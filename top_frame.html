@@ -1,4 +1,4 @@
-<!-- $Id: left_frame.html,v 1.12 2004/12/02 13:36:08 jz Exp $ -->
+<!-- $Id: top_frame.html,v 1.1 2004/12/02 13:36:40 jz Exp $ -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 
@@ -14,20 +14,28 @@
     </style>
 </head>
 
-<body class="left">
-<!--
-<p style="margin-bottom: 10pt; margin-top: 0; padding-top: 0; padding-bottom: 3pt">
-    <input id="update_periodically_checkbox" type="checkbox" onclick="update_periodically_checkbox__onclick()" NAME="update_periodically_checkbox"/>
-    <label for="update_periodically_checkbox"><span class="translate">Update periodically</span></label>
-    &#160; &#160;
-    <input id="update_button" class="button" type="button" value="Update" onclick="update__onclick()" NAME="update_button"/>    
-</p>
-//-->
-<span id="error_message" style="font-weight: bold; color: red"></span>
+
+<body class="top">
+
+    <table cellspacing="0" cellpadding="0" border="0" class="update" align="center">
+        <tr>
+            <td align="right" width="54%" class="update">
+                <input id="update_periodically_checkbox" type="checkbox" onclick="update_periodically_checkbox__onclick()" NAME="update_periodically_checkbox"/>
+                <label for="update_periodically_checkbox"><span class="translate">Update periodically</span></label>&#160; &#160;
+            </td>
+            <td width="46%" class="update">
+                <input id="update_button" class="update_button" type="button" value="&nbsp;Update&nbsp;" onclick="update__onclick()" NAME="update_button"/> &#160;
+            </td>
+        </tr>
+    </table>        
+    <p class="after_update_space">&nbsp;</p>
+
+<!--<span id="error_message" style="font-weight: bold; color: red"></span>-->
+
 <span id="stylesheet_output"></span>
 
 <script defer="true" type="text/javascript" src="scheduler.js" ></script>
-<script defer="true" type="text/javascript" src="browser_dependencies.js"></script>
+<script defer="true" type="text/javascript" src="browser_dependencies.js" ></script>
 <!--script defer="true" type="text/javascript" src="translation_de.js"></script-->
 <script defer="true" type="text/javascript" src="popup_menu.js"></script>
 
@@ -48,7 +56,6 @@ var _show_card = "jobs";
 //var _show_job_chains      = false;
 //var _show_process_classes = false;
 var _checkbox_states = new Object();
-var _saved_frameset_cols;
 
 _checkbox_states[ "show_order_jobs_checkbox" ] = true;
 //var _update_periodically = false;
@@ -57,7 +64,9 @@ _checkbox_states[ "show_order_jobs_checkbox" ] = true;
 
 function do_onload()
 {
-    _stylesheet = new Stylesheet( "scheduler.xslt" );
+    check_browser();    
+    
+    _stylesheet = new Stylesheet( "scheduler_top.xslt" );
 
     window.parent.document.title = "Scheduler " + document.location.host;
     
@@ -71,7 +80,7 @@ function do_onload()
     }
     
     _scheduler = new Scheduler();
-    repeat_update( parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked, true );
+    repeat_update( document.getElementById( "update_periodically_checkbox" ).checked, true );
     scheduler_init();
 }
 
@@ -87,15 +96,16 @@ function do_onunload()
 function update_periodically_checkbox__onclick()
 {
     reset_error();
-    repeat_update( parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked, 
-                   parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked );
+    repeat_update( document.getElementById( "update_periodically_checkbox" ).checked, 
+                   document.getElementById( "update_periodically_checkbox" ).checked );
 }
 
 //--------------------------------------------------------------------------------------reset_error
 
 function reset_error()
 {
-    document.getElementById( "error_message" ).innerHTML = "";
+    parent.left_frame.document.getElementById( "error_message" ).innerHTML = "";
+        
     window.status = "";
 }
 
@@ -106,15 +116,15 @@ function repeat_update( repeat, call_update )
     reset_error();
     if( _timer != undefined )  window.clearTimeout( _timer ),  _timer = undefined;
     
-    //try
+    try
     {
         if( call_update )
         {
-            parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked = false;     
+            document.getElementById( "update_periodically_checkbox" ).checked = false;     
             update();
         }
     }
-    if(0)//catch( x )
+    catch( x )
     {   
         repeat = false;
         var msg = "";
@@ -128,12 +138,12 @@ function repeat_update( repeat, call_update )
         else
             msg = xml_encode( x );
             
-        document.getElementById( "error_message" ).innerHTML = msg;
+        parent.left_frame.document.getElementById( "error_message" ).innerHTML = msg;
     }    
 
     if( repeat )
     {
-        parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked = true;
+        document.getElementById( "update_periodically_checkbox" ).checked = true;
         set_update_timer();
     }
 }
@@ -188,8 +198,9 @@ function update()
     reset_error();
     update_jobs_frame();
     
-    //if( window.parent.details_frame.document.readyState == "complete" )
-    if( window.parent._details_frame_loaded )
+    window.parent.left_frame.update();
+
+    if( window.parent.details_frame.document.readyState == "complete" )
     {
         window.parent.details_frame.update();
     }
@@ -274,14 +285,14 @@ function show_card( what )
         {
             window.parent.details_frame.clear();
             
-            _saved_frameset_cols = window.parent.document.getElementById( "left_and_right_frameset" ).cols; 
-            window.parent.document.getElementById( "left_and_right_frameset" ).cols = "100%, 0%";
+            //_saved_frameset_cols = window.parent.left_and_right_frameset.cols; 
+            //window.parent.left_and_right_frameset.cols = "100%, 0%";
         }
-        else
-        if( _saved_frameset_cols != undefined )
+        //else
+        //if( _saved_frameset_cols != undefined )
         {
-            window.parent.document.getElementById( "left_and_right_frameset" ).cols = _saved_frameset_cols;
-            _saved_frameset_cols = undefined;
+            //window.parent.left_and_right_frameset.cols = _saved_frameset_cols;
+            //_saved_frameset_cols = undefined;
         }
     
         _show_card = what;
@@ -322,6 +333,16 @@ function show_job_chain_details( job_chain_name )
 }
 
 //-------------------------------------------------------------------------------------------------
+/*
+Node.prototype.__defineGetter__( "xml", _Node_getXML );
+
+function _Node_getXML() 
+{
+    return new XMLSerializer().serializeToString( this );
+}
+Now, the Mozilla interface can use the xml attribute in the same way that IE uses it.
+
+*/
 --></script>
 
 
