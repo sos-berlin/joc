@@ -1,4 +1,4 @@
-<!-- $Id: details_frame.html,v 1.3 2004/08/02 14:14:58 jz Exp $ -->
+<!-- $Id: details_frame.html,v 1.4 2004/11/30 22:01:43 jz Exp $ -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 
@@ -42,7 +42,7 @@
 </p-->
 
 
-<xml id="stylesheet" src="scheduler.xslt"></xml>
+<span id="stylesheet_output"></span>
 
 <script defer="true" type="text/javascript" src="scheduler.js"></script>
 <script defer="true" type="text/javascript" src="popup_menu.js"></script>
@@ -67,19 +67,15 @@ var _saved_frameset_cols;
 
 function init()
 {
-    _job_element = undefined;
-    _job_name    = undefined;
-    _task_id     = undefined;
+    _job_element       = undefined;
+    _job_name          = undefined;
+    _task_id           = undefined;
     _job_chain_element = undefined;
 
     if( !_scheduler )
     {
         _scheduler = window.parent.left_frame._scheduler;
-        
-        _stylesheet = document.all.stylesheet.XMLDocument;
-        if( _stylesheet.parseError.errorCode )  throw new Error( "Fehler im Stylesheet:\n" + _stylesheet.parseError.reason );
-
-        document.all.stylesheet.outerHTML = "<span id='stylesheet'></span>";
+        _stylesheet = new Stylesheet( "scheduler.xslt" );
         
         scheduler_init();
     }
@@ -150,7 +146,7 @@ function show_task_details( job_element, task_element )
     //document.all.job_name.innerText = "Job " + _job_name;
     //document.all.job_title.innerText = job_title? job_title : "";
 
-    document.all.stylesheet.innerHTML = task_element.transformNode( _stylesheet );
+    document.getElementById( "stylesheet_output" ).innerHTML = _stylesheet.xml_transform( task_element );
     show();
 }
 
@@ -163,7 +159,7 @@ function show_job_details( job_element )
     _job_element = job_element;   
     _job_name    = job_element.getAttribute( "job" )
 
-    document.all.stylesheet.innerHTML = job_element.transformNode( _stylesheet );
+    document.getElementById( "stylesheet_output" ).innerHTML = _stylesheet.xml_transform( job_element );
     show();
 }
 
@@ -175,7 +171,7 @@ function show_job_chain_details( job_chain_element )
  
     _job_chain_element = job_chain_element
     
-    document.all.stylesheet.innerHTML = job_chain_element.transformNode( _stylesheet );
+    document.getElementById( "stylesheet_output" ).innerHTML = _stylesheet.xml_transform( job_chain_element );
     show();
 }
 
@@ -216,7 +212,7 @@ function update( force )
         var response = _scheduler.execute( "<show_task id='" + _task_id + "' what='all'/>" );
         
         var task_element = response.selectSingleNode( "spooler/answer/task" );
-        document.all.stylesheet.innerHTML = task_element? task_element.transformNode( _stylesheet ) : "";
+        document.getElementById( "stylesheet_output" ).innerHTML = task_element? _stylesheet.xml_transform( task_element ) : "";
 
         ok = true;
     }
@@ -227,7 +223,7 @@ function update( force )
         window.parent.left_frame.modify_response( response );
         
         _job_element = response.selectSingleNode( "spooler/answer/job" );
-        document.all.stylesheet.innerHTML = _job_element? _job_element.transformNode( _stylesheet ) : "";
+        document.getElementById( "stylesheet_output" ).innerHTML = _job_element? _stylesheet.xml_transform( _job_element ) : "";
 
         ok = true;
     }
@@ -240,7 +236,7 @@ function update( force )
         
         var job_chain_name = _job_chain_element.getAttribute( "name" );
         _job_chain_element = response.selectSingleNode( "//job_chain[ @name='" + job_chain_name + "' ]" );
-        document.all.stylesheet.innerHTML = _job_chain_element? _job_chain_element.transformNode( _stylesheet ) : "";
+        document.getElementById( "stylesheet_output" ).innerHTML = _job_chain_element? _stylesheet.xml_transform( _job_chain_element ) : "";
 
         ok = true;
     }
