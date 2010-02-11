@@ -1,66 +1,168 @@
-/*  $Id$ 
+body                            {font-family:Arial,Helvetica,Sans-Serif;font-size:12px;margin:0px;} 
+body.top                        {background-color:#FFFFFF;margin:6px 17px 0px 12px;}                         
+body.left                       {background-color:#FFFFFF;margin:0px 0px 0px 12px;}                         
+body.right                      {background-color:#FFFFFF;}                         
+body.error                      {background-color:#FFFFFF;margin:0px 17px 0px 12px;}                         
+body.corner                     {background-color:#FFFFFF;margin:0px 16px 0px -1px;}                         
+table                           {padding:0px;margin:0px;vertical-align:top;font-size:12px;color:#444444;}
+th                              {vertical-align:top;}
+td                              {padding:0px 1px;vertical-align:top;}
+td.top                          {padding:2px 0px 0px 0px;}
+input,select,option             {font-family:Arial,Helvetica,Sans-Serif;font-size:11px;margin:0px;}
+label                           {white-space:nowrap;}
+fieldset                        {border:1px solid #8B919F;padding:2px;font-size:12px;}
+a:hover       								  {color:#EA7A14;text-decoration:none;font-size:12px;}
+a:link        								  {color:#000066;text-decoration:none;font-size:12px;}
+a:visited        								{color:#000066;text-decoration:none;font-size:12px;}
 
-    STYLESHEET FÜR DEN SCHEDULER
+.small                          {font-size:11px;}
+.label                          {font-size:11px;white-space:nowrap;}
+.caption                        {font-size:16px;font-weight:bold;font-family:"Trebuchet MS",Arial,Helvetica,Sans-Serif;font-style:italic;color:#EA7A14;}       
+.red                            {color:darkred;}
+.file_based_error               {font-size:11px;color:darkred;}
+.job_error                      {font-size:11px;color:darkred;}
+.task                           {color:#009933;}
+.status_text                    {color:#009933;}
+.hover                          {background-color:#F2F5FA;}
+.head1                          {border-bottom:1px solid #8B919F;vertical-align:bottom;}
+.head                           {border-bottom:1px solid #8B919F;border-left:1px solid #8B919F;vertical-align:bottom;}
+.before_head_space              {margin-top:0px;margin-bottom:0px;line-height:6px;height:6px;}
+.link        								    {color:#000066;text-decoration:none;font-size:12px;}
+td.after_head_space1            {background-color:#CFD7EB;margin:0px;line-height:3px;height:3px;}
+td.after_head_space4            {background-color:#D4DBEE;margin:0px;line-height:1px;height:1px;}
+td.after_head_space5            {background-color:#DADFF0;margin:0px;line-height:1px;height:1px;}
+td.after_head_space6            {background-color:#DBE1F1;margin:0px;line-height:1px;height:1px;}
+td.after_head_space7            {background-color:#DEE3F4;margin:0px;line-height:1px;height:1px;}
+td.after_head_space8            {background-color:#E1E6F5;margin:0px;line-height:1px;height:1px;}
+td.after_head_space9            {background-color:#E5EAF5;margin:0px;line-height:2px;height:2px;}
+td.after_body_space1            {background-color:#CFD7EB;margin:0px;line-height:3px;height:3px;}
+td.after_body_space4            {background-color:#D4DBEE;margin:0px;line-height:1px;height:1px;}
+td.after_body_space5            {background-color:#DADFF0;margin:0px;line-height:1px;height:1px;}
+td.after_body_space6            {background-color:#DBE1F1;margin:0px;line-height:1px;height:1px;}
+td.after_body_space7            {background-color:#DEE3F4;margin:0px;line-height:1px;height:1px;}
+td.after_body_space8            {background-color:#E1E6F5;margin:0px;line-height:1px;height:1px;}
+td.after_body_space9            {background-color:#E5EAF5;margin:0px;line-height:2px;height:2px;}
+                                    
+div.outer                       {border:1px solid #8B919F;background-color:#CFD7EB;position:relative;}
+div.top                         {border:1px solid #8B919F;border-bottom:0px;background-color:#CFD7EB;position:relative;}
+div.middle                      {border-left:1px solid #8B919F;border-right:1px solid #8B919F;background-color:#CFD7EB;}
+div.bottom                      {border:1px solid #8B919F;border-top:0px;background-color:#CFD7EB;}
+div.rb                          {border-right:1px solid #F8F9FD;border-bottom:1px solid #F8F9FD;}
+#error_message                  {color:red;padding:0px 4px;font-size:12px;}
+#hide_button                    {display:none;position:absolute;bottom:10px;right:20px;z-index:5;background-color:#CFD7EB;}
+#backup                         {font-size:16px;font-weight:bold;font-style:italic;color:#EA7A14;}
+table.top                       {border:1px solid #F8F9FD;border-bottom:0px;}
+table.middle                    {border-left:1px solid #F8F9FD;border-right:1px solid #F8F9FD;}
+table.bottom                    {border:1px solid #F8F9FD;border-top:0px;}
+table.inner                     {border:1px solid #F8F9FD;}
+td.line                         {height:2px;line-height:2px;border-top:1px dashed #8B919F;}
+td.line_solid                   {height:2px;line-height:2px;border-top:1px solid #8B919F;}
+table.top tbody, table.middle tbody, table.bottom tbody, table.inner tbody {background-color:#E5EAF5;}
+
+/* round corners */
+#corner_tr, .corner_tl, .corner_tr, .corner_bl, .corner_br {width:4px;height:4px;padding:0px;border: 0px;z-index:5;}
+.corner_tl, .corner_bl          {float:left;clear:both;}
+#corner_tr, .corner_tr, .corner_br {float:right;clear:right;}
+.corner_tl                      {margin:0px;position:absolute;top:-1px;left:-1px;}
+.corner_tr                      {margin:0px;position:absolute;top:-1px;right:-1px;}
+.corner_bl                      {margin:-3px 0px 0px -1px;}
+.corner_br                      {margin:-3px -1px 0px 0px;}
+#corner_tr                      {margin:0px 0px 0px -1px;position:relative;top:30px;right:0px}
 
 
-    In der custom.css (im selben Verzeichnis) können Sie eigene Einstellungen vornehmen.
-*/
+/* Menu */
+div.button                      {display:block;cursor:pointer;padding:0px;white-space:nowrap;height:15px;vertical-align:top;text-align:center;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;font-weight:normal;font-size:11px;width:88px;background-color:#CFD7EB;color:#444444;}
+div.button:hover                {color:#EA7A14;}
+div.button a                    {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#444444; }
+div.button a:visited            {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#444444; }
+div.button a:hover              {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#EA7A14; }
+div.selectbox_menu              {width:88px;height:14px;overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;}
+div.selectbox_menu select       {cursor:pointer;position:relative;left:-3px;top:-1px;font-family:Arial,Helvetica,Sans-Serif;font-size:11px;font-weight:normal;width:160px;height:14px;margin:0px;padding:0px;background-color:#CFD7EB;border:0px;color:#444444;}
+div.selectbox_menu select:hover {color:#EA7A14;}
+div.selectbox_menu select.right {left:-70px;text-align:right;}
+div.selectbox_menu option       {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu;}
+div.selectbox_menu option.selected:hover {color:#EA7A14;}
+div.selectbox_extras              {width:88px;height:14px;overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;}
+div.selectbox_extras select       {cursor:pointer;position:relative;left:-3px;top:-1px;font-family:Arial,Helvetica,Sans-Serif;font-size:11px;font-weight:normal;width:160px;height:14px;margin:0px;padding:0px;background-color:#CFD7EB;border:0px;color:#444444;}
+div.selectbox_extras select:hover {color:#EA7A14;}
+div.selectbox_extras select.right {left:-70px;text-align:right; }
+div.selectbox_extras option       {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu;}
+div.selectbox_extras option.selected:hover {color:#EA7A14;}
 
+/* Tabs */
+ul.tabs                         {padding:0px; margin:4px 0px 0px 0px; list-style:none; height:32px; line-height:32px; background:transparent url(tab_b.gif); font-family:Arial,Helvetica,Sans-Serif; font-weight:bold;}
+ul.tabs li                      {float:left;cursor:pointer;}
+ul.tabs li span.inactive        {display:block; color:#666666; font-size:11px; text-decoration:none; padding:0px 0px 0px 4px;background: url(tab_l0.gif) no-repeat;}
+ul.tabs li span.inactive:hover  {color:#EA7A14;}
+ul.tabs li span.inactive span   {display:block; padding:0px 10px 0px 6px; background:url(tab_r0.gif) right top;}
+ul.tabs li span.inactive1       {display:block; color:#666666; font-size:11px; text-decoration:none; padding:0px 0px 0px 4px;background: url(tab_ll0.gif) no-repeat;}
+ul.tabs li span.inactive1:hover {color:#EA7A14;}
+ul.tabs li span.inactive1 span  {display:block; padding:0px 10px 0px 6px; background:url(tab_r0.gif) right top;}
+ul.tabs li span.active          {display:block; color:#EA7A14; font-size:12px; text-decoration:none; padding:0px 0px 0px 4px;background: url(tab_l.gif) no-repeat;}
+ul.tabs li span.active span     {display:block; padding:0px 10px 0px 6px; background:url(tab_r.gif) right top;}
+ul.tabs li span.active1         {display:block; color:#EA7A14; font-size:12px; text-decoration:none; padding:0px 0px 0px 4px;background: url(tab_ll.gif) no-repeat;}
+ul.tabs li span.active1 span    {display:block; padding:0px 10px 0px 6px; background:url(tab_r.gif) right top;}
+ul.tabs li a.inactive           {display:block; color:#666666; font-size:11px; text-decoration:none; padding:0px 0px 0px 4px;background: url(tab_l0.gif) no-repeat;}
+ul.tabs li a.inactive:hover     {color:#EA7A14;}
+ul.tabs li a.inactive span      {display:block; padding:0px 10px 0px 6px; background:url(tab_r0.gif) right top;}
+ul.tabs li a.inactive1          {display:block; color:#666666; font-size:11px; text-decoration:none; padding:0px 0px 0px 4px;background: url(tab_ll0.gif) no-repeat;}
+ul.tabs li a.inactive1:hover    {color:#EA7A14;}
+ul.tabs li a.inactive1 span     {display:block; padding:0px 10px 0px 6px; background:url(tab_r0.gif) right top;}
+ul.tabs li a.active             {display:block; color:#EA7A14; font-size:12px; text-decoration:none; padding:0px 0px 0px 4px;background: url(tab_l.gif) no-repeat;}
+ul.tabs li a.active span        {display:block; padding:0px 10px 0px 6px; background:url(tab_r.gif) right top;}
+ul.tabs li a.active1            {display:block; color:#EA7A14; font-size:12px; text-decoration:none; padding:0px 0px 0px 4px;background: url(tab_ll.gif) no-repeat;}
+ul.tabs li a.active1 span       {display:block; padding:0px 10px 0px 6px; background:url(tab_r.gif) right top;}
 
-body                    { font-family: Sans-Serif; font-size: 10pt; margin-top: 5pt; }
-th                      { font-size: 10pt; }
-td                      { font-size: 10pt; }
-p                       { font-size: 10pt; margin-top: 2ex; margin-bottom: 0; padding-left: 3pt; }
-label                   { font-size: 10pt; }
-/*col                   { padding-bottom: 1pt; padding-left: 3pt; padding-right: 2pt }  /* wirkt nicht in Firefox */
-td                      { padding-bottom: 1pt; padding-left: 3pt; padding-right: 2pt } 
-caption                 { font-size: 10pt; padding-bottom: 5pt; padding-left: 3pt; padding-right: 2pt; padding-top: 2pt }
+/* Dialog for Inputs of menu functions */
+.input                          {padding:0px;margin:0px;font-size:12px;}
+div.shadow1                     {display:none;position:absolute;background-color:#333333;left:34px;top:78px;z-index:18;-moz-opacity:0.4;}
+div.shadow2                     {display:none;position:absolute;background-color:#AAAAAA;left:32px;top:76px;z-index:19;-moz-opacity:0.4;}
+div.input                       {background-color:#F2F5FA;border:1px solid #8B919F;display:none;position:absolute;top:70px;left:26px;z-index:20;}
+div.inner_input                 {padding:0px;margin:0px;border:1px solid white;} 
+div.inner_input tbody           {background-color:#F2F5FA;} 
+div.inner_input th, div.inner_input div.inner td {padding-left:1px;padding-right:1px;vertical-align:middle; }
+div.inner_input th.input_title  {font-size:12px;font-weight:bold;color:#808080;text-align:center;white-space:nowrap; }  
+div.inner_input input, div.inner_input select, div.inner_input option {font-size:11px;}
+div.inner_input textarea        {font-size:12px;}
+div.inner_input input.buttonbar {padding:0px 1px;margin:0px 1px;font-size:11px;background-color:#E5EAF5;border:1px outset #FFFFFF;color:#444444; }
+button.arrows                   {padding:0px;margin:0px;font-size:14px;background-color:#E5EAF5;border:1px outset #FFFFFF;color:#444444;width:20px;height:20px;text-align:center;vertical-align:middle; }
 
+/* For Protocol */
+body.log                        {margin-left:0;padding-left:0}
+pre.log                         {font-family:"Lucida Console",monospace;font-size:12px;line-height:1.1em;margin-left:2px;padding-left:0}
+.log_error                      {color:red;}
+.log_warn                       {color:tomato;}
+.log_info                       {color:black;}
+.log_debug                      {color:darkgreen;}
+.log_debug2                     {color:#408040;}
+.log_debug3                     {color:#808080;}
+.log_debug4                     {color:#8080FF;}
+.log_debug5                     {color:#8080FF;}
+.log_debug6                     {color:#8080FF;}
+.log_debug7                     {color:#8080FF;}
+.log_debug8                     {color:#8080FF;}
+.log_debug9                     {color:#a0a0a0;}  
 
-.small                  { font-size: 8pt }
-.label                  { font-size: 8pt; white-space: nowrap }
+/*Style of the compact displaying for Multi-Monitoring*/
+/*body.titlebar                   {margin:0px;background-color:#F2F4F7;}*/
+body.titlebar                   {margin:0px;}
+img.titlebar                    {margin-right:4px;margin-bottom:1px;}
+table.titlebar                  {background-image:url('head.gif');background-repeat:repeat-x;}
+tr.titlebar                     {color:#FFFFFF;}
+td.titlebar                     {font-size:12px; font-family:Arial,Helvetica,sans-serif;white-space:nowrap;}
+a.titlebar:link                 {color:#FFFFFF;font-weight:bold;}
+a.titlebar:visited              {color:#FFFFFF;font-weight:bold;}
+a.titlebar:hover                {color:#FFFF66;font-weight:bold;}
+div.selectbox_titlebar_menu              {width:41px;height:10px;overflow:hidden;position:relative; top:3px;}
+div.selectbox_titlebar_menu select       {cursor:pointer;position:relative;left:-8px;top:-6px;color:#FFFFFF;font-family:Arial,Helvetica,Sans-Serif;font-size:12px;font-weight: bold;width:90px;height:18px;margin:0px;padding:0px;background-color:#0162FA;}
+div.selectbox_titlebar_menu select:hover {color:#FFFF66;}
+div.selectbox_titlebar_menu option       {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu; }
+div.selectbox_titlebar_menu option.selected:hover {color:#FFFF66;}
+div.selectbox_titlebar_extras            {width:46px;height:10px;overflow:hidden;position:relative; top:3px;}
+div.selectbox_titlebar_extras select     {cursor:pointer;position:relative;left:-8px;top:-6px;color:#FFFFFF;font-family:Arial,Helvetica,Sans-Serif;font-size:12px;font-weight: bold;width:90px;height:18px;margin:0px;padding:0px;background-color:#0162FA;}
+div.selectbox_titlebar_extras select:hover {color:#FFFF66;}
+div.selectbox_titlebar_extras option     {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu; }
+div.selectbox_titlebar_extras option.selected:hover {color:#FFFF66;}
 
-/* Job-Description */
-div.description         {}
-
-th.head1, td.head1      { padding-right: 2pt; border-bottom: 1px solid black; }
-th.head , td.head       { padding-right: 2pt; border-bottom: 1px solid black; border-left: 1px solid black; }
-
-td.after_head_space     { margin-top: 0; margin-bottom: 0pt; line-height: 4pt; }
-
-
-/* Allgemeiner Scheduler-Zustand */
-.scheduler              { background-color: #F0F0F0 }
-
-.job                    { font-size: 10pt; background-color: #00c8ff } /*#fff000*/
-.job_error              { color: darkred }
-
-.task                   { font-size: 10pt; background-color: #90EE90 }  /*#FFFFA0*/
-.task_hover             { font-size: 10pt; background-color: #90EE90; text-decoration: underline }
-                      
-.order                  { font-size: 10pt; background-color: #ffffe0 }  /*#f0ffff*/
-                        
-.job_chain              { font-size: 10pt; background-color: powderblue }
-
-.process_class          { background-color: #F0F0F0 }
-
-/* Anklickbar */
-.hover                  { text-decoration: underline }
-
-
-/* Fürs Protokoll */
-body.log                { margin-left: 0; padding-left: 0 }
-pre.log                 { font-family: Lucida Console, monospace; font-size: 9pt; line-height: 1.1em; margin-left: 2px; padding-left: 0 }
-
-.log_error              { color: Red; }
-.log_warn               { color: tomato; }
-.log_info               { color: black; }
-.log_debug              { color: darkgreen; }
-.log_debug2             { color: #408040; }
-.log_debug3             { color: #808080; }
-.log_debug4             { color: #8080FF; }
-.log_debug5             { color: #8080FF; }
-.log_debug6             { color: #8080FF; }
-.log_debug7             { color: #8080FF; }
-.log_debug8             { color: #8080FF; }
-.log_debug9             { color: #a0a0a0; }
+    
+    

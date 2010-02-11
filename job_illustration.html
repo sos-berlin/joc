@@ -1,0 +1,292 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+/********************************************************* begin of preamble
+**
+** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** All rights reserved.
+**
+** This file may be used under the terms of either the 
+**
+**   GNU General Public License version 2.0 (GPL)
+**
+**   as published by the Free Software Foundation
+**   http://www.gnu.org/licenses/gpl-2.0.txt and appearing in the file
+**   LICENSE.GPL included in the packaging of this file. 
+**
+** or the
+**  
+**   Agreement for Purchase and Licensing
+**
+**   as offered by Software- und Organisations-Service GmbH
+**   in the respective terms of supply that ship with this file.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+** IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+** THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+** PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+** BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+********************************************************** end of preamble*/
+//-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Job Scheduler - Job Illustration</title>
+    <script type="text/javascript" src="scheduler_init.js"></script>
+    <script type="text/javascript" src="scheduler.js"></script>
+    <script type="text/javascript" src="browser_dependencies.js"></script>
+    <script type="text/javascript" src="sos_logger.js"></script>
+    <script type="text/javascript" src="SOS_JobGraph.js"></script>
+    <script type="text/javascript" src="wz_jsgraphics.js"></script>
+    <script type="text/javascript" language="javascript"><!--
+//-------------------------------------------------------------------------------------------------
+
+var _scheduler;
+var _inherited_scheduler = true;
+var error_div;
+var _job_name;
+
+window.onload = function()
+{   
+
+    if( window.name == "" ) window.name = "scheduler_job_illustration";
+    if( !_scheduler ) {  
+      if( window.opener && window.opener._scheduler ) {
+        _scheduler = window.opener._scheduler;
+      } else {
+        _scheduler = new Scheduler();
+        _inherited_scheduler = false; 
+      }
+    }       
+    try {
+      _job_name  = window.opener.left_frame._job_name;
+    } catch(E) {
+      _job_name  = "";
+    }
+    error_div = document.getElementById('error');
+    illu_show();
+}
+
+window.onunload = function()
+{
+    if( !_inherited_scheduler && _scheduler ) {
+      _scheduler.close();
+    }
+}    
+    
+//-----------------------------------------------------------------------------show_job_illustration
+    
+function illu_show()
+{   
+    var jobname = _job_name;
+
+    try {
+      var response      = _scheduler.execute( "<show_state what='job_commands'/>", false, true, true ); 
+      showGraph (response,jobname);
+      if( document.getElementById("jobscheduler").innerHTML == "" ) {
+        throw new Error( "unknown error - please close this window, reload the calling window and try it again" );
+      }
+      return true;
+    }
+    catch( x ) {
+      return show_error( x );
+    }
+}
+
+//-----------------------------------------------------------------------------show_error
+
+function show_error( x )
+{
+    if( error_div ) {
+      error_div.style.display = "block";
+      error_div.innerHTML = x.message.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace( /\"/g, "&quot;" ).replace( /\'/g, "&#039;" ).replace( /\n/g, "<br/>" ).replace( "  ", "\xA0 " );
+    } else {
+      alert( x.message );
+    }
+    return false;
+}
+
+
+//-----------------------------------------------------------------------------showGraph
+
+	function showGraph (dom,jobname){
+ 
+    var jg = new jsGraphics("jobscheduler");
+    var jobs = new Array();
+    var j_index=0;
+    var max_length=0;
+    var max_exitLength=0;
+   
+    g = new SOS_JobGraph(jg);
+   
+    g.JobDefaultWidth = 140;
+    g.JobDefaultheight = 70;
+    g.JobYDistance = 80;
+    g.JobXDistance = 300;
+    g.ExitcodeWidth = 90;
+    g.ExitcodeHeight = 30;
+    
+     
+    var jobsNode = null;
+    jobsNode = dom.selectSingleNode( "spooler/answer/state/jobs" );
+    
+// Jobs anlegen    
+		childnodes = jobsNode.childNodes;
+		for (var i=0; i<childnodes.length; i++) {
+			if ( childnodes[i].nodeName=="job" ) {
+				aktjob = childnodes[i];
+				s = aktjob.getAttribute("path");
+			 
+				if (s.length>max_length)max_length=s.length;
+      	jobs[j_index] = new SOS_Job(s);
+    	  j_index = j_index+1;
+	 			}
+		}
+		if ( jobsNode==null ) throw ("XMLDOM: missing element \'<spooler>\'");
+
+// Exitcodes registrieren
+
+		childnodes = jobsNode.childNodes;
+		for (var i=0; i<childnodes.length; i++) {
+			if ( childnodes[i].nodeName=="job" ) {
+				aktjob = childnodes[i];
+         for (k=0;k<jobs.length;k++){
+     		  	if (jobs[k].name == aktjob.getAttribute("path")){
+     		   		pred = jobs[k];
+     		   		break;
+     		   	}
+     		 }
+     		 
+     		
+     	
+    		child_exitnodes = aktjob.childNodes;
+		    for (var ii=0; ii<child_exitnodes.length; ii++) {
+
+     			if ( child_exitnodes[ii].nodeName=="commands" ) {
+
+            aktexit = child_exitnodes[ii];
+                        
+     				aktCode = aktexit.getAttribute("on_exit_code");
+ 
+         		child_startnodes = aktexit.childNodes;
+            first=true;
+
+		        for (var iii=0; iii<child_startnodes.length; iii++) {
+		        	var succ=null;
+     		    	if ( child_startnodes[iii].nodeName=="start_job" ) {
+     		     
+                aktstart = child_startnodes[iii];
+     				    aktJob = aktstart.getAttribute("job");
+     				    for (k=0;k<jobs.length;k++){
+     				    	if (jobs[k].name == aktJob){
+     				    		succ = jobs[k];
+     				    		break;
+     				    	}
+     				    }
+             if (succ==null){
+      		       	succ = new SOS_Job(aktJob + "(unknown)");
+      		       	jobs[j_index] = succ;
+      		       	succ.isSucc = true;
+      		       	j_index = j_index+1;
+             }
+                //alert (pred.name + ".addExitcode(" + aktCode+"," +succ.name + ")");
+                if (aktCode.length>max_exitLength)max_exitLength=aktCode.length;
+                if (first ){
+	                   pred.addExitcode(g,aktCode,succ);
+ 	                  first=false;
+  	            }else{
+                	 
+   	                 pred.addNextExitcode(g,aktCode,succ);
+   	             
+ 	              }
+         			}
+	    	    }
+     			}
+		    }
+	 		}
+		}
+
+
+
+    for (i=0;i<jobs.length;i++){
+    	g.add(jobs[i]);    			
+    }
+    
+    g.JobDefaultWidth = 8*max_length-20;
+    g.JobDefaultheight = 30;
+    g.JobYDistance = 60;
+
+    g.ExitcodeWidth = 8*max_exitLength+10;
+    g.ExitcodeHeight = 20;
+
+    g.JobXDistance = g.JobDefaultWidth+ g.ExitcodeWidth+80;
+    g.headersize=555;
+    showHeader(dom,jg,jobname);
+     
+    g.show(jobname);
+
+  }
+  
+ function showHeader(dom,jg,jobname){
+  	
+  	
+  	var stateNode = null;
+    stateNode = dom.selectSingleNode( "spooler/answer/state" );    	
+    if ( stateNode==null ) throw ("XMLDOM: missing element \'<spooler>\'");
+    var scheduler_id = stateNode.getAttribute( "id" );
+    var scheduler_host = stateNode.getAttribute( "host" );
+    var scheduler_port = stateNode.getAttribute( "tcp_port" );
+    var scheduler_time = stateNode.getAttribute( "time" );
+   
+  	
+  	
+	  g.headersize=54;
+    
+    f = new SOS_Font("lucida console");
+    f.font_size="10";
+    f.font_unit="pt";
+    f.font_mode= Font.BOLD;
+    f.font_colour="#000000";    
+    
+     g.textOut(f,30,-1,"Scheduler ID: " + scheduler_id);
+     g.textOut(f,30,-1,"Host: " + scheduler_host);
+     g.textOut(f,30,-1,"Port: " + scheduler_port);
+     g.textOut(f,30,-1,"Date: " + scheduler_time);
+     g.yOffset = 84;
+     if (typeof jobname != "undefined" && jobname != ""){
+        g.textOut(f,30,-1,""); 
+        g.textOut(f,30,-1,"Dependencies for Job: " + jobname);
+        g.yOffset = g.yOffset + g.linesize;
+
+     }
+     
+     var from = new SOS_Point(0,0);
+     var to = new SOS_Point(0,0);
+        
+     from.x = 30
+     from.y =g.yOffset+g.headersize;
+            
+     var windowWidth = ( typeof window.innerWidth == "undefined" ) ? window.document.body.clientWidth : window.innerWidth;
+     to.x = windowWidth - from.x;
+     to.y = from.y;
+            
+     var l = new SOS_Line(from,to);
+     l.show(jg);
+     
+     g.linesize = 24
+  }
+ 
+  
+//-->
+    </script>
+</head>
+<body style="background-color:#F6F6FF">
+   <div id="error" style="color:red;display:none;padding-left:10px;padding-right:10px;"></div>
+	 <div id="jobscheduler" style="position:relative;top:-36pt;left:-10pt;width:100%;height:100%;"></div>
+</body>
+</html>

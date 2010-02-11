@@ -1,0 +1,492 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+/********************************************************* begin of preamble
+**
+** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** All rights reserved.
+**
+** This file may be used under the terms of either the 
+**
+**   GNU General Public License version 2.0 (GPL)
+**
+**   as published by the Free Software Foundation
+**   http://www.gnu.org/licenses/gpl-2.0.txt and appearing in the file
+**   LICENSE.GPL included in the packaging of this file. 
+**
+** or the
+**  
+**   Agreement for Purchase and Licensing
+**
+**   as offered by Software- und Organisations-Service GmbH
+**   in the respective terms of supply that ship with this file.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+** IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+** THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+** PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+** BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+********************************************************** end of preamble*/
+//-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Job Scheduler - Job Chain Illustration</title>
+    <script type="text/javascript" src="scheduler_init.js"></script>
+    <script type="text/javascript" src="scheduler.js"></script>
+    <script type="text/javascript" src="browser_dependencies.js"></script>
+    <script type="text/javascript" src="sos_logger.js"></script>
+    <script type="text/javascript" src="SOS_JobGraph.js"></script>
+    <script type="text/javascript" src="wz_jsgraphics.js"></script>
+    <script type="text/javascript" language="javascript"><!--
+//-------------------------------------------------------------------------------------------------
+
+var _scheduler;
+var _inherited_scheduler = true;
+var error_div;
+var _job_chain_name;
+var jobs           = new Object();
+var max_exitLength = 0;
+var chains         = new Object();
+var legendeReady   = false;
+
+window.onload = function()
+{   
+    if( window.name == "" ) window.name = "show_job_chain_illustration";
+    if( !_scheduler ) {
+      if( window.opener && window.opener._scheduler ) {
+        _scheduler = window.opener._scheduler;
+      } else {
+        _scheduler = new Scheduler();
+        _inherited_scheduler = false; 
+      }
+    }
+    try {
+      _job_chain_name  = window.opener.left_frame._job_chain;
+    } catch(E) {
+      _job_chain_name  = "";
+    }
+    error_div = document.getElementById('error');
+    illu_show();
+}
+
+window.onunload = function()
+{
+    if( !_inherited_scheduler && _scheduler ) {
+      _scheduler.close();
+    }
+}    
+    
+//-----------------------------------------------------------------------------show_job_illustration
+    
+function illu_show() 
+{   
+    var jobchain = _job_chain_name; 
+    try {
+      var response      = _scheduler.execute( "<show_state what='job_commands,job_chains'/>", false, true, true ); 
+      showGraph (response,jobchain);
+      if( document.getElementById("jobscheduler").innerHTML == "" ) {
+        throw new Error( "unknown error - please close this window, reload the calling window and try it again" );
+      }
+      return true;
+    }
+    catch( x ) {
+      return show_error( x );
+    }
+}
+
+//-----------------------------------------------------------------------------show_error
+
+function show_error( x )
+{
+    if( error_div ) {
+      error_div.style.display = "block";
+      error_div.innerHTML = x.message.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace( /\"/g, "&quot;" ).replace( /\'/g, "&#039;" ).replace( /\n/g, "<br/>" ).replace( "  ", "\xA0 " );
+    } else {
+      alert( x.message );
+    }
+    return false;
+}
+
+
+//-----------------------------------------------------------------------------showGraph
+
+function addJob (jobname,jobchain){
+	 var aktJob = null;
+   for (var name in jobs){
+    	
+     	if (jobs[name].jobname == jobname){
+          	aktJob = jobs[name];
+       }
+    
+    }    
+    if (aktJob == null ){
+     
+     	jobs[jobname] = new SOS_Job(jobname  );
+      jobs[jobname].jobchain = jobchain;
+     	aktJob = jobs[jobname];
+    	}
+     	
+    
+ 
+   	if (aktJob.jobname == "Endnode" || aktJob.jobname == ""){
+     		aktJob.showrec = false;
+      	}
+  	
+    return aktJob;
+}
+
+  function showHeader(dom,jg){
+  	
+  	
+  	var stateNode = null;
+    stateNode = dom.selectSingleNode( "spooler/answer/state" );    	
+    if ( stateNode==null ) throw ("XMLDOM: missing element \'<spooler>\'");
+    var scheduler_id = stateNode.getAttribute( "id" );
+    var scheduler_host = stateNode.getAttribute( "host" );
+    var scheduler_port = stateNode.getAttribute( "tcp_port" );
+    var scheduler_time = stateNode.getAttribute( "time" );
+   
+  	
+  	
+	  g.headersize=54;
+    
+    f = new SOS_Font("lucida console");
+    f.font_size="10";
+    f.font_unit="pt";
+    f.font_mode= Font.BOLD;
+    f.font_colour="#000000";    
+    
+     g.textOut(f,30,-1,"Scheduler ID: " + scheduler_id);
+     g.textOut(f,30,-1,"Host: " + scheduler_host);
+     g.textOut(f,30,-1,"Port: " + scheduler_port);
+     g.textOut(f,30,-1,"Date: " + scheduler_time);
+     
+     var from = new SOS_Point(0,0);
+     var to = new SOS_Point(0,0);
+        
+     from.x = 30
+     from.y =g.yOffset+g.headersize;
+            
+     var windowWidth = ( typeof window.innerWidth == "undefined" ) ? window.document.body.clientWidth : window.innerWidth;
+     to.x = windowWidth - from.x;
+     to.y = from.y;
+            
+     var l = new SOS_Line(from,to);
+     l.show(jg);
+      
+     g.linesize = 24
+     g.yOffset = 84;
+  }
+
+
+ function showHeader2(dom,jg){
+    ew = max_exitLength;
+    if (ew < 7) ew = 7;
+    ewl = 8*ew+10
+
+//Legende
+     legendeReady = true;
+     var from = new SOS_Point(0,0);
+     var to = new SOS_Point(0,0);
+      
+      x = 400;
+      y = 56;
+      p = new SOS_Point(x,y);
+      exitcode = new SOS_ExitCodeRectangle("success", p,ewl,g.ExitcodeHeight );
+      exitcode.show(jg);
+      f.font_size=8;
+      f.font_mode = Font.Plain;
+      g.textOut(f,x,y + 5 + g.ExitcodeHeight,"Job<br>exit code");
+
+      x = x + 40 + g.ExitcodeWidth;
+      p = new SOS_Point(x,y);
+      exitcode = new SOS_ExitCodeRectangle("100", p,ewl,g.ExitcodeHeight );
+      exitcode.rectangle.backgroundColour = "#AABBCC";
+      exitcode.show(jg);
+      f.font_size=8;
+      f.font_mode = Font.Plain;
+      g.textOut(f,x,y + 5 + g.ExitcodeHeight,"Job chain<br>next state");
+
+      x = x + 40 + g.ExitcodeWidth;
+      p = new SOS_Point(x,y);
+      exitcode.rectangle.caption = "200";
+      exitcode.rectangle.point = p;
+      exitcode.rectangle.stroke_width = 2;
+      exitcode.show(jg);
+      f.font_size=8;
+      f.font_mode = Font.Plain;
+      g.textOut(f,x,y + 5 + g.ExitcodeHeight,"Job chain<br>end state");
+
+      x = x + 40 + g.ExitcodeWidth;
+      p = new SOS_Point(x,y);
+      exitcode.rectangle.caption = "1200";
+      exitcode.rectangle.backgroundColour = "#fe6c01";
+      exitcode.rectangle.point = p;
+      exitcode.show(jg);
+      f.font_size=8;
+      f.font_mode = Font.Plain;
+      g.textOut(f,x,y + 5 + g.ExitcodeHeight,"Job chain<br>error state");
+      jg.paint();
+  }
+
+
+	function showGraph (dom,jobchain){
+ 
+    var jg = new jsGraphics("jobscheduler");
+    
+    g = new SOS_JobGraph(jg);
+   
+    g.JobDefaultWidth = 140;
+    g.JobDefaultheight = 70;
+    g.JobYDistance = 80;
+    g.JobXDistance = 300;
+    g.ExitcodeWidth = 90;
+    g.ExitcodeHeight = 30;
+  
+    showHeader(dom,jg)
+     
+     
+    var jobsNode = null;
+    jobsNode = dom.selectSingleNode( "spooler/answer/state/jobs" );    	
+    if ( jobsNode==null ) throw ("XMLDOM: missing element \'<spooler>\'");
+    
+    
+    
+    var jobchainNode = null;
+    jobchainNode = dom.selectSingleNode( "spooler/answer/state/job_chains" );
+    
+// Jobchains auslesen anlegen    
+		childnodes = jobchainNode.childNodes;
+		for (var k=0; k<childnodes.length; k++) {
+			if ( childnodes[k].nodeName=="job_chain" ) {
+				chain = childnodes[k];
+				jobchainName = chain.getAttribute("path");
+			 
+				
+        var aktChain = new SOS_JobChain(jobchainName);
+ 					child_chainnodes = chain.childNodes;
+      		for (var ii=0; ii<child_chainnodes.length; ii++) {
+      			if ( child_chainnodes[ii].nodeName=="job_chain_node" ) {
+      				aktnode = child_chainnodes[ii];
+     	  			j = aktnode.getAttribute("job");
+     	  			if (j != "<END_STATE>") {
+     	  			if (j == "/scheduler_file_order_sink") j = "File Sink"
+     	  			if (j==null) j = "Endnode";
+      				state = aktnode.getAttribute("state");
+      			
+      				error_state = aktnode.getAttribute("error_state");
+      			 
+      				if (error_state == state)error_state = "";
+
+			      	next_state = aktnode.getAttribute("next_state");
+      				if (j == "") j = "Endnode";
+ 			        aktChainNode = new SOS_JobChainNode(state, next_state, error_state,j );
+ 			        aktChain.add(aktChainNode);
+ 			      }
+      	  	}      			
+          }
+        
+          chains[jobchainName] = aktChain;
+        
+         }
+        }
+
+
+// Jobs der Jobchain anlegen.
+     g.headersize=64;
+     for (var chainname in chains){
+          g.jobs = new Object();
+          var init=false;
+         	aktChain = chains[chainname];
+         
+         
+         	aktChain.sortNodes();
+       
+        	jobs[chainname] = new SOS_Job(chainname);
+        	jobs[chainname].jobchain = chainname;
+        	starterNode = jobs[chainname];
+          minStateJob =null;
+           for (var chainnode in aktChain.nodes){
+            	aktChainnode = aktChain.nodes[chainnode];
+              aktJob = addJob(aktChainnode.job,chainname);
+              
+              if (minStateJob == null){
+                  for (var chainnode2 in aktChain.nodes){
+                    	c = aktChain.nodes[chainnode2];
+                    	if (c.next_state==aktChainnode.state ){
+                     		found = true;
+                        minStateJob = jobs[c.job];                    		
+                    		minState = c.state;
+                    	}
+                  }
+              }
+
+             if (minStateJob != null && !init){
+               starterNode.addOrderstate(g,minState,minStateJob,"#AABBCC");
+           	   starterNode.showrec = false;
+           	   init = true
+             }
+
+            	 
+              nextJobname = aktChain.getJobname(aktChainnode.next_state);
+             	nextJob= addJob(nextJobname,chainname);
+                  
+              if (aktChainnode.next_state != null && nextJob != null && aktChainnode.next_state != aktChainnode.state && aktChainnode.next_state != aktChainnode.error_state){
+                // alert (chainname + ":" + aktJob.jobname + "->" + aktChainnode.next_state + " " + nextJob.jobname);
+               	aktJob.addOrderstate(g,aktChainnode.next_state,nextJob,"#AABBCC");
+                if (aktChainnode.next_state.length>max_exitLength)	max_exitLength=aktChainnode.next_state.length;               
+                if (aktChainnode.error.length>max_exitLength)max_exitLength=aktChainnode.error.length;            		
+              }
+             	
+            
+               errorJobname = aktChain.getJobname(aktChainnode.error);
+                
+               if (errorJobname != ""){
+    	              errorJob = addJob(errorJobname,chainname);
+    	              
+                  if (aktChainnode.error != null){
+                    s = "Error:"+aktChainnode.error;
+                    s = aktChainnode.error;
+                   	aktJob.addOrderstate(g,s,errorJob,"#fe6c01");
+  
+                    if (s.length>max_exitLength)max_exitLength=s.length;            		
+                }
+           	  }
+          	}
+          
+          if (minStateJob != null){
+       
+            if (minState.length>max_exitLength)max_exitLength=minState.length;     
+
+             if (chainname == jobchain || typeof jobchain == "undefined" || jobchain == ""){
+              buildJobs(dom);
+              show(chainname,dom);
+             }
+             g.headersize=64;
+             jobs = new Object();
+          }
+        }
+        g.ExitcodeHeight = 30;
+        showHeader2(dom,g.jg); 
+  }
+
+ function show(jobchain,dom){
+   for (var name in jobs){    	           		
+   	if (jobs[name].name != ""){
+     	g.add(jobs[name]);  
+     }
+    }
+ 
+   g.JobDefaultheight = 30;
+   g.JobYDistance = 60;
+   g.ExitcodeWidth = 8*max_exitLength+10;
+   g.ExitcodeHeight = 20;
+
+   g.JobXDistance = g.JobDefaultWidth+ g.ExitcodeWidth+80;
+   g.setMoveleft(true);
+  
+  
+
+   
+   f = new SOS_Font("lucida console");
+   f.font_size="8";
+   f.font_unit="pt";
+   f.font_mode= Font.BOLD;
+   f.font_colour="#000000";       
+   
+   g.textOut(f,30,-1,"Job chain: " + jobchain);
+   g.show(jobchain);
+ }
+  
+ function buildJobs(dom){
+ 	// Jobs anlegen    
+	 var jobsNode = null;
+    jobsNode = dom.selectSingleNode( "spooler/answer/state/jobs" );    	
+    if ( jobsNode==null ) throw ("XMLDOM: missing element \'<spooler>\'");
+    
+    
+ 		childnodes = jobsNode.childNodes;
+		for (var i=0; i<childnodes.length; i++) {
+
+			if ( childnodes[i].nodeName=="job" ) {
+				aktjob = childnodes[i];
+				s = aktjob.getAttribute("path");
+				if (jobs[s] == undefined){
+				 	  jobs[s] = new SOS_Job(s);
+          }
+ 	 			}
+		}
+ 
+
+// Exitcodes registrieren
+
+ 	childnodes = jobsNode.childNodes;
+		for (var i=0; i<childnodes.length; i++) {
+			if ( childnodes[i].nodeName=="job" ) {
+				aktjob = childnodes[i];
+         for (var name in jobs){
+         
+     		  	if (jobs[name].name == aktjob.getAttribute("path")){
+     		   		pred = jobs[name];
+     		   		break;
+     		   	}
+     		 }
+     		 
+     		
+     	
+    		child_exitnodes = aktjob.childNodes;
+		    for (var ii=0; ii<child_exitnodes.length; ii++) {
+
+     			if ( child_exitnodes[ii].nodeName=="commands" ) {
+
+            aktexit = child_exitnodes[ii];
+                        
+     				aktCode = aktexit.getAttribute("on_exit_code");
+
+         		child_startnodes = aktexit.childNodes;
+            first=true;
+
+		        for (var iii=0; iii<child_startnodes.length; iii++) {
+		        	var succ=null;
+     		    	if ( child_startnodes[iii].nodeName=="start_job" ) {
+                aktstart = child_startnodes[iii];
+     				    aktJob = aktstart.getAttribute("path");     				    
+     				    for (var name2 in jobs){
+     				    	if (jobs[name2].name == aktJob){
+     				    		succ = jobs[name2];
+     				    		break;
+     				    	}
+     				    }
+             if (succ==null){
+      		       	succ = new SOS_Job(aktJob + "(unknown)");
+      		       	jobs[succ] = succ;
+      		       	succ.isSucc = true;
+             }
+                if (aktCode.length>max_exitLength)max_exitLength=aktCode.length;
+                if (first ){
+	                   pred.addExitcode(g,aktCode,succ);
+ 	                   first=false;
+  	            }else{
+   	                 pred.addNextExitcode(g,aktCode,succ);
+ 	              }
+         			}
+	    	    }
+     			}
+		    }
+			}
+		}
+  }
+//-->
+    </script>
+</head>
+<body style="background-color:#F6F6FF">
+   <div id="error" style="color:red;display:none;padding-left:10px;padding-right:10px;"></div>
+	 <div id="jobscheduler" style="position:relative;top:-36pt;left:-10pt;width:100%;height:100%;"></div>
+</body>
+</html>

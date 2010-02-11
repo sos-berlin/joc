@@ -1,355 +1,417 @@
-<!-- $Id$ -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+/********************************************************* begin of preamble
+**
+** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** All rights reserved.
+**
+** This file may be used under the terms of either the 
+**
+**   GNU General Public License version 2.0 (GPL)
+**
+**   as published by the Free Software Foundation
+**   http://www.gnu.org/licenses/gpl-2.0.txt and appearing in the file
+**   LICENSE.GPL included in the packaging of this file. 
+**
+** or the
+**  
+**   Agreement for Purchase and Licensing
+**
+**   as offered by Software- und Organisations-Service GmbH
+**   in the respective terms of supply that ship with this file.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+** IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+** THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+** PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+** BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+********************************************************** end of preamble*/
+//-->
 <html>
 
 <head>
-    <meta name="vs_targetSchema"    content="http://schemas.microsoft.com/intellisense/ie5"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <title>Scheduler</title>
+    <title>Job Scheduler</title>
 
-    <style type="text/css">
-        @import "scheduler.css";
-        @import "custom.css";
-    </style>
-</head>
+<style type="text/css">
+    @import url("scheduler.css");
+</style>
 
+<script type="text/javascript" src="scheduler_dialog.js"></script>
+<script type="text/javascript" src="browser_dependencies.js"></script>
+<script type="text/javascript" src="popup_menu.js"></script>
 
-<body class="top">
-
-    <table cellspacing="0" cellpadding="0" border="0" class="update" align="center">
-        <tr>
-            <td align="right" width="54%" class="update">
-                <input id="update_periodically_checkbox" type="checkbox" onclick="update_periodically_checkbox__onclick()" NAME="update_periodically_checkbox"/>
-                <label for="update_periodically_checkbox"><span class="translate">Update periodically</span></label>&#160; &#160;
-            </td>
-            <td width="46%" class="update">
-                <input id="update_button" class="update_button" type="button" value="&nbsp;Update&nbsp;" onclick="update__onclick()" NAME="update_button"/> &#160;
-            </td>
-        </tr>
-    </table>        
-    <p class="after_update_space">&nbsp;</p>
-
-<!--<span id="error_message" style="font-weight: bold; color: red"></span>-->
-
-<span id="stylesheet_output"></span>
-
-<script defer="true" type="text/javascript" src="scheduler.js" ></script>
-<script defer="true" type="text/javascript" src="browser_dependencies.js" ></script>
-<!--script defer="true" type="text/javascript" src="translation_de.js"></script-->
-<script defer="true" type="text/javascript" src="popup_menu.js"></script>
-
-<script defer="true" language="javascript"><!--
-//--------------------------------------------------------------------------------------------const
-
-var _max_orders = 10;
+<script language="javascript" type="text/javascript"><!--
 
 //----------------------------------------------------------------------------------------------var
+var ie      = (navigator.appVersion.match(/\bMSIE\b/));
+var ie6     = (ie && navigator.appVersion.match(/\bMSIE\s+(\d+)/)[1] < 7);
+//var chrome  = (window.navigator.userAgent.indexOf( "Chrome" ) > -1);
+var tabs                  = new Object();
+tabs['jobs']              = {title:'Jobs'             ,pos:'1', display:'inline'};
+tabs['job_chains']        = {title:'Job Chains'       ,pos:'' , display:'inline'};
+tabs['orders']            = {title:'Orders'           ,pos:'' , display:'inline'};
+tabs['schedules']         = {title:'Schedules'        ,pos:'' , display:'inline'};
+tabs['process_classes']   = {title:'Process Classes'  ,pos:'' , display:'inline'};
+tabs['locks']             = {title:'Locks'            ,pos:'' , display:'none'  };
+tabs['cluster']           = {title:'Cluster'          ,pos:'' , display:'none'  };
+tabs['remote_schedulers'] = {title:'Remote Schedulers',pos:'' , display:'none'  };
+tabs['last_activities']   = {title:'Last Activities'  ,pos:'' , display:'inline'};
 
-var _stylesheet;
-var _translation_table;
-var _response;
-var _timer;
-var _scheduler;
-var _show_card = "jobs";
-//var _show_jobs            = true;
-//var _show_job_chains      = false;
-//var _show_process_classes = false;
-var _checkbox_states = new Object();
-
-_checkbox_states[ "show_order_jobs_checkbox" ] = true;
-//var _update_periodically = false;
-
-//-------------------------------------------------------------------------------------------onload
-
+//----------------------------------------------------------------------------------------do_onload
 function do_onload()
-{
-    check_browser();    
-    
-    _stylesheet = new Stylesheet( "scheduler_top.xslt" );
-
-    window.parent.document.title = "Scheduler " + document.location.host;
-    
-    if( typeof init_translation_table != "undefined" )
-    {
-        _translation_table = new Object();
-        init_translation_table( _translation_table );
-        
-        // Auch für großgeschriebene Wörter:
-        for( word in _translation_table )  _translation_table[ word.substring.substring( 0, 1 ).toUpper() + word.substring( 1 ) ];
-    }
-    
-    _scheduler = new Scheduler();
-    repeat_update( document.getElementById( "update_periodically_checkbox" ).checked, true );
+{       
+    parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
     scheduler_init();
-}
-
-//-----------------------------------------------------------------------------------------onunload
-
-function do_onunload()
-{
-    if( _scheduler )  _scheduler.close();
-}
-
-//------------------------------------------------------------update_periodically_checkbox__onclick
-
-function update_periodically_checkbox__onclick()
-{
-    reset_error();
-    repeat_update( document.getElementById( "update_periodically_checkbox" ).checked, 
-                   document.getElementById( "update_periodically_checkbox" ).checked );
-}
-
-//--------------------------------------------------------------------------------------reset_error
-
-function reset_error()
-{
-    parent.left_frame.document.getElementById( "error_message" ).innerHTML = "";
-        
-    window.status = "";
-}
-
-//------------------------------------------------------------------------------------repeat_update
-
-function repeat_update( repeat, call_update )
-{
-    reset_error();
-    if( _timer != undefined )  window.clearTimeout( _timer ),  _timer = undefined;
-    
-    try
-    {
-        if( call_update )
-        {
-            document.getElementById( "update_periodically_checkbox" ).checked = false;     
-            update();
-        }
+    if( document.getElementById('check_folders_checkbox') ) {
+      document.getElementById('check_folders_checkbox').checked = parent._scheduler._update_incl_hot_folders;    
     }
-    catch( x )
-    {   
-        repeat = false;
-        var msg = "";
-        
-        if( typeof x == "object" )
-        {
-            if( x.number + 0xFFFFFFFF == 0x800C0004 )  repeat = true,  msg = "Connection to Scheduler lost<br/>";
-            msg += "0x" + hex_string( x.number, 8 ) + "&#160; " + xml_encode( x.message );
-            msg += "<p> </p>";
-        }
-        else
-            msg = xml_encode( x );
-            
-        parent.left_frame.document.getElementById( "error_message" ).innerHTML = msg;
-    }    
-
-    if( repeat )
-    {
-        document.getElementById( "update_periodically_checkbox" ).checked = true;
-        set_update_timer();
+    document.getElementById(parent._scheduler._show_card+'_inner_tab').className = 'active'+tabs[parent._scheduler._show_card].pos;
+    if( parent._state.selectNodes("cluster[@backup='yes']").length > 0 ) {
+      document.getElementById('backup').innerHTML = parent.getTranslation('THIS IS A BACKUP...').replace(/ /g,'&#160;');
     }
+    set_state(parent._state);
+    parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');    
 }
 
-//---------------------------------------------------------------------------------set_update_timer
-
-function set_update_timer()
-{
-    if( _timer != undefined )  window.clearTimeout( _timer ),  _timer = undefined;
-    _timer = window.setTimeout( "repeat_update(true,true)", 5000, "JavaScript" );
-}
-
-//--------------------------------------------------------------------------------update_jobs_frame
-
-function update_jobs_frame()
-{
-    var what       = "";
-    var max_orders = 0;
-    
-    if( _checkbox_states.show_job_chain_orders_checkbox || window.parent.details_frame._job_chain_element )
-    {
-        what = "job_chain_orders";
-        max_orders = window.parent.details_frame._job_chain_element? 9999 : _max_orders;
-    }
-    
-    _response = _scheduler.execute( "<show_state what='" + what + "' max_orders='" + max_orders + "'/>" );
-    modify_response( _response );
-    var scheduler_id = _response.selectSingleNode( "spooler/answer/state" ).getAttribute( "id" );
-    document.title = "Scheduler " + ( scheduler_id? " id=" + scheduler_id : "" );
-    
-    document.getElementById( "stylesheet_output" ).innerHTML = _stylesheet.xml_transform( _response );
-
-    if( _translation_table )
-    {    
-        var span_elements = document.body.getElementsByTagName( "span" );
-        for( var i = 0; i < span_elements.length; i++ )
-        {
-            var span_element = span_elements[i];
-            if( span_element.getAttribute( "className" ) == "translate" )
-            {
-                var translation = _translation_table[ span_element.innerText ];
-                if( translation )  span_element.innerText = translation, spanElement.removeAttribute( "className" );
-            }
-        }
-    }
-}
 
 //-------------------------------------------------------------------------------------------update
-
-function update()
+function update(response)
 {
-    reset_error();
-    update_jobs_frame();
+    parent._scheduler.logger(3,'START UPDATE '+self.name,'update_top');
     
-    window.parent.left_frame.update();
-
-    if( window.parent.details_frame.document.readyState == "complete" )
-    {
-        window.parent.details_frame.update();
+    if( response ) {
+      var state = response.selectSingleNode('/spooler/answer/state');
+    
+      document.getElementById('job_chains_tab').style.display        = (state.selectNodes("job_chains[@count = 0]").length > 0)        ? 'none' : 'inline';
+      document.getElementById('orders_tab').style.display            = (state.selectNodes("job_chains[@count = 0]").length > 0)        ? 'none' : 'inline';
+      document.getElementById('schedules_tab').style.display         = (state.selectNodes("schedules").length == 0)                    ? 'none' : 'inline';
+      document.getElementById('locks_tab').style.display             = (state.selectNodes("locks").length == 0)                        ? 'none' : 'inline';
+      document.getElementById('cluster_tab').style.display           = (state.selectNodes("cluster").length == 0)                      ? 'none' : 'inline';
+      document.getElementById('remote_schedulers_tab').style.display = (state.selectNodes("remote_schedulers[@count = 0]").length > 0) ? 'none' : 'inline';
+    
+      set_state(state);
+      if( state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("Job Scheduler is waiting for database ...")));
     }
-    
-    if( _timer != undefined )  set_update_timer();
+    parent._scheduler.logger(3,'ELAPSED TIME FOR UPDATE '+self.name,'update_top');
 }
 
-//----------------------------------------------------------------------------------modify_response
 
-function modify_response( response )
+//----------------------------------------------------------------------------------------set_state
+function set_state(state)
 {
-    // Antwort manipulieren: <tasks> mit <task> auffüllen, bis <job tasks=".."> erreicht ist.
-
-    var job_elements = response.selectNodes( ".//job" );
-    for( var j = 0; j < job_elements.length; j++ )
-    {
-        var job_element = job_elements[j];
-        
-        var tasks_element = job_element.selectSingleNode( "tasks" );
-        if( tasks_element )
-        {
-            var task_elements = tasks_element.selectNodes( "task" );
-            var n = 1*job_element.getAttribute( "tasks" ) - task_elements.length;
-            for( var t = 0; t < n; t++ )
-            {
-                tasks_element.appendChild( tasks_element.ownerDocument.createElement( "task" ) );
-            }
-        } 
+    var all_orders                                            = state.selectNodes('/spooler/answer/state/job_chains/job_chain');
+    var clustered_orders                                      = state.selectNodes('/spooler/answer/state/job_chains/job_chain/job_chain_node/order_queue/order[@occupied_by_cluster_member_id]');
+    var cnt_all_orders                                        = 0;
+    var cnt_clustered_orders                                  = (clustered_orders.length || 0);
+    if(all_orders) {
+      for( var i=0; i < all_orders.length; i++ ) cnt_all_orders += parseInt(all_orders[i].getAttribute('orders'));
+    } else {
+      all_orders                                              = state.selectNodes('jobs/job/order_queue');
+      if( all_orders ) {
+        for( var i=0; i < all_orders.length; i++ ) cnt_all_orders += parseInt(all_orders[i].getAttribute('length'));
+      }
     }
+    document.getElementById('spooler_id').innerHTML           = (state.getAttribute('id') || parent.getTranslation('unknown'));
+    document.getElementById('spooler_state').innerHTML        = (parent.getTranslation(state.getAttribute('state')) || parent.getTranslation('unknown'));
+    document.getElementById('spooler_version').title          = "pid:"+(state.getAttribute('pid') || parent.getTranslation('unknown'));
+    document.getElementById('spooler_version').innerHTML      = (state.getAttribute('version') || '0.0.000.0000 (0000-00-00 00:00:00)');
+    document.getElementById('spooler_time').innerHTML         = (state.getAttribute('time').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
+    document.getElementById('spooler_start_time').innerHTML   = (state.getAttribute('spooler_running_since').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
+    document.getElementById('jobs_running').innerHTML         = (state.selectNodes("jobs/job [ @state='running' ]").length || 0);
+    document.getElementById('jobs_stopped').innerHTML         = (state.selectNodes("jobs/job [ @state='stopped' ]").length || 0);
+    document.getElementById('jobs_need_process').innerHTML    = (state.selectNodes("jobs/job [ @waiting_for_process='yes' ]").length || 0);
+    document.getElementById('jobs_tasks').innerHTML           = (state.selectNodes("jobs/job/tasks/task[ @id ]").length || 0);
     
-
-    // Werte der Checkboxen show_tasks_checkbox und show_my_orders ins XML-Dokument übernehmen (für XSL)
-    
-    var spooler_element = response.selectSingleNode( "spooler" );
-    if( spooler_element )
-    {    
-        restore_checkbox_state( response, "show_order_jobs_checkbox" );
-        restore_checkbox_state( response, "show_tasks_checkbox" );
-        restore_checkbox_state( response, "show_job_chain_jobs_checkbox" );
-        restore_checkbox_state( response, "show_job_chain_orders_checkbox" );
-
-        spooler_element.setAttribute( "my_max_orders", _max_orders );
-        spooler_element.setAttribute( "my_show_card" , _show_card );
-    }
+    var jobs_orders_inner                                     = cnt_all_orders + "&#160;" + parent.getTranslation('orders');
+    if( cnt_clustered_orders > 0 ) jobs_orders_inner         += (parent._scheduler._lang_file_exists) ? "&#160;"+parent.getTranslation('in cluster',{cnt:cnt_clustered_orders}) : "&#160;("+cnt_clustered_orders+" in cluster)";
+    document.getElementById('jobs_orders').innerHTML          = jobs_orders_inner;    
 }
 
-//------------------------------------------------------------------------------save_checkbox_state
 
-function save_checkbox_state( name )
+//------------------------------------------------------------update_periodically_checkbox__onclick
+function update_periodically_checkbox__onclick(obj)
 {
-    if( document.getElementById( name ) )
-    {
-        _checkbox_states[ name ] = document.getElementById( name ).checked;
-    }
+    parent._scheduler._update_periodically     = obj.checked;
+    set_timeout("parent.left_frame.repeat_update( parent._scheduler._update_periodically, parent._scheduler._update_periodically )", 1);
 }
 
-//---------------------------------------------------------------------------restore_checkbox_state
-
-function restore_checkbox_state( response, name )
+function update_incl_hot_folders_checkbox__onclick(obj)
 {
-    var spooler_element = response.selectSingleNode( "spooler" );
-    if( spooler_element )
-    {
-        //if( document.all[ name ]  &&  document.all[ name ].checked )
-        //{
-         //   spooler_element.setAttribute( name, "yes" );
-        //}
-        //else
-        {
-            if( _checkbox_states[ name ] )  spooler_element.setAttribute( name, "yes" );
-        }
-    }
+    parent._scheduler._update_incl_hot_folders = obj.checked;
 }
 
-//-------------------------------------------------------------------------show_job_process_classes
-
+//---------------------------------------------------------------------------------------show_card
 function show_card( what )
 {
-    if( what != _show_card )
+    if( what != parent._scheduler._show_card )
     {
-        if( what == "process_classes" )
+        document.getElementById(what+'_inner_tab').className = 'active'+tabs[what].pos;
+        document.getElementById(parent._scheduler._show_card+'_inner_tab').className = 'inactive'+tabs[parent._scheduler._show_card].pos;
+        if( what == "process_classes" || what == "remote_schedulers" || what == "cluster" )
         {
-            window.parent.details_frame.clear();
-            
-            //_saved_frameset_cols = window.parent.left_and_right_frameset.cols; 
-            //window.parent.left_and_right_frameset.cols = "100%, 0%";
+            parent.details_frame.hide();
         }
-        //else
-        //if( _saved_frameset_cols != undefined )
-        {
-            //window.parent.left_and_right_frameset.cols = _saved_frameset_cols;
-            //_saved_frameset_cols = undefined;
-        }
-    
-        _show_card = what;
+        parent._scheduler._show_card = what;
     }
-    
-    update();
+    window.setTimeout("parent.left_frame.update()",5);
 }
 
-//--------------------------------------------------------------------------------show_task_details
 
-function show_task_details( job_name, task_id )
+//---------------------------------------------------------------------------------------write_menu
+function write_menu( menu, align )
 {
-    var job_element  = _response.selectSingleNode( ".//job[@job='" + job_name + "']" );
-    var task_element = _response.selectSingleNode( ".//task[@id=" + task_id + "]" );
-
-    update_jobs_frame();
-    window.parent.details_frame.show_task_details( job_element, task_element );
+  var menu_title = parent.getTranslation(menu.substr(0,1).toUpperCase() + menu.substring(1));
+  if( window.createPopup == undefined ) {
+    var blanks = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
+    document.writeln('                <div class="selectbox_'+menu+'">');
+    document.writeln('                  <select class="'+align+'" id="__selectbox_'+menu+'_'+align+'__" name="__selectbox_'+menu+'_'+align+'__" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
+    if( align == 'left' ) {
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">&#160;&#160;&#160;&#160;&#160;'+blanks+menu_title+'</option>');
+      document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');
+      document.writeln('                  </select>');
+    } else {
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+menu_title+blanks+'</option>');
+      document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');                    
+      document.writeln('                  </select>');
+      document.writeln('                  <div style="position:relative;top:-16px;height:14px;width:16px;background-color:#CFD7EB">&#160;</div>');
+    }
+    document.writeln('                </div>');
+  } else {
+    document.writeln('                <div class="button" onclick="scheduler_'+menu+'__onclick();">');
+    document.writeln('                  <!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->'+menu_title+'<!--[if lte IE 6]></a><![endif]-->');
+    document.writeln('                </div>');
+  }  
 }
 
-//---------------------------------------------------------------------------------show_job_details
 
-function show_job_details( job_name )
+//---------------------------------------------------------------------------------------write_tabs
+function write_tabs()
+{ 
+  var elem = (ie6) ? {tagName:'a',href:' href="javascript:void(0);"'} : {tagName:'span',href:''}
+  for( var entry in tabs ) {
+    document.writeln('                <li id="'+entry+'_tab" style="display:'+tabs[entry].display+'" onclick="callErrorChecked( \'show_card\', \''+entry+'\' );">');
+    document.writeln('                  <'+elem.tagName+' id="'+entry+'_inner_tab" class="inactive'+tabs[entry].pos+'"'+elem.href+'><span style="white-space:nowrap;">'+parent.getTranslation(tabs[entry].title)+'</span></'+elem.tagName+'>');
+    document.writeln('                </li>');
+  }
+}
+
+//---------------------------------------------------------------------------------------hide__onclick
+function hide__onclick()
+{   
+    parent.details_frame.hide();
+}
+
+
+//------------------------------------------------------------set_corner (onresize-Event only for IE<7)
+function set_corner_position()
 {
-    var job_element  = _response.selectSingleNode( ".//job[@job='" + job_name + "']" );
-
-    window.parent.details_frame.show_job_details( job_element );
-    update_jobs_frame();
+    if( ie6 ) {
+      var imgs = document.getElementsByTagName("img");
+      for( var i=0; i < imgs.length; i++ ) {
+        if( imgs[i].src.search(/corner_tr.gif$/) > -1 && imgs[i].className.search(/^corner_tr$/) > -1 ) {
+          imgs[i].style.right = -1*(document.body.clientWidth % 2)+"px"; 
+        }
+      }
+    }
 }
+//-----------------------------------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------show_job_chain_details
+window.onload   = do_onload;
 
-function show_job_chain_details( job_chain_name )
-{
-    var job_chain_element = _response.selectSingleNode( ".//job_chain[@name='" + job_chain_name + "']" );
+//-->
+</script>
+</head>
 
-    window.parent.details_frame.show_job_chain_details( job_chain_element );
-    update();
-}
-
-//-------------------------------------------------------------------------------------------------
-/*
-Node.prototype.__defineGetter__( "xml", _Node_getXML );
-
-function _Node_getXML() 
-{
-    return new XMLSerializer().serializeToString( this );
-}
-Now, the Mozilla interface can use the xml attribute in the same way that IE uses it.
-
-*/
---></script>
-
-
-<script defer="true" type="text/javascript" for="window" event="onload"  > do_onload();   </script>
-<script defer="true" type="text/javascript" for="window" event="onunload"> do_onunload(); </script>
-
-
+<body class="top" onresize="set_corner_position();">
+  <table cellspacing="0" cellpadding="0" width="100%"><thead><tr><td style="padding:0px">
+    <div class="top">
+      <img class="corner_tl" src="corner_tl.gif" alt="" />
+      <img class="corner_tr" src="corner_tr.gif" alt="" />
+    </div>
+    <div class="bottom" style="margin-bottom:4px;">
+      <table cellspacing="0" cellpadding="0" border="0" align="center" width="100%" class="inner">
+        <thead>
+          <tr>
+            <td align="left" width="25%" nowrap>
+              <table cellspacing="0" cellpadding="0" border="0">
+                <thead>
+                  <tr>
+                    <td align="left" valign="middle" width="1" class="top" style="padding-top:4px;">
+                      <script language="javascript" type="text/javascript">
+                        document.write(parent.getTranslation('Documentation')+'&#x25BA;');
+                      </script>
+                      <noscript>Documentation&#x25BA;</noscript>
+                    </td>
+                    <td align="left" valign="bottom" class="top" style="padding-top:6px;white-space:nowrap;">
+                        <img src="banner_english.gif" style="cursor:pointer;" onclick="open_url( 'doc/en/index.xml', 'scheduler_documentation' )"/>
+                        <img src="banner_german.gif"  style="cursor:pointer;" onclick="open_url( 'doc/de/index.xml', 'scheduler_documentation' )"/>
+                    </td>
+                  </tr>
+                </thead>
+              </table>  
+            </td>  
+            <td align="center" width="50%">
+              <table cellspacing="0" cellpadding="0" border="0" align="center">
+                <thead>
+                  <tr> 
+                    <td align="right" valign="bottom" class="top" style="padding-top:4px;">
+                        <input id="update_periodically_checkbox" type="checkbox" style="position:relative;top:0px;height:14px;margin:0px;padding:0px;" onclick="callErrorChecked( 'update_periodically_checkbox__onclick', this )" name="update_periodically_checkbox"/>
+                    </td>
+                    <td valign="middle" width="1px" class="top" style="padding:4px;">
+                        <label class="top" for="update_periodically_checkbox"><span id="update_seconds" style="white-space:nowrap;">
+                          <script language="javascript" type="text/javascript">
+                            if( parent._scheduler._lang_file_exists ) {
+                              document.write(parent.getTranslation('Update')+'&#160;('+parent.getTranslation('every',{sec:parent._scheduler._update_seconds})+")");
+                            } else {
+                              document.write('Update&#160;(every&#160;'+parent._scheduler._update_seconds+'s)');
+                            }
+                          </script>
+                          <noscript>Update&#160;periodically</noscript>
+                        </span></label>
+                    </td>
+                    <td valign="bottom" width="1px" class="top" style="padding-top:4px;">
+                        <input id="check_folders_checkbox" type="checkbox" style="position:relative;top:0px;height:14px;margin:0px;padding:0px;" name="check_folders_checkbox" onclick="update_incl_hot_folders_checkbox__onclick(this)"/>
+                    </td>
+                    <td valign="middle" width="1px" class="top" style="padding:4px;">
+                        <label class="top" for="check_folders_checkbox"><span id="check_folders_label" style="white-space:nowrap;">
+                          <script language="javascript" type="text/javascript">
+                            document.write(parent.getTranslation('incl. Hot Folders'));
+                          </script>
+                          <noscript>incl.&#160;Hot&#160;Folders</noscript>
+                        </span></label>
+                    </td>
+                    <td align="left" valign="middle" class="top" style="padding-left:4px;white-space:nowrap;"><div id="config_button" class="button" onclick="callErrorChecked('update__onclick');"><!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
+                      <script language="javascript" type="text/javascript">
+                        document.write(parent.getTranslation('Update'));
+                      </script>
+                      <noscript>Update</noscript>
+                      <!--[if lte IE 6]></a><![endif]--></div></td>
+                  </tr>
+                </thead>
+              </table>  
+            </td>
+            <td align="right" width="25%" title="scheduler extras" style="padding-top:2px;padding-right:2px;">
+              <script language="javascript" type="text/javascript">
+                write_menu('extras','right'); 
+              </script>  
+            </td>
+          </tr>
+        </thead>
+      </table>
+      <img class="corner_bl" src="corner_bl.gif" alt="" />
+      <img class="corner_br" src="corner_br.gif" alt="" />
+    </div>
+    <div class="top">
+      <img class="corner_tl" src="corner_tl.gif" alt="" />
+      <img class="corner_tr" src="corner_tr.gif" alt="" />
+                   
+      <table cellpadding="0" cellspacing="0" width="100%" border="0" class="top">
+          <colgroup>
+            <col width="20"/>
+            <col width="180"/>
+            <col width="*"/>
+            <col width="180"/>
+            <col width="20"/>
+          </colgroup>
+          <thead>
+          <tr>
+              <td align="left" title="scheduler menu" style="padding-top:2px;">
+                <script language="javascript" type="text/javascript">
+                  write_menu('menu','left'); 
+                </script>
+              </td>
+              <td align="left" style="white-space:nowrap">&#160;<span id="backup"></span></td>
+              <td align="center">
+                <span style="white-space:nowrap;">
+                  <a href="http://www.sos-berlin.com/" title="www.sos-berlin.com" target="sos_homepage" style="text-decoration:none;">
+                     <img src="job_scheduler_rabbit_colour.gif" border="0" style="margin-top:2px;"/>
+                     <img src="job_scheduler_typo_colour.gif" border="0"/>
+                  </a>
+                </span>
+              </td>
+              <td align="right">&#160;</td>
+              <td align="right" title="scheduler menu" style="padding-right:2px;padding-top:2px;">
+                <script language="javascript" type="text/javascript">
+                  write_menu('menu','right'); 
+                </script>
+              </td>
+          </tr>
+          </thead>
+      </table>
+    </div>
+    <div class="bottom">  
+      <table cellpadding="0" cellspacing="0" class="bottom" width="100%" border="0">
+          <colgroup>
+            <col width="15%"/>
+            <col width="14%"/>
+            <col width="14%"/>
+            <col width="14%"/>
+            <col width="14%"/>
+            <col width="29%"/>
+          </colgroup>
+          <thead>
+            <script language="javascript" type="text/javascript">
+              document.writeln( '            <tr>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('ID')+':&#160;</span><span id="spooler_id" style="white-space:nowrap;font-weight:bold;"></span></td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('State')+':&#160;</span><span id="spooler_state" style="white-space:nowrap;"></span></td>' );
+              document.writeln( '              <td colspan="3" align="center" style="white-space:nowrap;"><span id="spooler_version" style="white-space:nowrap;" title="'+parent.getTranslation('pid')+':'+parent.getTranslation('unknown')+'"><span class="label">'+parent.getTranslation('version')+':&#160;</span>0.0.000.0000 (0000-00-00 00:00:00)</span></td>' );
+              document.writeln( '              <td align="right" style="white-space:nowrap;"><span class="label">'+parent.getTranslation('Time')+':&#160;</span><span id="spooler_time">0000-00-00 00:00:00</span></td>' );
+              document.writeln( '            </tr>' );
+              document.writeln( '            <tr>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span id="jobs_running">0</span> '+parent.getTranslation('jobs')+' '+parent.getTranslation('running')+' </td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span id="jobs_stopped">0</span> '+parent.getTranslation('stopped')+' </td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span id="jobs_need_process">0</span> '+parent.getTranslation('need process')+' </td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span id="jobs_tasks">0</span> '+parent.getTranslation('tasks')+' </td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span id="jobs_orders">0 '+parent.getTranslation('orders')+'</span> </td>' );
+              document.writeln( '              <td align="right" style="white-space:nowrap;"><span class="label">Scheduler '+parent.getTranslation('Start-Time')+':&#160;</span><span id="spooler_start_time">0000-00-00 00:00:00</span></td>' );
+              document.writeln( '            </tr>' );
+            </script>
+        </thead>   
+      </table>
+      
+      <img class="corner_bl" src="corner_bl.gif" alt="" />
+      <img class="corner_br" src="corner_br.gif" alt="" />
+    </div>
+    <div>
+      <ul class="tabs">
+        <script language="javascript" type="text/javascript">
+          write_tabs(); 
+        </script>
+      </ul>
+      <img class="corner_br" src="corner_tr.gif" alt="" style="margin:-2px 0px 0px 0px;" />
+    </div>
+    <div class="middle">
+      <table cellspacing="0" cellpadding="0" width="100%" class="middle">
+        <thead><tr><td>&#160;</td></tr></thead>
+      </table>
+    </div>
+    <div id="hide_button" class="button" onclick="hide__onclick();"><!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
+      <script language="javascript" type="text/javascript">document.write(parent.getTranslation('Hide'))</script>
+      <noscript>Hide</noscript>
+    <!--[if lte IE 6]></a><![endif]--></div>
+  </td></tr></thead></table>
+  <!--[if lte IE 6]>
+    <script language="javascript" type="text/javascript">
+      var imgs = document.getElementsByTagName("img");
+      for( var i=0; i < imgs.length; i++ ) {
+        if( imgs[i].src.search(/corner_tl.gif$/) > -1 && imgs[i].className.search(/^corner_tl$/) > -1 ) {
+          imgs[i].style.top   = "0px"; 
+        }
+        if( imgs[i].src.search(/corner_tr.gif$/) > -1 && imgs[i].className.search(/^corner_tr$/) > -1 ) {
+          imgs[i].style.top   = "0px";
+          imgs[i].style.right = -1*(document.body.clientWidth % 2)+"px";
+        }
+      }
+    </script>
+  <![endif]-->
 </body>
 
 </html>

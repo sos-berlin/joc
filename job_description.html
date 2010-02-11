@@ -1,0 +1,203 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<!--
+/********************************************************* begin of preamble
+**
+** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** All rights reserved.
+**
+** This file may be used under the terms of either the 
+**
+**   GNU General Public License version 2.0 (GPL)
+**
+**   as published by the Free Software Foundation
+**   http://www.gnu.org/licenses/gpl-2.0.txt and appearing in the file
+**   LICENSE.GPL included in the packaging of this file. 
+**
+** or the
+**  
+**   Agreement for Purchase and Licensing
+**
+**   as offered by Software- und Organisations-Service GmbH
+**   in the respective terms of supply that ship with this file.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+** IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+** THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+** PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+** BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+********************************************************** end of preamble*/
+//-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Job Scheduler - Job Documentation</title>
+    <script type="text/javascript" src="scheduler_init.js"></script>
+    <script type="text/javascript" src="scheduler.js"></script>
+    <script type="text/javascript" src="browser_dependencies.js"></script>
+    <script type="text/javascript" src="sos_logger.js"></script>
+
+    <script language="javascript"><!--
+var _scheduler;
+var _desc_frame;
+var _job_name;
+var _first_call = true;
+
+window.onload = function()
+{   
+    if( !_scheduler ) {  
+      _scheduler = new Scheduler();
+      try {
+        if( window.opener && window.opener._scheduler ) {
+          _scheduler._runtime_settings.debug_level = window.opener._scheduler._runtime_settings.debug_level;
+        } else {
+          _scheduler.setDebugLevel();
+        }
+      } catch(E) {}
+    }
+    try {
+      _job_name  = window.opener.left_frame._job_name;
+    } catch(E) {
+      _job_name  = "";
+    }
+    if( !_desc_frame ) _desc_frame = window.frames["desc_frame"];
+    showJobDescription(_job_name);
+}
+
+window.onunload = function()
+{
+    if( _scheduler ) _scheduler.close();
+}    
+    
+//-----------------------------------------------------------------------------showJobDescription
+    
+function showJobDescription( job_name )
+{   
+    _job_name = job_name;
+    
+    try {
+      if( job_name == "" ) throw new Error( getTranslation("Job name") + " " + getTranslation("is missing") );
+      var url = _scheduler._url + "job_description?job=" + job_name;
+      try {
+        _scheduler._xml_http.open( "GET", url, false );
+        _scheduler._xml_http.send( null );
+        var desc = _scheduler._xml_http.responseText;
+        if( !desc ) throw new Error();
+      } catch(E) {
+        var statusText = ( typeof _scheduler._xml_http.statusText == 'string' && _scheduler._xml_http.statusText ) ? _scheduler._xml_http.statusText + " (" + _scheduler._xml_http.status + ")" : "";
+        throw new Error( getTranslation("Error at HTTP answer '$url':", {'url':url} ) + " " + statusText + "\n" + E.message );
+      }
+      //description in XML format
+      if( desc.search(/<\?xml/i) > -1 ) {
+        //response of older scheduler versions returns xml as content of html body
+        if( desc.search( /<body[^>]*>[^<]*<\?xml/i > -1 ) ) {
+          desc = desc.substring( desc.indexOf("<?xml") );
+          desc = desc.substring(0,desc.lastIndexOf("</body>"));
+        }
+        //clean up
+        desc   = desc.replace( /^[^<]*</, "<" );
+        desc   = desc.replace( />[^>]*$/, ">" );
+        //read name of stylesheet (default: scheduler_job_documentation.xsl)
+        var stylesheet_url         = "scheduler_job_documentation.xsl";
+        if( desc.search( /<\?xml-stylesheet[^>]+href[\s]*=[\s]*(?:\"|\')([^=]+)(?:\"|\')/i ) > -1 ) {
+            stylesheet_url         = desc.match( /<\?xml-stylesheet[^>]+href[\s]*=[\s]*(?:\"|\')([^=]+)(?:\"|\')/i )[1];
+        }
+        var response    = _scheduler.loadXML( desc );
+        _scheduler.loadXSLT( stylesheet_url );
+        desc            = _scheduler.xmlTransform(response,false);
+        desc            = desc.replace(/^<\?xml[^>]*>\s*<!DOCTYPE/i,'<!DOCTYPE');
+        if( desc == "" ) throw new Error( getTranslation("unknown error") ); 
+        desc            = desc.replace( /(select_lang\s*\(\s*[\'])[^\']*([\']\s*\))/, "$1"+_description_lang+"$2" );
+      }
+      _desc_frame.document.open();
+      _desc_frame.document.write(desc);
+      _desc_frame.document.close(); 
+      if( window.navigator.appName == "Microsoft Internet Explorer" ) _desc_frame.location.reload();
+      return true;
+    }
+    catch( x )
+    { 
+      show_error( x );
+      return false;
+    }
+}
+
+//-----------------------------------------------------------------------------show_error
+
+function show_error( x )
+{
+    var msg = x.message.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace( /\"/g, "&quot;" ).replace( /\'/g, "&#039;" ).replace( /\n/g, "<br/>" ).replace( "  ", "\xA0 " );
+    
+    var form_type       = 'none';
+    if( _job_name == "" && _first_call ) {
+      _first_call       = false;
+      msg               = "";
+      try {
+        var response    = _scheduler.execute( "<show_jobs max_task_history='0' max_orders='0'/>", false, false );
+        var jobsHasPath = response.selectNodes( "/spooler/answer/jobs/job[@path]" );
+        if( jobsHasPath.length == 0) _scheduler.addPathAttribute(response);
+        var jobs        = response.selectNodes( "/spooler/answer/jobs/job[@has_description='yes']" );
+        if( jobs.length == 0 ) msg = getTranslation("The Job Scheduler $scheduler has no jobs with a description.",{'scheduler':window.location.host});
+        else form_type  = 'radio';
+      }
+      catch( E ) {
+        form_type       = 'input';
+      }
+    }
+    
+    _desc_frame.document.open();
+    _desc_frame.document.writeln('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">');
+    _desc_frame.document.writeln('<html>');
+    _desc_frame.document.writeln('  <head>');
+    _desc_frame.document.writeln('    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>');
+    _desc_frame.document.writeln('    <title>SOS Scheduler Job Documentation - ERROR</title>');
+    _desc_frame.document.writeln('  </head>');
+    _desc_frame.document.writeln('  <body style="font-family:Arial;font-size:12px;margin:20px;" onload="try{parent.name}catch(E){ document.getElementById(\'sec_sanction\').style.display=\'block\';document.getElementById(\'sec_sanction2\').style.display=\'none\'; }">');
+    _desc_frame.document.writeln('    <p style="color:red;">'+msg+'</p>');
+    _desc_frame.document.writeln('    <p id="sec_sanction" style="color:red;display:none;">'+getTranslation("Because of a security sanction of your browser you must reload this site!")+'</p>');
+    _desc_frame.document.writeln('    <div id="sec_sanction2" style="display:block;">');
+    _desc_frame.document.writeln('    <form action="job_description.html" method="get" onsubmit="return false;">');
+    switch( form_type ) {
+      case "select" :
+        _desc_frame.document.writeln('    <p style="color:#808080;">'+getTranslation("Please select a job to display its description.")+'</p>');
+        _desc_frame.document.writeln('      <select id="job_name" name="job_name" style="width:600px;" size="1" onchange="parent.showJobDescription(this.value);this.selectedIndex=0;">');
+        _desc_frame.document.writeln('        <option value=""></option>');
+        for( var i=0; i < jobs.length; i++ ) { 
+          _desc_frame.document.writeln('        <option value="'+jobs[i].getAttribute('path')+'">'+jobs[i].getAttribute('title')+'&#160;('+jobs[i].getAttribute('path')+')</option>');
+        }
+        _desc_frame.document.writeln('      </select>');
+        break;
+      case "radio" :
+        _desc_frame.document.writeln('    <p style="color:#808080;">'+getTranslation("Please select a job to display its description.")+'</p>');
+        for( var i=0; i < jobs.length; i++ ) {
+          _desc_frame.document.writeln('      <input type="radio" name="job_name" value="'+jobs[i].getAttribute('path')+'" onclick="parent.showJobDescription(this.value);"/>&#160;<span style="position:relative;top:-2px;">'+jobs[i].getAttribute('title')+'&#160;('+jobs[i].getAttribute('path')+')</span><br/>');
+        }
+        break;
+      case "none" :
+        break;
+      default :
+        _desc_frame.document.writeln('    <p style="color:#808080;">'+getTranslation("Please enter a job name to display its description.")+'</p>');
+        _desc_frame.document.writeln('      <input type="text" name="job_name" style="width:600px;" value=""/>');
+        _desc_frame.document.writeln('      <input type="submit" name="go" value="go" onclick="parent.showJobDescription(this.form.elements[\'job_name\'].value);"/>');
+        break;
+    }
+    _desc_frame.document.writeln('    </form>');
+    _desc_frame.document.writeln('    </div>');
+    _desc_frame.document.writeln('  </body>');
+    _desc_frame.document.writeln('</html>');
+    _desc_frame.document.close();
+    
+    //return false;
+}
+//-->
+    </script>
+</head>
+<frameset rows="100%" framespacing="0" border="0">
+  <frame id="desc_frame" name="desc_frame" src="about:blank" frameborder="0" marginwidth="2" marginheight="2" scrolling="auto"/>
+</frameset>
+</html>

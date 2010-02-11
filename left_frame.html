@@ -1,111 +1,297 @@
-<!-- $Id$ -->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!--
+/********************************************************* begin of preamble
+**
+** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** All rights reserved.
+**
+** This file may be used under the terms of either the 
+**
+**   GNU General Public License version 2.0 (GPL)
+**
+**   as published by the Free Software Foundation
+**   http://www.gnu.org/licenses/gpl-2.0.txt and appearing in the file
+**   LICENSE.GPL included in the packaging of this file. 
+**
+** or the
+**  
+**   Agreement for Purchase and Licensing
+**
+**   as offered by Software- und Organisations-Service GmbH
+**   in the respective terms of supply that ship with this file.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+** IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+** THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+** PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+** BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+********************************************************** end of preamble*/
+//-->
 <html>
 
 <head>
-    <meta name="vs_targetSchema"    content="http://schemas.microsoft.com/intellisense/ie5"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <title>Scheduler</title>
+    <title>Job Scheduler</title>
 
     <style type="text/css">
-        @import "scheduler.css";
-        @import "custom.css";
+        @import url(scheduler.css);
+        html {overflow-y:scroll; overflow-x:auto}
     </style>
-</head>
+    <!--[if IE]>
+    <style type="text/css">
+        div.shadow1,div.shadow2 {filter:alpha(opacity=40);}
+        #__input_iframe__       {filter:alpha(opacity=0);}
+    </style>
+    <![endif]-->
 
-<body class="left">
-<!--
-<p style="margin-bottom: 10pt; margin-top: 0; padding-top: 0; padding-bottom: 3pt">
-    <input id="update_periodically_checkbox" type="checkbox" onclick="update_periodically_checkbox__onclick()" NAME="update_periodically_checkbox"/>
-    <label for="update_periodically_checkbox"><span class="translate">Update periodically</span></label>
-    &#160; &#160;
-    <input id="update_button" class="button" type="button" value="Update" onclick="update__onclick()" NAME="update_button"/>    
-</p>
-//-->
-<span id="error_message" style="font-weight: bold; color: red"></span>
-<span id="stylesheet_output"></span>
+<script type="text/javascript" src="scheduler_dialog.js"></script>
+<script type="text/javascript" src="browser_dependencies.js"></script>
+<script type="text/javascript" src="sos_div.js"></script>
+<script type="text/javascript" src="sos_calendar.js"></script>
+<script type="text/javascript" src="editor.js"></script>
+<script type="text/javascript" src="popup_menu.js"></script>
 
-<script defer="true" type="text/javascript" src="scheduler.js" ></script>
-<script defer="true" type="text/javascript" src="browser_dependencies.js"></script>
-<!--script defer="true" type="text/javascript" src="translation_de.js"></script-->
-<script defer="true" type="text/javascript" src="popup_menu.js"></script>
+<script type="text/javascript" language="javascript"><!--
 
-<script defer="true" language="javascript"><!--
-//--------------------------------------------------------------------------------------------const
-
-var _max_orders = 10;
-
-//----------------------------------------------------------------------------------------------var
-
-var _stylesheet;
-var _translation_table;
 var _response;
-var _timer;
-var _scheduler;
-var _show_card = "jobs";
-//var _show_jobs            = true;
-//var _show_job_chains      = false;
-//var _show_process_classes = false;
-var _checkbox_states = new Object();
-var _saved_frameset_cols;
-var update_seconds           = 5;
+var _schedules = new Array();
+var _job_element;
+var _job_name;
+var _job_chain;
+var _order_id;
+var _schedule;
+var _substitute;
+var _timer = 0;
 
-_checkbox_states[ "show_order_jobs_checkbox" ] = true;
-//var _update_periodically = false;
+// Fehlercodes von xmlhttp:
+var DE_E_INVALID_URL               = 0x800C0002 - 0xFFFFFFFF;
+var DE_E_NO_SESSION                = 0x800C0003 - 0xFFFFFFFF;
+var DE_E_CANNOT_CONNECT            = 0x800C0004 - 0xFFFFFFFF;
+var DE_E_RESOURCE_NOT_FOUND        = 0x800C0005 - 0xFFFFFFFF;
+var DE_E_OBJECT_NOT_FOUND          = 0x800C0006 - 0xFFFFFFFF;
+var DE_E_DATA_NOT_AVAILABLE        = 0x800C0007 - 0xFFFFFFFF;
+var DE_E_DOWNLOAD_FAILURE          = 0x800C0008 - 0xFFFFFFFF;
+var DE_E_AUTHENTICATION_REQUIRED   = 0x800C0009 - 0xFFFFFFFF;
+var DE_E_NO_VALID_MEDIA            = 0x800C000A - 0xFFFFFFFF;
+var DE_E_CONNECTION_TIMEOUT        = 0x800C000B - 0xFFFFFFFF;
+var DE_E_INVALID_REQUEST           = 0x800C000C - 0xFFFFFFFF;
+var DE_E_UNKNOWN_PROTOCOL          = 0x800C000D - 0xFFFFFFFF;
+var DE_E_SECURITY_PROBLEM          = 0x800C000E - 0xFFFFFFFF;
+var DE_E_CANNOT_LOAD_DATA          = 0x800C000F - 0xFFFFFFFF;
+var DE_E_CANNOT_INSTANTIATE_OBJECT = 0x800C0010 - 0xFFFFFFFF;
+var DE_E_REDIRECT_FAILED           = 0x800C0014 - 0xFFFFFFFF;
+var DE_E_REDIRECT_TO_DIR           = 0x800C0015 - 0xFFFFFFFF;
+var DE_E_CANNOT_LOCK_REQUEST       = 0x800C0016 - 0xFFFFFFFF;
+
 
 //-------------------------------------------------------------------------------------------onload
 
 function do_onload()
-{
-    _stylesheet = new Stylesheet( "scheduler.xslt" );
-
-    window.parent.document.title = "Scheduler " + document.location.host;
+{   
+    parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_left');
     
-    if( typeof init_translation_table != "undefined" )
-    {
-        _translation_table = new Object();
-        init_translation_table( _translation_table );
-        
-        // Auch für großgeschriebene Wörter:
-        for( word in _translation_table )  _translation_table[ word.substring.substring( 0, 1 ).toUpper() + word.substring( 1 ) ];
-    }
+    if(! parent._scheduler._lang_file_exists) _sos_lang='';
+    var scrollbarWidth = (parent.top_frame.document.documentElement.clientWidth - document.documentElement.clientWidth);
+    if( scrollbarWidth < 17 ) document.getElementsByTagName('body')[0].style.marginRight = (17 - scrollbarWidth) + "px";                                                   
     
-    _scheduler = new Scheduler();
-    repeat_update( parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked, true );
     scheduler_init();
+    callErrorChecked('repeat_update', parent._scheduler._update_periodically, true );
+    parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_left'); 
 }
 
 //-----------------------------------------------------------------------------------------onunload
 
 function do_onunload()
-{
-    if( _scheduler )  _scheduler.close();
+{   
+    if( typeof window['Editor'] == 'function' ) { Editor.close(); }
 }
 
-//------------------------------------------------------------update_periodically_checkbox__onclick
+//-------------------------------------------------------------------------------------------update
 
-function update_periodically_checkbox__onclick()
+function update(with_details)
+{   
+    if( typeof with_details != 'boolean' ) with_details = true;
+    var timer = 0;
+    if( _timer > 0 ) {
+      window.clearTimeout( _timer );  
+      timer   = _timer; 
+      _timer  = 0; 
+    }
+    update_jobs_frame();
+    
+    if( with_details && window.parent._details_frame_loaded ) callErrorChecked( 'parent.details_frame.update' );
+    if( timer > 0 ) {
+      _timer = set_timeout( "parent.left_frame.repeat_update(true,true)", parent._scheduler._update_seconds * 1000 );
+    }
+}
+
+//--------------------------------------------------------------------------------update_jobs_frame
+
+function update_jobs_frame()
+{   
+    var what       = "job_chain_orders";
+    var max_orders = parent._scheduler._runtime_settings.max_orders;
+    var max_order_history = "";
+    parent._scheduler.logger(1,'UPDATE ' + self.name + ' FOR TAB ' + parent._scheduler._show_card);
+    if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox || window.parent.details_frame._job_chain_element || parent._scheduler._show_card == 'orders' )
+    {
+        what += " job_params order_source_files blacklist";
+    } else if( parent._scheduler._show_card == "jobs"       )  what += " job_params"; 
+    if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) ) what += " schedules";
+    
+    if( parent._scheduler._show_card == "cluster"           )  what += " cluster";
+    if( parent._scheduler._show_card == "remote_schedulers" )  what += " remote_schedulers";
+    if( parent._scheduler._show_card == "job_chains" || parent._scheduler._show_card == "orders" )  what += " job_chains";
+    if( parent._scheduler._show_card == "last_activities"   )  what += " task_history job_chains";
+    
+    if( parent._scheduler._show_card == "last_activities" ) {
+      if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="' + parent._scheduler._runtime_settings.max_last_activities + '"';
+      _response = parent._scheduler.execute( '<show_state what="' + what + '" max_orders="' + max_orders + '" max_task_history="'+ parent._scheduler._runtime_settings.max_last_activities+'"' + max_order_history +'/>' );
+    } else {
+      if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="0"';
+      _response = parent._scheduler.execute( '<show_state what="' + what + '" max_orders="' + max_orders + '" max_task_history="0"' + max_order_history +'/>' );
+    }
+    window.parent.top_frame.update(_response);
+    if(typeof window.parent.control_frame.update == 'function') window.parent.control_frame.update(_response);
+    modify_response( _response );
+    document.getElementById( "stylesheet_output" ).innerHTML = parent._scheduler.xmlTransform( _response, true );
+}
+
+
+//----------------------------------------------------------------------------------modify_response
+
+function modify_response( response )
 {
-    reset_error();
-    repeat_update( parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked, 
-                   parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked );
+    parent._scheduler.logger(3,'START MODIFY RESPONSE '+self.name,'modify_response');
+    // Antwort manipulieren: <tasks> mit <task> auffuellen, bis <job tasks=".."> erreicht ist.
+    // Werte der Checkboxen show_tasks_checkbox und show_my_orders ins XML-Dokument uebernehmen (fuer XSL)
+    
+    var spooler_element = response.selectSingleNode( "spooler" );
+    
+    if( parent._scheduler._show_card == 'jobs' ) {
+      var job_elements = response.selectNodes( ".//jobs/job" );
+      
+      for( var j = 0; j < job_elements.length; j++ )
+      {
+          var job_element = job_elements[j];
+          if( !parent.control_frame.apply_filter( job_element, 'jobs' ) ) continue; 
+          if( !parent.left_frame.apply_jobs_select( job_element ) ) continue; 
+          var tasks_element = job_element.selectSingleNode( "tasks" );
+          if( tasks_element )
+          {
+              var task_elements = tasks_element.selectNodes( "task" );
+              var n = 1*job_element.getAttribute( "tasks" ) - task_elements.length;
+              for( var t = 0; t < n; t++ )
+              {
+                  tasks_element.appendChild( tasks_element.ownerDocument.createElement( "task" ) );
+              }
+          } 
+      }
+    }
+    if( parent._scheduler._show_card == 'job_chains' ) {
+      var job_elements = response.selectNodes( ".//jobs/job[not(@order) or @order != 'yes']" );
+      for( var j = 0; j < job_elements.length; j++ )
+      {
+        job_elements[j].parentNode.removeChild(job_elements[j]);
+      }
+      var job_chain_elements = response.selectNodes( ".//job_chains/job_chain" );
+      
+      for( var j = 0; j < job_chain_elements.length; j++ )
+      { 
+        if( !parent.control_frame.apply_filter( job_chain_elements[j], 'job_chains' ) ) continue;
+        if( !parent.left_frame.apply_job_chains_select( job_chain_elements[j], response ) ) continue;
+      }
+      
+      job_chain_elements = response.selectNodes( ".//job_chains/job_chain[job_chain_node.job_chain]" );
+      
+      for( var j = 0; j < job_chain_elements.length; j++ )
+      { 
+        if( !parent.left_frame.apply_big_chains_select( job_chain_elements[j] ) ) continue;
+      }
+    }
+    if( parent._scheduler._show_card == 'orders' ) {
+      var job_elements = response.selectNodes( ".//jobs/job[not(@order) or @order != 'yes']" );
+      for( var j = 0; j < job_elements.length; j++ )
+      {
+        job_elements[j].parentNode.removeChild(job_elements[j]);
+      }
+      var order_elements = response.selectNodes( ".//order" );
+      for( var j = 0; j < order_elements.length; j++ )
+      {
+        parent.control_frame.apply_filter( order_elements[j], 'orders' );
+      }
+    }
+    
+    if( spooler_element )
+    {   
+      restore_checkbox_state( spooler_element, "show_tasks_checkbox"            );
+      restore_checkbox_state( spooler_element, "show_job_chain_jobs_checkbox"   );
+      restore_checkbox_state( spooler_element, "show_job_chain_orders_checkbox" );
+      restore_checkbox_state( spooler_element, "show_task_error_checkbox"       );
+      restore_checkbox_state( spooler_element, "show_error_checkbox"            );
+      restore_checkbox_state( spooler_element, "check_folders_checkbox"         );
+      restore_state( spooler_element, parent._scheduler._radio_states );
+      restore_state( spooler_element, parent._scheduler._select_states );
+      
+      spooler_element.setAttribute( "my_frame"            , 'list' );
+      spooler_element.setAttribute( "my_max_orders"       , parent._scheduler._runtime_settings.max_orders );
+      spooler_element.setAttribute( "my_max_order_history", parent._scheduler._runtime_settings.max_order_history );
+      spooler_element.setAttribute( "my_max_last_activities" , parent._scheduler._runtime_settings.max_last_activities  );
+      spooler_element.setAttribute( "my_show_card"        , parent._scheduler._show_card );
+      //spooler_element.setAttribute( "my_url_base"         , document.location.href.replace( /\/[^\/]*$/, "/" )     );   // Alles bis zum letzten Schraeger
+      //spooler_element.setAttribute( "my_url_path_base"    , document.location.pathname.replace( /\/[^\/]*$/, "/" ) );   // Pfad bis zum letzten Schraeger
+      spooler_element.setAttribute( "my_ie_version"       , parseInt(parent.ie,10) );
+      spooler_element.setAttribute( "my_chrome_version"   , parent.chrome );
+      spooler_element.setAttribute( "my_lang"             , parent._sos_lang );
+      
+      spooler_element.setAttribute( "my_update_seconds"   , parent._scheduler._update_seconds );
+      spooler_element.setAttribute( "host"                , window.location.host              );
+      if( parent._scheduler._update_periodically ) spooler_element.setAttribute( "update_periodically_checkbox", "yes" );
+      if( window.createPopup != undefined        ) spooler_element.setAttribute( "my_popup_menu"               , "1" );
+    }
+    
+    parent._scheduler.logger(3,'ELAPSED TIME FOR MODIFY RESPONSE','modify_response');
+    parent._scheduler.logger(9,'MODIFIED RESPONSE '+self.name+':\n' + response.xml); 
+}
+
+
+//------------------------------------------------------------------------------------restore_state
+
+function restore_state( spooler_element, stateObj )
+{   
+    for(var entry in stateObj) {
+        spooler_element.setAttribute( entry, stateObj[entry] );
+    }
+}
+
+//---------------------------------------------------------------------------restore_checkbox_state
+
+function restore_checkbox_state( spooler_element, name )
+{
+    if( parent._scheduler._checkbox_states[ name ] )  spooler_element.setAttribute( name, "yes" );
 }
 
 //------------------------------------------------------------------------------------repeat_update
 
 function repeat_update( repeat, call_update )
-{
-    reset_error();
-    if( _timer != undefined )  window.clearTimeout( _timer ),  _timer = undefined;
+{   
+    resetError();
+    if( _timer > 0 ) { window.clearTimeout( _timer );  _timer = 0; }
     
     try
     {
         if( call_update )
         {
-            if( document.getElementById( "update_periodically_checkbox" ) )
-                document.getElementById( "update_periodically_checkbox" ).checked = false;     
-            update();
+            if( parent.top_frame.document.getElementById( "update_periodically_checkbox" ) ) 
+                parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked = false;
+            update__onclick();    
         }
     }
     catch( x )
@@ -118,165 +304,37 @@ function repeat_update( repeat, call_update )
              || x.number == DE_E_RESOURCE_NOT_FOUND )  repeat = true;       // Nur ie liefert diese Fehlercodes in x.number
         }
         
-        handle_exception( x );
+        showError(x);
     }    
-
-    var checkbox = document.getElementById( "update_periodically_checkbox" )
-    if( checkbox )  checkbox.checked = repeat;  // Im Fehlerfall ausschalten
-
-    if( repeat )  set_update_timer();
+    finally {
+        if( parent.top_frame.document.getElementById( "update_periodically_checkbox" ) ) {  
+            parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked = repeat;  // Im Fehlerfall ausschalten
+            parent._scheduler._update_periodically = repeat;
+        }
+        if( repeat )  set_update_timer();
+    }
 }
 
 //---------------------------------------------------------------------------------set_update_timer
 
 function set_update_timer()
 {
-    if( _timer != undefined )  window.clearTimeout( _timer ),  _timer = undefined;
-    _timer = window.setTimeout( "repeat_update(true,true)", update_seconds * 1000, "JavaScript" );
+    if( _timer > 0 ) { window.clearTimeout( _timer );  _timer = 0; }
+    _timer = set_timeout( "callErrorChecked('repeat_update',true,true)", parent._scheduler._update_seconds * 1000 );
 }
 
-//--------------------------------------------------------------------------------update_jobs_frame
-
-function update_jobs_frame()
-{
-    var what       = "";
-    var max_orders = 0;
-    
-    if( _checkbox_states.show_job_chain_orders_checkbox || window.parent.details_frame._job_chain_element )
-    {
-        what = "job_chain_orders";
-        max_orders = window.parent.details_frame._job_chain_element? 9999 : _max_orders;
-    }
-    
-    _response = _scheduler.execute( "<show_state what='" + what + "' max_orders='" + max_orders + "'/>" );
-    modify_response( _response );
-    var scheduler_id = _response.selectSingleNode( "spooler/answer/state" ).getAttribute( "id" );
-    document.title = "Scheduler " + ( scheduler_id? " id=" + scheduler_id : "" );
-    
-    document.getElementById( "stylesheet_output" ).innerHTML = _stylesheet.xml_transform( _response );
-
-    if( _translation_table )
-    {    
-        var span_elements = document.body.getElementsByTagName( "span" );
-        for( var i = 0; i < span_elements.length; i++ )
-        {
-            var span_element = span_elements[i];
-            if( span_element.getAttribute( "className" ) == "translate" )
-            {
-                var translation = _translation_table[ span_element.innerText ];
-                if( translation )  span_element.innerText = translation, spanElement.removeAttribute( "className" );
-            }
-        }
-    }
-}
-
-//-------------------------------------------------------------------------------------------update
-
-function update()
-{
-    reset_error();
-    update_jobs_frame();
-    
-    //if( window.parent.details_frame.document.readyState == "complete" )
-    if( window.parent._details_frame_loaded )
-    {
-        window.parent.details_frame.update();
-    }
-    
-    if( _timer != undefined )  set_update_timer();
-}
-
-//----------------------------------------------------------------------------------modify_response
-
-function modify_response( response )
-{
-    // Antwort manipulieren: <tasks> mit <task> auffüllen, bis <job tasks=".."> erreicht ist.
-
-    var job_elements = response.selectNodes( ".//job" );
-    for( var j = 0; j < job_elements.length; j++ )
-    {
-        var job_element = job_elements[j];
-        
-        var tasks_element = job_element.selectSingleNode( "tasks" );
-        if( tasks_element )
-        {
-            var task_elements = tasks_element.selectNodes( "task" );
-            var n = 1*job_element.getAttribute( "tasks" ) - task_elements.length;
-            for( var t = 0; t < n; t++ )
-            {
-                tasks_element.appendChild( tasks_element.ownerDocument.createElement( "task" ) );
-            }
-        } 
-    }
-    
-
-    // Werte der Checkboxen show_tasks_checkbox und show_my_orders ins XML-Dokument übernehmen (für XSL)
-    
-    var spooler_element = response.selectSingleNode( "spooler" );
-    if( spooler_element )
-    {    
-        restore_checkbox_state( response, "show_order_jobs_checkbox" );
-        restore_checkbox_state( response, "show_tasks_checkbox" );
-        restore_checkbox_state( response, "show_job_chain_jobs_checkbox" );
-        restore_checkbox_state( response, "show_job_chain_orders_checkbox" );
-
-        spooler_element.setAttribute( "my_max_orders"    , _max_orders );
-        spooler_element.setAttribute( "my_show_card"     , _show_card );
-        spooler_element.setAttribute( "my_update_seconds", update_seconds );
-    }
-}
-
-//------------------------------------------------------------------------------save_checkbox_state
-
-function save_checkbox_state( name )
-{
-    if( document.getElementById( name ) )
-    {
-        _checkbox_states[ name ] = document.getElementById( name ).checked;
-    }
-}
-
-//---------------------------------------------------------------------------restore_checkbox_state
-
-function restore_checkbox_state( response, name )
-{
-    var spooler_element = response.selectSingleNode( "spooler" );
-    if( spooler_element )
-    {
-        //if( document.all[ name ]  &&  document.all[ name ].checked )
-        //{
-         //   spooler_element.setAttribute( name, "yes" );
-        //}
-        //else
-        {
-            if( _checkbox_states[ name ] )  spooler_element.setAttribute( name, "yes" );
-        }
-    }
-}
-
-//-------------------------------------------------------------------------show_job_process_classes
+//---------------------------------------------------------------------------------------show_card
 
 function show_card( what )
 {
-    if( what != _show_card )
+    if( what != window.parent._show_card )
     {
-        if( what == "process_classes" )
+        if( what == "process_classes" || what == "remote_schedulers" || what == "cluster" )
         {
-            window.parent.details_frame.clear();
-            
-            _saved_frameset_cols = window.parent.document.getElementById( "left_and_right_frameset" ).cols; 
-            window.parent.document.getElementById( "left_and_right_frameset" ).cols = "100%, 0%";
+            window.parent.details_frame.hide();
         }
-        else
-        if( _saved_frameset_cols != undefined )
-        {
-            window.parent.document.getElementById( "left_and_right_frameset" ).cols = _saved_frameset_cols;
-            _saved_frameset_cols = undefined;
-        }
-    
-        _show_card = what;
+        window.parent._show_card = what;
     }
-    
     update();
 }
 
@@ -284,41 +342,269 @@ function show_card( what )
 
 function show_task_details( job_name, task_id )
 {
-    var job_element  = _response.selectSingleNode( ".//job[@job='" + job_name + "']" );
-    var task_element = _response.selectSingleNode( ".//task[@id=" + task_id + "]" );
-
-    update_jobs_frame();
+    var job_element  = _response.selectSingleNode( './/job[@path="' + xml_encode(job_name) + '"]' );
+    if( !job_element ) {
+      job_element = _response.selectSingleNode( './/job[@path="/' + xml_encode(job_name) + '"]' );
+    }
+    var task_element = _response.selectSingleNode( './/task[@id="' + task_id + '"]' );
     window.parent.details_frame.show_task_details( job_element, task_element );
+    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
+       set_timeout('parent.left_frame.update(false)', 1);
+    }
 }
 
 //---------------------------------------------------------------------------------show_job_details
 
-function show_job_details( job_name )
-{
-    var job_element  = _response.selectSingleNode( ".//job[@job='" + job_name + "']" );
-
+function show_job_details( path )
+{   
+    var job_element  = _response.selectSingleNode( './/job[@path="' + xml_encode(path) + '"]' ); 
+    if( !job_element ) {
+      job_element = _response.selectSingleNode( './/job[@path="/' + xml_encode(path) + '"]' );
+    }
     window.parent.details_frame.show_job_details( job_element );
-    update_jobs_frame();
+    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
+       set_timeout('parent.left_frame.update(false)', 1);
+    }    
+}
+
+
+//----------------------------------------------------------------------------show_schedule_details
+
+function show_schedule_details( path )
+{
+    var schedule_element  = _response.selectSingleNode( './/schedule[@path="' + xml_encode(path) + '"]' ); 
+    if( !schedule_element ) {
+      schedule_element = _response.selectSingleNode( './/job[@path="/' + xml_encode(path) + '"]' );
+    }
+    window.parent.details_frame.show_schedule_details( schedule_element );
+    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
+       set_timeout('parent.left_frame.update(false)', 1);
+    }
 }
 
 //---------------------------------------------------------------------------show_job_chain_details
 
-function show_job_chain_details( job_chain_name )
+function show_job_chain_details( path )
 {
-    var job_chain_element = _response.selectSingleNode( ".//job_chain[@name='" + job_chain_name + "']" );
-
+    var job_chain_element = _response.selectSingleNode( './/job_chain[@path="' + xml_encode(path) + '"]' );
+    if( !job_chain_element ) {
+      job_chain_element = _response.selectSingleNode( './/job_chain[@path="/' + xml_encode(path) + '"]' );
+    }
     window.parent.details_frame.show_job_chain_details( job_chain_element );
-    update();
+    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
+       set_timeout('parent.left_frame.update(false)', 1);
+    }
 }
 
+//-------------------------------------------------------------------------------show_order_details
+
+function show_order_details( order_id, job_chain_name, menu_caller )
+{   
+    window.parent.details_frame.show_order_details( order_id, job_chain_name );
+    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
+       set_timeout('parent.left_frame.update(false)', 1);
+    }
+}
+
+//-------------------------------------------------------------------------------input_dialog_submit
+ 
+function input_dialog_submit() 
+{
+    var fields = new Object();
+    var dialog_form = document.forms["__input_dialog__"];
+    if( dialog_form ) {
+      for( var i = 0; i < dialog_form.length; i++ ) {
+        var element = dialog_form.elements[i];
+        if( !element.type ) continue;
+        switch( element.type ) {
+          case "submit"  : break;
+          case "button"  : break;
+          case "checkbox": fields[ element.name ] = element.checked; break;
+          case "textarea": fields[ element.name ] = (element.name=="command") ? element.value.bin2hex() : element.value; break;
+          default        :
+              if( element.name.search( /^new_param_/ ) == -1 ) {
+                fields[ element.name ] = element.value;
+              } 
+              break;
+        }
+      }
+      fields.count_new_params = 0;
+      var count_new_params_element = dialog_form.elements["count_new_params"];
+      if( count_new_params_element ) {
+        var count_new_params = parseInt( count_new_params_element.value, 10 );
+        fields.new_params = new Object();
+        for( var i = 0; i < count_new_params; i++ ) {
+          var new_param_name = dialog_form.elements["new_param_name_" + i].value;
+          if( new_param_name != "" ) { 
+            fields.new_params[ new_param_name ] = dialog_form.elements["new_param_value_" + i].value;
+            fields.count_new_params++;
+          }
+        }
+      }
+    }
+    return fields;
+}
+
+
+//-------------------------------------------------------------------------------runtime_editor
+
+function runtime_editor( root, has_run_options )
+{   
+    var dialog_form = document.forms["__input_dialog__"];
+    if( typeof has_run_options != "boolean" )  has_run_options = false;
+    if( dialog_form && typeof window['Editor'] == 'function' ) {
+        Editor.close(); 
+        Editor.setCallback(set_new_runtime);
+        Editor.imgDir        = "";
+        Editor.root          = root;
+        //Editor.hasRunOptions = has_run_options;
+        Editor.hasRunOptions = false;
+        Editor.schedules     = _schedules;
+        Editor.calendar.src  = 'sos_calendar.js';
+        Editor.calendar.div  = 'sos_div.js';
+        Editor.start(dialog_form.elements['run_time'].value);
+    }
+  
+}
+
+
+//------------------------------------------------------------------------------set_new_runtime
+
+function set_new_runtime() 
+{       
+    var dialog_form = document.forms["__input_dialog__"];
+    if( dialog_form && typeof window['Editor'] == 'function' ) {
+      var new_runtime = Editor.getXML();  //liefert 0, wenn unveraendert, sonst neues xml der runtime
+      if( new_runtime != -1 ) dialog_form.elements['run_time'].value = new_runtime;
+    }
+}
+
+
+
+function apply_jobs_select( node )
+{   
+    switch( parent._scheduler._select_states[ 'show_jobs_select' ] ) {
+      case 'standalone'         : if( node.getAttribute( "order" ) == "yes" ) { node.parentNode.removeChild(node); return false; }
+                                  break;
+      case 'order'              : if( node.getAttribute( "order" ) != "yes" ) { node.parentNode.removeChild(node); return false; }
+                                  break;
+    }
+    switch( parent._scheduler._select_states[ 'jobs_state_select' ] ) {
+      case 'running'            : if( node.getAttribute( "state" ).search(/^running/) == -1 ) { node.parentNode.removeChild(node); return false; }
+                                  break;
+      case 'stopped'            : if( node.getAttribute( "state" ).search(/^stopp/) == -1 ) { node.parentNode.removeChild(node); return false; }
+                                  break;
+      case 'running_or_stopped' : if( node.getAttribute( "state" ).search(/^(stopp|running)/) == -1 ) { node.parentNode.removeChild(node); return false; }
+                                  break;
+      case 'other'              : if( node.getAttribute( "state" ).search(/^(stopp|running)/) > -1 ) { node.parentNode.removeChild(node); return false; }
+                                  break;
+    }
+    switch( parent._scheduler._select_states[ 'jobs_process_class_select' ] ) {
+      case 'all'                : break;
+      case 'default'            : if( node.getAttribute( "process_class" ) && node.getAttribute( "process_class" ) != "" ) { node.parentNode.removeChild(node); return false; }
+                                  break;
+      default                   : if( !node.getAttribute( "process_class" ) || node.getAttribute( "process_class" ).replace(/^\//,'') != window.parent._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) { node.parentNode.removeChild(node); return false; }
+                                  break;
+    }
+    return true;
+}
+
+
+function apply_job_chains_select( node, response )
+{   
+    var job_chain_jobs = node.selectNodes( "job_chain_node[@job]" );
+    var job;
+    var found = [false,false];
+    var order_id_space = node.getAttribute('order_id_space');
+    for( var i = 0; i < job_chain_jobs.length; i++ )
+    {
+      job = response.selectSingleNode( ".//jobs/job[@path = '"+job_chain_jobs[i].getAttribute('job')+"' and @order = 'yes']" );
+      if( !job || job.getAttribute('path') == '/scheduler_file_order_sink' ) continue;
+      if( !found[0] ) {
+        switch( parent._scheduler._select_states[ 'jobs_state_select' ] ) {
+          case 'all'                : found[0] = true;
+                                      break;
+          case 'running'            : if( job.getAttribute( "state" ).search(/^running/) > -1 ) found[0] = true;
+                                      break;
+          case 'stopped'            : if( job.getAttribute( "state" ).search(/^stopp/) > -1 ) found[0] = true;
+                                      break;
+          case 'running_or_stopped' : if( job.getAttribute( "state" ).search(/^(stopp|running)/) > -1 ) found[0] = true;
+                                      break;
+          case 'other'              : if( job.getAttribute( "state" ).search(/^(stopp|running)/) == -1 ) found[0] = true;
+                                      break;
+        }
+      }
+      if( !found[1] ) { 
+        switch( parent._scheduler._select_states[ 'jobs_process_class_select' ] ) {
+          case 'all'                : found[1] = true;
+                                      break;
+          case 'default'            : if( !job.getAttribute( "process_class" ) || job.getAttribute( "process_class" ) == "" ) found[1] = true;
+                                      break;
+          default                   : if( job.getAttribute( "process_class" ) && job.getAttribute( "process_class" ).replace(/^\//,'') == window.parent._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) found[1] = true;
+                                      break;
+        }
+      }
+      if( found[0] && found[1] ) break;
+    }
+    
+    if( !found[0] || !found[1] ) { 
+      if( order_id_space ) {
+        node.setAttribute('select_marked',1);
+      } else {
+        node.parentNode.removeChild(node); return false;
+      }
+    }
+              
+    return true;
+}
+
+
+function apply_big_chains_select( node )
+{ 
+    var job_chains2    = node.selectNodes( "job_chain_node.job_chain" );
+    var job_chains     = [];
+    var job_chain      = null;
+    var cnts           = [0,0];
+    for( var i=0; i < job_chains2.length; i++ ) {
+      job_chain = node.parentNode.selectSingleNode( "job_chain[@path='"+job_chains2[i].getAttribute('job_chain')+"']" ); 
+      if( job_chain ) job_chains.push( job_chain );
+    }
+    for( var i=0; i < job_chains.length; i++ ) {
+      if( job_chains[i].getAttribute('filter_marked') ) { job_chains[i].removeAttribute('filter_marked'); cnts[0]++; }
+      if( job_chains[i].getAttribute('select_marked') ) { job_chains[i].removeAttribute('select_marked'); cnts[1]++; }
+    }
+    if( cnts[1] == job_chains2.length ) {
+      node.parentNode.removeChild(node);
+      for( var i=0; i < job_chains.length; i++ ) { job_chains[i].parentNode.removeChild(job_chains[i]); }
+      return false;
+    }
+    if( cnts[0] == job_chains2.length && node.getAttribute('filter_marked') ) {
+      node.parentNode.removeChild(node);
+      for( var i=0; i < job_chains.length; i++ ) { job_chains[i].parentNode.removeChild(job_chains[i]); }
+      return false;
+    }
+    return true;
+}
+
+
 //-------------------------------------------------------------------------------------------------
---></script>
 
+window.onload   = do_onload;
+window.onunload = do_onunload;
+//-->
+</script>
+</head>
 
-<script defer="true" type="text/javascript" for="window" event="onload"  > do_onload();   </script>
-<script defer="true" type="text/javascript" for="window" event="onunload"> do_onunload(); </script>
-
-
+<body class="left">
+  <table cellspacing="0" cellpadding="0" width="100%"><thead><tr><td style="padding:0px">
+    <span id="stylesheet_output"></span>
+  </td></tr></thead></table>
+    <!-- iframe for IE to display div above without any listboxes shine through -->  
+    <iframe id="__input_iframe__" style="display:none;top:70px;position:absolute;" src="about:blank"></iframe>
+    <div id="__input_shadow1__" class="shadow1"></div>
+    <div id="__input_shadow2__" class="shadow2"></div>
+    <div id="__input__" class="input"></div>
+  
 </body>
 
 </html>
