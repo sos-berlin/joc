@@ -37,68 +37,68 @@
     <head>
         <TITLE>Job Scheduler</TITLE>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    </head>
     
-    <script type="text/javascript" src="scheduler_init.js"></script>
-    <script type="text/javascript" src="browser_dependencies.js"></script>
-    <script type="text/javascript" src="scheduler.js"></script>
-    <script type="text/javascript" src="sos_logger.js"></script>
-    <script type="text/javascript" language="javascript">
-    <!--
-      var _source                                         = undefined;
-      var onload_settings                                 = new Object();
-      onload_settings.checkbox_states                     = new Object();
-      onload_settings.radio_states                        = new Object();
-      onload_settings.select_states                       = new Object();
-      var _scheduler                                      = new Scheduler();
-      var _state                                          = null;
-      
-      check_browser();
-      
-      try {
-        _scheduler.loadXSLT( "scheduler.xslt" );
-        _scheduler.readCustomSettings();
-        var response    = _scheduler.execute( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
-        _state          = response.selectSingleNode( "/spooler/answer/state" );
-        _scheduler.setState( _state );
-        document.title  = "Job Scheduler " + _scheduler._host + ":" + _scheduler._port;
-        document.title += ( _scheduler._id ) ? " id=" + _scheduler._id : "";
-        if( !_server_settings ) _scheduler.readCookies();
-        
-        onload_settings.update_seconds             = _scheduler._update_seconds;
-        onload_settings.update_periodically        = _scheduler._update_periodically;
-        onload_settings.update_incl_hot_folders    = _scheduler._update_incl_hot_folders;
-        onload_settings.show_card                  = _scheduler._show_card;
-        
-        for( var state in _scheduler._checkbox_states ) {                   
-            onload_settings.checkbox_states[state] = _scheduler._checkbox_states[state];
-        }                                                      
-        for( var state in _scheduler._select_states ) {                   
-            onload_settings.select_states[state]   = _scheduler._select_states[state];
-        }                                                        
-        for( var state in _scheduler._radio_states ) {                      
-            onload_settings.radio_states[state]    = _scheduler._radio_states[state];
-        }
-      }
-      catch(E) {
-        alert(E.message);
-      }
-      
-      window.onunload = function() {
-        if( _scheduler )  _scheduler.close();
-      }
-      
-      window.onerror  = function( msg, url, line ) {
-        try {
-          frames.top_frame.showError(msg);
-        } catch(x) {
-          alert(msg.replace(/^.*connect to Job Scheduler\n(.*)$/,"No connection to Job Scheduler\n$1"));
-        } finally {
-          return true;
-        }
-      }
-    //-->
-    </script>
+        <script type="text/javascript" src="scheduler_init.js"></script>
+        <script type="text/javascript" src="browser_dependencies.js"></script>
+        <script type="text/javascript" src="scheduler.js"></script>
+        <script type="text/javascript" src="sos_logger.js"></script>
+        <script type="text/javascript" language="javascript">
+        <!--
+          var _source                                         = undefined;
+          var onload_settings                                 = new Object();
+          onload_settings.checkbox_states                     = new Object();
+          onload_settings.radio_states                        = new Object();
+          onload_settings.select_states                       = new Object();
+          var _scheduler                                      = new Scheduler();
+          var _state                                          = null;
+          
+          check_browser();
+          
+          try {
+            _scheduler.loadXSLT( "scheduler.xslt" );
+            _scheduler.readCustomSettings();
+            var response    = _scheduler.execute( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
+            _state          = response.selectSingleNode( "/spooler/answer/state" );
+            _scheduler.setState( _state );
+            document.title  = "Job Scheduler " + _scheduler._host + ":" + _scheduler._port;
+            document.title += ( _scheduler._id ) ? " id=" + _scheduler._id : "";
+            if( !_server_settings ) _scheduler.readCookies();
+            
+            onload_settings.update_seconds             = _scheduler._update_seconds;
+            onload_settings.update_periodically        = _scheduler._update_periodically;
+            onload_settings.update_incl_hot_folders    = _scheduler._update_incl_hot_folders;
+            onload_settings.show_card                  = _scheduler._show_card;
+            
+            for( var state in _scheduler._checkbox_states ) {                   
+                onload_settings.checkbox_states[state] = _scheduler._checkbox_states[state];
+            }                                                      
+            for( var state in _scheduler._select_states ) {                   
+                onload_settings.select_states[state]   = _scheduler._select_states[state];
+            }                                                        
+            for( var state in _scheduler._radio_states ) {                      
+                onload_settings.radio_states[state]    = _scheduler._radio_states[state];
+            }
+          }
+          catch(E) {
+            alert(E.message);
+          }
+          
+          window.onunload = function() {
+            if( _scheduler )  _scheduler.close();
+          }
+          
+          window.onerror  = function( msg, url, line ) {
+            try {
+              frames.top_frame.showError(msg);
+            } catch(x) {
+              alert(msg.replace(/^.*connect to Job Scheduler\n(.*)$/,"No connection to Job Scheduler\n$1"));
+            } finally {
+              return true;
+            }
+          }
+        //-->
+        </script>
+    </head>
     
     <frameset id="top_and_bottom_frameset" rows="71,0,44,*"       framespacing="0" border="0" onload="frames.left_frame.location.href='left_frame.html';">
         <frame   name="top_frame"     src="top_frame_compact.html" marginwidth="0" marginheight="0" frameborder="0" scrolling="no" >
