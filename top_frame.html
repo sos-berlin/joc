@@ -374,7 +374,8 @@ window.onerror  = function( msg, url, line ) {
               document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('ID')+':&#160;</span><span id="spooler_id" style="white-space:nowrap;font-weight:bold;"></span></td>' );
               document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('State')+':&#160;</span><span id="spooler_state" style="white-space:nowrap;"></span></td>' );
               document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('Pid')+':&#160;</span><span id="spooler_pid" style="white-space:nowrap;"></span></td>' );
-              document.writeln( '              <td colspan="2" align="center" style="white-space:nowrap;">&#160;</td>' );
+              document.writeln( '              <td class="location" align="center" style="white-space:nowrap;">'+parent._scheduler._host+':'+parent._scheduler._port+'</td>' );
+              document.writeln( '              <td style="white-space:nowrap;">&#160;</td>' );
               document.writeln( '              <td align="right" style="white-space:nowrap;"><span class="label">'+parent.getTranslation('Time')+':&#160;</span><span id="spooler_time">0000-00-00 00:00:00</span></td>' );
               document.writeln( '            </tr>' );
               document.writeln( '            <tr>' );
@@ -430,7 +431,7 @@ window.onerror  = function( msg, url, line ) {
             document.writeln('              <tr><td width="1">'+parent.getTranslation('Job Scheduler').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td style="text-align:right;">'+parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1") + '&#160;&#160;&#160;' + parent._scheduler._version_date.replace(/[ ]+.*$/,'')+'</td></tr>');
             document.writeln('            </table>');
             document.writeln('          </td></tr>');
-            document.writeln('          <tr><td style="padding:0px 6px 2px 0px;white-space:nowrap;"><div id="config_button" class="button" onclick="showInfo(\'none\');"><!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->'+parent.getTranslation('OK')+'<!--[if lte IE 6]></a><![endif]--></div></td></tr>');
+            document.writeln('          <tr><td align="right" style="padding:0px 6px 2px 0px;white-space:nowrap;"><div id="info_button" class="button" onclick="showInfo(\'none\');"><!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->'+parent.getTranslation('OK')+'<!--[if lte IE 6]></a><![endif]--></div></td></tr>');
           </script>
         </tbody></table>
         <img class="corner_bl" src="corner_bl.gif" alt="" />

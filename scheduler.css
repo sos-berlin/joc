@@ -18,6 +18,7 @@ a:visited        								{color:#000066;text-decoration:none;font-size:12px;}
 .small                          {font-size:11px;}
 .label                          {font-size:11px;white-space:nowrap;}
 .caption                        {font-size:16px;font-weight:bold;font-family:"Trebuchet MS",Arial,Helvetica,Sans-Serif;font-style:italic;color:#EA7A14;}       
+.location                       {font-weight:bold;color:#EA7A14;}       
 .red                            {color:darkred;}
 .file_based_error               {font-size:11px;color:darkred;}
 .job_error                      {font-size:11px;color:darkred;}
