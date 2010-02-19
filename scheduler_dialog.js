@@ -1317,7 +1317,6 @@ function scheduler_menu__onclick( elt )
     var waiting_errno   = window.parent.left_frame._response.selectSingleNode( "spooler/answer/state" ).getAttribute( "waiting_errno" );
     var cluster_element = window.parent.left_frame._response.selectSingleNode( "spooler/answer/state/cluster" );
     var within          = parent._scheduler._runtime_settings.terminate_timeout;
-    var within2         = (parent._scheduler._lang_file_exists) ? "" : " ~"+within+"s";
     
     var command         = function( cmd ) { return "<modify_spooler cmd='" + cmd + "'/>"; }
     
@@ -1345,9 +1344,9 @@ function scheduler_menu__onclick( elt )
     }
     if( parent._scheduler.versionIsNewerThan( "2007-01-05 17:00:00" ) ) {
       popup_builder.add_command ( parent.getTranslation("Terminate")                        , "<terminate/>"                           , !waiting_errno );
-      popup_builder.add_command ( parent.getTranslation("Terminate within",{sec:within})+within2, "<terminate timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"'/>", !waiting_errno );
+      popup_builder.add_command ( parent.getTranslation("Terminate within ~$secs",{sec:within}), "<terminate timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"'/>", !waiting_errno );
       popup_builder.add_command ( parent.getTranslation("Terminate and restart")            , "<terminate restart='yes'/>"             , !waiting_errno );
-      popup_builder.add_command ( parent.getTranslation("Terminate and restart within",{sec:within})+within2, "<terminate restart='yes' timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"'/>", !waiting_errno );
+      popup_builder.add_command ( parent.getTranslation("Terminate and restart within ~$secs",{sec:within}), "<terminate restart='yes' timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"'/>", !waiting_errno );
     } else {
       popup_builder.add_command ( parent.getTranslation("Terminate")                        , command( "terminate"                     ), !waiting_errno );
       popup_builder.add_command ( parent.getTranslation("Terminate and restart")            , command( "terminate_and_restart"         ), !waiting_errno );
@@ -1360,12 +1359,12 @@ function scheduler_menu__onclick( elt )
     if( cluster_element ) {
       popup_builder.add_bar();
       popup_builder.add_command ( parent.getTranslation("Terminate cluster")                , "<terminate all_schedulers='yes'/>"              , !waiting_errno );
-      popup_builder.add_command ( parent.getTranslation("Terminate cluster within",{sec:within})+within2    , "<terminate timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"' all_schedulers='yes'/>" , !waiting_errno );
+      popup_builder.add_command ( parent.getTranslation("Terminate cluster within ~$secs",{sec:within})    , "<terminate timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"' all_schedulers='yes'/>" , !waiting_errno );
       popup_builder.add_command ( parent.getTranslation("Terminate and restart cluster")    , "<terminate restart='yes' all_schedulers='yes'/>", !waiting_errno );
-      popup_builder.add_command ( parent.getTranslation("Terminate and restart cluster within",{sec:within})+within2  , "<terminate restart='yes' timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"' all_schedulers='yes'/>", !waiting_errno );
+      popup_builder.add_command ( parent.getTranslation("Terminate and restart cluster within ~$secs",{sec:within})  , "<terminate restart='yes' timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"' all_schedulers='yes'/>", !waiting_errno );
       if( cluster_element.getAttribute( "exclusive" ) == "yes" ) {
         popup_builder.add_command ( parent.getTranslation("Terminate fail-safe")            , "<terminate continue_exclusive_operation='yes'/>", !waiting_errno ); 
-        popup_builder.add_command ( parent.getTranslation("Terminate fail-safe within",{sec:within})+within2, "<terminate continue_exclusive_operation='yes' timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"'/>", !waiting_errno );
+        popup_builder.add_command ( parent.getTranslation("Terminate fail-safe within ~$secs",{sec:within}), "<terminate continue_exclusive_operation='yes' timeout='"+parent._scheduler._runtime_settings.terminate_timeout+"'/>", !waiting_errno );
       }
     }
     

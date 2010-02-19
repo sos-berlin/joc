@@ -121,8 +121,8 @@ function set_state(state)
     }
     document.getElementById('spooler_id').innerHTML           = (state.getAttribute('id') || parent.getTranslation('unknown'));
     document.getElementById('spooler_state').innerHTML        = (parent.getTranslation(state.getAttribute('state')) || parent.getTranslation('unknown'));
-    document.getElementById('spooler_version').title          = parent.getTranslation('pid')+":"+(state.getAttribute('pid') || parent.getTranslation('unknown'));
-    document.getElementById('spooler_version').innerHTML      = (state.getAttribute('version') || '0.0.000.0000 (0000-00-00 00:00:00)');
+    document.getElementById('spooler_pid').innerHTML          = (state.getAttribute('pid') || parent.getTranslation('unknown'));
+    document.getElementById('spooler_build').innerHTML        = parent._scheduler._gui_subversion_no.replace(/[ ]+[^ ]*/,"") + '/' + parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1");
     document.getElementById('spooler_time').innerHTML         = (state.getAttribute('time').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
     document.getElementById('spooler_start_time').innerHTML   = (state.getAttribute('spooler_running_since').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
     document.getElementById('jobs_running').innerHTML         = (state.selectNodes("jobs/job [ @state='running' ]").length || 0);
@@ -131,7 +131,7 @@ function set_state(state)
     document.getElementById('jobs_tasks').innerHTML           = (state.selectNodes("jobs/job/tasks/task[ @id ]").length || 0);
     
     var jobs_orders_inner                                     = cnt_all_orders + '&#160;<span class="label">' + parent.getTranslation('orders');
-    if( cnt_clustered_orders > 0 ) jobs_orders_inner         += (parent._scheduler._lang_file_exists) ? "&#160;("+parent.getTranslation('in cluster',{cnt:cnt_clustered_orders})+")" : "&#160;("+cnt_clustered_orders+" in cluster)";
+    if( cnt_clustered_orders > 0 ) jobs_orders_inner         += "&#160;("+parent.getTranslation('$cnt in cluster',{cnt:cnt_clustered_orders})+")";
     document.getElementById('jobs_orders').innerHTML          = jobs_orders_inner + "</span>";    
 }
 
@@ -166,7 +166,7 @@ function show_card( what )
 //---------------------------------------------------------------------------------------write_menu
 function write_menu(menu)
 {
-  var menu_title = (parent._scheduler._lang_file_exists) ? parent.getTranslation(menu.substr(0,1).toUpperCase() + menu.substring(1)) : parent.getTranslation(menu);
+  var menu_title = parent.getTranslation(menu.substr(0,1).toUpperCase() + menu.substring(1));
   if( window.createPopup == undefined ) {
     document.writeln('          <td align="left" title="scheduler '+menu+'" style="white-space:nowrap;height:16px;padding:0px 4px;">');
     document.writeln('            <div class="selectbox_titlebar_'+menu+'"><select id="__selectbox_'+menu+'__" name="__selectbox_'+menu+'__" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
@@ -203,7 +203,15 @@ function hide__onclick()
 //-------------------------------------------------------------------------------------------------
 
 window.onload   = do_onload;
-
+window.onerror  = function( msg, url, line ) {
+  try {
+    showError(msg);
+  } catch(x) {
+    alert(msg.replace(/^.*connect to Job Scheduler\n(.*)$/,"No connection to Job Scheduler\n$1"));
+  } finally {
+    return true;
+  }
+}
 //-->
 </script>
 </head>
@@ -244,11 +252,7 @@ window.onload   = do_onload;
               document.writeln('              <input id="update_periodically_checkbox" name="update_periodically_checkbox" type="checkbox" style="position:relative;top:0px;height:14px;margin:0px;padding:0px;" onclick="callErrorChecked( \'update_periodically_checkbox__onclick\', this );"/>');
               document.writeln('          </td>');
               document.writeln('          <td class="titlebar" style="padding:0px 2px;">');
-              if( parent._scheduler._lang_file_exists ) {
-                document.writeln('              <span class="label" style="white-space:nowrap;">'+parent.getTranslation('every',{sec:parent._scheduler._update_seconds})+'</span>');
-              } else {
-                document.writeln('              <span class="label" style="white-space:nowrap;">every'+parent._scheduler._update_seconds+'s</span>');
-              }
+              document.writeln('              <span class="label" style="white-space:nowrap;">'+parent.getTranslation('every $secs',{sec:parent._scheduler._update_seconds})+'</span>');
               document.writeln('          </td>');
               document.writeln('          <td class="titlebar">');
               document.writeln('              <input id="check_folders_checkbox" name="check_folders_checkbox" type="checkbox" style="position:relative;top:0px;height:14px;margin:0px;padding:0px;" onclick="update_incl_hot_folders_checkbox__onclick(this)"/>');
@@ -281,7 +285,8 @@ window.onload   = do_onload;
               document.writeln('              <span id="jobs_need_process">0</span>&#160;<span class="label">'+parent.getTranslation('need process')+'</span>&#160;|&#160;');
               document.writeln('              <span id="jobs_tasks">0</span>&#160;<span class="label">'+parent.getTranslation('tasks')+'</span>&#160;|&#160;');
               document.writeln('              <span id="jobs_orders" style="white-space:nowrap;">0&#160;<span class="label">'+parent.getTranslation('orders')+'</span></span>&#160;|&#160;');
-              document.writeln('              <span class="label">'+parent.getTranslation('version')+':</span>&#160;<span id="spooler_version" class="label" title="'+parent.getTranslation('pid')+':'+parent.getTranslation('unknown')+'">0.0.000.0000 (0000-00-00 00:00:00)</span>&#160;');
+              document.writeln('              <span class="label">'+parent.getTranslation('Pid')+':</span>&#160;<span id="spooler_pid" class="label"></span>&#160;|&#160;');
+              document.writeln('              <span class="label">'+parent.getTranslation('Build')+':</span>&#160;<span id="spooler_build" class="label"></span>&#160;');
               document.writeln('            </td>');
               document.writeln('            <td align="right">');
               document.writeln('              <span class="label">'+parent.getTranslation('Scheduler is running since')+':</span><span id="spooler_start_time">0000-00-00 00:00:00</span>');

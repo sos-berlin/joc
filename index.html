@@ -56,11 +56,12 @@
           try {
             _scheduler.loadXSLT( "scheduler.xslt" );
             _scheduler.readCustomSettings();
+            _scheduler.readGuiVersion();
             var response    = _scheduler.execute( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
             _state          = response.selectSingleNode( "/spooler/answer/state" );
             _scheduler.setState( _state );
-            document.title  = "Job Scheduler " + _scheduler._host + ":" + _scheduler._port;
-            document.title += ( _scheduler._id ) ? " id=" + _scheduler._id : "";
+            document.title  = getTranslation('Job Scheduler') + " " + _scheduler._host + ":" + _scheduler._port;
+            document.title += ( _scheduler._id ) ? " " + getTranslation('-id') + "=" + _scheduler._id : "";
             if( !_server_settings ) _scheduler.readCookies();
             
             onload_settings.update_seconds             = _scheduler._update_seconds;

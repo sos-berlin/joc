@@ -121,8 +121,7 @@ function set_state(state)
     }
     document.getElementById('spooler_id').innerHTML           = (state.getAttribute('id') || parent.getTranslation('unknown'));
     document.getElementById('spooler_state').innerHTML        = (parent.getTranslation(state.getAttribute('state')) || parent.getTranslation('unknown'));
-    document.getElementById('spooler_version').title          = "pid:"+(state.getAttribute('pid') || parent.getTranslation('unknown'));
-    document.getElementById('spooler_version').innerHTML      = (state.getAttribute('version') || '0.0.000.0000 (0000-00-00 00:00:00)');
+    document.getElementById('spooler_pid').innerHTML          = (state.getAttribute('pid') || parent.getTranslation('unknown'));
     document.getElementById('spooler_time').innerHTML         = (state.getAttribute('time').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
     document.getElementById('spooler_start_time').innerHTML   = (state.getAttribute('spooler_running_since').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
     document.getElementById('jobs_running').innerHTML         = (state.selectNodes("jobs/job [ @state='running' ]").length || 0);
@@ -131,7 +130,7 @@ function set_state(state)
     document.getElementById('jobs_tasks').innerHTML           = (state.selectNodes("jobs/job/tasks/task[ @id ]").length || 0);
     
     var jobs_orders_inner                                     = cnt_all_orders + "&#160;" + parent.getTranslation('orders');
-    if( cnt_clustered_orders > 0 ) jobs_orders_inner         += (parent._scheduler._lang_file_exists) ? "&#160;"+parent.getTranslation('in cluster',{cnt:cnt_clustered_orders}) : "&#160;("+cnt_clustered_orders+" in cluster)";
+    if( cnt_clustered_orders > 0 ) jobs_orders_inner         += "&#160;("+parent.getTranslation('$cnt in cluster',{cnt:cnt_clustered_orders})+")";
     document.getElementById('jobs_orders').innerHTML          = jobs_orders_inner;    
 }
 
@@ -210,6 +209,13 @@ function hide__onclick()
 }
 
 
+//--------------------------------------------------------------------------------------------showInfo
+function showInfo( act )
+{
+    if( act != 'none' ) act = 'block';
+    document.getElementById('info').style.display=act;
+}
+
 //------------------------------------------------------------set_corner (onresize-Event only for IE<7)
 function set_corner_position()
 {
@@ -225,6 +231,15 @@ function set_corner_position()
 //-----------------------------------------------------------------------------------------------------
 
 window.onload   = do_onload;
+window.onerror  = function( msg, url, line ) {
+  try {
+    showError(msg);
+  } catch(x) {
+    alert(msg.replace(/^.*connect to Job Scheduler\n(.*)$/,"No connection to Job Scheduler\n$1"));
+  } finally {
+    return true;
+  }
+}
 
 //-->
 </script>
@@ -268,11 +283,7 @@ window.onload   = do_onload;
                     <td valign="middle" width="1px" class="top" style="padding:4px;">
                         <label class="top" for="update_periodically_checkbox"><span id="update_seconds" style="white-space:nowrap;">
                           <script language="javascript" type="text/javascript">
-                            if( parent._scheduler._lang_file_exists ) {
-                              document.write(parent.getTranslation('Update')+'&#160;('+parent.getTranslation('every',{sec:parent._scheduler._update_seconds})+")");
-                            } else {
-                              document.write('Update&#160;(every&#160;'+parent._scheduler._update_seconds+'s)');
-                            }
+                              document.write(parent.getTranslation('Update')+'&#160;('+parent.getTranslation('every $secs',{sec:parent._scheduler._update_seconds})+")");
                           </script>
                           <noscript>Update&#160;periodically</noscript>
                         </span></label>
@@ -331,7 +342,7 @@ window.onload   = do_onload;
               <td align="left" style="white-space:nowrap">&#160;<span id="backup"></span></td>
               <td align="center">
                 <span style="white-space:nowrap;">
-                  <a href="http://www.sos-berlin.com/" title="www.sos-berlin.com" target="sos_homepage" style="text-decoration:none;">
+                  <a href="javascript:showInfo();" style="text-decoration:none;">
                      <img src="job_scheduler_rabbit_colour.gif" border="0" style="margin-top:2px;"/>
                      <img src="job_scheduler_typo_colour.gif" border="0"/>
                   </a>
@@ -362,7 +373,8 @@ window.onload   = do_onload;
               document.writeln( '            <tr>' );
               document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('ID')+':&#160;</span><span id="spooler_id" style="white-space:nowrap;font-weight:bold;"></span></td>' );
               document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('State')+':&#160;</span><span id="spooler_state" style="white-space:nowrap;"></span></td>' );
-              document.writeln( '              <td colspan="3" align="center" style="white-space:nowrap;"><span id="spooler_version" style="white-space:nowrap;" title="'+parent.getTranslation('pid')+':'+parent.getTranslation('unknown')+'"><span class="label">'+parent.getTranslation('version')+':&#160;</span>0.0.000.0000 (0000-00-00 00:00:00)</span></td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('Pid')+':&#160;</span><span id="spooler_pid" style="white-space:nowrap;"></span></td>' );
+              document.writeln( '              <td colspan="2" align="center" style="white-space:nowrap;">&#160;</td>' );
               document.writeln( '              <td align="right" style="white-space:nowrap;"><span class="label">'+parent.getTranslation('Time')+':&#160;</span><span id="spooler_time">0000-00-00 00:00:00</span></td>' );
               document.writeln( '            </tr>' );
               document.writeln( '            <tr>' );
@@ -398,6 +410,34 @@ window.onload   = do_onload;
       <noscript>Hide</noscript>
     <!--[if lte IE 6]></a><![endif]--></div>
   </td></tr></thead></table>
+  
+  <!-- info box -->
+  <div id="info" style="display:none;position:absolute;top:4px;left:20px;z-index:100;">
+    <table cellspacing="0" cellpadding="0"><thead><tr><td style="padding:0px">
+      <div class="top">
+        <img class="corner_tl" src="corner_tl.gif" alt="" />
+        <img class="corner_tr" src="corner_tr.gif" alt="" />
+      </div>
+      <div class="bottom" style="margin-bottom:4px;">
+        <table cellspacing="0" cellpadding="0" align="center" class="inner"><tbody>
+          <tr><td rowspan="3" style="padding:6px;"><img src="job_scheduler_rabbit_circle_colour.jpg"/></td>
+          <script language="javascript" type="text/javascript">
+            document.writeln('          <td style="padding:6px 6px 0px 0px;white-space:nowrap;">&copy; 2002-'+(new Date().getFullYear())+' <a href="http://www.sos-berlin.com/" title="www.sos-berlin.com" target="sos_homepage" style="text-decoration:none;">Software- und Organisations-Service GmbH.</a>');
+            document.writeln('          <br/>'+parent.getTranslation('All rights reserved.')+'</td></tr>');
+            document.writeln('          <tr><td style="padding:0px 6px 0px 0px;white-space:nowrap;">');
+            document.writeln('            <table cellpadding="0" cellspacing="0" width="100%">');
+            document.writeln('              <tr><td width="1">'+parent.getTranslation('Operations GUI').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td style="text-align:right;">'+parent._scheduler._gui_subversion_no.replace(/[ ]/,'&#160;&#160;&#160;')+'</td></tr>');
+            document.writeln('              <tr><td width="1">'+parent.getTranslation('Job Scheduler').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td style="text-align:right;">'+parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1") + '&#160;&#160;&#160;' + parent._scheduler._version_date.replace(/[ ]+.*$/,'')+'</td></tr>');
+            document.writeln('            </table>');
+            document.writeln('          </td></tr>');
+            document.writeln('          <tr><td style="padding:0px 6px 2px 0px;white-space:nowrap;"><div id="config_button" class="button" onclick="showInfo(\'none\');"><!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->'+parent.getTranslation('OK')+'<!--[if lte IE 6]></a><![endif]--></div></td></tr>');
+          </script>
+        </tbody></table>
+        <img class="corner_bl" src="corner_bl.gif" alt="" />
+        <img class="corner_br" src="corner_br.gif" alt="" />
+      </div>
+    </td></tr></thead></table>
+  </div>
   <!--[if lte IE 6]>
     <script language="javascript" type="text/javascript">
       var imgs = document.getElementsByTagName("img");

@@ -5,6 +5,16 @@ _lang_file_exists = true;
 *                            SCHEDULER (top_frame)                            *
 ******************************************************************************/
 
+//Window title 
+_translations['Job Scheduler']                             = 'Job Scheduler';
+_translations['-id']                                       = '-ID';
+
+//Product info
+_translations['Operations GUI']                            = 'Operations GUI';
+_translations['Build']                                     = 'Build';
+_translations['All rights reserved.']                      = 'Alle Rechte vorbehalten.'
+_translations['OK']                                        = 'OK'
+
 //Tabs
 _translations['Jobs']                                      = 'Jobs';
 _translations['Job Chains']                                = 'Job-Ketten';
@@ -32,17 +42,17 @@ _translations['Manage log categories']                     = 'Protokoll-Kategori
 _translations['Pause']                                     = 'Anhalten';
 _translations['Continue']                                  = 'Fortsetzen';
 _translations['Terminate']                                 = 'Beenden';
-_translations['Terminate within']                          = 'Binnen ~$secs beenden';
+_translations['Terminate within ~$secs']                   = 'Binnen ~$secs beenden';
 _translations['Terminate and restart']                     = 'Beenden mit Neustart';
-_translations['Terminate and restart within']              = 'Binnen ~$secs beenden mit Neustart';
+_translations['Terminate and restart within ~$secs']       = 'Binnen ~$secs beenden mit Neustart';
 _translations['Abort immediately']                         = 'Sofort abbrechen';
 _translations['Abort immediately and restart']             = 'Sofort abbrechen mit Neustart';
 _translations['Terminate cluster']                         = 'Cluster beenden';
-_translations['Terminate cluster within']                  = 'Binnen ~$secs Cluster beenden';
+_translations['Terminate cluster within ~$secs']           = 'Binnen ~$secs Cluster beenden';
 _translations['Terminate and restart cluster']             = 'Cluster mit Neustart beenden';
-_translations['Terminate and restart cluster within']      = 'Binnen ~$secs Cluster mit Neustart beenden';
+_translations['Terminate and restart cluster within ~$secs'] = 'Binnen ~$secs Cluster mit Neustart beenden';
 _translations['Terminate fail-safe']                       = 'Ausfallsicher beenden';
-_translations['Terminate fail-safe within']                = 'Binnen ~$secs ausfallsicher beenden';
+_translations['Terminate fail-safe within ~$secs']         = 'Binnen ~$secs ausfallsicher beenden';
                                                            
 //Menu content of extras                      
 _translations['Settings']                                  = 'Einstellungen';
@@ -51,18 +61,19 @@ _translations['Configuration']                             = 'Konfiguration';
                                                            
 //First line                                  
 _translations['Documentation']                             = 'Dokumentation';
-_translations['every']                                     = 'alle $secs';
+_translations['every $secs']                               = 'alle $secs';
 _translations['incl. Hot Folders']                         = 'inkl. Hot Folders';
                                                       
 //Other lines                            
 _translations['ID']                                        = 'ID';
 _translations['State']                                     = 'Status';
+_translations['Pid']                                       = 'Pid';
 _translations['Time']                                      = 'Zeit';
 _translations['jobs']                                      = 'Jobs';
 _translations['need process']                              = 'warten auf Prozess';
 _translations['tasks']                                     = 'Tasks';
 _translations['orders']                                    = 'Aufträge';
-_translations['in cluster']                                = '$cnt in Cluster';
+_translations['$cnt in cluster']                           = '$cnt in Cluster';
 _translations['Start-Time']                                = 'Startzeit';
 
 //Job Scheduler states
@@ -99,7 +110,6 @@ _translations['The settings dialog is not available,\nbecause $file is used as s
 _translations['from']                                      = 'von';
 _translations['update']                                    = 'Aktualisieren';
 _translations['last update']                               = 'letzte Aktualisierung';
-_translations['version']                                   = 'Version';
 _translations['Scheduler is running since']                = 'Startzeit';
 
 
@@ -165,7 +175,6 @@ _translations['mail on error']                             = 'Email im Fehlerfal
 _translations['mail on warning']                           = 'Email bei Warnungen';
 _translations['mail on success']                           = 'Email im Erfolgsfall';
 _translations['mail on process']                           = 'Email pro Prozess-Schritt';
-_translations['Pid']                                       = 'Pid';
 _translations['start cause']                               = 'Grund';
 _translations['waiting for order']                         = 'wartet auf Auftrag';
 _translations['Idle since']                                = 'Im Leerlauf seit';
@@ -402,7 +411,6 @@ _translations['No orders in the history']                  = 'Es sind keine Auft
 _translations['Process class']                             = 'Prozess-Klasse';
                                                            
 //Table header of process class list                       
-_translations['-id']                                       = '-ID';
 _translations['Operations']                                = 'Operationen';
 _translations['Callbacks']                                 = 'Callbacks';
 _translations['Current operation']                         = 'Aktuelle Operation';

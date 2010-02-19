@@ -57,6 +57,7 @@
           try {
             _scheduler.loadXSLT( "scheduler.xslt" );
             _scheduler.readCustomSettings();
+            _scheduler.readGuiVersion();
             var response    = _scheduler.execute( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
             _state          = response.selectSingleNode( "/spooler/answer/state" );
             _scheduler.setState( _state );

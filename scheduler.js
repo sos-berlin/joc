@@ -54,6 +54,7 @@ function Scheduler()
     this._update_finished                                = true;
     this._version_date                                   = '';
     this._version_no                                     = '';
+    this._gui_subversion_no                              = '';
     this._id                                             = '';
     this._host                                           = '';
     this._port                                           = '';
@@ -477,7 +478,21 @@ Scheduler.prototype.logger = function(level, msg, timerKey)
     }
     return true;
 }
-    
+
+
+//------------------------------------------------------------------------readGuiVersion
+Scheduler.prototype.readGuiVersion = function()
+{
+    try {
+      this._xml_http.open( "GET", ".version", false );
+      this._xml_http.send( null );
+      this._gui_subversion_no = this._xml_http.responseText || "0000 0000-00-00";
+      this._gui_subversion_no = this._gui_subversion_no.replace(/\s+/g,' ').replace(/^ /,'').replace(/ $/,'');
+      this._gui_subversion_no = this._gui_subversion_no.replace(/^(?:[0-9]+:)*([0-9]+)[^ ]*( [^ ]*)*$/,"$1$2");
+    }
+    catch(x) {
+    }
+}    
 
 
 //------------------------------------------------------------------------------setState
