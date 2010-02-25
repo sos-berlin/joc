@@ -319,11 +319,10 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Selects, Checkboxes and Radios')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     select_opts                    = new Object();
-    select_opts.all                = ' '+parent.getTranslation('all jobs')+' ';
-    select_opts.standalone         = ' '+parent.getTranslation('standalone jobs')+' ';
-    select_opts.order              = ' '+parent.getTranslation('order jobs')+' ';
+    select_opts.all                = ' '+parent.getTranslation('All jobs')+' ';
+    select_opts.standalone         = ' '+parent.getTranslation('Standalone jobs')+' ';
+    select_opts.order              = ' '+parent.getTranslation('Order jobs')+' ';
     dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
-    dialog._html_array.push( parent.getTranslation('Show')+' ' );
     dialog.add_select( "select_states_show_jobs_select", select_opts, window.parent.onload_settings.select_states[ 'show_jobs_select' ], 1, 0, false );
     select_opts                    = new Object();
     select_opts.all                = ' '+parent.getTranslation('(all)')+' ';
@@ -341,11 +340,10 @@ function scheduler_settings__onclick(ret)
     dialog.add_checkbox( "show_error_checkbox"           , parent.getTranslation('Show only faultily tasks and orders')+' '+parent.getTranslation('in the <i>last activities</i> tab'), window.parent.onload_settings.checkbox_states[ "show_error_checkbox" ] );
     dialog.add_checkbox( "show_task_error_checkbox"      , parent.getTranslation('Show last tasks error')+' '+parent.getTranslation('in the <i>last activities</i> tab')              , window.parent.onload_settings.checkbox_states[ "show_task_error_checkbox" ] );
     select_opts                    = new Object();
-    select_opts.all                = ' '+parent.getTranslation('all order and tasks')+' ';
-    select_opts.orders             = ' '+parent.getTranslation('only orders')+' ';
-    select_opts.tasks              = ' '+parent.getTranslation('only tasks')+' ';
+    select_opts.all                = ' '+parent.getTranslation('Show all')+' ';
+    select_opts.orders             = ' '+parent.getTranslation('Show only orders')+' ';
+    select_opts.tasks              = ' '+parent.getTranslation('Show only tasks')+' ';
     dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
-    dialog._html_array.push( parent.getTranslation('Show')+' ' );
     dialog.add_select( "last_activities_radios", select_opts, window.parent.onload_settings.radio_states[ 'last_activities_radios' ], 1, 0, false );
     dialog._html_array.push( ' '+parent.getTranslation('in the <i>last activities</i> tab')+'</td></tr>' );
     dialog._html_array.push( '</table>' );
@@ -393,7 +391,7 @@ function scheduler_settings__onclick(ret)
       Input_dialog.close();
       for( var entry in fields ) {
         if( entry.search(/new_params/) == -1 ) parent.control_frame.set_cookie( entry, fields[entry] );
-        if( entry.search(/^select_states_/) > -1 ) window.parent._select_states[entry.replace(/^select_states_/,'')] = fields[entry];
+        if( entry.search(/^select_states_/) > -1 ) parent._scheduler._select_states[entry.replace(/^select_states_/,'')] = fields[entry];
       }
       for( var entry in parent._scheduler._runtime_settings ) {
         if( typeof fields[entry] == "boolean" ) {
@@ -1707,14 +1705,14 @@ function open_url( url, window_name, with_hash, features )
 function map_url( host, port, elem )
 { 
   var host_port = host+":"+port;
-  if( typeof _url_aliase["http://"+host_port+"/"] == "string" ) {
-    host_port = _url_aliase["http://"+host_port+"/"];
+  if( typeof parent._url_aliase["http://"+host_port+"/"] == "string" ) {
+    host_port = parent._url_aliase["http://"+host_port+"/"];
   } else {
-    if( typeof _url_aliase["http://"+host_port] == "string" ) {
-      host_port = _url_aliase["http://"+host_port];
+    if( typeof parent._url_aliase["http://"+host_port] == "string" ) {
+      host_port = parent._url_aliase["http://"+host_port];
     } else {
-      if( typeof _url_aliase[host_port] == "string" ) {
-        host_port = _url_aliase[host_port];
+      if( typeof parent._url_aliase[host_port] == "string" ) {
+        host_port = parent._url_aliase[host_port];
       }
     }
   }
