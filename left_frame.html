@@ -519,18 +519,18 @@ function apply_job_chains_select( node, response )
     for( var i = 0; i < job_chain_jobs.length; i++ )
     {
       job = response.selectSingleNode( ".//jobs/job[@path = '"+job_chain_jobs[i].getAttribute('job')+"' and @order = 'yes']" );
-      if( !job || job.getAttribute('path') == '/scheduler_file_order_sink' ) continue;
+      if( job && job.getAttribute('path') == '/scheduler_file_order_sink' ) continue;
       if( !found[0] ) {
         switch( parent._scheduler._select_states[ 'jobs_state_select' ] ) {
           case 'all'                : found[0] = true;
                                       break;
-          case 'running'            : if( job.getAttribute( "state" ).search(/^running/) > -1 ) found[0] = true;
+          case 'running'            : if( job && job.getAttribute( "state" ).search(/^running/) > -1 ) found[0] = true;
                                       break;
-          case 'stopped'            : if( job.getAttribute( "state" ).search(/^stopp/) > -1 ) found[0] = true;
+          case 'stopped'            : if( job && job.getAttribute( "state" ).search(/^stopp/) > -1 ) found[0] = true;
                                       break;
-          case 'running_or_stopped' : if( job.getAttribute( "state" ).search(/^(stopp|running)/) > -1 ) found[0] = true;
+          case 'running_or_stopped' : if( job && job.getAttribute( "state" ).search(/^(stopp|running)/) > -1 ) found[0] = true;
                                       break;
-          case 'other'              : if( job.getAttribute( "state" ).search(/^(stopp|running)/) == -1 ) found[0] = true;
+          case 'other'              : if( job && job.getAttribute( "state" ).search(/^(stopp|running)/) == -1 ) found[0] = true;
                                       break;
         }
       }
@@ -538,9 +538,9 @@ function apply_job_chains_select( node, response )
         switch( parent._scheduler._select_states[ 'jobs_process_class_select' ] ) {
           case 'all'                : found[1] = true;
                                       break;
-          case 'default'            : if( !job.getAttribute( "process_class" ) || job.getAttribute( "process_class" ) == "" ) found[1] = true;
+          case 'default'            : if( job && !job.getAttribute( "process_class" ) || job.getAttribute( "process_class" ) == "" ) found[1] = true;
                                       break;
-          default                   : if( job.getAttribute( "process_class" ) && job.getAttribute( "process_class" ).replace(/^\//,'') == window.parent._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) found[1] = true;
+          default                   : if( job && job.getAttribute( "process_class" ) && job.getAttribute( "process_class" ).replace(/^\//,'') == window.parent._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) found[1] = true;
                                       break;
         }
       }
@@ -560,27 +560,31 @@ function apply_job_chains_select( node, response )
 
 
 function apply_big_chains_select( node )
-{ 
-    var job_chains2    = node.selectNodes( "job_chain_node.job_chain" );
-    var job_chains     = [];
+{   
+    var job_chains     = node.selectNodes( "job_chain_node.job_chain" );
     var job_chain      = null;
     var cnts           = [0,0];
-    for( var i=0; i < job_chains2.length; i++ ) {
-      job_chain = node.parentNode.selectSingleNode( "job_chain[@path='"+job_chains2[i].getAttribute('job_chain')+"']" ); 
-      if( job_chain ) job_chains.push( job_chain );
-    }
+    var parent_node    = node.parentNode;
     for( var i=0; i < job_chains.length; i++ ) {
-      if( job_chains[i].getAttribute('filter_marked') ) { job_chains[i].removeAttribute('filter_marked'); cnts[0]++; }
-      if( job_chains[i].getAttribute('select_marked') ) { job_chains[i].removeAttribute('select_marked'); cnts[1]++; }
+      job_chain = parent_node.selectSingleNode( "job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" );
+      if( !job_chain ) { cnts[0]++; cnts[1]++; continue; }
+      if( job_chain.getAttribute('filter_marked') ) { job_chain.removeAttribute('filter_marked'); cnts[0]++; }
+      if( job_chain.getAttribute('select_marked') ) { job_chain.removeAttribute('select_marked'); cnts[1]++; } 
     }
-    if( cnts[1] == job_chains2.length ) {
-      node.parentNode.removeChild(node);
-      for( var i=0; i < job_chains.length; i++ ) { job_chains[i].parentNode.removeChild(job_chains[i]); }
+    if( cnts[1] == job_chains.length ) {
+      for( var i=0; i < job_chains.length; i++ ) { 
+        job_chain = parent_node.selectSingleNode( "job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" );
+        if( job_chain ) { parent_node.removeChild(job_chain); }
+      }
+      parent_node.removeChild(node);
       return false;
     }
-    if( cnts[0] == job_chains2.length && node.getAttribute('filter_marked') ) {
-      node.parentNode.removeChild(node);
-      for( var i=0; i < job_chains.length; i++ ) { job_chains[i].parentNode.removeChild(job_chains[i]); }
+    if( cnts[0] == job_chains.length && node.getAttribute('filter_marked') ) {
+      for( var i=0; i < job_chains.length; i++ ) {
+        job_chain = parent_node.selectSingleNode( "job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" ); 
+        if( job_chain ) { parent_node.removeChild(job_chain); }
+      }
+      parent_node.removeChild(node);
       return false;
     }
     return true;
