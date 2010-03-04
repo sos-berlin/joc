@@ -1764,7 +1764,7 @@
                     </td>
                   </tr>
                 </xsl:if>
-                <xsl:if test="file_based/removed or replacement">
+                <xsl:if test="file_based/ERROR or file_based/removed or replacement">
                   <tr class="job">
                     <td></td>
                     <td colspan="4" style="padding-left: 2ex;">
@@ -1846,7 +1846,7 @@
                     </td>
                 </tr>
                 
-                <xsl:if test="file_based/removed or replacement">
+                <xsl:if test="file_based/ERROR or file_based/removed or replacement">
                     <tr>
                         <td colspan="5" style="padding-left: 4ex; padding-bottom: 0.5em;">
                             <xsl:apply-templates mode="file_based_line" select="."/>
@@ -2047,7 +2047,7 @@
                             </table>
                         </td>
                     </tr>
-                    <xsl:if test="file_based/removed or replacement">
+                    <xsl:if test="file_based/ERROR or file_based/removed or replacement">
                         <tr>
                             <td colspan="7" style="padding-left: 4ex; padding-bottom: 0.5em;">
                                 <xsl:apply-templates mode="file_based_line" select="."/>
@@ -2535,7 +2535,7 @@
             </xsl:element>
           </xsl:element>
         
-          <xsl:if test="file_based/removed or replacement">
+          <xsl:if test="file_based/ERROR or file_based/removed or replacement">
             <tr>
                 <td colspan="5" style="padding-left:4ex;">
                     <xsl:apply-templates mode="file_based_line" select="."/>
@@ -2678,7 +2678,7 @@
                     </xsl:element>
                   </xsl:element>
                 
-                  <xsl:if test="$job/file_based/removed or $job/replacement">
+                  <xsl:if test="$job/file_based/ERROR or $job/file_based/removed or $job/replacement">
                       <tr class="job">
                           <td>&#160;</td>
                           <td colspan="4">

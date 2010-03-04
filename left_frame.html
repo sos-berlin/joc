@@ -514,7 +514,7 @@ function apply_job_chains_select( node, response )
 {   
     var job_chain_jobs = node.selectNodes( "job_chain_node[@job]" );
     var job;
-    var found = [false,false];
+    var found = [(parent._scheduler._select_states[ 'jobs_state_select' ] == 'all'),(parent._scheduler._select_states[ 'jobs_process_class_select' ] == 'all')];
     var order_id_space = node.getAttribute('order_id_space');
     for( var i = 0; i < job_chain_jobs.length; i++ )
     {
@@ -522,8 +522,6 @@ function apply_job_chains_select( node, response )
       if( job && job.getAttribute('path') == '/scheduler_file_order_sink' ) continue;
       if( !found[0] ) {
         switch( parent._scheduler._select_states[ 'jobs_state_select' ] ) {
-          case 'all'                : found[0] = true;
-                                      break;
           case 'running'            : if( job && job.getAttribute( "state" ).search(/^running/) > -1 ) found[0] = true;
                                       break;
           case 'stopped'            : if( job && job.getAttribute( "state" ).search(/^stopp/) > -1 ) found[0] = true;
@@ -536,8 +534,6 @@ function apply_job_chains_select( node, response )
       }
       if( !found[1] ) { 
         switch( parent._scheduler._select_states[ 'jobs_process_class_select' ] ) {
-          case 'all'                : found[1] = true;
-                                      break;
           case 'default'            : if( job && !job.getAttribute( "process_class" ) || job.getAttribute( "process_class" ) == "" ) found[1] = true;
                                       break;
           default                   : if( job && job.getAttribute( "process_class" ) && job.getAttribute( "process_class" ).replace(/^\//,'') == window.parent._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) found[1] = true;
