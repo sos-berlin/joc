@@ -109,7 +109,8 @@ function check_browser()
             {
                 if( window.navigator.vendor == "Firefox" || window.navigator.userAgent.indexOf( "Firefox" ) > -1 )
                 {
-                    if( window.navigator.productSub >= 20041108 )  firefox = 1.0;
+                    firefox = 0.1;
+                    if( window.navigator.productSub >= 20041108 )  firefox = 1;
                 }
                 else
                 if( window.navigator.vendor == "Google Inc." || window.navigator.userAgent.indexOf( "Chrome" ) > -1 )
@@ -127,13 +128,25 @@ function check_browser()
         }
     }
     
-    if( ie < 6.0 && firefox < 1.0 && chrome < 0.2 && seamonkey < 2.0 )
+    if( ie < 6 && firefox < 1 && chrome < 0.2 && seamonkey < 2.0 )
     {
-        var msg = "The page may not work with this browser, which doesn't seem to be one of the following:\n" +
-                  "Microsoft Internet Explorer 6\n" +
-                  "Mozilla Firefox 1\n" + 
-                  "Google Chrome 0.2" +
-                  "SeaMonkey 2.0";
+        var allBrowser = ie+firefox+chrome+seamonkey;
+        var msg = "The page may not work with this browser.\n\n";
+        if( allBrowser == 0 ) 
+        {
+          msg += "Please use\n";
+          msg += "  - Microsoft Internet Explorer\n";
+          msg += "  - Mozilla Firefox\n";
+          msg += "  - Google Chrome\n";
+          msg += "  - SeaMonkey";
+        } 
+        else 
+        { 
+          if( allBrowser-ie        == 0 ) msg += "The Microsoft Internet Explorer version should be at least 6.0";
+          if( allBrowser-firefox   == 0 ) msg += "The Mozilla Firefox version should be at least 1.0";
+          if( allBrowser-chrome    == 0 ) msg += "The Google Chrome version should be at least 0.2";
+          if( allBrowser-seamonkey == 0 ) msg += "The SeaMonkey version should be at least 2.0";
+        }
 
         if( window.navigator != undefined )
         {

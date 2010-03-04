@@ -487,8 +487,10 @@ Scheduler.prototype.readGuiVersion = function()
       this._xml_http.open( "GET", ".version", false );
       this._xml_http.send( null );
       this._gui_subversion_no = this._xml_http.responseText || "0000 0000-00-00";
-      this._gui_subversion_no = this._gui_subversion_no.replace(/\s+/g,' ').replace(/^ /,'').replace(/ $/,'');
-      this._gui_subversion_no = this._gui_subversion_no.replace(/^(?:[0-9]+:)*([0-9]+)[^ ]*( [^ ]*)*$/,"$1$2");
+      this._gui_subversion_no = this._gui_subversion_no.replace(/[^-0-9:\. ]/g,'');
+      var pattern = /([0-9\.]+)\s+(\d{4}-\d{2}-\d{2})*/;
+      pattern.exec(this._gui_subversion_no);
+      this._gui_subversion_no = RegExp.$1 + ' (' + RegExp.$2 + ')';
     }
     catch(x) {
     }
