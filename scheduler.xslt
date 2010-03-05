@@ -375,7 +375,7 @@
                     </span>
                 </xsl:when>
                 <xsl:when test="@removed">
-                    <span class="label" style="color:darkred">removed</span>
+                    <span class="label" style="color:darkred">deleted</span>
                 </xsl:when>
                 <xsl:when test="@replacement">
                     <xsl:element name="span">
@@ -400,7 +400,7 @@
           </xsl:element>
           <xsl:element name="td">
               <xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
-              <xsl:if test="$job_chain/@state='stopped'" >
+              <xsl:if test="$job_chain/@state='stopped' or $job_chain/@state='under_construction'" >
                 <xsl:attribute name="class">red</xsl:attribute>
               </xsl:if>
               <xsl:choose>
@@ -1719,7 +1719,7 @@
                             </span>
                         </xsl:when>
                         <xsl:when test="@removed">
-                            <span class="label" style="white-space:nowrap;color:#800040">removed</span>
+                            <span class="label" style="white-space:nowrap;color:#800040">deleted</span>
                         </xsl:when>
                         <xsl:when test="@replacement">
                             <xsl:element name="span">
@@ -2494,7 +2494,7 @@
                 <xsl:attribute name="title">show job chain details</xsl:attribute>
               </xsl:if>
               <xsl:choose>
-                <xsl:when test="@state='stopped'">
+                <xsl:when test="@state='stopped' or @state='under_construction'">
                   <span class="translate" style="color:darkred"><xsl:value-of select="@state"/></span>    
                 </xsl:when>
                 <xsl:when test="@state='running'">
@@ -3385,7 +3385,7 @@
                                 </xsl:attribute>
 
                                 <xsl:if test="order/@removed='yes'">
-                                    <xsl:attribute name="title">Order is removed</xsl:attribute>
+                                    <xsl:attribute name="title">Order is deleted</xsl:attribute>
                                 </xsl:if>
                                 
                                 <xsl:if test="order/@replaced='yes'">
@@ -3544,7 +3544,7 @@
                         <td class="task"><xsl:apply-templates mode="date_time_nowrap" select="@start_at__xslt_datetime_with_diff"/></td>
                         <td align="right" valign="top" style="padding:0px 2px;">
                             <xsl:call-template name="command_menu">
-                                <xsl:with-param name="title"              select="'Remove'"/>
+                                <xsl:with-param name="title"              select="'Delete'"/>
                                 <xsl:with-param name="onclick_call"       select="'queued_task_menu__onclick'"/>
                                 <xsl:with-param name="onclick_param1_str" select="@task"/>
                             </xsl:call-template>                    

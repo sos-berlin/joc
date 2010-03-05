@@ -188,7 +188,7 @@ _translations['enqueued tasks']                            = 'Tasks in der Warte
 _translations['Id']                                        = 'ID';
 _translations['Enqueued']                                  = 'Eingereiht';
 _translations['Start at']                                  = 'Gestartet';
-_translations['Remove']                                    = 'Löschen';
+_translations['Delete']                                    = 'Löschen';
                                                            
                                                            
 //Task history                                             
@@ -222,7 +222,8 @@ _translations['Reread']                                    = 'Skript neu laden';
 _translations['End tasks']                                 = 'Tasks beenden';
 _translations['Suspend tasks']                             = 'Tasks suspendieren';
 _translations['Continue tasks']                            = 'Tasks fortsetzen';
-_translations['Remove job']                                = 'Job löschen';
+_translations['Delete job']                                = 'Job löschen';
+_translations['Do you really want to delete this job?']    = 'Wollen Sie wirklich diesen Job löschen?';
                                                            
                                                            
 //Menu content of task menu                                
@@ -235,7 +236,7 @@ _translations['Kill immediately']                          = 'Sofort abbrechen';
 _translations['show job details']                          = 'zeige Job-Details';
 _translations['show task details']                         = 'zeige Task-Details';
 _translations['show schedule details']                     = 'zeige Schedule-Details';
-_translations['Order is removed']                          = 'Auftrag ist gelöscht';
+_translations['Order is deleted']                          = 'Auftrag ist gelöscht';
 _translations['Order is replaced']                         = 'Auftrag ist ersetzt';
                                                            
 //misc.                          
@@ -330,16 +331,17 @@ _translations['Job chain menu']                            = 'Job-Ketten-Menü';
 _translations['Job node menu']                             = 'Job-Knoten-Menü';
 _translations['Add order']                                 = 'Auftrag hinzufügen';
 _translations['Add persistent order']                      = 'Auftrag persistent hinzufügen';
-_translations['Remove job chain']                          = 'Job-Kette löschen';
+_translations['Delete job chain']                          = 'Job-Kette löschen';
 _translations['Skip']                                      = 'Überspringen';
 _translations['Unskip']                                    = 'Einreihen';
+_translations['Do you really want to delete this job chain?']  = 'Wollen Sie wirklich diese Job-Kette löschen?';
 
 //Mouseover-Title
 _translations['show job chain details']                    = 'zeige Job-Ketten-Details';
 
 //job chain (node) states
 _translations['stopped']                                   = 'gestoppt';
-_translations['under_construction']                        = 'wird eingerichtet';
+_translations['under_construction']                        = 'unvollständig';
 _translations['finished']                                  = 'beendet';
 _translations['removing']                                  = 'wird gelöscht';
 _translations['Node is stopped']                           = 'Knoten ist gestoppt';
@@ -385,15 +387,16 @@ _translations['Set order state']                           = 'Status setzen';
 _translations['Suspend order']                             = 'Auftrag suspendieren';
 _translations['Resume order']                              = 'Auftrag fortsetzen';
 _translations['Reset order']                               = 'Auftrag zurücksetzen';
-_translations['Remove order']                              = 'Auftrag löschen';
+_translations['Delete order']                              = 'Auftrag löschen';
 _translations['Remove setback']                            = 'Verzögerung löschen';
+_translations['Do you really want to delete this order?']  = 'Wollen Sie wirklich diesen Auftrag löschen?';
 
 //misc
 _translations['No orders found']                           = 'Es wurden keine Aufträge gefunden';
 _translations['Processed by']                              = 'Verarbeitet von';
 _translations['Order']                                     = 'Auftrag';
 _translations['Setback']                                   = 'Verzögerung';
-_translations['removed']                                   = 'gelöscht';
+_translations['deleted']                                   = 'gelöscht';
 _translations['Replacement']                               = 'Ersatz';
 _translations['currently processed by']                    = 'momentan verarbeitet von'
 _translations['on blacklist']                              = 'in der Blacklist'
@@ -539,7 +542,8 @@ _translations['Schedule menu']                             = 'Schedule-Menü';
 _translations['Substitute menu']                           = 'Substitut-Menü';
 _translations['Add substitute']                            = 'Substitut hinzufügen';
 _translations['Edit schedule']                             = 'Schedule bearbeiten';
-_translations['Remove schedule']                           = 'Schedule löschen';
+_translations['Delete schedule']                           = 'Schedule löschen';
+_translations['Do you really want to delete this scheduler?']  = 'Wollen Sie wirklich diesen Schedule löschen?';
 
 //Table header of job chains list                          
 _translations['Schedule']                                  = 'Schedule';
@@ -614,6 +618,7 @@ _translations['at']                                        = 'um';
 _translations['FILTER ADMINISTRATION']                     = 'FILTERVERWALTUNG';
 _translations['store']                                     = 'Speichern';
 _translations['store as ...']                              = 'Speichern unter ...';
+_translations['remove']                                    = 'Löschen';
 _translations['quick check']                               = 'Schnellauswahl';
 _translations['regular expression for quick check']        = 'Regulärer Ausdruck für Schnellauswahl';
 _translations['select all']                                = 'Alle auswählen';

@@ -1100,7 +1100,7 @@ function add_job_chain(job_chain,step)
       for( var i = 0; i < job_keys.length; i++ ) {
         jobs[job_keys[i]]  = job_keys[i].replace(/^\//,"");
       }
-      var arrows        = (parent.ie > 0 && parent.ie < 8) ? ['&lt;','<div style="position:relative;top:-4px">&and;</div>','&gt;','<div style="position:relative;top:-4px">&or;</div>'] : ['&lt;','<span style="font-size:20px;">&#708;</span>','&gt;','<span style="font-size:20px;">&#709;</span>'];
+      var arrows        = (parent.ie > 0 && parent.ie < 8) ? ['&lt;','<span style="font-size:10px;">&and;</span>','&gt;','<span style="font-size:10px;">&or;</span>'] : ['&lt;','<span style="font-size:20px;">&#708;</span>','&gt;','<span style="font-size:20px;">&#709;</span>'];
       var dialog        = new Input_dialog();
       dialog.width      = 744;
       dialog.submit_fct = "callErrorChecked( 'add_job_chain', '"+job_chain+"', 2 )";
@@ -1447,8 +1447,8 @@ function job_menu__onclick( job_name )
     popup_builder.add_command ( parent.getTranslation("Suspend tasks") , "<modify_job job='" + parent.left_frame._job_name + "' cmd='suspend' />" );
     popup_builder.add_command ( parent.getTranslation("Continue tasks"), "<modify_job job='" + parent.left_frame._job_name + "' cmd='continue'/>" );
     popup_builder.add_bar();
-    //popup_builder.add_command ( parent.getTranslation("Remove job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", !order_job, 'Do you really want to remove this job?', 'job|'+parent.left_frame._job_name );
-    popup_builder.add_command ( parent.getTranslation("Remove job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", true, 'Do you really want to remove this job?', 'job|'+parent.left_frame._job_name );
+    //popup_builder.add_command ( parent.getTranslation("Delete job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", !order_job, parent.getTranslation('Do you really want to delete this job?'), 'job|'+parent.left_frame._job_name );
+    popup_builder.add_command ( parent.getTranslation("Delete job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", true, parent.getTranslation('Do you really want to delete this job?'), 'job|'+parent.left_frame._job_name );
     
     _popup_menu = popup_builder.show_popup_menu();
 }
@@ -1550,7 +1550,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     if( menu_caller == 'blacklist' ) {
       popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "show_log?job_chain=" + encodeComponent(job_chain) +
                                                    "&order=" + encodeComponent(order_id), "show_log_order_" + job_chain.replace(/\//g,'_') + "__" + order_id );
-      popup_builder.add_command ( parent.getTranslation("Remove order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, 'Do you really want to remove this order?', 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
+      popup_builder.add_command ( parent.getTranslation("Delete order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, parent.getTranslation('Do you really want to delete this order?'), 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
     } else {
       popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "show_log?job_chain=" + encodeComponent(job_chain) +
                                                    "&order=" + encodeComponent(order_id), "show_log_order_" + job_chain.replace(/\//g,'_') + "__" + order_id );
@@ -1568,7 +1568,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       if( parent._scheduler.versionIsNewerThan( "2008-12-12 09:00:00" ) ) {
         popup_builder.add_command ( parent.getTranslation("Reset order"), "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' action='reset'/>" );
       }
-      popup_builder.add_command ( parent.getTranslation("Remove order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, 'Do you really want to remove this order?', 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
+      popup_builder.add_command ( parent.getTranslation("Delete order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, parent.getTranslation('Do you really want to delete this order?'), 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
       popup_builder.add_command ( parent.getTranslation("Remove setback")  , "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' setback='no'/>", (setback != null) );
     }
     _popup_menu = popup_builder.show_popup_menu();
@@ -1613,7 +1613,7 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
       popup_builder.add_command ( parent.getTranslation("Stop")            , command('stopped'), state != 'stopped' );
       popup_builder.add_command ( parent.getTranslation("Unstop")          , command('running'), state == 'stopped' );
     }
-    popup_builder.add_command ( parent.getTranslation("Remove job chain")  , "<remove_job_chain job_chain='" + parent.left_frame._job_chain + "'/>", orders==1, 'Do you really want to remove this job chain?', 'job_chain|'+parent.left_frame._job_chain );
+    popup_builder.add_command ( parent.getTranslation("Delete job chain")  , "<remove_job_chain job_chain='" + parent.left_frame._job_chain + "'/>", orders==1, parent.getTranslation('Do you really want to delete this job chain?'), 'job_chain|'+parent.left_frame._job_chain );
     
     _popup_menu = popup_builder.show_popup_menu();
 }
@@ -1679,7 +1679,7 @@ function schedule_menu__onclick( schedule, substitute, used, hot, title )
     popup_builder.add_entry ( parent.getTranslation("Add substitute")   , "callErrorChecked('set_run_time','add_substitute',"+(hot-1)+")" );
     popup_builder.add_entry ( parent.getTranslation("Edit schedule")    , "callErrorChecked('set_run_time','schedule',"+(hot-1)+")" );
     popup_builder.add_bar();
-    popup_builder.add_command ( parent.getTranslation("Remove schedule"), "<schedule.remove schedule='" + parent.left_frame._schedule + "'/>", used == 1, 'Do you really want to remove this schedule?', 'schedule|'+parent.left_frame._schedule );
+    popup_builder.add_command ( parent.getTranslation("Delete schedule"), "<schedule.remove schedule='" + parent.left_frame._schedule + "'/>", used == 1, parent.getTranslation('Do you really want to delete this schedule?'), 'schedule|'+parent.left_frame._schedule );
     _popup_menu = popup_builder.show_popup_menu();
 }
 
