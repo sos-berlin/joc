@@ -325,7 +325,7 @@ function update( force )
           var job_chain_node_job_chain  = null;
           var order_element             = null;
           if( job_chain_node_job_chains.length > 0 ) {
-            restore_checkbox_state( response.selectSingleNode( "spooler" ), "show_order_history_checkbox" );
+            parent.left_frame.restore_checkbox_state( response.selectSingleNode( "spooler" ), "show_order_history_checkbox" );
             order_history_element.setAttribute( 'big_chain', 'yes' );
             for( var i=0; i < job_chain_node_job_chains.length; i++ ) {
               job_chain_node_job_chain  = parent._scheduler.execute( '<show_job_chain job_chain="' + job_chain_node_job_chains[i].getAttribute('job_chain') + '"' + max_order_history + ' max_orders="0" what="order_history"/>' );
