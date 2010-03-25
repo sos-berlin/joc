@@ -1430,7 +1430,7 @@ function job_menu__onclick( job_name )
     popup_builder.add_bar();
     if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) ) {
       popup_builder.add_command ( parent.getTranslation("Start task unforced now"), "<start_job job='" + parent.left_frame._job_name + "' force='no'/>", (initialized  && !order_job) );
-      popup_builder.add_command ( parent.getTranslation("Start task enforced now"), "<start_job job='" + parent.left_frame._job_name + "'/>", (initialized && !order_job) );
+      popup_builder.add_command ( parent.getTranslation("Start task immediately"), "<start_job job='" + parent.left_frame._job_name + "'/>", (initialized && !order_job) );
     } else {
       popup_builder.add_command ( parent.getTranslation("Start task now"), "<start_job job='" + parent.left_frame._job_name + "'/>", (initialized && !order_job) );
     }
