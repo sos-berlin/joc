@@ -376,7 +376,7 @@ _translations['show order details']                        = 'zeige Auftrags-Det
 _translations['This order is a replacement for another order with the same ID'] = 'This order is a replacement for another order with the same ID';
                                                            
 //Detail frame                                             
-_translations['ORDER']                                     = 'Auftrag';
+_translations['ORDER']                                     = 'AUFTRAG';
                                                                                                                      
 //Menu content of order menu                               
 _translations['Order menu']                                = 'Auftrags-Menü';
