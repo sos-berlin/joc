@@ -616,6 +616,7 @@ _translations['at']                                        = 'um';
 ******************************************************************************/
 
 _translations['FILTER ADMINISTRATION']                     = 'FILTERVERWALTUNG';
+_translations['close']                                     = 'Schließen';
 _translations['store']                                     = 'Speichern';
 _translations['store as ...']                              = 'Speichern unter ...';
 _translations['remove']                                    = 'Löschen';

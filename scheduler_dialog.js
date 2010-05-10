@@ -444,7 +444,7 @@ function start_task_at( ret ) {
     dialog.width      = 384;
     dialog.submit_fct = "callErrorChecked( 'start_task_at' ,true )";
     dialog.add_title( "Start task $task", {task:_obj_title} );
-    if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) ) {
+    if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) && parent._scheduler._runtime_settings.start_next_period_enabled ) {
       dialog.add_checkbox( 'force', parent.getTranslation('<b>Start enforced</b>'), false );
     } else {
       dialog.add_hidden( 'force', 1 );
@@ -494,7 +494,7 @@ function start_task( ret ) {
       dialog.width      = 384;
       dialog.submit_fct = "callErrorChecked( 'start_task', true )";
       dialog.add_title( "Start task $task", {task:_obj_title} );
-      if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) ) {
+      if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) && parent._scheduler._runtime_settings.start_next_period_enabled ) {
         dialog.add_checkbox( 'force', parent.getTranslation('<b>Start enforced</b>'), false );
       } else {
         dialog.add_hidden( 'force', 1 );
@@ -902,7 +902,8 @@ function set_run_time( caller, hot, ret )
     } else {
       var xml_command = '';
       var hot_command = '';
-      var fields = input_dialog_submit(); 
+      var fields = input_dialog_submit();
+      if( !fields.run_time ) fields.run_time = '<run_time/>'; 
       switch( caller ) {
         case 'order'          : Input_dialog.close();
                                 xml_command = '<modify_order job_chain="' + window.parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '">' + fields.run_time + '</modify_order>';
@@ -1431,12 +1432,10 @@ function job_menu__onclick( job_name )
       popup_builder.add_entry ( parent.getTranslation("Show start times"), "callErrorChecked('show_calendar','job')" );
     }
     popup_builder.add_bar();
-    if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) ) {
+    if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) && parent._scheduler._runtime_settings.start_next_period_enabled ) {
       popup_builder.add_command ( parent.getTranslation("Start task unforced now"), "<start_job job='" + parent.left_frame._job_name + "' force='no'/>", (initialized  && !order_job) );
-      popup_builder.add_command ( parent.getTranslation("Start task immediately"), "<start_job job='" + parent.left_frame._job_name + "'/>", (initialized && !order_job) );
-    } else {
-      popup_builder.add_command ( parent.getTranslation("Start task now"), "<start_job job='" + parent.left_frame._job_name + "'/>", (initialized && !order_job) );
     }
+    popup_builder.add_command ( parent.getTranslation("Start task immediately"), "<start_job job='" + parent.left_frame._job_name + "'/>", (initialized && !order_job) );
     popup_builder.add_entry   ( parent.getTranslation("Start task at") , "callErrorChecked('start_task_at')", (initialized && !order_job) );
     popup_builder.add_entry   ( parent.getTranslation("Start task parametrized")  , "callErrorChecked('start_task')", (initialized && !order_job) );
     popup_builder.add_entry   ( parent.getTranslation("Set run time")  , "callErrorChecked('set_run_time','job'," + hot + ")", (initialized && !order_job) );

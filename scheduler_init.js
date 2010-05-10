@@ -46,10 +46,11 @@ var _max_task_history           = 10;
 var _description_lang           = 'en';
 var _terminate_timeout          = 60;
 var _start_at_default_is_now    = true;
+var _start_next_period_enabled  = false;
 var _debug_level                = 0;
 var _extra_items                = new Object();
-_extra_items.monitor            = true;
-_extra_items.configuration      = true;
+_extra_items.monitor            = false;
+_extra_items.configuration      = false;
 var _extra_urls                 = new Object();
 var _url_aliase                 = new Object();
 var _sos_lang                   = '';
@@ -61,6 +62,7 @@ var _active_job_filter          = -1;
 var _active_job_chain_filter    = -1;
 var _active_order_filter        = -1;
 var _active_project_filter      = -1;
+
 
 
 //--------------------------------------------------------------------------custom.js per hash  

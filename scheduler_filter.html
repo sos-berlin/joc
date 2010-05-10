@@ -78,12 +78,15 @@
   
   function write_tab_content(no,obj) {
     document.writeln( '          <div id="tab_'+no+'" style="display:none;height:100%;">');
+    if( window.opener ) {
+      document.writeln( '          <button class="buttonbar" onclick="window.close()" style="float:right;margin:5px 7px;">' + getTranslation('close') + '</button>');
+    }
     document.writeln( '            <table cellpadding="2" cellspacing="5">');
     document.writeln( '            <tr>');
     document.writeln( '              <td>');
     write_selectbox(obj);
     document.writeln( '              </td>');
-    document.writeln( '              <td>&nbsp;</td>');
+    document.writeln( '              <td align="right"></td>');
     document.writeln( '            </tr>');
     document.writeln( '            <tr>');
     document.writeln( '              <td><input class="input" type="text" name="filter_name_'+obj+'" /></td>');
@@ -116,8 +119,10 @@
   
   <style type="text/css" media="screen">
     #tab_control th {background-color:#F6F6FF;}   
+    #tab_control th:hover {background-color:#F6F6FF; color:#EA7A14;}   
     #tab_content {background-color:#F6F6FF;}   
-    button.buttonbar{padding:0px; margin:0px; margin-left:1px; margin-right:1px; font-size:12px; background-color:#D9DEE3; border:2px outset #FFFFFF; color:#444444; }
+    button.buttonbar{padding:0px; margin:0px 1px; font-size:12px; background-color:#D9DEE3; border:2px outset #FFFFFF; color:#444444; }
+    button.buttonbar:hover{padding:0px; margin:0px 1px; font-size:12px; background-color:#D9DEE3; border:2px outset #FFFFFF; color:#EA7A14; }
     .input{width:250px; font-size:13px;}
     div.header {font-family:"Trebuchet MS",Arial,Helvetica,Sans-Serif; font-size:18px; font-weight:bold; color:#EA7A14; text-align:center; white-space:nowrap; } 
   </style>

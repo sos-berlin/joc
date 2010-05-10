@@ -120,6 +120,13 @@ _start_at_default_is_now = true;
 
 
 /*****************************************************************
+*  Enables job menu item 'Start task unforced now'. 
+*/
+
+_start_next_period_enabled  = false;
+
+
+/*****************************************************************
 *  level for debugging: 0-9
 */
 _debug_level         = 0;

@@ -72,6 +72,7 @@ function Scheduler()
     this._runtime_settings.max_last_activities           = 30;
     this._runtime_settings.terminate_timeout             = 60;
     this._runtime_settings.start_at_default_is_now       = true;
+    this._runtime_settings.start_next_period_enabled     = false;
     
     this._checkbox_states                                = new Object();
     this._checkbox_states.show_tasks_checkbox            = true;
@@ -694,6 +695,7 @@ Scheduler.prototype.readCookies = function()
       this._runtime_settings[cookie_entries[i]]      = parseInt(this.getCookie( cookie_entries[i], this._runtime_settings[cookie_entries[i]]),10);
     }
     this._runtime_settings.start_at_default_is_now   = (this.getCookie( 'start_at_default_is_now', this._runtime_settings.start_at_default_is_now.toString()) == 'true');
+    this._runtime_settings.start_next_period_enabled = (this.getCookie( 'start_next_period_enabled', this._runtime_settings.start_next_period_enabled.toString()) == 'true');
     
     for( var state in this._checkbox_states ) {                   
       this._checkbox_states[state]                   = (this.getCookie( state, this._checkbox_states[state].toString()) == 'true');
