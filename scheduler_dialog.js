@@ -746,10 +746,6 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
       fields.id        = ( fields.id != "" ) ? ' id="' + fields.id + '"' : '';
       fields.at        = ( persistent ) ? '' : ' at="' + fields.at + '"';
       fields.end_state = fields.end_state != "" ? ' end_state="'+fields.end_state+'"' : ''; 
-      var xml_command  = '<add_order' + fields.at + fields.id + ' job_chain="' + window.parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="'+(persistent ? 'yes' : 'no')+'">' + params + fields.run_time + '</add_order>';
-      if( scheduler_exec( xml_command, false ) ) { 
-          set_timeout("window.parent.left_frame.update()",1);
-      }
       
       if( hot && persistent && msg == '' ) {
         var priority     = '';
@@ -762,7 +758,14 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
           if( payload_elem ) payload = payload_elem.xml;
         }
         var hot_command  = '<modify_hot_folder folder="' + dirname(window.parent.left_frame._job_chain) + '"><order' + fields.id + ' job_chain="' + basename(window.parent.left_frame._job_chain) + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '"' + priority + web_service + '>' + osNewline(params + fields.run_time + payload) + '</order></modify_hot_folder>';
-        scheduler_exec( hot_command, false );
+        if( scheduler_exec( hot_command, false ) ) {
+          update__onclick(false, true, true, 3000, 4000);
+        }
+      } else {
+        var xml_command  = '<add_order' + fields.at + fields.id + ' job_chain="' + window.parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="'+(persistent ? 'yes' : 'no')+'">' + params + fields.run_time + '</add_order>';
+        if( scheduler_exec( xml_command, false ) ) { 
+          set_timeout("window.parent.left_frame.update()",1);
+        }
       }      
     }    
 }
@@ -958,14 +961,14 @@ function set_run_time( caller, hot, ret )
                                 break;
       }
       
-      if( xml_command != "" && scheduler_exec( xml_command, false ) ) {
+      if( hot_command == "" && xml_command != "" && scheduler_exec( xml_command, false ) ) {
         set_timeout("window.parent.left_frame.update()",1);
       }
       
       if( hot_command != "" && scheduler_exec( hot_command, false ) ) {
         switch( caller ) { 
           case 'order'          :
-          case 'job'            : break;
+          case 'job'            : //break;
           case 'add_schedule'   :
           case 'add_substitute' :
           case 'schedule'       : update__onclick(false, true, true, 3000, 4000); break;
