@@ -128,8 +128,8 @@ Scheduler.prototype.execute = function( xml, with_modify_datetime, with_add_path
       this.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST','scheduler_execute');
       return null;
     }
-    var dom_document  = this.loadXML(this._xml_http.responseText );
-    var error_element = dom_document.selectSingleNode( "spooler/answer/ERROR" );
+    this.parserErrorXML( this._xml_http.responseXML );
+    var error_element = this._xml_http.responseXML.selectSingleNode( "spooler/answer/ERROR" );
     if( error_element )
     {
         //Per default no exception is thrown if remove job, job_chain, order is clicked
@@ -138,12 +138,35 @@ Scheduler.prototype.execute = function( xml, with_modify_datetime, with_add_path
         } 
     }
     else 
-    {   if( with_modify_datetime ) this.modifyDatetimeForXSLT( dom_document );  
-        if( with_add_path && !this.versionIsNewerThan( "2007-10-08 14:00:00" ) ) this.addPathAttribute( dom_document );
+    {   if( with_modify_datetime ) this.modifyDatetimeForXSLT( this._xml_http.responseXML );  
+        if( with_add_path && !this.versionIsNewerThan( "2007-10-08 14:00:00" ) ) this.addPathAttribute( this._xml_http.responseXML );
     }
     this.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST','scheduler_execute');
-    this.logger(6,'SCHEDULER RESPONSE:\n' + dom_document.xml);  
-    return dom_document;
+    this.logger(6,'SCHEDULER RESPONSE:\n' + this._xml_http.responseXML.xml);  
+    return this._xml_http.responseXML;
+}
+
+
+//--------------------------------------------------------------------------------Scheduler.parserErrorXML
+// public
+
+Scheduler.prototype.parserErrorXML = function()
+{
+    try {
+      if( this._xml_http.responseXML.parseError ) {
+        if( this._xml_http.responseXML.parseError.errorCode != 0 ) {
+          throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + this._xml_http.responseXML.parseError.reason );
+        }
+      } else {
+        if( this._xml_http.responseXML.documentElement.nodeName == "parsererror" ) {
+          throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + this._xml_http.responseXML.documentElement.firstChild.nodeValue );
+        }
+      }
+    }
+    catch(x) {
+      var statusText = ( typeof this._xml_http.statusText == 'string' && this._xml_http.statusText ) ? this._xml_http.statusText + " (" + this._xml_http.status + ")" : "";
+      throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + statusText + "\n" + x.message );
+    }
 }
 
 
@@ -153,28 +176,22 @@ Scheduler.prototype.execute = function( xml, with_modify_datetime, with_add_path
 Scheduler.prototype.loadXML = function( xml )
 {
     var dom_document;
-    try {
-      if( window.DOMParser )
-      {
-          var dom_parser = new DOMParser();
-          dom_document = dom_parser.parseFromString( xml, "text/xml" );
-          if( dom_document.documentElement.nodeName == "parsererror" )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.documentElement.firstChild.nodeValue );
-      }
-      else
-      {
-          dom_document = new ActiveXObject( "MSXML2.DOMDocument" );
-          dom_document.validateOnParse = false;
-          var ok = dom_document.loadXML( xml );
-          if( !ok )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.parseError.reason );
-      }
-      
-      return dom_document;
+    if( window.DOMParser )
+    {
+        var dom_parser = new DOMParser();
+        dom_document = dom_parser.parseFromString( xml, "text/xml" );
+        if( dom_document.documentElement.nodeName == "parsererror" )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.documentElement.firstChild.nodeValue );
     }
-    catch(x) {
-      var statusText = ( typeof this._xml_http.statusText == 'string' && this._xml_http.statusText ) ? this._xml_http.statusText + " (" + this._xml_http.status + ")" : "";
-      throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + statusText + "\n" + x.message );
+    else
+    {
+        dom_document = new ActiveXObject( "MSXML2.DOMDocument" );
+        dom_document.validateOnParse = false;
+        if( !dom_document.loadXML( xml ) )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.parseError.reason );
     }
+    
+    return dom_document;
 }
+
 
 
 //------------------------------------------------------------------------------Scheduler.callHTTP
@@ -550,20 +567,16 @@ Scheduler.prototype.loadXSLT = function( url )
     try {
       this._xml_http.open( "GET", url, false );
       this._xml_http.send( null );
-      if( window.DOMParser )
+      if( window.XSLTProcessor )
       {
-        var dom_parser   = new DOMParser();
-        var xslt_dom     = dom_parser.parseFromString( this._xml_http.responseText, "text/xml" );
-        if( xslt_dom.documentElement.nodeName == "parsererror" )  throw new Error( this.getTranslation( "Error at XSL answer '$xsl':", {'xsl':url} ) + xslt_dom.documentElement.firstChild.nodeValue );
+        if( this._xml_http.responseXML.documentElement.nodeName == "parsererror" )  throw new Error( this.getTranslation( "Error at XSL answer '$xsl':", {'xsl':url} ) + this._xml_http.responseXML.documentElement.firstChild.nodeValue );
         this._xslt       = new XSLTProcessor();
-        this._xslt.importStylesheet( xslt_dom );       
+        this._xslt.importStylesheet( this._xml_http.responseXML );       
       }
       else
       {
-        this._xslt       = new ActiveXObject( "MSXML2.DOMDocument" );
-        this._xslt.validateOnParse = false;
-        var ok = this._xslt.loadXML( this._xml_http.responseText );
-        if( !ok )  throw new Error( this.getTranslation( "Error at XSL answer '$xsl':", {'xsl':url} ) + this._xslt.parseError.reason );
+        if( this._xml_http.responseXML.parseError.errorCode != 0 )  throw new Error( this.getTranslation( "Error at XSL answer '$xsl':", {'xsl':url} ) + this._xml_http.responseXML.parseError.reason );
+        this._xslt       = this._xml_http.responseXML;
         this._result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
       }
     }

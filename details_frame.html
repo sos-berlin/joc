@@ -296,7 +296,7 @@ function update( force )
         if( what ) 
         {
           if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="' + parent._scheduler._runtime_settings.max_order_history + '"';
-          response = parent._scheduler.execute( '<show_job_chain job_chain="' + job_chain_path + '"' + max_order_history + ' what="' + what + '" />' );
+          response = parent._scheduler.execute( '<show_job_chain job_chain="' + job_chain_path + '"' + max_order_history + ' max_orders="' + parent._scheduler._runtime_settings.max_orders + '" what="' + what + '" />' );
           
           var error_element = response.selectSingleNode( "/spooler/answer/ERROR" );
           if( error_element && error_element.getAttribute( "code" ) == "SCHEDULER-161" ) { //wenn remove job_chain im Job_Chain-Menue geklickt wird, DetailFrame schliessen

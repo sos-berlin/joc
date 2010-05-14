@@ -1781,10 +1781,10 @@
         <xsl:if test="@length &gt;= $max_orders  or  order[ ../@length &gt; last() ]">
             <tr class="order">
                 <td></td>
-                <td></td>
                 <td>
                     <span style="margin-left: 2ex">...</span>
                 </td>
+                <td></td>
                 <td></td>
                 <td></td>
             </tr>
