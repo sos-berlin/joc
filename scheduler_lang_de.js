@@ -94,7 +94,6 @@ _translations['No connection to Job Scheduler']            = 'Keine Verbindung z
 _translations['Error at XML answer:']                      = 'Fehler in XML-Antwort:';
 _translations["Error at XSL answer '$xsl':"]               = "Fehler in XSL-Antwort '$xsl':";
 _translations["Error at HTTP answer '$url':"]              = "Fehler in HTTP-Antwort '$url':";
-_translations['No connection to Job Scheduler']            = 'Keine Verbindung zum Job Scheduler';
 _translations['$trial trial (of 5) to (re)connect to Job Scheduler'] = '$trial Verbindungsversuch (von 5) mit dem Job Scheduler';
 _translations['First']                                     = 'Erster';
 _translations['Second']                                    = 'Zweiter';
@@ -140,6 +139,12 @@ _translations['next start time in descending order']       = 'Nächste Startzeit
 _translations['state in ascending order']                  = 'Status (aufsteigend)';
 _translations['state in descending order']                 = 'Status (absteigend)';
                                                            
+//Title of images
+_translations['toggle to list view']                       = 'Zur Listen-Ansicht wechseln'; 
+_translations['toggle to tree view']                       = 'Zur Baum-Ansicht wechseln'; 
+_translations['open all folders']                          = 'Alle Ordner öffnen';   
+_translations['close all folders']                         = 'Alle Ordner schließen';   
+
 //Label and Options of Selectbox of jobs filtering                     
 _translations['Filter jobs by']                            = 'Jobs filtern durch';
 _translations['(no filtering)']                            = '(ohne Filter)';
@@ -277,8 +282,6 @@ _translations['deleting_files']                            = 'StdIn, StdOut und 
 _translations['closed']                                    = 'beendet';
 _translations['Replacement is standing by']                = 'Ersetzung ist angehalten';
 _translations['changed file has error']                    = 'Fehler in geänderter Datei';
-_translations['Lock is not available, it is locked']       = 'Sperre ist nicht verfügbar, sie ist gesperrt';
-_translations['Lock is available']                         = 'Sperre ist verfügbar';
 _translations['is missing']                                = 'fehlt';
 _translations['non-excl.']                                 = 'nicht exkl.';
 _translations['is being replaced']                         = 'wurde ersetzt';
@@ -340,7 +343,6 @@ _translations['Do you really want to delete this job chain?']  = 'Wollen Sie wir
 _translations['show job chain details']                    = 'zeige Job-Ketten-Details';
 
 //job chain (node) states
-_translations['stopped']                                   = 'gestoppt';
 _translations['under_construction']                        = 'unvollständig';
 _translations['finished']                                  = 'beendet';
 _translations['removing']                                  = 'wird gelöscht';
@@ -521,7 +523,6 @@ _translations['Order state/']                              = 'Auftrags-Status/';
 _translations['Exitcode']                                  = 'Exitcode';
 _translations['Order ID']                                  = 'Auftrags-ID';
 _translations['Order state']                               = 'Auftrags-Status';
-_translations['Exitcode']                                  = 'Exitcode';
 
 //Button title
 _translations['Show order log']                            = 'Auftr.-Protokoll';
@@ -701,9 +702,6 @@ _translations['Start order $order']                        = 'Auftrag $order sta
 _translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS] or &quot;now&quot;. The time at which a task is to be started &lt;<p align="left">run</p>_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Setze eine Startzeit</b><span class="small"> im ISO-Format &quot;yyyy-mm-dd HH:MM[:SS] oder &quot;now&quot;. Startzeiten des &lt;run_time&gt;-Elements sind deaktiviert. Relativive Zeitangaben - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - sind möglich.<span>';
 _translations['<b>Enter a run time</b> or use the $editor'] = 'Für die Startzeiten nutze das Textfeld oder den $editor';
 _translations['<b>Start enforced</b>']                     = '<b> erzwungender Start</b>';
-_translations['Start order $order']                        = 'Auftrag $order starten';
-_translations['Start task $task']                          = 'Task $task starten';
-_translations['Start order $order']                        = 'Auftrag $order starten';
 _translations['Change parameters']                         = 'Parameter ändern';
 _translations['Declare parameters']                        = 'Parameter angeben';
 _translations['Declare new parameters']                    = 'Neue Parameter angeben';
