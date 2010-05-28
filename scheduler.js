@@ -368,7 +368,7 @@ Scheduler.prototype.xsltFormatDateOrTime = function( datetime )
 
     var now = new Date();
 
-    if(    1*datetime.substr( 0, 4 ) == now.getYear()
+    if(    1*datetime.substr( 0, 4 ) == now.getFullYear()
         && 1*datetime.substr( 5, 2 ) == now.getMonth() + 1
         && 1*datetime.substr( 8, 2 ) == now.getDate()  )
     {
@@ -380,7 +380,7 @@ Scheduler.prototype.xsltFormatDateOrTime = function( datetime )
     }
 }
 
-//-----------------------------------------------------------------xsltFormatDateOrTime
+//---------------------------------------------------------------xsltFormatDatetimeWithDiff
 
 Scheduler.prototype.xsltFormatDatetimeWithDiff = function( datetime, now, show_plus )
 {
