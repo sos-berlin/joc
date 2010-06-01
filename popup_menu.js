@@ -304,7 +304,11 @@ Popup_menu_builder.prototype.show_popup_menu = function()
         var width  = this._popup_menu._popup.document.body.scrollWidth;
         var height = this._popup_menu._popup.document.body.scrollHeight;
         this._popup_menu._popup.hide();
-        this._popup_menu._popup.show( (mouse_x()> 120 ? 90-width : 0), 15, width, height, event.srcElement );
+        if( event.type == 'contextmenu' ) {
+          this._popup_menu._popup.show( mouse_x(), mouse_y(), width, height, document.documentElement );
+        } else {
+          this._popup_menu._popup.show( (mouse_x()> 120 ? 90-width : 0), 15, width, height, event.srcElement );
+        }
     }
     
     return this._popup_menu;
@@ -431,14 +435,14 @@ Input_dialog.prototype.add_prompt = function( str, obj )
 {    
     if( typeof str == "string" ) {
       this._html_array.push( '<tr>' );
-      this._html_array.push( '<td style="text-align:justify">' + parent.getTranslation(str,obj) + '</td>' );
+      this._html_array.push( '<td>' + parent.getTranslation(str,obj) + '</td>' );
       this._html_array.push( '</tr>' );
     } 
 }
 
 
 Input_dialog.prototype.add_title = function( str, obj ) 
-{    
+{   
     if( typeof str == "string" ) {
       this._html_array.push( '<tr>' );
       this._html_array.push( '<th class="input_title" style="padding-bottom:6px;">' + parent.getTranslation(str,obj) + '</th>' );

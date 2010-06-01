@@ -4978,6 +4978,18 @@
         <tr>
             <xsl:element name="td">
               <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
+              <xsl:attribute name="class">after_head_space2</xsl:attribute>
+            </xsl:element>
+        </tr>
+        <tr>
+            <xsl:element name="td">
+              <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
+              <xsl:attribute name="class">after_head_space3</xsl:attribute>
+            </xsl:element>
+        </tr>
+        <tr>
+            <xsl:element name="td">
+              <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
               <xsl:attribute name="class">after_head_space4</xsl:attribute>
             </xsl:element>
         </tr>
@@ -4999,18 +5011,6 @@
               <xsl:attribute name="class">after_head_space7</xsl:attribute>
             </xsl:element>
         </tr>
-        <tr>
-            <xsl:element name="td">
-              <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_head_space8</xsl:attribute>
-            </xsl:element>
-        </tr>
-        <tr>
-            <xsl:element name="td">
-              <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_head_space9</xsl:attribute>
-            </xsl:element>
-        </tr>
     </xsl:template>
     
     <xsl:template name="after_body_space">
@@ -5018,43 +5018,43 @@
         <tr>
             <xsl:element name="td">
               <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_body_space9</xsl:attribute>
+              <xsl:attribute name="class">after_head_space7</xsl:attribute>
             </xsl:element>
         </tr>
         <tr>
             <xsl:element name="td">
               <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_body_space8</xsl:attribute>
+              <xsl:attribute name="class">after_head_space6</xsl:attribute>
             </xsl:element>
         </tr>
         <tr>
             <xsl:element name="td">
               <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_body_space7</xsl:attribute>
+              <xsl:attribute name="class">after_head_space5</xsl:attribute>
             </xsl:element>
         </tr>
         <tr>
             <xsl:element name="td">
               <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_body_space6</xsl:attribute>
+              <xsl:attribute name="class">after_head_space4</xsl:attribute>
             </xsl:element>
         </tr>
         <tr>
             <xsl:element name="td">
               <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_body_space5</xsl:attribute>
+              <xsl:attribute name="class">after_head_space3</xsl:attribute>
             </xsl:element>
         </tr>
         <tr>
             <xsl:element name="td">
               <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_body_space4</xsl:attribute>
+              <xsl:attribute name="class">after_head_space2</xsl:attribute>
             </xsl:element>
         </tr>
         <tr>
             <xsl:element name="td">
               <xsl:attribute name="colspan"><xsl:value-of select="$colspan"/></xsl:attribute>
-              <xsl:attribute name="class">after_body_space1</xsl:attribute>
+              <xsl:attribute name="class">after_head_space1</xsl:attribute>
             </xsl:element>
         </tr>
     </xsl:template> 

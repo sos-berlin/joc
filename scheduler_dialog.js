@@ -359,7 +359,7 @@ function scheduler_settings__onclick(ret)
     dialog.add_settings_input( parent.getTranslation('Max. number of history entries per task')+':',  'max_task_history',    parent._scheduler._runtime_settings.max_task_history, 3 );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );  
-    dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Termintate within')+'</legend>' );
+    dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Terminate within')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_settings_input( parent.getTranslation('Max. seconds within the Job Scheduler terminates')+':', 'terminate_timeout', parent._scheduler._runtime_settings.terminate_timeout, 3 );
     dialog._html_array.push( '</table>' );
@@ -415,7 +415,7 @@ function scheduler_settings__onclick(ret)
 function get_start_at_prompt()
 {  
     var prompt_title = '<b>Enter a start time</b><span class="small">';
-    prompt_title += " in ISO format &quot;yyyy-mm-dd HH:MM[:SS] or &quot;now&quot;. ";
+    prompt_title += " in ISO format &quot;yyyy-mm-dd HH:MM[:SS]&quot; or &quot;now&quot;. ";
     prompt_title += "The time at which a task is to be started &lt;run_time&gt; is deactivated. ";
     prompt_title += "Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.";
     prompt_title += "<span>";
@@ -443,9 +443,9 @@ function start_task_at( ret ) {
     dialog.close_after_submit = false;
     dialog.width      = 384;
     dialog.submit_fct = "callErrorChecked( 'start_task_at' ,true )";
-    dialog.add_title( "Start task $task", {task:_obj_title} );
+    dialog.add_title( "Start task $task", {task:'<br/>'+_obj_title} );
     if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) && parent._scheduler._runtime_settings.start_next_period_enabled ) {
-      dialog.add_checkbox( 'force', parent.getTranslation('<b>Start enforced</b>'), false );
+      dialog.add_checkbox( 'force', '<b>'+parent.getTranslation('Start enforced')+'</b>', false );
     } else {
       dialog.add_hidden( 'force', 1 );
     }
@@ -493,9 +493,9 @@ function start_task( ret ) {
       dialog.close_after_submit = false;
       dialog.width      = 384;
       dialog.submit_fct = "callErrorChecked( 'start_task', true )";
-      dialog.add_title( "Start task $task", {task:_obj_title} );
+      dialog.add_title( "Start task $task", {task:'<br/>'+_obj_title} );
       if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) && parent._scheduler._runtime_settings.start_next_period_enabled ) {
-        dialog.add_checkbox( 'force', parent.getTranslation('<b>Start enforced</b>'), false );
+        dialog.add_checkbox( 'force', '<b>'+parent.getTranslation('Start enforced')+'</b>', false );
       } else {
         dialog.add_hidden( 'force', 1 );
       }
@@ -547,7 +547,7 @@ function start_order_at( now ) {
               dialog.width      = 360;
               dialog.close_after_submit = false;
               dialog.submit_fct = "callErrorChecked( 'start_order_at', 2 )";
-              dialog.add_title( "Start order $order", {order:_obj_title} );
+              dialog.add_title( "Start order $order", {order:'<br/>'+_obj_title} );
               dialog.add_prompt( get_start_at_prompt() );
               dialog.add_prompt( "" );
               dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
@@ -604,7 +604,7 @@ function start_order( ret )
       dialog.close_after_submit = false;
       dialog.width      = 384;
       dialog.submit_fct = "callErrorChecked( 'start_order', true )";
-      dialog.add_title( "Start order $order", {order:_obj_title} );
+      dialog.add_title( "Start order $order", {order:'<br/>'+_obj_title} );
       dialog.add_prompt( get_start_at_prompt() );
       dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
       dialog.add_params( params, param_names.sort() );
@@ -650,9 +650,9 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
     if( typeof ret             != "boolean"   ) ret             = false;
     if( typeof order_state     == "undefined" ) order_state     = "";
     if( typeof order_end_state == "undefined" ) order_end_state = "";
-    var order_state_prompt     = parent.getTranslation('<b>Select an order state</b>');
+    var order_state_prompt     = '<b>'+parent.getTranslation('Select an order state')+'</b>';
     order_state_prompt        += ( order_state     == "" ) ? "" : '<br/>' + parent.getTranslation( '<span class="small">The current order state is $state.</span>', {state:'&quot;'+order_state+'&quot;'} );
-    var order_end_state_prompt = parent.getTranslation('<b>Select an order end state</b>');
+    var order_end_state_prompt = '<b>'+parent.getTranslation('Select an order end state')+'</b>';
     order_end_state_prompt    += ( order_end_state == "" ) ? "" : '<br/>' + parent.getTranslation( '<span class="small">The current order state is $state.</span>', {state:'&quot;'+order_end_state+'&quot;'} );
     var params_element         = null;
     var param_names            = new Array();
@@ -684,9 +684,9 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
       dialog.width      = 384;
       dialog.close_after_submit = false;
       dialog.submit_fct = "callErrorChecked( 'add_order', " + persistent + "," + big_chain + ", '" + order_state + "', '" + order_end_state + "', true )";
-      dialog.add_title( "Add order to $job_chain", {job_chain:window.parent.left_frame._job_chain.replace(/^\//,'')} );
-      dialog.add_labeled_input( parent.getTranslation("<b>Enter an order id</b>"), "id", "" );
-      dialog.add_labeled_input( parent.getTranslation("<b>Enter an order title</b>"), "title", _obj_title );
+      dialog.add_title( "Add order to $job_chain", {job_chain:'<br/>'+window.parent.left_frame._job_chain.replace(/^\//,'')} );
+      dialog.add_labeled_input( '<b>'+parent.getTranslation("Enter an order id")+'</b>', "id", "" );
+      dialog.add_labeled_input( '<b>'+parent.getTranslation("Enter an order title")+'</b>', "title", _obj_title );
       if( !persistent ) {
         dialog.add_prompt( get_start_at_prompt() );
         dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
@@ -784,7 +784,7 @@ function set_order_state( order_state, order_end_state, setback, hot, ret )
       var states        = get_order_states();
       dialog.width      = 240;
       dialog.submit_fct = "callErrorChecked( 'set_order_state', '" + order_state + "', '" + order_end_state + "', " + setback + ", " + hot + ", true )";
-      dialog.add_title( "Set order state of $order", {order:_obj_title} );
+      dialog.add_title( "Set order state of $order", {order:'<br/>'+_obj_title} );
       dialog.add_prompt( '<b>Select a new order state</b>' );
       dialog.add_prompt( '<span class="small">The current order state is $state.</span>', {state:'&quot;'+order_state+'&quot;'} );
       dialog.add_prompt( "" );
@@ -868,24 +868,24 @@ function set_run_time( caller, hot, ret )
       var has_run_options = ( caller == 'job' ) ? 'false' : 'false'; //z.Zt. werden noch keine run options unterstuetzt
       switch( caller ) {
         case 'order'          : 
-        case 'job'            : dialog.add_title( "Set run time of $job", {job:_obj_title.replace(/^\//,'')} );
+        case 'job'            : dialog.add_title( "Set run time of $job", {job:'<br/>'+_obj_title} );
                                 dialog.add_prompt( '<b>Enter a run time</b> or use the $editor', {editor:'<input class="buttonbar" type="button" value=" '+parent.getTranslation('run time editor')+' " onclick="runtime_editor(\'run_time\', ' + has_run_options + ')"/>'} );
                                 dialog.add_prompt( "" );
                                 break;
         case 'add_schedule'   : dialog.add_title( "Add schedule" );
-                                dialog.add_labeled_input( '<b>Enter a folder</b>', 'dir', dirname(window.parent.left_frame._schedule) );
-                                dialog.add_labeled_input( '<b>Enter a schedule name</b>', 'name', basename(window.parent.left_frame._schedule) );
+                                dialog.add_labeled_input( '<b>'+parent.getTranslation('Enter a folder')+'</b>', 'dir', dirname(window.parent.left_frame._schedule) );
+                                dialog.add_labeled_input( '<b>'+parent.getTranslation('Enter a schedule name')+'</b>', 'name', basename(window.parent.left_frame._schedule) );
                                 dialog.add_prompt( '<b>Enter a run time</b> or use the $editor', {editor:'<input class="buttonbar" type="button" value=" '+parent.getTranslation('run time editor')+' " onclick="runtime_editor(\'schedule\',false)"/>'} );
                                 dialog.add_prompt( "" );
                                 run_time = ['&lt;schedule/&gt;',''];
                                 break;
-        case 'add_substitute' : dialog.add_title( "Add substitute for $schedule", {schedule:(window.parent.left_frame._substitute =="/" ? _obj_title.replace(/^\//,'') : window.parent.left_frame._substitute.replace(/^\//,''))} );
-                                dialog.add_labeled_input( '<b>Enter a folder</b>', 'dir', dirname(window.parent.left_frame._substitute) );
-                                dialog.add_labeled_input( '<b>Enter a schedule name</b>', 'name', basename(window.parent.left_frame._substitute) );
+        case 'add_substitute' : dialog.add_title( "Add substitute for $schedule", {schedule:(window.parent.left_frame._substitute =="/" ? '<br/>'+_obj_title : '<br/>'+window.parent.left_frame._substitute.replace(/^\//,''))} );
+                                dialog.add_labeled_input( '<b>'+parent.getTranslation('Enter a folder')+'</b>', 'dir', dirname(window.parent.left_frame._substitute) );
+                                dialog.add_labeled_input( '<b>'+parent.getTranslation('Enter a schedule name')+'</b>', 'name', basename(window.parent.left_frame._substitute) );
                                 dialog.add_prompt( '<b>Enter a run time</b> or use the $editor', {editor:'<input class="buttonbar" type="button" value=" '+parent.getTranslation('run time editor')+' " onclick="runtime_editor(\'schedule\',false)"/>'} );
                                 dialog.add_prompt( "" );
                                 break;
-        case 'schedule'       : dialog.add_title( "Edit $schedule", {schedule:_obj_title.replace(/^\//,'')} );
+        case 'schedule'       : dialog.add_title( "Edit $schedule", {schedule:'<br/>'+_obj_title} );
                                 dialog.add_prompt( '<b>Enter a run time</b> or use the $editor', {editor:'<input class="buttonbar" type="button" value=" '+parent.getTranslation('run time editor')+' " onclick="runtime_editor(\'schedule\',false)"/>'} );
                                 dialog.add_prompt( "" );
                                 break;
@@ -1419,7 +1419,7 @@ function job_menu__onclick( job_name )
     var stopped       = (state == 'stopped' || state == "stopping");
     var order_job     = (job_element.getAttribute( "order" ) == "yes");
     var job_title     = job_element.getAttribute( "title" );
-    if( !job_title ) job_title = job_name;
+    if( !job_title ) job_title = job_name.replace(/^\//,'');
     _obj_title        = xml_encode(job_title);
     var hot           = (job_element.selectSingleNode('file_based/@file') && parent._scheduler.versionIsNewerThan( "2008-05-13 09:00:00" ) ) ? 1 : 0;
     
@@ -1543,7 +1543,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       } */
     }
     if( !end_state ) end_state = "";
-    if( !order_title ) order_title = order_id.replace(/\\/g,"\\\\");
+    if( !order_title ) order_title = order_id.replace(/\\/g,"\\\\").replace(/^\//,'');
     _obj_title = xml_encode(order_title);
     if( !occupied_http || occupied_http.search(/^http/) == -1 ) { occupied_http = ''; }
     occupied_http = occupied_http.replace(/[\/]*$/,'') + '/';
@@ -1673,7 +1673,7 @@ function cluster_member__onclick( cluster_member_id )
 
 function schedule_menu__onclick( schedule, substitute, used, hot, title )
 {   
-    var schedule_title = (title) ? title : schedule;
+    var schedule_title = (title) ? title : schedule.replace(/^\//,'');
     _obj_title  = xml_encode(schedule_title);
     parent.left_frame._schedule   = xml_encode(schedule);
     parent.left_frame._substitute = xml_encode(substitute);

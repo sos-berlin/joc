@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -67,7 +67,7 @@ tabs['last_activities']   = {title:'Last Activities'  ,pos:'' , display:'inline'
 
 //----------------------------------------------------------------------------------------do_onload
 function do_onload()
-{       
+{      
     parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
     scheduler_init();
     if( document.getElementById('check_folders_checkbox') ) {
@@ -84,7 +84,7 @@ function do_onload()
 
 //-------------------------------------------------------------------------------------------update
 function update(response)
-{
+{   
     parent._scheduler.logger(3,'START UPDATE '+self.name,'update_top');
     
     if( response ) {
@@ -107,8 +107,8 @@ function update(response)
 //----------------------------------------------------------------------------------------set_state
 function set_state(state)
 {
-    var all_orders                                            = state.selectNodes('/spooler/answer/state/job_chains/job_chain');
-    var clustered_orders                                      = state.selectNodes('/spooler/answer/state/job_chains/job_chain/job_chain_node/order_queue/order[@occupied_by_cluster_member_id]');
+    var all_orders                                            = state.selectNodes('job_chains/job_chain');
+    var clustered_orders                                      = state.selectNodes('job_chains/job_chain/job_chain_node/order_queue/order[@occupied_by_cluster_member_id]');
     var cnt_all_orders                                        = 0;
     var cnt_clustered_orders                                  = (clustered_orders.length || 0);
     if(all_orders) {
@@ -259,7 +259,7 @@ window.onerror  = function( msg, url, line ) {
       <table cellspacing="0" cellpadding="0" border="0" align="center" width="100%" class="inner">
         <thead>
           <tr>
-            <td align="left" width="25%" nowrap>
+            <td align="left" width="20" nowrap>
               <table cellspacing="0" cellpadding="0" border="0">
                 <thead>
                   <tr>
@@ -277,7 +277,7 @@ window.onerror  = function( msg, url, line ) {
                 </thead>
               </table>  
             </td>  
-            <td align="center" width="50%">
+            <td align="center" width="*">
               <table cellspacing="0" cellpadding="0" border="0" align="center">
                 <thead>
                   <tr> 
@@ -313,7 +313,7 @@ window.onerror  = function( msg, url, line ) {
                 </thead>
               </table>  
             </td>
-            <td align="right" width="25%" title="scheduler extras" style="padding-top:2px;padding-right:2px;">
+            <td align="right" width="20" title="scheduler extras" style="padding-top:2px;padding-right:2px;">
               <script language="javascript" type="text/javascript">
                 write_menu('extras','right'); 
               </script>  

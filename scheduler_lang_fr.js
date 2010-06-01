@@ -17,14 +17,14 @@ _translations['OK']                                        = 'OK'
 
 //Tabs
 _translations['Jobs']                                      = 'Tâches';
-_translations['Job Chains']                                = 'Chaîne de tâches';
-_translations['Orders']                                    = 'Ordre';
+_translations['Job Chains']                                = 'Chaînes des Tâches';
+_translations['Orders']                                    = 'Ordres';
 _translations['Schedules']                                 = 'Programmations';
-_translations['Process Classes']                           = 'Classes de Processus';
-_translations['Locks']                                     = 'Locks';
+_translations['Process Classes']                           = 'Classes des Processus';
+_translations['Locks']                                     = 'Verrouillage';
 _translations['Cluster']                                   = 'Cluster';
-_translations['Remote Schedulers']                         = 'Ordonnanceurs distants';
-_translations['Last Activities']                           = 'Activités récentes';
+_translations['Remote Schedulers']                         = 'Ordonnanceurs Distants';
+_translations['Last Activities']                           = 'Activités Récentes';
                                                            
 //Buttons menu, extras, update, hide          
 _translations['Menu']                                      = 'Menu';
@@ -34,11 +34,11 @@ _translations['Update']                                    = 'Mettre à jour';
 
 //Menu content of scheduler menu
 _translations['Show log']                                  = 'Visualiser log';
-_translations['Show job dependencies']                     = 'Visualiser dépendances de tâches';
-_translations['Show job chain dependencies']               = 'Visualiser dépendances de chaînes de tâches';
+_translations['Show job dependencies']                     = 'Visualiser dépendances des tâches';
+_translations['Show job chain dependencies']               = 'Visualiser dépendances des chaînes des tâches';
 _translations['Show start times']                          = 'Visualiser dates de démarrage';
 _translations['Manage filters']                            = 'Gérer les filtres';
-_translations['Manage log categories']                     = 'Gérer les catégories de filtres';
+_translations['Manage log categories']                     = 'Gérer les catégories de log';
 _translations['Pause']                                     = 'Mettre en pause';
 _translations['Continue']                                  = 'Continuer';
 _translations['Terminate']                                 = 'Arrêter';
@@ -78,7 +78,7 @@ _translations['Start-Time']                                = 'Heure de démarrag
 
 //Job Scheduler states
 _translations['starting']                                  = 'démarrage en cours';
-_translations['running']                                   = 'exécution en cours';
+_translations['running']                                   = 'en cours d\'exécution';
 _translations['paused']                                    = 'en pause';
 _translations['stopping']                                  = 'arrêt en cours';
 _translations['stopping_let_run']                          = 'arrêt en cours';
@@ -127,7 +127,7 @@ _translations['with state']                                = 'dans l\'état';
 _translations['(all)']                                     = '(tout)';
 _translations['(other)']                                   = '(autre)';
 _translations['running or stopped']                        = 'en cours d\'exécution ou arrêté';
-_translations['and with process class']                    = 'et avec les classes de processus';
+_translations['and with process class']                    = 'et avec la classe de processus';
                                                            
 //Label and Options in Selectbox of jobs sort                        
 _translations['Sort jobs by']                              = 'Trier les tâches par';
@@ -140,10 +140,10 @@ _translations['state in ascending order']                  = 'Etat (ordre croiss
 _translations['state in descending order']                 = 'Etat (ordre décroissant)';
 
 //Title of images
-_translations['toggle to list view']                       = 'toggle to list view'; 
-_translations['toggle to tree view']                       = 'toggle to tree view'; 
-_translations['open all folders']                          = 'open all folders';   
-_translations['close all folders']                         = 'close all folders';   
+_translations['toggle to list view']                       = 'passer à voir la liste'; 
+_translations['toggle to tree view']                       = 'passer à voir l\'arbre'; 
+_translations['open all folders']                          = 'ouvrir tous les repertoires';
+_translations['close all folders']                         = 'fermer tous les repertoires';
                                                            
 //Label and Options of Selectbox of jobs filtering                     
 _translations['Filter jobs by']                            = 'Tâches triées par';
@@ -207,9 +207,9 @@ _translations['Start']                                     = 'Démarrer';
                                                            
                                                            
 //Title of Tabs                                            
-_translations['Task Queue']                                = 'File des instances de tâches';
-_translations['Task History']                              = 'Historique des instances de tâches';
-_translations['Order Queue']                               = 'File des ordres';
+_translations['Task Queue']                                = 'File des Instances';
+_translations['Task History']                              = 'Historique des Instances';
+_translations['Order Queue']                               = 'File des Ordres';
                                                            
                                                            
 //Menu content of job menu                                 
@@ -228,7 +228,7 @@ _translations['End tasks']                                 = 'Terminer instances
 _translations['Suspend tasks']                             = 'Suspendre instances';
 _translations['Continue tasks']                            = 'Continuer instances';
 _translations['Delete job']                                = 'Supprimer tâche';
-_translations['Do you really want to delete this job?']    = 'Do you really want to delete this job?';
+_translations['Do you really want to delete this job?']    = 'Voules-vous vraiment supprimer cette instance?';
                                                            
                                                            
 //Menu content of task menu                                
@@ -238,9 +238,8 @@ _translations['Kill immediately']                          = 'Tuer immédiatemen
                                                            
                                                            
 //Mouseover-Title                                          
-_translations['show job details']                          = 'Visualiser détails tâche';
-_translations['show task details']                         = 'Visualiser détails instance';
-_translations['show schedule details']                     = 'Visualiser détails programmation';
+_translations['show job details']                          = 'Voir les détails du tâche';
+_translations['show task details']                         = 'Voir les détails de la instance';
 _translations['Order is deleted']                          = 'L\'ordre est supprimé';
 _translations['Order is replaced']                         = 'L\'ordre est remplacé';
                                                            
@@ -296,7 +295,7 @@ _translations['period_single']                             = 'durée_seule';
 _translations['period_repeat']                             = 'durée_répétition';
 _translations['queue']                                     = 'file';
 _translations['queue_at']                                  = 'file ';
-_translations['directory']                                 = 'dossier';
+_translations['directory']                                 = 'repertoire';
 _translations['delay_after_error']                         = 'retardé après erreur';
 _translations['order']                                     = 'ordre';
 _translations['wake']                                      = 'réveil';                                                     
@@ -307,7 +306,7 @@ _translations['wake']                                      = 'réveil';
 ******************************************************************************/
 //some labels are already translated above
 //Label of Checkboxes and Selectboxes
-_translations['Show job chains containing jobs']           = 'Voir les chaînes de tâches contenant des tâches';
+_translations['Job chains containing jobs']                = 'Voir les chaînes des tâches contenant des tâches';
 _translations['Show order history']                        = 'Voir l\'historique des ordres';
 _translations['Show jobs']                                 = 'Voir les tâches';
 _translations['Show orders']                               = 'Voir les ordres';
@@ -316,41 +315,41 @@ _translations['Show orders']                               = 'Voir les ordres';
 _translations['Sort job chains by']                        = 'Trier les châines de tâches par';
                                                            
 //Label of Selectbox of job chains filtering               
-_translations['Filter job chains by']                      = 'Trier les châines de tâches par';
+_translations['Filter job chains by']                      = 'Filtrer les châines de tâches par';
                                                            
 //Table header of job chains list                          
 _translations['Order state']                               = 'Etat de l\'ordre';
-_translations['Job chain']                                 = 'Chaîne de tâches';
-_translations['Job chain/']                                = 'Chaîne de tâches/';
+_translations['Job chain']                                 = 'Chaîne des tâches';
+_translations['Job chain/']                                = 'Chaîne des tâches/';
 _translations['Job state']                                 = 'Etat de la tâche';
                                                            
 //Table header in detail frame                             
-_translations['JOB CHAIN']                                 = 'Chaîne de tâches';
+_translations['JOB CHAIN']                                 = 'CHAINE DE TACHES';
 _translations['ORDER HISTORY']                             = 'HISTORIQUE DES ORDRES';
                                                            
 //Menu content of job chain menu                           
-_translations['Create job chain']                          = 'Créer une chaîne de tâches';
-_translations['Job chain menu']                            = 'Menu Chaîne de tâches';
-_translations['Job node menu']                             = 'Menu Tâche de type node';
-_translations['Add order']                                 = 'Ajouter une ordre';
-_translations['Add persistent order']                      = 'Ajouter une ordre persistent';
-_translations['Delete job chain']                          = 'Supprimer une chaîne de tâches';
+_translations['Create job chain']                          = 'Créer une chaîne des tâches';
+_translations['Job chain menu']                            = 'Menu Chaîne des tâches';
+_translations['Job node menu']                             = 'Menu Tâche Noed';
+_translations['Add order']                                 = 'Ajouter un ordre';
+_translations['Add persistent order']                      = 'Ajouter un ordre persistent';
+_translations['Delete job chain']                          = 'Supprimer une chaîne des tâches';
 _translations['Skip']                                      = 'Sauté la tâche courante';
 _translations['Unskip']                                    = 'Stop';
-_translations['Do you really want to delete this job chain?']  = 'Do you really want to delete this job chain?';
+_translations['Do you really want to delete this job chain?']  = 'Voulez-vous vraiment supprimer cette chaîne des tâches?';
 
 //Mouseover-Title
-_translations['show job chain details']                    = 'Voir les détails de la chaîne de tâches';
+_translations['show job chain details']                    = 'Voir les détails de la chaîne des tâches';
 
 //job chain (node) states
 _translations['under_construction']                        = 'en construction';
 _translations['finished']                                  = 'fini';
 _translations['removing']                                  = 'en cours de suppression';
-_translations['Node is stopped']                           = 'La tâche est arrété';
-_translations['Node is skipped']                           = 'La tâche a été sauté';
+_translations['Node is stopped']                           = 'Le noeud est arrété';
+_translations['Node is skipped']                           = 'Le noeud a été sauté';
 
 //misc.                                                          
-_translations['No job chains found']                       = 'Aucune chaîne de tâches trouvée';
+_translations['No job chains found']                       = 'Aucune chaîne des tâches trouvée';
 _translations['Web service']                               = 'Web service';
 _translations['file orders']                               = 'ordres des fichiers';
 _translations['pattern']                                   = 'modèle';
@@ -366,8 +365,8 @@ _translations['blacklist']                                 = 'liste noire';
 _translations['Sort orders by']                            = 'Trier les ordres par';
                                                            
 //Options in Selectbox of orders sort                      
-_translations['job chain in ascending order']              = 'Chaînes de tâche triées par ordre croissant';
-_translations['job chain in descending order']             = 'Chaînes de tâche triées par ordre décroissant';
+_translations['job chain in ascending order']              = 'Chaînes des tâche triées par ordre croissant';
+_translations['job chain in descending order']             = 'Chaînes des tâche triées par ordre décroissant';
                                                            
 //Label of Selectbox of jobs filtering                     
 _translations['Filter orders by']                          = 'Filtrer les ordres par';
@@ -386,15 +385,15 @@ _translations['Start order now']                           = 'Lancer l\'ordre ma
 _translations['Start order at']                            = 'Lancer l\'ordre à';
 _translations['Start order parametrized']                  = 'Lancer l\'ordre avec des paramètres';
 _translations['Set order state']                           = 'Positionner l\'état de l\'ordre';
-_translations['Suspend order']                             = 'Susprendre l\'ordre';
+_translations['Suspend order']                             = 'Suspendre l\'ordre';
 _translations['Resume order']                              = 'Reprendre l\'ordre';
 _translations['Reset order']                               = 'Réinitialiser l\'ordre';
 _translations['Delete order']                              = 'Supprimer l\'ordre';
 _translations['Remove setback']                            = 'Supprimer le report';
-_translations['Do you really want to delete this order?']  = 'Do you really want to delete this order?';
+_translations['Do you really want to delete this order?']  = 'Voulez-vous vraiment supprimer cet ordre?';
 
 //misc
-_translations['No orders found']                           = 'Aucune ordre trouvé';
+_translations['No orders found']                           = 'Aucun ordre trouvé';
 _translations['Processed by']                              = 'Traité par';
 _translations['Order']                                     = 'Ordre';
 _translations['Setback']                                   = 'Reporté';
@@ -406,24 +405,24 @@ _translations['on blacklist']                              = 'sur la liste noire
 
                                                            
 //order history                                            
-_translations['No orders in the history']                  = 'Aucune ordres dans l\'historique';
+_translations['No orders in the history']                  = 'Aucun ordre dans l\'historique';
 
 
 /******************************************************************************
 *                                PROCESS CLASS                                *
 ******************************************************************************/
 //some labels are already translated above
-_translations['Process class']                             = 'Classe de processus';
+_translations['Process class']                             = 'Classe des processus';
                                                            
 //Table header of process class list                       
-_translations['Operations']                                = 'Operations';
+_translations['Operations']                                = 'Opérations';
 _translations['Callbacks']                                 = 'Callbacks';
-_translations['Current operation']                         = 'Operation actuelle';
+_translations['Current operation']                         = 'Opération actuelle';
                                                            
 _translations['(default)']                                 = '(défaut)';
 _translations['max processes']                             = 'processus max.';
 _translations['Remote Scheduler']                          = 'Job Scheduler distant';
-                                                           
+
 
 /******************************************************************************
 *                                   CLUSTER                                   *
@@ -431,20 +430,20 @@ _translations['Remote Scheduler']                          = 'Job Scheduler dist
 //some labels are already translated above
 //Table header of process class list
 _translations['Last heart beat']                           = 'Dernier \'heart beat\'';
-_translations['Detected heart beats']                      = '\'heart beat\' détecté';
+_translations['Detected heart beats']                      = '\'heart beats\' détectés';
 _translations['Backup precedence']                         = 'Priorité sauvegarde';
                                                            
 //Menu content of cluster member                           
 _translations['Cluster member menu']                       = 'Menu membre de cluster';
 _translations['Delete entry']                              = 'Entrée supprimée';
-_translations['Restart']                                   = 'Redémmarage';
+_translations['Restart']                                   = 'Redémarrage';
 
 //misc.
 _translations['active Scheduler(s)']                       = 'Job Scheduler(s) actif';
 _translations['exclusive Scheduler(s)']                    = 'Job Scheduler(s) exclusif(s)';
 _translations['This Scheduler is active']                  = 'Ce Job Scheduler est actif';
 _translations['and exclusive']                             = 'et exclusif';
-_translations['Only non-backup Schedulers are allowed to start operation.'] = 'Uniquement les Job Schedulers qui ne font pas de sauvegardes sont autorisées à lancer des opérations.';
+_translations['Only non-backup Schedulers are allowed to start operation.'] = 'Uniquement les Job Schedulers qui ne font pas de sauvegardes sont autorisés à lancer des opérations.';
 _translations['This Scheduler']                            = 'Ce Job Scheduler';
 _translations['(was active!)']                             = '(était actif!)';
 _translations['active']                                    = 'actif';
@@ -452,7 +451,7 @@ _translations['inactive']                                  = 'inactif';
 _translations['distributed orders']                        = 'ordres distribués';
 _translations['exclusive']                                 = 'exclusif';
 _translations['backup']                                    = 'sauvegarde';
-_translations['still checking...']                         = 'encore en vérification...';
+_translations['still checking...']                         = 'en cours de vérification...';
 _translations['dead']                                      = 'mort';
 _translations['discovered']                                = 'découvert';
 _translations['after']                                     = 'après';
@@ -485,7 +484,7 @@ _translations['connected']                                 = 'connecté';
 *                                    LOCKS                                    *
 ******************************************************************************/
 //some labels are already translated above
-_translations['No locks found']                            = 'Aucune verrou trouvé';
+_translations['No locks found']                            = 'Aucun verrou trouvé';
 _translations['Lock']                                      = 'Verrou';
                                                            
 //Table header of process class list                       
@@ -501,7 +500,7 @@ _translations['Waiting jobs (non-exclusive)']              = 'En attente des tâ
 
 //Mouseover-Title
 _translations['Lock is not available, it is locked']       = 'Le verrou n\'est pas disponible, c\'est déjà verrouillé';
-_translations['Lock is available']                         = 'Le verrour est disponible';
+_translations['Lock is available']                         = 'Le verrou est disponible';
 
 
 
@@ -512,7 +511,7 @@ _translations['Lock is available']                         = 'Le verrour est dis
 //radio buttons, checkboxes
 _translations['Show all']                                  = 'Voir tout';
 _translations['Show only orders']                          = 'Voir uniquement les ordres';
-_translations['Show only tasks']                           = 'Voir uniquement les instances';
+_translations['Show only tasks']                           = 'Voir uniquement les tâches';
 _translations['Show only faultily tasks and orders']       = 'Voir uniquement les tâches et les ordres en erreur';
 _translations['Show last tasks error']                     = 'Voir les dernières instances échouées';
 
@@ -541,27 +540,27 @@ _translations['No last activities found']                  = 'Aucune activités 
 _translations['Create schedule']                           = 'Créer une programmation ';
 _translations['Schedule menu']                             = 'Menu des programmations';
 _translations['Substitute menu']                           = 'Menu des subsituts';
-_translations['Add substitute']                            = 'Ajouter une substitut';
+_translations['Add substitute']                            = 'Ajouter un substitut';
 _translations['Edit schedule']                             = 'Editer la programmation';
 _translations['Delete schedule']                           = 'Supprimer la programmation';
-_translations['Do you really want to delete this scheduler?']  = 'Do you really want to delete this scheduler?';
+_translations['Do you really want to delete this scheduler?']  = 'Voulez-vous vraiment supprimer cette programmation?';
 
 //Table header of job chains list                          
 _translations['Schedule']                                  = 'Programmation';
 _translations['Valid from']                                = 'Valable de';
 _translations['Valid to']                                  = 'Valable pour';
-_translations['Substituted by']                            = 'Substituer par';
+_translations['Substituted by']                            = 'Substitué par';
 
 //Mouseover-Title
 _translations['show schedule details']                     = 'voir les détails de la programmation';
 
 //misc.
-_translations['Green']                                     = 'Vert';
-_translations['marked schedules are currently active']     = 'Les programmations marquées sont actuellement actives';
+_translations['Green']                                     = '';
+_translations['marked schedules are currently active']     = 'Les programmations vertes sont actuellement actives';
 _translations['No schedules found']                        = 'Aucune programmation trouvées';
 _translations['Used by jobs']                              = 'Utilisée par les tâches';
 _translations['Used by orders']                            = 'Utiliées par les ordres';
-_translations['of job chain']                              = 'd\'une chaîne de tâches';
+_translations['of job chain']                              = 'd\'une chaîne des tâches';
 _translations['Substituted schedule']                      = 'Programmation substituée';
 
 //Detail frame                                             
@@ -573,17 +572,17 @@ _translations['Valid']                                     = 'Valable';
 *                                LOG CATEGORIES                               *
 ******************************************************************************/
 //some labels are already translated above
-_translations['LOG CATEGORIES']                            = 'CATEGORIES DE JOURNAUX XXXXXX';
+_translations['LOG CATEGORIES']                            = 'CATEGORIES DE LOG';
                                                            
 //misc.                                                    
-_translations['The default log caregories are marked']     = 'Les catégories de journaux sont marquées';
+_translations['The default log caregories are marked']     = 'Les catégories de log sont marquées';
 _translations['orange']                                    = 'orange';
 _translations['and they are active after each reset.']     = 'et elles sont actives après chaque réinitialisation.';
 _translations['Current log categories setting']            = 'Paramètrages actul des catégories de jounaux';
 _translations['Set']                                       = 'Positionner';
-_translations['log categories for a duration of']          = 'catégories de journaux pour une durée de';
+_translations['log categories for a duration of']          = 'catégories de log pour une durée de';
 _translations['seconds']                                   = 'secondes';
-_translations['log categories are updated']                = 'les catégories de journaux sont à jour';
+_translations['log categories are updated']                = 'les catégories de log sont à jour';
 _translations['reset is executed']                         = 'la réinitialisation est lancée';
 _translations['reset is executed after']                   = 'la réinitialisation est lancée après';
 _translations['Next reset']                                = 'Réinitialisation suivante';
@@ -602,11 +601,11 @@ _translations['Description']                               = 'Description';
 
 _translations['CALENDAR']                                  = 'CALENDRIER';
 _translations['job']                                       = 'tâche';
-_translations['job chain']                                 = 'chaîne de tâches';
-_translations['of job chain']                              = 'de la chaîne de tâches';
+_translations['job chain']                                 = 'chaîne des tâches';
+_translations['of job chain']                              = 'de la chaîne des tâches';
 _translations['all jobs']                                  = 'toutes les tâches';
 _translations['all jobs and orders']                       = 'toutes les tâches et tous les ordres';
-_translations['Start times for']                           = 'Date de lancement';
+_translations['Start times for']                           = 'Date de lancement pour';
 _translations['by calling']                                = 'en appelant';
 _translations['with output format']                        = 'avec le format de sortie';
 _translations['at']                                        = 'à';
@@ -624,14 +623,14 @@ _translations['remove']                                    = 'supprimer';
 _translations['quick check']                               = 'vérification rapide';
 _translations['regular expression for quick check']        = 'expression régulère pour une vérification rapide';
 _translations['select all']                                = 'sélectionner tout';
-_translations['deselect all']                              = 'séselectonner tout';
+_translations['deselect all']                              = 'désélectonner tout';
 _translations['new filter']                                = 'nouveau filtre';
 _translations['filter was stored']                         = 'le filtre a été enregistré';
 _translations['new filter was stored']                     = 'le nouveau filtre a été enregistré';
 _translations['filter was removed']                        = 'le filtre a été supprimé';
 _translations['Filter name must be stated']                = 'Un filtre doit être renseigné';
 _translations['Using\n\n|\n=>\n;\n\nis not allowed']       = 'Utiliser\n\n|\n=>\n;\n\nest interdit';
-_translations['A filter "$filter_name" is already defined in the file $file.'] = 'A filter "$filter_name" is already defined in the file $file.';
+_translations['A filter "$filter_name" is already defined in the file $file.'] = 'Le même nom de de filtre "$filter_name" est déjà utilisé par le fichier $file.';
 _translations['The same filter name "$filter" was already defined\n\nDo you want nevertheless to store it ?'] = 'Le même nom de filtre "$filter" est déjà utilisé.\nToutefois voulez-vous l\'enregister ?'; 
 
 
@@ -660,15 +659,15 @@ _translations['run time editor']                           = 'Editeur de dates d
 _translations['$field must be stated!']                    = '$field doit être renseigné!';
 _translations['Period from ($field) is invalid date or before 1970-01-01.'] = 'La durée de ($field) n\'est pas une date valide ou antérieur au 01/01/1970.';
 _translations['Max. hits ($field) is not a positive number.'] = 'Nombre d\'occurences max. ($field) n\'est pas un entier positf.';
-_translations['Please add an existing order job to the job chain nodes.'] = 'S\'il vous plait, ajoutez un ordre existant à la chaîne de tâches.';
+_translations['Please add an existing order job to the job chain nodes.'] = 'S\'il vous plait, ajoutez un ordre existant à la chaîne des tâches.';
 _translations['Please select an existing order job on the left hand side.'] = 'S\'il vous plait, ajoutez un ordre existant du coté gauche.';
 
 //Plausi fields
 _translations['Start time']                                = 'Date de lancement';
-_translations['Name']                                      = 'Name';
+_translations['Name']                                      = 'Nom';
 
 //Scheduler settings
-_translations['The following values will be stored in a cookie. If no cookies are available the values which are set in <code>./custom.js</code> are used.'] = 'Les valeurs suivantes seront enregistrées dans un cookie. Si aucun cookie n\'est disponible, les valeurs qui sont utilisées sont celles du fichiers <code>./custom.js>/code>.';
+_translations['The following values will be stored in a cookie. If no cookies are available the values which are set in <code>./custom.js</code> are used.'] = 'Les valeurs suivantes seront enregistrées dans un cookie. Si aucun cookie n\'est disponible, les valeurs qui sont utilisées sont celles du fichiers <code>./custom.js</code>.';
 _translations['Onload Values']                             = 'Valeurs au démarrage';
 _translations['periodically every']                        = 'périodiquement tous';
 _translations['inclusive &quot;<i>Hot Folders</i> &quot;'] = 'y comris les &quot;<i>Hot Folders</i> &quot;';
@@ -676,32 +675,32 @@ _translations['Tabs']                                      = 'Tabs';
 _translations['Switch to']                                 = 'Enchainer sur';
 _translations['as the beginning view']                     = 'comme vue de départ';
 _translations['Selects, Checkboxes and Radios']            = 'Selects, Checkboxes et Radios';
-_translations['in the <i>jobs</i> tab']                    = 'dans les <i>Tâches</i>-Tab';
-_translations['in the <i>job chains</i> tab']              = 'dans les <i>chaînes de tâches</i>-Tab';
-_translations['in the job chain details']                  = 'dans les détails des<i>Chaînes de tâches</i>';
-_translations['in the <i>last activities</i> tab']         = 'dans les <i>Activités récentes</i>';
+_translations['in the <i>jobs</i> tab']                    = 'dans l\'onglet des <i>Tâches</i>';
+_translations['in the <i>job chains</i> tab']              = 'dans l\'onglet des <i>Chaînes des Tâches</i>';
+_translations['in the <i>job chain</i> details']           = 'dans les détails des <i>chaînes des tâches</i>';
+_translations['in the <i>last activities</i> tab']         = 'dans l\'onglet des <i>Activités Récentes</i>';
 _translations['all orders and tasks']                      = 'tous les ordres et les instances';
 _translations['only tasks']                                = 'seulement les instance';
 _translations['only orders']                               = 'seulement les ordres';
 _translations['Runtime Values']                            = 'Paramètres de démarrage';
 _translations['Limits']                                    = 'Limites';
-_translations['Max. number of orders per job chain']       = 'Nombre maximum d\'ordre par chaîne de tâches.';
+_translations['Max. number of orders per job chain']       = 'Nombre maximum d\'ordre par chaîne des tâches';
 _translations['Max. number of last activities']            = 'Nombre maximum d\'activités récentes';
 _translations['Max. number of history entries per order']  = 'Nombre maximum d\'entrée par ordre dans l\'historique';
 _translations['Max. number of history entries per task']   = 'Nombre maximum d\'entrée par instance dans l\'historique';
-_translations['Termintate within']                         = 'Terminer dans les XXXXX';
+_translations['Terminate within']                          = 'Terminer dans les';
 _translations['Max. seconds within the Job Scheduler terminates'] = 'Durée maximal avant que Job Scheduler se termine';
 _translations['Dialogs']                                   = 'Dialogues';
-_translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'Date de lancement par défaut pour &quot;<i>Lancer instance/ordre à</i> &quot;est <i>maintenant</i>';
+_translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'Date de lancement par défaut pour &quot;<i>Lancer instance/ordre à</i>&#160;&quot; est <i>now</i>';
 _translations['Debug']                                     = 'Debug';
 _translations['Level']                                     = 'Level';
 
 //start task/order
-_translations['Start task $task']                          = 'Lancer un instance $task';
-_translations['Start order $order']                        = 'Lancer un ordre $order';
-_translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS] or &quot;now&quot;. The time at which a task is to be started &lt;<p align="left">run</p>_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Rentrer une date de lancement</b><span> class="small"> au format ISO  &quot;yyyy-mm-dd HH:MM[:SS] ou &quot;now&quot;.  La date à laquelle l\'instannce devrait être lancée &lt;<p align="left">run</p>_time&gt; sera désactivée. Les dates relatives - &quot;maintenant + + HH:MM[:SS]&quot; and &quot;maintenant  + SECONDS&quot; - sont acceptées.</span>';
-_translations['<b>Enter a run time</b> or use the $editor'] = '<b>Rentrez une date de lancement</b> ou utilisez $editor';
-_translations['<b>Start enforced</b>']                     = '<b>Lancement forcé</b>';
+_translations['Start task $task']                          = 'Lancer la instance $task';
+_translations['Start order $order']                        = 'Lancer l\'ordre $order';
+_translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS]&quot; or &quot;now&quot;. The time at which a task is to be started &lt;run_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Rentrer une date de lancement</b><span class="small"> au format ISO  &quot;yyyy-mm-dd HH:MM[:SS]&quot; ou &quot;now&quot;.  La date à laquelle l\'instannce devrait être lancée &lt;run_time&gt; sera désactivée. Les dates relatives - &quot;maintenant + HH:MM[:SS]&quot; and &quot;maintenant  + SECONDS&quot; - sont acceptées.</span>';
+_translations['<b>Enter a run time</b> or use the $editor'] = '<b>Rentrez une date de lancement</b> ou utilisez <span style="display:inline-block;width:100%;text-align:right;">$editor</span>';
+_translations['Start enforced']                            = 'Lancement forcé';
 _translations['Change parameters']                         = 'Changer des paramètres';
 _translations['Declare parameters']                        = 'Déclarer des paramètres';
 _translations['Declare new parameters']                    = 'Déclarer de nouveaux paramètres';
@@ -710,12 +709,12 @@ _translations['value']                                     = 'valeur';
 
 
 //add order
-_translations['Add order to $job_chain']                   = 'Ajouter un ordre $job_chain';
-_translations['<b>Enter an order id</b>']                  = '<b>Id ordre</b>';
-_translations['<b>Enter an order title</b>']               = '<b>Titre de l\'ordre</b>';
-_translations['<b>Select an order state</b>']              = '<b>Etat de l\'ordre</b>';
-_translations['<b>Select an order end state</b>']          = '<b>Etat de fin de l\'ordre</b>';
-_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?'] = 'Dans le but d\'enregistrer cet ordre dans le \"Hot Folder\" vous devez paramétrer un id d\'ordre.\nVotre ordre sera enregistré de manière permantent mais il sera valide\n pour la durée de validité de la session Job Scheduler. Voulez vous continuer ?';
+_translations['Add order to $job_chain']                   = 'Ajouter un ordre à $job_chain';
+_translations['Enter an order id']                         = 'Id ordre';
+_translations['Enter an order title']                      = 'Titre de l\'ordre';
+_translations['Select an order state']                     = 'Etat de l\'ordre';
+_translations['Select an order end state']                 = 'Etat de fin de l\'ordre';
+_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?'] = 'Dans le but d\'enregistrer cet ordre dans le \"Hot Folder\" vous devez paramétrer un id d\'ordre.\nVotre ordre sera enregistré de manière permanent mais il sera valide\n pour la durée de validité de la session Job Scheduler. Voulez-vous continuer?';
 
 
 //set order state
@@ -733,6 +732,8 @@ _translations['or choose a schedule']                      = 'ou choisissez une 
 _translations['Add schedule']                              = 'Ajouter une programmation';
 _translations['Add substitute for $schedule']              = 'Ajouter un subsitut pour $schedule';
 _translations['Edit $schedule']                            = 'Modifier $schedule';
+_translations['Enter a schedule name']                     = 'Nom de la programmation';
+
 
 //calendar
 _translations['Parameterize the start times list']         = 'Paramétrez la liste des dates de démarrage';
@@ -746,14 +747,14 @@ _translations['Include order start times']                 = 'Ajoutez les dates 
 
 //job chain
 _translations['Sorry, but this feature is only supported for\nJob Scheduler version 2.0.204.5774 or higher'] = 'Désolé, cette fonctionnalité est supportée à partir de la version 2.0.204.5774 de Job Scheduler';
-_translations['Modify job chain']                          = 'Job-Kette ändern';
-_translations['Now you can modify the job chain by editing the text area content.'] = 'Dorénavant vous pouvez modifier la chaîne de tâches en éditant le contenu du champ texte.';
+_translations['Modify job chain']                          = 'Modifier la chaîne des tâches';
+_translations['Now you can modify the job chain by editing the text area content.'] = 'Dorénavant vous pouvez modifier la chaîne des tâches en éditant le contenu du champ texte.';
 _translations['Orders are stored in the database (orders_recoverable)'] = 'Les ordres sont stockés en base de données (orders_recoverable)';
 _translations['Existing order jobs']                       = 'Tâches d\'ordre existant';
-_translations['Job chain nodes']                           = 'Noeud de la chaîne de tâches';
+_translations['Job chain nodes']                           = 'Noeuds de la chaîne des tâches';
 _translations['Enter a folder']                            = 'Repertoire';
-_translations['Enter a job chain name']                    = 'Nom de la chaîne de tâches';
-_translations['Enter a job chain title']                   = 'Titre de la chaîne de tâches';
+_translations['Enter a job chain name']                    = 'Nom de la chaîne des tâches';
+_translations['Enter a job chain title']                   = 'Titre de la chaîne des tâches';
 
 
 /******************************************************************************

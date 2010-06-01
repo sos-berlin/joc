@@ -697,11 +697,11 @@ _translations['Debug']                                     = 'Debug';
 _translations['Level']                                     = 'Level';
 
 //start task/order
-_translations['Start task $task']                          = 'Task $task starten';
-_translations['Start order $order']                        = 'Auftrag $order starten';
+_translations['Start task $task']                          = 'Starte Task $task';
+_translations['Start order $order']                        = 'Starte Auftrag $order';
 _translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS] or &quot;now&quot;. The time at which a task is to be started &lt;<p align="left">run</p>_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Setze eine Startzeit</b><span class="small"> im ISO-Format &quot;yyyy-mm-dd HH:MM[:SS] oder &quot;now&quot;. Startzeiten des &lt;run_time&gt;-Elements sind deaktiviert. Relativive Zeitangaben - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - sind möglich.<span>';
 _translations['<b>Enter a run time</b> or use the $editor'] = 'Für die Startzeiten nutze das Textfeld oder den $editor';
-_translations['<b>Start enforced</b>']                     = '<b> erzwungender Start</b>';
+_translations['Start enforced']                            = ' erzwungender Start';
 _translations['Change parameters']                         = 'Parameter ändern';
 _translations['Declare parameters']                        = 'Parameter angeben';
 _translations['Declare new parameters']                    = 'Neue Parameter angeben';
@@ -710,28 +710,29 @@ _translations['value']                                     = 'Wert';
 
 
 //add order
-_translations['Add order to $job_chain']                   = 'Auftrag für $job_chain hinzufügen';
-_translations['<b>Enter an order id</b>']                  = '<b>Id des Auftrags</b>';
-_translations['<b>Enter an order title</b>']               = '<b>Title des Auftrags</b>';
-_translations['<b>Select an order state</b>']              = '<b>Status des Auftrags</b>';
-_translations['<b>Select an order end state</b>']          = '<b>Endstatus des Auftrags</b>';
+_translations['Add order to $job_chain']                   = 'Füge Auftrag hinzu für $job_chain';
+_translations['Enter an order id']                         = 'Id des Auftrags';
+_translations['Enter an order title']                      = 'Title des Auftrags';
+_translations['Select an order state']                     = 'Status des Auftrags';
+_translations['Select an order end state']                 = 'Endstatus des Auftrags';
 _translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?'] = 'Um den Auftrag dem Hot-Folder zu übergeben, muss eine Auftrags-ID angegeben\nwerden. Ansonsten hat dieser nur die Lebenszeit der aktuellen Job Scheduler Session.\nWollen Sie fortfahren?';
 
 //set order state
-_translations['Set order state of $order']                 = 'Status für $order setzen';
+_translations['Set order state of $order']                 = 'Setze Status für $order';
 _translations['<b>Select a new order state</b>']           = '<b>Wähle einen neuen Auftrags-Status.</b>';
 _translations['<span class="small">The current order state is $state.</span>'] = '<span class="small">Der aktuelle Status ist $state.</span>';
 _translations['<b>Select a new order end state</b>']       = '<b>Wähle einen neuen Auftrags-Endstatus.</b>';
 _translations['<span class="small">The current order end state is $state.</span>'] = '<span class="small">Der aktuelle Endstatus ist $state.</span>';
 
 //set run time
-_translations['Set run time of $job']                      = 'Startzeit für $job setzen';
+_translations['Set run time of $job']                      = 'Setze Startzeit für $job setzen';
 _translations['or choose a schedule']                      = 'oder wähle einen Schedule';
 
 //schedules
 _translations['Add schedule']                              = 'Neuer Schedule';
 _translations['Add substitute for $schedule']              = 'Neues Substitut für $schedule';
-_translations['Edit $schedule']                            = '$schedule bearbeiten';
+_translations['Edit $schedule']                            = 'Bearbeite $schedule';
+_translations['Enter a schedule name']                     = 'Name des Schedules';
 
 //calendar
 _translations['Parameterize the start times list']         = 'Startzeiten-Abfrage parametrisieren';

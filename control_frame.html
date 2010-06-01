@@ -501,7 +501,7 @@ window.onresize = set_frame_height;
                 </span>
                 <span sos_class="job_chains" style="display:none;">
                   <wbr/><!--&#8203;-->
-                  <span style="white-space:nowrap;">
+                  <span style="white-space:nowrap;display:inline-block;">
                     <input id="show_job_chain_jobs_checkbox" type="checkbox" onclick="callErrorChecked( 'checkbox__onclick', this )" name="show_job_chain_jobs_checkbox"/>
                     <label for="show_job_chain_jobs_checkbox">Show jobs</label>
                     <input id="show_job_chain_orders_checkbox" type="checkbox" onclick="callErrorChecked( 'checkbox__onclick', this )" name="show_job_chain_orders_checkbox"/>
@@ -573,15 +573,15 @@ window.onresize = set_frame_height;
                   </span>
                 </span>
               </td>
-              <td sos_class="job_chains" id="add_job_chain" style="display:none; padding:1px 2px 0px 2px; width:1%;">
-                <div class="button" onclick="callErrorChecked( 'parent.left_frame.add_job_chain', '/' )">
+              <td sos_class="job_chains" id="add_job_chain" style="display:none; padding:2px 0px;;">
+                <div class="button" style="margin:0px 2px;" onclick="callErrorChecked( 'parent.left_frame.add_job_chain', '/' )">
                   <!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
                   <span class="translate">Create job chain</span>
                   <!--[if lte IE 6]></a><![endif]-->
                 </div>
               </td>
-              <td sos_class="schedules" style="display:none; padding:1px 2px 0px 2px; width:1%;">
-                <div class="button" onclick="parent.left_frame.add_schedule('')">
+              <td sos_class="schedules" style="display:none; padding:2px 0px;;">
+                <div class="button" style="margin:0px 2px;" onclick="parent.left_frame.add_schedule('')">
                   <!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
                   <span class="translate">Create schedule</span>
                   <!--[if lte IE 6]></a><![endif]-->
