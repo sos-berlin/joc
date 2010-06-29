@@ -140,7 +140,8 @@ Scheduler_Filter.init = function(){
   try {
     Scheduler_Filter.scheduler.logger(1,'INIT FILTER MANAGEMENT ' + self.name,'scheduler_init_filters');
   
-    var response                                = Scheduler_Filter.scheduler.execute( '<show_state what="job_chains job_chain_orders order_source_files blacklist" />', false, true, true ); 
+    var response                                = Scheduler_Filter.scheduler.executeSynchron( '<show_state what="job_chains job_chain_orders order_source_files blacklist" />', false, true, true ); 
+    if( !response ) return false;
     var state_element                           = response.selectSingleNode( "/spooler/answer/state");  
     if(!Scheduler_Filter.is_inherited_scheduler) {
       Scheduler_Filter.scheduler.setState( state_element );
@@ -684,4 +685,8 @@ Scheduler_Filter.remove_all_cookies = function(){
     var expires     = new Date(1981,01,01);
     document.cookie = name + "=; expires="+expires.toGMTString()+"; path=/"; 
   }
+}
+
+function show_error(x) {
+  Scheduler_Filter.show_error(x);
 }

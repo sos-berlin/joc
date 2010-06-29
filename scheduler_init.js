@@ -39,6 +39,7 @@ var _show_card                  = 'jobs';
 var _checkbox_states            = new Object();
 var _radio_states               = new Object();
 var _select_states              = new Object();
+var _view                       = new Object();
 var _max_orders                 = 10;
 var _max_last_activities        = 30;
 var _max_order_history          = 50;
@@ -111,8 +112,8 @@ function check_browser()
             {
                 if( window.navigator.vendor == "Firefox" || window.navigator.userAgent.indexOf( "Firefox" ) > -1 )
                 {
-                    firefox = 0.1;
-                    if( window.navigator.productSub >= 20041108 )  firefox = 1;
+                    var match = window.navigator.userAgent.match( /Firefox\/(\d+\.\d+)/ );
+                    if( match )  firefox = 1 * RegExp.$1;
                 }
                 else
                 if( window.navigator.vendor == "Google Inc." || window.navigator.userAgent.indexOf( "Chrome" ) > -1 )
@@ -130,7 +131,7 @@ function check_browser()
         }
     }
     
-    if( ie < 6 && firefox < 1 && chrome < 0.2 && seamonkey < 2.0 )
+    if( ie < 6 && firefox < 2 && chrome < 0.2 && seamonkey < 2 )
     {
         var allBrowser = ie+firefox+chrome+seamonkey;
         var msg = "The page may not work with this browser.\n\n";
@@ -145,7 +146,7 @@ function check_browser()
         else 
         { 
           if( allBrowser-ie        == 0 ) msg += "The Microsoft Internet Explorer version should be at least 6.0";
-          if( allBrowser-firefox   == 0 ) msg += "The Mozilla Firefox version should be at least 1.0";
+          if( allBrowser-firefox   == 0 ) msg += "The Mozilla Firefox version should be at least 2.0";
           if( allBrowser-chrome    == 0 ) msg += "The Google Chrome version should be at least 0.2";
           if( allBrowser-seamonkey == 0 ) msg += "The SeaMonkey version should be at least 2.0";
         }
@@ -165,3 +166,5 @@ function check_browser()
         alert( msg );
     }
 }
+
+

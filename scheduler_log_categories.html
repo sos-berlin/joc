@@ -109,11 +109,11 @@ function showCategories(cur_delay)
     try {
       if( typeof cur_delay != 'number' ) { cur_delay = -2; }
       _scheduler.logger(1,'SHOW LOG CATEGORIES','showCategories');
-      var response             = _scheduler.execute( "<scheduler_log.log_categories.show/>", false, false, true );
+      var response             = _scheduler.executeSynchron( "<scheduler_log.log_categories.show/>", false, false, true );
       var log_elements_elem    = response.selectSingleNode( ".//log_categories" );
-      if( !log_elements_elem  ) throw new Error( "no log categories found" ); //TODO translation
+      if( !log_elements_elem  ) throw new Error( "No log categories found" );
       var log_element_elems    = log_elements_elem.selectNodes( "log_category" );
-      if( !log_element_elems || log_element_elems.length == 0 ) throw new Error( "no log categories found" ); //TODO translation
+      if( !log_element_elems || log_element_elems.length == 0 ) throw new Error( "No log categories found" );
       var spooler_element      = response.selectSingleNode( "spooler" );
       spooler_element.setAttribute( "my_ie_version", _ie_version );
       spooler_element.setAttribute( "reset_delay", (_delay ? _delay : 0) );
@@ -125,7 +125,7 @@ function showCategories(cur_delay)
       
       modifyCategories(log_elements_elem,log_element_elems);
       _scheduler.logger(9,'MODIFIED LOG CATEGORIES RESPONSE:\n' + response.xml);
-      document.getElementById( "stylesheet_output" ).innerHTML = _scheduler.xmlTransform( response, true );
+      document.getElementById( "stylesheet_output" ).innerHTML = _scheduler.xmlTransform( response );
       setCornerPosition();
       setDelayElem();
       _scheduler.logger(1,'ELAPSED TIME FOR SHOW LOG CATEGORIES','showCategories');
@@ -215,7 +215,7 @@ function apply_category(chbox,form)
     _scrollOffset     = realYoffset(chbox);
     
     var val           = (chbox.type != 'checkbox' || chbox.checked) ? " value='yes'" : " value='no'";
-    var response      = _scheduler.execute( "<scheduler_log.log_categories.set category='"+chbox.name+"'"+val+"/>", false, false, true );
+    var response      = _scheduler.executeSynchron( "<scheduler_log.log_categories.set category='"+chbox.name+"'"+val+"/>", false, false, true );
     showCategories(-1);
     _scheduler.logger(3,'ELAPSED TIME FOR APPLY LOG CATEGORY ' + chbox.name,'apply_category');
     return true;
@@ -251,7 +251,7 @@ function reset_categories(delayElem)
       throw new Error( "The delay ("+_delay+") must be a not negative number" );
     } 
     var delay_cmd     = (!_delay ? "" : " delay='"+_delay+"'");
-    var response      = _scheduler.execute( "<scheduler_log.log_categories.reset"+delay_cmd+"/>", false, false, true );
+    var response      = _scheduler.executeSynchron( "<scheduler_log.log_categories.reset"+delay_cmd+"/>", false, false, true );
     if( _delay_timer ) window.clearTimeout( _delay_timer );
     if( _delay == 0 ) {
       showCategories(0);

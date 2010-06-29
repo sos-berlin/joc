@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -39,6 +39,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <script type="text/javascript" src="scheduler_init.js"></script>
         <script type="text/javascript" src="browser_dependencies.js"></script>
+        <script type="text/javascript" src="prototype.js"></script>
         <script type="text/javascript" src="scheduler.js"></script>
         <script type="text/javascript" src="sos_logger.js"></script>
         <script type="text/javascript" language="javascript">
@@ -48,19 +49,32 @@
           onload_settings.checkbox_states                     = new Object();
           onload_settings.radio_states                        = new Object();
           onload_settings.select_states                       = new Object();
+          onload_settings.view                                = new Object();
           var _scheduler                                      = new Scheduler();
-          var _state                                          = null;
+          var _response                                       = null;
           
           check_browser();
           
           try {
             _scheduler.loadXSLT( "scheduler.xslt" );
+          } 
+          catch(E) {
+            alert(E.message);
+          }
+          
+          try {
             _scheduler.readCustomSettings();
-            var response    = _scheduler.execute( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
-            _state          = response.selectSingleNode( "/spooler/answer/state" );
-            _scheduler.setState( _state );
+            try {
+              //solange die locks nicht in der Statistic enthalten sind, werden sie im show_state aufgerufen
+              _response = _scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster" subsystems="lock schedule process_class folder"/></commands>', false, false ); 
+              _scheduler._tree_view_enabled = true;
+            } catch(x) {
+              _response = _scheduler.executeSynchron( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
+            }
+            _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
             document.title  = getTranslation('Job Scheduler') + " " + _scheduler._host + ":" + _scheduler._port;
             document.title += ( _scheduler._id ) ? " " + getTranslation('-id') + "=" + _scheduler._id : "";
+            _scheduler.readCustomVersionedSettings();
             if( !_server_settings ) _scheduler.readCookies();
             
             onload_settings.update_seconds             = _scheduler._update_seconds;
@@ -77,7 +91,10 @@
             for( var state in _scheduler._radio_states ) {                      
                 onload_settings.radio_states[state]    = _scheduler._radio_states[state];
             }
-          }
+            for( var card in _scheduler._view ) {                      
+                onload_settings.view[card]             = _scheduler._view[card];
+            }
+          } 
           catch(E) {
             alert(E.message);
           }
@@ -103,8 +120,9 @@
         <frame   name="top_frame"     src="top_frame.html"        marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
         <frame   name="error_frame"   src="error_frame.html"      marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
         <frame   name="control_frame" src="control_frame.html"    marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
-        <frameset id="left_and_right_frameset" cols="100%,0%"    framespacing="0" border="0">
-          <frame name="left_frame"    src="about:blank"           marginwidth="0" marginheight="0" frameborder="0" scrolling="yes"/>
+        <frameset id="left_and_right_frameset" cols="12,100%,0%"    framespacing="0" border="0">
+          <frame name="dummy_frame"   src="dummy.html"            marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
+          <frame name="left_frame"    src="dummy.html"            marginwidth="0" marginheight="0" frameborder="0" scrolling="yes"/>
           <frameset id="right_frameset" rows="6,*"               framespacing="0" border="0">
             <frame name="corner_frame" src="corner_frame.html"    marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
             <frame name="details_frame" src="details_frame.html"  marginwidth="0" marginheight="0" frameborder="0" scrolling="yes" onload="_details_frame_loaded = true"/>

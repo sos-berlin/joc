@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -83,7 +83,7 @@ function do_onload()
 {   
     parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_control');
                                                            
-    _frm = window.parent.document.getElementById( "top_and_bottom_frameset" );
+    _frm = parent.document.getElementById( "top_and_bottom_frameset" );
     if( navigator.appVersion.indexOf("MSIE") > -1 ) document.getElementsByTagName('body')[0].style.marginRight = "19px";
     
     translate();
@@ -122,12 +122,12 @@ function set_frame_height()
 
 
 //-------------------------------------------------------------------------------------------update
-function update(response)
+function update()
 {   
     if( !_is_loaded ) do_onload();
     parent._scheduler.logger(3,'START UPDATE '+self.name,'update_control');
     if(parent._scheduler._show_card.search(/^(jobs|job_chains|orders)$/) > -1) {
-      get_process_classes(response);
+      get_process_classes();
       set_single_selected('jobs_process_class_select');
     }
     if( _card != parent._scheduler._show_card ) toggle(parent._scheduler._show_card);
@@ -138,7 +138,7 @@ function update(response)
 //------------------------------------------------------------------------------get_filters
 function get_filters( name, with_update_frame ) 
 {                                  
-    parent._scheduler.logger(1,'START READING '+name.toUpperCase()+' FILTER COOKIES ' + self.name,'scheduler_read_filters');
+    parent._scheduler.logger(3,'START READING '+name.toUpperCase()+' FILTER COOKIES ' + self.name,'scheduler_read_filters');
     _filters[name+'_order']   = new Array();
     _filters[name]            = new Object();
     _filters[name+'_details'] = "";
@@ -180,7 +180,7 @@ function get_filters( name, with_update_frame )
       if( _filters[name+'_details'] == "" ) _filters[name+'_details'] = parent._scheduler.getCookie( Scheduler_Filter['cookie_name_'+name+'_prefix']+parent._scheduler._select_states['filter_'+name+'_select'] );
     }
     
-    parent._scheduler.logger(1,'ELAPSED TIME FOR READING '+name.toUpperCase()+' FILTER COOKIES ' + self.name,'scheduler_read_filters');
+    parent._scheduler.logger(3,'ELAPSED TIME FOR READING '+name.toUpperCase()+' FILTER COOKIES ' + self.name,'scheduler_read_filters');
     
     if( typeof with_update_frame == 'boolean' && with_update_frame ) {
       set_filter_selects( name, true );
@@ -193,29 +193,29 @@ function set_filter_selects( name, with_update )
 {   
     if( name == "jobs" || name == "job_chains" || name == "orders" ) {
       try {
-        parent._scheduler.logger(1,'START CREATING ' +name.toUpperCase()+ ' FILTER SELECTBOX ' + self.name,'scheduler_create_filters');
+        parent._scheduler.logger(3,'START CREATING ' +name.toUpperCase()+ ' FILTER SELECTBOX ' + self.name,'scheduler_create_filters');
         var selectElem            = document.getElementById('filter_'+name+'_select');
         var curfilter             = selectElem.value;
         for( var i=1; i < selectElem.length; i++ ) {
           selectElem.options[i]   = null;
         }
-        parent._scheduler.logger(1,name.toUpperCase()+ ' FILTERS ('+_filters[name+'_order'].length+'): ' + _filters[name+'_order'].join());
+        parent._scheduler.logger(2,name.toUpperCase()+ ' FILTERS ('+_filters[name+'_order'].length+'): ' + _filters[name+'_order'].join());
         _filters[name+'_order'].sort(case_insensitive);
         for( var i=0; i < _filters[name+'_order'].length; i++ ) {
           var entry = _filters[name+'_order'][i];
           selectElem.options[i+1] = new Option(entry,_filters[name][entry]);
-          parent._scheduler.logger(1,'NEW ' +name.toUpperCase()+ ' FILTER SELECTBOX OPTION: ' + selectElem.options[i+1].value+'='+selectElem.options[i+1].text);
+          parent._scheduler.logger(2,'NEW ' +name.toUpperCase()+ ' FILTER SELECTBOX OPTION: ' + selectElem.options[i+1].value+'='+selectElem.options[i+1].text);
           selectElem.options[i+1].selected = ( parent._scheduler._select_states['filter_'+name+'_select'] == _filters[name][entry] );
         }
         if(with_update && selectElem.length > 1 && selectElem.value != curfilter) {
-          set_timeout('window.parent.left_frame.update(false)',1,1);
+          set_timeout('parent.left_frame.update(false)',1,1);
         }
         selectElem.parentNode.style.display  = (selectElem.length > 1) ? 'inline' : 'none';
-        parent._scheduler.logger(1,name.toUpperCase()+ ' FILTER SELECTBOX DISPLAY: '+ (selectElem.parentNode.style.display=='none' ? 'hidden' : 'visible'));
+        parent._scheduler.logger(2,name.toUpperCase()+ ' FILTER SELECTBOX DISPLAY: '+ (selectElem.parentNode.style.display=='none' ? 'hidden' : 'visible'));
       } catch(x) {
         parent._scheduler.logger(1,'ERROR OCCURS AT CREATING ' +name.toUpperCase()+ ' FILTER SELECTBOX:\n ' + x.message);
       } finally {
-        parent._scheduler.logger(1,'ELAPSED TIME FOR CREATING ' +name.toUpperCase()+ ' FILTER SELECTBOX ' + self.name,'scheduler_create_filters');
+        parent._scheduler.logger(3,'ELAPSED TIME FOR CREATING ' +name.toUpperCase()+ ' FILTER SELECTBOX ' + self.name,'scheduler_create_filters');
       }
     }
 }
@@ -305,16 +305,18 @@ function set_checkbox_checked()
 
 
 //---------------------------------------------------------------------------------get_process_classes
-function get_process_classes(response)
-{
-    var process_classes = response.selectNodes("/spooler/answer/state/process_classes/process_class[@path != '' and @path != '(temporaries)' and @path != '/(temporaries)']");
-    var selectElem      = document.forms[0].elements.jobs_process_class_select;
-    for( var i=2; i < selectElem.length; i++ ) {
-      selectElem.options[i]   = null;
-    }
-    for( var i=0; i < process_classes.length; i++ ) {
-      var path = process_classes[i].getAttribute('path');
-      selectElem.options[i+2] = new Option(path.replace(/^\//,''),path);
+function get_process_classes()
+{   
+    if( parent.top_frame._state ) {
+      var process_classes = parent.top_frame._state.selectNodes("//process_classes/process_class[@path != '' and @path != '(temporaries)' and @path != '/(temporaries)']");
+      var selectElem      = document.forms[0].elements.jobs_process_class_select;
+      for( var i=2; i < selectElem.length; i++ ) {
+        selectElem.options[i]   = null;
+      }
+      for( var i=0; i < process_classes.length; i++ ) {
+        var path = process_classes[i].getAttribute('path');
+        selectElem.options[i+2] = new Option(path.replace(/^\//,''),path);
+      }
     }
 }
 
@@ -334,6 +336,10 @@ function toggle(card)
     for( var i=0; i < elems.length; i++ ) {
       var sos_class = elems[i].getAttribute('sos_class');
       if( !sos_class ) continue;
+      if( elems[i].id == 'view_icons' ) {
+        if( !parent._scheduler._tree_view_enabled ) continue;
+        else set_view_icons(elems[i], _card);
+      }
       elems[i].style.display = (sos_class.indexOf(card) == -1) ? 'none' : 'inline';
     }
     set_frame_height();
@@ -346,6 +352,9 @@ function write_cookies()
   for( var entry in parent._scheduler._select_states ) {
     if( entry.search(/^filter_(jobs|job_chains|orders)_select$/) > -1 ) continue;
     set_cookie( 'select_states_'+entry, parent._scheduler._select_states[entry] );
+  }
+  for( var entry in parent._scheduler._supported_tree_views ) {
+    set_cookie( 'view_'+entry, parent._scheduler._view[entry] );
   }
   //set_cookie( Scheduler_Filter['cookie_name_jobs_active'], parent._scheduler._select_states.filter_jobs_select );
   //set_cookie( Scheduler_Filter['cookie_name_job_chains_active'], parent._scheduler._select_states.filter_job_chains_select );
@@ -368,7 +377,7 @@ function set_cookie(name, value, expire)
         expires.setTime(today.getTime() + expire);
         document.cookie = name+"="+escape(value)+"; expires="+expires.toGMTString()+"; path=/";
       }
-      parent._scheduler.logger(1,'COOKIE WRITE: ' + name + '=' + value);
+      parent._scheduler.logger(2,'COOKIE WRITE: ' + name + '=' + value);
     } catch(x) {
       parent._scheduler.logger(1,'ERROR OCCURS AT COOKIE WRITE: ' + name + '=' + value + '\n' + x.message);
     }      
@@ -382,7 +391,7 @@ function select__onclick( selectElem )
         parent._scheduler._select_states[ selectElem.name ] = selectElem.value;
     }
     resetError();
-    set_timeout("window.parent.left_frame.update()",1);
+    set_timeout('parent.left_frame.update();',1);
 }
 
 
@@ -391,7 +400,7 @@ function radios__onclick( radioElem )
 {
     parent._scheduler._radio_states[ radioElem.name ] = radioElem.value;
     resetError();
-    set_timeout("window.parent.left_frame.update()",1);
+    set_timeout('parent.left_frame.update();',1);
 }
 
 
@@ -400,7 +409,7 @@ function checkbox__onclick( checkElem )
 {
     parent._scheduler._checkbox_states[ checkElem.name ] = checkElem.checked;
     resetError();
-    set_timeout("window.parent.left_frame.update()",1);
+    set_timeout('parent.left_frame.update();',1);
 }
 
 
@@ -421,7 +430,60 @@ function translate()
       for( var i=0; i < elem.length; i++ ) {
         elem[i].text = parent.getTranslation(elem[i].text);
       }
+      elem      = document.getElementsByTagName("img");
+      for( var i=0; i < elem.length; i++ ) {
+        elem[i].title = parent.getTranslation(elem[i].title);
+      }
     }
+}
+
+
+//-------------------------------------------------------------------------------------------toggle_view
+function toggle_view(elem, init)
+{   
+    if( parent._scheduler._view[_card] == 'list') {
+      parent._scheduler._view[_card] = 'tree';
+    } else {
+      parent._scheduler._view[_card] = 'list';
+    }
+    set_view_icons(elem, _card);
+    callErrorChecked( 'update__onclick' );
+}
+
+//----------------------------------------------------------------------------------------set_view_icons
+function set_view_icons(elem, card)
+{   
+    var imgs        = elem.getElementsByTagName('img');
+    var selectElem  = document.getElementById('sort_'+card+'_select');
+      
+    if( parent._scheduler._view[card] == 'tree') {
+      imgs[0].title = parent.getTranslation('toggle to')+' '+parent.getTranslation('list view');
+      imgs[0].src   = 'explorer_listview.gif';
+      imgs[1].style.visibility = 'visible';
+      imgs[2].style.visibility = 'visible';
+      if( selectElem ) selectElem.disabled = true;
+    } else {
+      imgs[0].title = parent.getTranslation('toggle to')+' '+parent.getTranslation('tree view');
+      imgs[0].src   = 'explorer_folders.gif';
+      imgs[1].style.visibility = 'hidden';
+      imgs[2].style.visibility = 'hidden';
+      if( selectElem ) selectElem.disabled = false;
+    }
+}
+
+
+//--------------------------------------------------------------------------------------open_all_folders
+function open_all_folders()
+{   
+    parent.left_frame._open_all_folders = true;
+    parent.left_frame.update();
+}
+
+
+//--------------------------------------------------------------------------------------close_all_folders
+function close_all_folders()
+{   
+    parent.left_frame.close_all_folders();
 }
 
 
@@ -441,6 +503,12 @@ window.onresize = set_frame_height;
           <thead>
             <tr>
               <td style="height:20px;line-height:20px;width:100%">
+                <!--span id="view_icons" sos_class="jobs job_chains schedules locks orders" style="display:none;"-->
+                <span id="view_icons" sos_class="jobs job_chains" style="display:none;">
+                  <img src="explorer_folders.gif"       title="toggle to tree view" style="cursor:pointer"                   onclick="toggle_view(this.parentNode);" />
+                  <img src="explorer_open_folders.gif"  title="open all folders"    style="visibility:hidden;cursor:pointer" onclick="open_all_folders();" />
+                  <img src="explorer_close_folders.gif" title="close all folders"   style="visibility:hidden;cursor:pointer" onclick="close_all_folders(0);" />
+                </span>
                 <span sos_class="jobs job_chains" style="display:none;">
                   <wbr/><!--&#8203;-->
                   <span sos_class="jobs" style="display:none;padding-right:4px;">
@@ -573,14 +641,14 @@ window.onresize = set_frame_height;
                   </span>
                 </span>
               </td>
-              <td sos_class="job_chains" id="add_job_chain" style="display:none; padding:2px 0px;;">
+              <td sos_class="job_chains" id="add_job_chain" style="display:none; padding:2px 0px;">
                 <div class="button" style="margin:0px 2px;" onclick="callErrorChecked( 'parent.left_frame.add_job_chain', '/' )">
                   <!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
                   <span class="translate">Create job chain</span>
                   <!--[if lte IE 6]></a><![endif]-->
                 </div>
               </td>
-              <td sos_class="schedules" style="display:none; padding:2px 0px;;">
+              <td sos_class="schedules" style="display:none;padding:2px 0px;">
                 <div class="button" style="margin:0px 2px;" onclick="parent.left_frame.add_schedule('')">
                   <!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
                   <span class="translate">Create schedule</span>

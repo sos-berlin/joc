@@ -36,6 +36,13 @@ _show_card           = 'jobs';
 
 
 /*****************************************************************
+*  For some tabs you can set the default view mode (list or tree).
+*/
+_view[ 'jobs' ]       = 'list';
+_view[ 'job_chains' ] = 'list';
+
+
+/*****************************************************************
 *  You can specify which checkboxes are on (true) or off (false).
 *  Defaults: 'show order jobs' and 'show tasks' are on and the
 *  others are off.

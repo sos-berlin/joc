@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -53,12 +53,11 @@
     <script type="text/javascript" src="scheduler_init.js"></script>
     <script type="text/javascript" src="scheduler.js"></script>
     <script type="text/javascript" src="browser_dependencies.js"></script>
+    <script type="text/javascript" src="prototype.js"></script>
     <script type="text/javascript" src="sos_logger.js"></script>
     <script type="text/javascript" language="javascript"><!--
 
 var _scheduler;
-var _inherited_scheduler = true;
-var error_div;
 var _calendar_params;
 var _response = null;
 var _at_nodes = new Array();
@@ -66,14 +65,8 @@ var _at_nodes = new Array();
 window.onload = function()
 {   
     if( window.name == "" ) window.name = "scheduler_calendar";
-    if( !_scheduler ) {  
-      if( window.opener && window.opener._scheduler ) {
-        _scheduler = window.opener._scheduler;
-      } else {
-        _scheduler = new Scheduler();
-        _inherited_scheduler = false; 
-      }
-    }       
+    _scheduler = new Scheduler();
+    
     if( !_calendar_params ) {
       try {
         _calendar_params  = window.opener.left_frame._calendar_params;
@@ -81,15 +74,12 @@ window.onload = function()
         _calendar_params  = {'xml_command':'','menu':'scheduler','format':'html','job':'','order':''};;
       }
     }
-    error_div = document.getElementById('error');
     calendar_show();
 }
 
 window.onunload = function()
 {
-    if( !_inherited_scheduler && _scheduler ) {
-      _scheduler.close();
-    }
+    if( _scheduler ) _scheduler.close();
 }    
     
 //-----------------------------------------------------------------------------calendar_show
@@ -118,7 +108,22 @@ function calendar_show()
       if( calendar_params.xml_command == "" ) {
         throw new Error( "unknown error - please close this window, reload the calling window and try it again" );
       }
-      _response         = _scheduler.execute( calendar_params.xml_command, false, false, true ); 
+      _scheduler.executeAsynchron( calendar_params.xml_command, calendar_show_callback, false, false, true );
+      return true; 
+    }
+    catch( x ) {
+      return show_error( x );
+    }
+}
+
+
+//-----------------------------------------------------------------------------calendar_show_callback
+    
+function calendar_show_callback(response)
+{   
+    var calendar_params = _calendar_params;
+    _response           = response;
+    try { 
       if( !_response ) {
         throw new Error( "unknown error - please close this window, reload the calling window and try it again" );
       }
@@ -199,6 +204,7 @@ function xml_encode( text )
 
 function show_error( x )
 {
+    var error_div = document.getElementById('error');
     if( error_div ) {
       error_div.style.display = "inline";
       error_div.innerHTML = x.message.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace( /\"/g, "&quot;" ).replace( /\'/g, "&#039;" ).replace( /\n/g, "<br/>" ).replace( "  ", "\xA0 " );

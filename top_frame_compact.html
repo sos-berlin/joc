@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -50,8 +50,7 @@
 
 <script language="javascript" type="text/javascript"><!--
 
-var _scheduler;
-var _response;
+var _state                = null;
 var tabs                  = new Object();
 tabs['jobs']              = {title:'Jobs'             ,pos:'1', display:'inline'};
 tabs['job_chains']        = {title:'Job Chains'       ,pos:'' , display:'inline'};
@@ -79,57 +78,97 @@ function do_onload()
       document.getElementById( "update_periodically_checkbox" ).style.top = '2px';
     }
     document.getElementById(parent._scheduler._show_card+'_inner_tab').className = 'active'+tabs[parent._scheduler._show_card].pos;
-    set_state(parent._state);
+    set_state(parent._response);
     parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
 }
 
 
 //-------------------------------------------------------------------------------------------update
-function update(response)
+function update()
 {
     parent._scheduler.logger(3,'START UPDATE '+self.name,'update_top');
     
-    var state = response.selectSingleNode('/spooler/answer/state');
+    if(parent._scheduler._tree_view_enabled) {
+      
+      var response   = parent._scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster remote_schedulers schedules" subsystems="lock schedule process_class folder"/></commands>', false, false, false ); 
+      
+      var subsystems = response.selectSingleNode('/spooler/answer/subsystems');
+      _state         = response.selectSingleNode('/spooler/answer/state');
+      if(typeof parent.control_frame.update == 'function') parent.control_frame.update();
+      
+      //document.getElementById('job_chains_tab').style.display        = (subsystems.selectSingleNode("subsystem[@name='order']/file_based.statistics/@count_visible").nodeValue    == 0) ? 'none' : 'inline';
+      //document.getElementById('orders_tab').style.display            = document.getElementById('job_chains_tab').style.display;
+      //document.getElementById('schedules_tab').style.display         = (subsystems.selectSingleNode("subsystem[@name='schedule']/file_based.statistics/@count_visible").nodeValue == 0) ? 'none' : 'inline';
+      //document.getElementById('locks_tab').style.display             = (subsystems.selectSingleNode("subsystem[@name='lock']/file_based.statistics/@count").nodeValue     == 0) ? 'none' : 'inline';
+      document.getElementById('locks_tab').style.display             = (_state.selectNodes("//locks").length == 0)                      ? 'none' : 'inline';
+      document.getElementById('cluster_tab').style.display           = (_state.selectNodes("cluster").length == 0)                      ? 'none' : 'inline';
+      document.getElementById('remote_schedulers_tab').style.display = (_state.selectNodes("remote_schedulers[@count = 0]").length > 0) ? 'none' : 'inline';
+      
+      set_state(response);
+      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("Job Scheduler is waiting for database ...")));
     
-    document.getElementById('job_chains_tab').style.display        = (state.selectNodes("job_chains[@count = 0]").length > 0)        ? 'none' : 'inline';
-    document.getElementById('orders_tab').style.display            = (state.selectNodes("job_chains[@count = 0]").length > 0)        ? 'none' : 'inline';
-    document.getElementById('schedules_tab').style.display         = (state.selectNodes("schedules").length == 0)                    ? 'none' : 'inline';
-    document.getElementById('locks_tab').style.display             = (state.selectNodes("locks").length == 0)                        ? 'none' : 'inline';
-    document.getElementById('cluster_tab').style.display           = (state.selectNodes("cluster").length == 0)                      ? 'none' : 'inline';
-    document.getElementById('remote_schedulers_tab').style.display = (state.selectNodes("remote_schedulers[@count = 0]").length > 0) ? 'none' : 'inline';
-    
-    set_state(state);
-    if( state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("Job Scheduler is waiting for database ...")));
-    
+    } else if( parent.left_frame._response ) {
+      
+      _state         = response.selectSingleNode('/spooler/answer/state');
+      if(typeof parent.control_frame.update == 'function') parent.control_frame.update();
+      
+      //document.getElementById('job_chains_tab').style.display        = (_state.selectNodes("job_chains[@count = 0]").length > 0)        ? 'none' : 'inline';
+      //document.getElementById('orders_tab').style.display            = document.getElementById('job_chains_tab').style.display;
+      //document.getElementById('schedules_tab').style.display         = (_state.selectNodes("schedules").length == 0)                    ? 'none' : 'inline';
+      document.getElementById('locks_tab').style.display             = (_state.selectNodes("locks").length == 0)                        ? 'none' : 'inline';
+      document.getElementById('cluster_tab').style.display           = (_state.selectNodes("cluster").length == 0)                      ? 'none' : 'inline';
+      document.getElementById('remote_schedulers_tab').style.display = (_state.selectNodes("remote_schedulers[@count = 0]").length > 0) ? 'none' : 'inline';
+      
+      set_state(parent.left_frame._response);
+      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("Job Scheduler is waiting for database ...")));
+    }
     parent._scheduler.logger(3,'ELAPSED TIME FOR UPDATE '+self.name,'update_top');
 }
 
 //----------------------------------------------------------------------------------------set_state
-function set_state(state)
+function set_state(response)
 {
-    var all_orders                                            = state.selectNodes('/spooler/answer/state/job_chains/job_chain');
-    var clustered_orders                                      = state.selectNodes('/spooler/answer/state/job_chains/job_chain/job_chain_node/order_queue/order[@occupied_by_cluster_member_id]');
-    var cnt_all_orders                                        = 0;
-    var cnt_clustered_orders                                  = (clustered_orders.length || 0);
-    if(all_orders) {
-      for( var i=0; i < all_orders.length; i++ ) cnt_all_orders += parseInt(all_orders[i].getAttribute('orders'));
+    var state        = response.selectSingleNode('/spooler/answer/state');
+      
+    if(parent._scheduler._tree_view_enabled) {
+      
+      var subsystems = response.selectSingleNode('/spooler/answer/subsystems');
+      
+      document.getElementById('jobs_running').innerHTML       = (subsystems.selectSingleNode("subsystem[@name='job']//job.statistic[ @job_state='running' ]/@count").nodeValue   || 0);
+      document.getElementById('jobs_stopped').innerHTML       = (subsystems.selectSingleNode("subsystem[@name='job']//job.statistic[ @job_state='stopped' ]/@count").nodeValue   || 0);
+      document.getElementById('jobs_need_process').innerHTML  = (subsystems.selectSingleNode("subsystem[@name='job']//job.statistic[ @need_process='true' ]/@count").nodeValue   || 0);
+      document.getElementById('jobs_tasks').innerHTML         = (subsystems.selectSingleNode("subsystem[@name='task']//task.statistic[ @task_state='exist' ]/@count").nodeValue  || 0); 
+      var cnt_all_orders                                      = (subsystems.selectSingleNode("subsystem[@name='standing_order']/file_based.statistics/@count_visible").nodeValue || 0);
+      var cnt_clustered_orders                                = (subsystems.selectSingleNode("subsystem[@name='order']//order.statistic[@order_state='clustered']/@count").nodeValue || 0);
+      
+      
     } else {
-      all_orders                                              = state.selectNodes('jobs/job/order_queue');
-      if( all_orders ) {
-        for( var i=0; i < all_orders.length; i++ ) cnt_all_orders += parseInt(all_orders[i].getAttribute('length'));
+      
+      var all_orders                                            = state.selectNodes('job_chains/job_chain');
+      var clustered_orders                                      = state.selectNodes('job_chains/job_chain/job_chain_node/order_queue/order[@occupied_by_cluster_member_id]');
+      var cnt_all_orders                                        = 0;
+      var cnt_clustered_orders                                  = (clustered_orders.length || 0);
+      if(all_orders) {
+        for( var i=0; i < all_orders.length; i++ ) cnt_all_orders += parseInt(all_orders[i].getAttribute('orders'));
+      } else {
+        all_orders                                              = state.selectNodes('jobs/job/order_queue');
+        if( all_orders ) {
+          for( var i=0; i < all_orders.length; i++ ) cnt_all_orders += parseInt(all_orders[i].getAttribute('length'));
+        }
       }
+      document.getElementById('jobs_running').innerHTML         = (state.selectNodes("jobs/job [ @state='running' ]").length || 0);
+      document.getElementById('jobs_stopped').innerHTML         = (state.selectNodes("jobs/job [ @state='stopped' ]").length || 0);
+      document.getElementById('jobs_need_process').innerHTML    = (state.selectNodes("jobs/job [ @waiting_for_process='yes' ]").length || 0);
+      document.getElementById('jobs_tasks').innerHTML           = (state.selectNodes("jobs/job/tasks/task[ @id ]").length || 0);
     }
+    
     document.getElementById('spooler_id').innerHTML           = (state.getAttribute('id') || parent.getTranslation('unknown'));
     document.getElementById('spooler_state').innerHTML        = (parent.getTranslation(state.getAttribute('state')) || parent.getTranslation('unknown'));
     document.getElementById('spooler_pid').innerHTML          = (state.getAttribute('pid') || parent.getTranslation('unknown'));
     document.getElementById('spooler_build').innerHTML        = parent._scheduler._gui_subversion_no.replace(/[ ]+[^ ]*/,"") + '/' + parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1");
     document.getElementById('spooler_time').innerHTML         = (state.getAttribute('time').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
     document.getElementById('spooler_start_time').innerHTML   = (state.getAttribute('spooler_running_since').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
-    document.getElementById('jobs_running').innerHTML         = (state.selectNodes("jobs/job [ @state='running' ]").length || 0);
-    document.getElementById('jobs_stopped').innerHTML         = (state.selectNodes("jobs/job [ @state='stopped' ]").length || 0);
-    document.getElementById('jobs_need_process').innerHTML    = (state.selectNodes("jobs/job [ @waiting_for_process='yes' ]").length || 0);
-    document.getElementById('jobs_tasks').innerHTML           = (state.selectNodes("jobs/job/tasks/task[ @id ]").length || 0);
-    
+      
     var jobs_orders_inner                                     = cnt_all_orders + '&#160;<span class="label">' + parent.getTranslation('orders');
     if( cnt_clustered_orders > 0 ) jobs_orders_inner         += "&#160;("+parent.getTranslation('$cnt in cluster',{cnt:cnt_clustered_orders})+")";
     document.getElementById('jobs_orders').innerHTML          = jobs_orders_inner + "</span>";    
@@ -139,7 +178,7 @@ function set_state(state)
 function update_periodically_checkbox__onclick(obj)
 {
     parent._scheduler._update_periodically     = obj.checked;
-    set_timeout("parent.left_frame.repeat_update( parent._scheduler._update_periodically, parent._scheduler._update_periodically )", 1);
+    set_timeout('parent.left_frame.repeat_update( parent._scheduler._update_periodically, parent._scheduler._update_periodically );',1);
 }
 
 function update_incl_hot_folders_checkbox__onclick(obj)
@@ -205,7 +244,7 @@ function hide__onclick()
 window.onload   = do_onload;
 window.onerror  = function( msg, url, line ) {
   try {
-    showError(msg);
+    showError( msg, url, line );
   } catch(x) {
     alert(msg.replace(/^.*connect to Job Scheduler\n(.*)$/,"No connection to Job Scheduler\n$1"));
   } finally {
@@ -312,9 +351,9 @@ window.onerror  = function( msg, url, line ) {
         <thead><tr><td>&#160;</td></tr></thead>
       </table>
     </div>
-    <div id="hide_button" class="button" onclick="hide__onclick();"><!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
+    <div id="hide_button" class="button" onclick="hide__onclick();"><!--[if lte IE 7]><a href="javascript:void(0);"><![endif]-->
       <script language="javascript" type="text/javascript">document.write(parent.getTranslation('Hide'))</script>
-    <!--[if lte IE 6]></a><![endif]--></div>
+    <!--[if lte IE 7]></a><![endif]--></div>
   </td></tr></thead></table>
 </body>
 

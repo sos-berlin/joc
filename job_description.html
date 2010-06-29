@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -39,6 +39,7 @@
     <title>Job Scheduler - Job Documentation</title>
     <script type="text/javascript" src="scheduler_init.js"></script>
     <script type="text/javascript" src="scheduler.js"></script>
+    <script type="text/javascript" src="prototype.js"></script>
     <script type="text/javascript" src="browser_dependencies.js"></script>
     <script type="text/javascript" src="sos_logger.js"></script>
 
@@ -82,16 +83,7 @@ function showJobDescription( job_name )
     
     try {
       if( job_name == "" ) throw new Error( getTranslation("Job name") + " " + getTranslation("is missing") );
-      var url = _scheduler._url + "job_description?job=" + job_name;
-      try {
-        _scheduler._xml_http.open( "GET", url, false );
-        _scheduler._xml_http.send( null );
-        var desc = _scheduler._xml_http.responseText;
-        if( !desc ) throw new Error();
-      } catch(E) {
-        var statusText = ( typeof _scheduler._xml_http.statusText == 'string' && _scheduler._xml_http.statusText ) ? _scheduler._xml_http.statusText + " (" + _scheduler._xml_http.status + ")" : "";
-        throw new Error( getTranslation("Error at HTTP answer '$url':", {'url':url} ) + " " + statusText + "\n" + E.message );
-      }
+      var desc = _scheduler.executeGet("job_description?job=" + job_name);
       //description in XML format
       if( desc.search(/<\?xml/i) > -1 ) {
         //response of older scheduler versions returns xml as content of html body
@@ -110,8 +102,8 @@ function showJobDescription( job_name )
         var response    = _scheduler.loadXML( desc );
         _scheduler.loadXSLT( stylesheet_url );
         desc            = _scheduler.xmlTransform(response,false);
-        desc            = desc.replace(/^<\?xml[^>]*>\s*<!DOCTYPE/i,'<!DOCTYPE');
         if( desc == "" ) throw new Error( getTranslation("unknown error") ); 
+        desc            = desc.replace(/^<\?xml[^>]*>\s*<!DOCTYPE/i,'<!DOCTYPE');
         desc            = desc.replace( /(select_lang\s*\(\s*[\'])[^\']*([\']\s*\))/, "$1"+_description_lang+"$2" );
       }
       _desc_frame.document.open();
@@ -130,7 +122,7 @@ function showJobDescription( job_name )
 //-----------------------------------------------------------------------------show_error
 
 function show_error( x )
-{
+{   
     var msg = x.message.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace( /\"/g, "&quot;" ).replace( /\'/g, "&#039;" ).replace( /\n/g, "<br/>" ).replace( "  ", "\xA0 " );
     
     var form_type       = 'none';
@@ -138,7 +130,7 @@ function show_error( x )
       _first_call       = false;
       msg               = "";
       try {
-        var response    = _scheduler.execute( "<show_jobs max_task_history='0' max_orders='0'/>", false, false );
+        var response    = _scheduler.executeSynchron( "<show_jobs max_task_history='0' max_orders='0'/>", false, false );
         var jobsHasPath = response.selectNodes( "/spooler/answer/jobs/job[@path]" );
         if( jobsHasPath.length == 0) _scheduler.addPathAttribute(response);
         var jobs        = response.selectNodes( "/spooler/answer/jobs/job[@has_description='yes']" );

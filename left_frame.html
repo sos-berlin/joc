@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -52,6 +52,7 @@
     <![endif]-->
 
 <script type="text/javascript" src="scheduler_dialog.js"></script>
+<script type="text/javascript" src="prototype.js"></script>
 <script type="text/javascript" src="browser_dependencies.js"></script>
 <script type="text/javascript" src="sos_div.js"></script>
 <script type="text/javascript" src="sos_calendar.js"></script>
@@ -61,14 +62,30 @@
 <script type="text/javascript" language="javascript"><!--
 
 var _response;
-var _schedules = new Array();
+var _schedules        = [];
 var _job_element;
 var _job_name;
 var _job_chain;
 var _order_id;
 var _schedule;
 var _substitute;
-var _timer = 0;
+var _answer           = [[],[]];
+var _answer_complete  = 0;
+var _timer            = 0;
+var _card             = 'jobs';
+var _open_folders     = '||';
+var _parent_ul_elems  = [];
+var _open_all_folders = false;
+var _what             = '';
+var _obj_names        = {'jobs'             :'job',
+                         'job_chains'       :'job_chain',
+                         'orders'           :'order',
+                         'schedules'        :'schedule',
+                         'process_classes'  :'process_class',
+                         'locks'            :'lock',
+                         'cluster'          :'',
+                         'remote_schedulers':'',
+                         'last_activities'  :''};
 
 // Fehlercodes von xmlhttp:
 var DE_E_INVALID_URL               = 0x800C0002 - 0xFFFFFFFF;
@@ -99,7 +116,7 @@ function do_onload()
     
     if(! parent._scheduler._lang_file_exists) _sos_lang='';
     var scrollbarWidth = (parent.top_frame.document.documentElement.clientWidth - document.documentElement.clientWidth);
-    if( scrollbarWidth < 17 ) document.getElementsByTagName('body')[0].style.marginRight = (17 - scrollbarWidth) + "px";                                                   
+    if( scrollbarWidth < 29 ) document.getElementsByTagName('body')[0].style.marginRight = (29 - scrollbarWidth) + "px";                                                   
     
     scheduler_init();
     callErrorChecked('repeat_update', parent._scheduler._update_periodically, true );
@@ -117,6 +134,7 @@ function do_onunload()
 
 function update(with_details)
 {   
+    parent._scheduler.logger(1,'UPDATE ' + self.name, 'scheduler_left_frame');
     if( typeof with_details != 'boolean' ) with_details = true;
     var timer = 0;
     if( _timer > 0 ) {
@@ -126,7 +144,7 @@ function update(with_details)
     }
     update_jobs_frame();
     
-    if( with_details && window.parent._details_frame_loaded ) callErrorChecked( 'parent.details_frame.update' );
+    if( with_details && parent._details_frame_loaded ) callErrorChecked( 'parent.details_frame.update' );
     if( timer > 0 ) {
       _timer = set_timeout( "parent.left_frame.repeat_update(true,true)", parent._scheduler._update_seconds * 1000 );
     }
@@ -136,47 +154,270 @@ function update(with_details)
 
 function update_jobs_frame()
 {   
-    var what       = "job_chain_orders";
-    var max_orders = parent._scheduler._runtime_settings.max_orders;
-    var max_order_history = "";
-    parent._scheduler.logger(1,'UPDATE ' + self.name + ' FOR TAB ' + parent._scheduler._show_card);
-    if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox || window.parent.details_frame._job_chain_element || parent._scheduler._show_card == 'orders' )
+    if( parent._scheduler._show_card != _card ) 
     {
-        what += " job_params order_source_files blacklist";
-    } else if( parent._scheduler._show_card == "jobs"       )  what += " job_params"; 
-    if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) ) what += " schedules";
-    
-    if( parent._scheduler._show_card == "cluster"           )  what += " cluster";
-    if( parent._scheduler._show_card == "remote_schedulers" )  what += " remote_schedulers";
-    if( parent._scheduler._show_card == "job_chains" || parent._scheduler._show_card == "orders" )  what += " job_chains";
-    if( parent._scheduler._show_card == "last_activities"   )  what += " task_history job_chains";
-    
-    if( parent._scheduler._show_card == "last_activities" ) {
-      if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="' + parent._scheduler._runtime_settings.max_last_activities + '"';
-      _response = parent._scheduler.execute( '<show_state what="' + what + '" max_orders="' + max_orders + '" max_task_history="'+ parent._scheduler._runtime_settings.max_last_activities+'"' + max_order_history +'/>' );
-    } else {
-      if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="0"';
-      _response = parent._scheduler.execute( '<show_state what="' + what + '" max_orders="' + max_orders + '" max_task_history="0"' + max_order_history +'/>' );
+      $( _card+"_output" ).hide();
+      $( parent._scheduler._show_card+"_output" ).show();
+      _card = parent._scheduler._show_card;
+      if(typeof parent.control_frame.toggle == 'function') parent.control_frame.toggle( _card );
     }
-    window.parent.top_frame.update(_response);
-    if(typeof window.parent.control_frame.update == 'function') window.parent.control_frame.update(_response);
-    modify_response( _response );
-    document.getElementById( "stylesheet_output" ).innerHTML = parent._scheduler.xmlTransform( _response, true );
+    
+    parent._scheduler.logger(2,'UPDATE ' + self.name + ' FOR TAB ' + _card);
+    
+    var what              = '';
+    var path              = '';
+    var max_orders        = 0;
+    var max_order_history = '';
+    var max_task_history  = 0;
+    
+    switch( _card ) {
+      case 'jobs'              : if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled ) what = 'schedules'; 
+                                 break;
+      case 'job_chains'        : max_orders       = parent._scheduler._runtime_settings.max_orders;
+                                 what             = 'job_chains';
+                                 if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox ) what += ' job_chain_orders order_source_files blacklist';
+                                 if( (parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox || parent._scheduler._checkbox_states.show_job_chain_orders_checkbox) && parent._scheduler._tree_view_enabled ) what += " job_chain_jobs";
+                                 if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled  ) what += ' schedules';
+                                 break;
+      case 'orders'            : max_orders       = parent._scheduler._runtime_settings.max_orders;
+                                 what             = 'job_chain_orders order_source_files blacklist';
+                                 if( parent._scheduler._tree_view_enabled ) what += ' job_chain_jobs';
+                                 if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled  ) what += ' schedules';
+                                 break;
+      case 'last_activities'   : max_orders       = parent._scheduler._runtime_settings.max_orders;
+                                 max_task_history = parent._scheduler._runtime_settings.max_last_activities;
+                                 if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="' + parent._scheduler._runtime_settings.max_last_activities + '"';
+                                 what             = 'job_chain_orders task_history order_history';
+                                 if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled  ) what += 'schedules';
+                                 break;
+      case 'process_classes'   : break;
+      case 'locks'             : break;
+      default                  : what             = _card;
+                                 break;
+    }
+    
+    var max_attributes = ' max_orders="' + max_orders + '" max_task_history="'+ max_task_history +'"' + max_order_history;
+    _what = what;
+    
+    if( parent._scheduler._tree_view_enabled ) {
+      parent._scheduler.logger(3,'SCHEDULER TREE REQUEST','scheduler_tree_execute');
+      parent.top_frame.update();
+      _parent_ul_elems  = [];
+      //var req = '<commands>';
+      var req = '';
+      if( parent._scheduler._view[_card] == 'list' ) 
+      {
+        if( _card == 'schedules' || _card == 'process_classes' || _card == 'locks' || _card == 'cluster' || _card == 'remote_schedulers' ) {
+          collect_list_answer2();
+        } else {
+          var folders = parent.top_frame._state.selectNodes('//folder');
+          _answer[0] = new Array(folders.length);
+          if( _card == 'last_activities' ) _answer[1] = new Array(folders.length);
+          _answer_complete = 0;
+          for( var i=0; i < folders.length; i++ ) {
+            req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+folders[i].getAttribute('path')+'"'+max_attributes+'/>'; 
+            parent._scheduler.executeAsynchron( req, parent.left_frame.collect_list_answer, false, false, false, i );
+          }
+          //req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders '+what+'" path="/" max_orders="' + max_orders + '" max_task_history="'+ max_task_history +'" />'; 
+        }
+      }
+      else if( _open_all_folders ) 
+      {
+        var folders = parent.top_frame._state.selectNodes('//folder');
+        _answer[0] = new Array(folders.length);
+        _answer_complete = 0;
+        _open_all_folders = false;
+        _open_folders = '||';
+        var open_folders = [];
+        for( var i=0; i < folders.length; i++ ) {
+          open_folders.push(folders[i].getAttribute('path'));
+          if( i == folders.length-1 ) _open_folders = '|'+open_folders.join('|')+'|';
+          req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+folders[i].getAttribute('path')+'"'+max_attributes+'/>'; 
+          parent._scheduler.executeAsynchron( req, parent.left_frame.collect_tree_answer, false, false, false, i );
+        }
+        //req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders '+what+'" path="/" max_orders="' + max_orders + '" max_task_history="'+ max_task_history +'" />'; 
+      } 
+      else 
+      {
+        var id_start      = _card.length;
+        var open_folders1 = [];
+        var open_folders2 = [];
+        var open_folders3 = [];
+        $( _card+'_output' ).down('tbody',2).select('ul[sos_mode="open"]').each( function(item) {
+          open_folders1.push(item.id.substr(id_start));
+        });
+        var open_folder_ids = '|'+open_folders1.join('|')+'|';
+        for( var i=0; i < open_folders1.length; i++ ) {
+          if( open_folder_ids.indexOf('|'+dirname(open_folders1[i])+'|') > -1 ) open_folders2.push(open_folders1[i]);
+          else open_folders3.push(open_folders1[i]);
+        }
+        for( var i=0; i < open_folders3.length; i++ ) {
+          var parent_paths = open_folders3[i].substr(1).split('/');
+          var last_path    = '';
+          for( var j=0; j < parent_paths.length; j++ ) {
+            last_path += '/'+ parent_paths[j];
+            var parent_ul = $(_card+last_path);
+            if( parent_ul.getAttribute('sos_mode') == 'closed' ) {
+              _parent_ul_elems.push(parent_ul);
+              break;
+            }
+          }
+        }
+        _open_folders = (open_folders2.length > 0) ? '|'+open_folders2.join('|')+'|' : '||';
+        _answer[0] = new Array(open_folders2.length);
+        _answer_complete = 0;
+        for( var i=0; i < open_folders2.length; i++ ) {
+          req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+open_folders2[i]+'"'+max_attributes+'/>'; 
+          parent._scheduler.executeAsynchron( req, parent.left_frame.collect_tree_answer, false, false, false, i );
+        }
+      }
+      //req += '</commands>';
+      //parent._scheduler.executeAsynchron( req, parent.left_frame.update_callback );
+    } else {
+      parent._scheduler.executeAsynchron( '<show_state what="' + what + '"'+max_attributes+'/>', parent.left_frame.update_callback );
+    }
 }
+  
+
+//--------------------------------------------------------------------------------collect_tree_answer
+
+function collect_tree_answer( response, index )
+{
+  _answer[0][index] = response.selectSingleNode('/spooler/answer/state').xml;
+  _answer_complete++;
+  if( _answer_complete == _answer[0].length ) {
+    var dom_xml = '<spooler><answer>' + _answer[0].join('') + '</answer></spooler>';
+    _answer[0]  = [];
+    _answer_complete = 0;
+    _response   = parent._scheduler.loadXML(dom_xml);
+    dom_xml     = '';
+    parent._scheduler.modifyDatetimeForXSLT( _response );
+    parent._scheduler.logger(9,'SCHEDULER TREE RESPONSE:\n' + _response.xml);
+    parent._scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER TREE REQUEST','scheduler_tree_execute');
+    update_callback();
+  }
+}
+
+
+//--------------------------------------------------------------------------------collect_list_answer
+
+function collect_list_answer( response, index )
+{ 
+  var node_name  = [parent._scheduler._show_card];
+  var node       = null;
+  if( parent._scheduler._show_card == 'orders' ) node_name[0] = 'job_chains';
+  if( parent._scheduler._show_card == 'last_activities' ) node_name = ['jobs','job_chains'];
+  for( var i=0; i < node_name.length; i++ ) {
+     node        = response.selectSingleNode('/spooler/answer/state/folder/'+node_name[i]);
+    if( !node || node.xml.search( /\/>$/ ) > -1 ) {
+      _answer[i][index] = '';
+    } else {
+      _answer[i][index] = node.xml.replace(/^<[^>]+>/,'').replace(/<\/[^>]+>$/,'');
+    }
+  }
+  _answer_complete++;
+  if( _answer_complete == _answer[0].length ) {
+    var dom_xml  = '<spooler><answer><state state="'+parent.top_frame._state.getAttribute('state')+'">';
+    for( var i=0; i < node_name.length; i++ ) {
+      dom_xml   += '<'+node_name[i]+'>' + _answer[i].join('') + '</'+node_name[i]+'>';
+      _answer[i] = [];
+    }
+    dom_xml     += '</state></answer></spooler>';
+    _answer_complete = 0;
+    _response    = parent._scheduler.loadXML(dom_xml);
+    dom_xml      = '';
+    parent._scheduler.modifyDatetimeForXSLT( _response );
+    parent._scheduler.logger(9,'SCHEDULER LIST RESPONSE:\n' + _response.xml);
+    parent._scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER TREE REQUEST','scheduler_tree_execute');
+    update_callback();
+  }
+}
+
+
+//--------------------------------------------------------------------------------collect_list_answer2
+
+function collect_list_answer2()
+{ 
+  var node_name  = parent._scheduler._show_card;
+  var dom_xml    = '';
+  if( node_name == 'cluster' || node_name == 'remote_schedulers' ) {
+    dom_xml      = '<spooler><answer>'+parent.top_frame._state.xml+'</answer></spooler>';
+  } else {
+    var nodes    = parent.top_frame._state.selectNodes('//'+node_name);
+    dom_xml      = '<spooler><answer><state state="'+parent.top_frame._state.getAttribute('state')+'">';
+    dom_xml     += '<'+node_name+'>';
+    for(var i=0; i<nodes.length; i++ ) {
+      if( nodes[i].xml.search( /\/>$/ ) == -1 ) {
+        dom_xml += nodes[i].xml.replace(/^<[^>]+>/,'').replace(/<\/[^>]+>$/,'');
+      }
+    }
+    dom_xml     += '</'+node_name+'></state></answer></spooler>';
+  }
+  _response      = parent._scheduler.loadXML(dom_xml);
+  dom_xml        = '';
+  parent._scheduler.modifyDatetimeForXSLT( _response );
+  parent._scheduler.logger(9,'SCHEDULER LIST RESPONSE:\n' + _response.xml);
+  parent._scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER TREE REQUEST','scheduler_tree_execute');
+  update_callback();
+}
+
+
+//--------------------------------------------------------------------------------update_callback
+
+function update_callback( response )
+{
+    if( response ) _response = response; 
+    if( !parent._scheduler._tree_view_enabled ) set_timeout('parent.top_frame.update();',1);
+    modify_response( _response );
+    parent._scheduler.logger(3,'WRITE HTML','scheduler_tree_html');
+      
+    var output_table = $( _card+'_output' );
+    var tbodylist    = output_table.down('tbody',1);
+    var tbodytree    = output_table.down('tbody',2);
+    var colspan      = tbodytree.down('td').getAttribute('colspan');
+    output_table.down('thead').update(set_table_header(colspan));
+    if( parent._scheduler._view[_card] == 'tree' ) {
+      var dom = parent._scheduler.xmlTransform( _response, true, false );
+      var children = dom.documentElement.childNodes;
+      for(var i=0; i < children.length; i++) {
+        var ul_elem = $(children[i].getAttribute('id'));
+        if( ul_elem ) ul_elem.replace(children[i].xml);
+        //alert(children[i].xml);
+      }
+      $A(_parent_ul_elems).each( function(item) {
+        var elem = $(item.id);
+        if( elem ) elem.innerHTML = item.innerHTML;
+      });
+      
+      tbodylist.hide();
+      tbodytree.show();
+    } else {
+      tbodytree.hide();
+      tbodylist.replace(parent._scheduler.xmlTransform( _response ));
+      tbodylist.show();      
+    }
+    parent._scheduler.logger(3,'ELAPSED TIME FOR WRITE HTML','scheduler_tree_html');
+    parent._scheduler.logger(1,'ELAPSED TIME FOR UPDATE ' + self.name, 'scheduler_left_frame');
+}    
 
 
 //----------------------------------------------------------------------------------modify_response
 
 function modify_response( response )
-{
+{   
     parent._scheduler.logger(3,'START MODIFY RESPONSE '+self.name,'modify_response');
     // Antwort manipulieren: <tasks> mit <task> auffuellen, bis <job tasks=".."> erreicht ist.
-    // Werte der Checkboxen show_tasks_checkbox und show_my_orders ins XML-Dokument uebernehmen (fuer XSL)
     
     var spooler_element = response.selectSingleNode( "spooler" );
+    //var state_element   = spooler_element.selectSingleNode( "answer/state" );
+      
+    var hidden_elements = spooler_element.selectNodes( "//*[@visible='no']" );
+    for( var j = 0; j < hidden_elements.length; j++ ) {
+      hidden_elements[j].parentNode.removeChild(hidden_elements[j]);
+    }
     
-    if( parent._scheduler._show_card == 'jobs' ) {
-      var job_elements = response.selectNodes( ".//jobs/job" );
+    if( _card == 'jobs' ) {
+      var job_elements = spooler_element.selectNodes( "//jobs/job" );
       
       for( var j = 0; j < job_elements.length; j++ )
       {
@@ -195,13 +436,14 @@ function modify_response( response )
           } 
       }
     }
-    if( parent._scheduler._show_card == 'job_chains' ) {
-      var job_elements = response.selectNodes( ".//jobs/job[not(@order) or @order != 'yes']" );
+    if( _card == 'job_chains' ) {
+      var job_elements = spooler_element.selectNodes( "//jobs/job[not(@order) or @order != 'yes']" );
+      var job_chain_element = null;
       for( var j = 0; j < job_elements.length; j++ )
       {
         job_elements[j].parentNode.removeChild(job_elements[j]);
       }
-      var job_chain_elements = response.selectNodes( ".//job_chains/job_chain" );
+      var job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain" );
       
       for( var j = 0; j < job_chain_elements.length; j++ )
       { 
@@ -209,26 +451,54 @@ function modify_response( response )
         if( !parent.left_frame.apply_job_chains_select( job_chain_elements[j], response ) ) continue;
       }
       
-      job_chain_elements = response.selectNodes( ".//job_chains/job_chain[job_chain_node.job_chain]" );
+      job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain]" );
       
       for( var j = 0; j < job_chain_elements.length; j++ )
       { 
         if( !parent.left_frame.apply_big_chains_select( job_chain_elements[j] ) ) continue;
       }
+      //special for nested job chain support in tree view
+      //add job chains from node if it is not in _response
+      
+      if( parent._scheduler._view[_card] == 'tree' ) {
+        for( var j = 0; j < job_chain_elements.length; j++ )
+        { 
+          var job_chain_nodes = job_chain_elements[j].selectNodes( "job_chain_node.job_chain/@job_chain" );
+          
+          for( var k=0; k < job_chain_nodes.length; k++ ) 
+          {
+              if( job_chain_elements[j].selectSingleNode( "file_based/requisites/requisite[@path = '"+job_chain_nodes[k].nodeValue.toLowerCase()+"' and @is_missing='yes']" ) ) continue;
+              if( spooler_element.selectSingleNode( "//job_chains/job_chain[@path = '"+job_chain_nodes[k].nodeValue+"']" ) ) continue;
+              var job_chain_element = parent._scheduler.executeSynchron( '<show_job_chain job_chain="'+job_chain_nodes[k].nodeValue+'" max_orders="'+parent._scheduler._runtime_settings.max_orders+'" what="'+_what+'"/>' );
+              if( job_chain_element ) {
+                job_chain_element = job_chain_element.selectSingleNode( '/spooler/answer/job_chain' );
+                if( !parent.ie ) job_chain_element = job_chain_elements[j].ownerDocument.importNode(job_chain_element, true);
+                job_chain_elements[j].parentNode.appendChild(job_chain_element);
+              }
+          }
+        }
+      } 
+    
     }
-    if( parent._scheduler._show_card == 'orders' ) {
-      var job_elements = response.selectNodes( ".//jobs/job[not(@order) or @order != 'yes']" );
+    if( _card == 'orders' ) {
+      var job_elements = spooler_element.selectNodes( "//jobs/job[not(@order) or @order != 'yes']" );
       for( var j = 0; j < job_elements.length; j++ )
       {
         job_elements[j].parentNode.removeChild(job_elements[j]);
       }
-      var order_elements = response.selectNodes( ".//order" );
+      var order_elements = spooler_element.selectNodes( "//order" );
       for( var j = 0; j < order_elements.length; j++ )
       {
         parent.control_frame.apply_filter( order_elements[j], 'orders' );
       }
     }
+    var default_process = spooler_element.selectSingleNode( "//process_classes/process_class[@path='']" );
+    if( default_process ) {
+      default_process.setAttribute('path','/(default)');
+      default_process.setAttribute('name','(default)');
+    }
     
+    //alert(open_folders);
     if( spooler_element )
     {   
       restore_checkbox_state( spooler_element, "show_tasks_checkbox"            );
@@ -240,11 +510,13 @@ function modify_response( response )
       restore_state( spooler_element, parent._scheduler._radio_states );
       restore_state( spooler_element, parent._scheduler._select_states );
       
-      spooler_element.setAttribute( "my_frame"            , 'list' );
+      spooler_element.setAttribute( "my_frame"            , parent._scheduler._view[_card] );
       spooler_element.setAttribute( "my_max_orders"       , parent._scheduler._runtime_settings.max_orders );
       spooler_element.setAttribute( "my_max_order_history", parent._scheduler._runtime_settings.max_order_history );
       spooler_element.setAttribute( "my_max_last_activities" , parent._scheduler._runtime_settings.max_last_activities  );
-      spooler_element.setAttribute( "my_show_card"        , parent._scheduler._show_card );
+      spooler_element.setAttribute( "my_show_card"        , _card );
+      spooler_element.setAttribute( "my_object_name"      , _obj_names[_card] );
+      spooler_element.setAttribute( "my_open_folders"     , _open_folders );
       //spooler_element.setAttribute( "my_url_base"         , document.location.href.replace( /\/[^\/]*$/, "/" )     );   // Alles bis zum letzten Schraeger
       //spooler_element.setAttribute( "my_url_path_base"    , document.location.pathname.replace( /\/[^\/]*$/, "/" ) );   // Pfad bis zum letzten Schraeger
       spooler_element.setAttribute( "my_ie_version"       , parseInt(parent.ie,10) );
@@ -327,44 +599,29 @@ function set_update_timer()
 
 function show_card( what )
 {
-    if( what != window.parent._show_card )
+    if( what != parent._scheduler._show_card )
     {
         if( what == "process_classes" || what == "remote_schedulers" || what == "cluster" )
         {
-            window.parent.details_frame.hide();
+            parent.details_frame.hide();
         }
-        window.parent._show_card = what;
+        parent._scheduler._show_card = what;
     }
     update();
 }
 
 //--------------------------------------------------------------------------------show_task_details
 
-function show_task_details( job_name, task_id )
+function show_task_details( task_id )
 {
-    var job_element  = _response.selectSingleNode( './/job[@path="' + xml_encode(job_name) + '"]' );
-    if( !job_element ) {
-      job_element = _response.selectSingleNode( './/job[@path="/' + xml_encode(job_name) + '"]' );
-    }
-    var task_element = _response.selectSingleNode( './/task[@id="' + task_id + '"]' );
-    window.parent.details_frame.show_task_details( job_element, task_element );
-    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
-       set_timeout('parent.left_frame.update(false)', 1);
-    }
+    set_timeout('parent.details_frame.show_task_details( '+task_id+' );',1);
 }
 
 //---------------------------------------------------------------------------------show_job_details
 
 function show_job_details( path )
 {   
-    var job_element  = _response.selectSingleNode( './/job[@path="' + xml_encode(path) + '"]' ); 
-    if( !job_element ) {
-      job_element = _response.selectSingleNode( './/job[@path="/' + xml_encode(path) + '"]' );
-    }
-    window.parent.details_frame.show_job_details( job_element );
-    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
-       set_timeout('parent.left_frame.update(false)', 1);
-    }    
+    set_timeout('window.parent.details_frame.show_job_details( "'+path+'" );',1);    
 }
 
 
@@ -372,37 +629,29 @@ function show_job_details( path )
 
 function show_schedule_details( path )
 {
-    var schedule_element  = _response.selectSingleNode( './/schedule[@path="' + xml_encode(path) + '"]' ); 
-    if( !schedule_element ) {
-      schedule_element = _response.selectSingleNode( './/job[@path="/' + xml_encode(path) + '"]' );
-    }
-    window.parent.details_frame.show_schedule_details( schedule_element );
-    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
-       set_timeout('parent.left_frame.update(false)', 1);
-    }
+    set_timeout('window.parent.details_frame.show_schedule_details( "'+path+'" );',1);
 }
 
 //---------------------------------------------------------------------------show_job_chain_details
 
 function show_job_chain_details( path )
-{
-    var job_chain_element = _response.selectSingleNode( './/job_chain[@path="' + xml_encode(path) + '"]' );
-    if( !job_chain_element ) {
-      job_chain_element = _response.selectSingleNode( './/job_chain[@path="/' + xml_encode(path) + '"]' );
-    }
-    window.parent.details_frame.show_job_chain_details( job_chain_element );
-    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
-       set_timeout('parent.left_frame.update(false)', 1);
-    }
+{   
+    set_timeout('window.parent.details_frame.show_job_chain_details( "'+path+'" );',1);
 }
 
 //-------------------------------------------------------------------------------show_order_details
 
-function show_order_details( order_id, job_chain_name, menu_caller )
+function show_order_details( order_id, job_chain_name )
 {   
-    window.parent.details_frame.show_order_details( order_id, job_chain_name );
-    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && _timer > 30)) {
-       set_timeout('parent.left_frame.update(false)', 1);
+    set_timeout('window.parent.details_frame.show_order_details( "'+order_id+'", "'+job_chain_name+'" );',1);
+}
+
+//-------------------------------------------------------------------------------toggle_tree_node
+
+function toggle_tree_node( elem )
+{   
+    if( parent._scheduler.treeDisplay( $(elem) ) ) {
+      parent.left_frame.update();
     }
 }
 
@@ -503,7 +752,7 @@ function apply_jobs_select( node )
       case 'all'                : break;
       case 'default'            : if( node.getAttribute( "process_class" ) && node.getAttribute( "process_class" ) != "" ) { node.parentNode.removeChild(node); return false; }
                                   break;
-      default                   : if( !node.getAttribute( "process_class" ) || node.getAttribute( "process_class" ).replace(/^\//,'') != window.parent._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) { node.parentNode.removeChild(node); return false; }
+      default                   : if( !node.getAttribute( "process_class" ) || node.getAttribute( "process_class" ).replace(/^\//,'') != parent._scheduler._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) { node.parentNode.removeChild(node); return false; }
                                   break;
     }
     return true;
@@ -536,7 +785,7 @@ function apply_job_chains_select( node, response )
         switch( parent._scheduler._select_states[ 'jobs_process_class_select' ] ) {
           case 'default'            : if( job && !job.getAttribute( "process_class" ) || job.getAttribute( "process_class" ) == "" ) found[1] = true;
                                       break;
-          default                   : if( job && job.getAttribute( "process_class" ) && job.getAttribute( "process_class" ).replace(/^\//,'') == window.parent._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) found[1] = true;
+          default                   : if( job && job.getAttribute( "process_class" ) && job.getAttribute( "process_class" ).replace(/^\//,'') == parent._scheduler._select_states[ 'jobs_process_class_select' ].replace(/^\//,'') ) found[1] = true;
                                       break;
         }
       }
@@ -587,23 +836,314 @@ function apply_big_chains_select( node )
 }
 
 
+function set_table_header(colspan) 
+{  
+  var s  = '';
+  var s1 = '<tr><td colspan="'+colspan+'" class="before_head_space">&#160;</td></tr>';
+  if( parent._scheduler._view[_card] == 'list' ) {
+    switch( _card ) {
+      case 'jobs'              : s += s1+'<tr>';
+                                 s += '  <td class="head1">'+parent.getTranslation('Job')+' </td>';
+                                 s += '  <td class="head"> '+parent.getTranslation('Time')+' </td>';
+                                 s += '  <td class="head"> '+parent.getTranslation('Steps')+' </td>';
+                                 s += '  <td class="head" style="white-space:nowrap">'+parent.getTranslation('Next start');
+                                 if( parent._scheduler._select_states.show_jobs_select != 'standalone' ) {
+                                   s += '&#160;/&#160;'+parent.getTranslation('Orders');
+                                 }
+                                 s += '</td>';
+                                 s += '  <td class="head1">&#160;</td>';
+                                 s += '</tr>';
+                                 break;
+      case 'job_chains'        : s += s1+'<tr>';
+                                 if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox || parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox ) {
+                                   s += '  <td class="head1">'+parent.getTranslation('Order state')+'</td>';
+                                   s += '  <td class="head">'+parent.getTranslation('Job')+'</td>';
+                                   s += '  <td class="head"><span style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'/</span> <span style="white-space:nowrap;">'+parent.getTranslation('Job state')+'</span></td>';
+                                 } else { 
+                                   s += '  <td class="head1" style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'</td>';
+                                   s += '  <td class="head1">&#160;</td>';
+                                   s += '  <td class="head">'+parent.getTranslation('State')+'</td>';
+                                 }    
+                                 s += '  <td class="head" colspan="2">'+parent.getTranslation('Orders')+'</td>';
+                                 s += '</tr>';
+                                 break;
+      case 'orders'            : s += s1+'<tr>';
+                                 s += '  <td class="head1" style="padding-left:8px;">'+parent.getTranslation('State')+' </td>';
+                                 s += '  <td class="head"><span style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'/</span> '+parent.getTranslation('Job')+'</td>';
+                                 s += '  <td class="head"><span style="white-space:nowrap;color:#009933;">'+parent.getTranslation('Next start')+'/</span> <span style="white-space:nowrap;color:darkred;">'+parent.getTranslation('Setback')+'</span></td>';
+                                 s += '  <td class="head" colspan="2" align="left"><span style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'/</span> <span style="white-space:nowrap;">'+parent.getTranslation('Job state')+'</span></td>';
+                                 s += '</tr>';
+                                 break;
+      case 'schedules'         : s += s1;
+                                 if( _response.selectNodes('//schedule').length > 0 ) {
+                                   s += '<tr>';
+                                   s += '  <td class="head1" style="white-space:nowrap;">'+parent.getTranslation('Schedule')+'</td>';
+                                   s += '  <td class="head1">&#160;</td>';
+                                   if( _response.selectNodes('//schedule[@substitute]').length > 0 ) {
+                                     s += '  <td class="head" style="white-space:nowrap;">'+parent.getTranslation('Valid from')+'</td>';
+                                     s += '  <td class="head" style="white-space:nowrap;">'+parent.getTranslation('Valid to')+'</td>';
+                                   } else {
+                                     s += '  <td class="head1">&#160;</td>';
+                                     s += '  <td class="head1">&#160;</td>';
+                                   }
+                                   s += '  <td class="head1">&#160;</td>';
+                                   s += '</tr>';
+                                 }
+                                 break;
+      case 'locks'             : break;
+      case 'last_activities'   : s += s1+'<tr>';
+                                 switch( parent._scheduler._radio_states.last_activities_radios ) {
+                                   case 'all'   : s += '  <td class="head1"><span style="white-space:nowrap;">'+parent.getTranslation('Order ID')+'/</span> <span style="color:#808080;white-space:nowrap;">'+parent.getTranslation('Job name')+'</span></td>';
+                                                  s += '  <td class="head">'+parent.getTranslation('Started')+'</td>';
+                                                  s += '  <td class="head">'+parent.getTranslation('Ended')+'</td>';
+                                                  s += '  <td class="head"><span style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'/</span> <span style="color:#009933;">'+parent.getTranslation('Cause')+'</span></td>';
+                                                  s += '  <td class="head" colspan="2"><span style="white-space:nowrap;">'+parent.getTranslation('Order state')+'/</span> <span style="color:darkred;white-space:nowrap;">'+parent.getTranslation('Exitcode')+'</span></td>';
+                                                  break;
+                                   case 'orders': s += '  <td class="head1" style="white-space:nowrap;">'+parent.getTranslation('Order ID')+'</td>';
+                                                  s += '  <td class="head">'+parent.getTranslation('Started')+'</td>';
+                                                  s += '  <td class="head">'+parent.getTranslation('Ended')+'</td>';
+                                                  s += '  <td class="head" style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'</td>';
+                                                  s += '  <td class="head" colspan="2" style="white-space:nowrap;">'+parent.getTranslation('Order state')+'</td>';
+                                                  break;
+                                   case 'tasks' : s += '  <td class="head1" style="white-space:nowrap;">'+parent.getTranslation('Job name')+'</td>';
+                                                  s += '  <td class="head">'+parent.getTranslation('Started')+'</td>';
+                                                  s += '  <td class="head">'+parent.getTranslation('Ended')+'</td>';
+                                                  s += '  <td class="head" style="white-space:nowrap;">'+parent.getTranslation('Cause')+'</td>';
+                                                  s += '  <td class="head" colspan="2" style="white-space:nowrap;">'+parent.getTranslation('Exitcode')+'</td>';
+                                                  break;
+                                 }
+                                 s += '</tr>';
+                                 break;
+      case 'process_classes'   : s += s1+'<tr>';
+                                 s += '  <td class="head1" style="padding-left: 2ex">'+parent.getTranslation('Pid')+' </td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Task')+'</td>';
+                                 s += '  <td class="head1" align="right" style="padding-right: 4px">'+parent.getTranslation('-id')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Running since')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Operations')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Callbacks')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Current operation')+'</td>';
+                                 s += '</tr>';
+                                 break;
+      case 'remote_schedulers' : var remote_schedulers = _response.selectSingleNode('//remote_schedulers');
+                                 s += s1+'<tr><td colspan="7">'+remote_schedulers.getAttribute('count')+'&#160;'+parent.getTranslation('Scheduler(s)');
+                                 s += '&#160;('+remote_schedulers.getAttribute('connected')+'&#160;'+parent.getTranslation('connected')+')</td></tr>';
+                                 s += '<tr>';
+                                 s += '  <td class="head1" style="padding-left:2ex">'+parent.getTranslation('IP')+' </td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Hostname')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Port')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Id')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Connected')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Disconnected')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Version')+'</td>';
+                                 s += '</tr>';
+                                 break;
+      case 'cluster'           : var cluster = _response.selectSingleNode('//cluster');
+                                 s += '<tr><td colspan="8">';
+                                 s += '<span style="margin-right:1em;font-weight:bold;">'+cluster.selectNodes("cluster_member[@active='yes']").length+' '+parent.getTranslation('active Scheduler(s)')+'. </span>';
+                                 s += '<span style="margin-right:1em;font-weight:bold;">'+cluster.selectNodes("cluster_member[@exclusive='yes']").length+' '+parent.getTranslation('exclusive Scheduler(s)')+'. </span>';
+                                 if( cluster.getAttribute('active') == 'yes' ) {
+                                   s += '<span style="margin-right:1em;font-weight:bold; color:#009933">'+parent.getTranslation('This Scheduler is active');
+                                   if( cluster.getAttribute('exclusive') == 'yes' ) {  
+                                     s += ' '+parent.getTranslation('and exclusive');
+                                   }
+                                   s += '. </span>';
+                                 }
+                                 if( cluster.getAttribute('active') != 'yes' ) {
+                                   s += '<span style="margin-right: 1em; color:#800040">'+parent.getTranslation('Only active Job Schedulers are allowed to start operation.')+'</span>';
+                                 }
+                                 s += '</td></tr>';
+                                 s += '<tr><td style="line-height:5pt;height:5pt;">&#160;</td></tr>';
+                                 s += '<tr>';
+                                 s += '  <td class="head1">Scheduler</td>';
+                                 s += '  <td class="head" style="width:20ex">'+parent.getTranslation('Started')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('State')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Pid')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Last heart beat')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Detected heart beats')+'</td>';
+                                 s += '  <td class="head">'+parent.getTranslation('Backup precedence')+'</td>';
+                                 s += '  <td class="head1">&#160;</td>';
+                                 s += '</tr>';
+                                 break;
+    }
+  }
+  if( parent._scheduler._view[_card] == 'tree' ) {
+    switch( _card ) {
+      case 'job_chains'        : if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox || parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox ) {
+                                   s += '<tr>';
+                                   s += '  <td class="head1" colspan="4" style="width:10000px;">&#160;</td>';
+                                   s += '  <td class="head" style="white-space:nowrap;width:1px;">'+parent.getTranslation('Orders')+'</td>';
+                                   s += '</tr>';
+                                 }
+                                 break;
+    }
+  }
+  return s;
+}
+
+
+//--------------------------------------------------------------------------------------write_table
+function write_table( colspan, card )
+{
+  document.writeln( '        <thead></thead>' );
+  document.writeln( '        <tbody>' );
+  for( var i=1; i<=7; i++ ) document.writeln( '          <tr><td colspan="'+colspan+'" class="after_head_space'+i+'"></td></tr>' );
+  document.writeln( '        </tbody>' );
+  document.writeln( '        <tbody style="display:none;overflow:hidden;width:100%"></tbody>' );
+  document.writeln( '        <tbody style="display:none;overflow:hidden;width:100%"><tr><td colspan="'+colspan+'"><ul id="'+card+'/" class="tree" sos_mode="open"></ul></td></tr></tbody>' );
+  document.writeln( '        <tfoot>' );
+  for( var i=7; i>=1; i-- ) document.writeln( '          <tr><td colspan="'+colspan+'" class="after_head_space'+i+'"></td></tr>' );
+  document.writeln( '        </tfoot>' );
+  
+}
+
+
+//--------------------------------------------------------------------------------------close_all_folders
+function close_all_folders()
+{   
+    $( _card+'_output' ).down('tbody',2).select('ul[sos_level="1"]').each( function(item) {
+        if( item.getAttribute('sos_mode') == 'open' ) {
+          parent._scheduler.treeDisplay( $(item.parentNode) );
+        }
+    });    
+}
+
+
 //-------------------------------------------------------------------------------------------------
 
 window.onload   = do_onload;
 window.onunload = do_onunload;
+window.onerror  = function( msg, url, line ) {
+  showError(msg, url, line);
+  return true;
+}
+
 //-->
 </script>
 </head>
 
 <body class="left">
-  <table cellspacing="0" cellpadding="0" width="100%"><thead><tr><td style="padding:0px">
-    <span id="stylesheet_output"></span>
-  </td></tr></thead></table>
-    <!-- iframe for IE to display div above without any listboxes shine through -->  
-    <iframe id="__input_iframe__" style="display:none;top:70px;position:absolute;" src="about:blank"></iframe>
-    <div id="__input_shadow1__" class="shadow1"></div>
-    <div id="__input_shadow2__" class="shadow2"></div>
-    <div id="__input__" class="input"></div>
+  <table cellspacing="0" cellpadding="0" width="100%"><tr><td style="padding:0px">
+    <div class="bottom">
+      
+      <table id="jobs_output" style="display:;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <colgroup>
+          <col width="40%"/>
+          <col width="110"/>  
+          <col width="10"  align="right"/>
+          <col width="40%"/>
+          <col width="80"  align="right"/>
+        </colgroup>
+        <script type="text/javascript" language="javascript">
+          write_table(5, 'jobs');
+        </script>
+      </table>
+      
+      <table id="job_chains_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <colgroup>
+          <col width="10"/>
+          <col width="*"/>
+          <col width="20"/>
+          <col width="1%"/>
+          <col width="10" align="right"/>
+        </colgroup>
+        <script type="text/javascript" language="javascript">
+          write_table(5, 'job_chains');
+        </script>
+      </table>
+      
+      <table id="orders_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <colgroup>
+          <col width="10"/>
+          <col width="*"/>
+          <col width="*"/>
+          <col width="1%" align="right"/>
+          <col width="40" align="right"/>
+        </colgroup>
+        <script type="text/javascript" language="javascript">
+          write_table(5, 'orders');
+        </script>
+      </table>
+      
+      <table id="process_classes_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <colgroup>
+          <col width="50"/>
+          <col width="100"/>
+          <col width="50"/>
+          <col width="*"/>
+          <col width="10"  align="right"/>
+          <col width="10"  align="right"/>
+          <col width="*"/>
+        </colgroup>
+        <script type="text/javascript" language="javascript">
+          write_table(7, 'process_classes');
+        </script>
+      </table>
+      
+      <table id="schedules_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <colgroup>
+          <col width="*"/>
+          <col width="*"/>
+          <col width="20%"/>
+          <col width="20%"/>
+          <col width="94"/>
+        </colgroup>
+        <script type="text/javascript" language="javascript">
+          write_table(5, 'schedules');
+        </script>
+      </table>
+      
+      <table id="locks_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <script type="text/javascript" language="javascript">
+          write_table(5, 'locks');
+        </script>
+      </table>
+      
+      <table id="remote_schedulers_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <script type="text/javascript" language="javascript">
+          write_table(7, 'remote_schedulers');
+        </script>
+      </table>
+      
+      <table id="cluster_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <colgroup>
+          <col width="160"/>
+          <col width="240"/>
+          <col width="240"/>
+          <col width="80"/>
+          <col width="160"/>
+          <col width="80"/>
+          <col width="80"/>
+          <col width="120"/>
+        </colgroup>
+        <script type="text/javascript" language="javascript">
+          write_table(8, 'cluster');
+        </script>
+      </table>
+      
+      <table id="last_activities_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+        <colgroup>
+          <col width="*"/>
+          <col width="110"/>
+          <col width="110"/>
+          <col width="*"/>
+          <col width="1%"/>
+          <col width="40" align="right"/>
+        </colgroup>
+        <script type="text/javascript" language="javascript">
+          write_table(6, 'last_activities');
+        </script>
+      </table>
+      
+      <img class="corner_bl" src="corner_bl.gif" alt="" />
+      <img class="corner_br" src="corner_br.gif" alt="" />  
+    </div>
+  </td></tr></table>
+    
+  <!-- iframe for IE to display div above without any listboxes shine through -->  
+  <iframe id="__input_iframe__" style="display:none;top:70px;position:absolute;" src="about:blank"></iframe>
+  <div id="__input_shadow1__" class="shadow1"></div>
+  <div id="__input_shadow2__" class="shadow2"></div>
+  <div id="__input__" class="input"></div>
   
 </body>
 

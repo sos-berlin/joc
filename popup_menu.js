@@ -62,7 +62,7 @@ function mouse_x( indent )
 //------------------------------------------------------------------------------------------mouse_y
 
 function mouse_y( indent )
-{ 
+{   
     if( typeof indent != "number" ) { indent = 0; }
     return (typeof window.event != "undefined") ? document.documentElement.scrollTop  + event.clientY + indent
                                                 : _mouse_y + indent;
@@ -305,7 +305,7 @@ Popup_menu_builder.prototype.show_popup_menu = function()
         var height = this._popup_menu._popup.document.body.scrollHeight;
         this._popup_menu._popup.hide();
         if( event.type == 'contextmenu' ) {
-          this._popup_menu._popup.show( mouse_x(), mouse_y(), width, height, document.documentElement );
+          this._popup_menu._popup.show( event.clientX, event.clientY, width, height, document.documentElement );
         } else {
           this._popup_menu._popup.show( (mouse_x()> 120 ? 90-width : 0), 15, width, height, event.srcElement );
         }
@@ -700,7 +700,7 @@ Input_dialog.prototype.html = function()
 Input_dialog.show_calendar = function(formElement,fullDatetime,evt){
     
     if(window['SOS_Calendar']) {                      
-      SOS_Calendar.language      = 'en';
+      SOS_Calendar.language      = (parent._scheduler._lang_file_exists ? parent._sos_lang : 'en');
       SOS_Calendar.fullYear      = true;
       SOS_Calendar.returnISO     = true;
       SOS_Calendar.onFillForm    = '';

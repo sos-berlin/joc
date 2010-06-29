@@ -42,14 +42,33 @@ if( window['_sos_lang'] ) {
 function Scheduler()
 {
     this._url                                            = ( document.location.href + "" ).replace( /\/[^\/]*$/, "/" );
-    this._xml_http                                       = window.XMLHttpRequest? new XMLHttpRequest() : new ActiveXObject( "Msxml2.XMLHTTP" );
     this._dependend_windows                              = new Object();
     this._logger                                         = ( typeof window['SOS_Logger'] == 'function' ) ? SOS_Logger : null;
     this._debug_timer                                    = new Object();
     this._ftimer                                         = new Object();
-    this._utimer                                         = 0;
     this._lang_file_exists                               = ( typeof window['_lang_file_exists'] == 'boolean' ) ? _lang_file_exists : false;
-    
+    this._tree_view_enabled                              = false; //2.1.0.6101  (2010-04-06 11:53:57)
+    this._activeRequestCount                             = 0;
+    this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains'}; 
+    this._view                                           = {'jobs'             :'list',
+                                                            'job_chains'       :'list',
+                                                            'orders'           :'list',
+                                                            'schedules'        :'list',
+                                                            'process_classes'  :'list',
+                                                            'locks'            :'list',
+                                                            'cluster'          :'list',
+                                                            'remote_schedulers':'list',
+                                                            'last_activities'  :'list'};
+    this._subsystems                                     = {'jobs'             :'job',
+                                                            'job_chains'       :'order',
+                                                            'orders'           :'order',
+                                                            //'orders'           :'standing_order',
+                                                            'schedules'        :'schedule',
+                                                            'process_classes'  :'process_class',
+                                                            'locks'            :'lock',
+                                                            'cluster'          :'',
+                                                            'remote_schedulers':'',
+                                                            'last_activities'  :'job order'};
     this._update_counter                                 = 1;
     this._update_finished                                = true;
     this._version_date                                   = '';
@@ -93,6 +112,9 @@ function Scheduler()
     this._select_states.show_jobs_select                 = 'all';
     this._select_states.jobs_state_select                = 'all';
     this._select_states.jobs_process_class_select        = 'all';
+    
+    this._imgFolderOpen                                  = 'explorer_folder_open.gif';
+    this._imgFolderClose                                 = 'explorer_folder_closed.gif';
 }
 
 
@@ -101,72 +123,10 @@ function Scheduler()
 
 Scheduler.prototype.close = function()
 {
-    this._xml_http         = null;
     this._logger           = null;
-    this._result_dom       = null;
     
-    var dependend_windows  = this._dependend_windows;
-    this._depended_windows = new Object();
-    
-    for( var window_name in dependend_windows )  this._dependend_windows[ window_name ].close();
-}
-
-
-//--------------------------------------------------------------------------------Scheduler.execute
-// public
-
-Scheduler.prototype.execute = function( xml, with_modify_datetime, with_add_path, with_all_errors )
-{    
-    this.logger(3,'START SCHEDULER REQUEST: ' + xml,'scheduler_execute');
-    
-    if( typeof with_add_path        != "boolean" ) { with_add_path        = true; }
-    if( typeof with_modify_datetime != "boolean" ) { with_modify_datetime = true; }
-    if( typeof with_all_errors      != "boolean" ) { with_all_errors      = false; }
-    this.callHTTP( xml );
-    
-    if( xml == '<check_folders/>' ) {
-      this.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST','scheduler_execute');
-      return null;
-    }
-    this.parserErrorXML( this._xml_http.responseXML );
-    var error_element = this._xml_http.responseXML.selectSingleNode( "spooler/answer/ERROR" );
-    if( error_element )
-    {
-        //Per default no exception is thrown if remove job, job_chain, order is clicked
-        if( with_all_errors || error_element.getAttribute( "code" ).search(/SCHEDULER-(108|161|162)/i) == -1 ) {
-            throw new Error( error_element.getAttribute( "text" ) );
-        } 
-    }
-    else 
-    {   if( with_modify_datetime ) this.modifyDatetimeForXSLT( this._xml_http.responseXML );  
-        if( with_add_path && !this.versionIsNewerThan( "2007-10-08 14:00:00" ) ) this.addPathAttribute( this._xml_http.responseXML );
-    }
-    this.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST','scheduler_execute');
-    this.logger(6,'SCHEDULER RESPONSE:\n' + this._xml_http.responseXML.xml);  
-    return this._xml_http.responseXML;
-}
-
-
-//--------------------------------------------------------------------------------Scheduler.parserErrorXML
-// public
-
-Scheduler.prototype.parserErrorXML = function()
-{
-    try {
-      if( this._xml_http.responseXML.parseError ) {
-        if( this._xml_http.responseXML.parseError.errorCode != 0 ) {
-          throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + this._xml_http.responseXML.parseError.reason );
-        }
-      } else {
-        if( this._xml_http.responseXML.documentElement.nodeName == "parsererror" ) {
-          throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + this._xml_http.responseXML.documentElement.firstChild.nodeValue );
-        }
-      }
-    }
-    catch(x) {
-      var statusText = ( typeof this._xml_http.statusText == 'string' && this._xml_http.statusText ) ? this._xml_http.statusText + " (" + this._xml_http.status + ")" : "";
-      throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + statusText + "\n" + x.message );
-    }
+    for( var window_name in this._dependend_windows )  this._dependend_windows[ window_name ].close();
+    this._depended_windows = new Object();    
 }
 
 
@@ -175,76 +135,203 @@ Scheduler.prototype.parserErrorXML = function()
 
 Scheduler.prototype.loadXML = function( xml )
 {
+    this.logger(3,'START LOAD XML TO DOM','scheduler_dom');
     var dom_document;
     if( window.DOMParser )
     {
         var dom_parser = new DOMParser();
-        dom_document = dom_parser.parseFromString( xml, "text/xml" );
+        dom_document   = dom_parser.parseFromString( xml, "text/xml" );
         if( dom_document.documentElement.nodeName == "parsererror" )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.documentElement.firstChild.nodeValue );
     }
     else
     {
-        dom_document = new ActiveXObject( "MSXML2.DOMDocument" );
+        dom_document   = new ActiveXObject( "MSXML2.DOMDocument" );
         dom_document.validateOnParse = false;
         if( !dom_document.loadXML( xml ) )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.parseError.reason );
     }
-    
+    this.logger(3,'ELAPSED TIME FOR LOAD XML TO DOM','scheduler_dom');
     return dom_document;
 }
 
 
+//------------------------------------------------------------------------------Scheduler.executeGet
 
-//------------------------------------------------------------------------------Scheduler.callHTTP
-
-Scheduler.prototype.callHTTP = function( text )
-{
-    this._xml_http.open( "POST", this._url, false );
-    this._xml_http.setRequestHeader( "Cache-Control", "no-cache" );
-
-    var status = window.status;
-    window.status = this.getTranslation("Waiting for response from Job Scheduler ...");
-
-    try
+Scheduler.prototype.executeGet = function( href, txt_mode, callback_on_success )
+{         
+    if( typeof txt_mode == "undefined" ) txt_mode = true;
+    var async     = ( typeof callback_on_success == "function"  );
+    var scheduler = this;
+    var ret       = null;
+    var err       = null;
+    
+    new Ajax.Request( scheduler._url+href,
     {
-        var this_scheduler = false;
-        if( text.search( /this_scheduler=(\'|\")yes(\'|\")/i ) > -1 ) {
-          this_scheduler = true;
-          text = text.replace( /this_scheduler=(\'|\")yes(\'|\")/i, "" );
-        }
-        this._xml_http.send( text );
-        if( text.search( /^<modify_spooler cmd=(\'|\").*(abort|terminate).*(\'|\")\/>/i ) > -1 ) { throw new Error(); }
-        if( text.search( /^<terminate/i ) > -1 && ( text.search( /cluster_member_id=/i ) == -1 || this_scheduler ) ) { throw new Error(); }
-        if( this._xml_http.status.toString().substr(0,1) != '2' ) {
-          var E = new Error();
-          if( typeof this._xml_http.statusText == 'string' ) {
-            E.message = this._xml_http.statusText;
-            E.number  = this._xml_http.status;
-          }
-          throw E;  
-        }
-        this._update_counter  = 1;
-        this._update_finished = true;
-    }
-    catch( x )
-    {   
-        var update_counter_txt = ['First','Second','Third','Fourth','Last'];
-        var message = "";
-        if( this._update_counter == 6 ) { 
-           message = this.getTranslation("No connection to Job Scheduler")+"\n";
-           this._update_finished = true;
-        } else {
-           message = this.getTranslation("$trial trial (of 5) to (re)connect to Job Scheduler",{trial:this.getTranslation(update_counter_txt[this._update_counter-1])}) + "\n";
-           this._update_finished = false;
-        }
-        message += x.message;
-        
-        throw new Error(message);
-    }
-    finally
-    {
-        window.status = status;
-    }
+       asynchronous   : async,
+       method         : 'get',
+       onSuccess      : function(transport) {
+                          if( txt_mode ) {
+                            if( async ) callback_on_success( transport.responseText );
+                            else ret = transport.responseText;
+                          } else {
+                            if( transport.responseXML.parseError ) {
+                              if( transport.responseXML.parseError.errorCode != 0 ) {
+                                throw new Error( scheduler.getTranslation( "Error at HTTP answer '$url':", {'url':href} ) + " " + transport.responseXML.parseError.reason );
+                              }
+                            } else {
+                              if( transport.responseXML.documentElement.nodeName == "parsererror" ) {
+                                throw new Error( scheduler.getTranslation( "Error at HTTP answer '$url':", {'url':href} ) + " " + transport.responseXML.documentElement.firstChild.nodeValue );
+                              }
+                            }
+                            if( async ) callback_on_success( transport.responseXML );
+                            else ret = transport.responseXML;
+                          }
+                        },
+       onFailure:       function(transport) {
+                          throw new Error( getTranslation( "Error at HTTP answer '$url':", {'url':href} ) + " " + transport.statusText + " (" + transport.status + ")" );
+                        },
+       onException:     function(requester, x) {
+                          if( async ) {
+                            if( parent.top_frame && typeof parent.top_frame.showError == 'function' ) {
+                              parent.top_frame.showError(x);
+                            } 
+                            else if(typeof window['show_error'] == 'function') {
+                              show_error(x);
+                            }
+                            else alert(x.message);
+                          } else {
+                            err = x;
+                          } 
+                        }  
+    });
+    if( err ) throw err;
+    return ret;
 }
+
+
+//------------------------------------------------------------------------------Scheduler.executePost
+
+Scheduler.prototype.executePost = function( xml, callback_on_success, async, with_modify_datetime, with_add_path, with_all_errors, params )
+{         
+    var rand = Math.random();
+    this.logger(3,'START SCHEDULER REQUEST: ' + xml,rand);
+    window.status = this.getTranslation("Waiting for response from Job Scheduler ...");
+    if( typeof with_add_path        != "boolean"  ) { with_add_path        = true;  }
+    if( typeof with_modify_datetime != "boolean"  ) { with_modify_datetime = true;  }
+    if( typeof with_all_errors      != "boolean"  ) { with_all_errors      = false; }
+    if( typeof async                != "boolean"  ) { async                = true;  }
+    var scheduler      = this;
+    var ret            = null;
+    var err            = null;
+    var this_scheduler = false;
+    if( xml.search( /this_scheduler=(\'|\")yes(\'|\")/i ) > -1 ) {
+      this_scheduler   = true;
+      xml              = xml.replace( /this_scheduler=(\'|\")yes(\'|\")/i, "" );
+    }
+    if( xml.search( /^<modify_spooler cmd=(\'|\")[^\'\"]*(abort|terminate)[^\'\"]*(\'|\")\/>/i ) > -1 ) { err = new Error(); }
+    if( xml.search( /^<terminate/i ) > -1 && ( xml.search( /cluster_member_id=/i ) == -1 || this_scheduler ) ) { err = new Error(); }
+        
+    
+    new Ajax.Request( scheduler._url,
+    {
+       asynchronous   : async,
+       method         : 'post',
+       postBody       : xml,
+       contentType    : 'text/xml',
+       requestHeaders : { 'Cache-Control':'no-cache', 
+                          'Pragma':'no-cache', 
+                          //'Transfer-Encoding':'identity', 
+                          'Content-Length': xml.length 
+                        },
+       onCreate       : function() { scheduler._activeRequestCount++; },
+       onComplete     : function() { 
+                          //scheduler.logger(6,'ACTIVE CONNECTIONS:' + scheduler._activeRequestCount);
+                          scheduler._activeRequestCount--; 
+                          if(scheduler._activeRequestCount == 0) window.status = ''; 
+                        },
+       onSuccess      : function(transport) {
+                          //alert(transport.getAllResponseHeaders());
+                          if( !transport.responseText ) err = new Error();
+                          if( err ) throw err;
+                          scheduler._update_counter  = 1;
+                          scheduler._update_finished = true;
+                          scheduler.logger(6,'SCHEDULER RESPONSE:\n' + transport.responseXML.xml);  
+                          if( xml == '<check_folders/>' ) {
+                            ret = true;
+                            return null;
+                          } 
+                          if( transport.responseXML.parseError ) {
+                             if( transport.responseXML.parseError.errorCode != 0 ) {
+                               throw new Error( scheduler.getTranslation( "Error at XML answer:" ) + " " + transport.responseXML.parseError.reason );
+                             }
+                          } else {
+                             if( transport.responseXML.documentElement.nodeName == "parsererror" ) {
+                               throw new Error( scheduler.getTranslation( "Error at XML answer:" ) + " " + transport.responseXML.documentElement.firstChild.nodeValue );
+                             }
+                          }
+                          var error_element = transport.responseXML.selectSingleNode( "spooler/answer/ERROR" );
+                          if( error_element )
+                          {
+                              //Per default no exception is thrown if remove job, job_chain, order is clicked
+                              if( with_all_errors || error_element.getAttribute( "code" ).search(/SCHEDULER-(108|161|162)/i) == -1 ) {
+                                  throw new Error( error_element.getAttribute( "text" ) );
+                              } 
+                          }
+                          scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
+                          if( with_modify_datetime ) scheduler.modifyDatetimeForXSLT( transport.responseXML );  
+                          if( with_add_path && !scheduler.versionIsNewerThan( "2007-10-08 14:00:00" ) ) scheduler.addPathAttribute( transport.responseXML );
+                          //if( parent.top_frame && typeof parent.top_frame.resetError == 'function' ) {
+                            //parent.top_frame.resetError();
+                          //}
+                          if( typeof callback_on_success == 'function' ) callback_on_success( transport.responseXML, params );
+                          if( !async ) ret = transport.responseXML;
+                        },
+       onFailure:       function(transport) {
+                          if( transport.status >= 12000 ) err = new Error();
+                          if( err ) throw err;
+                          throw new Error( scheduler.getTranslation( "Error at XML answer:" ) + " " + transport.statusText + " (" + transport.status + ")" );
+                        },
+       onException:     function(requester, x) {
+                          scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
+                          if( err ) {
+                            var message = '';
+                            var update_counter_txt = ['First','Second','Third','Fourth','Last'];
+                            if( scheduler._update_counter == 6 ) {
+                               message = scheduler.getTranslation("No connection to Job Scheduler") 
+                               scheduler._update_finished = true;
+                            } else {
+                               message = scheduler.getTranslation("$trial trial (of 5) to (re)connect to Job Scheduler",{trial:scheduler.getTranslation(update_counter_txt[scheduler._update_counter-1])});
+                               scheduler._update_finished = false;
+                            }
+                            x = new Error( message );
+                          }
+                          if( async ) {
+                            if( parent.top_frame && typeof parent.top_frame.showError == 'function' ) {
+                              parent.top_frame.showError(x);
+                            } 
+                            else if(typeof window['show_error'] == 'function') {
+                              show_error(x);
+                            }
+                            else alert(x.message);
+                          } else {
+                            err = x;
+                          }
+                        }  
+    }); 
+    if( err ) throw err;
+    return ret;
+}
+
+
+Scheduler.prototype.executeSynchron = function( xml, with_modify_datetime, with_add_path, with_all_errors )
+{
+  return this.executePost( xml, null, false, with_modify_datetime, with_add_path, with_all_errors );
+}
+
+Scheduler.prototype.executeAsynchron = function( xml, callback_on_success, with_modify_datetime, with_add_path, with_all_errors, params )
+{  
+  return this.executePost( xml, callback_on_success, true, with_modify_datetime, with_add_path, with_all_errors, params );
+}
+
 
 //-------------------------------------------------------Scheduler.addDatetimeAttributesForXSLT
 
@@ -266,8 +353,10 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
               case "valid_to"              : 
               case "spooler_running_since" :
               case "time"                  :
-              case "start_time"            :
-              case "end_time"              : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value, now ) );
+              case "end_time"              : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value ) );
+                                             break;
+              case "start_time"            : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value ) );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
                                              break;
               case "connected_at"          :
               case "disconnected_at"       : element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , this.xsltFormatDateOrTimeWithDiff( value, now ) );
@@ -292,7 +381,9 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
               case "setback"               : element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , this.xsltFormatDateOrTimeWithDiff( value, now ) );
                                              element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
                                              break;
-              default                      : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value, now ) );
+              case "last_write_time"       : element.setAttribute( attribute_name + "__xslt_datetime_zone_support"  , this.xsltFormatDatetimeZoneSupport( value ) );
+                                             break;
+              default                      : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value ) );
                                              element.setAttribute( attribute_name + "__xslt_datetime_diff"          , this.xsltFormatDatetimeDiff( value, now, false ) );
                                              element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
                                              element.setAttribute( attribute_name + "__xslt_datetime_with_diff_plus", this.xsltFormatDatetimeWithDiff( value, now, true ) );
@@ -308,6 +399,7 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
 
 Scheduler.prototype.addPathAttribute = function( response )
 {   
+    this.logger(3,'ADDING PATH ATTRIBUTE:','scheduler_addpath');
     var elements = response.selectNodes( "//job|//job_chain|//process_class|//lock|//order" );
     
     for( var i = 0; i < elements.length; i++ )
@@ -323,41 +415,50 @@ Scheduler.prototype.addPathAttribute = function( response )
       if( !path ) path = '';
       elements[i].setAttribute('path', path );
     }
+    this.logger(3,'ELAPSED TIME FOR ADDING PATH ATTRIBUTE','scheduler_addpath');
 }
 
 //---------------------------------------------------------------Scheduler.modifyDatetimeForXSLT
 
 Scheduler.prototype.modifyDatetimeForXSLT = function( response )
 {   
+    this.logger(3,'MODIFY DATETIME ATTRIBUTES:','scheduler_datetime');
     // Fuer Firefox, dass kein Skript im Stylesheet zulaesst.
     var now;
 
     var datetime = response.selectSingleNode( "/spooler/answer/@time" );
     if( datetime )  now = this.dateFromDatetime( datetime.nodeValue );
-
-    this.addDatetimeAttributesForXSLT( response, now, "time"                  );
-    this.addDatetimeAttributesForXSLT( response, now, "spooler_running_since" );
+    
+    //task attributes
     this.addDatetimeAttributesForXSLT( response, now, "running_since"         );
     this.addDatetimeAttributesForXSLT( response, now, "in_process_since"      );
-    this.addDatetimeAttributesForXSLT( response, now, "next_start_time"       );
-    this.addDatetimeAttributesForXSLT( response, now, "start_at"              );
     this.addDatetimeAttributesForXSLT( response, now, "idle_since"            );
+    //task_queue and task attributes
+    this.addDatetimeAttributesForXSLT( response, now, "start_at"              );
     this.addDatetimeAttributesForXSLT( response, now, "enqueued"              );
-    //this.addDatetimeAttributesForXSLT( response, now, "created"               );
+    //order_queue, order and job attributes
+    this.addDatetimeAttributesForXSLT( response, now, "next_start_time"       );
+    //order attributes
     this.addDatetimeAttributesForXSLT( response, now, "setback"               );
-    this.addDatetimeAttributesForXSLT( response, now, "start_time"            );
-    this.addDatetimeAttributesForXSLT( response, now, "end_time"              );
+    //remote_scheduler attributes
     this.addDatetimeAttributesForXSLT( response, now, "connected_at"          );
     this.addDatetimeAttributesForXSLT( response, now, "disconnected_at"       );
+    //schedule attributes
+    this.addDatetimeAttributesForXSLT( response, now, "start_time"            );
+    this.addDatetimeAttributesForXSLT( response, now, "end_time"              );
     this.addDatetimeAttributesForXSLT( response, now, "valid_from"            );
     this.addDatetimeAttributesForXSLT( response, now, "valid_to"              );
+    //file_based attribute
+    this.addDatetimeAttributesForXSLT( response, now, "last_write_time"       );
+    
+    this.logger(3,'ELAPSED TIME FOR MODIFY DATETIME ATTRIBUTES','scheduler_datetime');
 }
 
 //---------------------------------------------------------------------xsltFormatDatetime
 
 Scheduler.prototype.xsltFormatDatetime = function( datetime )
 {
-    return ( !datetime ) ? "" : datetime.replace( /\.\d*$/, "" );
+    return ( !datetime ) ? "" : datetime.replace( /\.\d*Z*$/, "" );
 }
 
 //-----------------------------------------------------------------xsltFormatDateOrTime
@@ -386,7 +487,7 @@ Scheduler.prototype.xsltFormatDatetimeWithDiff = function( datetime, now, show_p
 {
     var date   = this.dateFromDatetime( datetime );
     var result = this.xsltFormatDatetime( datetime );
-    if( result && now && date )  result += " \xA0(" + this.xsltFormatDatetimeDiff( date, now, show_plus ) + ")";
+    if( result && now && date )  result += "\xA0(" + this.xsltFormatDatetimeDiff( date, now, show_plus ) + ")";
 
     return result;
 }
@@ -397,7 +498,7 @@ Scheduler.prototype.xsltFormatDateOrTimeWithDiff = function( datetime, now )
 {
     var date   = this.dateFromDatetime( datetime );
     var result = this.xsltFormatDateOrTime( datetime );
-    if( result && now && date )  result += " \xA0(" + this.xsltFormatDatetimeDiff( date, now ) + ")";
+    if( result && now && date )  result += "\xA0(" + this.xsltFormatDatetimeDiff( date, now ) + ")";
 
     return result;
 }
@@ -477,6 +578,27 @@ Scheduler.prototype.dateFromDatetime = function( datetime )
 }
 
 
+//-----------------------------------------------------------------------xsltFormatDatetimeZoneSupport
+// datetime == yyyy-mm-ddThh-mm-ss[.mmm]Z
+
+Scheduler.prototype.xsltFormatDatetimeZoneSupport = function( datetime ) 
+{
+    if( datetime.lastIndexOf('Z') == -1 ) return this.xsltFormatDatetime( datetime );
+    var dateobj = this.dateFromDatetime( datetime );
+    if( dateobj ) {
+      dateobj.setTime( dateobj.getTime() - ( dateobj.getTimezoneOffset()*60*1000 ) );
+      return dateobj.getFullYear()+'-'+this.addLeadingZero(dateobj.getMonth()+1)+'-'+this.addLeadingZero(dateobj.getDate())+' '+this.addLeadingZero(dateobj.getHours())+':'+this.addLeadingZero(dateobj.getMinutes())+':'+this.addLeadingZero(dateobj.getSeconds());
+    }
+    return this.xsltFormatDatetime( datetime );
+}
+
+
+Scheduler.prototype.addLeadingZero = function( num ) 
+{
+    return ( num < 10 ) ? '0'+num : num;
+}
+
+
 //----------------------------------------------------------------------------------------logger
 Scheduler.prototype.logger = function(level, msg, timerKey)
 {   
@@ -502,9 +624,8 @@ Scheduler.prototype.logger = function(level, msg, timerKey)
 Scheduler.prototype.readGuiVersion = function()
 {
     try {
-      this._xml_http.open( "GET", ".version", false );
-      this._xml_http.send( null );
-      this._gui_subversion_no = this._xml_http.responseText || "0000 0000-00-00";
+      var responseText = this.executeGet( '.version' );
+      this._gui_subversion_no = responseText || "0000 0000-00-00";
       this._gui_subversion_no = this._gui_subversion_no.replace(/[^-0-9:\. ]/g,'');
       var pattern = /([0-9\.]+)\s+(\d{4}-\d{2}-\d{2})*/;
       pattern.exec(this._gui_subversion_no);
@@ -564,47 +685,38 @@ Scheduler.prototype.versionIsNewerThan = function( version_date )
 //---------------------------------------------------------------------------------------loadXSLT
 Scheduler.prototype.loadXSLT = function( url )
 {
-    try {
-      this._xml_http.open( "GET", url, false );
-      this._xml_http.send( null );
-      if( window.XSLTProcessor )
-      {
-        if( this._xml_http.responseXML.documentElement.nodeName == "parsererror" )  throw new Error( this.getTranslation( "Error at XSL answer '$xsl':", {'xsl':url} ) + this._xml_http.responseXML.documentElement.firstChild.nodeValue );
-        this._xslt       = new XSLTProcessor();
-        this._xslt.importStylesheet( this._xml_http.responseXML );       
-      }
-      else
-      {
-        if( this._xml_http.responseXML.parseError.errorCode != 0 )  throw new Error( this.getTranslation( "Error at XSL answer '$xsl':", {'xsl':url} ) + this._xml_http.responseXML.parseError.reason );
-        this._xslt       = this._xml_http.responseXML;
-        this._result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
-      }
-    }
-    catch(x) {
-      var statusText = ( typeof this._xml_http.statusText == 'string' && this._xml_http.statusText ) ? this._xml_http.statusText + " (" + this._xml_http.status + ")" : "";
-      throw new Error( this.getTranslation( "Error at XSL answer '$xsl':", {'xsl':url} ) + " " + statusText + "\n" + x.message );
+    if( window.XSLTProcessor ) {
+      this._xslt = new XSLTProcessor();
+      this._xslt.importStylesheet( this.executeGet( url, false ) );       
+    } else {
+      this._xslt = this.executeGet( url, false );
     }
 }
 
 
 //------------------------------------------------------------------------------------xmlTransform
-Scheduler.prototype.xmlTransform = function( dom_document, with_translate, stylesheet )
+Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_output )
 {   
     this.logger(3,'START TRANSFORM RESPONSE frameset','transform_response');
-    if( stylesheet ) this.loadXSLT( stylesheet );
+    var result_dom = null;
+    if( typeof with_translate != 'boolean' ) with_translate = true;
+    if( typeof text_output    != 'boolean' ) text_output    = true;
+    
+    if( window.DOMParser ) {   
+      result_dom = this._xslt.transformToDocument( dom_document );
+    } else {
+      result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
+      dom_document.transformNodeToObject( this._xslt, result_dom );
+    } 
+      
     if( with_translate && this._lang_file_exists )
     {
-      if( window.DOMParser ) {   
-        this._result_dom = this._xslt.transformToDocument( dom_document );
-      } else {
-        dom_document.transformNodeToObject( this._xslt, this._result_dom );
-      } 
-      var spans = this._result_dom.selectNodes("//label|//option|//span[@class='translate' or @class='label' or @class='caption' or @class='job_error' or @class='file_based_error']|//a[@class='translate']");
+      var spans = result_dom.selectNodes("//label|//option|//span[@class='translate' or @class='label' or @class='caption' or @class='job_error' or @class='file_based_error']|//a[@class='translate']");
       for( var i=0; i<spans.length; i++ ) {
         if( !spans[i].firstChild || !spans[i].firstChild.nodeValue ) continue;
         spans[i].firstChild.nodeValue = this.getTranslation(spans[i].firstChild.nodeValue); 
       }
-      var attributes = this._result_dom.selectNodes("//td[@title]|//tr[@title]|//span[@title]");
+      var attributes = result_dom.selectNodes("//td[@title]|//tr[@title]|//span[@title]|//div[@title]");
       for( var i=0; i<attributes.length; i++ ) {
         var old_title = attributes[i].getAttribute( "title" );
         if( attributes[i].getAttribute("arg") ) {
@@ -615,14 +727,10 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, style
         }
         attributes[i].setAttribute( "title", old_title ); 
       }
-      var transformed = this._result_dom.xml;
     } 
-    else 
-    {
-      var transformed = ( window.DOMParser ) ? this._xslt.transformToDocument( dom_document ).xml : dom_document.transformNode( this._xslt );
-    }
     this.logger(3,'ELAPSED TIME FOR TRANSFORM RESPONSE frameset','transform_response');
-    return transformed;
+    if( text_output ) return result_dom.xml;
+    return result_dom;
 }
 
 
@@ -647,35 +755,46 @@ Scheduler.prototype.readCustomSettings = function()
 {  
     for( var entry in this._runtime_settings ) {                   
       if( typeof window['_'+entry] != 'undefined' ) {
-        this._runtime_settings[entry]               = window['_'+entry];
+        this._runtime_settings[entry]                = window['_'+entry];
       }
     }
     if( typeof _checkbox_states == 'object' ) {
       for( var state in _checkbox_states ) {                   
-        this._checkbox_states[state]                = _checkbox_states[state];
+        this._checkbox_states[state]                 = _checkbox_states[state];
       }
     }
     if( typeof _select_states == 'object' ) {                                                      
       for( var state in _select_states ) {                   
-        this._select_states[state]                  = _select_states[state];
+        this._select_states[state]                   = _select_states[state];
       }
     }
     if( typeof _radio_states == 'object' ) {                                                        
       for( var state in _radio_states ) {                      
-        this._radio_states[state]                   = _radio_states[state];
+        this._radio_states[state]                    = _radio_states[state];
       }
     }
     if( typeof _update_seconds == 'number' ) {
-      this._update_seconds                          = _update_seconds;
+      this._update_seconds                           = _update_seconds;
     }
     if( typeof _show_card == 'string' ) {
-      this._show_card                               = _show_card;
+      this._show_card                                = _show_card;
     }
     if( typeof _update_periodically == 'boolean' ) {
-      this._update_periodically                     = _update_periodically;
+      this._update_periodically                      = _update_periodically;
     }
     if( typeof _update_incl_hot_folders == 'boolean' ) {
-      this._update_incl_hot_folders                 = _update_incl_hot_folders;
+      this._update_incl_hot_folders                  = _update_incl_hot_folders;
+    }
+}
+
+
+//-------------------------------------------------------------------readCustomVersionedSettings
+Scheduler.prototype.readCustomVersionedSettings = function()
+{  
+    if(this._tree_view_enabled && typeof _view == 'object') {
+      for( var entry in this._supported_tree_views ) {
+        if( _view[entry] ) this._view[entry]         = _view[entry];
+      }
     }
 }
 
@@ -692,9 +811,9 @@ Scheduler.prototype.setDebugLevel = function()
 //---------------------------------------------------------------------------------readCookies
 Scheduler.prototype.readCookies = function()
 {  
-    var logged = this.logger(1,'START READING COOKIES frameset','scheduler_read_cookies');
+    var logged = this.logger(3,'START READING COOKIES frameset','scheduler_read_cookies');
     this._runtime_settings.debug_level               = Math.max(_debug_level,parseInt(this.getCookie( 'debug_level', this._runtime_settings.debug_level),10));
-    if(!logged) this.logger(1,'START READING COOKIES frameset','scheduler_read_cookies');
+    if(!logged) this.logger(3,'START READING COOKIES frameset','scheduler_read_cookies');
     this._update_periodically                        = (this.getCookie( 'update_periodically', this._update_periodically.toString()) == 'true');
     this._update_incl_hot_folders                    = (this.getCookie( 'update_incl_hot_folders', this._update_incl_hot_folders.toString()) == 'true');
     this._update_seconds                             = parseInt(this.getCookie( 'update_seconds', this._update_seconds),10);
@@ -717,10 +836,16 @@ Scheduler.prototype.readCookies = function()
       if( state.search(/^filter_(jobs|job_chains|orders)_select$/) > -1 ) continue;
       var value = this.getCookie( 'select_states_'+state );
       if( value != '' ) this._select_states[state]   = value;
+    }
+    if( this._tree_view_enabled ) {
+      for( var entry in this._supported_tree_views ) {
+        var value = this.getCookie( 'view_'+entry );
+        if( value != '' ) this._view[entry]            = value;
+      }
     }                                                      
-    
-    this.logger(1,'ALL AVAILABLE COOKIES:\n  ' + document.cookie.replace(/;/g,"\n "));
-    this.logger(1,'ELAPSED TIME FOR READING COOKIES frameset','scheduler_read_cookies');
+                                                          
+    this.logger(6,'ALL AVAILABLE COOKIES:\n  ' + document.cookie.replace(/;/g,"\n "));
+    this.logger(3,'ELAPSED TIME FOR READING COOKIES frameset','scheduler_read_cookies');
 }
 
 
@@ -728,7 +853,7 @@ Scheduler.prototype.readCookies = function()
 Scheduler.prototype.getCookie = function(name, default_value) 
 {   
     name = this._cookie_prefix + name;
-    this.logger(1,'LOOKING FOR COOKIE: ' + name);
+    this.logger(3,'LOOKING FOR COOKIE: ' + name);
     if( typeof default_value == 'undefined' ) default_value = "";
     var value   = "";
     var pattern = new RegExp(name+"=([^;]*);");
@@ -736,11 +861,31 @@ Scheduler.prototype.getCookie = function(name, default_value)
       var result = pattern.exec(document.cookie+";");
       if( result.length > 0 ) {
         if( RegExp.$1 != "" ) value = unescape(RegExp.$1);
-        this.logger(1,'COOKIE FOUND: ' + name + '=' + value);
+        this.logger(3,'COOKIE FOUND: ' + name + '=' + value);
       }
     } else {
-      this.logger(1,'COOKIE NOT FOUND (default value is "' + default_value + '")');
+      this.logger(2,'COOKIE NOT FOUND (default value is "' + default_value + '")');
     }
     if( value == "" ) value = default_value;
     return value;
+}
+
+
+//--------------------------------------------------------------------------------treeDisplay
+Scheduler.prototype.treeDisplay = function( li_element )
+{
+    var ul          = li_element.down('ul');
+    var img_folder  = li_element.down('img');
+    if( ul.getAttribute('sos_mode') == 'closed' ) {
+      ul.setAttribute('sos_mode','open');
+      ul.style.display  = 'block';
+      img_folder.src    = this._imgFolderOpen;
+      return true;
+    }
+    else {
+      ul.style.display  = 'none';
+      ul.setAttribute('sos_mode','closed');
+      img_folder.src    = this._imgFolderClose;
+      return false;
+    }
 }

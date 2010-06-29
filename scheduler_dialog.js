@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -38,26 +38,32 @@ var _obj_title               = "";
 
 
 //---------------------------------------------------------------------------------showError
-function showError( x )
+function showError( x, url, line )
 {
     var err;
     
     if( typeof x == "object" )
     {
         if( x.number )  x.message = "0x" + x.number.toHex( 8 ) + "  " + x.message;
+        //if( url )  x.message += " [File: " + url + "]";
+        //else if( x.fileName ) x.message += " [File: " + x.fileName + "]";
+        //if( line ) x.message += " [Line: " + line + "]";
+        //else if( x.lineNumber ) x.message += " [Line: " + x.lineNumber + "]";
         err = x;
     }
     else
     {
         err = new Error();
         err.message = x;
+        //if( url )  err.message += " [File: " + url + "]";
+        //if( line ) err.message += " [Line: " + line + "]";
         err.stack = "";
     }
     
     if( parent.error_frame && typeof parent.error_frame.show_error == 'function' ) {
       parent.error_frame.show_error(err);
       if( parent._scheduler._update_counter < 6 && !parent._scheduler._update_finished ) {
-        set_timeout( "callErrorChecked( 'update__onclick', true, false );", 15000 );
+        set_timeout( "callErrorChecked( 'update__onclick', false );", 15000 );
         parent._scheduler._update_counter++; 
       }
     } 
@@ -82,7 +88,7 @@ function resetError()
 }
 
 
-//-------------------------------------------------------------------Popup_menu_builder.add_command
+//---------------------------------------------------------------------------------callErrorChecked
 function callErrorChecked( fct, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 )
 {
     try
@@ -121,31 +127,25 @@ function callErrorChecked( fct, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 )
 
 
 //-------------------------------------------------------------------update__onclick
-function update__onclick( with_reset, delayed, force, time1, time2 )
+function update__onclick( with_reset, force, time )
 {   
     
     //try {
       if( typeof with_reset != 'boolean' ) with_reset = true;
-      if( typeof delayed    != 'boolean' ) delayed    = true;
       if( typeof force      != 'boolean' ) force      = false;
-      if( typeof time1      != 'number'  ) time1      = 1;
-      if( typeof time2      != 'number'  ) time2      = 200;
+      if( typeof time       != 'number'  ) time       = 200;
       if( with_reset ) resetError();
       if( parent._scheduler.versionIsNewerThan( "2007-10-28 19:00:00" ) ) {
         if( parent._scheduler._update_incl_hot_folders ) force = true;
-        if( delayed ) {  
-          if( force ) set_timeout("parent._scheduler.execute( '<check_folders/>',false,false )",time1);
-          set_timeout("parent.left_frame.update()",time2);
+        if( force ) {
+          if( parent._scheduler.executeSynchron( '<check_folders/>', false, false ) ) {
+            set_timeout("parent.left_frame.update()",time);
+          }
         } else {
-          if( force ) parent._scheduler.execute( '<check_folders/>',false,false );
-          parent.left_frame.update();
+          set_timeout("parent.left_frame.update()",time);
         }
       } else {
-        if( delayed ) {
-          set_timeout("parent.left_frame.update()",1);
-        } else {
-          parent.left_frame.update();
-        }
+         set_timeout("parent.left_frame.update()",1);
       }
     //} catch(E) {
     //  showError(E);
@@ -283,7 +283,7 @@ function scheduler_settings__onclick(ret)
     var dialog                     = new Input_dialog();
     dialog._with_reload            = true;
     dialog.width                   = 768;
-    var fieldset_height            = (parent.ie) ? 320 : (parent.chrome ? 311 : 317);
+    //var fieldset_height            = (parent.ie) ? 320 : (parent.chrome ? 311 : 317);
     var cellspacing                = (parent.ie) ? 0   : 2;
     var select_opts;               
     dialog.submit_fct              = "callErrorChecked( 'scheduler_settings__onclick', true )";
@@ -294,12 +294,14 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( '<table cellspacing="0" cellpadding="2" width="'+dialog.width+'px" border="0">' );
     dialog._html_array.push( '<tr><td width="50%" valign="top">' );
     dialog._html_array.push( '<fieldset style="margin:2px;width:'+((dialog.width/2)-10)+'px;"><legend>'+parent.getTranslation('Onload Values')+'</legend>' );
+    
     dialog._html_array.push( '<fieldset><legend>'+parent.getTranslation('Update')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_checkbox( "update_periodically", parent.getTranslation('periodically every')+' <input type="text" name="update_seconds" style="text-align:right;width:28px;padding:0px 2px;font-size:12px;" value="' + window.parent.onload_settings.update_seconds + '"/> '+parent.getTranslation('seconds'), window.parent.onload_settings.update_periodically );
     dialog.add_checkbox( "update_incl_hot_folders", parent.getTranslation('inclusive &quot;<i>Hot Folders</i> &quot;'), window.parent.onload_settings.update_incl_hot_folders );
     dialog._html_array.push( '</table>' );
-    dialog._html_array.push( '</fieldset>' );  
+    dialog._html_array.push( '</fieldset>' );
+    
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Tabs')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
@@ -315,7 +317,22 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( ' '+parent.getTranslation('as the beginning view') );
     dialog._html_array.push( '</td></tr>' );
     dialog._html_array.push( '</table>' );
-    dialog._html_array.push( '</fieldset>' );  
+    dialog._html_array.push( '</fieldset>' );
+    
+    if( parent._scheduler._tree_view_enabled ) {  
+      dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('View Mode')+'</legend>' );
+      dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
+      select_opts                    = {'tree':' '+parent.getTranslation('tree view')+' ','list':' '+parent.getTranslation('list view')+' '};
+      for( var entry in  parent._scheduler._supported_tree_views ) {
+        dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
+        dialog.add_select( "view_"+entry, select_opts, window.parent.onload_settings.view[ entry ], 1, 0, false );
+        dialog._html_array.push( ' '+parent.getTranslation('for')+' <i>'+parent.getTranslation(parent._scheduler._supported_tree_views[entry])+' </i>' );
+        dialog._html_array.push( '</td></tr>' );
+      }
+      dialog._html_array.push( '</table>' );
+      dialog._html_array.push( '</fieldset>' );  
+    }
+    
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Selects, Checkboxes and Radios')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     select_opts                    = new Object();
@@ -348,9 +365,11 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( ' '+parent.getTranslation('in the <i>last activities</i> tab')+'</td></tr>' );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );  
+    
     dialog._html_array.push( '</fieldset>' );  
     dialog._html_array.push( '</td><td width="50%" valign="top">' );
-    dialog._html_array.push( '<fieldset style="margin:2px;width:'+((dialog.width/2)-8)+'px;height:'+fieldset_height+'px;"><legend>'+parent.getTranslation('Runtime Values')+'</legend>' );
+    dialog._html_array.push( '<fieldset style="margin:2px;width:'+((dialog.width/2)-8)+'px;"><legend>'+parent.getTranslation('Runtime Values')+'</legend>' );
+    
     dialog._html_array.push( '<fieldset><legend>'+parent.getTranslation('Limits')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_settings_input( parent.getTranslation('Max. number of orders per job chain')+':',      'max_orders',          parent._scheduler._runtime_settings.max_orders, 3 );
@@ -359,21 +378,25 @@ function scheduler_settings__onclick(ret)
     dialog.add_settings_input( parent.getTranslation('Max. number of history entries per task')+':',  'max_task_history',    parent._scheduler._runtime_settings.max_task_history, 3 );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );  
+    
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Terminate within')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_settings_input( parent.getTranslation('Max. seconds within the Job Scheduler terminates')+':', 'terminate_timeout', parent._scheduler._runtime_settings.terminate_timeout, 3 );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );
+    
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Dialogs')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_checkbox( "start_at_default_is_now", parent.getTranslation('Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'), parent._scheduler._runtime_settings.start_at_default_is_now );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );  
+    
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Debug')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_settings_input( parent.getTranslation('Level')+' (0-9):', 'debug_level', parent._scheduler._runtime_settings.debug_level, 3 );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );  
+    
     dialog._html_array.push( '</fieldset>' );  
     dialog._html_array.push( '</td></tr>' );
     dialog._html_array.push( '</table>' );
@@ -389,9 +412,11 @@ function scheduler_settings__onclick(ret)
     }
     if( plausi.length == 0 ) {
       Input_dialog.close();
+      alert($H(fields).inspect());
       for( var entry in fields ) {
         if( entry.search(/new_params/) == -1 ) parent.control_frame.set_cookie( entry, fields[entry] );
         if( entry.search(/^select_states_/) > -1 ) parent._scheduler._select_states[entry.replace(/^select_states_/,'')] = fields[entry];
+        //if( entry.search(/^view_/) > -1 ) parent._scheduler._view[entry.replace(/^view_/,'')] = fields[entry];
       }
       for( var entry in parent._scheduler._runtime_settings ) {
         if( typeof fields[entry] == "boolean" ) {
@@ -413,7 +438,7 @@ function scheduler_settings__onclick(ret)
 //-----------------------------------------------------------------------------get_start_at_prompt
 // Fuer start_task_at() und add_order()
 function get_start_at_prompt()
-{  
+{   
     var prompt_title = '<b>Enter a start time</b><span class="small">';
     prompt_title += " in ISO format &quot;yyyy-mm-dd HH:MM[:SS]&quot; or &quot;now&quot;. ";
     prompt_title += "The time at which a task is to be started &lt;run_time&gt; is deactivated. ";
@@ -459,13 +484,13 @@ function start_task_at( ret ) {
       Input_dialog.close();
       var force = fields.force ? '' : ' force="no"';
       var at    = fields.at == 'now' ? '' : ' at="' + fields.at + '"';
-      var xml_command = '<start_job job="' + window.parent.left_frame._job_name + '"'+ at + force +'/>';
+      var xml_command = '<start_job job="' + parent.left_frame._job_name + '"'+ at + force +'/>';
       if( fields.at && scheduler_exec( xml_command, false ) ) { 
-          set_timeout("window.parent.left_frame.update()",1);
+          set_timeout("parent.left_frame.update()",1);
       }
     } else {
       alert( msg );
-      window.parent.left_frame.document.forms.__input_dialog__.elements.at.focus(); 
+      parent.left_frame.document.forms.__input_dialog__.elements.at.focus(); 
     }
   }
 }
@@ -475,13 +500,19 @@ function start_task( ret ) {
   
     if( typeof ret != "boolean" ) ret = false;
     var params_element = null;
-    var param_names = new Array();
+    var param_names    = new Array();
       
     if( !ret ) {
       
-      _popup_menu.close(); 
-      var params         = new Object();
-      var params_element = window.parent.left_frame._job_element.selectSingleNode('params');
+      _popup_menu.close();
+      var params             = new Object();
+      try { 
+          var response       = parent._scheduler.executeSynchron( '<show_job job="' + window.parent.left_frame._job_name + '" what="job_params"/>', false );
+          var params_element = response.selectSingleNode('//job/params'); 
+      }
+      catch( x ) { 
+          return showError( x );
+      }
       if( params_element ) {  
           var param_elements = params_element.selectNodes('param');
           for( var i = 0; i < param_elements.length; i++ ) {  
@@ -526,13 +557,13 @@ function start_task( ret ) {
         Input_dialog.close();
         var force = fields.force ? '' : ' force="no"';
         var at    = fields.at == 'now' ? '' : ' at="' + fields.at + '"';
-        var xml_command = '<start_job job="' + window.parent.left_frame._job_name + '"'+ at + force +'>' + params + '</start_job>';
+        var xml_command = '<start_job job="' + parent.left_frame._job_name + '"'+ at + force +'>' + params + '</start_job>';
         if( fields.at && scheduler_exec( xml_command, false ) ) { 
-            set_timeout("window.parent.left_frame.update()",1);
+            set_timeout("parent.left_frame.update()",1);
         }
       } else {
         alert( msg );
-        window.parent.left_frame.document.forms.__input_dialog__.elements.at.focus(); 
+        parent.left_frame.document.forms.__input_dialog__.elements.at.focus(); 
       }
     }
 }
@@ -554,22 +585,22 @@ function start_order_at( now ) {
               dialog.show();
               break;
       case 1: _popup_menu.close();
-              var xml_command = '<modify_order at="now" job_chain="' + window.parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"/>';
+              var xml_command = '<modify_order at="now" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"/>';
               if( scheduler_exec( xml_command, false ) ) {
-                set_timeout("window.parent.left_frame.update()",1);
+                set_timeout("parent.left_frame.update()",1);
               }
               break;
       case 2: var fields        = input_dialog_submit();
               var msg           = mandatory_field( fields.at, parent.getTranslation('Start time') );
               if( msg == '' ) {
                 Input_dialog.close();
-                var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + window.parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"/>';
+                var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"/>';
                 if( scheduler_exec( xml_command, false ) ) {
-                  set_timeout("window.parent.left_frame.update()",1);
+                  set_timeout("parent.left_frame.update()",1);
                 }
               } else {
                 alert( msg );
-                window.parent.left_frame.document.forms.__input_dialog__.elements.at.focus();
+                parent.left_frame.document.forms.__input_dialog__.elements.at.focus();
               } 
               break;
     }
@@ -587,7 +618,7 @@ function start_order( ret )
       
       var params      = new Object();
       try { 
-          var response       = parent._scheduler.execute( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="payload"/>', false );
+          var response       = parent._scheduler.executeSynchron( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="payload"/>', false );
           var params_element = response.selectSingleNode('//order/payload/params'); 
       }
       catch( x ) { 
@@ -631,13 +662,13 @@ function start_order( ret )
       var msg = mandatory_field( fields.at, parent.getTranslation('Start time') );
       if( msg == '' ) {
         Input_dialog.close();
-        var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + window.parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '">' + params + '</modify_order>';
+        var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '">' + params + '</modify_order>';
         if( scheduler_exec( xml_command, false ) ) { 
-            set_timeout("window.parent.left_frame.update()",1);
+            set_timeout("parent.left_frame.update()",1);
         }
       } else {
         alert( msg );
-        window.parent.left_frame.document.forms.__input_dialog__.elements.at.focus();
+        parent.left_frame.document.forms.__input_dialog__.elements.at.focus();
       }
     }   
 }
@@ -665,7 +696,7 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
       if( window.parent.left_frame._order_id != "" ) {
           var params   = new Object();
           try {
-              var response       = parent._scheduler.execute( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="payload"/>', false );
+              var response       = parent._scheduler.executeSynchron( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="payload"/>', false );
               var params_element = response.selectSingleNode('//order/payload/params');
           }
           catch( x ) {
@@ -757,14 +788,14 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
           var payload_elem  = parent._source.selectSingleNode('xml_payload');
           if( payload_elem ) payload = payload_elem.xml;
         }
-        var hot_command  = '<modify_hot_folder folder="' + dirname(window.parent.left_frame._job_chain) + '"><order' + fields.id + ' job_chain="' + basename(window.parent.left_frame._job_chain) + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '"' + priority + web_service + '>' + osNewline(params + fields.run_time + payload) + '</order></modify_hot_folder>';
+        var hot_command  = '<modify_hot_folder folder="' + dirname(parent.left_frame._job_chain) + '"><order' + fields.id + ' job_chain="' + basename(window.parent.left_frame._job_chain) + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '"' + priority + web_service + '>' + osNewline(params + fields.run_time + payload) + '</order></modify_hot_folder>';
         if( scheduler_exec( hot_command, false ) ) {
-          update__onclick(false, true, true, 3000, 4000);
+          set_timeout("update__onclick(false, true, 1000)",3000);
         }
       } else {
-        var xml_command  = '<add_order' + fields.at + fields.id + ' job_chain="' + window.parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="'+(persistent ? 'yes' : 'no')+'">' + params + fields.run_time + '</add_order>';
+        var xml_command  = '<add_order' + fields.at + fields.id + ' job_chain="' + parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="'+(persistent ? 'yes' : 'no')+'">' + params + fields.run_time + '</add_order>';
         if( scheduler_exec( xml_command, false ) ) { 
-          set_timeout("window.parent.left_frame.update()",1);
+          set_timeout("parent.left_frame.update()",1);
         }
       }      
     }    
@@ -809,13 +840,13 @@ function set_order_state( order_state, order_end_state, setback, hot, ret )
       var fields = input_dialog_submit();
       var sback = fields.remove_setback ? ' setback="no"' : '';
       var end_state = (fields.new_end_state != "") ? ' end_state="'+fields.new_end_state+'"' : '';
-      var xml_command = '<modify_order job_chain="' + window.parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"' + sback + ' state="' + fields.new_state + '"' + end_state + '/>'; 
+      var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"' + sback + ' state="' + fields.new_state + '"' + end_state + '/>'; 
       if( scheduler_exec( xml_command, false ) ) { 
-          set_timeout("window.parent.left_frame.update()",1);
+          set_timeout("parent.left_frame.update()",1);
       }
       /* modify should not be stored persistent
       if( hot ) {
-        var response   = parent._scheduler.execute( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="source"/>', false, false );
+        var response   = parent._scheduler.executeSynchron( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="source"/>', false, false );
         parent._source = response.selectSingleNode('/spooler/answer/order/source/order');
         parent._source.setAttribute('id', window.parent.left_frame._order_id);
         parent._source.setAttribute('job_chain', basename(window.parent.left_frame._job_chain));
@@ -950,20 +981,20 @@ function set_run_time( caller, hot, ret )
                                   hot_command = '<modify_hot_folder folder="'+fields.dir.replace(/\\/g,'/')+'">'+osNewline(new_run_time.xml)+'</modify_hot_folder>';
                                 } else {
                                   alert( msg );                                                                  
-                                  window.parent.left_frame.document.forms.__input_dialog__.elements.name.focus();
+                                  parent.left_frame.document.forms.__input_dialog__.elements.name.focus();
                                   return true;
                                 }
                                 break;
         case 'schedule'       : Input_dialog.close();
                                 var new_run_time = parent._scheduler.loadXML(fields.run_time);
                                 var scheduler_elem = new_run_time.selectSingleNode('/schedule'); 
-                                scheduler_elem.setAttribute('name', basename(window.parent.left_frame._schedule));
-                                hot_command = '<modify_hot_folder folder="'+dirname(window.parent.left_frame._schedule)+'">'+osNewline(new_run_time.xml)+'</modify_hot_folder>';
+                                scheduler_elem.setAttribute('name', basename(parent.left_frame._schedule));
+                                hot_command = '<modify_hot_folder folder="'+dirname(parent.left_frame._schedule)+'">'+osNewline(new_run_time.xml)+'</modify_hot_folder>';
                                 break;
       }
       
       if( hot_command == "" && xml_command != "" && scheduler_exec( xml_command, false ) ) {
-        set_timeout("window.parent.left_frame.update()",1);
+        set_timeout("parent.left_frame.update()",1);
       }
       
       if( hot_command != "" && scheduler_exec( hot_command, false ) ) {
@@ -972,7 +1003,7 @@ function set_run_time( caller, hot, ret )
           case 'job'            : //break;
           case 'add_schedule'   :
           case 'add_substitute' :
-          case 'schedule'       : update__onclick(false, true, true, 3000, 4000); break;
+          case 'schedule'       : set_timeout("update__onclick(false, true, 1000)",3000); break;
         }
       }
     }
@@ -989,22 +1020,24 @@ function get_run_time( caller, hot )
     try {
         switch( caller ) {
           case 'order'          : if( typeof window.parent.left_frame._order_id != 'string' || window.parent.left_frame._order_id == '' ) return ['&lt;run_time/&gt;',''];
-                                  var response   = parent._scheduler.execute( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="' + what + '"/>', false, false );
+                                  var response   = parent._scheduler.executeSynchron( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="' + what + '"/>', false, false );
                                   run_time       = response.selectSingleNode('//order/run_time');
                                   parent._source = response.selectSingleNode('/spooler/answer/order/source/order');
                                   schedule       = (run_time) ? run_time.getAttribute('schedule') : '';
                                   break;
-          case 'job'            : var response   = parent._scheduler.execute( '<show_job job="' + window.parent.left_frame._job_name + '" what="' + what + '"/>', false, false );
+          case 'job'            : var response   = parent._scheduler.executeSynchron( '<show_job job="' + window.parent.left_frame._job_name + '" what="' + what + '"/>', false, false );
                                   run_time       = response.selectSingleNode('//job/run_time');
                                   parent._source = response.selectSingleNode('/spooler/answer/job/source/job');
                                   schedule       = (run_time) ? run_time.getAttribute('schedule') : '';
                                   break;
           case 'add_schedule'   : return ['&lt;schedule/&gt;',''];
-          case 'add_substitute' : //var run_time = parent.left_frame._response.selectSingleNode( "/spooler/answer/state/schedules/schedule[@path = '"+window.parent.left_frame._schedule+"']" );
-                                  //if( !run_time ) {
-                                    var response = parent._scheduler.execute( '<show_state what="schedules"/>', false, false );
+          case 'add_substitute' : if( parent._scheduler._tree_view_enabled ) {
+                                    var response = parent._scheduler.executeSynchron( '<show_state what="folders" subsystems="schedule folder"/>', false, false );
+                                    run_time     = response.selectSingleNode( "/spooler/answer/state//schedules/schedule[@path = '"+window.parent.left_frame._schedule+"']" );
+                                  } else {
+                                    var response = parent._scheduler.executeSynchron( '<show_state what="schedules" max_task_history="0" max_orders="0/>', false, false );
                                     run_time     = response.selectSingleNode( "/spooler/answer/state/schedules/schedule[@path = '"+window.parent.left_frame._schedule+"']" );
-                                  //}
+                                  }
                                   if( !run_time ) return ['&lt;schedule/&gt;',''];
                                   for(var i=0; i<run_time.attributes.length; i++) {
                                     if( run_time.attributes[i].nodeName.search(/^(substitute|valid_from|valid_to|title)$/) == -1 ) {
@@ -1025,11 +1058,13 @@ function get_run_time( caller, hot )
 		                              	}
 		                              }
 		                              break;
-          case 'schedule'       : //var run_time = parent.left_frame._response.selectSingleNode( "/spooler/answer/state/schedules/schedule[@path = '"+window.parent.left_frame._schedule+"']" );
-                                  //if( !run_time ) {
-                                    var response = parent._scheduler.execute( '<show_state what="schedules"/>', false, false );
+          case 'schedule'       : if( parent._scheduler._tree_view_enabled ) {
+                                    var response = parent._scheduler.executeSynchron( '<show_state what="folders" subsystems="schedule folder"/>', false, false );
+                                    run_time     = response.selectSingleNode( "/spooler/answer/state//schedules/schedule[@path = '"+window.parent.left_frame._schedule+"']" );
+                                  } else {
+                                    var response = parent._scheduler.executeSynchron( '<show_state what="schedules" max_task_history="0" max_orders="0/>', false, false );
                                     run_time     = response.selectSingleNode( "/spooler/answer/state/schedules/schedule[@path = '"+window.parent.left_frame._schedule+"']" );
-                                  //}
+                                  }
                                   if( !run_time ) return ['&lt;schedule/&gt;',''];
                                   for(var i=0; i<run_time.attributes.length; i++) {
                                     if( run_time.attributes[i].nodeName.search(/^(substitute|valid_from|valid_to|title)$/) == -1 ) {
@@ -1061,7 +1096,12 @@ function get_schedules()
     var schedules = new Object();
     schedules[''] = '(none)';
     parent.left_frame._schedules = new Array();
-    var schedule_elems = parent.left_frame._response.selectNodes('/spooler/answer/state/schedules/schedule[not(@substitute)]');
+    var schedule_elems = [];
+    if(parent._scheduler._tree_view_enabled) {
+      schedule_elems = parent.top_frame._state.selectNodes('//schedules/schedule[not(@substitute)]');
+    } else {
+      schedule_elems = parent.left_frame._response.selectNodes('/spooler/answer/state/schedules/schedule[not(@substitute)]');
+    }
     for( var i=0; i < schedule_elems.length; i++ ) {
       path = schedule_elems[i].getAttribute('path');
       schedules[path] = path;
@@ -1174,7 +1214,7 @@ function add_job_chain(job_chain,step)
         xml_command = '<modify_hot_folder folder="'+fields.dir.replace(/\\/g,'/')+'">'+osNewline(xml_command.xml)+'</modify_hot_folder>';
       
         if( scheduler_exec( xml_command, false ) ) {
-          update__onclick(false, true, true, 3000, 4000);
+          set_timeout("update__onclick(false, true, 1000)",3000);
         }
       } else {
         alert( msg );
@@ -1491,7 +1531,7 @@ function queued_task_menu__onclick( task_id )
 {
     var xml_command = '<kill_task job="' + _job_name + '" id="' + task_id + '" immediately="yes"/>';
     if( scheduler_exec( xml_command, false ) ) { 
-        set_timeout("window.parent.left_frame.update()",1);
+        set_timeout("parent.left_frame.update()",1);
     }
 }
 
@@ -1519,7 +1559,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       order_element       = job_chain_element.selectSingleNode('.//order[@id="' + parent.left_frame._order_id + '"]');
     }
     if( !order_element ) {
-      var response        = parent._scheduler.execute( '<show_order order="' + parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '"/>', false );
+      var response        = parent._scheduler.executeSynchron( '<show_order order="' + parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '"/>', false );
       if( response ) order_element = response.selectSingleNode('//order');
     }
     if( order_element ) {
@@ -1747,6 +1787,7 @@ function xml_encode( text )
     return text.toString().replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace( /\"/g, "&quot;" ).replace( /\'/g, "&#039;" );
 }
 
+
 //-----------------------------------------------------------------------------------scheduler_init
 function scheduler_init()
 {
@@ -1765,7 +1806,7 @@ function scheduler_exec( xml, with_modify_datetime, with_add_path, with_all_erro
 {
     try {
       resetError();
-      parent._scheduler.execute( xml, with_modify_datetime, with_add_path, with_all_errors )
+      parent._scheduler.executeSynchron( xml, with_modify_datetime, with_add_path, with_all_errors )
       return true;
     }
     catch( x ) {
@@ -1821,6 +1862,13 @@ String.prototype.bin2hex = function() {
 String.prototype.right = function(num) {
 	
 	  return this.substring(this.length-num); 
+}
+
+
+String.prototype.padLeftShlash = function() {
+	  
+	  if(this.substr(0,1) != '/') return '/'+this;
+	  return this; 
 }
 
 

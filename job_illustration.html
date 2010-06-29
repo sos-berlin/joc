@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -40,6 +40,7 @@
     <script type="text/javascript" src="scheduler_init.js"></script>
     <script type="text/javascript" src="scheduler.js"></script>
     <script type="text/javascript" src="browser_dependencies.js"></script>
+    <script type="text/javascript" src="prototype.js"></script>
     <script type="text/javascript" src="sos_logger.js"></script>
     <script type="text/javascript" src="SOS_JobGraph.js"></script>
     <script type="text/javascript" src="wz_jsgraphics.js"></script>
@@ -47,46 +48,33 @@
 //-------------------------------------------------------------------------------------------------
 
 var _scheduler;
-var _inherited_scheduler = true;
-var error_div;
 var _job_name;
 
 window.onload = function()
 {   
-
     if( window.name == "" ) window.name = "scheduler_job_illustration";
-    if( !_scheduler ) {  
-      if( window.opener && window.opener._scheduler ) {
-        _scheduler = window.opener._scheduler;
-      } else {
-        _scheduler = new Scheduler();
-        _inherited_scheduler = false; 
-      }
-    }       
+    _scheduler = new Scheduler();
+    
     try {
       _job_name  = window.opener.left_frame._job_name;
     } catch(E) {
       _job_name  = "";
     }
-    error_div = document.getElementById('error');
-    illu_show();
+    _scheduler.executeAsynchron( "<show_state what='job_commands'/>", illu_show, false, true, true );
 }
 
 window.onunload = function()
 {
-    if( !_inherited_scheduler && _scheduler ) {
-      _scheduler.close();
-    }
+    if( _scheduler ) _scheduler.close();
 }    
     
 //-----------------------------------------------------------------------------show_job_illustration
     
-function illu_show()
+function illu_show(response)
 {   
     var jobname = _job_name;
 
     try {
-      var response      = _scheduler.execute( "<show_state what='job_commands'/>", false, true, true ); 
       showGraph (response,jobname);
       if( document.getElementById("jobscheduler").innerHTML == "" ) {
         throw new Error( "unknown error - please close this window, reload the calling window and try it again" );
@@ -102,6 +90,7 @@ function illu_show()
 
 function show_error( x )
 {
+    var error_div = document.getElementById('error');
     if( error_div ) {
       error_div.style.display = "block";
       error_div.innerHTML = x.message.replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace( /\"/g, "&quot;" ).replace( /\'/g, "&#039;" ).replace( /\n/g, "<br/>" ).replace( "  ", "\xA0 " );

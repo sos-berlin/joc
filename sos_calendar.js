@@ -187,7 +187,7 @@
         elDiv.id                    = SOS_Calendar.id;
         elDiv.style.position        = SOS_Calendar.defaultStylePosition;
         elDiv.style.width           = SOS_Calendar.defaultStyleWidth;
-        if(navigator.appVersion.match(/\bMSIE\b/)) elDiv.style.height = SOS_Calendar.defaultStyleHeight;
+        if(navigator.appVersion.match(/\bMSIE\b/)) elDiv.style.Height = SOS_Calendar.defaultStyleHeight;
         elDiv.style.top             = SOS_Calendar.defaultStyleTop;
         elDiv.style.left            = SOS_Calendar.defaultStyleLeft;
         elDiv.style.border          = SOS_Calendar.defaultStyleBorderActiv;
@@ -264,25 +264,25 @@
   SOS_Calendar.setLables = function(){
     try{
       switch(SOS_Calendar.language.toLowerCase()){
-        case 'en'     :
-                        SOS_Calendar.labelMonths        = new Array('','January','February','March','April','May','June','July','August','September','October','November','December');
-                        SOS_Calendar.labelDays          = new Array('Su','Mo','Tu','We','Th','Fr','Sa');
-                        SOS_Calendar.labelClock         = 'o\'clock';
-                        SOS_Calendar.labelYearBack      = 'one year back';
-                        SOS_Calendar.labelYearNext      = 'next year';
-                        SOS_Calendar.labelDayCurrent    = 'today';
-                        SOS_Calendar.labelMonthCurrent  = 'show current month';
-                        SOS_Calendar.labelMonthBack     = 'one month back';
-                        SOS_Calendar.labelMonthNext     = 'next month';
-                        SOS_Calendar.labelClose         = 'close';
-                        SOS_Calendar.labelHoliday       = 'holiday';
+        case 'fr'     :
+                        SOS_Calendar.labelMonths        = new Array('','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre');
+                        SOS_Calendar.labelDays          = new Array('Di','Lu','Ma','Me','Je','Ve','Sa');
+                        SOS_Calendar.labelClock         = 'heures';
+                        SOS_Calendar.labelYearBack      = 'année précédente';
+                        SOS_Calendar.labelYearNext      = 'année prochaine';
+                        SOS_Calendar.labelDayCurrent    = 'aujourd\'hui';
+                        SOS_Calendar.labelMonthCurrent  = 'mois actuel';
+                        SOS_Calendar.labelMonthBack     = 'mois précédent';
+                        SOS_Calendar.labelMonthNext     = 'mois prochain';
+                        SOS_Calendar.labelClose         = 'fermer';
+                        SOS_Calendar.labelHoliday       = 'jour férié';
                         
-                        // Kalenderanzeige ab Sonntag
+                        // Kalenderanzeige ab Montag
                         if(SOS_Calendar.autoStartDay){
-                          SOS_Calendar.startDay = 0;
+                          SOS_Calendar.startDay = 1;
                         }
                         break;
-        default       :
+        case 'de'     :
                         SOS_Calendar.labelMonths        = new Array('','Januar','Februar','M&auml;rz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember');
                         SOS_Calendar.labelDays          = new Array('So','Mo','Di','Mi','Do','Fr','Sa');
                         SOS_Calendar.labelClock         = 'Uhr';
@@ -299,6 +299,25 @@
                         if(SOS_Calendar.autoStartDay){
                           SOS_Calendar.startDay = 1;
                         }
+                        break;
+        default       :
+                        SOS_Calendar.labelMonths        = new Array('','January','February','March','April','May','June','July','August','September','October','November','December');
+                        SOS_Calendar.labelDays          = new Array('Su','Mo','Tu','We','Th','Fr','Sa');
+                        SOS_Calendar.labelClock         = 'o\'clock';
+                        SOS_Calendar.labelYearBack      = 'one year back';
+                        SOS_Calendar.labelYearNext      = 'next year';
+                        SOS_Calendar.labelDayCurrent    = 'today';
+                        SOS_Calendar.labelMonthCurrent  = 'show current month';
+                        SOS_Calendar.labelMonthBack     = 'one month back';
+                        SOS_Calendar.labelMonthNext     = 'next month';
+                        SOS_Calendar.labelClose         = 'close';
+                        SOS_Calendar.labelHoliday       = 'holiday';
+                        
+                        // Kalenderanzeige ab Sonntag
+                        if(SOS_Calendar.autoStartDay){
+                          SOS_Calendar.startDay = 0;
+                        }
+                        break;        
       }
     }
     catch(x){
@@ -361,8 +380,12 @@
       SOS_Calendar.getNow();
       window.clearTimeout(SOS_Calendar.timeout);
       SOS_Calendar.timeout = window.setTimeout('SOS_Calendar.paintTime()',SOS_Calendar.refreshInterval);
-          
-      document.getElementById(SOS_Calendar.id+':time').innerHTML = SOS_Calendar.currentHour+':'+SOS_Calendar.currentMinute; 
+      switch( this.language ) {
+        case 'fr' : document.getElementById(SOS_Calendar.id+':time').innerHTML = SOS_Calendar.currentHour+'h'+SOS_Calendar.currentMinute;
+                    break;
+        default   : document.getElementById(SOS_Calendar.id+':time').innerHTML = SOS_Calendar.currentHour+':'+SOS_Calendar.currentMinute; 
+                    break;
+      }
     }
     catch(x){}
   }
@@ -544,7 +567,13 @@
   SOS_Calendar.paint = function() {
     try{
       var trTag         = '<tr align="center" valign="middle">';
-      var titleDate     = (this.language == 'de') ? SOS_Calendar.nowDay+'.&nbsp;'+SOS_Calendar.labelMonths[SOS_Calendar.nowMonth]+'&nbsp;'+SOS_Calendar.nowYear : SOS_Calendar.labelMonths[SOS_Calendar.nowMonth]+'&nbsp;'+SOS_Calendar.nowDay+',&nbsp;'+SOS_Calendar.nowYear;
+      var titleDate     = SOS_Calendar.labelMonths[SOS_Calendar.nowMonth]+'&nbsp;'+SOS_Calendar.nowDay+',&nbsp;'+SOS_Calendar.nowYear;
+      switch( this.language ) {
+        case 'de' : titleDate = SOS_Calendar.nowDay+'.&nbsp;'+SOS_Calendar.labelMonths[SOS_Calendar.nowMonth]+'&nbsp;'+SOS_Calendar.nowYear;
+                    break;
+        case 'fr' : titleDate = SOS_Calendar.nowDay+'&nbsp;'+SOS_Calendar.labelMonths[SOS_Calendar.nowMonth]+'&nbsp;'+SOS_Calendar.nowYear;
+                    break;
+      }
       var styleListbox  = (SOS_Calendar.styleListbox != null && SOS_Calendar.styleListbox.length > 0) ? 'style="'+SOS_Calendar.styleListbox+'"' : ''; 
       var content       = '';
       content += ' <table  style="cursor:move" width="100%" border="0" cellpadding="0" cellspacing="0">\n';
@@ -737,13 +766,12 @@
         }
         else{
           switch(SOS_Calendar.language.toLowerCase()){
-            case 'de'   :
-                          fieldValue = day+'.'+month+'.'+year+time;
-                        
+            case 'de'   : fieldValue = day+'.'+month+'.'+year+time;
                           break;
-            default
-                        :
-                          fieldValue = month+'/'+day+'/'+year+time;
+            case 'fr'   : fieldValue = day+'/'+month+'/'+year+time;
+                          break;
+            default     : fieldValue = month+'/'+day+'/'+year+time;
+                          break;
           }
         }
         try{

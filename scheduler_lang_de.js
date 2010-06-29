@@ -74,7 +74,7 @@ _translations['need process']                              = 'warten auf Prozess
 _translations['tasks']                                     = 'Tasks';
 _translations['orders']                                    = 'Aufträge';
 _translations['$cnt in cluster']                           = '$cnt in Cluster';
-_translations['Start-Time']                                = 'Startzeit';
+_translations['Start Time']                                = 'Startzeit';
 
 //Job Scheduler states
 _translations['starting']                                  = 'startet';
@@ -88,6 +88,7 @@ _translations['waiting_for_activation']                    = 'wartet auf Aktivie
 //Misc.
 _translations['unknown']                                   = 'unbekannt';
 _translations['THIS IS A BACKUP...']                       = 'DAS IST EIN BACKUP...';
+_translations['Backup Job Scheduler:']                     = 'Backup Job Scheduler:';
 _translations['Job Scheduler is waiting for database ...'] = 'Job Scheduler wartet auf Datenbank ...';
 _translations['Waiting for response from Job Scheduler ...'] = 'Auf Antwort des Job Scheduler warten ...';
 _translations['No connection to Job Scheduler']            = 'Keine Verbindung zum Job Scheduler';
@@ -140,8 +141,9 @@ _translations['state in ascending order']                  = 'Status (aufsteigen
 _translations['state in descending order']                 = 'Status (absteigend)';
                                                            
 //Title of images
-_translations['toggle to list view']                       = 'Zur Listen-Ansicht wechseln'; 
-_translations['toggle to tree view']                       = 'Zur Baum-Ansicht wechseln'; 
+_translations['toggle to']                                 = 'Wechseln zur'; 
+_translations['list view']                                 = 'Listen-Ansicht'; 
+_translations['tree view']                                 = 'Baum-Ansicht'; 
 _translations['open all folders']                          = 'Alle Ordner öffnen';   
 _translations['close all folders']                         = 'Alle Ordner schließen';   
 
@@ -423,6 +425,8 @@ _translations['Current operation']                         = 'Aktuelle Operation
 _translations['(default)']                                 = '(default)';
 _translations['max processes']                             = 'max. Prozesse';
 _translations['Remote Scheduler']                          = 'Remote Scheduler';
+
+_translations['No process classes found']                  = 'Es wurden keine Prozess-Klassen gefunden';
                                                            
 
 /******************************************************************************
@@ -465,8 +469,7 @@ _translations['ago']                                       = 'vergangen';
 *                               REMOTE SCHEDULER                              *
 ******************************************************************************/
 //some labels are already translated above
-_translations['Cluster member menu']                       = 'Cluster-Menü';
-                                                           
+
 //Table header of process class list                       
 _translations['IP']                                        = 'IP';
 _translations['Hostname']                                  = 'Host';
@@ -564,6 +567,9 @@ _translations['Used by orders']                            = 'Benutzt von den Au
 _translations['of job chain']                              = 'der Job-Kette';
 _translations['Substituted schedule']                      = 'Ersetzender Schedule';
 
+//State
+_translations['incomplete']                                = 'unvollständig';
+
 //Detail frame                                             
 _translations['SCHEDULE']                                  = 'SCHEDULE';
 _translations['Valid']                                     = 'Gültig';
@@ -594,6 +600,8 @@ _translations['explicit']                                  = 'explizit';
 _translations['Category']                                  = 'Kategorie';
 _translations['Mode']                                      = 'Modus';
 _translations['Description']                               = 'Beschreibung';
+
+_translations['No log categories found']                   = 'Es wurden keine Protokoll-Kategorien gefunden';
 
 
 /******************************************************************************
@@ -653,7 +661,7 @@ _translations['unknown error']                             = 'unbekannter Fehler
 _translations['submit']                                    = 'Speichern';
 _translations['submit and reload']                         = 'Speichern mit Neustart';
 _translations['cancel']                                    = 'Abbrechen';
-_translations['new param']                                 = 'Neuer Param';
+_translations['new param']                                 = 'Neuer Parameter';
 _translations['run time editor']                           = 'Runtime-Editor';
 
 //Plausi
@@ -675,6 +683,8 @@ _translations['inclusive &quot;<i>Hot Folders</i> &quot;'] = 'inklusive &quot;<i
 _translations['Tabs']                                      = 'Tabs';
 _translations['Switch to']                                 = 'Am Anfang den Tab';
 _translations['as the beginning view']                     = 'anzeigen';
+_translations['View Mode']                                 = 'Art der Ansicht';
+_translations['for']                                       = 'für';
 _translations['Selects, Checkboxes and Radios']            = 'Auswahllisten, Checkboxen und Radios';
 _translations['in the <i>jobs</i> tab']                    = 'im <i>Jobs</i>-Tab';
 _translations['in the <i>job chains</i> tab']              = 'im <i>Job-Ketten</i>-Tab';

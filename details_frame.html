@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -52,23 +52,22 @@
 
 <script type="text/javascript" language="javascript"><!--
 
-var _job_element;
 var _job_name;
 var _order_id;
 var _task_id;
-var _process_class_missing;
 var _job_chain_element;
 var _job_chain_name;
-var _schedule_element;
-var _description_popup;
-var _hidden    = true;
-var _show_card = "";
+var _schedule_name;
+var _hidden      = true;
+var _show_card   = "";
 var _removed_obj = "";
+var _no_left_frame_update = true;
 
 function init()
 {
     clear();
     scheduler_init();
+    resetError();
 }
 
 //---------------------------------------------------------------------------------------------hide
@@ -82,14 +81,12 @@ function hide__onclick()
 
 function clear()
 {
-    _job_element       = undefined;
     _job_name          = undefined;
     _task_id           = undefined;
     _job_chain_element = undefined;
     _job_chain_name    = undefined;
     _order_id          = undefined;
-    _schedule_element  = undefined;
-    _process_class_missing = false;
+    _schedule_name     = undefined;
     _removed_obj       = "";
 }
 
@@ -99,320 +96,287 @@ function hide()
 {
     if( !_hidden )
     {
-        _hidden      = true;
-        parent.document.getElementById( "left_and_right_frameset" ).cols = "100%,0%";
-        if( parent.top_frame.document.getElementById('hide_button') ) {
-          parent.top_frame.document.getElementById('hide_button').style.display = "none";
-        }
+        _hidden         = true;
+        parent.document.getElementById( "left_and_right_frameset" ).cols = "12,100%,0%";
+        var hide_button = parent.top_frame.document.getElementById('hide_button');
+        if( hide_button ) hide_button.style.display = "none";
     }
 }
 
-//---------------------------------------------------------------------------------------------show
+//-------------------------------------------------------------------------------------------visible
 
-function show()
-{   
-    var ok = update(true);
-    if( ok )
+function visible()
+{
+    set_corner_position();
+    if( _hidden )
     {
-        if( _hidden )
-        {   
-            parent.document.getElementById( "left_and_right_frameset" ).cols = "50%,50%";
-            parent.top_frame.document.getElementById( "hide_button" ).style.display = "block";
-            _hidden = false;
-        }
-    }
-    else
-        hide();
+        parent.document.getElementById( "left_and_right_frameset" ).cols = "12,50%,50%";
+        parent.top_frame.document.getElementById( "hide_button" ).style.display = "block";
+        _hidden = false;
+     }
 }
 
 //--------------------------------------------------------------------------------show_task_details
 
-function show_task_details( job_element, task_element )
+function show_task_details( task_id )
 {
     init();
-    
-    if( typeof job_element != 'object' ) {
-      var job_elem  = window.parent.left_frame._response.selectSingleNode( './/job[@path="' + xml_encode(job_element) + '"]' );
-      if( !job_elem ) {
-        job_elem = window.parent.left_frame._response.selectSingleNode( './/job[@path="/' + xml_encode(job_element) + '"]' );
-      }
-      job_element = job_elem;
-    }
-    if( typeof task_element != 'object' ) {
-      task_element  = window.parent.left_frame._response.selectSingleNode( './/task[@id="' + xml_encode(task_element) + '"]' );
-    }
-    
-    _job_element = job_element;
-    _job_name    = xml_encode(job_element.getAttribute( "path" ));
-    _task_id     = xml_encode(task_element.getAttribute( "id" ));
-    
-    show();
+    _task_id = xml_encode(task_id);
+    update(true, false);
 }
 
 //---------------------------------------------------------------------------------show_job_details
 
-function show_job_details( job_element )
+function show_job_details( job_name )
 {
     init();
-    
-    if( typeof job_element != 'object' ) {
-      var job_elem  = window.parent.left_frame._response.selectSingleNode( './/job[@path="' + xml_encode(job_element) + '"]' );
-      if( !job_elem ) {
-        job_elem = window.parent.left_frame._response.selectSingleNode( './/job[@path="/' + xml_encode(job_element) + '"]' );
-      }
-      job_element = job_elem;
-    } 
-    
-    _job_element = job_element;  
-    _job_name    = xml_encode(job_element.getAttribute( "path" ));
-    
-    //_show_card = job_element.getAttribute( "order" ) == "yes"? "order_queue" : "task_queue";
+    _job_name  = xml_encode(job_name.padLeftShlash());
     _show_card = "task_history";
-    if( job_element.getAttribute( "process_class" ) && 
-        !window.parent.left_frame._response.selectSingleNode( '//process_classes/process_class[ @path = \''+job_element.getAttribute( "process_class" )+'\' ]') ) {
-      _process_class_missing = true;
-    }
-
-    show();
+    update(true, false);
 }
 
-//---------------------------------------------------------------------------show_job_chain_details
+//------------------------------------------------------------------show_job_chain_details
 
-function show_job_chain_details( job_chain_element )
-{
+function show_job_chain_details( job_chain_name )
+{   
     init();
-    
-    if( typeof job_chain_element != 'object' ) {
-      var job_chain_elem  = window.parent.left_frame._response.selectSingleNode( './/job_chain[@path="' + xml_encode(job_chain_element) + '"]' );
-      if( !job_chain_elem ) {
-        job_chain_elem = window.parent.left_frame._response.selectSingleNode( './/job_chain[@path="/' + xml_encode(job_chain_element) + '"]' );
-      }
-      job_chain_element = job_chain_elem;
-    }
-    
-    _job_chain_element = job_chain_element;
-    
-    show();
+    _job_chain_name = job_chain_name;
+    //if( typeof job_chain_element != 'object' ) {
+    //  _job_chain_element  = parent.left_frame._response.selectSingleNode( './/job_chain[@path="' + xml_encode(job_chain_name.padLeftShlash()) + '"]' );
+    //} else _job_chain_element = job_chain_element;
+    update(true, false);
 }
 
-
-//-------------------------------------------------------------------------------show_order_details
+//----------------------------------------------------------------------show_order_details
 
 function show_order_details( order_id, job_chain_name )
 {
     init();
-    
-    if( typeof order_id == 'object' ) {
-      order_id = order_id.getAttribute( "path" );
-    }
+    if( typeof order_id == 'object' ) order_id = order_id.getAttribute( "path" );
     _order_id       = xml_encode(order_id);
-    _job_chain_name = xml_encode(job_chain_name);
-    
-    show();
+    _job_chain_name = xml_encode(job_chain_name.padLeftShlash());
+    update(true, false);
 }
 
-//----------------------------------------------------------------------------show_schedule_details
+//-------------------------------------------------------------------show_schedule_details
 
-function show_schedule_details( schedule_element )
+function show_schedule_details( schedule_name )
 {
     init();
-    
-    if( typeof schedule_element != 'object' ) {
-      var schedule_elem  = window.parent.left_frame._response.selectSingleNode( './/schedule[@path="' + xml_encode(schedule_element) + '"]' ); 
-      if( !schedule_elem ) {
-        schedule_elem = window.parent.left_frame._response.selectSingleNode( './/job[@path="/' + xml_encode(schedule_element) + '"]' );
-      }
-      schedule_element = schedule_elem;
-    }
-    _schedule_element = schedule_element;
-    
-    show();
+    _schedule_name  = xml_encode(schedule_name.padLeftShlash()); 
+    update(true, false);
+    update_left_frame();
 }
 
-//-------------------------------------------------------------------------------------------update
+//----------------------------------------------------------------------------------update
 
-function update( force )
+function update(force, no_left_frame_update )
 {   
-    if( force == undefined )  force = false;
-    if( ( _hidden || _description_popup ) &&  !force )  return false;
-
-    var ok = false;
+    _no_left_frame_update = (typeof no_left_frame_update == 'boolean' ) ? no_left_frame_update : true;
+    if( typeof force != 'boolean' )  force = false;
+    if( _hidden &&  !force ) return false;
     
     if( _task_id != undefined )
     {
-        var response = parent._scheduler.execute( '<show_task id="' + _task_id + '" what="all"/>' );
-        
-        var task_element = response.selectSingleNode( "/spooler/answer/task" );
-        modify_response( response );
-        document.getElementById( "stylesheet_output" ).innerHTML = task_element? parent._scheduler.xmlTransform( response, true ) : "";
-
-        ok = true;
+        parent._scheduler.executeAsynchron( '<show_task id="' + _task_id + '" what="all"/>',parent.details_frame.update_task_callback );
     }
     else
     if( _job_name != undefined )
     {
         if( _removed_obj == 'job|'+_job_name ) {
-          hide(); return true;
+          hide(); return false;
         }
         var what = "run_time job_params";
         what    += _show_card == "task_queue"  ? " task_queue"   :
                    _show_card == "task_history"? " task_history" :
                    _show_card == "order_queue" ? " job_orders" 
                                                : "";
-        var response      = parent._scheduler.execute( '<show_job job="' + _job_name + '" what="' + what + '" max_task_history="' + parent._scheduler._runtime_settings.max_task_history + '"/>' );
-        
-        var error_element = response.selectSingleNode( "/spooler/answer/ERROR" );
-        if( error_element && error_element.getAttribute( "code" ).search(/SCHEDULER-(108|161)/i) > -1 ) { //wenn remove job im Job-Menue geklickt wird, DetailFrame schliessen
-            hide(); return true; 
-        }
-        _job_element = response.selectSingleNode( "/spooler/answer/job" );
-        _job_element.setAttribute( "my_show_card", _show_card );
-        if( _process_class_missing ) _job_element.setAttribute( "process_class_missing", 1 ); 
-        var run_time = _job_element.selectSingleNode( 'run_time' );
-        if( run_time && run_time.getAttribute( "schedule" ) && 
-           !window.parent.left_frame._response.selectSingleNode( '//schedules/schedule[ @path = \''+run_time.getAttribute( "schedule" )+'\' ]') ) {
-           _job_element.setAttribute( "schedule_missing", 1 );
-        } 
-        modify_response( response );
-        document.getElementById( "stylesheet_output" ).innerHTML = _job_element? parent._scheduler.xmlTransform( response, true ) : "";
-        ok = true;
-    }
-    else
-    if( _job_chain_element != undefined )
-    {   
-        var response          = window.parent.left_frame._response;
-        var job_chain_path    = xml_encode(_job_chain_element.getAttribute( "path" ));
-        var what              = "";
-        var max_order_history = "";
-        
-        if( _removed_obj == 'job_chain|'+job_chain_path ) {
-          hide(); return true;
-        }
-        
-        if( _job_chain_element.selectNodes( './/job_chain_node/order_queue' ).length == 0 ) what = "job_chain_orders job_chain_jobs order_source_files blacklist";
-        if( parent._scheduler._checkbox_states[ 'show_order_history_checkbox' ] ) what = "job_chain_orders job_chain_jobs order_history order_source_files blacklist";
-        if( _job_chain_element.selectNodes( './/job_chain_node.job_chain' ).length > 0 ) what = "";
-         
-        if( what ) 
-        {
-          if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="' + parent._scheduler._runtime_settings.max_order_history + '"';
-          response = parent._scheduler.execute( '<show_job_chain job_chain="' + job_chain_path + '"' + max_order_history + ' max_orders="' + parent._scheduler._runtime_settings.max_orders + '" what="' + what + '" />' );
-          
-          var error_element = response.selectSingleNode( "/spooler/answer/ERROR" );
-          if( error_element && error_element.getAttribute( "code" ) == "SCHEDULER-161" ) { //wenn remove job_chain im Job_Chain-Menue geklickt wird, DetailFrame schliessen
-            hide(); return true; 
-          }
-          
-          //modify_response( response );
-        } else {
-          
-          var state_element        = response.selectSingleNode( '/spooler/answer/state' );
-          state_element.setAttribute( 'detail', 'job_chain' );
-          state_element.setAttribute( 'detail_path', job_chain_path );
-        } 
-         
-        _job_chain_element              = response.selectSingleNode( '//job_chain[ @path="' + job_chain_path + '" ]' );
-         
-        var order_history_element       = _job_chain_element.selectSingleNode( './/order_history' );
-        if( !order_history_element ) {
-          order_history_element         = _job_chain_element.ownerDocument.createElement( "order_history" );
-          _job_chain_element.appendChild( order_history_element );
-        }
-        
-        //if _job_chain_element job chain of job chains then build order_history by order histories of its nodes
-        if( parent._scheduler._checkbox_states[ 'show_order_history_checkbox' ] ) {
-          var job_chain_node_job_chains = _job_chain_element.selectNodes( 'job_chain_node.job_chain' );
-          var job_chain_node_job_chain  = null;
-          var order_element             = null;
-          if( job_chain_node_job_chains.length > 0 ) {
-            parent.left_frame.restore_checkbox_state( response.selectSingleNode( "spooler" ), "show_order_history_checkbox" );
-            order_history_element.setAttribute( 'big_chain', 'yes' );
-            for( var i=0; i < job_chain_node_job_chains.length; i++ ) {
-              job_chain_node_job_chain  = parent._scheduler.execute( '<show_job_chain job_chain="' + job_chain_node_job_chains[i].getAttribute('job_chain') + '"' + max_order_history + ' max_orders="0" what="order_history"/>' );
-              job_chain_node_job_chain  = job_chain_node_job_chain.selectNodes( '//order_history/order' );
-              if( job_chain_node_job_chain ) {
-                for( var j=0; j < job_chain_node_job_chain.length; j++ ) {
-                  order_element         = _job_chain_element.ownerDocument.createElement( "order" );
-                  for( var k=0; k < job_chain_node_job_chain[j].attributes.length; k++ ) {
-                    order_element.setAttribute(job_chain_node_job_chain[j].attributes[k].nodeName, job_chain_node_job_chain[j].attributes[k].nodeValue);
-                  }
-                  order_history_element.appendChild( order_element );
-                }
-              }
-            }
-          }
-        }
-        //alert(_job_chain_element.xml);
-        modify_response( response );
-        document.getElementById( "stylesheet_output" ).innerHTML = _job_chain_element? parent._scheduler.xmlTransform( response, true ) : "";
-
-        ok = true;
+        parent._scheduler.executeAsynchron( '<show_job job="' + _job_name + '" what="' + what + '" max_task_history="' + parent._scheduler._runtime_settings.max_task_history + '"/>', parent.details_frame.update_job_callback );
     }
     else
     if( _order_id != undefined && _job_chain_name != undefined )
     {                                                                                                                                    
-       if( _removed_obj == 'job_chain|'+_job_chain_name+'|order|'+_order_id || _removed_obj == 'job_chain|'+_job_chain_name ) {
-         hide(); return true;
-       }
-       var response            = parent._scheduler.execute( '<show_order order="' + _order_id + '" job_chain="' + _job_chain_name + '" what="run_time"/>' );
-       var error_element       = response.selectSingleNode( "/spooler/answer/ERROR" );
-       if( error_element && error_element.getAttribute( "code" ) == "SCHEDULER-162" ) { //wenn remove order im Order-Menue geklickt wird, DetailFrame schliessen
-         hide(); return true; 
-       }
-       if( error_element && error_element.getAttribute( "code" ) == "SCHEDULER-161" ) { //wenn job_chain nicht existiert
-         var answer_element    = response.selectSingleNode('/spooler/answer');
-         order_element         = answer_element.ownerDocument.createElement( "order" );
-         order_element.setAttribute('id', _order_id);
-         order_element.setAttribute('job_chain', _job_chain_name);
-         answer_element.appendChild( order_element ); 
-       }
-       
-       var order_element = response.selectSingleNode( "/spooler/answer/order" );
-       var run_time = order_element.selectSingleNode( 'run_time' );
-       if( run_time && run_time.getAttribute( "schedule" ) && 
-           !parent.left_frame._response.selectSingleNode( '//schedules/schedule[ @path = \''+run_time.getAttribute( "schedule" )+'\' ]') ) {
-           order_element.setAttribute( "schedule_missing", 1 );
-       } 
-       modify_response( response ); 
-       document.getElementById( "stylesheet_output" ).innerHTML = order_element? parent._scheduler.xmlTransform( response, true ) : "";
-       ok = true;
+        if( _removed_obj == 'job_chain|'+_job_chain_name+'|order|'+_order_id || _removed_obj == 'job_chain|'+_job_chain_name ) {
+          hide(); return false;
+        }
+        parent._scheduler.executeAsynchron( '<show_order order="' + _order_id + '" job_chain="' + _job_chain_name + '" what="run_time"/>',parent.details_frame.update_order_callback );
     }
     else
-    if( _schedule_element != undefined )
-    {  
-       if( _removed_obj == 'schedule|'+xml_encode(_schedule_element.getAttribute( 'path' )) ) {
-         hide(); return true;
-       }
-       var response          = window.parent.left_frame._response;
-       var state_element     = response.selectSingleNode( '/spooler/answer/state' );
-       state_element.setAttribute( 'detail', 'schedule' );
-       state_element.setAttribute( 'detail_path', _schedule_element.getAttribute( 'path' ) );
-       modify_response( response );
-       document.getElementById( "stylesheet_output" ).innerHTML = _schedule_element? parent._scheduler.xmlTransform( response, true ) : "";
-       ok = true;
-    }
-    
-    
-    if( parent.ie > 0 && parent.ie < 7 ) {
-      var imgs = document.getElementsByTagName("img");
-      for( var i=0; i < imgs.length; i++ ) {
-        if( imgs[i].src.search(/corner_t(l|r).gif$/) > -1 && imgs[i].id != "corner_tr" ) {
-          imgs[i].style.marginTop   = "1px";
-          imgs[i].style.marginRight = (1-(document.body.clientWidth % 2)) + "px";
+    if( _job_chain_name != undefined )
+    {   
+        if( _removed_obj == 'job_chain|'+_job_chain_name ) {
+          hide(); return false;
         }
-      }
+        
+        var max_order_history = ( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) ? ' max_order_history="' + parent._scheduler._runtime_settings.max_order_history + '"' : '';
+        var what = "job_chain_orders job_chain_jobs order_source_files blacklist";
+        if( parent._scheduler._checkbox_states[ 'show_order_history_checkbox' ] ) what += " order_history";
+        var show_job_chain_query = '<show_job_chain job_chain="[job_chain_name]"' + max_order_history + ' max_orders="' + parent._scheduler._runtime_settings.max_orders + '" what="' + what + '" />';
+        
+        parent._scheduler.executeAsynchron( show_job_chain_query.replace(/\[job_chain_name\]/,_job_chain_name), parent.details_frame.update_job_chain_callback, true, true, false, show_job_chain_query );
     }
-    
-    return ok;
+    else
+    if( _schedule_name != undefined )
+    {  
+        if( _removed_obj == 'schedule|'+_schedule_name ) {
+          hide(); return false;
+        }
+        if( parent._scheduler._tree_view_enabled ) {
+          var state_element     = parent.top_frame._state;
+          state_element.setAttribute( 'detail', 'schedule' );
+          state_element.setAttribute( 'detail_path', _schedule_name );
+          var response          = parent._scheduler.loadXML('<spooler><answer>'+state_element.xml+'</answer></spooler>');
+        } else {
+          var response          = parent.left_frame._response;
+          var state_element     = response.selectSingleNode( '/spooler/answer/state' );
+          state_element.setAttribute( 'detail', 'schedule' );
+          state_element.setAttribute( 'detail_path', _schedule_name );
+        }
+        modify_response( response ); 
+        document.getElementById( "stylesheet_output" ).innerHTML = _schedule_name? parent._scheduler.xmlTransform( response ) : "";
+        visible();
+    }
+    return true;
 }
 
 
+//--------------------------------------------------------------------------update_left_frame
+function update_left_frame() 
+{   
+    if( _no_left_frame_update ) return true;
+    _no_left_frame_update = true;
+    if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && parent.left_frame._timer > 30)) {
+       set_timeout('parent.left_frame.update(false);',1);
+    }
+}
+
+//--------------------------------------------------------------------------update_task_callback
+
+function update_task_callback( response )
+{
+    var task_element = response.selectSingleNode( "/spooler/answer/task" );
+    modify_response( response );
+    document.getElementById( "stylesheet_output" ).innerHTML = task_element? parent._scheduler.xmlTransform( response ) : "";
+    visible();
+    update_left_frame();
+}
+
+//---------------------------------------------------------------------------update_job_callback
+
+function update_job_callback( response )
+{
+    var error_element = response.selectSingleNode( "/spooler/answer/ERROR" );
+    if( error_element && error_element.getAttribute( "code" ).search(/SCHEDULER-(108|161)/i) > -1 ) { //wenn remove job im Job-Menue geklickt wird, DetailFrame schliessen
+      hide(); 
+    } else {
+      var job_element = response.selectSingleNode( "/spooler/answer/job" );
+      job_element.setAttribute( "my_show_card", _show_card );
+      modify_response( response );
+      document.getElementById( "stylesheet_output" ).innerHTML = job_element? parent._scheduler.xmlTransform( response ) : "";
+      visible();
+    }
+    update_left_frame();
+}
+
+//-------------------------------------------------------------------------update_order_callback
+
+function update_order_callback( response )
+{
+    var error_element = response.selectSingleNode( "/spooler/answer/ERROR" );
+    if( error_element && error_element.getAttribute( "code" ) == "SCHEDULER-162" ) { //wenn remove order im Order-Menue geklickt wird, DetailFrame schliessen
+      hide(); 
+    } else {
+      var order_element = null;
+      if( error_element && error_element.getAttribute( "code" ) == "SCHEDULER-161" ) { //wenn job_chain nicht existiert
+        var answer_element    = response.selectSingleNode('/spooler/answer');
+        order_element         = answer_element.ownerDocument.createElement( "order" );
+        order_element.setAttribute('id', _order_id);
+        order_element.setAttribute('job_chain', _job_chain_name);
+        answer_element.appendChild( order_element ); 
+      }
+      order_element = response.selectSingleNode( "/spooler/answer/order" );
+      modify_response( response );
+      document.getElementById( "stylesheet_output" ).innerHTML = order_element? parent._scheduler.xmlTransform( response ) : "";
+      visible();
+    }
+    update_left_frame();
+}
+
+//---------------------------------------------------------------------update_job_chain_callback
+
+function update_job_chain_callback( response, show_job_chain_query )
+{   
+    var error_element = response.selectSingleNode( "/spooler/answer/ERROR" );
+    if( error_element && error_element.getAttribute( "code" ) == "SCHEDULER-161" ) { //wenn remove job_chain im Job_Chain-Menue geklickt wird, DetailFrame schliessen
+      hide(); ok = false; 
+    } else {
+      _job_chain_element = response.selectSingleNode("//job_chain[@path='"+xml_encode(_job_chain_name.padLeftShlash())+"']");      
+      response = normalize_order_history( response, show_job_chain_query );
+      modify_response( response );
+      document.getElementById( "stylesheet_output" ).innerHTML = _job_chain_element? parent._scheduler.xmlTransform( response ) : "";
+      visible();
+    }
+    update_left_frame();
+}
+
+//-----------------------------------------------------------------------normalize_order_history
+
+function normalize_order_history( response, show_job_chain_query )
+{
+    var order_history_element       = _job_chain_element.selectSingleNode( '//order_history' );
+    if( !order_history_element ) {
+      order_history_element         = _job_chain_element.ownerDocument.createElement( "order_history" );
+      _job_chain_element.appendChild( order_history_element );
+    }
+    //if nested job chain
+    var job_chain_node_job_chains = _job_chain_element.selectNodes( 'job_chain_node.job_chain' );
+    if( job_chain_node_job_chains.length > 0 ) {
+      var job_chain_node_job_chain  = [];  
+      var job_chain_node_history    = null;
+      var order_element             = null;
+      var orders = order_history_element.childNodes;
+      while( order_history_element.childNodes.length > 0 ) {
+        order_history_element.removeChild(order_history_element.childNodes[0]);
+      }
+      order_history_element.setAttribute( 'big_chain', 'yes' );
+      for( var i=0; i < job_chain_node_job_chains.length; i++ ) {
+        if( _job_chain_element.selectSingleNode( "file_based/requisites/requisite[@path = '"+job_chain_node_job_chains[i].getAttribute('job_chain').toLowerCase()+"' and @is_missing='yes']" ) ) {
+          job_chain_node_job_chain.push( null );
+          continue;
+        }
+        job_chain_node_job_chain.push( parent._scheduler.executeSynchron( show_job_chain_query.replace(/\[job_chain_name\]/,job_chain_node_job_chains[i].getAttribute('job_chain')) ) );
+        job_chain_node_job_chain[i]  = job_chain_node_job_chain[i].selectSingleNode( '/spooler/answer/job_chain' );
+        job_chain_node_history       = job_chain_node_job_chain[i].selectNodes( 'order_history/order' );
+        //build order_history by order histories of its nodes
+        if( job_chain_node_history ) {
+          for( var j=0; j < job_chain_node_history.length; j++ ) {
+            order_element            = _job_chain_element.ownerDocument.createElement( "order" );
+            for( var k=0; k < job_chain_node_history[j].attributes.length; k++ ) {
+              order_element.setAttribute(job_chain_node_history[j].attributes[k].nodeName, job_chain_node_history[j].attributes[k].nodeValue);
+            }
+            order_history_element.appendChild( order_element );
+            job_chain_node_history[j].parentNode.removeChild(job_chain_node_history[j]);
+          }
+        }
+      }
+      var dom_xml = '<spooler><answer><state state="'+parent.top_frame._state.getAttribute('state')+'" detail="job_chain" detail_path="'+_job_chain_element.getAttribute('path')+'"><job_chains>'; 
+      dom_xml    += _job_chain_element.xml;
+      for( var i=0; i < job_chain_node_job_chain.length; i++ ) {
+        if( job_chain_node_job_chain[i] ) dom_xml  += job_chain_node_job_chain[i].xml;
+      }
+      dom_xml    += '</job_chains></state></answer></spooler>';
+      response    = parent._scheduler.loadXML(dom_xml);
+      dom_xml     = '';
+    }
+    
+    return response;
+}
+
+        
 //----------------------------------------------------------------------------------modify_response
 function modify_response( response )
 {
     parent._scheduler.logger(3,'START MODIFY RESPONSE '+self.name,'modify_response');
-    // Antwort manipulieren: <tasks> mit <task> auffuellen, bis <job tasks=".."> erreicht ist.
-    // Werte der Checkboxen show_tasks_checkbox und show_my_orders ins XML-Dokument uebernehmen (fuer XSL)
     
     var spooler_element = response.selectSingleNode( "spooler" );
     if(spooler_element) {
@@ -427,22 +391,22 @@ function modify_response( response )
     parent._scheduler.logger(9,'MODIFIED RESPONSE '+self.name+':\n' + response.xml); 
 }
 
-
-//----------------------------------------------------------------------------------------show_card
+//---------------------------------------------------------------------------------------show_card
 function show_card( what )
 {
     _show_card = what;
     update();
 }
 
-//------------------------------------------------------------set_corner (onresize-Event only for IE<7)
+//--------------------------------------------------------set_corner (onresize-Event only for IE<7)
 function set_corner_position()
 {
     if( parent.ie > 0 && parent.ie < 7 ) {
       var imgs = document.getElementsByTagName("img");
       for( var i=0; i < imgs.length; i++ ) {
-        if( imgs[i].src.search(/corner_tr.gif$/) > -1 && imgs[i].id != "corner_tr" ) {
-          imgs[i].style.marginRight = (1-(document.body.clientWidth % 2)) + "px"; 
+        if( imgs[i].src.search(/corner_t(l|r).gif$/) > -1 && imgs[i].id != "corner_tr" ) {
+          imgs[i].style.marginTop   = "1px";
+          imgs[i].style.marginRight = (1-(document.body.clientWidth % 2)) + "px";
         }
       }
     }
@@ -451,12 +415,16 @@ function set_corner_position()
 //-------------------------------------------------------------show_order_history_checkbox__onclick
 function show_order_history_checkbox__onclick()
 {   
-    parent._scheduler._checkbox_states.show_order_history_checkbox = window.parent.details_frame.document.getElementById( "show_order_history_checkbox" ).checked;
-    window.parent.details_frame.update(true);
-    //set_timeout("window.parent.left_frame.update(false)",1);
+    parent._scheduler._checkbox_states.show_order_history_checkbox = parent.details_frame.document.getElementById( "show_order_history_checkbox" ).checked;
+    parent.details_frame.update(true);
 }
 
+//------------------------------------------------------------------------------------------onerror
 
+window.onerror = function( msg, url, line ) {
+  showError( msg, url, line ); 
+  return true;
+}
 
 //-------------------------------------------------------------------------------------------------
 --></script>
