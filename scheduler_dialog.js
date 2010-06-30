@@ -415,7 +415,7 @@ function scheduler_settings__onclick(ret)
       for( var entry in fields ) {
         if( entry.search(/new_params/) == -1 ) parent.control_frame.set_cookie( entry, fields[entry] );
         if( entry.search(/^select_states_/) > -1 ) parent._scheduler._select_states[entry.replace(/^select_states_/,'')] = fields[entry];
-        //if( entry.search(/^view_/) > -1 ) parent._scheduler._view[entry.replace(/^view_/,'')] = fields[entry];
+        if( entry.search(/^view_/) > -1 ) parent._scheduler._view[entry.replace(/^view_/,'')] = fields[entry];
       }
       for( var entry in parent._scheduler._runtime_settings ) {
         if( typeof fields[entry] == "boolean" ) {
