@@ -412,7 +412,6 @@ function scheduler_settings__onclick(ret)
     }
     if( plausi.length == 0 ) {
       Input_dialog.close();
-      alert($H(fields).inspect());
       for( var entry in fields ) {
         if( entry.search(/new_params/) == -1 ) parent.control_frame.set_cookie( entry, fields[entry] );
         if( entry.search(/^select_states_/) > -1 ) parent._scheduler._select_states[entry.replace(/^select_states_/,'')] = fields[entry];
