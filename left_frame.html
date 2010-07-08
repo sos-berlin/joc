@@ -155,7 +155,7 @@ function update(with_details)
 function update_jobs_frame()
 {   
     if( parent._scheduler._show_card != _card ) 
-    {
+    { 
       $( _card+"_output" ).hide();
       $( parent._scheduler._show_card+"_output" ).show();
       _card = parent._scheduler._show_card;
@@ -243,7 +243,7 @@ function update_jobs_frame()
         var open_folders1 = [];
         var open_folders2 = [];
         var open_folders3 = [];
-        $( _card+'_output' ).down('tbody',2).select('ul[sos_mode="open"]').each( function(item) {
+        $( _card+'_tree_output' ).down('tbody',1).select('ul[sos_mode="open"]').each( function(item) {
           open_folders1.push(item.id.substr(id_start));
         });
         var open_folder_ids = '|'+open_folders1.join('|')+'|';
@@ -371,12 +371,12 @@ function update_callback( response )
     modify_response( _response );
     parent._scheduler.logger(3,'WRITE HTML','scheduler_tree_html');
       
-    var output_table = $( _card+'_output' );
-    var tbodylist    = output_table.down('tbody',1);
-    var tbodytree    = output_table.down('tbody',2);
-    var colspan      = tbodytree.down('td').getAttribute('colspan');
-    output_table.down('thead').update(set_table_header(colspan));
+    var output_tree = $( _card+'_tree_output' );
+    var output_list = $( _card+'_list_output' );
     if( parent._scheduler._view[_card] == 'tree' ) {
+      var tbodytree    = output_tree.down('tbody',1);
+      output_tree.down('thead').update(set_table_header());
+      
       var dom = parent._scheduler.xmlTransform( _response, true, false );
       var children = dom.documentElement.childNodes;
       for(var i=0; i < children.length; i++) {
@@ -389,12 +389,12 @@ function update_callback( response )
         if( elem ) elem.innerHTML = item.innerHTML;
       });
       
-      tbodylist.hide();
-      tbodytree.show();
+      output_list.hide();
+      output_tree.show();
     } else {
-      tbodytree.hide();
-      tbodylist.replace(parent._scheduler.xmlTransform( _response ));
-      tbodylist.show();      
+      output_tree.hide();
+      output_list.innerHTML = parent._scheduler.xmlTransform( _response );
+      output_list.show();      
     }
     parent._scheduler.logger(3,'ELAPSED TIME FOR WRITE HTML','scheduler_tree_html');
     parent._scheduler.logger(1,'ELAPSED TIME FOR UPDATE ' + self.name, 'scheduler_left_frame');
@@ -836,141 +836,14 @@ function apply_big_chains_select( node )
 }
 
 
-function set_table_header(colspan) 
+function set_table_header() 
 {  
   var s  = '';
-  var s1 = '<tr><td colspan="'+colspan+'" class="before_head_space">&#160;</td></tr>';
-  if( parent._scheduler._view[_card] == 'list' ) {
-    switch( _card ) {
-      case 'jobs'              : s += s1+'<tr>';
-                                 s += '  <td class="head1">'+parent.getTranslation('Job')+' </td>';
-                                 s += '  <td class="head"> '+parent.getTranslation('Time')+' </td>';
-                                 s += '  <td class="head"> '+parent.getTranslation('Steps')+' </td>';
-                                 s += '  <td class="head" style="white-space:nowrap">'+parent.getTranslation('Next start');
-                                 if( parent._scheduler._select_states.show_jobs_select != 'standalone' ) {
-                                   s += '&#160;/&#160;'+parent.getTranslation('Orders');
-                                 }
-                                 s += '</td>';
-                                 s += '  <td class="head1">&#160;</td>';
-                                 s += '</tr>';
-                                 break;
-      case 'job_chains'        : s += s1+'<tr>';
-                                 if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox || parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox ) {
-                                   s += '  <td class="head1">'+parent.getTranslation('Order state')+'</td>';
-                                   s += '  <td class="head">'+parent.getTranslation('Job')+'</td>';
-                                   s += '  <td class="head"><span style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'/</span> <span style="white-space:nowrap;">'+parent.getTranslation('Job state')+'</span></td>';
-                                 } else { 
-                                   s += '  <td class="head1" style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'</td>';
-                                   s += '  <td class="head1">&#160;</td>';
-                                   s += '  <td class="head">'+parent.getTranslation('State')+'</td>';
-                                 }    
-                                 s += '  <td class="head" colspan="2">'+parent.getTranslation('Orders')+'</td>';
-                                 s += '</tr>';
-                                 break;
-      case 'orders'            : s += s1+'<tr>';
-                                 s += '  <td class="head1" style="padding-left:8px;">'+parent.getTranslation('State')+' </td>';
-                                 s += '  <td class="head"><span style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'/</span> '+parent.getTranslation('Job')+'</td>';
-                                 s += '  <td class="head"><span style="white-space:nowrap;color:#009933;">'+parent.getTranslation('Next start')+'/</span> <span style="white-space:nowrap;color:darkred;">'+parent.getTranslation('Setback')+'</span></td>';
-                                 s += '  <td class="head" colspan="2" align="left"><span style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'/</span> <span style="white-space:nowrap;">'+parent.getTranslation('Job state')+'</span></td>';
-                                 s += '</tr>';
-                                 break;
-      case 'schedules'         : s += s1;
-                                 if( _response.selectNodes('//schedule').length > 0 ) {
-                                   s += '<tr>';
-                                   s += '  <td class="head1" style="white-space:nowrap;">'+parent.getTranslation('Schedule')+'</td>';
-                                   s += '  <td class="head1">&#160;</td>';
-                                   if( _response.selectNodes('//schedule[@substitute]').length > 0 ) {
-                                     s += '  <td class="head" style="white-space:nowrap;">'+parent.getTranslation('Valid from')+'</td>';
-                                     s += '  <td class="head" style="white-space:nowrap;">'+parent.getTranslation('Valid to')+'</td>';
-                                   } else {
-                                     s += '  <td class="head1">&#160;</td>';
-                                     s += '  <td class="head1">&#160;</td>';
-                                   }
-                                   s += '  <td class="head1">&#160;</td>';
-                                   s += '</tr>';
-                                 }
-                                 break;
-      case 'locks'             : break;
-      case 'last_activities'   : s += s1+'<tr>';
-                                 switch( parent._scheduler._radio_states.last_activities_radios ) {
-                                   case 'all'   : s += '  <td class="head1"><span style="white-space:nowrap;">'+parent.getTranslation('Order ID')+'/</span> <span style="color:#808080;white-space:nowrap;">'+parent.getTranslation('Job name')+'</span></td>';
-                                                  s += '  <td class="head">'+parent.getTranslation('Started')+'</td>';
-                                                  s += '  <td class="head">'+parent.getTranslation('Ended')+'</td>';
-                                                  s += '  <td class="head"><span style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'/</span> <span style="color:#009933;">'+parent.getTranslation('Cause')+'</span></td>';
-                                                  s += '  <td class="head" colspan="2"><span style="white-space:nowrap;">'+parent.getTranslation('Order state')+'/</span> <span style="color:darkred;white-space:nowrap;">'+parent.getTranslation('Exitcode')+'</span></td>';
-                                                  break;
-                                   case 'orders': s += '  <td class="head1" style="white-space:nowrap;">'+parent.getTranslation('Order ID')+'</td>';
-                                                  s += '  <td class="head">'+parent.getTranslation('Started')+'</td>';
-                                                  s += '  <td class="head">'+parent.getTranslation('Ended')+'</td>';
-                                                  s += '  <td class="head" style="white-space:nowrap;">'+parent.getTranslation('Job chain')+'</td>';
-                                                  s += '  <td class="head" colspan="2" style="white-space:nowrap;">'+parent.getTranslation('Order state')+'</td>';
-                                                  break;
-                                   case 'tasks' : s += '  <td class="head1" style="white-space:nowrap;">'+parent.getTranslation('Job name')+'</td>';
-                                                  s += '  <td class="head">'+parent.getTranslation('Started')+'</td>';
-                                                  s += '  <td class="head">'+parent.getTranslation('Ended')+'</td>';
-                                                  s += '  <td class="head" style="white-space:nowrap;">'+parent.getTranslation('Cause')+'</td>';
-                                                  s += '  <td class="head" colspan="2" style="white-space:nowrap;">'+parent.getTranslation('Exitcode')+'</td>';
-                                                  break;
-                                 }
-                                 s += '</tr>';
-                                 break;
-      case 'process_classes'   : s += s1+'<tr>';
-                                 s += '  <td class="head1" style="padding-left: 2ex">'+parent.getTranslation('Pid')+' </td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Task')+'</td>';
-                                 s += '  <td class="head1" align="right" style="padding-right: 4px">'+parent.getTranslation('-id')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Running since')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Operations')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Callbacks')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Current operation')+'</td>';
-                                 s += '</tr>';
-                                 break;
-      case 'remote_schedulers' : var remote_schedulers = _response.selectSingleNode('//remote_schedulers');
-                                 s += s1+'<tr><td colspan="7">'+remote_schedulers.getAttribute('count')+'&#160;'+parent.getTranslation('Scheduler(s)');
-                                 s += '&#160;('+remote_schedulers.getAttribute('connected')+'&#160;'+parent.getTranslation('connected')+')</td></tr>';
-                                 s += '<tr>';
-                                 s += '  <td class="head1" style="padding-left:2ex">'+parent.getTranslation('IP')+' </td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Hostname')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Port')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Id')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Connected')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Disconnected')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Version')+'</td>';
-                                 s += '</tr>';
-                                 break;
-      case 'cluster'           : var cluster = _response.selectSingleNode('//cluster');
-                                 s += '<tr><td colspan="8">';
-                                 s += '<span style="margin-right:1em;font-weight:bold;">'+cluster.selectNodes("cluster_member[@active='yes']").length+' '+parent.getTranslation('active Scheduler(s)')+'. </span>';
-                                 s += '<span style="margin-right:1em;font-weight:bold;">'+cluster.selectNodes("cluster_member[@exclusive='yes']").length+' '+parent.getTranslation('exclusive Scheduler(s)')+'. </span>';
-                                 if( cluster.getAttribute('active') == 'yes' ) {
-                                   s += '<span style="margin-right:1em;font-weight:bold; color:#009933">'+parent.getTranslation('This Scheduler is active');
-                                   if( cluster.getAttribute('exclusive') == 'yes' ) {  
-                                     s += ' '+parent.getTranslation('and exclusive');
-                                   }
-                                   s += '. </span>';
-                                 }
-                                 if( cluster.getAttribute('active') != 'yes' ) {
-                                   s += '<span style="margin-right: 1em; color:#800040">'+parent.getTranslation('Only active Job Schedulers are allowed to start operation.')+'</span>';
-                                 }
-                                 s += '</td></tr>';
-                                 s += '<tr><td style="line-height:5pt;height:5pt;">&#160;</td></tr>';
-                                 s += '<tr>';
-                                 s += '  <td class="head1">Scheduler</td>';
-                                 s += '  <td class="head" style="width:20ex">'+parent.getTranslation('Started')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('State')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Pid')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Last heart beat')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Detected heart beats')+'</td>';
-                                 s += '  <td class="head">'+parent.getTranslation('Backup precedence')+'</td>';
-                                 s += '  <td class="head1">&#160;</td>';
-                                 s += '</tr>';
-                                 break;
-    }
-  }
   if( parent._scheduler._view[_card] == 'tree' ) {
     switch( _card ) {
       case 'job_chains'        : if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox || parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox ) {
                                    s += '<tr>';
-                                   s += '  <td class="head1" colspan="4" style="width:10000px;">&#160;</td>';
+                                   s += '  <td class="head1" style="width:10000px;">&#160;</td>';
                                    s += '  <td class="head" style="white-space:nowrap;width:1px;">'+parent.getTranslation('Orders')+'</td>';
                                    s += '</tr>';
                                  }
@@ -982,25 +855,30 @@ function set_table_header(colspan)
 
 
 //--------------------------------------------------------------------------------------write_table
-function write_table( colspan, card )
+function write_tables( colspan, card )
 {
+  document.writeln( '    <span style="display:'+(card == _card ? '' : 'none')+'" id="'+card+'_output">' );
+  document.writeln( '      <span style="display:none" id="'+card+'_list_output"></span>' );
+    
+  document.writeln( '      <table id="'+card+'_tree_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">' );
   document.writeln( '        <thead></thead>' );
   document.writeln( '        <tbody>' );
   for( var i=1; i<=7; i++ ) document.writeln( '          <tr><td colspan="'+colspan+'" class="after_head_space'+i+'"></td></tr>' );
   document.writeln( '        </tbody>' );
-  document.writeln( '        <tbody style="display:none;overflow:hidden;width:100%"></tbody>' );
-  document.writeln( '        <tbody style="display:none;overflow:hidden;width:100%"><tr><td colspan="'+colspan+'"><ul id="'+card+'/" class="tree" sos_mode="open"></ul></td></tr></tbody>' );
+  document.writeln( '        <tbody><tr><td colspan="'+colspan+'"><div><ul id="'+card+'/" class="tree" sos_mode="open"></ul></div></td></tr></tbody>' );
   document.writeln( '        <tfoot>' );
   for( var i=7; i>=1; i-- ) document.writeln( '          <tr><td colspan="'+colspan+'" class="after_head_space'+i+'"></td></tr>' );
   document.writeln( '        </tfoot>' );
+  document.writeln( '      </table>' );
   
+  document.writeln( '    </span>' );  
 }
 
 
 //--------------------------------------------------------------------------------------close_all_folders
 function close_all_folders()
 {   
-    $( _card+'_output' ).down('tbody',2).select('ul[sos_level="1"]').each( function(item) {
+    $( _card+'_tree_output' ).down('tbody',1).select('ul[sos_level="1"]').each( function(item) {
         if( item.getAttribute('sos_mode') == 'open' ) {
           parent._scheduler.treeDisplay( $(item.parentNode) );
         }
@@ -1025,114 +903,17 @@ window.onerror  = function( msg, url, line ) {
   <table cellspacing="0" cellpadding="0" width="100%"><tr><td style="padding:0px">
     <div class="bottom">
       
-      <table id="jobs_output" style="display:;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <colgroup>
-          <col width="40%"/>
-          <col width="110"/>  
-          <col width="10"  align="right"/>
-          <col width="40%"/>
-          <col width="80"  align="right"/>
-        </colgroup>
-        <script type="text/javascript" language="javascript">
-          write_table(5, 'jobs');
-        </script>
-      </table>
-      
-      <table id="job_chains_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <colgroup>
-          <col width="10"/>
-          <col width="*"/>
-          <col width="20"/>
-          <col width="1%"/>
-          <col width="10" align="right"/>
-        </colgroup>
-        <script type="text/javascript" language="javascript">
-          write_table(5, 'job_chains');
-        </script>
-      </table>
-      
-      <table id="orders_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <colgroup>
-          <col width="10"/>
-          <col width="*"/>
-          <col width="*"/>
-          <col width="1%" align="right"/>
-          <col width="40" align="right"/>
-        </colgroup>
-        <script type="text/javascript" language="javascript">
-          write_table(5, 'orders');
-        </script>
-      </table>
-      
-      <table id="process_classes_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <colgroup>
-          <col width="50"/>
-          <col width="100"/>
-          <col width="50"/>
-          <col width="*"/>
-          <col width="10"  align="right"/>
-          <col width="10"  align="right"/>
-          <col width="*"/>
-        </colgroup>
-        <script type="text/javascript" language="javascript">
-          write_table(7, 'process_classes');
-        </script>
-      </table>
-      
-      <table id="schedules_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <colgroup>
-          <col width="*"/>
-          <col width="*"/>
-          <col width="20%"/>
-          <col width="20%"/>
-          <col width="94"/>
-        </colgroup>
-        <script type="text/javascript" language="javascript">
-          write_table(5, 'schedules');
-        </script>
-      </table>
-      
-      <table id="locks_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <script type="text/javascript" language="javascript">
-          write_table(5, 'locks');
-        </script>
-      </table>
-      
-      <table id="remote_schedulers_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <script type="text/javascript" language="javascript">
-          write_table(7, 'remote_schedulers');
-        </script>
-      </table>
-      
-      <table id="cluster_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <colgroup>
-          <col width="160"/>
-          <col width="240"/>
-          <col width="240"/>
-          <col width="80"/>
-          <col width="160"/>
-          <col width="80"/>
-          <col width="80"/>
-          <col width="120"/>
-        </colgroup>
-        <script type="text/javascript" language="javascript">
-          write_table(8, 'cluster');
-        </script>
-      </table>
-      
-      <table id="last_activities_output" style="display:none;" cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
-        <colgroup>
-          <col width="*"/>
-          <col width="110"/>
-          <col width="110"/>
-          <col width="*"/>
-          <col width="1%"/>
-          <col width="40" align="right"/>
-        </colgroup>
-        <script type="text/javascript" language="javascript">
-          write_table(6, 'last_activities');
-        </script>
-      </table>
+      <script type="text/javascript" language="javascript">
+          write_tables(1, 'jobs');
+          write_tables(2, 'job_chains');
+          write_tables(1, 'orders');
+          write_tables(1, 'process_classes');
+          write_tables(1, 'schedules');
+          write_tables(1, 'locks');
+          write_tables(1, 'remote_schedulers');
+          write_tables(1, 'cluster');
+          write_tables(1, 'last_activities');
+      </script>
       
       <img class="corner_bl" src="corner_bl.gif" alt="" />
       <img class="corner_br" src="corner_br.gif" alt="" />  

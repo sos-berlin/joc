@@ -702,7 +702,7 @@ _translations['Terminate within']                          = 'Terminer dans la d
 _translations['Max. seconds within the Job Scheduler terminates'] = 'Durée maximum avant que Job Scheduler se termine';
 _translations['Dialogs']                                   = 'Dialogues';
 _translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'Date de lancement par défaut pour &quot;<i>Lancer instance/ordre à</i>&#160;&quot; est <i>now</i>';
-_translations['Debug']                                     = 'Debug';
+_translations['Debugging of the operations GUI']           = 'Déverminage d\'operations GUI ';
 _translations['Level']                                     = 'Niveau';
 
 //start task/order

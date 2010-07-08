@@ -50,11 +50,23 @@
             <xsl:choose>
                 
                 <xsl:when test="$is_inactive_backup_scheduler and /spooler/@my_show_card != 'cluster' and /spooler/@my_show_card != 'remote_schedulers'">
-                  <tbody><tr><td colspan="8">
-                    <span class="translate" style="font-weight:bold;">Backup Job Scheduler:</span>
-                    <xsl:text> </xsl:text>
-                    <span class="translate" style="font-weight:bold;">No <xsl:value-of select="translate(/spooler/@my_show_card,'_',' ')"/> found</span>
-                  </td></tr></tbody>
+                      <table width="100%" cellpadding="0" cellspacing="0" border="0" class="bottom">
+                         <thead>
+                             <xsl:call-template name="after_head_space">
+                               <xsl:with-param name="colspan" select="'1'"/>
+                             </xsl:call-template>
+                         </thead>      
+                         <tbody><tr><td>
+                           <span class="translate" style="font-weight:bold;">Backup Job Scheduler:</span>
+                           <xsl:text> </xsl:text>
+                           <span class="translate" style="font-weight:bold;">No <xsl:value-of select="translate(/spooler/@my_show_card,'_',' ')"/> found</span>
+                         </td></tr></tbody>
+                         <tfoot>
+                             <xsl:call-template name="after_body_space">
+                               <xsl:with-param name="colspan" select="'1'"/>
+                             </xsl:call-template>
+                         </tfoot>
+                     </table>
                 </xsl:when>
                 
                 <xsl:when test="/spooler/@my_show_card='orders'">
@@ -98,7 +110,7 @@
                 
                 <xsl:when test="count(state/folder/descendant::*[name()=/spooler/@my_object_name] | state/folder/folders/folder) = 0">
                   <div><ul id="{concat(/spooler/@my_show_card,'/')}" class="tree" style="display:block" sos_mode="open"><li>
-                    <span class="translate" style="font-weight:bold;">No <xsl:value-of select="/spooler/@my_show_card"/> found</span>
+                    <span class="translate" style="font-weight:bold;">No <xsl:value-of select="translate(/spooler/@my_show_card,'_',' ')"/> found</span>
                   </li></ul></div>
                 </xsl:when>
                 
@@ -733,7 +745,30 @@
     <xsl:template match="job_chains" mode="order_list">
     
         <xsl:variable name="orders" select="job_chain[not(@visible) or @visible='yes']/descendant::order_queue/order"/>
+        
+          <table cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
             
+            <colgroup>
+              <col width="10"/>
+              <col width="*"/>
+              <col width="*"/>
+              <col width="1%" align="right"/>
+              <col width="40" align="right"/>
+            </colgroup>
+            
+            <thead>
+                <tr><td colspan="5" class="before_head_space">&#160;</td></tr>
+                <tr style="">
+                    <td class="head1" style="padding-left:8px;"><span class="translate">State</span></td>
+                    <td class="head"><span class="translate" style="white-space:nowrap;">Job chain</span>/ <span class="translate">Job</span></td>
+                    <td class="head"><span class="translate" style="white-space:nowrap;color:#009933;">Next start</span>&#160;/ <span class="translate" style="white-space:nowrap;color:darkred;">Setback</span></td>
+                    <td class="head" colspan="2" align="left"><span class="translate" style="white-space:nowrap;">Job chain/</span>&#160;  <span class="translate" style="white-space:nowrap;">Job state</span></td>
+                </tr>
+                <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+                </xsl:call-template>
+            </thead>
+                
             <tbody>
               <xsl:if test="count($orders) = 0">
                   <tr><td colspan="5"><span class="translate" style="font-weight:bold;">No orders found</span></td></tr>
@@ -804,7 +839,12 @@
                 </xsl:otherwise>
               </xsl:choose>
             </tbody>
-            
+            <tfoot>
+              <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+              </xsl:call-template>
+            </tfoot>
+          </table>
     </xsl:template>
     
     
@@ -1034,6 +1074,45 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Schedules-->
     <xsl:template match="schedules">
       
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+            
+          <colgroup>
+            <col width="*"/>
+            <col width="*"/>
+            <col width="20%"/>
+            <col width="20%"/>
+            <col width="94"/>
+          </colgroup>
+          
+          <thead>
+              <tr><td colspan="5" class="before_head_space">&#160;</td></tr>
+              <xsl:choose>
+              <xsl:when test="count(schedule) = 0">
+              </xsl:when>
+              <xsl:when test="count(schedule[@substitute]) &gt; 0">
+                <tr>
+                  <td class="head1"><span class="translate" style="white-space:nowrap;">Schedule</span></td>
+                  <td class="head1">&#160;</td>
+                  <td class="head"><span class="translate" style="white-space:nowrap;">Valid from</span></td>
+                  <td class="head"><span class="translate" style="white-space:nowrap;">Valid to</span></td>
+                  <td class="head1">&#160;</td>
+                </tr>
+              </xsl:when>
+              <xsl:otherwise>
+                <tr>
+                  <td class="head1"><span class="translate" style="white-space:nowrap;">Schedule</span></td>
+                  <td class="head1">&#160;</td>
+                  <td class="head1">&#160;</td>
+                  <td class="head1">&#160;</td>
+                  <td class="head1">&#160;</td>
+                </tr>
+              </xsl:otherwise>
+              </xsl:choose>
+                <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+                </xsl:call-template>
+          </thead>
+          
           <tbody>
               <xsl:choose>
                 <xsl:when test="count(schedule) = 0">
@@ -1049,7 +1128,12 @@
                 </xsl:otherwise>
               </xsl:choose>
           </tbody>
-      
+          <tfoot>
+              <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+              </xsl:call-template>
+            </tfoot>
+          </table>
     </xsl:template>  
       
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Schedule-->
@@ -1387,11 +1471,11 @@
             <div class="middle">
               <table class="middle" cellpadding="0" cellspacing="0" border="0" width="100%">
                 <colgroup>    
-                  <col valign="baseline" width="*"/>
-                  <col valign="baseline" width="*"/>
-                  <col valign="baseline" width="20%"/>
-                  <col valign="baseline" width="20%"/>
-                  <col valign="baseline" width="94"/>  
+                  <col width="*"/>
+                  <col width="*"/>
+                  <col width="20%"/>
+                  <col width="20%"/>
+                  <col width="94"/>  
                 </colgroup>
                 <thead>
                     <tr>
@@ -1524,7 +1608,51 @@
     <!--left-->
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Last Activities-->
     <xsl:template match="state" mode="history">
-              
+       
+        <table cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+          <colgroup>    
+            <col width="*"/>
+            <col width="110"/>
+            <col width="110"/>
+            <col width="*"/>  
+            <col width="1%"/>  
+            <col width="40" align="right"/>  
+          </colgroup>  
+          
+          <thead class="order">
+              <tr>
+                  <td colspan="6" class="before_head_space">&#160;</td>
+              </tr>
+              <tr>
+                  <xsl:choose>
+                    <xsl:when test="/spooler/@last_activities_radios = 'all'">
+                      <td class="head1"><span class="translate" style="color:#808080;white-space:nowrap;">Order ID/</span>&#160; <span class="translate" style="color:#808080;white-space:nowrap;">Job name</span></td>
+                      <td class="head"><span class="translate">Started</span></td>
+                      <td class="head"><span class="translate">Ended</span></td>
+                      <td class="head"><span class="translate" style="white-space:nowrap;">Job chain/</span>&#160; <span class="translate" style="color:#009933;">Cause</span></td>
+                      <td class="head" colspan="2"><span class="translate" style="white-space:nowrap;">Order state/</span>&#160; <span class="translate" style="color:darkred;white-space:nowrap;">Exitcode</span></td>
+                    </xsl:when>
+                    <xsl:when test="/spooler/@last_activities_radios = 'orders'">
+                      <td class="head1"><span class="translate" style="white-space:nowrap;">Order ID</span></td>
+                      <td class="head"><span class="translate">Started</span></td>
+                      <td class="head"><span class="translate">Ended</span></td>
+                      <td class="head"><span class="translate" style="white-space:nowrap;">Job chain</span></td>
+                      <td class="head" colspan="2"><span class="translate" style="white-space:nowrap;">Order state</span></td>
+                    </xsl:when>
+                    <xsl:when test="/spooler/@last_activities_radios = 'tasks'">
+                      <td class="head1"><span class="translate" style="white-space:nowrap;">Job name</span></td>
+                      <td class="head"><span class="translate">Started</span></td>
+                      <td class="head"><span class="translate">Ended</span></td>
+                      <td class="head"><span class="translate">Cause</span></td>
+                      <td class="head" colspan="2"><span class="translate" style="white-space:nowrap;">Exitcode</span></td>
+                    </xsl:when>
+                  </xsl:choose>
+              </tr>
+              <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'6'"/>
+              </xsl:call-template>
+          </thead>
+                 
           <tbody>
             <xsl:variable name="ohistory" select="job_chains/job_chain/order_history/order" />
             <xsl:variable name="thistory" select="jobs/job/history/history.entry" />
@@ -1617,13 +1745,47 @@
             </xsl:choose>
           </tbody>
           
+          <tfoot>
+              <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'6'"/>
+              </xsl:call-template>
+          </tfoot>
+        </table>
     </xsl:template>
     
     <!--left-->
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Jobs-->
 
     <xsl:template match="jobs">
-        
+       
+          <table cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+            
+            <colgroup>
+              <col width="40%"/>
+              <col width="110"/>  
+              <col width="10"  align="right"/>
+              <col width="40%"/>
+              <col width="80"  align="right"/>
+            </colgroup>
+            
+            <thead>
+                <tr><td colspan="5" class="before_head_space">&#160;</td></tr>
+                <tr style="">
+                    <td class="head1"><span class="translate">Job</span> </td>
+                    <td class="head"> <span class="translate">Time</span> </td>
+                    <td class="head"> <span class="translate">Steps</span> </td>
+                    <td class="head"><span class="translate" style="white-space:nowrap">Next start</span>
+                        <xsl:if test="/spooler/@show_jobs_select != 'standalone'">
+                            <span>&#160;/&#160;<span class="translate">Orders</span></span>
+                        </xsl:if>
+                    </td>
+                    <td class="head1">&#160;</td>
+                </tr>
+                <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+                </xsl:call-template>
+            </thead>
+             
             <tbody>
               <xsl:variable name="jobs" select="job [ not(@visible) or @visible='yes' ]" />
               <xsl:if test="count($jobs) = 0">
@@ -1692,6 +1854,12 @@
               </xsl:choose>
             </tbody>
             
+            <tfoot>
+              <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+              </xsl:call-template>
+            </tfoot>
+          </table>
     </xsl:template>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tasks (in Jobs)-->
@@ -1782,8 +1950,43 @@
 
     <xsl:template match="job_chains">
         <xsl:variable    name="job_chain_select" select="job_chain[ not(@visible) or @visible='yes' ]" />
-         
-            <tbody class="job_chain">
+        
+          <table cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">  
+            
+            <colgroup>
+              <col width="10"/>
+              <col width="*"/>
+              <col width="20"/>
+              <col width="1%"/>
+              <col width="40" align="right"/>
+            </colgroup>
+            
+            <thead>
+                <tr>
+                    <td colspan="5" class="before_head_space">&#160;</td>
+                </tr>
+                <tr>
+                    <xsl:choose>
+                        <xsl:when test="/spooler/@show_job_chain_orders_checkbox or /spooler/@show_job_chain_jobs_checkbox">
+                            <td class="head1"><span class="translate">Order state</span></td>
+                            <td class="head"><span class="translate">Job</span></td>
+                            <td class="head"><span class="translate" style="white-space:nowrap;">Job chain/</span>&#160; <span class="translate" style="white-space:nowrap;">Job state</span></td>
+                            <td class="head" colspan="2"><span class="translate">Orders</span></td>
+                        </xsl:when>
+                        <xsl:otherwise>
+                             <td class="head1"><span class="translate" style="white-space:nowrap;">Job chain</span></td>
+                             <td class="head1">&#160;</td>
+                             <td class="head"><span class="translate">State</span></td>
+                             <td class="head" colspan="2"><span class="translate">Orders</span></td>
+                        </xsl:otherwise>
+                    </xsl:choose>    
+                </tr>
+                <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+                </xsl:call-template>
+            </thead>
+             
+            <tbody>
               <xsl:if test="not( $job_chain_select )">
                   <tr><td colspan="5"><span class="translate" style="font-weight:bold;">No job chains found</span></td></tr>
               </xsl:if>
@@ -1858,7 +2061,14 @@
                 </xsl:otherwise>
               </xsl:choose>
             </tbody>
-                   
+            
+            <tfoot>
+              <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+              </xsl:call-template>
+            </tfoot>
+          </table>
+               
     </xsl:template>
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Job_chain-->
@@ -1898,11 +2108,11 @@
           <table cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">  
             
             <colgroup>
-              <col valign="baseline"  width="10"/>
-              <col valign="baseline"  width="*"/>
-              <col valign="baseline"  width="20"/>
-              <col valign="baseline"  width="1%"/>
-              <col valign="baseline"  width="40" align="right"/>
+              <col width="10"/>
+              <col width="*"/>
+              <col width="20"/>
+              <col width="1%"/>
+              <col width="40" align="right"/>
             </colgroup>
             
             <thead class="list"> 
@@ -2161,6 +2371,13 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Locks-->
 
     <xsl:template match="locks">
+          <table width="100%" cellpadding="0" cellspacing="0" class="bottom">
+            <thead>
+               <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+               </xsl:call-template>
+            </thead>
+            
             <tbody>
               <xsl:if test="count(lock) = 0">
                   <tr><td colspan="5" ><span class="translate" style="font-weight:bold">No locks found</span></td></tr>
@@ -2238,6 +2455,13 @@
               </xsl:for-each>
             </tbody>
             
+            <tfoot>
+              <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'5'"/>
+              </xsl:call-template>
+            </tfoot>
+          </table>
+          
     </xsl:template>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~lock.queue-->
@@ -2321,6 +2545,35 @@
 
     <xsl:template match="process_classes">
         
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" class="bottom">
+            <colgroup>  
+              <col width="50"/>
+              <col width="100"/>  
+              <col width="50"/>  
+              <col width="*"/>  
+              <col width="10"  align="right"/>
+              <col width="10"  align="right"/>
+              <col width="*"/>
+            </colgroup>
+            
+            <thead>
+                <tr>
+                    <td colspan="7" class="before_head_space">&#160;</td>
+                </tr>
+                <tr style="">
+                    <td class="head1" style="padding-left: 2ex"><span class="translate">Pid</span> </td>
+                    <td class="head"><span class="translate">Task</span></td>
+                    <td class="head1" align="right" style="padding-right: 4px"><span class="translate">-id</span></td>
+                    <td class="head"><span class="translate">Running since</span></td>
+                    <td class="head"><span class="translate">Operations</span></td>
+                    <td class="head"><span class="translate">Callbacks</span></td>
+                    <td class="head"><span class="translate">Current operation</span></td>
+                </tr>
+                <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'7'"/>
+                </xsl:call-template>
+            </thead>
+            
             <tbody>
                 <xsl:for-each select="process_class">
                 
@@ -2392,6 +2645,14 @@
                 </xsl:for-each>
             </tbody>
             
+            <tfoot>
+                <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'7'"/>
+                </xsl:call-template>
+            </tfoot>
+        </table>
+        
+      
     </xsl:template>
 
 
@@ -2399,7 +2660,72 @@
 <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~cluster-->
 
     <xsl:template match="cluster">
-        
+       
+          <table cellpadding="0" cellspacing="0" width="100%" border="0" class="bottom">
+            
+            <colgroup>
+              <col width="160"/>
+              <col width="240"/>  
+              <col width="240"/>  
+              <col width="80"/>
+              <col width="160"/>
+              <col width="80"/>
+              <col width="80"/>
+              <col width="120"/>
+            </colgroup>
+            
+            <thead>
+                <tr>
+                    <td colspan="8">
+                        <span style="margin-right: 1em; font-weight:bold;">
+                            <xsl:value-of select="count( cluster_member [ @active='yes' ] )" />
+                            <xsl:text> </xsl:text><span class="translate">active Scheduler(s)</span>
+                            <xsl:text>. </xsl:text>
+                        </span>
+                        
+                        <span style="margin-right: 1em; font-weight:bold;">
+                            <xsl:value-of select="count( cluster_member [ @exclusive='yes' ] )" />
+                            <xsl:text> </xsl:text><span class="translate">exclusive Scheduler(s)</span>
+                            <xsl:text>. </xsl:text>
+                        </span>
+                        
+                        <xsl:if test="@active='yes'">
+                            <span style="margin-right: 1em; font-weight:bold; color:#009933">
+                                <span class="translate">This Scheduler is active</span>
+
+                                <xsl:if test="@exclusive='yes'">
+                                    <xsl:text> </xsl:text><span class="translate">and exclusive</span>
+                                </xsl:if>
+
+                                <xsl:text>. </xsl:text>
+                            </span>
+                        </xsl:if>
+
+                        <xsl:if test="@active!='yes'">
+                            <span class="translate" style="margin-right: 1em; color:#800040">Only active Job Schedulers are allowed to start operation.</span>
+                        </xsl:if>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="line-height: 5pt">&#160;</td>
+                </tr>
+
+                <tr>
+                    <td class="head1">Scheduler</td>
+                    <td class="head"  style="width: 20ex"><span class="translate">Started</span></td>
+                    <td class="head"><span class="translate">State</span></td>
+                    <td class="head"><span class="translate">Pid</span></td>
+                    <td class="head"><span class="translate">Last heart beat</span></td>
+                    <td class="head"><span class="translate">Detected heart beats</span></td>
+                    <td class="head"><span class="translate">Backup precedence</span></td>
+                    <td class="head1">&#160;</td>
+                </tr>
+
+                <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'8'"/>
+                </xsl:call-template>
+            </thead>
+             
             <tbody>
                 <xsl:apply-templates select="cluster_member">
                     <xsl:sort select="@http_url"/>
@@ -2407,6 +2733,16 @@
                     <xsl:sort select="@heart_beat_count = 0"/>
                 </xsl:apply-templates>
             </tbody>
+            
+            <tfoot>
+              <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'8'"/>
+              </xsl:call-template>
+            </tfoot>
+
+          </table>
+          
+
             
     </xsl:template>
 
@@ -2598,6 +2934,32 @@
 
     <xsl:template match="remote_schedulers">
         
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" class="bottom">
+            
+            <thead>
+                <tr>
+                    <td colspan="7" class="before_head_space">&#160;</td>
+                </tr>
+                <tr>
+                    <td colspan="7">
+                        <xsl:value-of select="@count" />&#160;<span class="translate">Scheduler(s)</span>&#160;
+                        (<xsl:value-of select="@connected" />&#160;<span class="translate">connected</span>)
+                    </td>
+                </tr>
+                <tr style="">
+                    <td class="head1" style="padding-left: 2ex"><span class="translate">IP</span><xsl:text> </xsl:text></td>
+                    <td class="head"><span class="translate">Hostname</span></td>
+                    <td class="head"><span class="translate">Port</span></td>
+                    <td class="head"><span class="translate">Id</span></td>
+                    <td class="head"><span class="translate">Connected</span></td>
+                    <td class="head"><span class="translate">Disconnected</span></td>
+                    <td class="head"><span class="translate">Version</span></td>
+                </tr>
+                <xsl:call-template name="after_head_space">
+                  <xsl:with-param name="colspan" select="'7'"/>
+                </xsl:call-template>
+            </thead>
+            
             <tbody>
                 <xsl:for-each select="remote_scheduler">
                     <xsl:element name="tr">
@@ -2631,6 +2993,13 @@
                 </xsl:for-each>
             </tbody>
             
+            <tfoot>
+              <xsl:call-template name="after_body_space">
+                  <xsl:with-param name="colspan" select="'7'"/>
+              </xsl:call-template>
+            </tfoot>
+            
+          </table>
     </xsl:template>
     
 
@@ -3185,10 +3554,10 @@
            <table cellpadding="0" cellspacing="0" width="100%" class="bottom">
            
               <colgroup>    
-                <col valign="baseline" align="left" width="1"/>
-                <col valign="baseline" align="left" width="50%"/>
-                <col valign="baseline" align="left" width="1"/>
-                <col valign="baseline" align="left" width="50%"/>  
+                <col align="left" width="1"/>
+                <col align="left" width="50%"/>
+                <col align="left" width="1"/>
+                <col align="left" width="50%"/>  
               </colgroup>
               <tbody>  
                 <tr>
@@ -3523,8 +3892,8 @@
           
           <table cellpadding="0" cellspacing="0" class="bottom" width="100%" >
             <colgroup>
-                <col valign="baseline" align="left"  width="1"/>
-                <col valign="baseline" align="left"  /> 
+                <col align="left"  width="1"/>
+                <col align="left"  /> 
             </colgroup>
             
             <tbody>
@@ -3652,10 +4021,10 @@
       <div class="bottom">
         <table valign="top" cellpadding="0" cellspacing="0" width="100%" class="bottom"> 
           <colgroup>
-              <col valign="baseline" align="left" width="40"/>
-              <col valign="baseline" align="left" width="70"/>
-              <col valign="baseline" align="left" width="*"/>
-              <col valign="baseline" align="left" width="80"/>
+              <col align="left" width="40"/>
+              <col align="left" width="70"/>
+              <col align="left" width="*"/>
+              <col align="left" width="80"/>
           </colgroup>
             
           <xsl:if test="not( queued_task )">
@@ -3729,12 +4098,12 @@
       <div class="bottom">
         <table valign="top" cellpadding="0" cellspacing="0" width="100%" class="bottom">
           <colgroup>
-            <col valign="baseline" align="left" width="10"/>
-            <col valign="baseline" align="left" width="10"/>
-            <col valign="baseline" align="left" width="*"/>
-            <col valign="baseline" align="right" width="10"/>
-            <col valign="baseline" align="left" width="*"/>
-            <col valign="baseline" align="left" width="80"/>
+            <col align="left" width="10"/>
+            <col align="left" width="10"/>
+            <col align="left" width="*"/>
+            <col align="right" width="10"/>
+            <col align="left" width="*"/>
+            <col align="left" width="80"/>
           </colgroup>
           
             <xsl:choose>
@@ -3822,10 +4191,10 @@
           <table class="bottom" cellpadding="0" cellspacing="0" width="100%">
             
               <colgroup>
-                <col valign="baseline"  width="*"/>
-                <col valign="baseline"  width="1%"/>
-                <col valign="baseline"  width="1%"/>  
-                <col valign="baseline"  width="80" align="right"/>  
+                <col width="*"/>
+                <col width="1%"/>
+                <col width="1%"/>  
+                <col width="80" align="right"/>  
               </colgroup> 
               <xsl:if test="@length=0">
                 <thead>
@@ -3915,11 +4284,11 @@
           <table class="bottom" cellpadding="0" cellspacing="0" width="100%">
             
               <colgroup>
-                <col valign="baseline"  width="*"/>
-                <col valign="baseline"  width="*"/>
-                <col valign="baseline"  width="*"/>
-                <col valign="baseline"  width="40"/>  
-                <col valign="baseline"  width="60" align="right"/>  
+                <col width="*"/>
+                <col width="*"/>
+                <col width="*"/>
+                <col width="40"/>  
+                <col width="60" align="right"/>  
               </colgroup>
               <xsl:if test="count(child::*)=0">
                 <thead class="order">

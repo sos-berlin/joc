@@ -391,7 +391,7 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );  
     
-    dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Debug')+'</legend>' );
+    dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Debugging of the operations GUI')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_settings_input( parent.getTranslation('Level')+' (0-9):', 'debug_level', parent._scheduler._runtime_settings.debug_level, 3 );
     dialog._html_array.push( '</table>' );

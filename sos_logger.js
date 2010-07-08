@@ -30,12 +30,7 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
-if( typeof window['SOS_Exception'] != 'function' ) {
-  
-  function SOS_Exception( err, msg, file, line ) {
-    if(msg) alert( msg );
-  } 
-}
+
 var SOSDebugWindow              = null;
 var SOS_Logger                  = function(){}  
 /** @access public */           
@@ -60,7 +55,7 @@ SOS_Logger.windowWidth          = '1000';
 SOS_Logger.windowHeight         = '200';
 SOS_Logger.windowTop            = '0';
 SOS_Logger.windowLeft           = '0';
-SOS_Logger.windowProperties     = 'scrollbars=yes,resizable=yes,status=no,toolbar=no,menubar=no';
+SOS_Logger.windowProperties     = ',scrollbars=yes,resizable=yes,status=no,toolbar=no,menubar=no';
 /** ob das Debugfenster einen Fokus bekommen soll */
 SOS_Logger.enableFocus          = false;
 /** Style für die Meta-Ausgaben [debug level, Zeit, Funk. name] */
@@ -69,6 +64,10 @@ SOS_Logger.styleDebug           = 'color: #009933;';
 SOS_Logger.styleMsg             = '';
 /** image Verzeichnis der Anwendung */
 SOS_Logger.imgDir               = 'js/util/images/logger/';
+SOS_Logger.popUpBlocker         = false;
+
+
+
 /**
 * Kontrolelemente werden in der aufrufenden Anwendung gemalt
 * zB: <td id="sos_debugger_control"></td>
@@ -95,6 +94,14 @@ SOS_Logger.hasError             = false;
 SOS_Logger.WARN                 = 11;
 SOS_Logger.ERROR                = 12;
 SOS_Logger.errorText            = '';
+
+if( typeof window['SOS_Exception'] != 'function' ) {
+  
+  function SOS_Exception( err, msg, file, line ) {
+    if(msg) { SOS_Logger.setError('SOS_Logger.error : '+msg); }
+  } 
+}
+
 /**
 * Debug bzw Log Error setzen
 * wird ausgegeben im Browser, wenn debugLevel > 0, mit der Markierung [ERROR] und dem Messagetext rot
@@ -461,17 +468,24 @@ SOS_Logger.debugLog = function(level,msg,styleMsg){
 }
 /** Prüft ob Debugfenster bereits aufgemacht wurde, oder öffnet es neu */
 SOS_Logger.getDebugWindow = function(){
-  try{   
-    if(typeof SOSDebugWindow == 'undefined' || SOSDebugWindow == null || SOSDebugWindow.closed == true){
-      SOSDebugWindow = window.open('',SOS_Logger.windowName,'top='+SOS_Logger.windowTop+',left='+SOS_Logger.windowLeft+',width='+SOS_Logger.windowWidth+',innerwidth='+SOS_Logger.windowWidth+',height='+SOS_Logger.windowHeight+',innerheight='+SOS_Logger.windowHeight+','+SOS_Logger.windowProperties);
+  try{
+    if(!SOS_Logger.popUpBlocker && (typeof SOSDebugWindow == 'undefined' || SOSDebugWindow == null || SOSDebugWindow.closed == true)){
+      SOSDebugWindow = window.open('dummy.html',SOS_Logger.windowName,'top='+SOS_Logger.windowTop+',left='+SOS_Logger.windowLeft+',width='+SOS_Logger.windowWidth+',innerwidth='+SOS_Logger.windowWidth+',height='+SOS_Logger.windowHeight+',innerheight='+SOS_Logger.windowHeight+SOS_Logger.windowProperties,true);
     }
-    if(SOSDebugWindow.document.title != 'Job Scheduler - Logger') {
-      SOSDebugWindow.document.title = 'Job Scheduler - Logger';
+    if(typeof SOSDebugWindow == 'undefined' || SOSDebugWindow == null){
+      SOS_Logger.popUpBlocker = true;
+      throw new Error('PopUp Blocker is active');
+    } else {
+      if(SOSDebugWindow.document.title != 'Job Scheduler - Logger') {
+        SOSDebugWindow.document.title = 'Job Scheduler - Logger';
+      }
+      if(SOS_Logger.enableFocus){ SOSDebugWindow.focus(); }
     }
-    if(SOS_Logger.enableFocus){ SOSDebugWindow.focus(); }
   }
   catch(x){
-    throw new SOS_Exception(x,x.message,'',0);    
+    //throw new SOS_Exception(x,x.message,'',0);
+    SOS_Logger.popUpBlocker = true;
+    throw new Error(x.message);   
   }
 }
 /** Liefert Funktionsname des Debugcallers */

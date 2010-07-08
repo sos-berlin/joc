@@ -602,21 +602,27 @@ Scheduler.prototype.addLeadingZero = function( num )
 //----------------------------------------------------------------------------------------logger
 Scheduler.prototype.logger = function(level, msg, timerKey)
 {   
-    if( !this._logger || !this._runtime_settings.debug_level ) return false;
-    if( typeof timerKey == 'undefined' ) timerKey = '';
-    
-    this._logger.debugLevel = this._runtime_settings.debug_level;
-    this._logger.styleDebug = 'font-family:\'Courier New\';font-size:10pt;color: #009933;white-space:nowrap;';
-    if( timerKey != '' && this._debug_timer[timerKey] ) {
-      this._logger.debug( level, msg + ': ' + ((new Date().getTime() - this._debug_timer[timerKey])/1000) + 's' );
-      this._debug_timer[timerKey] = undefined;
-    } else if( timerKey != '' && !this._debug_timer[timerKey] ) {
-      this._debug_timer[timerKey] = new Date().getTime();
-      this._logger.debug( level, msg );
-    } else {
-      this._logger.debug( level, msg ); 
+    try{
+      if( !this._logger || !this._runtime_settings.debug_level ) return false;
+      if( typeof timerKey == 'undefined' ) timerKey = '';
+      
+      this._logger.debugLevel = this._runtime_settings.debug_level;
+      this._logger.styleDebug = 'font-family:\'Courier New\';font-size:10pt;color: #009933;white-space:nowrap;';
+      if( timerKey != '' && this._debug_timer[timerKey] ) {
+        this._logger.debug( level, msg + ': ' + ((new Date().getTime() - this._debug_timer[timerKey])/1000) + 's' );
+        this._debug_timer[timerKey] = undefined;
+      } else if( timerKey != '' && !this._debug_timer[timerKey] ) {
+        this._debug_timer[timerKey] = new Date().getTime();
+        this._logger.debug( level, msg );
+      } else {
+        this._logger.debug( level, msg ); 
+      }
+      if(this._logger.hasError) throw new Error(this._logger.getError());
+      return true;
+    } catch(x) {
+      this._logger = null;
+      return false;
     }
-    return true;
 }
 
 
