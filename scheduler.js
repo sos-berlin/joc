@@ -252,6 +252,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           //alert(transport.getAllResponseHeaders());
                           if( !transport.responseText ) err = new Error();
                           if( err ) throw err;
+                          var with_reset = (!scheduler._update_finished);
                           scheduler._update_counter  = 1;
                           scheduler._update_finished = true;
                           scheduler.logger(6,'SCHEDULER RESPONSE:\n' + transport.responseXML.xml);  
@@ -279,9 +280,9 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
                           if( with_modify_datetime ) scheduler.modifyDatetimeForXSLT( transport.responseXML );  
                           if( with_add_path && !scheduler.versionIsNewerThan( "2007-10-08 14:00:00" ) ) scheduler.addPathAttribute( transport.responseXML );
-                          //if( parent.top_frame && typeof parent.top_frame.resetError == 'function' ) {
-                            //parent.top_frame.resetError();
-                          //}
+                          if( with_reset && parent.top_frame && typeof parent.top_frame.resetError == 'function' ) {
+                            parent.top_frame.resetError();
+                          }
                           if( typeof callback_on_success == 'function' ) callback_on_success( transport.responseXML, params );
                           if( !async ) ret = transport.responseXML;
                         },
@@ -620,7 +621,8 @@ Scheduler.prototype.logger = function(level, msg, timerKey)
       if(this._logger.hasError) throw new Error(this._logger.getError());
       return true;
     } catch(x) {
-      this._logger = null;
+      //this._logger.closeDebugWindow();
+      //this._logger = null;
       return false;
     }
 }

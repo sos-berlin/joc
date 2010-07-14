@@ -63,8 +63,8 @@ function showError( x, url, line )
     if( parent.error_frame && typeof parent.error_frame.show_error == 'function' ) {
       parent.error_frame.show_error(err);
       if( parent._scheduler._update_counter < 6 && !parent._scheduler._update_finished ) {
+        parent._scheduler._update_counter++;
         set_timeout( "callErrorChecked( 'update__onclick', false );", 15000 );
-        parent._scheduler._update_counter++; 
       }
     } 
     else if(typeof window['show_error'] == 'function') {

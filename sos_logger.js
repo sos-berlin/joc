@@ -164,7 +164,7 @@ SOS_Logger.debug = function(level,msg,styleMsg,functionCallerName){
     }    
   }
   catch(x){
-    SOS_Logger.setError('SOS_Logger.debug : '+x.message);
+    if(x.message != '') SOS_Logger.setError('SOS_Logger.debug : '+x.message);
   } 
 }
 /**

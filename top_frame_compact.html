@@ -109,7 +109,7 @@ function update()
     
     } else if( parent.left_frame._response ) {
       
-      _state         = response.selectSingleNode('/spooler/answer/state');
+      _state         = parent.left_frame._response.selectSingleNode('/spooler/answer/state');
       if(typeof parent.control_frame.update == 'function') parent.control_frame.update();
       
       //document.getElementById('job_chains_tab').style.display        = (_state.selectNodes("job_chains[@count = 0]").length > 0)        ? 'none' : 'inline';
