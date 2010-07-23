@@ -713,8 +713,14 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
     if( window.DOMParser ) {   
       result_dom = this._xslt.transformToDocument( dom_document );
     } else {
-      result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
-      dom_document.transformNodeToObject( this._xslt, result_dom );
+      if( !with_translate && text_output ) {
+        var transformed = dom_document.transformNode( this._xslt );
+        this.logger(3,'ELAPSED TIME FOR TRANSFORM RESPONSE frameset','transform_response');
+        return transformed;
+      } else {
+        result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
+        dom_document.transformNodeToObject( this._xslt, result_dom );
+      }
     } 
       
     if( with_translate && this._lang_file_exists )
