@@ -272,8 +272,8 @@ window.onerror  = function( msg, url, line ) {
               document.writeln('            <span class="label">&#160;'+parent.getTranslation('ID')+':&#160;</span>');
               document.writeln('            <span id="spooler_id" style="white-space:nowrap;font-weight:bold;">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</span>');
               document.writeln('            <span class="label">&#160;&#160;'+parent.getTranslation('from')+'&#160;</span>');
-              document.writeln('            <a class="titlebar" target="'+scheduler_url+parent._scheduler._id+'" href="http://'+scheduler_url+'/index.html">');
-              document.writeln('              <span style="font-family:Arial;">&#9658;</span>'+scheduler_url);
+              document.writeln('            <a class="titlebar" target="'+scheduler_url+parent._scheduler._id+'" href="'+parent._scheduler._url+'index.html">');
+              document.writeln('              <span style="font-family:Arial;">&#9658;</span>'+parent._scheduler._url.replace(/^http:\/\//,'').replace(/\/$/,''));
               document.writeln('            </a>&#160;&#160;');
               document.writeln('          </td>');
               document.writeln('          <td class="titlebar">');
