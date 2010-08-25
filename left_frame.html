@@ -452,13 +452,14 @@ function modify_response( response )
       }
       
       job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain]" );
-      
       for( var j = 0; j < job_chain_elements.length; j++ )
       { 
         if( !parent.left_frame.apply_big_chains_select( job_chain_elements[j] ) ) continue;
       }
+      
       //special for nested job chain support in tree view
       //add job chains from node if it is not in _response
+      job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain]" );
       
       if( parent._scheduler._view[_card] == 'tree' ) {
         for( var j = 0; j < job_chain_elements.length; j++ )

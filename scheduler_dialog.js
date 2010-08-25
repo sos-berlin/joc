@@ -45,18 +45,22 @@ function showError( x, url, line )
     if( typeof x == "object" )
     {
         if( x.number )  x.message = "0x" + x.number.toHex( 8 ) + "  " + x.message;
-        //if( url )  x.message += " [File: " + url + "]";
-        //else if( x.fileName ) x.message += " [File: " + x.fileName + "]";
-        //if( line ) x.message += " [Line: " + line + "]";
-        //else if( x.lineNumber ) x.message += " [Line: " + x.lineNumber + "]";
+        if( parent._scheduler._runtime_settings.debug_level > 0 ) {
+          if( url )  x.message += " [File: " + url + "]";
+          else if( x.fileName ) x.message += " [File: " + x.fileName + "]";
+          if( line ) x.message += " [Line: " + line + "]";
+          else if( x.lineNumber ) x.message += " [Line: " + x.lineNumber + "]";
+        }
         err = x;
     }
     else
     {
         err = new Error();
         err.message = x;
-        //if( url )  err.message += " [File: " + url + "]";
-        //if( line ) err.message += " [Line: " + line + "]";
+        if( parent._scheduler._runtime_settings.debug_level > 0 ) {
+          if( url )  err.message += " [File: " + url + "]";
+          if( line ) err.message += " [Line: " + line + "]";
+        }
         err.stack = "";
     }
     
@@ -867,6 +871,10 @@ function get_order_states( big_chain )
     var states            = new Object();
     var end_states        = new Object();
     var job_chain_element = window.parent.left_frame._response.selectSingleNode( ".//job_chain[@path='" + window.parent.left_frame._job_chain + "']" );
+    if( !job_chain_element ) {
+      var response        = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + parent.left_frame._job_chain + '"/>', false );
+      if( response ) job_chain_element = response.selectSingleNode('//job_chain');
+    }
     if( big_chain ) {
       var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node.job_chain" );
     } else {
@@ -1135,7 +1143,10 @@ function add_job_chain(job_chain,step)
       Input_dialog.close();
       var jobs          = new Object();
       var job_keys      = new Array();
-      var job_elements  = parent.left_frame._response.selectNodes( "//jobs/job[@order='yes' and (not(@visible) or @visible='yes')]" );
+      var job_elements  = new Array();
+      var response      = parent._scheduler.executeSynchron( '<show_jobs max_orders="0" max_task_history="0"/>', false );
+      if( response ) job_elements = response.selectNodes( "//jobs/job[@order='yes' and (not(@visible) or @visible='yes')]" );
+      
       for( var i = 0; i < job_elements.length; i++ ) {
         job_keys.push( job_elements[i].getAttribute('path') );
       }
@@ -1452,6 +1463,10 @@ function job_menu__onclick( job_name )
     var popup_builder = new Popup_menu_builder();
     parent.left_frame._job_name = xml_encode(job_name);
     var job_element   = parent.left_frame._response.selectSingleNode( './/job[@path="' + parent.left_frame._job_name + '"]' );
+    if( !job_element ) {
+      var response    = parent._scheduler.executeSynchron( '<show_job job="' + parent.left_frame._job_name + '" max_orders="0" max_task_history="0"/>', false );
+      if( response ) job_element = response.selectSingleNode('//job');
+    }
     parent.left_frame._job_element      = job_element;
     var state         = job_element.getAttribute( "state" );
     var initialized   = (state && state != '' && state != 'not_initialized' && state != 'error');
@@ -1648,8 +1663,13 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
     popup_builder.add_entry ( parent.getTranslation("Add order")           , "callErrorChecked('add_order',false," + big_chain + ")" );
     popup_builder.add_entry ( parent.getTranslation("Add persistent order"), "callErrorChecked('add_order',true," + big_chain + ")" );
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {
-      var state       = parent.left_frame._response.selectSingleNode('spooler/answer//job_chains/job_chain[ @path="'+parent.left_frame._job_chain+'" ]').getAttribute( "state" );
-      var command     = function( cmd ) { return "<job_chain.modify job_chain='"+parent.left_frame._job_chain+"' state='"+cmd+"'/>"; }
+      var job_chain_element = parent.left_frame._response.selectSingleNode('spooler/answer//job_chains/job_chain[ @path="'+parent.left_frame._job_chain+'" ]');
+      if( !job_chain_element ) {
+        var response        = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + parent.left_frame._job_chain + '"/>', false );
+        if( response ) job_chain_element = response.selectSingleNode('//job_chain');
+      }
+      var state             = job_chain_element.getAttribute( "state" );
+      var command           = function( cmd ) { return "<job_chain.modify job_chain='"+parent.left_frame._job_chain+"' state='"+cmd+"'/>"; }
       popup_builder.add_bar();
       popup_builder.add_command ( parent.getTranslation("Stop")            , command('stopped'), state != 'stopped' );
       popup_builder.add_command ( parent.getTranslation("Unstop")          , command('running'), state == 'stopped' );
@@ -1664,6 +1684,10 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
 function job_chain_node_menu__onclick( state, job_chain )
 { 
     var job_chain_elem = parent.left_frame._response.selectSingleNode('spooler/answer//job_chains/job_chain[ @path="'+job_chain+'" ]');
+    if( !job_chain_elem ) {
+      var response     = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + job_chain + '"/>', false );
+      if( response ) job_chain_elem = response.selectSingleNode('//job_chain');
+    }
     var node_action    = null;
     if(job_chain_elem) { 
       node_action      = job_chain_elem.selectSingleNode('job_chain_node[ @state="'+state+'" ] | job_chain_node.job_chain[ @state="'+state+'" ]').getAttribute( "action" );
