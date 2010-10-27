@@ -92,9 +92,10 @@ function getTranslation( s, args )
 
 //------------------------------------------------------------------------------------check_browser
 var ie        = 0;   // Microsoft Internet Explorer
-var firefox   = 0;   // Mozilla Firefox
+var gecko     = 0;   // Mozilla Firefox, Seamonkey, Iceweasel, Iceapel, Netscape
 var chrome    = 0;   // Google Chrome
-var seamonkey = 0;   // SeaMonkey
+var geckoName = 'Mozilla Browser';
+
 
 function check_browser()
 {   
@@ -108,32 +109,26 @@ function check_browser()
                 if( match )  ie = 1 * RegExp.$1;
             }
             else
+            if( window.navigator.vendor == "Google Inc." || window.navigator.userAgent.indexOf( "Chrome" ) > -1 )
+            {
+                var match = window.navigator.appVersion.match( /Chrome\/(\d+\.\d+)/ );
+                if( match )  chrome = 1 * RegExp.$1;
+            }
+            else
             if( window.navigator.appName == "Netscape" )
             {
-                if( window.navigator.vendor == "Firefox" || window.navigator.userAgent.indexOf( "Firefox" ) > -1 )
-                {
-                    var match = window.navigator.userAgent.match( /Firefox\/(\d+\.\d+)/ );
-                    if( match )  firefox = 1 * RegExp.$1;
-                }
-                else
-                if( window.navigator.vendor == "Google Inc." || window.navigator.userAgent.indexOf( "Chrome" ) > -1 )
-                {
-                    var match = window.navigator.appVersion.match( /Chrome\/(\d+\.\d+)/ );
-                    if( match )  chrome = 1 * RegExp.$1;
-                }
-                else
-                if( window.navigator.userAgent.indexOf("SeaMonkey") > -1 )
-                {
-                    var match = window.navigator.userAgent.match( /SeaMonkey\/(\d+\.\d+)/ );
-                    if( match )  seamonkey = 1 * RegExp.$1;
+                var match = window.navigator.userAgent.match( /\).*\b([^\/]+)\/(\d+\.\d+)/ );
+                if( match ) {
+                  gecko = 1 * RegExp.$2;
+                  geckoName = RegExp.$1;
                 }
             }
         }
     }
     
-    if( ie < 6 && firefox < 2 && chrome < 0.2 && seamonkey < 2 )
+    if( ie < 6 && gecko < 2 && chrome < 0.2 )
     {
-        var allBrowser = ie+firefox+chrome+seamonkey;
+        var allBrowser = ie+gecko+chrome;
         var msg = "The page may not work with this browser.\n\n";
         if( allBrowser == 0 ) 
         {
@@ -145,10 +140,9 @@ function check_browser()
         } 
         else 
         { 
-          if( allBrowser-ie        == 0 ) msg += "The Microsoft Internet Explorer version should be at least 6.0";
-          if( allBrowser-firefox   == 0 ) msg += "The Mozilla Firefox version should be at least 2.0";
-          if( allBrowser-chrome    == 0 ) msg += "The Google Chrome version should be at least 0.2";
-          if( allBrowser-seamonkey == 0 ) msg += "The SeaMonkey version should be at least 2.0";
+          if( allBrowser-ie        == 0 ) msg += "Your Microsoft Internet Explorer version should be at least 6.0";
+          if( allBrowser-gecko     == 0 ) msg += "Your " + geckoName + " version should be at least 2.0";
+          if( allBrowser-chrome    == 0 ) msg += "Your Google Chrome version should be at least 0.2";
         }
 
         if( window.navigator != undefined )
