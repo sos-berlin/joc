@@ -104,7 +104,8 @@ _translations['Last']                                      = 'Dernière';
 _translations['never']                                     = 'jamais';
 _translations['now']                                       = 'maintenant';
 _translations['days']                                      = 'Jours';
-_translations['The settings dialog is not available,\nbecause $file is used as settings file.'] = 'La fenêtre de dialogue \'Paramètres\' n\'est pas disponible,\ncar le fichier $file est utilisé en tant que fichier de paramétrage.'; 
+_translations['The settings dialog is not available,\nbecause $file is used as settings file.']                 = 'La fenêtre de dialogue \'Paramètres\' n\'est pas disponible,\ncar le fichier $file est utilisé en tant que fichier de paramétrage.'; 
+_translations['You can enable the settings dialog \nvia the _enable_cookie_settings flag in the settings file'] = 'Vous pouvez activer le dialogue par le _enable_cookie_settings \ninterrupteur dans le fichier ci-dessus.';
 
 //compact
 _translations['from']                                      = 'de';

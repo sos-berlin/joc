@@ -275,7 +275,13 @@ function scheduler_settings__onclick(ret)
 {  
   if( parent._server_settings ) {
     _popup_menu.close();
-    alert(parent.getTranslation('The settings dialog is not available,\nbecause $file is used as settings file.',{file:parent.location.hash.substr(1)+'.js'}));
+    var with_hash   = (parent.location.hash && parent.location.hash.substr(1));
+    var custom_file = (with_hash) ? parent.location.hash.substr(1)+'.js' : 'custom.js';
+    var msg         = parent.getTranslation('The settings dialog is not available,\nbecause $file is used as settings file.',{file:custom_file});
+    if(!with_hash) {
+      msg          += '\n\n'+parent.getTranslation('You can enable the settings dialog \nvia the _enable_cookie_settings flag in the settings file');
+    }
+    alert(msg);
     return false;
   }
   if( typeof ret != "boolean" ) ret = false;
@@ -1439,7 +1445,7 @@ function scheduler_extras__onclick( elt )
     
     popup_builder.add_entry( parent.getTranslation("Settings")      , "callErrorChecked('scheduler_settings__onclick')", parent.left_frame );
     if( parent._extra_items.monitor )       popup_builder.add_entry( parent.getTranslation("Monitor")       , "open_url( 'monitor.html', 'monitor_applet' )" );
-    if( parent._extra_items.configuration ) popup_builder.add_entry( parent.getTranslation("Configuration") , "open_url( 'scheduler/config/scheduler_documentation.html', 'config_xml' )" );
+    if( parent._extra_items.configuration ) popup_builder.add_entry( parent.getTranslation("Configuration") , "open_url( 'scheduler_data/config/scheduler_documentation.html', 'config_xml' )" );
     
     var first_extra_urls = true;
     for(var entry in parent._extra_urls ) {

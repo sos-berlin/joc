@@ -1,19 +1,39 @@
 /*****************************************************************
 *   For user-defined settings
 *   The following variables are defaults when the site is loaded
+*   but can be overwritten via cookies.
 ******************************************************************/
+
+
+/*****************************************************************
+*  If 'false' then almost all following variables are stored in 
+*  cookies, so that these settings are only default values and 
+*  will be overwritten via the cookies.
+*  If 'true' then only filters are read from cookies whereat the
+*  defined correspondent filters in this file have priority.
+*/
+_disable_cookie_settings = false;
+
+
+/*****************************************************************
+*  Set the interface language. 
+*  A language file scheduler_lang_[_sos_lang].js must exist.
+*  If this value is empty then no language file is tried to include 
+*  and english is used.
+*/
+_sos_lang            = '${jsLang}';
 
 
 /*****************************************************************
 *  If 'true' then the periodically update is on (default = false).
 */
-_update_periodically = false;
+_update_periodically     = false;
 
 
 /*****************************************************************
 *  Interval between the updates in seconds (default = 5).
 */
-_update_seconds      = 5;
+_update_seconds          = 5;
 
 
 /*****************************************************************
@@ -28,14 +48,14 @@ _update_incl_hot_folders = true;
 *  'process_classes' and 'last_activities' 
 *  (default = 'jobs') as the beginning view.
 */
-_show_card           = 'jobs';
+_show_card               = 'jobs';
 
 
 /*****************************************************************
 *  For some tabs you can set the default view mode (list or tree).
 */
-_view.jobs           = 'list';
-_view.job_chains     = 'list';
+_view.jobs               = 'list';
+_view.job_chains         = 'list';
 
 
 /*****************************************************************
@@ -74,14 +94,14 @@ _select_states.jobs_state_select     = 'all';
 *  You can set how much orders are shown in the job chains if the
 *  checkbox 'show orders' is checked. The default is 10.
 */
-_max_orders          = 10;
+_max_orders              = 10;
 
 
 /*****************************************************************
 *  You can set how much orders and tasks are shown in the last
 *  activities. The default is 30.
 */
-_max_last_activities = 30;
+_max_last_activities     = 30;
 
 
 /*****************************************************************
@@ -89,22 +109,15 @@ _max_last_activities = 30;
 *  and last 10 from the tasks history respectively. 
 *  You can set another value.
 */
-_max_order_history   = 50;
-_max_task_history    = 10;
-
-
-/*****************************************************************
-*  The job descriptions open up in english per default. You can
-*  set 'de' (for german) instead of 'en' (for english).
-*/
-_description_lang    = '${supportedLang}';
+_max_order_history       = 50;
+_max_task_history        = 10;
 
 
 /*****************************************************************
 *  If you have a cluster with backup or distributed Job Schedulers
 *  then you can terminate the cluster with a timeout in seconds.
 */
-_terminate_timeout   = 60;
+_terminate_timeout       = 60;
 
 
 /*****************************************************************
@@ -123,12 +136,12 @@ _start_next_period_enabled  = false;
 /*****************************************************************
 *  level for debugging: 0-9
 */
-_debug_level         = 0;
+_debug_level             = 0;
 
 
 /*****************************************************************
 *  You can add two items to the popup menu of the extras button:
-*  monitor and configuration
+*  monitor and configuration. These functons are deprecated.
 */
 _extra_items.monitor       = false;
 _extra_items.configuration = false;
@@ -146,15 +159,6 @@ _extra_items.configuration = false;
 *  Apache proxy configuration is used. Set an alias in the form: 
 *  _url_aliase[ 'remote_host:remote_port' ] = 'url';
 */
-
-
-/*****************************************************************
-*  Set the interface language. 
-*  A language file scheduler_lang_[_sos_lang].js must exist.
-*  If this value is empty no language file is tried to include and 
-*  english is used.
-*/
-_sos_lang            = '${jsLang}';
 
 
 /*****************************************************************

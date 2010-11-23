@@ -32,6 +32,7 @@
 ********************************************************** end of preamble*/
 
 //----------------------------Initialising of global vars which are set in the custom.js file
+var _disable_cookie_settings    = false;
 var _update_periodically        = false;
 var _update_seconds             = 5;
 var _update_incl_hot_folders    = false;
@@ -68,9 +69,9 @@ var _active_project_filter      = -1;
 
 //--------------------------------------------------------------------------custom.js per hash  
 var _server_settings            = location.hash && location.hash.substr(1);
-document.writeln('<script type="text/javascript" src="custom.js"></sc'+'ript>');
+document.writeln('<script type="text/javascript" src="scheduler_data/config/operations_gui/custom.js"></sc'+'ript>');
 if( _server_settings && location.hash.substr(1) != 'custom' ) {
-  document.writeln('<script type="text/javascript" src="'+location.hash.substr(1)+'.js"></sc'+'ript>');
+  document.writeln('<script type="text/javascript" src="scheduler_data/config/operations_gui/'+location.hash.substr(1)+'.js"></sc'+'ript>');
 }
 
 

@@ -36,6 +36,12 @@ if( window['_sos_lang'] ) {
   document.writeln('<script type="text/javascript" src="scheduler_lang_'+_sos_lang+'.js"></sc'+'ript>');
 }
 
+
+//----------------------------------------------------------------------------------cookie_handling
+if( !window['_server_settings'] && window['_disable_cookie_settings'] ) {
+  _server_settings = true; 
+}
+
 //----------------------------------------------------------------------------------------Scheduler
 // public
 
@@ -721,7 +727,7 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
         result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
         dom_document.transformNodeToObject( this._xslt, result_dom );
       }
-    } 
+    }
       
     if( with_translate && this._lang_file_exists )
     {

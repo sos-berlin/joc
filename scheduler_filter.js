@@ -386,8 +386,8 @@ Scheduler_Filter.store_filter = function(range,is_store_as){
         return false; 
       }
       if((typeof _project_filter[filter_name] != 'undefined') || (typeof server_filters[filter_name] != 'undefined')){
-        var custom_file = ( _server_settings ) ? location.hash.substr(1) : 'custom';
-        alert(getTranslation('A filter "$filter_name" is already defined in the file $file.',{'filter_name':filter_name,'file':custom_file+'.js'}));
+        var custom_file = ( _server_settings && location.hash ) ? location.hash.substr(1)+'.js' : 'custom.js';
+        alert(getTranslation('A filter "$filter_name" is already defined in the file $file.',{'filter_name':filter_name,'file':custom_file}));
         return false; 
       }
       if(el_filters.value == '-1' || is_store_as){//new

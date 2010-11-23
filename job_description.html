@@ -80,6 +80,7 @@ window.onunload = function()
 function showJobDescription( job_name )
 {   
     _job_name = job_name;
+    var description_lang = (window['_sos_lang']) ? _sos_lang : 'en';
     
     try {
       if( job_name == "" ) throw new Error( getTranslation("Job name") + " " + getTranslation("is missing") );
@@ -95,7 +96,7 @@ function showJobDescription( job_name )
         if( include_file_attribute ) {
           include_file_attribute   = include_file_attribute.replace(/\\/g,'/');
           if( path_is_relative( include_file_attribute ) ) {
-            desc_frame_href = 'scheduler/'+include_file_attribute;
+            desc_frame_href = 'scheduler_data/'+include_file_attribute;
           } else {
             desc_frame_href = 'descriptions/'+include_file_attribute.replace( /.*\//, '' );
           }
@@ -107,9 +108,9 @@ function showJobDescription( job_name )
           if( include_file_attribute ) {
             include_file_attribute = include_file_attribute.replace(/\\/g,'/');
             if( path_is_relative( include_file_attribute ) ) {
-              desc_frame_href = 'scheduler/config/live'+job_dir+include_file_attribute;
+              desc_frame_href = 'scheduler_data/config/live'+job_dir+include_file_attribute;
             } else {
-              desc_frame_href = 'scheduler/config/live'+include_file_attribute;
+              desc_frame_href = 'scheduler_data/config/live'+include_file_attribute;
             }
             try {
               if( desc_frame_href ) _scheduler.executeGet(desc_frame_href);
@@ -126,7 +127,7 @@ function showJobDescription( job_name )
           }
         }
         if( desc_frame_href ) {
-          _desc_frame.location.href = _scheduler._url+desc_frame_href+'#'+_description_lang;
+          _desc_frame.location.href = _scheduler._url+desc_frame_href+'#'+ description_lang;
           return true;
         }
       } catch(E) {}
@@ -156,7 +157,7 @@ function showJobDescription( job_name )
         desc            = _scheduler.xmlTransform(response,false);
         if( desc == "" ) throw new Error( getTranslation("unknown error") ); 
         desc            = desc.replace(/^<\?xml[^>]*>\s*<!DOCTYPE/i,'<!DOCTYPE');
-        desc            = desc.replace( /(select_lang\s*\(\s*[\'])[^\']*([\']\s*\))/, "$1"+_description_lang+"$2" );
+        desc            = desc.replace( /(select_lang\s*\(\s*[\'])[^\']*([\']\s*\))/, "$1"+description_lang+"$2" );
       }
       _desc_frame.document.open();
       _desc_frame.document.write(desc);

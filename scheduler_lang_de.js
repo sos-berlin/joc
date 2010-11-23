@@ -105,6 +105,7 @@ _translations['never']                                     = 'nie';
 _translations['now']                                       = 'jetzt';
 _translations['days']                                      = 'Tage';
 _translations['The settings dialog is not available,\nbecause $file is used as settings file.'] = 'Der Dialog \'Einstellungen\' steht nicht zur Verfügung,\nda die Datei $file für die Einstellungen benutzt wird.'; 
+_translations['You can enable the settings dialog \nvia the _enable_cookie_settings flag in the settings file'] = 'Sie können den Dialog durch den _enable_cookie_settings \nSchalter in der obigen Datei aktivieren.';
 
 //compact
 _translations['from']                                      = 'von';
