@@ -279,7 +279,7 @@ function scheduler_settings__onclick(ret)
     var custom_file = (with_hash) ? parent.location.hash.substr(1)+'.js' : 'custom.js';
     var msg         = parent.getTranslation('The settings dialog is not available,\nbecause $file is used as settings file.',{file:custom_file});
     if(!with_hash) {
-      msg          += '\n\n'+parent.getTranslation('You can enable the settings dialog \nvia the _enable_cookie_settings flag in the settings file');
+      msg          += '\n\n'+parent.getTranslation('You can enable the settings dialog \nvia the _disable_cookie_settings flag in the settings file');
     }
     alert(msg);
     return false;
@@ -1474,8 +1474,10 @@ function job_menu__onclick( job_name )
       if( response ) job_element = response.selectSingleNode('//job');
     }
     parent.left_frame._job_element      = job_element;
+    var enabled       = job_element.getAttribute( "enabled" );
+    enabled           = ( !enabled || enabled != "no" );
     var state         = job_element.getAttribute( "state" );
-    var initialized   = (state && state != '' && state != 'not_initialized' && state != 'error');
+    var initialized   = (state && state != '' && state != 'not_initialized' && state != 'error' && enabled);
     var stopped       = (state == 'stopped' || state == "stopping");
     var order_job     = (job_element.getAttribute( "order" ) == "yes");
     var job_title     = job_element.getAttribute( "title" );
@@ -1499,15 +1501,15 @@ function job_menu__onclick( job_name )
     popup_builder.add_entry   ( parent.getTranslation("Start task at") , "callErrorChecked('start_task_at')", (initialized && !order_job) );
     popup_builder.add_entry   ( parent.getTranslation("Start task parametrized")  , "callErrorChecked('start_task')", (initialized && !order_job) );
     popup_builder.add_entry   ( parent.getTranslation("Set run time")  , "callErrorChecked('set_run_time','job'," + hot + ")", (initialized && !order_job) );
-    popup_builder.add_command ( parent.getTranslation("Stop")          , "<modify_job job='" + parent.left_frame._job_name + "' cmd='stop'    />", !stopped );
-    popup_builder.add_command ( parent.getTranslation("Unstop")        , "<modify_job job='" + parent.left_frame._job_name + "' cmd='unstop'  />", stopped );
+    popup_builder.add_command ( parent.getTranslation("Stop")          , "<modify_job job='" + parent.left_frame._job_name + "' cmd='stop'    />", (!stopped && enabled) );
+    popup_builder.add_command ( parent.getTranslation("Unstop")        , "<modify_job job='" + parent.left_frame._job_name + "' cmd='unstop'  />", (stopped && enabled) );
 //  popup_builder.add_command ( parent.getTranslation("Wake")          , "<modify_job job='" + parent.left_frame._job_name + "' cmd='wake'    />" );
 //  popup_builder.add_command ( parent.getTranslation("Start at &lt;runtime&gt;"), "<modify_job job='" + parent.left_frame._job_name + "' cmd='start'   />" );
-    popup_builder.add_command ( parent.getTranslation("Reread")        , "<modify_job job='" + parent.left_frame._job_name + "' cmd='reread'  />" );
+    popup_builder.add_command ( parent.getTranslation("Reread")        , "<modify_job job='" + parent.left_frame._job_name + "' cmd='reread'  />", enabled );
     popup_builder.add_bar();
-    popup_builder.add_command ( parent.getTranslation("End tasks")     , "<modify_job job='" + parent.left_frame._job_name + "' cmd='end'     />" );
-    popup_builder.add_command ( parent.getTranslation("Suspend tasks") , "<modify_job job='" + parent.left_frame._job_name + "' cmd='suspend' />" );
-    popup_builder.add_command ( parent.getTranslation("Continue tasks"), "<modify_job job='" + parent.left_frame._job_name + "' cmd='continue'/>" );
+    popup_builder.add_command ( parent.getTranslation("End tasks")     , "<modify_job job='" + parent.left_frame._job_name + "' cmd='end'     />", enabled );
+    popup_builder.add_command ( parent.getTranslation("Suspend tasks") , "<modify_job job='" + parent.left_frame._job_name + "' cmd='suspend' />", enabled );
+    popup_builder.add_command ( parent.getTranslation("Continue tasks"), "<modify_job job='" + parent.left_frame._job_name + "' cmd='continue'/>", enabled );
     popup_builder.add_bar();
     //popup_builder.add_command ( parent.getTranslation("Delete job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", !order_job, parent.getTranslation('Do you really want to delete this job?'), 'job|'+parent.left_frame._job_name );
     popup_builder.add_command ( parent.getTranslation("Delete job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", true, parent.getTranslation('Do you really want to delete this job?'), 'job|'+parent.left_frame._job_name );

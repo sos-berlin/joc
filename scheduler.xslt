@@ -282,6 +282,7 @@
     <xsl:template match="job" mode="leaf">
       <xsl:variable name="icon_color">
         <xsl:choose>
+          <xsl:when test="@enabled = 'no'">gray</xsl:when>
           <xsl:when test="file_based/ERROR or file_based/removed or replacement">crimson</xsl:when>
           <xsl:when test="file_based/requisites/requisite/@is_missing = 'yes'">crimson</xsl:when>
           <xsl:when test="@remove = 'yes'">crimson</xsl:when>
@@ -303,6 +304,7 @@
       </xsl:variable>
       <xsl:variable name="icon_title">
         <xsl:choose>
+          <xsl:when test="@enabled = 'no'">disabled</xsl:when>
           <xsl:when test="file_based/ERROR or file_based/removed or replacement">error</xsl:when>
           <xsl:when test="file_based/requisites/requisite/@is_missing = 'yes'">error</xsl:when>
           <xsl:when test="@remove = 'yes'">error</xsl:when>
@@ -3343,6 +3345,9 @@
                 </xsl:apply-templates>&#160;
             </xsl:element>
             <xsl:element name="td">
+                <xsl:if test="@enabled='no'">
+                  <xsl:attribute name="class">gray</xsl:attribute>
+                </xsl:if>
                 <xsl:attribute name="colspan">2</xsl:attribute>
                 <xsl:attribute name="align">left</xsl:attribute>
                 <xsl:attribute name="onclick">callErrorChecked( 'show_job_details','<xsl:value-of select="@path"/>' )</xsl:attribute>
@@ -3534,6 +3539,9 @@
                </tr>
                <tr>
                    <td colspan="3">
+                       <xsl:if test="@enabled='no'">
+                         <xsl:attribute name="class">gray</xsl:attribute>
+                       </xsl:if>
                        <xsl:apply-templates mode="job_path" select="@path">
                          <xsl:with-param name="job" select="."/>
                        </xsl:apply-templates>
@@ -3777,6 +3785,10 @@
 
     <xsl:template match="job/@state">
         <xsl:choose>
+            <xsl:when test="parent::job/@enabled='no'">
+                <span class="translate">disabled</span>
+            </xsl:when>
+            
             <xsl:when test=".='pending'">
                 <span class="translate"><xsl:value-of select="."/></span>
             </xsl:when>
@@ -5187,6 +5199,9 @@
             <xsl:choose>
                 <xsl:when test="not( $job )">
                     <xsl:attribute name="class">job_error</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$job/@enabled='no'">
+                    <xsl:attribute name="class">gray</xsl:attribute>
                 </xsl:when>
                 <xsl:when test="@remove='yes'">
                     <xsl:attribute name="class">job_remove</xsl:attribute>

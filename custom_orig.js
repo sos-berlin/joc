@@ -178,3 +178,4 @@ _extra_items.configuration = false;
 *  or 
 *  _active_project_filter             = 'name of the filter';  
 */
+

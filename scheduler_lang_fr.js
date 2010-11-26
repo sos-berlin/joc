@@ -105,7 +105,7 @@ _translations['never']                                     = 'jamais';
 _translations['now']                                       = 'maintenant';
 _translations['days']                                      = 'Jours';
 _translations['The settings dialog is not available,\nbecause $file is used as settings file.']                 = 'La fenêtre de dialogue \'Paramètres\' n\'est pas disponible,\ncar le fichier $file est utilisé en tant que fichier de paramétrage.'; 
-_translations['You can enable the settings dialog \nvia the _enable_cookie_settings flag in the settings file'] = 'Vous pouvez activer le dialogue par le _enable_cookie_settings \ninterrupteur dans le fichier ci-dessus.';
+_translations['You can enable the settings dialog \nvia the _disable_cookie_settings flag in the settings file'] = 'Vous pouvez activer le dialogue par le _disable_cookie_settings \ninterrupteur dans le fichier ci-dessus.';
 
 //compact
 _translations['from']                                      = 'de';
@@ -257,6 +257,7 @@ _translations['pending']                                   = 'en attente';
 _translations['loaded']                                    = 'chargé';
 _translations['initialized']                               = 'initialisé';
 _translations['not_initialized']                           = 'non initialisé';
+_translations['disabled']                                  = 'inactif';
 _translations['none']                                      = 'aucun';
 _translations['read_error']                                = 'erreur de lecture';
 _translations['delayed after error']                       = 'retardé après erreur';
