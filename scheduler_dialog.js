@@ -785,7 +785,8 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
       }
       fields.id        = ( fields.id != "" ) ? ' id="' + fields.id + '"' : '';
       fields.at        = ( persistent ) ? '' : ' at="' + fields.at + '"';
-      fields.end_state = fields.end_state != "" ? ' end_state="'+fields.end_state+'"' : ''; 
+      //fields.end_state = fields.end_state != "" ? ' end_state="'+fields.end_state+'"' : ''; 
+      fields.end_state = parent._scheduler.versionIsNewerThan( "2008-04-08 00:00:00" ) ? ' end_state="'+fields.end_state+'"' : '';  
       
       if( hot && persistent && msg == '' ) {
         var priority     = '';
@@ -848,7 +849,8 @@ function set_order_state( order_state, order_end_state, setback, hot, ret )
     } else {
       var fields = input_dialog_submit();
       var sback = fields.remove_setback ? ' setback="no"' : '';
-      var end_state = (fields.new_end_state != "") ? ' end_state="'+fields.new_end_state+'"' : '';
+      //var end_state = (fields.new_end_state != "") ? ' end_state="'+fields.new_end_state+'"' : '';
+      var end_state = parent._scheduler.versionIsNewerThan( "2008-04-08 00:00:00" ) ? ' end_state="'+fields.new_end_state+'"' : '';  
       var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"' + sback + ' state="' + fields.new_state + '"' + end_state + '/>'; 
       if( scheduler_exec( xml_command, false ) ) { 
           set_timeout("parent.left_frame.update()",1);
