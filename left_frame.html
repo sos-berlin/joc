@@ -188,7 +188,7 @@ function update_jobs_frame()
                                  max_task_history = parent._scheduler._runtime_settings.max_last_activities;
                                  if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="' + parent._scheduler._runtime_settings.max_last_activities + '"';
                                  what             = 'job_chain_orders task_history order_history';
-                                 if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled  ) what += 'schedules';
+                                 if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled  ) what += ' schedules';
                                  break;
       case 'process_classes'   : break;
       case 'locks'             : break;
