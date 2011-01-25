@@ -80,6 +80,7 @@ function Scheduler()
     this._version_date                                   = '';
     this._version_no                                     = '';
     this._gui_subversion_no                              = '';
+    this._gui_release_no                                 = '';
     this._id                                             = '';
     this._host                                           = '';
     this._port                                           = '';
@@ -639,8 +640,12 @@ Scheduler.prototype.readGuiVersion = function()
 {
     try {
       var responseText = this.executeGet( '.version' );
-      this._gui_subversion_no = responseText || "0000 0000-00-00";
-      this._gui_subversion_no = this._gui_subversion_no.replace(/[^-0-9:\. ]/g,'');
+      var version = ["0000 0000-00-00","0.0.0.0000"];
+      if(responseText) {
+        version = responseText.split("\n");
+      }
+      this._gui_release_no = version[1].replace(/^\s+/,'').replace(/\s+$/,'');
+      this._gui_subversion_no = version[0].replace(/[^-0-9:\. ]/g,'');
       var pattern = /([0-9\.]+)\s+(\d{4}-\d{2}-\d{2})*/;
       pattern.exec(this._gui_subversion_no);
       this._gui_subversion_no = RegExp.$1 + ' (' + RegExp.$2 + ')';

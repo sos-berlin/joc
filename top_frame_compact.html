@@ -165,6 +165,7 @@ function set_state(response)
     document.getElementById('spooler_id').innerHTML           = (state.getAttribute('id') || parent.getTranslation('unknown'));
     document.getElementById('spooler_state').innerHTML        = (parent.getTranslation(state.getAttribute('state')) || parent.getTranslation('unknown'));
     document.getElementById('spooler_pid').innerHTML          = (state.getAttribute('pid') || parent.getTranslation('unknown'));
+    document.getElementById('spooler_release').innerHTML      = parent._scheduler._gui_release_no;
     document.getElementById('spooler_build').innerHTML        = parent._scheduler._gui_subversion_no.replace(/[ ]+[^ ]*/,"") + '/' + parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1");
     document.getElementById('spooler_time').innerHTML         = (state.getAttribute('time').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
     document.getElementById('spooler_start_time').innerHTML   = (state.getAttribute('spooler_running_since').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
@@ -325,6 +326,7 @@ window.onerror  = function( msg, url, line ) {
               document.writeln('              <span id="jobs_tasks">0</span>&#160;<span class="label">'+parent.getTranslation('tasks')+'</span>&#160;|&#160;');
               document.writeln('              <span id="jobs_orders" style="white-space:nowrap;">0&#160;<span class="label">'+parent.getTranslation('orders')+'</span></span>&#160;|&#160;');
               document.writeln('              <span class="label">'+parent.getTranslation('Pid')+':</span>&#160;<span id="spooler_pid" class="label"></span>&#160;|&#160;');
+              document.writeln('              <span class="label">'+parent.getTranslation('Release')+':</span>&#160;<span id="spooler_release" class="label"></span>&#160;|&#160;');
               document.writeln('              <span class="label">'+parent.getTranslation('Build')+':</span>&#160;<span id="spooler_build" class="label"></span>&#160;');
               document.writeln('            </td>');
               document.writeln('            <td align="right">');
