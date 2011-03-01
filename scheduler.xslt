@@ -325,7 +325,14 @@
           <xsl:attribute name="onclick">show_job_details( '<xsl:value-of select="@path"/>' )</xsl:attribute>
           <xsl:attribute name="oncontextmenu">job_menu__onclick( '<xsl:value-of select="@path"/>' );return false;</xsl:attribute>
           
-          <span class="status" title="{$icon_title}" style="{concat('background-color:',$icon_color)}">&#160;</span>
+          <!--xsl:choose>
+            <xsl:when test="@order='yes'">
+              <span class="status" title="{$icon_title}" style="font-size:18px;margin:0px 9px 0px 0px;border:0px;{concat('color:',$icon_color)}">&#x25CF;</span>
+            </xsl:when>
+            <xsl:otherwise-->
+              <span class="status" title="{$icon_title}" style="{concat('background-color:',$icon_color)}">&#160;</span>
+            <!--/xsl:otherwise>
+          </xsl:choose-->
           <span class="bold" style="{concat('color:',$font_color)}"><xsl:value-of select="@name" /></span>
           
           <xsl:if test="(@order='yes' and order_queue/@length &gt; 0) or @next_start_time">
@@ -4154,7 +4161,7 @@
                 <xsl:for-each select="history.entry">
                     <tr>
                         <td><xsl:value-of select="@task"/>&#160;</td>
-                        <td><span class="translate"><xsl:value-of select="@cause"/></span>&#160;</td>
+                        <td><nobr><span class="translate"><xsl:value-of select="@cause"/></span></nobr>&#160;</td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime"/></td>
                         <td align="right"><xsl:value-of select="@steps"/>&#160;</td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>
@@ -4172,9 +4179,8 @@
                     <xsl:if test="ERROR">
                         <tr>
                             <td>&#160;</td>
-                            <td colspan="5" class="job_error">
-                                <xsl:apply-templates select="ERROR"/>
-                            </td>
+                            <td colspan="4" class="job_error"><xsl:apply-templates select="ERROR"/></td>
+                            <td>&#160;</td>
                         </tr>
                     </xsl:if>
                 </xsl:for-each>

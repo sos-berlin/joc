@@ -236,7 +236,6 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
     }
     if( xml.search( /^<modify_spooler cmd=(\'|\")[^\'\"]*(abort|terminate)[^\'\"]*(\'|\")\/>/i ) > -1 ) { err = new Error(); }
     if( xml.search( /^<terminate/i ) > -1 && ( xml.search( /cluster_member_id=/i ) == -1 || this_scheduler ) ) { err = new Error(); }
-        
     
     new Ajax.Request( scheduler._url,
     {
@@ -250,13 +249,14 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           'Content-Length': xml.length 
                         },
        onCreate       : function() { scheduler._activeRequestCount++; },
-       onComplete     : function() { 
+       onComplete     : function(transport) { 
                           //scheduler.logger(6,'ACTIVE CONNECTIONS:' + scheduler._activeRequestCount);
                           scheduler._activeRequestCount--; 
                           if(scheduler._activeRequestCount == 0) window.status = ''; 
+                          scheduler.logger(3,'HTTP REQUEST STATUS onComplete '+transport.status);
                         },
        onSuccess      : function(transport) {
-                          //alert(transport.getAllResponseHeaders());
+       	                  //alert(transport.getAllResponseHeaders());
                           if( !transport.responseText ) err = new Error();
                           if( err ) throw err;
                           var with_reset = (!scheduler._update_finished);
@@ -295,13 +295,14 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                         },
        onFailure:       function(transport) {
                           if( transport.status >= 12000 ) err = new Error();
+                          scheduler.logger(3,'HTTP REQUEST STATUS onFailure '+transport.status);
                           if( err ) throw err;
                           throw new Error( scheduler.getTranslation( "Error at XML answer:" ) + " " + transport.statusText + " (" + transport.status + ")" );
                         },
        onException:     function(requester, x) {
                           scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
-                          if( err ) {
-                            var message = '';
+                          if( err || !scheduler._update_finished ) {
+                          	var message = '';
                             var update_counter_txt = ['First','Second','Third','Fourth','Last'];
                             if( scheduler._update_counter == 6 ) {
                                message = scheduler.getTranslation("No connection to Job Scheduler") 

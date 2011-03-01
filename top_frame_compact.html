@@ -138,7 +138,8 @@ function set_state(response)
       document.getElementById('jobs_stopped').innerHTML       = (subsystems.selectSingleNode("subsystem[@name='job']//job.statistic[ @job_state='stopped' ]/@count").nodeValue   || 0);
       document.getElementById('jobs_need_process').innerHTML  = (subsystems.selectSingleNode("subsystem[@name='job']//job.statistic[ @need_process='true' ]/@count").nodeValue   || 0);
       document.getElementById('jobs_tasks').innerHTML         = (subsystems.selectSingleNode("subsystem[@name='task']//task.statistic[ @task_state='exist' ]/@count").nodeValue  || 0); 
-      var cnt_all_orders                                      = (subsystems.selectSingleNode("subsystem[@name='standing_order']/file_based.statistics/@count_visible").nodeValue || 0);
+      //var cnt_all_orders                                      = (subsystems.selectSingleNode("subsystem[@name='standing_order']/file_based.statistics/@count_visible").nodeValue || 0);
+      var cnt_all_orders                                      = (subsystems.selectSingleNode("subsystem[@name='order']//order.statistic[@order_state='any']/@count").nodeValue || 0);
       var cnt_clustered_orders                                = (subsystems.selectSingleNode("subsystem[@name='order']//order.statistic[@order_state='clustered']/@count").nodeValue || 0);
       
       

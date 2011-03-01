@@ -66,6 +66,7 @@ function showError( x, url, line )
     
     if( parent.error_frame && typeof parent.error_frame.show_error == 'function' ) {
       parent.error_frame.show_error(err);
+      parent._scheduler.logger(4, "_update_counter=" + parent._scheduler._update_counter + "; _update_finished=" + (parent._scheduler._update_finished) );
       if( parent._scheduler._update_counter < 6 && !parent._scheduler._update_finished ) {
         parent._scheduler._update_counter++;
         set_timeout( "callErrorChecked( 'update__onclick', false );", 15000 );
@@ -657,7 +658,7 @@ function start_order( ret )
           var params        = "";
           if( param_names.length + fields.count_new_params > 0 ) params += '<params>'; 
           for( var i = 0; i < param_names.length; i++ ) {
-             params += '<param name="' + param_names[i] + '" value="' + xml_encode(fields[param_names[i]]) + '"/>';
+          	 params += '<param name="' + param_names[i] + '" value="' + xml_encode(fields[param_names[i]]) + '"/>';
           }
           for( var new_param in fields.new_params ) {
             var value = (new_param == "command") ? fields.new_params[new_param].bin2hex() : xml_encode(fields.new_params[new_param]);
@@ -1576,6 +1577,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     var suspended         = null;
     var occupied_http     = null;
     var hot               = 0;
+    //var real_job_chain    = parent.left_frame._job_chain;
     
     if( job_chain_element ) {
       //job_chain_nodes     = job_chain_element.selectNodes( './/job_chain_node' );
@@ -1594,6 +1596,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       suspended           = order_element.getAttribute('suspended');
       occupied_http       = order_element.getAttribute('occupied_by_http_url');
       hot                 = (order_element.selectSingleNode('file_based/@file') && parent._scheduler.versionIsNewerThan( "2008-05-13 09:00:00" )) ? 1 : 0;
+      //real_job_chain      = order_element.getAttribute('path').replace(/([^,]+),[^,]+$/,"$1");
       /*
       var job_chain_stack = order_element.selectSingleNode('order.job_chain_stack/order.job_chain_stack.entry');
       if( job_chain_stack ) {
@@ -1886,8 +1889,10 @@ String.prototype.hex2bin = function() {
 String.prototype.bin2hex = function() {
 	
 	  var tmp = "";
-	  for( var i = 0; i < this.split("").length; i++ ) { 
-	      tmp += this.charCodeAt(i).toString(16);
+	  var str = this;  
+	  var sLength = this.length;
+	  for( var i = 0; i < sLength; i++ ) { 
+	      tmp += str.charCodeAt(i).toString(16).replace(/^([\da-f])$/,"0$1");
 	  }
 	  return tmp;
 }
