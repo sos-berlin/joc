@@ -69,7 +69,7 @@ function showError( x, url, line )
       parent._scheduler.logger(4, "_update_counter=" + parent._scheduler._update_counter + "; _update_finished=" + (parent._scheduler._update_finished) );
       if( parent._scheduler._update_counter < 6 && !parent._scheduler._update_finished ) {
         parent._scheduler._update_counter++;
-        set_timeout( "callErrorChecked( 'update__onclick', false );", 15000 );
+        set_timeout( "callErrorChecked( 'update__onclick', false, false );", 15000 );
       }
     } 
     else if(typeof window['show_error'] == 'function') {
@@ -141,7 +141,6 @@ function update__onclick( with_reset, force, time )
       if( typeof time       != 'number'  ) time       = 200;
       if( with_reset ) resetError();
       if( parent._scheduler.versionIsNewerThan( "2007-10-28 19:00:00" ) ) {
-        if( parent._scheduler._update_incl_hot_folders ) force = true;
         if( force ) {
           if( parent._scheduler.executeSynchron( '<check_folders/>', false, false ) ) {
             set_timeout("parent.left_frame.update()",time);
@@ -309,7 +308,6 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( '<fieldset><legend>'+parent.getTranslation('Update')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_checkbox( "update_periodically", parent.getTranslation('periodically every')+' <input type="text" name="update_seconds" style="text-align:right;width:28px;padding:0px 2px;font-size:12px;" value="' + window.parent.onload_settings.update_seconds + '"/> '+parent.getTranslation('seconds'), window.parent.onload_settings.update_periodically );
-    dialog.add_checkbox( "update_incl_hot_folders", parent.getTranslation('inclusive &quot;<i>Hot Folders</i> &quot;'), window.parent.onload_settings.update_incl_hot_folders );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );
     

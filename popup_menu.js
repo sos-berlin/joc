@@ -679,7 +679,7 @@ Input_dialog.prototype.html = function()
       var submit_onclick = (this.submit_fct) ? this.submit_fct+";" : ""; 
       submit_onclick    += (this.close_after_submit) ? "Input_dialog.close();return false;" : "return false;";
       if( this._with_reload ) {
-        this._html_array.push( '<input class="buttonbar" type="submit" value=" '+parent.getTranslation(this.submit_title+' and reload')+' " onclick="if(' + this.submit_fct + ') window.parent.location.reload();"/>' );
+        this._html_array.push( '<input class="buttonbar" type="submit" value=" '+parent.getTranslation(this.submit_title)+' " onclick="if(' + this.submit_fct + ') window.parent.location.reload();"/>' );
       } else {
         this._html_array.push( '<input class="buttonbar" type="submit" value=" '+parent.getTranslation(this.submit_title)+' " onclick="' + submit_onclick + '"/>' );
       }

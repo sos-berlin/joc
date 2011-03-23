@@ -88,7 +88,6 @@ function Scheduler()
     this._update_seconds                                 = 5;
     this._show_card                                      = 'jobs';
     this._update_periodically                            = false;
-    this._update_incl_hot_folders                        = true;
     
     this._runtime_settings                               = new Object();
     this._runtime_settings.debug_level                   = 0;
@@ -808,9 +807,6 @@ Scheduler.prototype.readCustomSettings = function()
     if( typeof _update_periodically == 'boolean' ) {
       this._update_periodically                      = _update_periodically;
     }
-    if( typeof _update_incl_hot_folders == 'boolean' ) {
-      this._update_incl_hot_folders                  = _update_incl_hot_folders;
-    }
 }
 
 
@@ -841,7 +837,6 @@ Scheduler.prototype.readCookies = function()
     this._runtime_settings.debug_level               = Math.max(_debug_level,parseInt(this.getCookie( 'debug_level', this._runtime_settings.debug_level),10));
     if(!logged) this.logger(3,'START READING COOKIES frameset','scheduler_read_cookies');
     this._update_periodically                        = (this.getCookie( 'update_periodically', this._update_periodically.toString()) == 'true');
-    this._update_incl_hot_folders                    = (this.getCookie( 'update_incl_hot_folders', this._update_incl_hot_folders.toString()) == 'true');
     this._update_seconds                             = parseInt(this.getCookie( 'update_seconds', this._update_seconds),10);
     this._show_card                                  = this.getCookie( 'show_card', this._show_card);
     

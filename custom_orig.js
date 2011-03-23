@@ -37,13 +37,6 @@ _update_seconds          = 5;
 
 
 /*****************************************************************
-*  If 'true' then the update checks the hot folders additionally 
-*  (default = false).
-*/
-_update_incl_hot_folders = true;
-
-
-/*****************************************************************
 *  You can switch between the tabs 'jobs', 'job_chains',
 *  'process_classes' and 'last_activities' 
 *  (default = 'jobs') as the beginning view.

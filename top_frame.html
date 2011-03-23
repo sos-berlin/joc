@@ -70,9 +70,6 @@ function do_onload()
 {      
     parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
     scheduler_init();
-    if( document.getElementById('check_folders_checkbox') ) {
-      document.getElementById('check_folders_checkbox').checked = parent._scheduler._update_incl_hot_folders;    
-    }
     document.getElementById(parent._scheduler._show_card+'_inner_tab').className = 'active'+tabs[parent._scheduler._show_card].pos;
     if( parent._response.selectNodes("/spooler/answer/state/cluster[@backup='yes']").length > 0 ) {
       document.getElementById('backup').innerHTML = parent.getTranslation('THIS IS A BACKUP...').replace(/ /g,'&#160;');
@@ -179,11 +176,6 @@ function update_periodically_checkbox__onclick(obj)
 {
     parent._scheduler._update_periodically     = obj.checked;
     set_timeout('parent.left_frame.repeat_update( parent._scheduler._update_periodically, parent._scheduler._update_periodically );',1);
-}
-
-function update_incl_hot_folders_checkbox__onclick(obj)
-{
-    parent._scheduler._update_incl_hot_folders = obj.checked;
 }
 
 //---------------------------------------------------------------------------------------show_card
@@ -336,18 +328,7 @@ window.onerror  = function( msg, url, line ) {
                           <noscript>Update&#160;periodically</noscript>
                         </span></label>
                     </td>
-                    <td valign="bottom" width="1px" class="top" style="padding-top:4px;">
-                        <input id="check_folders_checkbox" type="checkbox" style="position:relative;top:0px;height:14px;margin:0px;padding:0px;" name="check_folders_checkbox" onclick="update_incl_hot_folders_checkbox__onclick(this)"/>
-                    </td>
-                    <td valign="middle" width="1px" class="top" style="padding:4px;">
-                        <label class="top" for="check_folders_checkbox"><span id="check_folders_label" style="white-space:nowrap;">
-                          <script language="javascript" type="text/javascript">
-                            document.write(parent.getTranslation('incl. Hot Folders'));
-                          </script>
-                          <noscript>incl.&#160;Hot&#160;Folders</noscript>
-                        </span></label>
-                    </td>
-                    <td align="left" valign="middle" class="top" style="padding-left:4px;white-space:nowrap;"><div id="config_button" class="button" onclick="callErrorChecked('update__onclick');"><!--[if lte IE 7]><a href="javascript:void(0);"><![endif]-->
+                    <td align="left" valign="middle" class="top" style="padding-left:4px;white-space:nowrap;"><div id="config_button" class="button" onclick="callErrorChecked('update__onclick', true, true);"><!--[if lte IE 7]><a href="javascript:void(0);"><![endif]-->
                       <script language="javascript" type="text/javascript">
                         document.write(parent.getTranslation('Update'));
                       </script>

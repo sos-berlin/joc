@@ -70,10 +70,6 @@ function do_onload()
     parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
     scheduler_init();
     
-    if( document.getElementById('check_folders_checkbox') ) {
-      if( !ie ) document.getElementById('check_folders_checkbox').style.top = '2px';
-      document.getElementById('check_folders_checkbox').checked = parent._scheduler._update_incl_hot_folders;    
-    }
     if( document.getElementById( "update_periodically_checkbox" ) && !ie ) {
       document.getElementById( "update_periodically_checkbox" ).style.top = '2px';
     }
@@ -183,11 +179,6 @@ function update_periodically_checkbox__onclick(obj)
     set_timeout('parent.left_frame.repeat_update( parent._scheduler._update_periodically, parent._scheduler._update_periodically );',1);
 }
 
-function update_incl_hot_folders_checkbox__onclick(obj)
-{
-    parent._scheduler._update_incl_hot_folders = obj.checked;
-}
-
 //---------------------------------------------------------------------------------------show_card
 function show_card( what )
 {
@@ -262,7 +253,7 @@ window.onerror  = function( msg, url, line ) {
     <table class="titlebar" cellspacing="0" cellpadding="0" border="0" width="100%">
       <colgroup>
         <col width="30%"/>
-        <col width="1%" span="8"/>
+        <col width="1%" span="6"/>
         <col width="*"/>
         <col width="86"/>
       </colgroup>
@@ -285,7 +276,7 @@ window.onerror  = function( msg, url, line ) {
               write_menu('extras');
               write_menu('menu');
               document.writeln('          <td class="titlebar" align="right" title="update" style="padding:0px 4px;">');
-              document.writeln('            <a class="titlebar" href="javascript:void(0);" onclick="callErrorChecked( \'update__onclick\' );">');
+              document.writeln('            <a class="titlebar" href="javascript:void(0);" onclick="callErrorChecked( \'update__onclick\', true, true );">');
               document.writeln('              <span style="font-family:Arial;">&#9658;</span>'+parent.getTranslation('update'));
               document.writeln('            </a>');
               document.writeln('          </td>');
@@ -294,12 +285,6 @@ window.onerror  = function( msg, url, line ) {
               document.writeln('          </td>');
               document.writeln('          <td class="titlebar" style="padding:0px 2px;">');
               document.writeln('              <span class="label" style="white-space:nowrap;">'+parent.getTranslation('every $secs',{sec:parent._scheduler._update_seconds})+'</span>');
-              document.writeln('          </td>');
-              document.writeln('          <td class="titlebar">');
-              document.writeln('              <input id="check_folders_checkbox" name="check_folders_checkbox" type="checkbox" style="position:relative;top:0px;height:14px;margin:0px;padding:0px;" onclick="update_incl_hot_folders_checkbox__onclick(this)"/>');
-              document.writeln('          </td>');
-              document.writeln('          <td class="titlebar" style="padding:0px 2px;">');
-              document.writeln('              <span class="label" style="white-space:nowrap;">'+parent.getTranslation('incl. Hot Folders')+'</span>');
               document.writeln('          </td>');
               document.writeln('          <td class="titlebar" align="right" style="padding:0px 2px;">');
               document.writeln('              <span class="label">&#160;'+parent.getTranslation('last update')+':</span><span id="spooler_time">0000-00-00 00:00:00</span>');

@@ -62,7 +62,6 @@ _translations['Configuration']                             = 'Konfiguration';
 //First line                                  
 _translations['Documentation']                             = 'Dokumentation';
 _translations['every $secs']                               = 'alle $secs';
-_translations['incl. Hot Folders']                         = 'inkl. Hot Folders';
                                                       
 //Other lines                            
 _translations['ID']                                        = 'ID';
@@ -661,7 +660,6 @@ _translations['unknown error']                             = 'unbekannter Fehler
 
 //Buttons
 _translations['submit']                                    = 'Speichern';
-_translations['submit and reload']                         = 'Speichern mit Neustart';
 _translations['cancel']                                    = 'Abbrechen';
 _translations['new param']                                 = 'Neuer Parameter';
 _translations['run time editor']                           = 'Runtime-Editor';
@@ -681,7 +679,6 @@ _translations['Name']                                      = 'Name';
 _translations['The following values will be stored in a cookie. If no cookies are available the values which are set in <code>./custom.js</code> are used.'] = 'Die folgenden Einstellungen werden in einem Cookie gespeichert. Falls keine Cookies zur Verfügung stehen, werden die entsprechenden Werte aus <code>./custom.js</code> herangezogen.';
 _translations['Onload Values']                             = 'Einstellungen beim Laden';
 _translations['periodically every']                        = 'periodisch alle';
-_translations['inclusive &quot;<i>Hot Folders</i> &quot;'] = 'inklusive &quot;<i>Hot Folders</i> &quot;';
 _translations['Tabs']                                      = 'Tabs';
 _translations['Switch to']                                 = 'Am Anfang den Tab';
 _translations['as the beginning view']                     = 'anzeigen';
@@ -727,7 +724,7 @@ _translations['Enter an order id']                         = 'Id des Auftrags';
 _translations['Enter an order title']                      = 'Title des Auftrags';
 _translations['Select an order state']                     = 'Status des Auftrags';
 _translations['Select an order end state']                 = 'Endstatus des Auftrags';
-_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?'] = 'Um den Auftrag dem Hot-Folder zu übergeben, muss eine Auftrags-ID angegeben\nwerden. Ansonsten hat dieser nur die Lebenszeit der aktuellen Job Scheduler Session.\nWollen Sie fortfahren?';
+_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?'] = 'Um den Auftrag dem Hot Folder zu übergeben, muss eine Auftrags-ID angegeben\nwerden. Ansonsten hat dieser nur die Lebenszeit der aktuellen Job Scheduler Session.\nWollen Sie fortfahren?';
 
 //set order state
 _translations['Set order state of $order']                 = 'Setze Status für $order';

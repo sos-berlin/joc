@@ -62,7 +62,6 @@ _translations['Configuration']                             = 'Configuration';
 //First line                                  
 _translations['Documentation']                             = 'Documentation';
 _translations['every $secs']                               = 'toutes les $secs';
-_translations['incl. Hot Folders']                         = 'incl. Hot Folders';
                                                       
 //Other lines                            
 _translations['ID']                                        = 'ID';
@@ -660,7 +659,6 @@ _translations['unknown error']                             = 'erreur inconnue';
 
 //Buttons
 _translations['submit']                                    = 'soumettre';
-_translations['submit and reload']                         = 'soumettre et recharger la configuration';
 _translations['cancel']                                    = 'annuler';
 _translations['new param']                                 = 'nouveau paramètre';
 _translations['run time editor']                           = 'Editeur de dates de lancement';
@@ -680,7 +678,6 @@ _translations['Name']                                      = 'Nom';
 _translations['The following values will be stored in a cookie. If no cookies are available the values which are set in <code>./custom.js</code> are used.'] = 'Les valeurs suivantes seront enregistrées dans un cookie. Si aucun cookie n\'est disponible, les valeurs qui sont utilisées sont celles du fichier <code>./custom.js</code>.';
 _translations['Onload Values']                             = 'Valeurs au démarrage';
 _translations['periodically every']                        = 'périodiquement tous les';
-_translations['inclusive &quot;<i>Hot Folders</i> &quot;'] = 'y compris les &quot;<i>Hot Folders</i> &quot;';
 _translations['Tabs']                                      = 'Onglets';
 _translations['Switch to']                                 = 'Enchaîner sur';
 _translations['as the beginning view']                     = 'comme vue de départ';
