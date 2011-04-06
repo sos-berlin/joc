@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <!--
 /********************************************************* begin of preamble
 **
@@ -83,8 +83,7 @@ function do_onload()
 {   
     parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_control');
                                                            
-    _frm = parent.document.getElementById( "top_and_bottom_frameset" );
-    if( navigator.appVersion.indexOf("MSIE") > -1 ) document.getElementsByTagName('body')[0].style.marginRight = "19px";
+    _frm = parent.document.getElementById( "top_and_bottom_frameset" ); 
     
     translate();
     get_filters( 'jobs' );
@@ -101,6 +100,8 @@ function do_onload()
     
     parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_control'); 
 }
+
+
 
 
 //-----------------------------------------------------------------------------------------onunload
@@ -502,7 +503,7 @@ window.onresize = set_frame_height;
         <table id="controls" class="middle" cellpadding="0" cellspacing="0" border="0" width="100%">
           <thead>
             <tr>
-              <td style="height:20px;line-height:20px;width:100%">
+              <td style="height:24px;line-height:24px;width:100%;padding-bottom:4px;">
                 <!--span id="view_icons" sos_class="jobs job_chains schedules locks orders" style="display:none;"-->
                 <span id="view_icons" sos_class="jobs job_chains" style="display:none;">
                   <img src="explorer_folders.gif"       title="toggle to tree view" style="cursor:pointer"                   onclick="toggle_view(this.parentNode);" />
@@ -656,7 +657,6 @@ window.onresize = set_frame_height;
                 </div>
               </td>
             </tr>
-            <tr><td colspan="2" style="height:4px;line-height:4px;"></td></tr>
           </thead>
         </table>
       </div>

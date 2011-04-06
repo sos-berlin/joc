@@ -95,13 +95,14 @@ function getTranslation( s, args )
 var ie        = 0;   // Microsoft Internet Explorer
 var gecko     = 0;   // Mozilla Firefox, Seamonkey, Iceweasel, Iceapel, Netscape
 var chrome    = 0;   // Google Chrome
+var safari    = 0;   // Safari
 var geckoName = 'Mozilla Browser';
 
 
 function check_browser()
 {   
     if( window != undefined )
-    {                
+    {                 
         if( window.navigator != undefined  &&  window.navigator.appName )
         {   
             if( window.navigator.appName == "Microsoft Internet Explorer" )
@@ -117,11 +118,12 @@ function check_browser()
             }
             else
             if( window.navigator.appName == "Netscape" )
-            {
+            {   
                 var match = window.navigator.userAgent.match( /\).*\b([^\/]+)\/(\d+\.\d+)/ );
                 if( match ) {
-                  gecko = 1 * RegExp.$2;
-                  geckoName = RegExp.$1;
+                	geckoName = RegExp.$1;
+                  if( geckoName.toLowerCase() != "epiphany" ) gecko = 1 * RegExp.$2;
+                  if( geckoName.toLowerCase() == "safari" ) safari = 1 * RegExp.$2;
                 }
             }
         }

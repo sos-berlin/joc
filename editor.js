@@ -360,7 +360,7 @@ DOMManager.loadXML = function( xml ) {
     xml = '<job name="">\n' + xml;
     xml += '\n</job>';
 
-    if ( window.DOMParser ) {
+    if ( !navigator.appVersion.match(/\bMSIE\b/) && window.DOMParser ) {
 
       var dom_parser = new DOMParser();
       dom_document = dom_parser.parseFromString( xml, "text/xml" );

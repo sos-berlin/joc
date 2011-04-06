@@ -55,6 +55,7 @@ function Scheduler()
     this._lang_file_exists                               = ( typeof window['_lang_file_exists'] == 'boolean' ) ? _lang_file_exists : false;
     this._tree_view_enabled                              = false; //2.1.0.6101  (2010-04-06 11:53:57)
     this._activeRequestCount                             = 0;
+    this._ie                                             = navigator.appVersion.match(/\bMSIE\b/);
     this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains'}; 
     this._view                                           = {'jobs'             :'list',
                                                             'job_chains'       :'list',
@@ -143,14 +144,14 @@ Scheduler.prototype.loadXML = function( xml )
 {
     this.logger(3,'START LOAD XML TO DOM','scheduler_dom');
     var dom_document;
-    if( window.DOMParser )
-    {
+    if(!this._ie && window.DOMParser)
+    {   
         var dom_parser = new DOMParser();
         dom_document   = dom_parser.parseFromString( xml, "text/xml" );
         if( dom_document.documentElement.nodeName == "parsererror" )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.documentElement.firstChild.nodeValue );
     }
     else
-    {
+    {   
         dom_document   = new ActiveXObject( "MSXML2.DOMDocument" );
         dom_document.validateOnParse = false;
         if( !dom_document.loadXML( xml ) )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.parseError.reason );
@@ -254,7 +255,8 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           if(scheduler._activeRequestCount == 0) window.status = ''; 
                           scheduler.logger(3,'HTTP REQUEST STATUS onComplete '+transport.status);
                         },
-       onSuccess      : function(transport) {
+       onSuccess      : function(transport) { 
+       	                  //alert(document.documentMode);
        	                  //alert(transport.getAllResponseHeaders());
                           if( !transport.responseText ) err = new Error();
                           if( err ) throw err;
@@ -721,7 +723,7 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
     if( typeof with_translate != 'boolean' ) with_translate = true;
     if( typeof text_output    != 'boolean' ) text_output    = true;
     
-    if( window.DOMParser ) {   
+    if( !this._ie ) {   
       result_dom = this._xslt.transformToDocument( dom_document );
     } else {
       if( !with_translate && text_output ) {

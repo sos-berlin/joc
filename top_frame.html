@@ -197,10 +197,11 @@ function show_card( what )
 
 //---------------------------------------------------------------------------------------write_menu
 function write_menu( menu, align )
-{
+{ 
   var menu_title = parent.getTranslation(menu.substr(0,1).toUpperCase() + menu.substring(1));
   if( window.createPopup == undefined ) {
     var blanks = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
+    var blanks2 = (parent.safari > 0) ? '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' : '';
     document.writeln('                <div class="selectbox_'+menu+'">');
     document.writeln('                  <select class="'+align+'" id="__selectbox_'+menu+'_'+align+'__" name="__selectbox_'+menu+'_'+align+'__" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
     if( align == 'left' ) {
@@ -208,10 +209,10 @@ function write_menu( menu, align )
       document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');
       document.writeln('                  </select>');
     } else {
-      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+menu_title+blanks+'</option>');
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+blanks+blanks2+menu_title+blanks+'&#160;&#160;</option>');
       document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');                    
       document.writeln('                  </select>');
-      document.writeln('                  <div style="position:relative;top:-16px;height:14px;width:16px;background-color:#CFD7EB">&#160;</div>');
+      document.writeln('                  <div style="position:relative;top:-18px;height:16px;width:16px;background-color:#CFD7EB">&#160;</div>');
     }
     document.writeln('                </div>');
   } else {
