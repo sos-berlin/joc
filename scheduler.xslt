@@ -4503,10 +4503,10 @@
                 <xsl:if test="parent::answer/ERROR">
                   <tr>
                         <td class="label"><span class="label">Error</span>:</td>
-                        <td>
+                        <td colspan="2">
                             <span class="red"><xsl:value-of select="parent::answer/ERROR/@text"/></span>
                         </td>
-                        <td>
+                        <!--td>
                              <xsl:attribute name="class">job_chain</xsl:attribute>
                              <xsl:attribute name="style">text-align:right;padding:0px 2px;</xsl:attribute>
                              <xsl:call-template name="command_menu">
@@ -4514,7 +4514,7 @@
                                  <xsl:with-param name="onclick_call"         select="'add_job_chain'"/>
                                  <xsl:with-param name="onclick_param1_str"   select="@job_chain"/>
                              </xsl:call-template>
-                        </td>
+                        </td-->
                     </tr>
                 </xsl:if>
                 

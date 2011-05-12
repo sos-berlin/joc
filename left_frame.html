@@ -283,10 +283,11 @@ function update_jobs_frame()
 
 function collect_tree_answer( response, index )
 {
-  _answer[0][index] = response.selectSingleNode('/spooler/answer/state').xml;
+  var stateElem = response.selectSingleNode('/spooler/answer/state');
+  _answer[0][index] = stateElem.xml;
   _answer_complete++;
   if( _answer_complete == _answer[0].length ) {
-    var dom_xml = '<spooler><answer>' + _answer[0].join('') + '</answer></spooler>';
+    var dom_xml = '<spooler><answer time="'+stateElem.getAttribute('time')+'">' + _answer[0].join('') + '</answer></spooler>';
     _answer[0]  = [];
     _answer_complete = 0;
     _response   = parent._scheduler.loadXML(dom_xml);
@@ -317,7 +318,8 @@ function collect_list_answer( response, index )
   }
   _answer_complete++;
   if( _answer_complete == _answer[0].length ) {
-    var dom_xml  = '<spooler><answer><state state="'+parent.top_frame._state.getAttribute('state')+'">';
+    var dom_xml  = '<spooler><answer time="'+parent.top_frame._state.getAttribute('time')+'">'
+    dom_xml     += '<state state="'+parent.top_frame._state.getAttribute('state')+'">';
     for( var i=0; i < node_name.length; i++ ) {
       dom_xml   += '<'+node_name[i]+'>' + _answer[i].join('') + '</'+node_name[i]+'>';
       _answer[i] = [];
@@ -339,12 +341,12 @@ function collect_list_answer( response, index )
 function collect_list_answer2()
 { 
   var node_name  = parent._scheduler._show_card;
-  var dom_xml    = '';
+  var dom_xml    = '<spooler><answer time="'+parent.top_frame._state.getAttribute('time')+'">';
   if( node_name == 'cluster' || node_name == 'remote_schedulers' ) {
-    dom_xml      = '<spooler><answer>'+parent.top_frame._state.xml+'</answer></spooler>';
+    dom_xml     += parent.top_frame._state.xml+'</answer></spooler>';
   } else {
     var nodes    = parent.top_frame._state.selectNodes('//'+node_name);
-    dom_xml      = '<spooler><answer><state state="'+parent.top_frame._state.getAttribute('state')+'">';
+    dom_xml     += '<state state="'+parent.top_frame._state.getAttribute('state')+'">';
     dom_xml     += '<'+node_name+'>';
     for(var i=0; i<nodes.length; i++ ) {
       if( nodes[i].xml.search( /\/>$/ ) == -1 ) {

@@ -1511,9 +1511,9 @@ function job_menu__onclick( job_name )
     popup_builder.add_command ( parent.getTranslation("End tasks")     , "<modify_job job='" + parent.left_frame._job_name + "' cmd='end'     />", enabled );
     popup_builder.add_command ( parent.getTranslation("Suspend tasks") , "<modify_job job='" + parent.left_frame._job_name + "' cmd='suspend' />", enabled );
     popup_builder.add_command ( parent.getTranslation("Continue tasks"), "<modify_job job='" + parent.left_frame._job_name + "' cmd='continue'/>", enabled );
-    popup_builder.add_bar();
-    //popup_builder.add_command ( parent.getTranslation("Delete job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", !order_job, parent.getTranslation('Do you really want to delete this job?'), 'job|'+parent.left_frame._job_name );
-    popup_builder.add_command ( parent.getTranslation("Delete job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", true, parent.getTranslation('Do you really want to delete this job?'), 'job|'+parent.left_frame._job_name );
+    //popup_builder.add_bar();
+    ////popup_builder.add_command ( parent.getTranslation("Delete job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", !order_job, parent.getTranslation('Do you really want to delete this job?'), 'job|'+parent.left_frame._job_name );
+    //popup_builder.add_command ( parent.getTranslation("Delete job")    , "<modify_job job='" + parent.left_frame._job_name + "' cmd='remove'/>", true, parent.getTranslation('Do you really want to delete this job?'), 'job|'+parent.left_frame._job_name );
     
     _popup_menu = popup_builder.show_popup_menu();
 }
