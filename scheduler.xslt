@@ -4349,7 +4349,7 @@
                         <tr><td colspan="5" style="color: darkred"><xsl:value-of select="ERROR/@text"/></td></tr>
                     </xsl:if> 
                     <xsl:for-each select="order[ position() &lt;= $max_order_history ]">
-                        <xsl:sort select="@end_time" order="descending"/>
+                        <xsl:sort select="concat(@end_time,@start_time)" order="descending"/>
                         <xsl:element name="tr">
                             <xsl:element name="td">                
                             <xsl:if test="@state = ancestor::job_chain[@path=current()/@job_chain or substring(@path,2)=current()/@job_chain]/job_chain_node/@error_state">
