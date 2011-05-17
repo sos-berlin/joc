@@ -470,7 +470,8 @@ SOS_Logger.debugLog = function(level,msg,styleMsg){
 SOS_Logger.getDebugWindow = function(){
   try{
     if(!SOS_Logger.popUpBlocker && (typeof SOSDebugWindow == 'undefined' || SOSDebugWindow == null || SOSDebugWindow.closed == true)){
-      SOSDebugWindow = window.open('dummy.html',SOS_Logger.windowName,'top='+SOS_Logger.windowTop+',left='+SOS_Logger.windowLeft+',width='+SOS_Logger.windowWidth+',innerwidth='+SOS_Logger.windowWidth+',height='+SOS_Logger.windowHeight+',innerheight='+SOS_Logger.windowHeight+SOS_Logger.windowProperties,true);
+      SOSDebugWindow = window.open('dummy.html',SOS_Logger.windowName); 
+      //SOSDebugWindow = window.open('dummy.html',SOS_Logger.windowName,'top='+SOS_Logger.windowTop+',left='+SOS_Logger.windowLeft+',width='+SOS_Logger.windowWidth+',innerwidth='+SOS_Logger.windowWidth+',height='+SOS_Logger.windowHeight+',innerheight='+SOS_Logger.windowHeight+SOS_Logger.windowProperties,true);
     }
     if(typeof SOSDebugWindow == 'undefined' || SOSDebugWindow == null){
       SOS_Logger.popUpBlocker = true;

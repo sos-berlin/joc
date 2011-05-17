@@ -245,6 +245,13 @@ function show_job_desc()
 }
 
 
+//------------------------------------------------------------------------------------show_xml
+function show_xml(obj_name)
+{
+    open_window( "show_xml" + encodeComponent(obj_name), "scheduler_data/config/live" + encodeComponent(obj_name), false );
+}
+
+
 //-----------------------------------------------------------------------------show_job_illustration
 // Fuer scheduler_menu__onclick()
 function show_job_illustration()
@@ -1487,7 +1494,8 @@ function job_menu__onclick( job_name )
     var hot           = (job_element.selectSingleNode('file_based/@file') && parent._scheduler.versionIsNewerThan( "2008-05-13 09:00:00" ) ) ? 1 : 0;
     
     popup_builder.add_show_log( parent.getTranslation("Show log")        , "show_log?job=" + encodeComponent(job_name), "show_log_job_" + job_name.replace(/\//g,'_') );
-
+    popup_builder.add_entry   ( parent.getTranslation("Show xml"), "show_xml('"+job_name+".job.xml')", hot );
+    
     var has_description = (job_element.getAttribute( "has_description" ) == "yes");
     popup_builder.add_entry   ( parent.getTranslation("Show description"), "show_job_desc()", has_description );
     popup_builder.add_entry   ( parent.getTranslation("Show dependency") , "show_job_illustration()", true );
@@ -1621,7 +1629,8 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     } else {
       popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "show_log?job_chain=" + encodeComponent(job_chain) +
                                                    "&order=" + encodeComponent(order_id), "show_log_order_" + job_chain.replace(/\//g,'_') + "__" + order_id );
-      popup_builder.add_entry ( parent.getTranslation("Show start times") , "callErrorChecked('show_calendar','order')" );
+      popup_builder.add_entry   ( parent.getTranslation("Show xml")         , "show_xml('"+job_chain+","+order_id+".order.xml')", hot );
+      popup_builder.add_entry   ( parent.getTranslation("Show start times") , "callErrorChecked('show_calendar','order')" );
       popup_builder.add_bar();
       popup_builder.add_entry   ( parent.getTranslation("Start order now"), "callErrorChecked('start_order_at',1)", (suspended != "yes") );
       popup_builder.add_entry   ( parent.getTranslation("Start order at") , "callErrorChecked('start_order_at',0)", (suspended != "yes") );
@@ -1666,6 +1675,7 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
     parent.left_frame._order_id  = '';
     parent.left_frame._job_chain = xml_encode(job_chain);
         
+    popup_builder.add_entry ( parent.getTranslation("Show xml")            , "show_xml('"+job_chain+".job_chain.xml')", hot );
     popup_builder.add_entry ( parent.getTranslation("Show dependency")     , "show_job_chain_illustration()", !big_chain );
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {
       popup_builder.add_entry ( parent.getTranslation("Show start times")  , "callErrorChecked('show_calendar','job_chain')", !big_chain );
@@ -1752,6 +1762,7 @@ function schedule_menu__onclick( schedule, substitute, used, hot, title )
     parent.left_frame._schedule   = xml_encode(schedule);
     parent.left_frame._substitute = xml_encode(substitute);
     var popup_builder = new Popup_menu_builder();
+    popup_builder.add_entry ( parent.getTranslation("Show xml")         , "show_xml('"+schedule+".schedule.xml')", (hot-1) );
     popup_builder.add_entry ( parent.getTranslation("Add substitute")   , "callErrorChecked('set_run_time','add_substitute',"+(hot-1)+")" );
     popup_builder.add_entry ( parent.getTranslation("Edit schedule")    , "callErrorChecked('set_run_time','schedule',"+(hot-1)+")" );
     popup_builder.add_bar();

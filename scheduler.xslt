@@ -297,8 +297,8 @@
       </xsl:variable>
       <xsl:variable name="font_color">
         <xsl:choose>
-          <xsl:when test="$icon_color = 'crimson'">darkred</xsl:when>
-          <xsl:when test="$icon_color = 'darkorange'">darkred</xsl:when>
+          <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
+          <xsl:when test="$icon_color = 'darkorange'">crimson</xsl:when>
           <xsl:when test="$icon_color = 'gray'">gray</xsl:when>
         </xsl:choose>
       </xsl:variable>
@@ -382,7 +382,7 @@
       </xsl:variable>
       <xsl:variable name="font_color">
         <xsl:choose>
-          <xsl:when test="$icon_color = 'crimson'">darkred</xsl:when>
+          <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
           <xsl:when test="$icon_color = 'gray'">gray</xsl:when>
         </xsl:choose>
       </xsl:variable>
@@ -518,7 +518,7 @@
                   <xsl:attribute name="onmouseout">this.className='tree';</xsl:attribute>
                 </xsl:if>
                 <td><span class="status" title="is missing" style="background-color:crimson;">&#160;</span>
-                    <span class="bold" style="color:darkred;"><xsl:apply-templates mode="trim_slash" select="@job_chain" /></span>
+                    <span class="bold" style="color:crimson;"><xsl:apply-templates mode="trim_slash" select="@job_chain" /></span>
                 </td><td align="right"><span class="job_error" style="white-space:nowrap;">is missing</span></td>
               </tr></table>
           </li>
@@ -548,8 +548,8 @@
       </xsl:variable>
       <xsl:variable name="font_color">
         <xsl:choose>
-          <xsl:when test="$icon_color = 'crimson'">darkred</xsl:when>
-          <xsl:when test="$icon_color = 'darkorange'">darkred</xsl:when>
+          <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
+          <xsl:when test="$icon_color = 'darkorange'">crimson</xsl:when>
           <xsl:when test="$icon_color = 'gray'">gray</xsl:when>
         </xsl:choose>
       </xsl:variable>
@@ -647,7 +647,7 @@
       </xsl:param>
       <xsl:param name="font_color">
         <xsl:choose>
-          <xsl:when test="$icon_color = 'crimson'">darkred</xsl:when>
+          <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
           <xsl:when test="$icon_color = 'gray'">gray</xsl:when>
           <xsl:otherwise>black</xsl:otherwise>
         </xsl:choose>
@@ -687,7 +687,7 @@
       </xsl:param>
       <xsl:param name="font_color">
         <xsl:choose>
-          <xsl:when test="$icon_color = 'crimson'">darkred</xsl:when>
+          <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
           <xsl:when test="$icon_color = 'gray'">gray</xsl:when>
           <xsl:otherwise>black</xsl:otherwise>
         </xsl:choose>
@@ -733,7 +733,7 @@
       </xsl:param>
       <xsl:param name="font_color">
         <xsl:choose>
-          <xsl:when test="$icon_color = 'crimson'">darkred</xsl:when>
+          <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
           <xsl:when test="$icon_color = 'gray'">gray</xsl:when>
           <xsl:otherwise>black</xsl:otherwise>
         </xsl:choose>
@@ -770,7 +770,7 @@
                 <tr style="">
                     <td class="head1" style="padding-left:8px;"><span class="translate">State</span></td>
                     <td class="head"><span class="translate" style="white-space:nowrap;">Job chain</span>/ <span class="translate">Job</span></td>
-                    <td class="head"><span class="translate" style="white-space:nowrap;color:#009933;">Next start</span>&#160;/ <span class="translate" style="white-space:nowrap;color:darkred;">Setback</span></td>
+                    <td class="head"><span class="translate" style="white-space:nowrap;color:#009933;">Next start</span>&#160;/ <span class="translate" style="white-space:nowrap;color:crimson;">Setback</span></td>
                     <td class="head" colspan="2" align="left"><span class="translate" style="white-space:nowrap;">Job chain/</span>&#160;  <span class="translate" style="white-space:nowrap;">Job state</span></td>
                 </tr>
                 <xsl:call-template name="after_head_space">
@@ -964,18 +964,18 @@
                     </xsl:element>
                 </xsl:when>
                 <xsl:when test="@on_blacklist='yes'">
-                    <span class="label" style="color:darkred">on blacklist</span>
+                    <span class="label" style="color:crimson">on blacklist</span>
                 </xsl:when>
                 <xsl:when test="@suspended = 'yes'">
-                    <span class="label" style="color:darkred">suspended</span>
+                    <span class="label" style="color:crimson">suspended</span>
                 </xsl:when>
                 <xsl:when test="@setback">
-                    <span class="label" style="color:darkred">
+                    <span class="label" style="color:crimson">
                        <xsl:apply-templates mode="date_time_nowrap" select="@setback__xslt_date_or_time_with_diff"/>
                     </span>
                 </xsl:when>
                 <xsl:when test="@removed">
-                    <span class="label" style="color:darkred">deleted</span>
+                    <span class="label" style="color:crimson">deleted</span>
                 </xsl:when>
                 <xsl:when test="@replacement">
                     <xsl:element name="span">
@@ -1546,7 +1546,7 @@
                      </xsl:choose-->
                      <xsl:choose>
                        <xsl:when test="file_based/@state='active'"><span class="translate" style="color:forestgreen;"><xsl:value-of select="file_based/@state"/></span></xsl:when>
-                       <xsl:otherwise><span class="translate" style="darkred;"><xsl:value-of select="file_based/@state"/></span></xsl:otherwise>
+                       <xsl:otherwise><span class="translate" style="crimson;"><xsl:value-of select="file_based/@state"/></span></xsl:otherwise>
                      </xsl:choose>
                    </td>
               </tr>
@@ -1639,7 +1639,7 @@
                       <td class="head"><span class="translate">Started</span></td>
                       <td class="head"><span class="translate">Ended</span></td>
                       <td class="head"><span class="translate" style="white-space:nowrap;">Job chain/</span>&#160; <span class="translate" style="color:#009933;">Cause</span></td>
-                      <td class="head" colspan="2"><span class="translate" style="white-space:nowrap;">Order state/</span>&#160; <span class="translate" style="color:darkred;white-space:nowrap;">Exitcode</span></td>
+                      <td class="head" colspan="2"><span class="translate" style="white-space:nowrap;">Order state/</span>&#160; <span class="translate" style="color:crimson;white-space:nowrap;">Exitcode</span></td>
                     </xsl:when>
                     <xsl:when test="/spooler/@last_activities_radios = 'orders'">
                       <td class="head1"><span class="translate" style="white-space:nowrap;">Order ID</span></td>
@@ -2337,7 +2337,7 @@
                <span class="task"><xsl:value-of select="@task"/></span>
            </xsl:when>
            <xsl:when test="@suspended = 'yes'">
-               <span class="label" style="white-space:nowrap;color:darkred">suspended</span>
+               <span class="label" style="white-space:nowrap;color:crimson">suspended</span>
            </xsl:when>
            <xsl:when test="@setback">
                <span class="label" style="{$style}">Setback</span><span class="small" style="{$style}">:&#160;</span>
@@ -2346,7 +2346,7 @@
                </span>
            </xsl:when>
            <xsl:when test="@removed">
-               <span class="label" style="white-space:nowrap;color:darkred">deleted</span>
+               <span class="label" style="white-space:nowrap;color:crimson">deleted</span>
            </xsl:when>
            <xsl:when test="@replacement">
                <span class="label" title="This order is a replacement for another order with the same ID">
@@ -2764,7 +2764,7 @@
                 <xsl:text>cursor: default;</xsl:text>
                 <xsl:choose>
                     <xsl:when test="@heart_beat_count=0">color:gray;</xsl:when>
-                    <xsl:when test="@dead='yes'">color:darkred;</xsl:when>
+                    <xsl:when test="@dead='yes'">color:crimson;</xsl:when>
                     <xsl:when test="@active='yes'">color:forestgreen;</xsl:when>
                 </xsl:choose>
             </xsl:attribute>
@@ -2992,7 +2992,7 @@
                         <td><xsl:value-of select="@tcp_port"/></td>
                         <td><xsl:value-of select="@scheduler_id"/></td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@connected_at__xslt_date_or_time_with_diff"/></td>
-                        <td style="color: darkred">
+                        <td style="color: crimson">
                             <xsl:if test="@connected='no'">
                                 <xsl:apply-templates mode="date_time_nowrap" select="@disconnected_at__xslt_date_or_time_with_diff"/>
                             </xsl:if>
@@ -3062,7 +3062,7 @@
               </xsl:if>
               <xsl:choose>
                 <xsl:when test="@state='stopped' or @state='under_construction'">
-                  <span class="translate" style="color:darkred"><xsl:value-of select="@state"/></span>    
+                  <span class="translate" style="color:crimson"><xsl:value-of select="@state"/></span>    
                 </xsl:when>
                 <xsl:when test="@state='running'">
                   <span class="translate" style="color:forestgreen">active</span>    
@@ -4233,7 +4233,7 @@
                     </tr>
                     <tr>
                         <td class="head1"><span class="translate">Id</span></td>
-                        <td class="head"><span class="translate" style="color:forestgreen;">Start</span>&#160;/&#160;<span class="translate" style="color:darkred">Setback</span></td>
+                        <td class="head"><span class="translate" style="color:forestgreen;">Start</span>&#160;/&#160;<span class="translate" style="color:crimson">Setback</span></td>
                         <td class="head"><span class="translate">State</span></td>
                         <td class="head1">&#160;</td>
                     </tr>
@@ -4253,10 +4253,10 @@
                             <td class="label" style="white-space:nowrap;">
                                 <xsl:choose>
                                 <xsl:when test="@suspended = 'yes'">
-                                    <span class="translate" style="color:darkred">suspended</span>
+                                    <span class="translate" style="color:crimson">suspended</span>
                                 </xsl:when>
                                 <xsl:when test="@setback">
-                                    <span style="color:darkred;">
+                                    <span style="color:crimson;">
                                     <xsl:apply-templates mode="date_time_nowrap" select="@setback__xslt_date_or_time_with_diff"/>
                                     </span>
                                 </xsl:when>
@@ -4346,14 +4346,17 @@
                 
                 <tbody>
                     <xsl:if test="ERROR">
-                        <tr><td colspan="5" style="color: darkred"><xsl:value-of select="ERROR/@text"/></td></tr>
+                        <tr><td colspan="5" style="color: crimson"><xsl:value-of select="ERROR/@text"/></td></tr>
                     </xsl:if> 
                     <xsl:for-each select="order[ position() &lt;= $max_order_history ]">
                         <xsl:sort select="concat(@end_time,@start_time)" order="descending"/>
                         <xsl:element name="tr">
                             <xsl:element name="td">                
+                            <!--xsl:if test="@state = ancestor::job_chain[@path=current()/@job_chain or substring(@path,2)=current()/@job_chain]/job_chain_node[not(@job) or @job='/scheduler_file_order_sink']/@state">
+                                <xsl:attribute name="style">color: forestgreen</xsl:attribute>
+                            </xsl:if-->
                             <xsl:if test="@state = ancestor::job_chain[@path=current()/@job_chain or substring(@path,2)=current()/@job_chain]/job_chain_node/@error_state">
-                                <xsl:attribute name="style">color: darkred</xsl:attribute>
+                                <xsl:attribute name="style">color: crimson</xsl:attribute>
                             </xsl:if>
                             <b><xsl:apply-templates mode="trim_slash" select="@id" /></b>
                             </xsl:element>
@@ -4574,7 +4577,7 @@
               <xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
               <xsl:attribute name="title">show job chain details</xsl:attribute>
               <xsl:if test="$faultily">
-                <xsl:attribute name="style">color:darkred</xsl:attribute>
+                <xsl:attribute name="style">color:crimson</xsl:attribute>
               </xsl:if>
               <b><xsl:apply-templates mode="trim_slash" select="@id" /></b>
             </xsl:element>
@@ -4628,7 +4631,7 @@
               <xsl:attribute name="title">show job details</xsl:attribute>
               <xsl:choose>
                 <xsl:when test="ERROR">
-                  <xsl:attribute name="style">color:darkred;</xsl:attribute>
+                  <xsl:attribute name="style">color:crimson;</xsl:attribute>
                 </xsl:when>
                 <xsl:when test="$highlightning">
                   <xsl:attribute name="style">color:#808080;</xsl:attribute>
@@ -4664,7 +4667,7 @@
               <xsl:attribute name="title">show job details</xsl:attribute>
               <xsl:choose>
                 <xsl:when test="$highlightning">
-                  <xsl:attribute name="style">color:darkred;padding-right:2px</xsl:attribute>
+                  <xsl:attribute name="style">color:crimson;padding-right:2px</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:attribute name="style">padding-right:2px</xsl:attribute>
@@ -5242,7 +5245,7 @@
 
         <xsl:if test="@waiting_for_process='yes'">
             <xsl:text>, </xsl:text>
-            <span class="translate" style="color: darkred; font-weight: bold">needs process</span>
+            <span class="translate" style="color: crimson; font-weight: bold">needs process</span>
         </xsl:if>
 
         <xsl:if test="lock.requestor">
@@ -5250,7 +5253,7 @@
 
             <xsl:choose>
                 <xsl:when test="lock.requestor[ @enqueued='yes' ]">
-                    <span class="translate" style="color: darkred; font-weight: bold;">needs lock</span><xsl:text> </xsl:text>
+                    <span class="translate" style="color: crimson; font-weight: bold;">needs lock</span><xsl:text> </xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
                     <span class="translate">Lock</span><xsl:text> </xsl:text>
