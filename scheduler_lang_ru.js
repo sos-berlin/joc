@@ -216,6 +216,7 @@ _translations['Order Queue']                               = 'Ордер-Оче�
                                                            
 //Menu content of job menu                                 
 _translations['Job menu']                                  = 'Job-Меню';
+_translations['Show configuration']                        = 'Конфигурация';
 _translations['Show description']                          = 'Описание';
 _translations['Show dependency']                           = 'Зависимости';
 _translations['Start task immediately']                    = 'Стартовать Task немедленно';

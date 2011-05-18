@@ -216,6 +216,7 @@ _translations['Order Queue']                               = 'File des Ordres';
                                                            
 //Menu content of job menu                                 
 _translations['Job menu']                                  = 'Menu Tâche';
+_translations['Show configuration']                        = 'Visualiser configuration';
 _translations['Show description']                          = 'Visualiser description';
 _translations['Show dependency']                           = 'Visualiser dépendance';
 _translations['Start task immediately']                    = 'Lancer instance immédiatement';
