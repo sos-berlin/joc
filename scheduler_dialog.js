@@ -206,6 +206,9 @@ function show_log__onclick( show_log_command, window_name )
                  ", top="         + ( Math.floor( window.screen.availHeight * 0.8 ) );
 
     if( show_log_command.search(/^http:/) == -1 ) show_log_command = document.location.href.replace( /\/[^\/]*$/, "/" ) + show_log_command;
+    
+    if( parent._scheduler && parent._scheduler._dependend_windows[ window_name ] ) parent._scheduler._dependend_windows[ window_name ].close();
+        
     var log_window = parent.open( show_log_command, window_name, features, true );
     
     if( log_window )   // null, wenn Popups blockiert sind.

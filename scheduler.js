@@ -661,13 +661,15 @@ Scheduler.prototype.readGuiVersion = function()
 Scheduler.prototype.setState = function( state )
 {
     if( state ) {
-        var version         = state.getAttribute( "version" ).split("  ");
-        this._version_no    = version[0];
-        this._version_date  = version[1].replace( /\D*$/, "" ).replace( /^\D*/, "" ); //trim
-        this._host          = state.getAttribute('host');
-        this._port          = state.getAttribute('tcp_port');
-        this._id            = state.getAttribute('id');
-        this._cookie_prefix = 'SOS_SCHEDULER_GUI_'+this._host+'_'+this._port+'_';
+        var version           = state.getAttribute( "version" ).split("  ");
+        this._version_no      = version[0];
+        if(version.length > 0) {
+          this._version_date  = version[1].replace( /\D*$/, "" ).replace( /^\D*/, "" ); //trim
+        }
+        this._host            = state.getAttribute('host');
+        this._port            = state.getAttribute('tcp_port');
+        this._id              = state.getAttribute('id');
+        this._cookie_prefix   = 'SOS_SCHEDULER_GUI_'+this._host+'_'+this._port+'_';
     }
 }
 
@@ -695,7 +697,7 @@ Scheduler.prototype.versionIsNewerThan = function( version_date )
           pattern.exec(version_date);
           timestamp -= Date.UTC(parseInt(RegExp.$1,10),(parseInt(RegExp.$2,10)-1),parseInt(RegExp.$3,10),parseInt(RegExp.$4,10),parseInt(RegExp.$5,10),parseInt(RegExp.$6,10)); 
           return ( timestamp >= 0 );
-        } else return false;
+        } else return true;
     }
     catch(x) {
         return false;  

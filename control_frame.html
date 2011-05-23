@@ -330,7 +330,7 @@ function toggle(card)
     for( var i=0; i < elems.length; i++ ) {
       var sos_class = elems[i].getAttribute('sos_class');
       if( !sos_class ) continue;
-      if( elems[i].id == 'add_job_chain' && !parent._scheduler.versionIsNewerThan( "2008-05-06 12:00:00" ) ) continue;
+      //if( elems[i].id == 'add_job_chain' && !parent._scheduler.versionIsNewerThan( "2008-05-06 12:00:00" ) ) continue;
       elems[i].style.display = (sos_class.indexOf(card) == -1) ? 'none' : 'block';
     }
     elems       = document.getElementsByTagName("span");
