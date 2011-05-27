@@ -21,7 +21,7 @@ _disable_cookie_settings = false;
 *  If this value is empty then no language file is tried to include 
 *  and english is used.
 */
-_sos_lang            = '${jsLang}';
+_sos_lang            = '';
 
 
 /*****************************************************************

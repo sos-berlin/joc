@@ -285,6 +285,7 @@ _translations['deleting_files']                            = 'suppression fichie
 _translations['closed']                                    = 'fermé';
 _translations['Replacement is standing by']                = 'Le remplacement va être effectué';
 _translations['changed file has error']                    = 'le fichier modifié comporte une erreur';
+_translations['not an order job']                          = 'n\'est pas tâche d\'ordre';
 _translations['is missing']                                = 'est manquant';
 _translations['non-excl.']                                 = 'non-excl';
 _translations['is being replaced']                         = 'est en cours de remplacement';

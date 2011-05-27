@@ -450,7 +450,7 @@ function modify_response( response )
       for( var j = 0; j < job_chain_elements.length; j++ )
       { 
         if( !parent.control_frame.apply_filter( job_chain_elements[j], 'job_chains' ) ) continue;
-        if( !parent.left_frame.apply_job_chains_select( job_chain_elements[j], response ) ) continue;
+        if( !parent.left_frame.apply_job_chains_select( job_chain_elements[j] ) ) continue;
       }
       
       job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain]" );
@@ -762,15 +762,15 @@ function apply_jobs_select( node )
 }
 
 
-function apply_job_chains_select( node, response )
+function apply_job_chains_select( node )
 {   
-    var job_chain_jobs = node.selectNodes( "job_chain_node[@job]" );
+    var job_chain_jobs = node.selectNodes( "job_chain_node[@job]" ); 
     var job;
     var found = [(parent._scheduler._select_states[ 'jobs_state_select' ] == 'all'),(parent._scheduler._select_states[ 'jobs_process_class_select' ] == 'all')];
     var order_id_space = node.getAttribute('order_id_space');
     for( var i = 0; i < job_chain_jobs.length; i++ )
     {
-      job = response.selectSingleNode( ".//jobs/job[@path = '"+job_chain_jobs[i].getAttribute('job')+"' and @order = 'yes']" );
+      job = job_chain_jobs[i].selectSingleNode( "job" );
       if( job && job.getAttribute('path') == '/scheduler_file_order_sink' ) continue;
       if( !found[0] ) {
         switch( parent._scheduler._select_states[ 'jobs_state_select' ] ) {

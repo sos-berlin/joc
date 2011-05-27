@@ -538,6 +538,7 @@
           <xsl:when test="job/file_based/requisites/requisite/@is_missing = 'yes'">crimson</xsl:when>
           <xsl:when test="job/@remove = 'yes'">crimson</xsl:when>
           <xsl:when test="job/lock.requestor/lock.use/@is_missing = 'yes'">crimson</xsl:when>
+          <xsl:when test="not(job/@order) or job/@order = 'no'">crimson</xsl:when>
           <xsl:when test="job/@delay_until">darkorange</xsl:when>
           <xsl:when test="job/@state = 'pending' or job/@state = 'initialized' or job/@state = 'loaded'">gold</xsl:when>
           <xsl:when test="job/@state = 'running'">forestgreen</xsl:when>
@@ -562,6 +563,7 @@
           <xsl:when test="job/file_based/requisites/requisite/@is_missing = 'yes'">error</xsl:when>
           <xsl:when test="job/@remove = 'yes'">error</xsl:when>
           <xsl:when test="job/lock.requestor/lock.use/@is_missing = 'yes'">error</xsl:when>
+          <xsl:when test="not(job/@order) or job/@order = 'no'">not an order job</xsl:when>
           <xsl:when test="job/@delay_until">delayed after error</xsl:when>
           <xsl:when test="job/@state"><xsl:value-of select="job/@state" /></xsl:when>
           <xsl:when test="not(job/@state)">none</xsl:when>
@@ -1040,6 +1042,7 @@
               <xsl:apply-templates mode="job_path" select="@job">
                  <xsl:with-param name="job" select="$job[1]"/>
                  <xsl:with-param name="style" select="''"/>
+                 <xsl:with-param name="order_job" select="true()"/>
               </xsl:apply-templates>
             </xsl:element>
             <xsl:element name="td">
@@ -3162,6 +3165,7 @@
                         <xsl:apply-templates mode="job_path" select="@job">
                            <xsl:with-param name="job" select="$job"/>
                            <xsl:with-param name="style" select="''"/>
+                           <xsl:with-param name="order_job" select="true()"/>
                         </xsl:apply-templates>
                         <xsl:apply-templates mode="trim_slash" select="@job_chain" />
                     </td>                            
@@ -3289,6 +3293,9 @@
           </xsl:when>
           <xsl:when test="not($job)">
             <span class="job_error" style="white-space:nowrap;">is missing</span>
+          </xsl:when>
+          <xsl:when test="not($job/@order) or $job/@order='no'">
+            <span class="job_error" style="white-space:nowrap;">not an order job</span>
           </xsl:when>
           <xsl:when test="$all_states">
             <xsl:element name="span">
@@ -5203,6 +5210,7 @@
         
         <xsl:param name="job" />
         <xsl:param name="style" select="'font-weight:bold;'" />
+        <xsl:param name="order_job" select="false()"/>
         
         <xsl:element name="span">
             <xsl:choose>
@@ -5212,7 +5220,7 @@
                 <xsl:when test="$job/@enabled='no'">
                     <xsl:attribute name="class">gray</xsl:attribute>
                 </xsl:when>
-                <xsl:when test="@remove='yes'">
+                <xsl:when test="$job/@remove='yes'">
                     <xsl:attribute name="class">job_remove</xsl:attribute>
                 </xsl:when>
                 <xsl:when test="$job/@state='initialized' or $job/@state='loaded'">
@@ -5225,6 +5233,9 @@
                     <xsl:attribute name="class">red</xsl:attribute>
                 </xsl:when>
                 <xsl:when test="file_based/requisites/requisite/@is_missing ='yes'">
+                    <xsl:attribute name="class">red</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="$order_job and (not($job/@order) or $job/@order='no')">
                     <xsl:attribute name="class">red</xsl:attribute>
                 </xsl:when>
                 <xsl:when test="$job/@state='pending' or $job/@state='running'">

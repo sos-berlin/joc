@@ -287,6 +287,7 @@ _translations['closed']                                    = 'beendet';
 _translations['Replacement is standing by']                = 'Ersetzung ist angehalten';
 _translations['changed file has error']                    = 'Fehler in geänderter Datei';
 _translations['is missing']                                = 'fehlt';
+_translations['not an order job']                          = 'kein Auftrags-Job';
 _translations['non-excl.']                                 = 'nicht exkl.';
 _translations['is being replaced']                         = 'wurde ersetzt';
 _translations['undefined']                                 = 'undefiniert';

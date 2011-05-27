@@ -286,6 +286,7 @@ _translations['deleting_files']                            = 'StdIn, StdOut и S
 _translations['closed']                                    = 'закончено';
 _translations['Replacement is standing by']                = 'Замена приостановлена';
 _translations['changed file has error']                    = 'Ошибка в изменённом файле';
+_translations['not an order job']                          = 'не Ордер-Job';
 _translations['is missing']                                = 'не хватает';
 _translations['non-excl.']                                 = 'non-excl.';
 _translations['is being replaced']                         = 'заменено';
