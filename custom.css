@@ -1,0 +1,10 @@
+/******************************************************************************** 
+   Another custom-defined style e.g. to distinguish between production and test 
+   This style has priority over scheduler.css 
+*********************************************************************************/ 
+
+/* Example */
+/*
+body.top div.bottom table.inner thead {background-color:DarkGreen; color:white;}
+body.titlebar table.bottom {background-color:DarkGreen; color:white;}
+*/

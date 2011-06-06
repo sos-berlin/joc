@@ -175,6 +175,3 @@ div.selectbox_titlebar_extras select     {cursor:pointer;position:relative;left:
 div.selectbox_titlebar_extras select:hover {color:#FFFF66;}
 div.selectbox_titlebar_extras option     {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu; }
 div.selectbox_titlebar_extras option.selected:hover {color:#FFFF66;}
-
-    
-    
