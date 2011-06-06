@@ -1647,7 +1647,9 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       if( parent._scheduler.versionIsNewerThan( "2008-12-12 09:00:00" ) ) {
         popup_builder.add_command ( parent.getTranslation("Reset order"), "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' action='reset'/>" );
       }
-      popup_builder.add_command ( parent.getTranslation("Delete order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, parent.getTranslation('Do you really want to delete this order?'), 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
+      if(!hot) {
+        popup_builder.add_command ( parent.getTranslation("Delete order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, parent.getTranslation('Do you really want to delete this order?'), 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
+      }
       popup_builder.add_command ( parent.getTranslation("Remove setback")  , "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' setback='no'/>", (setback != null) );
     }
     _popup_menu = popup_builder.show_popup_menu();
