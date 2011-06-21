@@ -4,6 +4,7 @@ body.left                       {background-color:#FFFFFF;margin:0px 0px 0px 0px
 body.right                      {background-color:#FFFFFF;}                         
 body.error                      {background-color:#FFFFFF;margin:0px 17px 0px 12px;}                         
 body.corner                     {background-color:#FFFFFF;margin:0px 16px 0px -1px;}                         
+body.configuration              {background-color:#FFFFFF;font-size:14px;margin:6px 17px;}                         
 table                           {padding:0px;margin:0px;vertical-align:top;font-size:12px;color:#444444;}
 th                              {vertical-align:top;}
 td                              {padding:0px 1px;vertical-align:top;}
@@ -138,6 +139,14 @@ div.inner_input textarea        {font-size:12px;}
 div.inner_input input.buttonbar {cursor:pointer; padding:0px 1px;margin:0px 1px;font-size:11px;background-color:#E5EAF5;border:1px outset #FFFFFF;color:#444444; }
 div.inner_input input.buttonbar:hover {color:#EA7A14; }
 button.arrows                   {padding:0px;margin:0px;font-size:14px;background-color:#E5EAF5;border:1px outset #FFFFFF;color:#444444;width:20px;height:20px;text-align:center;vertical-align:middle; }
+
+/* For Show Configuration */
+span.bracket                    {color:black;}
+span.attribute_name             {color:black;}
+span.attribute_val              {color:blue;}
+span.element_name               {color:purple;}
+span.cdata                      {color:blue;font-family:Arial,Helvetica,Sans-Serif;}
+pre.cdata                       {color:grey;}
 
 /* For Protocol */
 body.log                        {margin-left:0;padding-left:0}

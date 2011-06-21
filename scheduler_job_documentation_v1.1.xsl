@@ -97,7 +97,6 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 					</a>
 				</td>
 				<td style="text-align:center">
-				  <!--
 					<a class="navi" href="#">
             <xsl:attribute name="onclick">genXML('<xsl:value-of select="$lang"/>');return false;</xsl:attribute>
             <xsl:call-template name="get_label">
@@ -108,7 +107,6 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
           </a>
 					<xsl:text>&#160;</xsl:text>
 					<xsl:text>&#160;</xsl:text>
-					-->
 				</td>
 				<td style="text-align:right">
 					<a class="lang"><xsl:attribute name="href">javascript:switch_lang('de');</xsl:attribute>
@@ -133,8 +131,8 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 				<td class="td2_3" colspan="2">
 				  <xsl:call-template name="get_label">
 				  	<xsl:with-param name="lang" select="$lang"/>
-				  	<xsl:with-param name="label_de" select="'Code zur Konfiguration des Jobs - [kann via Zwischenablage in die Datei scheduler.xml eingefügt werden]'"/>
-				  	<xsl:with-param name="label_en" select="'Code to configurate the job - [can be inserted into file scheduler.xml via clipboard]'"/>
+				  	<xsl:with-param name="label_de" select="'Code zur Konfiguration des Jobs - [kann via Zwischenablage in eine Datei eingefügt werden]'"/>
+				  	<xsl:with-param name="label_en" select="'Code to configurate the job - [can be inserted into a file via clipboard]'"/>
 				  </xsl:call-template>
   				<hr/>
 				</td>
@@ -177,7 +175,6 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 					<xsl:text>&#160;</xsl:text>
 				</td>
 				<td class="td2" onmouseout="hideWMTT()" >
-				<!--
 				<xsl:attribute name="onmouseover">showWMTT('ttorderControl_<xsl:value-of select="$lang"/>')</xsl:attribute>
   				<xsl:call-template name="get_label">
 						<xsl:with-param name="lang" select="$lang"/>
@@ -192,7 +189,6 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 								<xsl:with-param name="label_en" select="'An order activates the processing of a job chain and contains parameters for one or more jobs in the job chain.'"/>
 							</xsl:call-template>
 						</span>
-				-->
 				</td>
 				<td class="td3">
 					<span class="desc">
@@ -265,10 +261,10 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 			    order&#160;=&#160;"no"
 			  </xsl:otherwise>
 			</xsl:choose>
-      <!--xsl:if test="@tasks">
+      <xsl:if test="@tasks">
         <br/>&#160;&#160;&#160;&#160;
         tasks&#160;= "<xsl:value-of select="@tasks"/>"
-      </xsl:if-->
+      </xsl:if>
       &gt;
       <br/>
       <br/>&#160;&#160;&#160;&#160;
@@ -318,6 +314,18 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
    <br/>
   </xsl:template>
 
+  <xsl:template match="xhtml:paramref" mode="copy">
+   <code><xsl:value-of select="." /></code>
+  </xsl:template>
+
+  <xsl:template match="xhtml:paramval" mode="copy">
+   <code><xsl:value-of select="." /></code>
+  </xsl:template>
+
+  <xsl:template match="xhtml:shell" mode="copy">
+   <code><xsl:value-of select="." /></code>
+  </xsl:template>
+
   <xsl:template match="*" mode="copy">
     <xsl:element name="{name()}">
         <xsl:copy-of select="@*"/>
@@ -330,7 +338,9 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
   </xsl:template>
 
 	<xsl:template match="jobdoc:note">
-		<xsl:apply-templates mode="copy"/>
+	
+		<xsl:apply-templates mode="copy" /> 
+		
 	</xsl:template>
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Template Script/ Monitor Script -->
 	<xsl:template match="jobdoc:script">
@@ -1169,20 +1179,18 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 		<xsl:variable name="reftext">
 			<xsl:choose>
 				<xsl:when test="ancestor::jobdoc:payload">
-			    Payload Parameter
-			    <!-- xsl:call-template name="get_label">
+			    <xsl:call-template name="get_label">
 					  <xsl:with-param name="lang" select="$lang"/>
 						<xsl:with-param name="label_de" select="'Payload-Parameter'"/>
 						<xsl:with-param name="label_en" select="'Payload Parameter'"/>
-					</xsl:call-template -->
+					</xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise>
-				  Job Parameter
-				  <!-- xsl:call-template name="get_label">
+				  <xsl:call-template name="get_label">
 					  <xsl:with-param name="lang" select="$lang"/>
 						<xsl:with-param name="label_de" select="'Job-Parameter'"/>
 						<xsl:with-param name="label_en" select="'Job Parameter'"/>
-					</xsl:call-template -->
+					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
@@ -1200,6 +1208,7 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 		<tr>
 			<td class="section1">
 				<xsl:call-template name="set_anchor"><xsl:with-param name="lang" select="$lang"/><xsl:with-param name="anchor_name" select="@id"/></xsl:call-template>
+				<xsl:call-template name="set_anchor"><xsl:with-param name="lang" select="$lang"/><xsl:with-param name="anchor_name" select="@name"/></xsl:call-template>
 				<span class="sourceName">
 					<xsl:value-of select="@name"/>
 				</span>
@@ -1214,6 +1223,9 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 							<xsl:choose>
 								<xsl:when test="@default_value and not(@default_value='')">
 									<xsl:value-of select="@default_value"/>
+								</xsl:when>
+								<xsl:when test="@DefaultValue and not(@DefaultValue='')">
+									<xsl:value-of select="@DefaultValue"/>
 								</xsl:when>
 								<xsl:otherwise>---</xsl:otherwise>
 							</xsl:choose>
@@ -1238,15 +1250,15 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 					</xsl:if>
 				</td>
 				<td class="section2">
-					<span class="desc">
-						<xsl:if test="./jobdoc:note[@language=$lang]">
-							<xsl:apply-templates select="./jobdoc:note[@language=$lang]"/>
-						</xsl:if>
-						
-<!--                         <xsl:if test="$extdoc//jobdoc:note[@language=$lang]">
-                            <xsl:apply-templates select="$extdoc//jobdoc:note[@language=$lang]"/>
-                        </xsl:if>
-                         -->
+				  <span class="desc">
+					  <xsl:choose>
+					    <xsl:when test="$extdoc and $extdoc//jobdoc:note[@language=$lang]">
+                <xsl:apply-templates select="$extdoc//jobdoc:note[@language=$lang]"/>
+              </xsl:when>
+						  <xsl:when test="./jobdoc:note[@language=$lang]">
+							  <xsl:apply-templates select="./jobdoc:note[@language=$lang]"/>
+						  </xsl:when>
+						</xsl:choose>
 					</span>
 				</td>
 			</tr>
@@ -1258,28 +1270,28 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 		<xsl:variable name="reftext">
 			<xsl:choose>
 				<xsl:when test="ancestor::jobdoc:payload">
-				  Payload Parameter
-				  <!-- xsl:call-template name="get_label">
+				  <xsl:call-template name="get_label">
 					  <xsl:with-param name="lang" select="$lang"/>
 						<xsl:with-param name="label_de" select="'Payload-Parameter'"/>
 						<xsl:with-param name="label_en" select="'Payload Parameter'"/>
-					</xsl:call-template -->
+					</xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise>
-				  Job Parameter
-				  <!-- xsl:call-template name="get_label">
+				  <xsl:call-template name="get_label">
 					  <xsl:with-param name="lang" select="$lang"/>
 						<xsl:with-param name="label_de" select="'Job-Parameter'"/>
 						<xsl:with-param name="label_en" select="'Job Parameter'"/>
-					</xsl:call-template -->
+					</xsl:call-template>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
 		<a class="doc">
 			<xsl:attribute name="href">#<xsl:value-of select="@id"/>_<xsl:value-of select="$lang"/></xsl:attribute>
+			<xsl:attribute name="href">#<xsl:value-of select="@name"/>_<xsl:value-of select="$lang"/></xsl:attribute>
 			<span style="font-family:Arial;font-size:12px;">&#8594;</span>
 			<xsl:text>&#160;</xsl:text>
 			<xsl:value-of select="$reftext"/>
+			<xsl:text>&#160;</xsl:text>
 		</a>
 		<span class="sourceName"><xsl:value-of select="@name"/></span>
 	</xsl:template>
@@ -1375,7 +1387,6 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 			  <tr>
 		    	<td class="td1"><xsl:text>&#160;</xsl:text></td>
 		    	<td class="td2">
-		    		<!--
 		    		<span class="label">
 		    			<xsl:call-template name="get_label">
 		    			  <xsl:with-param name="lang" select="$lang"/>
@@ -1383,7 +1394,6 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 		    				<xsl:with-param name="label_en" select="'Settings'"/>
 		    			</xsl:call-template>
 		    		</span>
-		    		-->
 		    	</td>
 		    	<td class="td3">
 		    		<xsl:apply-templates select="jobdoc:note[@language=$lang]"/>
@@ -1614,7 +1624,7 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 	<xsl:template name="process_reference">
 		<xsl:param name="lang"/>
 		<xsl:variable name="reference" select="@reference"/>
-		<xsl:apply-templates select="//*[@id=$reference]" mode="reference"><xsl:with-param name="lang" select="$lang"/></xsl:apply-templates>
+		<xsl:apply-templates select="//*[@id=$reference or @name=$reference]" mode="reference"><xsl:with-param name="lang" select="$lang"/></xsl:apply-templates>
 	</xsl:template>
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Template set_anchor -->
 	<xsl:template name="set_anchor">
@@ -1824,6 +1834,21 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
       	a.mail    						    { color:#FF9900; font-weight:300;}
 
     ]]></style>
+	</xsl:template>
+	
+	<xsl:template match="code" >
+	<code>
+		<apply-templates select="." />
+	</code>
+	</xsl:template>
+
+
+	<xsl:template match="paramref" >
+	<code> Paramref
+	<i>
+		<apply-templates select="." />
+	</i>
+	</code>
 	</xsl:template>
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Template get_js -->
 	<xsl:template name="get_js">
@@ -2049,11 +2074,11 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 	</xsl:template>
 	
 <xsl:template match="xi:include">
-  <xsl:param name="lang"/>
-  <xsl:apply-templates select="document(@href)/jobdoc:param" >
-      <xsl:with-param name="lang" select="$lang"/>
-      <xsl:with-param name="extdoc" select="document(@href)" />
-  </xsl:apply-templates>
-</xsl:template>
+<xsl:param name="lang"/>
+    <xsl:apply-templates select="document(@href)/jobdoc:param" >
+    <xsl:with-param name="lang" select="$lang"/>
+    <xsl:with-param name="extdoc" select="document(@href)" />
+    </xsl:apply-templates>
+  </xsl:template>
 	
 </xsl:stylesheet>
