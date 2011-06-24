@@ -1712,7 +1712,7 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
       popup_builder.add_command ( parent.getTranslation("Stop")            , command('stopped'), state != 'stopped' );
       popup_builder.add_command ( parent.getTranslation("Unstop")          , command('running'), state == 'stopped' );
     }
-    popup_builder.add_command ( parent.getTranslation("Delete job chain")  , "<remove_job_chain job_chain='" + parent.left_frame._job_chain + "'/>", orders==1, parent.getTranslation('Do you really want to delete this job chain?'), 'job_chain|'+parent.left_frame._job_chain );
+    //popup_builder.add_command ( parent.getTranslation("Delete job chain")  , "<remove_job_chain job_chain='" + parent.left_frame._job_chain + "'/>", orders==1, parent.getTranslation('Do you really want to delete this job chain?'), 'job_chain|'+parent.left_frame._job_chain );
     
     _popup_menu = popup_builder.show_popup_menu();
 }
@@ -1783,8 +1783,8 @@ function schedule_menu__onclick( schedule, substitute, used, hot, title )
     popup_builder.add_entry ( parent.getTranslation("Show configuration") , "show_xml2('schedule', '"+schedule+"')", (hot-1) );
     popup_builder.add_entry ( parent.getTranslation("Add substitute")     , "callErrorChecked('set_run_time','add_substitute',"+(hot-1)+")" );
     popup_builder.add_entry ( parent.getTranslation("Edit schedule")      , "callErrorChecked('set_run_time','schedule',"+(hot-1)+")" );
-    popup_builder.add_bar();
-    popup_builder.add_command ( parent.getTranslation("Delete schedule")  , "<schedule.remove schedule='" + parent.left_frame._schedule + "'/>", used == 1, parent.getTranslation('Do you really want to delete this schedule?'), 'schedule|'+parent.left_frame._schedule );
+    //popup_builder.add_bar();
+    //popup_builder.add_command ( parent.getTranslation("Delete schedule")  , "<schedule.remove schedule='" + parent.left_frame._schedule + "'/>", used == 1, parent.getTranslation('Do you really want to delete this schedule?'), 'schedule|'+parent.left_frame._schedule );
     _popup_menu = popup_builder.show_popup_menu();
 }
 
