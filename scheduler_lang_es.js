@@ -284,12 +284,12 @@ _translations['release']                                   = 'liberar';
 _translations['ended']                                     = 'terminado';
 _translations['deleting_files']                            = 'eliminando archivos';
 _translations['closed']                                    = 'cerrado';
-_translations['Replacement is standing by']                = 'Reemplazo está  en espera';
+_translations['Replacement is standing by']                = 'Reemplazo está en espera';
 _translations['changed file has error']                    = 'Archivo modificado tiene error';
 _translations['not an order job']                          = 'no ordenar tarea';
-_translations['is missing']                                = 'falta';
+_translations['is incorrect or missing']                   = 'es incorrecta o falta';
 _translations['non-excl.']                                 = 'no excl.';
-_translations['is being replaced']                         = 'ser  reemplazado';
+_translations['is being replaced']                         = 'ser reemplazado';
 _translations['undefined']                                 = 'indefinido';
 
 

@@ -460,7 +460,9 @@ window.onerror  = function( msg, url, line ) {
             document.writeln('            <table cellpadding="0" cellspacing="0" width="100%">');
             document.writeln('              <tr><td width="1" id="release_title">'+parent.getTranslation('Release')+'</td><td></td><td id="release_no" style="text-align:right;"></td></tr>');
             document.writeln('              <tr><td width="1">'+parent.getTranslation('Operations GUI').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td id="gui_info" style="text-align:right;"></td></tr>');
-            document.writeln('              <tr><td width="1">'+parent.getTranslation('Job Scheduler').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td style="text-align:right;">'+parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1") + '&#160;&#160;&#160;(' + parent._scheduler._version_date.replace(/[ ]+.*$/,'')+')</td></tr>');
+            if(parent._scheduler._version_date) {
+              document.writeln('              <tr><td width="1">'+parent.getTranslation('Job Scheduler').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td style="text-align:right;">'+parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1") + '&#160;&#160;&#160;(' + parent._scheduler._version_date.replace(/[ ]+.*$/,'')+')</td></tr>');
+            }
             document.writeln('            </table>');
             document.writeln('          </td></tr>');
             document.writeln('          <tr><td align="right" style="padding:0px 6px 2px 0px;white-space:nowrap;"><div id="info_button" class="button" onclick="showInfo(\'none\');"><!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->'+parent.getTranslation('OK')+'<!--[if lte IE 6]></a><![endif]--></div></td></tr>');

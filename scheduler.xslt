@@ -1877,18 +1877,7 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tasks (in Jobs)-->
 
     <xsl:template match="tasks" mode="job_list">
-        <xsl:for-each select="task">            
-              <xsl:choose>
-                  <xsl:when test=" not( @id ) ">
-                      <xsl:if test="../../@waiting_for_process='yes'">
-                          <tr>
-                            <td colspan="5" style="margin-left: 2ex">
-                              <span class="job_error">needs process</span>
-                            </td>
-                          </tr>
-                      </xsl:if>
-                  </xsl:when>
-                  <xsl:otherwise>
+        <xsl:for-each select="task[@id]">            
                       <xsl:element name="tr">
                           
                           <td class="task">
@@ -1942,9 +1931,14 @@
                               </xsl:otherwise>
                           </xsl:choose>
                       </xsl:element>
-                  </xsl:otherwise>
-              </xsl:choose>
         </xsl:for-each>
+        <xsl:if test="task[not( @id )] and ../@waiting_for_process='yes'">
+            <tr>
+              <td colspan="5" style="margin-left: 2ex">
+                <span class="job_error">needs process</span>
+              </td>
+            </tr>
+        </xsl:if>
     </xsl:template>
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~task-->
@@ -2634,7 +2628,7 @@
                             </table>
                         </td>
                     </tr>
-                    <xsl:if test="file_based/ERROR or file_based/removed or replacement">
+                    <xsl:if test="file_based/removed or replacement">
                         <tr>
                             <td colspan="7" style="padding-left: 4ex; padding-bottom: 0.5em;">
                                 <xsl:apply-templates mode="file_based_line" select="."/>
@@ -3691,7 +3685,7 @@
                         </xsl:if>
                         <xsl:apply-templates mode="only_trim_slash" select="@process_class"/>
                         <xsl:if test="file_based/requisites/requisite[translate(@type,'P','p') = 'process_class' and @path = current()/@process_class]/@is_missing ='yes'">
-                          <xsl:text> </xsl:text><span class="translate">is missing</span>
+                          <xsl:text> </xsl:text><span class="translate">is incorrect or missing</span>
                         </xsl:if> 
                       </xsl:element>
                     </td>

@@ -663,7 +663,7 @@ Scheduler.prototype.setState = function( state )
     if( state ) {
         var version           = state.getAttribute( "version" ).split("  ");
         this._version_no      = version[0];
-        if(version.length > 0) {
+        if(version.length > 1) {
           this._version_date  = version[1].replace( /\D*$/, "" ).replace( /^\D*/, "" ); //trim
         }
         this._host            = state.getAttribute('host');
