@@ -144,8 +144,7 @@ function update(with_details)
       _timer  = 0; 
     }
     update_jobs_frame();
-    
-    if( with_details && parent._details_frame_loaded ) callErrorChecked( 'parent.details_frame.update' );
+    if( with_details ) callErrorChecked( 'parent.details_frame.update' );
     if( timer > 0 ) {
       _timer = set_timeout( "parent.left_frame.repeat_update(true,true)", parent._scheduler._update_seconds * 1000 );
     }

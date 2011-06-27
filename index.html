@@ -52,7 +52,6 @@
           onload_settings.view                                = new Object();
           var _scheduler                                      = new Scheduler();
           var _response                                       = null;
-          var _details_frame_loaded                           = false;
           
           check_browser();
           
@@ -116,7 +115,7 @@
         </script>
     </head>
     
-    <frameset id="top_and_bottom_frameset" rows="130,0,44,*"     framespacing="0" border="0" onload="frames.left_frame.location.href='left_frame.html';">
+    <frameset id="top_and_bottom_frameset" rows="130,0,28,*"     framespacing="0" border="0" onload="frames.corner_frame.location.href='corner_frame.html'; frames.details_frame.location.href='details_frame.html'; frames.left_frame.location.href='left_frame.html';">
         <frame   name="top_frame"     src="top_frame.html"        marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
         <frame   name="error_frame"   src="error_frame.html"      marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
         <frame   name="control_frame" src="control_frame.html"    marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
@@ -124,8 +123,8 @@
           <frame name="dummy_frame"   src="dummy.html"            marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
           <frame name="left_frame"    src="dummy.html"            marginwidth="0" marginheight="0" frameborder="0" scrolling="yes"/>
           <frameset id="right_frameset" rows="6,*"               framespacing="0" border="0">
-            <frame name="corner_frame" src="corner_frame.html"    marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
-            <frame name="details_frame" src="details_frame.html"  marginwidth="0" marginheight="0" frameborder="0" scrolling="yes" onload="_details_frame_loaded = true"/>
+            <frame name="corner_frame" src="dummy.html"           marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
+            <frame name="details_frame" src="dummy.html"          marginwidth="0" marginheight="0" frameborder="0" scrolling="yes"/>
           </frameset>
         </frameset>
         
