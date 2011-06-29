@@ -68,7 +68,8 @@ var _active_project_filter      = -1;
 
 
 //--------------------------------------------------------------------------custom.js per hash  
-var _server_settings            = location.hash && location.hash.substr(1);
+var _location_hash              = location.hash && location.hash.substr(1);
+var _server_settings            = ( _location_hash && _location_hash.indexOf("=") == -1);
 document.writeln('<script type="text/javascript" src="scheduler_data/config/operations_gui/custom.js"></sc'+'ript>');
 if( _server_settings && location.hash.substr(1) != 'custom' ) {
   document.writeln('<script type="text/javascript" src="scheduler_data/config/operations_gui/'+location.hash.substr(1)+'.js"></sc'+'ript>');
