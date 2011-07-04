@@ -216,7 +216,7 @@ _translations['Order Queue']                               = 'Auftrags-Warteschl
                                                            
 //Menu content of job menu                                 
 _translations['Job menu']                                  = 'Job-Menü';
-_translations['Show configuration']                        = 'Konfiguration';
+_translations['Show configuration']                        = 'Konfiguration anzeigen';
 _translations['Show description']                          = 'Beschreibung';
 _translations['Show dependency']                           = 'Abhängigkeiten';
 _translations['Start task immediately']                    = 'Starte Task sofort';

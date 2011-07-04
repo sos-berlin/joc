@@ -216,7 +216,7 @@ _translations['Order Queue']                               = 'Cola de ordenes';
                                                            
 //Menu content of job menu                                 
 _translations['Job menu']                                  = 'Menú de trabajo';
-_translations['Show configuration']                        = 'Configuración';
+_translations['Show configuration']                        = 'Mostrar configuración';
 _translations['Show description']                          = 'Descripción';
 _translations['Show dependency']                           = 'Dependencia';
 _translations['Start task immediately']                    = 'Iniciar tarea ahora';
