@@ -258,7 +258,7 @@ function show_xml(obj_name)
 //------------------------------------------------------------------------------------show_xml
 function show_xml2(type, path)
 {
-    var window_name       = 'show_xml' + path.replace(/[^a-zA-Z_-]/g,'_');
+    var window_name       = 'show_xml' + path.replace(/[^a-zA-Z_]/g,'_');
     open_window( window_name, "show_configuration.html#type=" + type + "&path=" + encodeURIComponent(path), false );
 }
 
