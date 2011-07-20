@@ -3147,7 +3147,7 @@
                     <td>
                         <xsl:attribute name="onclick">callErrorChecked( 'show_job_details','<xsl:value-of select="@job"/>' )</xsl:attribute>
                         <xsl:attribute name="title">show job details</xsl:attribute>                          
-                        <span class="translate" style="margin-left: 2ex;white-space:nowrap;"><xsl:value-of select="@state"/></span>
+                        <span style="margin-left: 2ex;white-space:nowrap;"><xsl:value-of select="@state"/></span>
                     </td>
         
                     <td>
