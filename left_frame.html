@@ -166,25 +166,24 @@ function update_jobs_frame()
     
     var what              = '';
     var path              = '';
-    var max_orders        = 0;
+    var max_orders        = '';
     var max_order_history = '';
     var max_task_history  = 0;
     
     switch( _card ) {
       case 'jobs'              : if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled ) what = 'schedules'; 
                                  break;
-      case 'job_chains'        : max_orders       = parent._scheduler._runtime_settings.max_orders;
+      case 'job_chains'        : max_orders       = ' max_orders="' + parent._scheduler._runtime_settings.max_orders + '"';
                                  what             = 'job_chains';
                                  if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox ) what += ' job_chain_orders order_source_files blacklist';
                                  if( (parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox || parent._scheduler._checkbox_states.show_job_chain_orders_checkbox) && parent._scheduler._tree_view_enabled ) what += " job_chain_jobs";
                                  if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled  ) what += ' schedules';
                                  break;
-      case 'orders'            : max_orders       = parent._scheduler._runtime_settings.max_orders;
-                                 what             = 'job_chain_orders order_source_files blacklist';
+      case 'orders'            : what             = 'job_chain_orders order_source_files blacklist';
                                  if( parent._scheduler._tree_view_enabled ) what += ' job_chain_jobs';
                                  if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled  ) what += ' schedules';
                                  break;
-      case 'last_activities'   : max_orders       = parent._scheduler._runtime_settings.max_orders;
+      case 'last_activities'   : max_orders       = ' max_orders="' + parent._scheduler._runtime_settings.max_orders + '"';
                                  max_task_history = parent._scheduler._runtime_settings.max_last_activities;
                                  if( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) max_order_history = ' max_order_history="' + parent._scheduler._runtime_settings.max_last_activities + '"';
                                  what             = 'job_chain_orders task_history order_history';
@@ -196,7 +195,7 @@ function update_jobs_frame()
                                  break;
     }
     
-    var max_attributes = ' max_orders="' + max_orders + '" max_task_history="'+ max_task_history +'"' + max_order_history;
+    var max_attributes = max_orders + ' max_task_history="'+ max_task_history +'"' + max_order_history;
     _what = what;
     
     if( parent._scheduler._tree_view_enabled ) {
@@ -218,7 +217,7 @@ function update_jobs_frame()
             req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+folders[i].getAttribute('path')+'"'+max_attributes+'/>'; 
             parent._scheduler.executeAsynchron( req, parent.left_frame.collect_list_answer, false, false, false, i );
           }
-          //req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders '+what+'" path="/" max_orders="' + max_orders + '" max_task_history="'+ max_task_history +'" />'; 
+          //req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders '+what+'" path="/" ' + max_orders + ' max_task_history="'+ max_task_history +'" />'; 
         }
       }
       else if( _open_all_folders ) 
@@ -235,7 +234,7 @@ function update_jobs_frame()
           req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+folders[i].getAttribute('path')+'"'+max_attributes+'/>'; 
           parent._scheduler.executeAsynchron( req, parent.left_frame.collect_tree_answer, false, false, false, i );
         }
-        //req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders '+what+'" path="/" max_orders="' + max_orders + '" max_task_history="'+ max_task_history +'" />'; 
+        //req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders '+what+'" path="/" ' + max_orders + ' max_task_history="'+ max_task_history +'" />'; 
       } 
       else 
       {
@@ -418,6 +417,12 @@ function modify_response( response )
       hidden_elements[j].parentNode.removeChild(hidden_elements[j]);
     }
     
+    var unimportant_elements = spooler_element.selectNodes( "//connections" );
+    for( var j = 0; j < unimportant_elements.length; j++ )
+    {
+      unimportant_elements[j].parentNode.removeChild(unimportant_elements[j]);
+    }
+    
     if( _card == 'jobs' ) {
       var job_elements = spooler_element.selectNodes( "//jobs/job" );
       
@@ -488,6 +493,11 @@ function modify_response( response )
       for( var j = 0; j < job_elements.length; j++ )
       {
         job_elements[j].parentNode.removeChild(job_elements[j]);
+      }
+      var job_chain_elements_without_orders = spooler_element.selectNodes( "//job_chains/job_chain[@orders = '0']" );
+      for( var j = 0; j < job_chain_elements_without_orders.length; j++ )
+      {
+        job_chain_elements_without_orders[j].parentNode.removeChild(job_chain_elements_without_orders[j]);
       }
       var order_elements = spooler_element.selectNodes( "//order" );
       for( var j = 0; j < order_elements.length; j++ )

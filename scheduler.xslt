@@ -98,11 +98,6 @@
                   </li></ul></div>
                 </xsl:when>
                 
-                <xsl:when test="/spooler/@my_show_card='orders'">
-                  <!-- orders -->
-                  <xsl:apply-templates select="state/job_chains" mode="order_list"/>
-                </xsl:when>
-                
                 <xsl:when test="/spooler/@my_show_card='all'">
                   <!-- tree view with all objects (not yet implemented)-->
                   <xsl:apply-templates select="state" mode="tree"/>
@@ -196,7 +191,7 @@
     <xsl:template match="folder" mode="tree">
       <xsl:param    name="children"       select="''"/>
       <xsl:param    name="grandchildren"  select="''"/>
-      
+                          
       <ul id="{concat($children,@path)}" style="display:block" sos_mode="open">
         <xsl:if test="@path = '/'">
           <xsl:attribute name="class">tree</xsl:attribute>
@@ -245,6 +240,17 @@
               <xsl:apply-templates select="." mode="leaf"/>
             </xsl:for-each>
             <xsl:if test="count(job_chains/job_chain[not(@order_id_space)] | job_chains/job_chain[@order_id_space and job_chain_node.job_chain] | folders/folder) = 0">
+              <xsl:call-template name="no_objects_found">
+                 <xsl:with-param name="children" select="$children" />
+              </xsl:call-template>
+            </xsl:if>
+          </xsl:when>
+          <xsl:when test="$children = 'orders'">
+            <xsl:for-each select="job_chains/job_chain/job_chain_node/order_queue/order" >
+              <xsl:sort select="translate( @path, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz' )" order="ascending" />
+              <xsl:apply-templates select="." mode="leaf"/>
+            </xsl:for-each>
+            <xsl:if test="count(job_chains/job_chain/job_chain_node/order_queue/order | folders/folder) = 0">
               <xsl:call-template name="no_objects_found">
                  <xsl:with-param name="children" select="$children" />
               </xsl:call-template>
@@ -641,9 +647,9 @@
       <xsl:param name="children" select="''" />
       <xsl:param name="icon_color">
         <xsl:choose>
+          <xsl:when test="@enabled = 'no'">gray</xsl:when>
           <xsl:when test="file_based/ERROR or file_based/removed or replacement">crimson</xsl:when>
           <xsl:when test="file_based/requisites/requisite/@is_missing='yes'">crimson</xsl:when>
-          <xsl:when test="@state = 'not_initialized'">gray</xsl:when>
           <xsl:otherwise>gold</xsl:otherwise>
         </xsl:choose>
       </xsl:param>
@@ -654,22 +660,51 @@
           <xsl:otherwise>black</xsl:otherwise>
         </xsl:choose>
       </xsl:param>
+      <xsl:variable name="icon_title">
+        <xsl:choose>
+          <xsl:when test="@enabled = 'no'">disabled</xsl:when>
+          <xsl:when test="file_based/ERROR or file_based/removed or replacement">error</xsl:when>
+          <xsl:when test="file_based/requisites/requisite/@is_missing = 'yes'">error</xsl:when>
+          <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
+      
       <xsl:variable name="normalized_order_id">
         <xsl:apply-templates mode="normalized_order_id" select="@order" />
       </xsl:variable>
-      <li>
-        <div class="tree">
-          <xsl:attribute name="style">color:<xsl:value-of select="$font_color" />;</xsl:attribute>
+      
+      <li class="tree">
+        <xsl:if test="/spooler/@my_ie_version &gt; 0 and /spooler/@my_ie_version &lt; 8">
           <xsl:attribute name="onmouseover">this.className='hover';</xsl:attribute>
           <xsl:attribute name="onmouseout">this.className='tree';</xsl:attribute>
+        </xsl:if>
           
-          <xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
+        <div title="show order details" style="cursor:pointer;">
+          <xsl:attribute name="onclick">show_order_details( '<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
           <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="@id"/>', '<xsl:value-of select="name(parent::*)"/>' );return false;</xsl:attribute>
-          <xsl:attribute name="title">show order details</xsl:attribute>
-          <xsl:attribute name="style">color:<xsl:value-of select="$font_color" />;cursor:pointer;</xsl:attribute>
           
-          <div class="status"><xsl:attribute name="style">background-color:<xsl:value-of select="$icon_color" /></xsl:attribute>&#160;</div>
-          <xsl:value-of select="@name" />&#160;&#160;&#160;&#160;&#160;
+          <span class="status" title="{$icon_title}" style="{concat('background-color:',$icon_color)}">&#160;</span>
+          <span class="bold" style="{concat('color:',$font_color)}"><xsl:value-of select="@name" /></span>
+          
+          <xsl:if test="@next_start_time">
+            <span class="status_text">&#160;&#160;-&#160;<span class="label" style="white-space:nowrap;">Next start</span><span class="small">: </span><xsl:apply-templates mode="date_time_nowrap" select="@next_start_time__xslt_date_or_time_with_diff"/></span>
+          </xsl:if>
+          
+          <xsl:if test="@title">
+            <span>&#160;&#160;-&#160;&#160;<xsl:value-of select="@title"/></span>
+          </xsl:if>
+          
+          <xsl:if test="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/requisites/requisite/@is_missing='yes'">
+            <ul style="margin-left:31px;">
+              <xsl:if test="ERROR">
+                <li><span class="job_error"><xsl:apply-templates select="ERROR"/></span></li>
+              </xsl:if>
+              <xsl:if test="file_based/ERROR or file_based/removed or replacement or file_based/requisites/requisite/@is_missing='yes'">
+                <li><xsl:apply-templates mode="file_based_line" select="."/></li>
+              </xsl:if>
+            </ul>
+          </xsl:if>
         </div>
       </li>
     </xsl:template>
