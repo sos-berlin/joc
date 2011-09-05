@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2011 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -87,10 +87,10 @@ function update()
     
     if(parent._scheduler._tree_view_enabled) {
       
-      var response   = parent._scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster remote_schedulers schedules" subsystems="lock schedule process_class folder"/></commands>', false, false, false ); 
+      var response   = parent._scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster remote_schedulers schedules" subsystems="lock schedule process_class folder"/></commands>', true, false ); 
       
       var subsystems = response.selectSingleNode('/spooler/answer/subsystems');
-      _state         = response.selectSingleNode('/spooler/answer/state');
+      _state         = response.selectSingleNode('/spooler/answer/state'); 
       if(typeof parent.control_frame.update == 'function') parent.control_frame.update();
       
       //document.getElementById('job_chains_tab').style.display        = (subsystems.selectSingleNode("subsystem[@name='order']/file_based.statistics/@count_visible").nodeValue    == 0) ? 'none' : 'inline';
@@ -158,6 +158,15 @@ function set_state(response)
       document.getElementById('jobs_stopped').innerHTML       = (state.selectNodes("jobs/job [ @state='stopped' ]").length || 0);
       document.getElementById('jobs_need_process').innerHTML  = (state.selectNodes("jobs/job [ @waiting_for_process='yes' ]").length || 0);
       document.getElementById('jobs_tasks').innerHTML         = (state.selectNodes("jobs/job/tasks/task[ @id ]").length || 0);
+    }
+    
+    var spooler_state = state.getAttribute('state');
+    var spooler_state_elem = document.getElementById('spooler_state');
+    switch(spooler_state) {
+    	case 'running' : spooler_state_elem.style.color = 'forestgreen';
+    	                 break;
+    	default        : spooler_state_elem.style.color = 'crimson';
+    	                 break;
     }
     
     document.getElementById('spooler_id').innerHTML           = (state.getAttribute('id') || parent.getTranslation('unknown'));
@@ -403,7 +412,7 @@ window.onerror  = function( msg, url, line ) {
             <script language="javascript" type="text/javascript">
               document.writeln( '            <tr>' );
               document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('ID')+':&#160;</span><span id="spooler_id" style="white-space:nowrap;font-weight:bold;"></span></td>' );
-              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('State')+':&#160;</span><span id="spooler_state" style="white-space:nowrap;"></span></td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('State')+':&#160;</span><span id="spooler_state" style="white-space:nowrap;;font-weight:bold;"></span></td>' );
               document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('Pid')+':&#160;</span><span id="spooler_pid" style="white-space:nowrap;"></span></td>' );
               document.writeln( '              <td style="white-space:nowrap;" class="location" align="center">'+parent._scheduler._host+':'+parent._scheduler._port+'</td>' );
               document.writeln( '              <td style="white-space:nowrap;">&#160;</td>' );

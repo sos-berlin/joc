@@ -326,7 +326,6 @@ _translations['Filter job chains by']                      = 'Filtrar cadenas de
 //Table header of job chains list                          
 _translations['Order state']                               = 'Estado de orden';
 _translations['Job chain']                                 = 'Cadena de trabajo';
-_translations['Job chain/']                                = 'Cadena de trabajo/';
 _translations['Job state']                                 = 'Estado de trabajo';
                                                            
 //Table header in detail frame                             
@@ -342,6 +341,10 @@ _translations['Add persistent order']                      = 'Añadir orden pers
 _translations['Delete job chain']                          = 'Eliminar cadena de trabajo';
 _translations['Skip']                                      = 'Omitir';
 _translations['Unskip']                                    = 'No omitir';
+_translations['Skip node']                                 = 'Omitir el nodo';
+_translations['Stop node']                                 = 'Parar el nodo';
+_translations['Stop job']                                  = 'Parar el trabajo';
+_translations['Unstop job']                                = 'Reanudar el trabajo';
 _translations['Do you really want to delete this job chain?']  = 'Desea usted realmente eliminar esta cadena de trabajo?';
 
 //Mouseover-Title
@@ -523,9 +526,7 @@ _translations['Show only faultily tasks and orders']       = 'Mostrar sólo tare
 _translations['Show last tasks error']                     = 'Mostrar últimos errores de tarea';
 
 //Table header of job chains list                          
-_translations['Order ID/']                                 = 'ID de la orden/';
 _translations['Job name']                                  = 'Nombre de tarea';
-_translations['Order state/']                              = 'Estado de la orden/';
 _translations['Exitcode']                                  = 'Código de salida';
 _translations['Order ID']                                  = 'ID de orden';
 _translations['Order state']                               = 'Estado de orden';

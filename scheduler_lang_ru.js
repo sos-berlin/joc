@@ -326,7 +326,6 @@ _translations['Filter job chains by']                      = 'Job-Цепочки
 //Table header of job chains list                          
 _translations['Order state']                               = 'Ордер-Статус';
 _translations['Job chain']                                 = 'Job-Цепочка';
-_translations['Job chain/']                                = 'Job-Цепочки-/';
 _translations['Job state']                                 = 'Job-Статус';
                                                            
 //Table header in detail frame                             
@@ -342,6 +341,10 @@ _translations['Add persistent order']                      = 'Добавить �
 _translations['Delete job chain']                          = 'Job-Цепочку удалить';
 _translations['Skip']                                      = 'Перепрыгнуть';
 _translations['Unskip']                                    = 'Добавить';
+_translations['Skip node']                                 = 'Узел перепрыгнуть';
+_translations['Stop node']                                 = 'Узел остановить';
+_translations['Stop job']                                  = 'Узел продолжить';
+_translations['Unstop job']                                = 'Job продолжить';
 _translations['Do you really want to delete this job chain?']  = 'Вы действительно хотите удалить эту Job-Цепочку?';
 
 //Mouseover-Title
@@ -523,9 +526,7 @@ _translations['Show only faultily tasks and orders']       = 'Показать �
 _translations['Show last tasks error']                     = 'Показать последие Task-Ошибки';
 
 //Table header of job chains list                          
-_translations['Order ID/']                                 = 'Ордер-ID/';
 _translations['Job name']                                  = 'Job-Имя';
-_translations['Order state/']                              = 'Ордер-Статус/';
 _translations['Exitcode']                                  = 'Exitcode';
 _translations['Order ID']                                  = 'Ордер-ID';
 _translations['Order state']                               = 'Ордер-Статус';

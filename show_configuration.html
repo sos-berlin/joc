@@ -62,12 +62,19 @@ function on_load()
       setHeader(params);
       
       _scheduler           = new Scheduler();
+      
       var response         = _scheduler.executeSynchron( getXMLQuery(params), false, false, true );
       var modified         = response.selectSingleNode("//file_based[@last_write_time]");
       if(modified) {
       	$('modified').update(getTranslation('File timestamp') + ': ' + _scheduler.xsltFormatDatetimeZoneSupport( modified.getAttribute('last_write_time') ));
       }
-      var srcElem          = response.selectSingleNode("//"+params.get('type')+"[@path='"+params.get('path')+"']/source");
+      
+      var srcElem          = null;
+      if(params.get('type') == 'order') {
+        srcElem            = response.selectSingleNode("//order[@id='"+params.get('order_id')+"' and @job_chain='"+params.get('job_chain')+"']/source");
+      } else {
+      	srcElem            = response.selectSingleNode("//"+params.get('type')+"[@path='"+params.get('path')+"']/source");
+      }
       if(!srcElem) {
         throw new Error('The source of the '+params.get('type')+' object ' + params.get('path') + ' could not be read.');
       }
@@ -115,10 +122,10 @@ function setHeader( params )
 }
 
 function show_error( x ) 
-{
+{   
 	  var msg = htmlEncode(x.message);
-	  msg     = msg.replace( /\n/g, "<br/>" ).replace( "  "/g, "&nbsp; " )
-    $('error_message').update(msg);
+	  msg     = msg.replace( /\n/g, "<br/>" ).replace( /"  "/g, "&nbsp; " );
+	  $('error_message').update(msg);
 }
 
 window.onload = on_load;

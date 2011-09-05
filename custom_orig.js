@@ -49,6 +49,8 @@ _show_card               = 'jobs';
 */
 _view.jobs               = 'list';
 _view.job_chains         = 'list';
+_view.orders             = 'list';
+_view.schedules          = 'list';
 
 
 /*****************************************************************

@@ -325,7 +325,6 @@ _translations['Filter job chains by']                      = 'Filtrer les châin
 //Table header of job chains list                          
 _translations['Order state']                               = 'Etat de l\'ordre';
 _translations['Job chain']                                 = 'Chaîne des tâches';
-_translations['Job chain/']                                = 'Chaîne des tâches/';
 _translations['Job state']                                 = 'Etat de la tâche';
                                                            
 //Table header in detail frame                             
@@ -339,8 +338,11 @@ _translations['Job node menu']                             = 'Menu Tâche Noeud'
 _translations['Add order']                                 = 'Ajouter un ordre';
 _translations['Add persistent order']                      = 'Ajouter un ordre persistent';
 _translations['Delete job chain']                          = 'Supprimer une chaîne des tâches';
-_translations['Skip']                                      = 'Sauter la tâche courante';
 _translations['Unskip']                                    = 'Annuler la saute';
+_translations['Skip node']                                 = 'Skip le noeud';
+_translations['Stop node']                                 = 'Désactiver le noeud';
+_translations['Stop job']                                  = 'Désactiver la tâche';
+_translations['Unstop job']                                = 'Activer la tâche';
 _translations['Do you really want to delete this job chain?']  = 'Voulez-vous vraiment supprimer cette chaîne des tâches?';
 
 //Mouseover-Title
@@ -522,9 +524,7 @@ _translations['Show only faultily tasks and orders']       = 'Voir uniquement le
 _translations['Show last tasks error']                     = 'Voir les dernières instances échouées';
 
 //Table header of job chains list                          
-_translations['Order ID/']                                 = 'ID Ordre/';
 _translations['Job name']                                  = 'Nom de la tâche';
-_translations['Order state/']                              = 'Etat de l\'ordre/';
 _translations['Exitcode']                                  = 'Code de sortie';
 _translations['Order ID']                                  = 'ID Ordre';
 _translations['Order state']                               = 'Etat de l\'ordre';

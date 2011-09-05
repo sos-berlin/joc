@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2011 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -56,7 +56,7 @@ function Scheduler()
     this._tree_view_enabled                              = false; //2.1.0.6101  (2010-04-06 11:53:57)
     this._activeRequestCount                             = 0;
     this._ie                                             = navigator.appVersion.match(/\bMSIE\b/);
-    this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains'}; 
+    this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains','orders':'Orders','schedules':'Schedules','locks':'Locks'}; 
     this._view                                           = {'jobs'             :'list',
                                                             'job_chains'       :'list',
                                                             'orders'           :'list',
@@ -351,6 +351,7 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
     for( var i = 0; i < elements.length; i++ )
     {
         var element = elements[ i ];
+        if( element.tagName == 'order_queue') continue;
         var value   = element.getAttribute( attribute_name );
         if( value )
         {   
@@ -740,7 +741,7 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
       
     if( with_translate && this._lang_file_exists )
     {
-      var spans = result_dom.selectNodes("//label|//option|//span[@class='translate' or @class='label' or @class='caption' or @class='job_error' or @class='file_based_error']|//a[@class='translate']");
+      var spans = result_dom.selectNodes("//label|//option|//span[@class='translate' or @class='label' or @class='red_label' or @class='green_label' or @class='caption' or @class='job_error' or @class='file_based_error']|//a[@class='translate']");
       for( var i=0; i<spans.length; i++ ) {
         if( !spans[i].firstChild || !spans[i].firstChild.nodeValue ) continue;
         spans[i].firstChild.nodeValue = this.getTranslation(spans[i].firstChild.nodeValue); 

@@ -225,7 +225,7 @@ _translations['Start task at']                             = 'Starte Task um...'
 _translations['Start task parametrized']                   = 'Starte Task parametrisiert';
 _translations['Set run time']                              = 'Setze Startzeiten';
 _translations['Stop']                                      = 'Stoppen';
-_translations['Unstop']                                    = 'Entstoppen';
+_translations['Unstop']                                    = 'Fortsetzen';
 _translations['Reread']                                    = 'Skript neu laden';
 _translations['End tasks']                                 = 'Tasks beenden';
 _translations['Suspend tasks']                             = 'Tasks suspendieren';
@@ -326,7 +326,6 @@ _translations['Filter job chains by']                      = 'Job-Ketten filtern
 //Table header of job chains list                          
 _translations['Order state']                               = 'Auftrags-Status';
 _translations['Job chain']                                 = 'Job-Kette';
-_translations['Job chain/']                                = 'Job-Ketten-/';
 _translations['Job state']                                 = 'Job-Status';
                                                            
 //Table header in detail frame                             
@@ -340,7 +339,10 @@ _translations['Job node menu']                             = 'Job-Knoten-Menü';
 _translations['Add order']                                 = 'Auftrag hinzufügen';
 _translations['Add persistent order']                      = 'Auftrag persistent hinzufügen';
 _translations['Delete job chain']                          = 'Job-Kette löschen';
-_translations['Skip']                                      = 'Überspringen';
+_translations['Skip node']                                 = 'Knoten überspringen';
+_translations['Stop node']                                 = 'Knoten stoppen';
+_translations['Stop job']                                  = 'Job stoppen';
+_translations['Unstop job']                                = 'Job fortsetzen';
 _translations['Unskip']                                    = 'Einreihen';
 _translations['Do you really want to delete this job chain?']  = 'Wollen Sie wirklich diese Job-Kette löschen?';
 
@@ -523,9 +525,7 @@ _translations['Show only faultily tasks and orders']       = 'Nur fehlerhafte Ta
 _translations['Show last tasks error']                     = 'Letzten Task-Fehler anzeigen';
 
 //Table header of job chains list                          
-_translations['Order ID/']                                 = 'Auftrags-ID/';
 _translations['Job name']                                  = 'Job-Name';
-_translations['Order state/']                              = 'Auftrags-Status/';
 _translations['Exitcode']                                  = 'Exitcode';
 _translations['Order ID']                                  = 'Auftrags-ID';
 _translations['Order state']                               = 'Auftrags-Status';

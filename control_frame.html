@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2011 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -116,6 +116,7 @@ function do_onunload()
 function set_frame_height()
 {
   if( _card.search(/^(process_classes|cluster|remote_schedulers|locks)$/) > -1 ) {
+  //if( _card.search(/^(cluster|remote_schedulers)$/) > -1 ) {
     _frm.rows  = _frm.rows.replace(/([^,]+,)([^,]+,)[^,]+(.*)/, "$1$20$3");
   } else {
     _frm.rows  = _frm.rows.replace(/([^,]+,)([^,]+,)[^,]+(.*)/, "$1$2"+(document.getElementById('controls').offsetHeight)+"$3");
@@ -506,7 +507,7 @@ window.onresize = set_frame_height;
             <tr>
               <td style="height:24px;line-height:24px;width:100%;padding-bottom:4px;">
                 <!--span id="view_icons" sos_class="jobs job_chains schedules locks orders" style="display:none;"-->
-                <span id="view_icons" sos_class="jobs job_chains" style="display:none;">
+                <span id="view_icons" sos_class="jobs job_chains orders schedules" style="display:none;">
                   <img src="explorer_folders.gif"       title="toggle to tree view" style="cursor:pointer"                   onclick="toggle_view(this.parentNode);" />
                   <img src="explorer_open_folders.gif"  title="open all folders"    style="visibility:hidden;cursor:pointer" onclick="open_all_folders();" />
                   <img src="explorer_close_folders.gif" title="close all folders"   style="visibility:hidden;cursor:pointer" onclick="close_all_folders(0);" />

@@ -18,6 +18,11 @@ a:visited        								{color:#000066;text-decoration:none;font-size:12px;}
 
 .small                          {font-size:11px;}
 .label                          {font-size:11px;white-space:nowrap;}
+.green_label                    {font-size:11px;white-space:nowrap;color:forestgreen;}
+.red_label                      {font-size:11px;white-space:nowrap;color:crimson;}
+.value                          {font-size:11px;white-space:nowrap;}
+.green_value                    {font-size:11px;white-space:nowrap;color:forestgreen;}
+.red_value                      {font-size:11px;white-space:nowrap;color:crimson;}
 .bold                           {font-weight:bold;}
 .caption                        {font-size:16px;font-weight:bold;font-family:"Trebuchet MS",Arial,Helvetica,Sans-Serif;font-style:italic;color:#EA7A14;}       
 .location                       {font-weight:bold;color:#EA7A14;}       
@@ -31,7 +36,7 @@ a:visited        								{color:#000066;text-decoration:none;font-size:12px;}
 .head1                          {border-bottom:1px solid #8B919F;vertical-align:bottom;}
 .head                           {border-bottom:1px solid #8B919F;border-left:1px solid #8B919F;vertical-align:bottom;}
 .before_head_space              {margin:0px;line-height:6px;height:6px;}
-.link        								    {color:#000066;text-decoration:none;font-size:12px;}
+.link        								    {color:#000066;text-decoration:none;font-size:12px;cursor:pointer;}
 td.after_head_space1            {background-color:#CFD7EB;margin:0px;line-height:3px;height:3px;}
 td.after_head_space2            {background-color:#D4DBEE;margin:0px;line-height:1px;height:1px;}
 td.after_head_space3            {background-color:#DADFF0;margin:0px;line-height:1px;height:1px;}
@@ -115,15 +120,26 @@ ul.tabs li a.active1 span       {display:block; padding:0px 10px 0px 6px; backgr
 /*Tree*/
 ul.tree                         {padding:0px; margin:0px 0px 0px 4px;  list-style:none;}
 li.tree                         {white-space:nowrap;}
+li.tree div                     {cursor:pointer;}
 li.jobs                         {margin-left:15px; padding-bottom:1px; padding-left:8px; border-left:1px dashed #8B919F; border-bottom:1px dashed #8B919F;}
 li.job_chains                   {margin-left:15px; padding-bottom:1px; border-left:1px dashed #8B919F; border-bottom:1px dashed #8B919F;}
 ul.tree li ul                   {padding:0px; margin:0px 0px 0px 12px; list-style:none;}
 div.tree:hover                  {background-color:#F2F5FA;}
+tr.tree                         {cursor:pointer;}
 tr.tree:hover                   {background-color:#F2F5FA;}
 li.tree:hover                   {background-color:#F2F5FA;}
 span.status                     {display:inline-block;margin:0px 6px 0px 1px;width:6px;height:6px;line-height:6px;border:1px solid #8B919F;}
 span.name                       {display:inline-block;min-width:200px;font-weight:bold;}
-img.folder                      {margin:0px 2px 0px 0px;}
+img.folder                      {margin:0px 2px 0px 0px;cursor:pointer;}
+
+/*List*/
+tbody.list                      {cursor:pointer;}
+tbody.list:hover                {background-color:#F2F5FA;}
+tr.list                         {cursor:pointer;}
+tr.list:hover                   {background-color:#F2F5FA;}
+a.list                          {cursor:pointer;font-size:11px;}
+a.list:hover                    {background-color:#F2F5FA;}
+
 
 /* Dialog for Inputs of menu functions */
 .input                          {padding:0px;margin:0px;font-size:12px;}

@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2011 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -350,7 +350,7 @@ function scheduler_settings__onclick(ret)
       dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('View Mode')+'</legend>' );
       dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
       select_opts                    = {'tree':' '+parent.getTranslation('tree view')+' ','list':' '+parent.getTranslation('list view')+' '};
-      for( var entry in  parent._scheduler._supported_tree_views ) {
+      for( var entry in parent._scheduler._supported_tree_views ) {
         dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
         dialog.add_select( "view_"+entry, select_opts, window.parent.onload_settings.view[ entry ], 1, 0, false );
         dialog._html_array.push( ' '+parent.getTranslation('for')+' <i>'+parent.getTranslation(parent._scheduler._supported_tree_views[entry])+' </i>' );
@@ -1390,9 +1390,9 @@ function scheduler_menu__onclick( elt )
     window.parent.left_frame._job_name  = '';
     var popup_builder   = new Popup_menu_builder();
     
-    var state           = window.parent.left_frame._response.selectSingleNode( "spooler/answer/state" ).getAttribute( "state" );
-    var waiting_errno   = window.parent.left_frame._response.selectSingleNode( "spooler/answer/state" ).getAttribute( "waiting_errno" );
-    var cluster_element = window.parent.left_frame._response.selectSingleNode( "spooler/answer/state/cluster" );
+    var state           = window.parent.top_frame._state.getAttribute( "state" );
+    var waiting_errno   = window.parent.top_frame._state.getAttribute( "waiting_errno" );
+    var cluster_element = window.parent.top_frame._state.selectSingleNode( "cluster" );
     var within          = parent._scheduler._runtime_settings.terminate_timeout;
     
     var command         = function( cmd ) { return "<modify_spooler cmd='" + cmd + "'/>"; }
@@ -1506,7 +1506,7 @@ function job_menu__onclick( job_name )
     
     popup_builder.add_show_log( parent.getTranslation("Show log")        , "show_log?job=" + encodeComponent(job_name), "show_log_job_" + job_name.replace(/\//g,'_') );
     //popup_builder.add_entry   ( parent.getTranslation("Show configuration"),  "show_xml('"+job_name+".job.xml')", hot );
-    popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('job', '"+job_name+"')", hot );
+    popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('job', '"+parent.left_frame._job_name+"')", hot );
     
     var has_description = (job_element.getAttribute( "has_description" ) == "yes");
     popup_builder.add_entry   ( parent.getTranslation("Show description"), "show_job_desc()", has_description );
@@ -1521,7 +1521,7 @@ function job_menu__onclick( job_name )
     popup_builder.add_command ( parent.getTranslation("Start task immediately"), "<start_job job='" + parent.left_frame._job_name + "'/>", (initialized && !order_job) );
     popup_builder.add_entry   ( parent.getTranslation("Start task at") , "callErrorChecked('start_task_at')", (initialized && !order_job) );
     popup_builder.add_entry   ( parent.getTranslation("Start task parametrized")  , "callErrorChecked('start_task')", (initialized && !order_job) );
-    popup_builder.add_entry   ( parent.getTranslation("Set run time")  , "callErrorChecked('set_run_time','job'," + hot + ")", (initialized && !order_job) );
+    popup_builder.add_entry   ( parent.getTranslation("Set run time")  , "callErrorChecked('set_run_time','job'," + hot + ")", initialized );
     popup_builder.add_command ( parent.getTranslation("Stop")          , "<modify_job job='" + parent.left_frame._job_name + "' cmd='stop'    />", (!stopped && enabled) );
     popup_builder.add_command ( parent.getTranslation("Unstop")        , "<modify_job job='" + parent.left_frame._job_name + "' cmd='unstop'  />", (stopped && enabled) );
 //  popup_builder.add_command ( parent.getTranslation("Wake")          , "<modify_job job='" + parent.left_frame._job_name + "' cmd='wake'    />" );
@@ -1720,16 +1720,30 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
 //--------------------------------------------------------------------------job_chain_node_menu__onclick
 
 function job_chain_node_menu__onclick( state, job_chain )
-{ 
-    var job_chain_elem = parent.left_frame._response.selectSingleNode('spooler/answer//job_chains/job_chain[ @path="'+job_chain+'" ]');
-    if( !job_chain_elem ) {
-      var response     = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + job_chain + '"/>', false );
-      if( response ) job_chain_elem = response.selectSingleNode('//job_chain');
-    }
+{   
+    var job_chain_elem = null;
+    var job_element    = null;
+    var job_name       = '';
+    var hot            = false;
+    var enabled        = true;
+    var job_stopped    = false;
     var node_action    = null;
-    if(job_chain_elem) { 
-      node_action      = job_chain_elem.selectSingleNode('job_chain_node[ @state="'+state+'" ] | job_chain_node.job_chain[ @state="'+state+'" ]').getAttribute( "action" );
+    var response       = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + job_chain + '" what="job_chain_jobs" max_orders="0" max_order_history="0"/>', false );
+    if( response ) {
+     job_chain_elem    = response.selectSingleNode('//job_chain');
     }
+    if( job_chain_elem ) {
+    	var node_elem    = job_chain_elem.selectSingleNode('job_chain_node[@state="'+state+'"]'); 
+      job_element      = node_elem.selectSingleNode("job");
+      node_action      = node_elem.getAttribute( "action" );
+    }
+    if( job_element ) {
+      	job_name       = job_element.getAttribute('path');
+      	hot            = (job_element.selectSingleNode('file_based/@file') && parent._scheduler.versionIsNewerThan( "2008-05-13 09:00:00" ) ) ? 1 : 0;    
+      	enabled        = ( !job_element.getAttribute( "enabled" ) || job_element.getAttribute( "enabled" ) != "no" );
+        job_stopped    = (job_element.getAttribute( "state" ) == 'stopped' || job_element.getAttribute( "state" ) == "stopping");
+    }
+    
     var command        = function( cmd ) { return "<job_chain_node.modify action='"+cmd+"' job_chain='"+job_chain+"' state='"+state+"'/>"; }
     var undo_title     = parent.getTranslation("Unstop") + " | " + parent.getTranslation("Unskip");
     switch( node_action ) {
@@ -1738,10 +1752,15 @@ function job_chain_node_menu__onclick( state, job_chain )
     }
     var popup_builder = new Popup_menu_builder();
     
-    popup_builder.add_command ( parent.getTranslation("Stop")    , command('stop'),       node_action != 'stop' );
-    popup_builder.add_command ( parent.getTranslation("Skip")    , command('next_state'), node_action != 'next_state' );
+    popup_builder.add_command ( parent.getTranslation("Stop node")    , command('stop'),       node_action != 'stop' );
+    popup_builder.add_command ( parent.getTranslation("Skip node")    , command('next_state'), node_action != 'next_state' );
     if( undo_title ) popup_builder.add_command ( undo_title, command('process'),    node_action != null );
-    
+    if( job_name ) {
+      popup_builder.add_bar();
+      popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('job', '"+job_name+"')", hot );
+      popup_builder.add_command ( parent.getTranslation("Stop job")          , "<modify_job job='" + job_name + "' cmd='stop'    />", (!job_stopped && enabled) );
+      popup_builder.add_command ( parent.getTranslation("Unstop job")        , "<modify_job job='" + job_name + "' cmd='unstop'  />", (job_stopped && enabled) );
+    }
     _popup_menu = popup_builder.show_popup_menu();
 }
 
