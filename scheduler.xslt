@@ -1163,7 +1163,7 @@
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Schedule (Substitutes)-->
     <xsl:template match="schedule.user" mode="used_schedules">
-             <xsl:for-each select=".[@job]">
+             <xsl:for-each select="self::*[@job]">
                 <xsl:sort select="translate( @job, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz' )" order="ascending"/>
                 <xsl:if test="position() = 1">
                    <tr><td class="small" colspan="5"><span class="label" style="font-style:italic;">Used by jobs</span>:</td></tr>
@@ -1175,7 +1175,7 @@
                   </td>
                 </tr>      
             </xsl:for-each>
-            <xsl:for-each select=".[@order]">
+            <xsl:for-each select="self::*[@order]">
                 <xsl:sort select="translate( @job_chain, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz' )" order="ascending"/>
                 <xsl:sort select="translate( @order, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz' )" order="ascending"/>
                 <xsl:if test="position() = 1">
@@ -1194,6 +1194,7 @@
                 </tr>      
             </xsl:for-each>
      </xsl:template>
+     
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Schedule (Substitutes)-->
     <xsl:template match="schedule" mode="substitute">
@@ -2275,7 +2276,7 @@
                     </td>
                 </tr>
                 
-                <xsl:if test="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
+                <xsl:if test="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
                     <tr>
                         <td colspan="5" style="padding-left: 4ex; padding-bottom: 0.5em;">
                             <xsl:apply-templates mode="file_based_line" select="."/>
@@ -2872,7 +2873,7 @@
             
             <td colspan="2">
               <xsl:if test="not( $single ) or $big_chain">
-                <xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@path"/>' )</xsl:attribute>       
+                <xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@path"/>' )</xsl:attribute>
               </xsl:if>
               <xsl:if test="$big_chain">
                 <xsl:attribute name="style">padding-left:4px;</xsl:attribute>
@@ -3428,7 +3429,7 @@
             <xsl:otherwise>
                 <span class="red_label"><xsl:value-of select="."/></span>
             </xsl:otherwise>
-        </xsl:choose>
+        </xsl:choose>
     </xsl:template>
     
     

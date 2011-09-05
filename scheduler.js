@@ -56,7 +56,7 @@ function Scheduler()
     this._tree_view_enabled                              = false; //2.1.0.6101  (2010-04-06 11:53:57)
     this._activeRequestCount                             = 0;
     this._ie                                             = navigator.appVersion.match(/\bMSIE\b/);
-    this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains','orders':'Orders','schedules':'Schedules','locks':'Locks'}; 
+    this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains','orders':'Orders','schedules':'Schedules'}; 
     this._view                                           = {'jobs'             :'list',
                                                             'job_chains'       :'list',
                                                             'orders'           :'list',
@@ -726,8 +726,8 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
     if( typeof with_translate != 'boolean' ) with_translate = true;
     if( typeof text_output    != 'boolean' ) text_output    = true;
     
-    if( !this._ie ) {   
-      result_dom = this._xslt.transformToDocument( dom_document );
+    if( !this._ie ) {
+    	result_dom = this._xslt.transformToDocument( dom_document );
     } else {
       if( !with_translate && text_output ) {
         var transformed = dom_document.transformNode( this._xslt );
