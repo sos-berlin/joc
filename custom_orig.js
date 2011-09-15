@@ -47,10 +47,10 @@ _show_card               = 'jobs';
 /*****************************************************************
 *  For some tabs you can set the default view mode (list or tree).
 */
-_view.jobs               = 'list';
-_view.job_chains         = 'list';
-_view.orders             = 'list';
-_view.schedules          = 'list';
+_view.jobs               = 'tree';
+_view.job_chains         = 'tree';
+_view.orders             = 'tree';
+_view.schedules          = 'tree';
 
 
 /*****************************************************************

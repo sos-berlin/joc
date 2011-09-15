@@ -211,7 +211,7 @@ function write_menu( menu, align )
   var menu_title = parent.getTranslation(menu.substr(0,1).toUpperCase() + menu.substring(1));
   if( window.createPopup == undefined ) {
     var blanks = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
-    var blanks2 = (parent.safari > 0) ? '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' : '';
+    var blanks2 = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
     document.writeln('                <div class="selectbox_'+menu+'">');
     document.writeln('                  <select class="'+align+'" id="__selectbox_'+menu+'_'+align+'__" name="__selectbox_'+menu+'_'+align+'__" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
     if( align == 'left' ) {
