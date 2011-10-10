@@ -64,8 +64,13 @@ modify_title();
 
 document.onreadystatechange = document__onreadystatechange;
 window.onscroll             = window__onscroll;
+document.onmousewheel 			= window__onscroll; /* IE, Chrome */
+if(document.addEventListener){ /* Safari, Firefox */
+    document.addEventListener('DOMMouseScroll', window__onscroll, false);
+}
 
-if( window.navigator.vendor == "Firefox" )      // Firefox ruft onscroll nur auf, wenn der Knopf in der Bildlaufleiste mit der Maus verschoben wird.
+if( window.navigator.appName == "Netscape" )
+//if( window.navigator.vendor == "Firefox" )      // Firefox ruft onscroll nur auf, wenn der Knopf in der Bildlaufleiste mit der Maus verschoben wird.
 {                                               // Nicht beim Mausklick auf die Leiste oder bei Page-Up.
     window.onkeydown            = stop_timer;
     window.onmousedown          = stop_timer;
@@ -79,7 +84,7 @@ function start_timer()
 {
     stop_timer();
     
-    if( !error )  timer = window.setInterval( "scroll_down()", 100, "JavaScript" );
+    if( !error )  timer = window.setInterval( "scroll_down()", 200 );
 }
 
 //---------------------------------------------------------------------------------------stop_timer
