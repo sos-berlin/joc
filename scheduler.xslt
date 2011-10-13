@@ -2224,7 +2224,7 @@
                <span class="green_value"><xsl:apply-templates mode="date_time_nowrap" select="@next_start_time__xslt_datetime_with_diff"/></span>
            </xsl:when>
            <xsl:when test="@start_time">
-               <span class="green_label">Start at</span><span class="green_value">:&#160;</span>
+               <span class="green_label">Running since</span><span class="green_value">:&#160;</span>
                <span class="green_value"><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime_with_diff"/></span>
            </xsl:when>
            <!-- TODO @start_time und @task wird gleichzeitig geliefert -->
@@ -4144,7 +4144,7 @@
                          <td class="green_value" valign="top" colspan="2"><xsl:apply-templates mode="date_time_nowrap" select="@next_start_time__xslt_datetime_with_diff"/></td>
                      </xsl:when>
                      <xsl:when test="@start_time">
-                         <td class="label"><span class="label">Start at</span>:&#160;</td>
+                         <td class="label"><span class="label">Running since</span>:&#160;</td>
                          <td class="green_value" valign="top" colspan="2"><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime_with_diff"/></td>
                      </xsl:when>
                   </xsl:choose>
