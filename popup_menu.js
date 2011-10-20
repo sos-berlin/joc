@@ -553,7 +553,7 @@ Input_dialog.prototype.add_textarea = function( name, val, rows )
 
 Input_dialog.prototype.add_params = function( params, param_names ) 
 {    
-    this.add_hidden( "param_names", param_names.join(",") );
+    this.add_hidden( "param_names", param_names.join(";") );
       
     this._with_params = true;
     var first = true;
