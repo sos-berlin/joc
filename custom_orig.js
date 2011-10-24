@@ -87,9 +87,9 @@ _select_states.jobs_state_select     = 'all';
 
 /*****************************************************************
 *  You can set how much orders are shown in the job chains if the
-*  checkbox 'show orders' is checked. The default is 10.
+*  checkbox 'show orders' is checked. The default is 30.
 */
-_max_orders              = 10;
+_max_orders              = 30;
 
 
 /*****************************************************************
