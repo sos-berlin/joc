@@ -343,7 +343,7 @@
             <span>&#160;&#160;- &#160;<span class="green_label">Next start</span><span class="green_value">: </span><span class="green_value"><xsl:apply-templates mode="date_time_nowrap" select="@next_start_time__xslt_datetime_with_diff"/></span></span>
           </xsl:if>
           <xsl:if test="@title">
-            <span>&#160;&#160;- &#160;<i><xsl:value-of select="@title"/></i></span>
+            <span>&#160;&#160;- &#160;<xsl:apply-templates select="@title"/></span>
           </xsl:if>
           
           <xsl:if test="ERROR or file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes' or lock.requestor/lock.use/@is_missing='yes'">
@@ -409,7 +409,7 @@
             </span>
           </xsl:if>
           <xsl:if test="@title">
-            <span>&#160;&#160;-&#160;&#160;<i><xsl:value-of select="@title"/></i></span>
+            <span>&#160;&#160;-&#160;&#160;<xsl:apply-templates select="@title"/></span>
           </xsl:if>
           
           <xsl:if test="$error or $web_services">
@@ -682,7 +682,7 @@
           <span>&#160;&#160;-&#160;<xsl:apply-templates mode="properties" select="." /></span>
           
           <xsl:if test="@title">
-            <span>&#160;&#160;-&#160;&#160;<i><xsl:value-of select="@title"/></i></span>
+            <span>&#160;&#160;-&#160;&#160;<xsl:apply-templates select="@title"/></span>
           </xsl:if>
           
           <xsl:if test="ERROR or file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
@@ -759,7 +759,7 @@
           <span class="status" title="{$icon_title}" style="{concat('background-color:',$icon_color)}">&#160;</span>
           <span class="bold" style="{concat('color:',$font_color)}"><xsl:value-of select="@name" /></span>
           <xsl:if test="@title">
-            <span>&#160;&#160;-&#160;&#160;<i><xsl:value-of select="@title"/></i></span>
+            <span>&#160;&#160;-&#160;&#160;<xsl:apply-templates select="@title"/></span>
           </xsl:if>
           <xsl:if test="@valid_from">
             <xsl:text>&#160;&#160;- &#160;</xsl:text><span class="small">
@@ -951,7 +951,7 @@
           <td colspan="4">
               <xsl:attribute name="onclick">callErrorChecked( 'show_order_details', '<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
               <b><xsl:apply-templates mode="trim_slash" select="@order"/></b>
-              <xsl:if test="@title">&#160;&#160;- &#160;<i><xsl:value-of select="@title"/></i></xsl:if>
+              <xsl:if test="@title">&#160;&#160;- &#160;<xsl:apply-templates select="@title"/></xsl:if>
           </td>
           <td style="padding:0px 2px;text-align:right;" title="Order menu">
              <xsl:call-template name="command_menu">
@@ -1127,7 +1127,7 @@
             <xsl:attribute name="onclick">callErrorChecked( 'show_schedule_details','<xsl:value-of select="@path"/>' )</xsl:attribute>
             <b class="{$class}"><xsl:apply-templates mode="trim_slash" select="@path" /></b>
             <xsl:if test="@title">
-              <span>&#160;&#160;-&#160;&#160;<i><xsl:value-of select="@title"/></i></span>
+              <span>&#160;&#160;-&#160;&#160;<xsl:apply-templates select="@title"/></span>
             </xsl:if>
           </td>
           <td style="text-align:right;padding:0px 2px;" title="Schedule menu">
@@ -1219,7 +1219,7 @@
               <xsl:attribute name="onclick">callErrorChecked( 'show_schedule_details','<xsl:value-of select="@path"/>' )</xsl:attribute>
               <span class="{$class}" style="font-size:8pt;font-family:Courier;">&#8594; </span><b class="{$class}"><xsl:apply-templates mode="trim_slash" select="@path" /></b>
               <xsl:if test="@title">
-                 <xsl:text>&#160;&#160;- &#160;</xsl:text><i><xsl:value-of select="@title"/></i>
+                 <xsl:text>&#160;&#160;- &#160;</xsl:text><xsl:apply-templates select="@title"/>
               </xsl:if>
             </td>
             <td class="small">
@@ -1250,7 +1250,7 @@
               <xsl:attribute name="oncontextmenu">schedule_menu__onclick( '<xsl:value-of select="@path"/>', '<xsl:value-of select="@substitute"/>', 1, <xsl:value-of select="1 + count(file_based/@file)"/>, '<xsl:value-of select="@title"/>' );return false;</xsl:attribute>
               <span class="{$class}"><xsl:apply-templates mode="trim_slash" select="@path" /></span>
               <xsl:if test="@title">
-                 <xsl:text>&#160;&#160;- &#160;</xsl:text><i><xsl:value-of select="@title"/></i>
+                 <xsl:text>&#160;&#160;- &#160;</xsl:text><xsl:apply-templates select="@title"/>
               </xsl:if>
               <xsl:text>&#160;&#160;- &#160;</xsl:text><span class="small">
               <xsl:apply-templates mode="date_time_nowrap" select="@valid_from__xslt_datetime"/> - 
@@ -1356,7 +1356,7 @@
                    <td colspan="3">
                        <b class="{$class}"><xsl:apply-templates mode="trim_slash" select="@path" /></b>
                        <xsl:if test="@title">
-                           <xsl:text>&#160;&#160;- &#160;</xsl:text><i><xsl:value-of select="@title"/></i>
+                           <xsl:text>&#160;&#160;- &#160;</xsl:text><xsl:apply-templates select="@title"/>
                        </xsl:if>
                    </td>
                </tr>
@@ -2884,7 +2884,7 @@
               </xsl:if>
               <b><xsl:apply-templates mode="trim_slash" select="@path" /></b>&#160;
               <xsl:if test="@title">
-                 <nobr><xsl:value-of select="@title"/></nobr>
+                 <nobr><xsl:apply-templates select="@title"/></nobr>
               </xsl:if>
             </td>
             
@@ -3120,7 +3120,7 @@
                 <td colspan="4" title="show job details">
                     <xsl:attribute name="onclick">callErrorChecked( 'show_job_details','<xsl:value-of select="@path"/>' )</xsl:attribute>
                     <xsl:apply-templates mode="job_path" select="."/>
-                    <xsl:if test="@title">&#160;&#160;- &#160;<i><xsl:value-of select="@title"/></i></xsl:if>&#160;
+                    <xsl:if test="@title">&#160;&#160;- &#160;<xsl:apply-templates select="@title"/></xsl:if>&#160;
                 </td>
                 <td valign="top" align="right" title="Job menu">
                     <xsl:call-template name="command_menu">
@@ -3231,7 +3231,7 @@
                          <xsl:attribute name="class">gray</xsl:attribute>
                        </xsl:if>
                        <xsl:apply-templates mode="job_path" select="." />
-                       <xsl:if test="@title">&#160;&#160;- &#160;<i><xsl:value-of select="@title"/></i></xsl:if>
+                       <xsl:if test="@title">&#160;&#160;- &#160;<xsl:apply-templates select="@title"/></xsl:if>
                    </td>
                </tr>
                <xsl:call-template name="after_head_space">
@@ -4054,7 +4054,7 @@
                        <td colspan="3">
                            <b><xsl:value-of select="$job_chain_path" />,<xsl:value-of select="@id"/></b>
                            <xsl:if test="@title">
-                               <xsl:text>&#160;&#160;- &#160;</xsl:text><i><xsl:value-of select="@title"/></i>
+                               <xsl:text>&#160;&#160;- &#160;</xsl:text><xsl:apply-templates select="@title"/>
                            </xsl:if>
                        </td>
                    </tr>
@@ -4856,6 +4856,19 @@
         </xsl:variable>
         <span class="{$class}" style="{$style}"><xsl:apply-templates mode="trim_slash" select="@path" /></span>
         
+    </xsl:template>
+    
+    
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~@title-->
+    
+    <xsl:template match="@title">
+        
+        <i>
+          <xsl:call-template name="show_text_with_url">
+             <xsl:with-param name="text" select="."/>
+          </xsl:call-template>
+        </i>
+        
     </xsl:template> 
     
     
@@ -4867,38 +4880,115 @@
         <xsl:param name="text"/>
 
         <xsl:choose>
+            <xsl:when test="contains( $text, '&lt;a ' )">
+                <xsl:call-template name="show_text_with_url">
+                    <xsl:with-param name="text" select="substring-before( $text, '&lt;a ' )"/>
+                </xsl:call-template>
+                <xsl:call-template name="show_text_with_url.url_tag_end">
+                		<xsl:with-param name="tail" select="substring-after( $text, '&lt;a ' )"/>
+                </xsl:call-template>
+            </xsl:when>
             <xsl:when test="contains( $text, 'http://' )">
                 <xsl:value-of select="substring-before( $text, 'http://' )"/>
-                
-                <xsl:variable name="tail" select="substring-after( $text, 'http://' )"/>
-                
-                <xsl:choose>
-                    <xsl:when test="contains( $tail, ' ' )">
-                        <xsl:variable name="url" select="concat( 'http://', substring-before( $tail, ' ' ) )"/>
-
-                        <xsl:call-template name="show_text_with_url.url_with_punctuation">
-                            <xsl:with-param name="url" select="$url"/>
-                        </xsl:call-template>
-
-                        <xsl:text> </xsl:text>
-
-                        <xsl:call-template name="show_text_with_url">
-                            <xsl:with-param name="text" select="substring-after( $tail, ' ' )"/>
-                        </xsl:call-template>
-                    </xsl:when>
-
-                    <xsl:otherwise>
-                        <xsl:call-template name="show_text_with_url.url_with_punctuation">
-                            <xsl:with-param name="url" select="concat( 'http://', $tail )"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <xsl:call-template name="show_text_with_url.url_end">
+                		<xsl:with-param name="tail" select="substring-after( $text, 'http://' )"/>
+                		<xsl:with-param name="protocol" select="'http://'"/>
+                </xsl:call-template>
             </xsl:when>
-
+            <xsl:when test="contains( $text, 'https://' )">
+                <xsl:value-of select="substring-before( $text, 'https://' )"/>
+                <xsl:call-template name="show_text_with_url.url_end">
+                		<xsl:with-param name="tail" select="substring-after( $text, 'https://' )"/> 
+                		<xsl:with-param name="protocol" select="'https://'"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="contains( $text, 'www.' )">
+                <xsl:value-of select="substring-before( $text, 'www.' )"/>
+                <xsl:call-template name="show_text_with_url.url_end">
+                		<xsl:with-param name="tail" select="substring-after( $text, 'www.' )"/> 
+                		<xsl:with-param name="protocol" select="'www.'"/>
+                </xsl:call-template>
+            </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$text"/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~show_text_with_url.url_end-->
+ 
+    <xsl:template name="show_text_with_url.url_end">
+        <xsl:param name="tail"/>
+        <xsl:param name="protocol"/>
+        
+        <xsl:choose>
+            <xsl:when test="contains( $tail, ' ' )">
+                <xsl:call-template name="show_text_with_url.url_with_punctuation">
+                    <xsl:with-param name="url" select="concat( $protocol, substring-before( $tail, ' ' ) )"/>
+                </xsl:call-template>
+
+                <xsl:text> </xsl:text>
+
+                <xsl:call-template name="show_text_with_url">
+                    <xsl:with-param name="text" select="substring-after( $tail, ' ' )"/>
+                </xsl:call-template>
+            </xsl:when>
+
+            <xsl:otherwise>
+                <xsl:call-template name="show_text_with_url.url_with_punctuation">
+                    <xsl:with-param name="url" select="concat( $protocol, $tail )"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:template>
+    
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~show_text_with_url.url_tag_end-->
+ 
+    <xsl:template name="show_text_with_url.url_tag_end">
+        <xsl:param name="tail"/>
+        
+        <xsl:choose>
+            <xsl:when test="contains( $tail, '&lt;/a&gt;' )">
+                <xsl:variable name="before_end_tag" select="substring-before( $tail, '&lt;/a&gt;' )" />
+                <xsl:choose>
+                   <xsl:when test="contains( $before_end_tag, 'href=&quot;' )">
+                       <xsl:variable name="after_href" select="substring-after( $before_end_tag, 'href=&quot;' )" />
+                       <xsl:choose>
+                         <xsl:when test="contains( $after_href, '&quot;' )">
+                           <xsl:variable name="url" select="substring-before( $after_href, '&quot;' )" />
+                           <xsl:variable name="after_url" select="substring-after( $after_href, '&quot;' )" />
+                           <xsl:choose>
+                             <xsl:when test="contains( $after_url, '&gt;' )">
+                               <xsl:call-template name="show_text_with_url.url">
+                                 <xsl:with-param name="url" select="$url"/>
+                                 <xsl:with-param name="link_text" select="substring-after( $after_url, '&gt;' )"/>
+                               </xsl:call-template>
+                               <xsl:call-template name="show_text_with_url">
+                                 <xsl:with-param name="text" select="substring-after( $tail, '&lt;/a&gt;' )"/>
+                               </xsl:call-template>
+                             </xsl:when>
+                             <xsl:otherwise>
+                               <xsl:value-of select="concat( '&lt;a ', $tail )"/>
+                             </xsl:otherwise>
+                           </xsl:choose>
+                         </xsl:when>
+                         <xsl:otherwise>
+                           <xsl:value-of select="concat( '&lt;a ', $tail )"/>
+                         </xsl:otherwise>
+                       </xsl:choose>
+                   </xsl:when>
+                   <xsl:otherwise>
+                     <xsl:value-of select="concat( '&lt;a ', $tail )"/>
+                   </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+
+            <xsl:otherwise>
+                <xsl:value-of select="concat( '&lt;a ', $tail )"/>
+            </xsl:otherwise>
+        </xsl:choose>
+
     </xsl:template>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~show_text_with_url.url_with_punctuation-->
@@ -4908,7 +4998,7 @@
         
         <xsl:choose>
             <xsl:when test="not( contains( 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/', substring( $url, string-length( $url ), 1 ) ) )">
-                <xsl:call-template name="show_text_with_url.url">
+                <xsl:call-template name="show_text_with_url.url_with_punctuation">
                     <xsl:with-param name="url" select="substring( $url, 1, string-length( $url ) - 1 )"/>
                 </xsl:call-template>
                 <xsl:value-of select="substring( $url, string-length( $url ), 1 )"/>
@@ -4917,6 +5007,7 @@
             <xsl:otherwise>
                 <xsl:call-template name="show_text_with_url.url">
                     <xsl:with-param name="url" select="$url"/>
+                    <xsl:with-param name="link_text" select="$url"/>
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
@@ -4927,14 +5018,15 @@
     
     <xsl:template name="show_text_with_url.url">
         <xsl:param name="url"/>
-
+        <xsl:param name="link_text"/>
+        
         <xsl:element name="a">
             <xsl:attribute name="target">_blank</xsl:attribute>
             <xsl:attribute name="href">
                 <xsl:value-of select="$url"/>
             </xsl:attribute>
 
-            <xsl:value-of select="$url"/>
+            <xsl:value-of select="$link_text"/>
         </xsl:element>
 
     </xsl:template>
