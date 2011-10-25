@@ -35,7 +35,7 @@
 //-->
 <html>
     <head>
-        <title>Job Scheduler</title>
+        <title>JobScheduler</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <script type="text/javascript" src="scheduler_init.js"></script>
         <script type="text/javascript" src="browser_dependencies.js"></script>
@@ -72,7 +72,7 @@
               _response = _scheduler.executeSynchron( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
             }
             _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
-            document.title  = getTranslation('Job Scheduler') + " " + _scheduler._host + ":" + _scheduler._port;
+            document.title  = getTranslation('JobScheduler') + " " + _scheduler._host + ":" + _scheduler._port;
             document.title += ( _scheduler._id ) ? " " + getTranslation('-id') + "=" + _scheduler._id : "";
             _scheduler.readCustomVersionedSettings();
             if( !_server_settings ) _scheduler.readCookies();
@@ -106,7 +106,7 @@
             try {
               frames.top_frame.showError(msg);
             } catch(x) {
-              alert(msg.replace(/^.*connect to Job Scheduler\n(.*)$/,"No connection to Job Scheduler\n$1"));
+              alert(msg.replace(/^.*connect to JobScheduler\n(.*)$/,"No connection to JobScheduler\n$1"));
             } finally {
               return true;
             }
@@ -115,7 +115,7 @@
         </script>
     </head>
     
-    <frameset id="top_and_bottom_frameset" rows="130,0,28,*"     framespacing="0" border="0" onload="frames.corner_frame.location.href='corner_frame.html'; frames.details_frame.location.href='details_frame.html'; frames.left_frame.location.href='left_frame.html';">
+    <frameset id="top_and_bottom_frameset" rows="100,0,28,*"     framespacing="0" border="0" onload="frames.corner_frame.location.href='corner_frame.html'; frames.details_frame.location.href='details_frame.html'; frames.left_frame.location.href='left_frame.html';">
         <frame   name="top_frame"     src="top_frame.html"        marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
         <frame   name="error_frame"   src="error_frame.html"      marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>
         <frame   name="control_frame" src="control_frame.html"    marginwidth="0" marginheight="0" frameborder="0" scrolling="no"/>

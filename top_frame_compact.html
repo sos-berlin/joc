@@ -38,7 +38,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <title>Job Scheduler</title>
+    <title>JobScheduler</title>
 
     <style type="text/css">
         @import url(scheduler.css);
@@ -102,7 +102,7 @@ function update()
       document.getElementById('remote_schedulers_tab').style.display = (_state.selectNodes("remote_schedulers[@count = 0]").length > 0) ? 'none' : 'inline';
       
       set_state(response);
-      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("Job Scheduler is waiting for database ...")));
+      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("JobScheduler is waiting for database ...")));
     
     } else if( parent.left_frame._response ) {
       
@@ -117,7 +117,7 @@ function update()
       document.getElementById('remote_schedulers_tab').style.display = (_state.selectNodes("remote_schedulers[@count = 0]").length > 0) ? 'none' : 'inline';
       
       set_state(parent.left_frame._response);
-      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("Job Scheduler is waiting for database ...")));
+      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("JobScheduler is waiting for database ...")));
     }
     parent._scheduler.logger(3,'ELAPSED TIME FOR UPDATE '+self.name,'update_top');
 }
@@ -244,7 +244,7 @@ window.onerror  = function( msg, url, line ) {
   try {
     showError( msg, url, line );
   } catch(x) {
-    alert(msg.replace(/^.*connect to Job Scheduler\n(.*)$/,"No connection to Job Scheduler\n$1"));
+    alert(msg.replace(/^.*connect to JobScheduler\n(.*)$/,"No connection to JobScheduler\n$1"));
   } finally {
     return true;
   }

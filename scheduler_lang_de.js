@@ -6,7 +6,7 @@ _lang_file_exists = true;
 ******************************************************************************/
 
 //Window title 
-_translations['Job Scheduler']                             = 'Job Scheduler';
+_translations['JobScheduler']                              = 'JobScheduler';
 _translations['-id']                                       = '-ID';
 
 //Product info
@@ -29,6 +29,7 @@ _translations['Last Activities']                           = 'Letzte Aktivitäte
 //Buttons menu, extras, update, hide          
 _translations['Menu']                                      = 'Menü';
 _translations['Extras']                                    = 'Extras';
+_translations['Help']                                      = 'Hilfe';
 _translations['Hide']                                      = 'Details schließen';
 _translations['Update']                                    = 'Aktualisieren';
 
@@ -87,14 +88,14 @@ _translations['waiting_for_activation']                    = 'wartet auf Aktivie
 //Misc.
 _translations['unknown']                                   = 'unbekannt';
 _translations['THIS IS A BACKUP...']                       = 'DAS IST EIN BACKUP...';
-_translations['Backup Job Scheduler:']                     = 'Backup Job Scheduler:';
-_translations['Job Scheduler is waiting for database ...'] = 'Job Scheduler wartet auf Datenbank ...';
-_translations['Waiting for response from Job Scheduler ...'] = 'Auf Antwort des Job Scheduler warten ...';
-_translations['No connection to Job Scheduler']            = 'Keine Verbindung zum Job Scheduler';
+_translations['Backup JobScheduler:']                      = 'Backup JobScheduler:';
+_translations['JobScheduler is waiting for database ...']  = 'JobScheduler wartet auf Datenbank ...';
+_translations['Waiting for response from JobScheduler ...'] = 'Auf Antwort des JobScheduler warten ...';
+_translations['No connection to JobScheduler']             = 'Keine Verbindung zum JobScheduler';
 _translations['Error at XML answer:']                      = 'Fehler in XML-Antwort:';
 _translations["Error at XSL answer '$xsl':"]               = "Fehler in XSL-Antwort '$xsl':";
 _translations["Error at HTTP answer '$url':"]              = "Fehler in HTTP-Antwort '$url':";
-_translations['$trial trial (of 5) to (re)connect to Job Scheduler'] = '$trial Verbindungsversuch (von 5) mit dem Job Scheduler';
+_translations['$trial trial (of 5) to (re)connect to JobScheduler'] = '$trial Verbindungsversuch (von 5) mit dem JobScheduler';
 _translations['First']                                     = 'Erster';
 _translations['Second']                                    = 'Zweiter';
 _translations['Third']                                     = 'Dritter';
@@ -453,7 +454,7 @@ _translations['active Scheduler(s)']                       = 'aktive(r) Schedule
 _translations['exclusive Scheduler(s)']                    = 'exklusive(r) Scheduler';
 _translations['This Scheduler is active']                  = 'Dieser Scheduler ist aktiv';
 _translations['and exclusive']                             = 'und exclusiv';
-_translations['Only active Job Schedulers are allowed to start operation.'] = 'Nur aktiven Job Schedulern ist es erlaubt Operationen zu startet.';
+_translations['Only active JobSchedulers are allowed to start operation.'] = 'Nur aktiven JobSchedulern ist es erlaubt Operationen zu startet.';
 _translations['This Scheduler']                            = 'Dieser Scheduler';
 _translations['(was active!)']                             = '(war aktiv!)';
 _translations['active']                                    = 'aktiv';
@@ -484,7 +485,7 @@ _translations['Disconnected']                              = 'Getrennt';
 _translations['Version']                                   = 'Version';
                                                            
 //misc.                                                    
-_translations['Scheduler(s)']                              = 'Job Scheduler';
+_translations['Scheduler(s)']                              = 'JobScheduler';
 _translations['connected']                                 = 'verbunden';
 
 
@@ -701,7 +702,7 @@ _translations['Max. number of last activities']            = 'Max. Anzahl der le
 _translations['Max. number of history entries per order']  = 'Max. Anzahl der Historien-Einträge pro Auftrag';
 _translations['Max. number of history entries per task']   = 'Max. Anzahl der Historien-Einträge pro Task';
 _translations['Termintate within']                         = 'Beenden innerhalb';
-_translations['Max. seconds within the Job Scheduler terminates'] = 'Max. Zeitraum (Sekunden) in der sich der Job Scheduler beendet';
+_translations['Max. seconds within the JobScheduler terminates'] = 'Max. Zeitraum (Sekunden) in der sich der JobScheduler beendet';
 _translations['Dialogs']                                   = 'Dialoge';
 _translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'Voreingestellter Startzeitpunkt im &quot;<i>Start Task/Auftrag um...</i> &quot;-Dialog ist <i>now</i>';
 _translations['Debugging of the operations GUI']           = 'Debugging der Operations GUI';
@@ -726,7 +727,7 @@ _translations['Enter an order id']                         = 'Id des Auftrags';
 _translations['Enter an order title']                      = 'Title des Auftrags';
 _translations['Select an order state']                     = 'Status des Auftrags';
 _translations['Select an order end state']                 = 'Endstatus des Auftrags';
-_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?'] = 'Um den Auftrag dem Hot Folder zu übergeben, muss eine Auftrags-ID angegeben\nwerden. Ansonsten hat dieser nur die Lebenszeit der aktuellen Job Scheduler Session.\nWollen Sie fortfahren?';
+_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?'] = 'Um den Auftrag dem Hot Folder zu übergeben, muss eine Auftrags-ID angegeben\nwerden. Ansonsten hat dieser nur die Lebenszeit der aktuellen JobScheduler Session.\nWollen Sie fortfahren?';
 
 //set order state
 _translations['Set order state of $order']                 = 'Setze Status für $order';
@@ -756,7 +757,7 @@ _translations['Output format']                             = 'Ausgabeformat';
 _translations['Include order start times']                 = 'Inklusive Auftrags-Startzeiten';
 
 //job chain
-_translations['Sorry, but this feature is only supported for\nJob Scheduler version 2.0.204.5774 or higher'] = 'Leider kann diese Funktion erst für Job Scheduler\nab der Version 2.0.204.5774 angeboten werden.';
+_translations['Sorry, but this feature is only supported for\nJobScheduler version 2.0.204.5774 or higher'] = 'Leider kann diese Funktion erst für JobScheduler\nab der Version 2.0.204.5774 angeboten werden.';
 _translations['Modify job chain']                          = 'Job-Kette ändern';
 _translations['Now you can modify the job chain by editing the text area content.'] = 'Bearbeiten Sie den Textfeld-Inhalt, falls noch Änderungen an der Job-Kette nötig sind.';
 _translations['Orders are stored in the database (orders_recoverable)'] = 'Aufträge in die Datenbank speichern (orders_recoverable)';
@@ -771,7 +772,7 @@ _translations['Enter a job chain title']                   = 'Title der Job-Kett
 *                           JOB DESCRIPTION                                   *
 ******************************************************************************/
 
-_translations['The Job Scheduler $scheduler has no jobs with a description.']              = 'Der Job Scheduler $scheduler hat keine Jobs mit einer Beschreibung.';
+_translations['The JobScheduler $scheduler has no jobs with a description.']               = 'Der JobScheduler $scheduler hat keine Jobs mit einer Beschreibung.';
 _translations['Because of a security sanction of your browser you must reload this site!'] = 'Wegen einer Sicherheitssanktion Ihres Browsers muss die Seite neu geladen werden!';
 _translations['Please select a job to display its description.']                           = 'Wählen Sie einen Job um dessen Beschreibung anzuzeigen.';
 _translations['Please enter a job name to display its description.']                       = 'Geben Sie einen Job-Namen an, um dessen Beschreibung anzuzeigen.';

@@ -477,8 +477,8 @@ SOS_Logger.getDebugWindow = function(){
       SOS_Logger.popUpBlocker = true;
       throw new Error('PopUp Blocker is active');
     } else {
-      if(SOSDebugWindow.document.title != 'Job Scheduler - Logger') {
-        SOSDebugWindow.document.title = 'Job Scheduler - Logger';
+      if(SOSDebugWindow.document.title != 'JobScheduler - Logger') {
+        SOSDebugWindow.document.title = 'JobScheduler - Logger';
       }
       if(SOS_Logger.enableFocus){ SOSDebugWindow.focus(); }
     }

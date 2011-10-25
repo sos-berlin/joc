@@ -38,7 +38,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 
-    <title>Job Scheduler</title>
+    <title>JobScheduler</title>
 
 <style type="text/css">
     @import url("scheduler.css");
@@ -102,7 +102,7 @@ function update()
       document.getElementById('remote_schedulers_tab').style.display = (_state.selectNodes("remote_schedulers[@count = 0]").length > 0) ? 'none' : 'inline';
       
       set_state(response);
-      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("Job Scheduler is waiting for database ...")));
+      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("JobScheduler is waiting for database ...")));
     
     } else if( parent.left_frame._response ) {
       
@@ -117,7 +117,7 @@ function update()
       document.getElementById('remote_schedulers_tab').style.display = (_state.selectNodes("remote_schedulers[@count = 0]").length > 0) ? 'none' : 'inline';
       
       set_state(parent.left_frame._response);
-      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("Job Scheduler is waiting for database ...")));
+      if( _state.getAttribute('db_waiting') == "yes" ) showError(new Error(parent.getTranslation("JobScheduler is waiting for database ...")));
     }
     parent._scheduler.logger(3,'ELAPSED TIME FOR UPDATE '+self.name,'update_top');
 }
@@ -206,20 +206,20 @@ function show_card( what )
 
 
 //---------------------------------------------------------------------------------------write_menu
-function write_menu( menu, align )
+function write_menu( menu_title, menu, align )
 { 
-  var menu_title = parent.getTranslation(menu.substr(0,1).toUpperCase() + menu.substring(1));
   if( window.createPopup == undefined ) {
-    var blanks = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
-    var blanks2 = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+    var left_blanks   = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;';
+    var right_blanks  = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
+    var right_blanks2 = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
     document.writeln('                <div class="selectbox_'+menu+'">');
     document.writeln('                  <select class="'+align+'" id="__selectbox_'+menu+'_'+align+'__" name="__selectbox_'+menu+'_'+align+'__" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
     if( align == 'left' ) {
-      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">&#160;&#160;&#160;&#160;&#160;'+blanks+menu_title+'</option>');
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+left_blanks+menu_title+'</option>');
       document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');
       document.writeln('                  </select>');
     } else {
-      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+blanks+blanks2+menu_title+blanks+'&#160;&#160;</option>');
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+right_blanks+right_blanks2+menu_title+right_blanks+'&#160;&#160;</option>');
       document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');                    
       document.writeln('                  </select>');
       document.writeln('                  <div style="position:relative;top:-18px;height:16px;width:16px;background-color:#CFD7EB">&#160;</div>');
@@ -286,7 +286,7 @@ window.onerror  = function( msg, url, line ) {
   try {
     showError(msg);
   } catch(x) {
-    alert(msg.replace(/^.*connect to Job Scheduler\n(.*)$/,"No connection to Job Scheduler\n$1"));
+    alert(msg.replace(/^.*connect to JobScheduler\n(.*)$/,"No connection to JobScheduler\n$1"));
   } finally {
     return true;
   }
@@ -301,30 +301,40 @@ window.onerror  = function( msg, url, line ) {
     <div class="top">
       <img class="corner_tl" src="corner_tl.gif" alt="" />
       <img class="corner_tr" src="corner_tr.gif" alt="" />
-    </div>
-    <div class="bottom" style="margin-bottom:4px;">
-      <table cellspacing="0" cellpadding="0" border="0" align="center" width="100%" class="inner">
-        <thead>
+                   
+      <table cellpadding="0" cellspacing="0" width="100%" border="0" class="top">
+          <colgroup>
+            <col width="20"/>
+            <col width="30"/>
+            <col width="150"/>
+            <col width="*"/>
+            <col width="30"/>
+            <col width="150"/>
+            <col width="20"/>
+          </colgroup>
+          <thead>
           <tr>
-            <td align="left" width="20" nowrap>
-              <table cellspacing="0" cellpadding="0" border="0">
-                <thead>
-                  <tr>
-                    <td align="left" valign="middle" width="1" class="top" style="padding-top:4px;">
-                      <script language="javascript" type="text/javascript">
-                        document.write(parent.getTranslation('Documentation')+'&#x25BA;');
-                      </script>
-                      <noscript>Documentation&#x25BA;</noscript>
-                    </td>
-                    <td align="left" valign="bottom" class="top" style="padding-top:6px;white-space:nowrap;">
-                        <img src="banner_english.gif" style="cursor:pointer;" onclick="open_url( 'scheduler_home/doc/en/reference/index.xml', 'scheduler_documentation' )"/>
-                        <img src="banner_german.gif"  style="cursor:pointer;" onclick="open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )"/>
-                    </td>
-                  </tr>
-                </thead>
-              </table>  
-            </td>  
-            <td align="center" width="*">
+              <td align="left" style="padding-top:2px;">
+                <script language="javascript" type="text/javascript">
+                  write_menu(parent.getTranslation('Menu'), 'menu', 'left'); 
+                </script>
+              </td>
+              <td align="right" width="20" style="padding-top:2px;padding-right:2px;">
+                <script language="javascript" type="text/javascript">
+                  write_menu(parent.getTranslation('Help') + ' &#160;|&#160;  ' + parent.getTranslation('Extras'), 'extras', 'left'); 
+                </script>  
+              </td>
+              <td align="left" style="white-space:nowrap">&#160;<span id="backup"></span></td>
+              <td align="center">
+                <span style="white-space:nowrap;">
+                  <a href="javascript:showInfo();" style="text-decoration:none;">
+                     <img src="job_scheduler_rabbit_colour.gif" border="0" style="margin-top:2px;"/>
+                     <img src="job_scheduler_typo_colour.gif" border="0"/>
+                  </a>
+                </span>
+              </td>
+              <td>&#160;</td>
+              <td align="right">
               <table cellspacing="0" cellpadding="0" border="0" align="center">
                 <thead>
                   <tr> 
@@ -345,53 +355,13 @@ window.onerror  = function( msg, url, line ) {
                       </script>
                       <noscript>Update</noscript>
                       <!--[if lte IE 7]></a><![endif]--></div></td>
-                  </tr>
+                    </tr>
                 </thead>
               </table>  
-            </td>
-            <td align="right" width="20" title="scheduler extras" style="padding-top:2px;padding-right:2px;">
-              <script language="javascript" type="text/javascript">
-                write_menu('extras','right'); 
-              </script>  
-            </td>
-          </tr>
-        </thead>
-      </table>
-      <img class="corner_bl" src="corner_bl.gif" alt="" />
-      <img class="corner_br" src="corner_br.gif" alt="" />
-    </div>
-    <div class="top">
-      <img class="corner_tl" src="corner_tl.gif" alt="" />
-      <img class="corner_tr" src="corner_tr.gif" alt="" />
-                   
-      <table cellpadding="0" cellspacing="0" width="100%" border="0" class="top">
-          <colgroup>
-            <col width="20"/>
-            <col width="180"/>
-            <col width="*"/>
-            <col width="180"/>
-            <col width="20"/>
-          </colgroup>
-          <thead>
-          <tr>
-              <td align="left" title="scheduler menu" style="padding-top:2px;">
-                <script language="javascript" type="text/javascript">
-                  write_menu('menu','left'); 
-                </script>
               </td>
-              <td align="left" style="white-space:nowrap">&#160;<span id="backup"></span></td>
-              <td align="center">
-                <span style="white-space:nowrap;">
-                  <a href="javascript:showInfo();" style="text-decoration:none;">
-                     <img src="job_scheduler_rabbit_colour.gif" border="0" style="margin-top:2px;"/>
-                     <img src="job_scheduler_typo_colour.gif" border="0"/>
-                  </a>
-                </span>
-              </td>
-              <td align="right">&#160;</td>
-              <td align="right" title="scheduler menu" style="padding-right:2px;padding-top:2px;">
+              <td align="right" style="padding-right:2px;padding-top:2px;">
                 <script language="javascript" type="text/javascript">
-                  write_menu('menu','right'); 
+                  write_menu(parent.getTranslation('Menu'), 'menu', 'right'); 
                 </script>
               </td>
           </tr>
@@ -470,7 +440,7 @@ window.onerror  = function( msg, url, line ) {
             document.writeln('              <tr><td width="1" id="release_title">'+parent.getTranslation('Release')+'</td><td></td><td id="release_no" style="text-align:right;"></td></tr>');
             document.writeln('              <tr><td width="1">'+parent.getTranslation('Operations GUI').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td id="gui_info" style="text-align:right;"></td></tr>');
             if(parent._scheduler._version_date) {
-              document.writeln('              <tr><td width="1">'+parent.getTranslation('Job Scheduler').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td style="text-align:right;">'+parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1") + '&#160;&#160;&#160;(' + parent._scheduler._version_date.replace(/[ ]+.*$/,'')+')</td></tr>');
+              document.writeln('              <tr><td width="1">'+parent.getTranslation('JobScheduler').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td style="text-align:right;">'+parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1") + '&#160;&#160;&#160;(' + parent._scheduler._version_date.replace(/[ ]+.*$/,'')+')</td></tr>');
             }
             document.writeln('            </table>');
             document.writeln('          </td></tr>');

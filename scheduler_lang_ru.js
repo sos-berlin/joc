@@ -6,7 +6,7 @@ _lang_file_exists = true;
 ******************************************************************************/
 
 //Window title 
-_translations['Job Scheduler']                             = 'Job Scheduler';
+_translations['JobScheduler']                              = 'JobScheduler';
 _translations['-id']                                       = '-ID';
 
 //Product info
@@ -29,6 +29,7 @@ _translations['Last Activities']                           = 'Последние
 //Buttons menu, extras, update, hide          
 _translations['Menu']                                      = 'Меню';
 _translations['Extras']                                    = 'Сервис';
+_translations['Help']                                      = 'Помощь';
 _translations['Hide']                                      = 'Закрыть Детали';
 _translations['Update']                                    = 'Обновить';
 
@@ -87,14 +88,14 @@ _translations['waiting_for_activation']                    = 'ждёт акти�
 //Misc.
 _translations['unknown']                                   = 'неизвестно';
 _translations['THIS IS A BACKUP...']                       = 'ЭТО BACKUP...';
-_translations['Backup Job Scheduler:']                     = 'Backup Job Scheduler:';
-_translations['Job Scheduler is waiting for database ...'] = 'Job Scheduler ждёт базу данных ...';
-_translations['Waiting for response from Job Scheduler ...'] = 'Ждётся ответ от Job Scheduler ...';
-_translations['No connection to Job Scheduler']            = 'Связь с Job Scheduler отсутствует';
+_translations['Backup JobScheduler:']                      = 'Backup JobScheduler:';
+_translations['JobScheduler is waiting for database ...']  = 'JobScheduler ждёт базу данных ...';
+_translations['Waiting for response from JobScheduler ...'] = 'Ждётся ответ от JobScheduler ...';
+_translations['No connection to JobScheduler']            = 'Связь с JobScheduler отсутствует';
 _translations['Error at XML answer:']                      = 'Ошибка в XML-Ответе:';
 _translations["Error at XSL answer '$xsl':"]               = "Ошибка в XSL-Ответе '$xsl':";
 _translations["Error at HTTP answer '$url':"]              = "Ошибка в HTTP-Ответе '$url':";
-_translations['$trial trial (of 5) to (re)connect to Job Scheduler'] = '$trial попытка соединения (из 5) с Job Scheduler';
+_translations['$trial trial (of 5) to (re)connect to JobScheduler'] = '$trial попытка соединения (из 5) с JobScheduler';
 _translations['First']                                     = 'Первая';
 _translations['Second']                                    = 'Вторая';
 _translations['Third']                                     = 'Третья';
@@ -454,7 +455,7 @@ _translations['active Scheduler(s)']                       = 'active Scheduler(s
 _translations['exclusive Scheduler(s)']                    = 'exclusive Scheduler(s)';
 _translations['This Scheduler is active']                  = 'Этот Scheduler активен';
 _translations['and exclusive']                             = 'и exclusive';
-_translations['Only active Job Schedulers are allowed to start operation.'] = 'Только активным Job Scheduler разрешается запуск Операций.';
+_translations['Only active JobSchedulers are allowed to start operation.'] = 'Только активным JobScheduler разрешается запуск Операций.';
 _translations['This Scheduler']                            = 'Этот Scheduler';
 _translations['(was active!)']                             = '(был активный!)';
 _translations['active']                                    = 'активный';
@@ -485,7 +486,7 @@ _translations['Disconnected']                              = 'Разъединё
 _translations['Version']                                   = 'Версия';
                                                            
 //misc.                                                    
-_translations['Scheduler(s)']                              = 'Job Scheduler';
+_translations['Scheduler(s)']                              = 'JobScheduler';
 _translations['connected']                                 = 'соединён';
 
 
@@ -702,7 +703,7 @@ _translations['Max. number of last activities']            = 'Макс. коли
 _translations['Max. number of history entries per order']  = 'Макс. количество записей в Ордер';
 _translations['Max. number of history entries per task']   = 'Макс. количество записей в Task';
 _translations['Termintate within']                         = 'Закончить в пределах';
-_translations['Max. seconds within the Job Scheduler terminates'] = 'Макс. период (секунды), в пределах которого заканчивает свою работу Job Scheduler';
+_translations['Max. seconds within the JobScheduler terminates'] = 'Макс. период (секунды), в пределах которого заканчивает свою работу JobScheduler';
 _translations['Dialogs']                                   = 'Диалоги';
 _translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'По умолчанию установленное время старта в &quot;<i>Start Task/Ордер в...</i> &quot;-Диалог <i>сейчас</i>';
 _translations['Debugging of the operations GUI']           = 'Debugging Operations GUI';
@@ -727,7 +728,7 @@ _translations['Enter an order id']                         = 'Id Ордера';
 _translations['Enter an order title']                      = 'Название Ордера';
 _translations['Select an order state']                     = 'Статус Ордера';
 _translations['Select an order end state']                 = 'Конечный статус Ордера';
-_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?'] = 'Для передачи Ордера в Hot Folder нужно указать Ордер-ID\n.Иначе этот Ордер действителен только в течении актуальной Job Scheduler Session.\nПродолжить?';
+_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?'] = 'Для передачи Ордера в Hot Folder нужно указать Ордер-ID\n.Иначе этот Ордер действителен только в течении актуальной JobScheduler Session.\nПродолжить?';
 
 //set order state
 _translations['Set order state of $order']                 = 'Задать статус для $order';
@@ -757,7 +758,7 @@ _translations['Output format']                             = 'Формат вы�
 _translations['Include order start times']                 = 'Включая Ордер-времена старта';
 
 //job chain
-_translations['Sorry, but this feature is only supported for\nJob Scheduler version 2.0.204.5774 or higher'] = 'К сожалению эта Функция доступна только в\nJob Scheduler 2.0.204.5774.';
+_translations['Sorry, but this feature is only supported for\nJobScheduler version 2.0.204.5774 or higher'] = 'К сожалению эта Функция доступна только в\nJobScheduler 2.0.204.5774.';
 _translations['Modify job chain']                          = 'Job-Цепочку изменить';
 _translations['Now you can modify the job chain by editing the text area content.'] = 'Обработайте текстовое содержание поля, если необходимы изменения в Job-Цепочке.';
 _translations['Orders are stored in the database (orders_recoverable)'] = 'Ордер сохранить в базе данных (orders_recoverable)';
@@ -772,7 +773,7 @@ _translations['Enter a job chain title']                   = 'Название J
 *                           JOB DESCRIPTION                                   *
 ******************************************************************************/
 
-_translations['The Job Scheduler $scheduler has no jobs with a description.']              = 'У этого Job Scheduler $scheduler не имеется описания Jobs.';
+_translations['The JobScheduler $scheduler has no jobs with a description.']               = 'У этого JobScheduler $scheduler не имеется описания Jobs.';
 _translations['Because of a security sanction of your browser you must reload this site!'] = 'Из-за защитной санкции Вашего браузера страницу нужно вызвать заново!';
 _translations['Please select a job to display its description.']                           = 'Выберети пожалуйста Joб для показа его описания.';
 _translations['Please enter a job name to display its description.']                       = 'Для показа описания задайте пожалуйста Job-Имя.';

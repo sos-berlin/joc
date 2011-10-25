@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-		<title>Job Scheduler</title>
+		<title>JobScheduler</title>
 		
 		<style type="text/css">
         @import url(scheduler.css);
@@ -36,7 +36,7 @@ function on_load()
       params.update(queryParams);
       
       if(!params.get('path') || !params.get('type')) {
-      	throw new Error('The parameter of the Job Scheduler object are incomplete!\nParams: '+window.location.hash.substring(1));
+      	throw new Error('The parameter of the JobScheduler object are incomplete!\nParams: '+window.location.hash.substring(1));
       }
       
       if(params.get('path').substring(0,1) != '/') {
@@ -44,7 +44,7 @@ function on_load()
       }
       
       if( supported_objs.indexOf(params.get('type')) == -1 ) {
-      	throw new Error('The type parameter of the Job Scheduler object must be a value of\nParams: ' + supported_objs.inspect());
+      	throw new Error('The type parameter of the JobScheduler object must be a value of\nParams: ' + supported_objs.inspect());
       }
       
       if(params.get('type') == 'order') {
@@ -58,7 +58,7 @@ function on_load()
       
       params.set('name', params.get('path').replace(/.*\/([^\/]+)$/,"$1"));
       
-      document.title       = "Job Scheduler - " + params.get('name');
+      document.title       = "JobScheduler - " + params.get('name');
       setHeader(params);
       
       _scheduler           = new Scheduler();

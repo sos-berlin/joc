@@ -6,7 +6,7 @@ _lang_file_exists = true;
 ******************************************************************************/
 
 //Window title 
-_translations['Job Scheduler']                             = 'Planificador de tareas';
+_translations['JobScheduler']                              = 'JobScheduler';
 _translations['-id']                                       = '-ID';
 
 //Product info
@@ -29,6 +29,7 @@ _translations['Last Activities']                           = 'Ultimas actividade
 //Buttons menu, extras, update, hide          
 _translations['Menu']                                      = 'Menú';
 _translations['Extras']                                    = 'Extras';
+_translations['Help']                                      = 'Ayuda';
 _translations['Hide']                                      = 'Ocultar detalles';
 _translations['Update']                                    = 'Actualizar';
 
@@ -88,14 +89,14 @@ _translations['waiting_for_activation']                    = 'esperando para act
 //Misc.
 _translations['unknown']                                   = 'Desconocido';
 _translations['THIS IS A BACKUP...']                       = 'Esto es una copia de seguridad...';
-_translations['Backup Job Scheduler:']                     = 'Copia de seguridad de planificador de tareas:';
-_translations['Job Scheduler is waiting for database ...'] = 'Planificador de tareas está esperando a base de datos ...';
-_translations['Waiting for response from Job Scheduler ...'] = 'Está esperando respuesta de planificador de tareas ...';
-_translations['No connection to Job Scheduler']            = 'No hay conexión con el planificador de tareas';
+_translations['Backup JobScheduler:']                      = 'Copia de seguridad de planificador de tareas:';
+_translations['JobScheduler is waiting for database ...']  = 'Planificador de tareas está esperando a base de datos ...';
+_translations['Waiting for response from JobScheduler ...'] = 'Está esperando respuesta de planificador de tareas ...';
+_translations['No connection to JobScheduler']             = 'No hay conexión con el planificador de tareas';
 _translations['Error at XML answer:']                      = 'Error en la respuesta XML:';
 _translations["Error at XSL answer '$xsl':"]               = " Error en la respuesta XSL '$xsl':";
 _translations["Error at HTTP answer '$url':"]              = " Error en la respuesta HTTP '$url':";
-_translations['$trial trial (of 5) to (re)connect to Job Scheduler'] = '$trial Intentos (de 5) con el planificador de tareas';
+_translations['$trial trial (of 5) to (re)connect to JobScheduler'] = '$trial Intentos (de 5) con el planificador de tareas';
 _translations['First']                                     = 'Primero';
 _translations['Second']                                    = 'Segundo';
 _translations['Third']                                     = 'Tercero';
@@ -454,7 +455,7 @@ _translations['active Scheduler(s)']                       = 'Planificador(es) a
 _translations['exclusive Scheduler(s)']                    = 'Planificador(es) exclusivo(s)';
 _translations['This Scheduler is active']                  = 'Este planificador está activo';
 _translations['and exclusive']                             = 'y exclusivo';
-_translations['Only active Job Schedulers are allowed to start operation.'] = 'Sólo planificadores de tareas activos están autorizados a iniciar operación.';
+_translations['Only active JobSchedulers are allowed to start operation.'] = 'Sólo planificadores de tareas activos están autorizados a iniciar operación.';
 _translations['This Scheduler']                            = 'Este planificador';
 _translations['(was active!)']                             = '(estaba activo!)';
 _translations['active']                                    = 'activo';
@@ -704,7 +705,7 @@ _translations['Max. number of last activities']            = 'Max. número de ac
 _translations['Max. number of history entries per order']  = 'Max. número de entradas en el historial por orden';
 _translations['Max. number of history entries per task']   = 'Max. número de entradas en el historial por tarea';
 _translations['Termintate within']                         = 'Terminará dentro de';
-_translations['Max. seconds within the Job Scheduler terminates'] = 'Max. Tiempo (Segundos) para terminar el planificador de trabajos';
+_translations['Max. seconds within the JobScheduler terminates'] = 'Max. Tiempo (Segundos) para terminar el planificador de trabajos';
 _translations['Dialogs']                                   = 'Diálogos';
 _translations['Default start time in the &quot;<i>Start task/order at</i> &quot;-Dialog is <i>now</i>'] = 'Hora de inicio por defecto en las &quot;<i>Comenzar Tarea/Orden a las...</i> &quot;-Dialog es <i>now</i>';
 _translations['Debugging of the operations GUI']           = 'Depuración de la GUI de operaciones';
@@ -729,7 +730,7 @@ _translations['Enter an order id']                         = 'Ingrese la id de l
 _translations['Enter an order title']                      = 'Ingrese titulo de la orden';
 _translations['Select an order state']                     = 'Seleccione el estado de la orden';
 _translations['Select an order end state']                 = 'Seleccione el estado final de la orden';
-_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?'] = 'Con el fin de almacenar esta orden en una carpeta activa tiene que establecer una id de orden. \ nSu orden solo se almacena de forma permanente, sin embargo, es válida \nde por vida para esta sesión del programador de trabajo. Desea continuar?';
+_translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?'] = 'Con el fin de almacenar esta orden en una carpeta activa tiene que establecer una id de orden. \ nSu orden solo se almacena de forma permanente, sin embargo, es válida \nde por vida para esta sesión del programador de trabajo. Desea continuar?';
 
 //set order state
 _translations['Set order state of $order']                 = 'Establezca estado de $order';
@@ -759,7 +760,7 @@ _translations['Output format']                             = 'Formato de salida'
 _translations['Include order start times']                 = 'Incluir horas de inicio de la orden';
 
 //job chain
-_translations['Sorry, but this feature is only supported for\nJob Scheduler version 2.0.204.5774 or higher'] = 'Lo sentimos, pero esta función es solamente soportada\ndesde la versión 2.0.204.5774 en adelante.';
+_translations['Sorry, but this feature is only supported for\nJobScheduler version 2.0.204.5774 or higher'] = 'Lo sentimos, pero esta función es solamente soportada\ndesde la versión 2.0.204.5774 en adelante.';
 _translations['Modify job chain']                          = 'Modificar cadena de trabajo';
 _translations['Now you can modify the job chain by editing the text area content.'] = 'Ahora puede modificar la cadena de trabajo editando el contenido en el área de texto.';
 _translations['Orders are stored in the database (orders_recoverable)'] = 'Ordenes guardadas en la base de datos (orders_recoverable)';
@@ -774,7 +775,7 @@ _translations['Enter a job chain title']                   = 'Ingrese titulo de 
 *                           JOB DESCRIPTION                                   *
 ******************************************************************************/
 
-_translations['The Job Scheduler $scheduler has no jobs with a description.']              = 'El planificador de trabajo $scheduler no tiene trabajos con  una descripción.';
+_translations['The JobScheduler $scheduler has no jobs with a description.']               = 'El planificador de trabajo $scheduler no tiene trabajos con  una descripción.';
 _translations['Because of a security sanction of your browser you must reload this site!'] = 'Debido a una sanción de seguridad de su navegador usted debe volver a cargar esta página web!';
 _translations['Please select a job to display its description.']                           = 'Seleccione un trabajo para ver su descripción.';
 _translations['Please enter a job name to display its description.']                       = 'Introduzca un nombre de trabajo para ver su descripción.';

@@ -36,7 +36,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Job Scheduler - Job Documentation</title>
+    <title>JobScheduler - Job Documentation</title>
     <script type="text/javascript" src="scheduler_init.js"></script>
     <script type="text/javascript" src="scheduler.js"></script>
     <script type="text/javascript" src="prototype.js"></script>
@@ -196,7 +196,7 @@ function show_error( x )
         var jobsHasPath = response.selectNodes( "/spooler/answer/jobs/job[@path]" );
         if( jobsHasPath.length == 0) _scheduler.addPathAttribute(response);
         var jobs        = response.selectNodes( "/spooler/answer/jobs/job[@has_description='yes']" );
-        if( jobs.length == 0 ) msg = getTranslation("The Job Scheduler $scheduler has no jobs with a description.",{'scheduler':window.location.host});
+        if( jobs.length == 0 ) msg = getTranslation("The JobScheduler $scheduler has no jobs with a description.",{'scheduler':window.location.host});
         else form_type  = 'radio';
       }
       catch( E ) {

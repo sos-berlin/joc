@@ -408,7 +408,7 @@ function scheduler_settings__onclick(ret)
     
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Terminate within')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
-    dialog.add_settings_input( parent.getTranslation('Max. seconds within the Job Scheduler terminates')+':', 'terminate_timeout', parent._scheduler._runtime_settings.terminate_timeout, 3 );
+    dialog.add_settings_input( parent.getTranslation('Max. seconds within the JobScheduler terminates')+':', 'terminate_timeout', parent._scheduler._runtime_settings.terminate_timeout, 3 );
     dialog._html_array.push( '</table>' );
     dialog._html_array.push( '</fieldset>' );
     
@@ -779,7 +779,7 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
       var fields = input_dialog_submit();
       var msg    = "";
       if( hot && persistent ) msg = mandatory_field( fields.id, parent.getTranslation('Order ID') );
-      if(msg != '' && !confirm( parent.getTranslation("In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this Job Scheduler session. Do you want to continue?") )) {
+      if(msg != '' && !confirm( parent.getTranslation("In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?") )) {
         window.parent.left_frame.document.forms.__input_dialog__.elements.id.focus();
         return true;
       } 
@@ -1157,7 +1157,7 @@ function add_schedule( path )
 function add_job_chain(job_chain,step) 
 {   
     if( !parent._scheduler.versionIsNewerThan( "2008-05-06 12:00:00" ) ) {
-      alert( "Sorry, but this feature is only supported for\nJob Scheduler version 2.0.204.5774 or higher");
+      alert( "Sorry, but this feature is only supported for\nJobScheduler version 2.0.204.5774 or higher");
       return true;
     }
     
@@ -1462,6 +1462,11 @@ function scheduler_extras__onclick( elt )
     
     var popup_builder   = new Popup_menu_builder();
     
+    popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(en)") + '<img src="banner_english.gif" style="position:relative;top:3px;left:2px;"/>'     , "open_url( 'scheduler_home/doc/en/reference/index.xml', 'scheduler_documentation' )" );
+    popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(de)") + '<img src="banner_german.gif" style="position:relative;top:3px;left:2px;"/>'      , "open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("FAQ"), "open_url( 'http://sourceforge.net/apps/mediawiki/jobscheduler/index.php?title=JobScheduler_FAQ', 'scheduler_wiki' )" );
+    
+    popup_builder.add_bar();
     popup_builder.add_entry( parent.getTranslation("Settings")      , "callErrorChecked('scheduler_settings__onclick')", parent.left_frame );
     if( parent._extra_items.monitor )       popup_builder.add_entry( parent.getTranslation("Monitor")       , "open_url( 'monitor.html', 'monitor_applet' )" );
     if( parent._extra_items.configuration ) popup_builder.add_entry( parent.getTranslation("Configuration") , "open_url( 'scheduler_data/config/scheduler_documentation.html', 'config_xml' )" );

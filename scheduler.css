@@ -52,7 +52,7 @@ div.bottom                      {border:1px solid #8B919F;border-top:0px;backgro
 div.rb                          {border-right:1px solid #F8F9FD;border-bottom:1px solid #F8F9FD;}
 #error_message                  {color:red;padding:0px 4px;font-size:12px;}
 #hide_button                    {display:none;position:absolute;bottom:10px;right:20px;z-index:5;background-color:#CFD7EB;}
-#backup                         {font-size:16px;font-weight:bold;font-style:italic;color:#EA7A14;}
+#backup                         {font-size:14px;font-weight:bold;font-style:italic;color:#EA7A14;}
 #info_button                    {width:88px;}
 table.top                       {border:1px solid #F8F9FD;border-bottom:0px;}
 table.middle                    {border-left:1px solid #F8F9FD;border-right:1px solid #F8F9FD;}
@@ -79,13 +79,13 @@ div.button:hover                {color:#EA7A14;}
 div.button a                    {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#444444; }
 div.button a:visited            {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#444444; }
 div.button a:hover              {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#EA7A14; }
-div.selectbox_menu              {width:88px;height:14px;overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;}
+div.selectbox_menu              {width:88px;height:15px;overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;}
 div.selectbox_menu select       {cursor:pointer;position:relative;left:-3px;top:-1px;font-family:Arial,Helvetica,Sans-Serif;font-size:11px;font-weight:normal;width:200px;height:14px;margin:0px;padding:0px;background-color:#CFD7EB;border:0px;color:#444444;}
 div.selectbox_menu select:hover {color:#EA7A14;}
 div.selectbox_menu select.right {left:-100px;text-align:right;}
 div.selectbox_menu option       {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu;}
 div.selectbox_menu option.selected:hover {color:#EA7A14;}
-div.selectbox_extras              {width:88px;height:14px;overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;}
+div.selectbox_extras              {width:88px;height:15px;overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;}
 div.selectbox_extras select       {cursor:pointer;position:relative;left:-3px;top:-1px;font-family:Arial,Helvetica,Sans-Serif;font-size:11px;font-weight:normal;width:200px;height:14px;margin:0px;padding:0px;background-color:#CFD7EB;border:0px;color:#444444;}
 div.selectbox_extras select:hover {color:#EA7A14;}
 div.selectbox_extras select.right {left:-100px;text-align:right; }

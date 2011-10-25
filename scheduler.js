@@ -221,7 +221,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
 {         
     var rand = Math.random();
     this.logger(3,'START SCHEDULER REQUEST: ' + xml,rand);
-    window.status = this.getTranslation("Waiting for response from Job Scheduler ...");
+    window.status = this.getTranslation("Waiting for response from JobScheduler ...");
     if( typeof with_add_path        != "boolean"  ) { with_add_path        = true;  }
     if( typeof with_modify_datetime != "boolean"  ) { with_modify_datetime = true;  }
     if( typeof with_all_errors      != "boolean"  ) { with_all_errors      = false; }
@@ -306,10 +306,10 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           	var message = '';
                             var update_counter_txt = ['First','Second','Third','Fourth','Last'];
                             if( scheduler._update_counter == 6 ) {
-                               message = scheduler.getTranslation("No connection to Job Scheduler") 
+                               message = scheduler.getTranslation("No connection to JobScheduler") 
                                scheduler._update_finished = true;
                             } else {
-                               message = scheduler.getTranslation("$trial trial (of 5) to (re)connect to Job Scheduler",{trial:scheduler.getTranslation(update_counter_txt[scheduler._update_counter-1])});
+                               message = scheduler.getTranslation("$trial trial (of 5) to (re)connect to JobScheduler",{trial:scheduler.getTranslation(update_counter_txt[scheduler._update_counter-1])});
                                scheduler._update_finished = false;
                             }
                             x = new Error( message );

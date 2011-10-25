@@ -109,7 +109,7 @@ _max_task_history        = 10;
 
 
 /*****************************************************************
-*  If you have a cluster with backup or distributed Job Schedulers
+*  If you have a cluster with backup or distributed JobSchedulers
 *  then you can terminate the cluster with a timeout in seconds.
 */
 _terminate_timeout       = 60;

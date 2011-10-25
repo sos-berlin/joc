@@ -57,7 +57,7 @@
                              </xsl:call-template>
                          </thead>      
                          <tbody><tr><td>
-                           <span class="translate" style="font-weight:bold;">Backup Job Scheduler:</span>
+                           <span class="translate" style="font-weight:bold;">Backup JobScheduler:</span>
                            <xsl:text> </xsl:text>
                            <span class="translate" style="font-weight:bold;">No <xsl:value-of select="translate(/spooler/@my_show_card,'_',' ')"/> found</span>
                          </td></tr></tbody>
@@ -92,7 +92,7 @@
                 
                 <xsl:when test="$is_inactive_backup_scheduler and /spooler/@my_show_card != 'cluster' and /spooler/@my_show_card != 'remote_schedulers'">
                   <div><ul id="{concat(/spooler/@my_show_card,'/')}" class="tree" style="display:block" sos_mode="open"><li>
-                    <span class="translate" style="font-weight:bold;">Backup Job Scheduler:</span>
+                    <span class="translate" style="font-weight:bold;">Backup JobScheduler:</span>
                     <xsl:text> </xsl:text>
                     <span class="translate" style="font-weight:bold;">No <xsl:value-of select="translate(/spooler/@my_show_card,'_',' ')"/> found</span>
                   </li></ul></div>
@@ -2555,7 +2555,7 @@
                         </xsl:if>
 
                         <xsl:if test="@active!='yes'">
-                            <span class="translate" style="margin-right: 1em; color:#800040">Only active Job Schedulers are allowed to start operation.</span>
+                            <span class="translate" style="margin-right: 1em; color:#800040">Only active JobSchedulers are allowed to start operation.</span>
                         </xsl:if>
                     </td>
                 </tr>
