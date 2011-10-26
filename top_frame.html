@@ -209,7 +209,9 @@ function show_card( what )
 function write_menu( menu_title, menu, align )
 { 
   if( window.createPopup == undefined ) {
-    var left_blanks   = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;';
+    var left_blanks   = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
+    if(parent._sos_lang == 'ru' && menu == 'extras')  left_blanks = '';
+    if(parent._sos_lang == 'es' && menu == 'extras')  left_blanks = '&#160;&#160;&#160;';
     var right_blanks  = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
     var right_blanks2 = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
     document.writeln('                <div class="selectbox_'+menu+'">');
@@ -321,7 +323,7 @@ window.onerror  = function( msg, url, line ) {
               </td>
               <td align="right" width="20" style="padding-top:2px;padding-right:2px;">
                 <script language="javascript" type="text/javascript">
-                  write_menu(parent.getTranslation('Help') + ' &#160;|&#160;  ' + parent.getTranslation('Extras'), 'extras', 'left'); 
+                  write_menu(parent.getTranslation('Help') + ' |  ' + parent.getTranslation('Extras'), 'extras', 'left'); 
                 </script>  
               </td>
               <td align="left" style="white-space:nowrap">&#160;<span id="backup"></span></td>

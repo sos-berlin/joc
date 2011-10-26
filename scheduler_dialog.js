@@ -1465,6 +1465,9 @@ function scheduler_extras__onclick( elt )
     popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(en)") + '<img src="banner_english.gif" style="position:relative;top:3px;left:2px;"/>'     , "open_url( 'scheduler_home/doc/en/reference/index.xml', 'scheduler_documentation' )" );
     popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(de)") + '<img src="banner_german.gif" style="position:relative;top:3px;left:2px;"/>'      , "open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("FAQ"), "open_url( 'http://sourceforge.net/apps/mediawiki/jobscheduler/index.php?title=JobScheduler_FAQ', 'scheduler_wiki' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Forum"), "open_url( 'http://sourceforge.net/projects/jobscheduler/forums/forum/486122', 'scheduler_forum' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Downloads"), "open_url( 'http://sourceforge.net/projects/jobscheduler/files/', 'scheduler_download' )" );
+    popup_builder.add_entry( parent.getTranslation("Follow us on Twitter"), "open_url( 'http://twitter.com/#!/job_scheduler', 'scheduler_twitter' )" );
     
     popup_builder.add_bar();
     popup_builder.add_entry( parent.getTranslation("Settings")      , "callErrorChecked('scheduler_settings__onclick')", parent.left_frame );

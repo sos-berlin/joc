@@ -56,12 +56,15 @@ _translations['Terminate fail-safe']                       = 'Terminar en modo d
 _translations['Terminate fail-safe within ~$secs']         = 'Terminar en modo de prueba de fallos dentro de ~$secs';
                                                            
 //Menu content of extras                      
+_translations['Documentation']                             = 'Documentación';
+_translations['Forum']                                     = 'Foro';
+_translations['Downloads']                                 = 'Descargas';
+_translations['Follow us on Twitter']                      = 'Síguenos en Twitter';
 _translations['Settings']                                  = 'Ajustes';
 _translations['Monitor']                                   = 'Monitor';
 _translations['Configuration']                             = 'Configuración';
                                                            
 //First line                                  
-_translations['Documentation']                             = 'Documentación';
 _translations['every $secs']                               = 'Todos los $secs';
 _translations['incl. Hot Folders']                         = 'incl. carpetas activas';
                                                       

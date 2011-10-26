@@ -56,12 +56,15 @@ _translations['Terminate fail-safe']                       = 'Ausfallsicher been
 _translations['Terminate fail-safe within ~$secs']         = 'Binnen ~$secs ausfallsicher beenden';
                                                            
 //Menu content of extras                      
+_translations['Documentation']                             = 'Dokumentation';
+_translations['Forum']                                     = 'Forum';
+_translations['Downloads']                                 = 'Downloads';
+_translations['Follow us on Twitter']                      = 'Folgen Sie uns auf Twitter';
 _translations['Settings']                                  = 'Einstellungen';
 _translations['Monitor']                                   = 'Monitor';
 _translations['Configuration']                             = 'Konfiguration';
                                                            
 //First line                                  
-_translations['Documentation']                             = 'Dokumentation';
 _translations['every $secs']                               = 'alle $secs';
                                                       
 //Other lines                            

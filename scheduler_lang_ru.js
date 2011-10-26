@@ -56,12 +56,15 @@ _translations['Terminate fail-safe']                       = 'Завершить
 _translations['Terminate fail-safe within ~$secs']         = 'Завершить работу в безопасном режиме в пределах ~$secs';
                                                            
 //Menu content of extras                      
+_translations['Documentation']                             = 'Документация';
+_translations['Forum']                                     = 'Форум';
+_translations['Downloads']                                 = 'Загрузка';
+_translations['Follow us on Twitter']                      = 'Следуйте за нами на Twitter';
 _translations['Settings']                                  = 'Настройки';
 _translations['Monitor']                                   = 'Монитор';
 _translations['Configuration']                             = 'Конфигурация';
                                                            
 //First line                                  
-_translations['Documentation']                             = 'Документация';
 _translations['every $secs']                               = 'каждые $sec секунд';
                                                       
 //Other lines                            
