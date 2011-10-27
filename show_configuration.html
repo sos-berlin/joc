@@ -19,7 +19,9 @@
 
 var _scheduler;
 var _supported_commands  = $H({
-	                         job:'<show_job job="%path%" what="source"/>', 
+	                         job:'<show_job job="%path%" what="source"/>',
+	                         //request to get job_chain source with jobs and orders
+	                         //job_chain:'<show_job_chain job_chain="%path%" what="source job_chain_orders job_chain_jobs" max_order_history="0"/>', 
 	                         job_chain:'<show_job_chain job_chain="%path%" what="source" max_order_history="0" max_orders="0"/>',
 	                         order:'<show_order order="%order_id%" job_chain="%job_chain%" what="source"/>',
 	                         schedule:'<show_state what="folders source" subsystems="schedule folder"/>',
@@ -58,7 +60,7 @@ function on_load()
       
       params.set('name', params.get('path').replace(/.*\/([^\/]+)$/,"$1"));
       
-      document.title       = "JobScheduler - " + params.get('name');
+      document.title       = params.get('name') + " - JobScheduler";
       setHeader(params);
       
       _scheduler           = new Scheduler();

@@ -68,8 +68,9 @@
               _response = _scheduler.executeSynchron( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
             }
             _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
-            document.title  = getTranslation('JobScheduler') + " " + _scheduler._host + ":" + _scheduler._port;
-            document.title += ( _scheduler._id ) ? " id=" + _scheduler._id : "";
+            document.title  = _scheduler._host + ":" + _scheduler._port;
+            document.title += ( _scheduler._id ) ? "/" + _scheduler._id : "";
+            document.title += " - " + getTranslation('JobScheduler');
             _scheduler.readCustomVersionedSettings();
             if( !_server_settings ) _scheduler.readCookies();
             

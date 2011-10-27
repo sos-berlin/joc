@@ -59,8 +59,10 @@ _translations['Terminate fail-safe within ~$secs']         = 'Завершить
 _translations['Documentation']                             = 'Документация';
 _translations['Forum']                                     = 'Форум';
 _translations['Downloads']                                 = 'Загрузка';
+_translations['Release Notes']                             = 'Заметки о Выпуске';
 _translations['Follow us on Twitter']                      = 'Следуйте за нами на Twitter';
 _translations['Settings']                                  = 'Настройки';
+_translations['About']                                     = 'Насчёт';
 _translations['Monitor']                                   = 'Монитор';
 _translations['Configuration']                             = 'Конфигурация';
                                                            

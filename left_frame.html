@@ -899,6 +899,23 @@ function close_all_folders()
 }
 
 
+//--------------------------------------------------------------------------------------------showInfo
+function showInfo( act )
+{
+    if( act != 'none' ) {
+      act = 'block';
+      parent._scheduler.readGuiVersion();
+      document.getElementById('gui_info').innerHTML = parent._scheduler._gui_subversion_no.replace(/[ ]/,'&#160;&#160;&#160;');
+      if( parent._scheduler._gui_release_no ) {
+        document.getElementById('release_no').innerHTML = parent._scheduler._gui_release_no;
+      } else {
+        document.getElementById('release_title').innerHTML = '';
+      }
+    }        
+    document.getElementById('info').style.display=act;
+}
+
+
 //-------------------------------------------------------------------------------------------------
 
 window.onload   = do_onload;
@@ -938,6 +955,37 @@ window.onerror  = function( msg, url, line ) {
   <div id="__input_shadow1__" class="shadow1"></div>
   <div id="__input_shadow2__" class="shadow2"></div>
   <div id="__input__" class="input"></div>
+  
+  <!-- info box -->
+  <div id="info" style="display:none;position:absolute;top:54px;left:40px;z-index:100;">
+    <table cellspacing="0" cellpadding="0"><thead><tr><td style="padding:0px">
+      <div class="top">
+        <img class="corner_tl" src="corner_tl.gif" alt="" />
+        <img class="corner_tr" src="corner_tr.gif" alt="" />
+      </div>
+      <div class="bottom" style="margin-bottom:4px;">
+        <table cellspacing="0" cellpadding="0" align="center" class="inner"><thead>
+          <tr><td rowspan="3" style="padding:6px;"><img src="job_scheduler_rabbit_circle_colour.jpg"/></td>
+          <script language="javascript" type="text/javascript">
+            document.writeln('          <td style="padding:6px 6px 0px 0px;white-space:nowrap;">&copy; 2002-'+(new Date().getFullYear())+' <a href="http://www.sos-berlin.com/" title="www.sos-berlin.com" target="sos_homepage" style="text-decoration:none;">Software- und Organisations-Service GmbH.</a>');
+            document.writeln('          <br/>'+parent.getTranslation('All rights reserved.')+'</td></tr>');
+            document.writeln('          <tr><td style="padding:0px 6px 0px 0px;white-space:nowrap;">');
+            document.writeln('            <table cellpadding="0" cellspacing="0" width="100%"><thead>');
+            document.writeln('              <tr><td width="1" id="release_title">'+parent.getTranslation('Release')+'</td><td></td><td id="release_no" style="text-align:right;"></td></tr>');
+            document.writeln('              <tr><td width="1">'+parent.getTranslation('Operations GUI').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td id="gui_info" style="text-align:right;"></td></tr>');
+            if(parent._scheduler._version_date) {
+              document.writeln('              <tr><td width="1">'+parent.getTranslation('JobScheduler').replace(/ /g,'&#160;')+'</td><td>'+parent.getTranslation('Build')+':</td><td style="text-align:right;">'+parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1") + '&#160;&#160;&#160;(' + parent._scheduler._version_date.replace(/[ ]+.*$/,'')+')</td></tr>');
+            }
+            document.writeln('            <thead></table>');
+            document.writeln('          </td></tr>');
+            document.writeln('          <tr><td align="right" style="padding:0px 6px 2px 0px;white-space:nowrap;"><div id="info_button" class="button" onclick="showInfo(\'none\');"><!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->'+parent.getTranslation('OK')+'<!--[if lte IE 6]></a><![endif]--></div></td></tr>');
+          </script>
+        </thead></table>
+        <img class="corner_bl" src="corner_bl.gif" alt="" />
+        <img class="corner_br" src="corner_br.gif" alt="" />
+      </div>
+    </td></tr></thead></table>
+  </div>
   
 </body>
 

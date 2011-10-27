@@ -1468,6 +1468,8 @@ function scheduler_extras__onclick( elt )
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Forum"), "open_url( 'http://sourceforge.net/projects/jobscheduler/forums/forum/486122', 'scheduler_forum' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Downloads"), "open_url( 'http://sourceforge.net/projects/jobscheduler/files/', 'scheduler_download' )" );
     popup_builder.add_entry( parent.getTranslation("Follow us on Twitter"), "open_url( 'http://twitter.com/#!/job_scheduler', 'scheduler_twitter' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Release Notes"), "open_url( 'http://www.sos-berlin.com/jira/browse/JS#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel', 'scheduler_jira' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Home"), "open_url( 'http://www.sos-berlin.com/scheduler', 'scheduler_wiki' )" );
     
     popup_builder.add_bar();
     popup_builder.add_entry( parent.getTranslation("Settings")      , "callErrorChecked('scheduler_settings__onclick')", parent.left_frame );
@@ -1482,6 +1484,10 @@ function scheduler_extras__onclick( elt )
       }
       popup_builder.add_entry ( entry , "open_url( '"+parent._extra_urls[entry]+"', 'extras_"+entry.replace(/[^a-zA-Z0-9_]/g,"_")+"' )" );
     }
+    
+    popup_builder.add_bar();
+    popup_builder.add_entry( parent.getTranslation("About") + ' ' + parent.getTranslation("JobScheduler"), "parent.left_frame.showInfo()" );
+    
     if( window.createPopup == undefined ) {
       _popup_menu = popup_builder.show_selectbox_menu( elt );
     } else {

@@ -60,6 +60,7 @@ _translations['Documentation']                             = 'Dokumentation';
 _translations['Forum']                                     = 'Forum';
 _translations['Downloads']                                 = 'Downloads';
 _translations['Follow us on Twitter']                      = 'Folgen Sie uns auf Twitter';
+_translations['About']                                     = 'Über';
 _translations['Settings']                                  = 'Einstellungen';
 _translations['Monitor']                                   = 'Monitor';
 _translations['Configuration']                             = 'Konfiguration';
