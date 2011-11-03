@@ -528,7 +528,7 @@ _translations['Lock is available']                         = 'Блокировк
 _translations['Show all']                                  = 'Показать все';
 _translations['Show only orders']                          = 'Показать только Ордера';
 _translations['Show only tasks']                           = 'Показать только Tasks';
-_translations['Show only faultily tasks and orders']       = 'Показать только Tasks/Ордера с ошибками';
+_translations['Show only faulty tasks and orders']         = 'Показать только Tasks/Ордера с ошибками';
 _translations['Show last tasks error']                     = 'Показать последие Task-Ошибки';
 
 //Table header of job chains list                          

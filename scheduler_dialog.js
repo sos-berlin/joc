@@ -381,7 +381,7 @@ function scheduler_settings__onclick(ret)
     dialog.add_checkbox( "show_job_chain_orders_checkbox", parent.getTranslation('Show orders')+' '+parent.getTranslation('in the <i>job chains</i> tab')                             , window.parent.onload_settings.checkbox_states[ "show_job_chain_orders_checkbox" ] );
     dialog.add_checkbox( "show_job_chain_jobs_checkbox"  , parent.getTranslation('Show jobs')+' '+parent.getTranslation('in the <i>job chains</i> tab')                               , window.parent.onload_settings.checkbox_states[ "show_job_chain_jobs_checkbox" ] );
     dialog.add_checkbox( "show_order_history_checkbox"   , parent.getTranslation('Show order history')+' '+parent.getTranslation('in the <i>job chain</i> details')                   , window.parent.onload_settings.checkbox_states[ "show_order_history_checkbox" ] );
-    dialog.add_checkbox( "show_error_checkbox"           , parent.getTranslation('Show only faultily tasks and orders')+' '+parent.getTranslation('in the <i>last activities</i> tab'), window.parent.onload_settings.checkbox_states[ "show_error_checkbox" ] );
+    dialog.add_checkbox( "show_error_checkbox"           , parent.getTranslation('Show only faulty tasks and orders')+' '+parent.getTranslation('in the <i>last activities</i> tab'), window.parent.onload_settings.checkbox_states[ "show_error_checkbox" ] );
     dialog.add_checkbox( "show_task_error_checkbox"      , parent.getTranslation('Show last tasks error')+' '+parent.getTranslation('in the <i>last activities</i> tab')              , window.parent.onload_settings.checkbox_states[ "show_task_error_checkbox" ] );
     select_opts                    = new Object();
     select_opts.all                = ' '+parent.getTranslation('Show all')+' ';

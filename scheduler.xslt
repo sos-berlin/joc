@@ -169,7 +169,7 @@
         <li>
           <xsl:attribute name="onclick">callErrorChecked( 'show_card', '<xsl:value-of select="$name"/>' )</xsl:attribute>
           <xsl:choose>
-            <xsl:when test="/spooler/@my_ie_version &gt; 0 and /spooler/@my_ie_version &lt; 7">
+            <xsl:when test="/spooler/@my_ie_version &gt; 0 and /spooler/@my_ie_version &lt; 8">
                <a href="javascript:void(0);" class="{$class_name}">
                  <span class="translate"><xsl:value-of select="$title"/></span>
                </a>
@@ -523,7 +523,12 @@
           <xsl:when test="not(job/@order) or job/@order = 'no'">crimson</xsl:when>
           <xsl:when test="job/@delay_until">darkorange</xsl:when>
           <xsl:when test="job/@state = 'pending' or job/@state = 'initialized' or job/@state = 'loaded'">gold</xsl:when>
-          <xsl:when test="job/@state = 'running'">forestgreen</xsl:when>
+          <xsl:when test="job/@state = 'running'">
+            <xsl:choose>
+              <xsl:when test="job/@order = 'yes' and order_queue/@length = '0'">gold</xsl:when>
+              <xsl:otherwise>forestgreen</xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
           <xsl:when test="job/@state = 'not_initialized'">gray</xsl:when>
           <xsl:when test="not(job/@state)">white</xsl:when>
           <xsl:otherwise>crimson</xsl:otherwise>
@@ -2080,7 +2085,11 @@
                     </td>  
                     <td colspan="3" style="padding-left:4px;white-space:nowrap;">
                       <xsl:if test="name(parent::*) = 'order_queue'">
+                        <span>-&#160;&#160;</span>
                         <xsl:apply-templates mode="properties" select="." />
+                      </xsl:if>
+                      <xsl:if test="@title">
+                        <span>&#160;&#160;-&#160;&#160;<xsl:apply-templates select="@title"/></span>
                       </xsl:if>
                     </td>
                   </xsl:when>
@@ -2091,6 +2100,9 @@
                       <span style="white-space:normal;">
                           <xsl:apply-templates mode="trim_slash" select="@id" />
                       </span>
+                      <xsl:if test="@title">
+                        <span>&#160;&#160;-&#160;&#160;<xsl:apply-templates select="@title"/></span>
+                      </xsl:if>
                       <xsl:if test="name(parent::*) = 'order_queue'">
                         <br/>
                         <xsl:apply-templates mode="properties" select="." />
@@ -3095,10 +3107,7 @@
           </xsl:when>
           <xsl:when test="$all_states">
             <span>
-              <xsl:if test="$job/@state='running'">
-                <xsl:attribute name="class">green_value</xsl:attribute>
-              </xsl:if>
-              <span class="label"><xsl:value-of select="$job/@state"/></span>
+              <xsl:apply-templates select="$job/@state"/>
               <xsl:if test="$job/tasks/@count>0">
                   <span class="green_value"><xsl:text>, </xsl:text><xsl:value-of select="$job/tasks/@count"/> <span class="translate">tasks</span></span>
               </xsl:if>
@@ -3409,8 +3418,9 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~job/@state-->
 
     <xsl:template match="job/@state">
+        <xsl:variable name="job" select="parent::job"/>  
         <xsl:choose>
-            <xsl:when test="parent::job/@enabled='no'">
+            <xsl:when test="$job/@enabled='no'">
                 <span class="label">disabled</span>
             </xsl:when>
             
@@ -3419,10 +3429,17 @@
             </xsl:when>
 
             <xsl:when test=".='running'">
-                <span class="green_label"><xsl:value-of select="."/></span>
+                <xsl:choose>
+                    <xsl:when test="$job/@order='yes' and $job/parent::job_chain_node/order_queue/@length = '0'">
+                        <span class="label">pending</span>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <span class="green_label"><xsl:value-of select="."/></span>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:when>
             
-            <xsl:when test="parent::job/@delay_until">
+            <xsl:when test="$job/@delay_until">
                 <span class="red_label">delayed after error</span>
             </xsl:when>
             

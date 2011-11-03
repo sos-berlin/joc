@@ -526,7 +526,7 @@ _translations['Lock is available']                         = 'Le verrou est disp
 _translations['Show all']                                  = 'Voir tout';
 _translations['Show only orders']                          = 'Voir uniquement les ordres';
 _translations['Show only tasks']                           = 'Voir uniquement les tâches';
-_translations['Show only faultily tasks and orders']       = 'Voir uniquement les tâches et les ordres en erreur';
+_translations['Show only faulty tasks and orders']         = 'Voir uniquement les tâches et les ordres en erreur';
 _translations['Show last tasks error']                     = 'Voir les dernières instances échouées';
 
 //Table header of job chains list                          

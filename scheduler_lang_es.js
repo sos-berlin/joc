@@ -528,7 +528,7 @@ _translations['Lock is available']                         = 'Bloqueo disponible
 _translations['Show all']                                  = 'Mostrar todo';
 _translations['Show only orders']                          = 'Mostrar sólo ordenes';
 _translations['Show only tasks']                           = 'Mostrar sólo tareas';
-_translations['Show only faultily tasks and orders']       = 'Mostrar sólo tareas y ordenes defectuosas';
+_translations['Show only faulty tasks and orders']         = 'Mostrar sólo tareas y ordenes defectuosas';
 _translations['Show last tasks error']                     = 'Mostrar últimos errores de tarea';
 
 //Table header of job chains list                          
