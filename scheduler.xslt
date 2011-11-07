@@ -510,7 +510,8 @@
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tree-Leaf for job_chain_node-->
     <!--xsl:template match="job_chain_node | job_chain_node.job_chain" mode="leaf"-->
-    <xsl:template match="job_chain_node" mode="leaf"> 
+    <xsl:template match="job_chain_node" mode="leaf">
+      <xsl:param name="task_id" select="0" />
       <xsl:variable name="icon_color">
         <xsl:choose>
           <xsl:when test="not(job)">crimson</xsl:when>
@@ -525,8 +526,9 @@
           <xsl:when test="job/@state = 'pending' or job/@state = 'initialized' or job/@state = 'loaded'">gold</xsl:when>
           <xsl:when test="job/@state = 'running'">
             <xsl:choose>
-              <xsl:when test="job/@order = 'yes' and order_queue/@length = '0'">gold</xsl:when>
-              <xsl:otherwise>forestgreen</xsl:otherwise>
+              <xsl:when test="job/@order = 'yes' and $task_id &gt; 0 and job/tasks/task/@id = $task_id">forestgreen</xsl:when>
+              <xsl:when test="job/@order = 'yes' and $task_id = 0 and order_queue/order/@task = job/tasks/task/@id">forestgreen</xsl:when>
+              <xsl:otherwise>gold</xsl:otherwise>
             </xsl:choose>
           </xsl:when>
           <xsl:when test="job/@state = 'not_initialized'">gray</xsl:when>
@@ -708,7 +710,9 @@
               <col width="1%"/>
               <col width="1%"/>
             </colgroup>
-            <xsl:apply-templates mode="leaf" select="ancestor::job_chain_node[ @job ]"/>            
+            <xsl:apply-templates mode="leaf" select="ancestor::job_chain_node[ @job ]">
+                <xsl:with-param name="task_id" select="current()/@task" />
+            </xsl:apply-templates>            
           </table>
         </li>
       </xsl:if>
@@ -3430,11 +3434,14 @@
 
             <xsl:when test=".='running'">
                 <xsl:choose>
-                    <xsl:when test="$job/@order='yes' and $job/parent::job_chain_node/order_queue/@length = '0'">
-                        <span class="label">pending</span>
+                    <xsl:when test="$job/@order='yes' and $job/parent::job_chain_node/order_queue/order/@task = $job/tasks/task/@id">
+                        <span class="green_label"><xsl:value-of select="."/></span>
+                    </xsl:when>
+                    <xsl:when test="not($job/@order) or $job/@order='no'">
+                        <span class="green_label"><xsl:value-of select="."/></span>
                     </xsl:when>
                     <xsl:otherwise>
-                        <span class="green_label"><xsl:value-of select="."/></span>
+                        <span class="label">pending</span>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
@@ -5040,6 +5047,9 @@
         <xsl:element name="a">
             <xsl:attribute name="target">_blank</xsl:attribute>
             <xsl:attribute name="href">
+                <xsl:if test="starts-with($url,'www.')" >
+                  <xsl:text>http://</xsl:text>
+                </xsl:if>
                 <xsl:value-of select="$url"/>
             </xsl:attribute>
 

@@ -196,7 +196,7 @@ function Popup_menu_builder__add_show_log( html, show_log_command, window_name, 
 function show_log__onclick( show_log_command, window_name )
 {
     window_name = "show_log";  // Nur ein Fenster. ie6 will nicht mehrere Logs gleichzeitig lesen, nur nacheinander
-
+    
     var features = _open_url_features;
     features +=  ", width="       + ( window.screen.availWidth - 11 ) +
                  ", innerwidth="  + ( window.screen.availWidth - 11 ) +                             // Fuer Firefox
@@ -204,7 +204,6 @@ function show_log__onclick( show_log_command, window_name )
                  ", innerheight=" + ( Math.floor( window.screen.availHeight * 0.2 ) - 32 ) +        // Fuer Firefox
                  ", left=0"       +
                  ", top="         + ( Math.floor( window.screen.availHeight * 0.8 ) );
-
     if( show_log_command.search(/^http:/) == -1 ) show_log_command = document.location.href.replace( /\/[^\/]*$/, "/" ) + show_log_command;
     
     if( parent._scheduler && parent._scheduler._dependend_windows[ window_name ] ) parent._scheduler._dependend_windows[ window_name ].close();
