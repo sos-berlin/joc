@@ -5,6 +5,13 @@
 
 /* Example */
 /*
-body.top div.bottom table.inner thead {background-color:DarkGreen; color:white;}
-body.titlebar table.bottom {background-color:DarkGreen; color:white;}
+body.top table.top {background-color:white; color:gray;}
+body.top table.bottom {background-color:white; color:gray;}
+body.top div.button {border:1px solid gray;background-color:white;color:blue;}
+body.top div.button:hover {color:orange;}
+body.top div.selectbox_menu {border:1px solid gray;background-color:white;color:blue;}
+body.top div.selectbox_extras {border:1px solid gray;background-color:white;color:blue;}
+body.top select {background-color:white;color:blue;}
+body.top select:hover {color:orange;}
+#hide_button {background-color:white;}
 */

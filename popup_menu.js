@@ -192,7 +192,7 @@ Popup_menu_builder.prototype.add_bar = function()
     this._html_array.push( html );
     
     if( window.createPopup == undefined ) {
-      if( parent.chrome > 0 ) {
+      if( parent.chrome > 0 || parent.safari > 0 ) {
         var opt         = new Option( '--------------------------------------------', '' );
       } else {
         var opt         = new Option( '---------------------------------------------------------------------------------------', '' );

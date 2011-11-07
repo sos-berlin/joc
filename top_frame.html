@@ -48,6 +48,7 @@
 <script type="text/javascript" src="scheduler_dialog.js"></script>
 <script type="text/javascript" src="browser_dependencies.js"></script>
 <script type="text/javascript" src="popup_menu.js"></script>
+<script type="text/javascript" src="prototype.js"></script>
 
 <script language="javascript" type="text/javascript"><!--
 
@@ -207,24 +208,48 @@ function show_card( what )
 
 //---------------------------------------------------------------------------------------write_menu
 function write_menu( menu_title, menu, align )
-{ 
+{  //ru 300px; de 200px; es 245px; fr 250; en 200px
   if( window.createPopup == undefined ) {
-    var left_blanks   = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
-    if(parent._sos_lang == 'ru' && menu == 'extras')  left_blanks = '';
-    if(parent._sos_lang == 'es' && menu == 'extras')  left_blanks = '&#160;&#160;&#160;';
-    var right_blanks  = (menu == 'menu') ? '&#160;&#160;&#160;&#160;&#160;' : '&#160;&#160;&#160;&#160;';
-    var right_blanks2 = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+  	var selectbox_id  = '__selectbox_'+menu+'_'+align+'__';
+  	var blanks = {'menu_left':'','extras_left':'','menu_right':''};
+  	blanks.menu_left    = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+    blanks.extras_left  = '&#160;&#160;&#160;&#160;&#160;&#160;';
+    blanks.menu_right   = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+    var widths = {'menu':220,'extras':200};
+    var leftmove = -120;
+    switch(parent._sos_lang) {
+      	case 'ru' : widths.menu = 350;
+      	            leftmove = -250;
+      	            blanks.extras_left = '&#160;&#160;';
+      	            blanks.menu_right += '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+      	            break;
+      	case 'de' : widths.menu = 230;
+      	            leftmove = -130;
+      	            blanks.menu_right += '&#160;&#160;&#160;';
+      	            break;
+      	case 'fr' : widths.menu = 270;
+      	            leftmove = -170;
+      	            blanks.menu_right += '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+      	            break;
+      	case 'es' : widths.menu = 280;
+      	            leftmove = -180;
+      	            blanks.menu_right += '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+      	            blanks.extras_left = '&#160;&#160;&#160;&#160;';
+      	            break;
+    }
     document.writeln('                <div class="selectbox_'+menu+'">');
-    document.writeln('                  <select class="'+align+'" id="__selectbox_'+menu+'_'+align+'__" name="__selectbox_'+menu+'_'+align+'__" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
     if( align == 'left' ) {
-      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+left_blanks+menu_title+'</option>');
+      document.writeln('                  <select class="'+align+'" id="'+selectbox_id+'" name="'+selectbox_id+'" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+blanks[menu+'_'+align]+menu_title+blanks[menu+'_'+align]+'&#160;&#160;</option>');
       document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');
       document.writeln('                  </select>');
     } else {
-      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+right_blanks+right_blanks2+menu_title+right_blanks+'&#160;&#160;</option>');
+      document.writeln('                  <select class="'+align+'" id="'+selectbox_id+'" name="'+selectbox_id+'" size="1" style="width:'+widths[menu]+'px;left:'+leftmove+'px;" onfocus="scheduler_'+menu+'__onclick( this.name );">');
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+blanks[menu+'_'+align]+menu_title+'</option>');
       document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');                    
       document.writeln('                  </select>');
-      document.writeln('                  <div style="position:relative;top:-18px;height:16px;width:16px;background-color:#CFD7EB">&#160;</div>');
+      document.writeln('                  <div id="hide_arrow_'+menu+'_'+align+'" style="position:relative;top:-18px;height:16px;width:16px;background-color:#CFD7EB">&#160;</div>');
+      $('hide_arrow_'+menu+'_'+align).setStyle({'backgroundColor':$(selectbox_id).getStyle('backgroundColor')});
     }
     document.writeln('                </div>');
   } else {
@@ -232,6 +257,10 @@ function write_menu( menu_title, menu, align )
     document.writeln('                  <!--[if lte IE 7]><a href="javascript:void(0);"><![endif]-->'+menu_title+'<!--[if lte IE 7]></a><![endif]-->');
     document.writeln('                </div>');
   }  
+}
+
+function getWidth(id) {
+	return $(id).getWidth()+"\n"+$(id).down('option').getWidth();
 }
 
 
@@ -294,9 +323,9 @@ window.onerror  = function( msg, url, line ) {
             <col width="30"/>
             <col width="150"/>
             <col width="*"/>
-            <col width="30"/>
-            <col width="150"/>
             <col width="20"/>
+            <col width="150"/>
+            <col width="30"/>
           </colgroup>
           <thead>
           <tr>
