@@ -24,8 +24,10 @@ a:visited        								{color:#000066;text-decoration:none;font-size:12px;}
 .green_value                    {font-size:11px;white-space:nowrap;color:forestgreen;}
 .red_value                      {font-size:11px;white-space:nowrap;color:crimson;}
 .bold                           {font-weight:bold;}
-.caption                        {font-size:16px;font-weight:bold;font-family:"Trebuchet MS",Arial,Helvetica,Sans-Serif;font-style:italic;color:#EA7A14;}       
+.green_bold                     {font-weight:bold;color:forestgreen;}
+.red_bold                       {font-weight:bold;color:crimson;}
 .location                       {font-weight:bold;color:#EA7A14;}       
+.caption                        {font-size:16px;font-weight:bold;font-family:"Trebuchet MS",Arial,Helvetica,Sans-Serif;font-style:italic;color:#EA7A14;}       
 .red                            {color:crimson;}
 .gray                           {color:gray;}
 .file_based_error               {font-size:11px;color:crimson;}

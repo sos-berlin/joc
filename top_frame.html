@@ -164,9 +164,9 @@ function set_state(response)
     var spooler_state = state.getAttribute('state');
     var spooler_state_elem = document.getElementById('spooler_state');
     switch(spooler_state) {
-    	case 'running' : spooler_state_elem.style.color = 'forestgreen';
+    	case 'running' : spooler_state_elem.className = 'green_bold';
     	                 break;
-    	default        : spooler_state_elem.style.color = 'crimson';
+    	default        : spooler_state_elem.className = 'red_bold';
     	                 break;
     }
     
@@ -257,10 +257,6 @@ function write_menu( menu_title, menu, align )
     document.writeln('                  <!--[if lte IE 7]><a href="javascript:void(0);"><![endif]-->'+menu_title+'<!--[if lte IE 7]></a><![endif]-->');
     document.writeln('                </div>');
   }  
-}
-
-function getWidth(id) {
-	return $(id).getWidth()+"\n"+$(id).down('option').getWidth();
 }
 
 
@@ -396,8 +392,8 @@ window.onerror  = function( msg, url, line ) {
           <thead>
             <script language="javascript" type="text/javascript">
               document.writeln( '            <tr>' );
-              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('ID')+':&#160;</span><span id="spooler_id" style="white-space:nowrap;font-weight:bold;"></span></td>' );
-              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('State')+':&#160;</span><span id="spooler_state" style="white-space:nowrap;;font-weight:bold;"></span></td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('ID')+':&#160;</span><span class="bold" id="spooler_id" style="white-space:nowrap;"></span></td>' );
+              document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('State')+':&#160;</span><span class="bold" id="spooler_state" style="white-space:nowrap;"></span></td>' );
               document.writeln( '              <td style="white-space:nowrap;"><span class="label">'+parent.getTranslation('Pid')+':&#160;</span><span id="spooler_pid" style="white-space:nowrap;"></span></td>' );
               document.writeln( '              <td style="white-space:nowrap;" class="location" align="center">'+parent._scheduler._host+':'+parent._scheduler._port+'</td>' );
               document.writeln( '              <td style="white-space:nowrap;">&#160;</td>' );

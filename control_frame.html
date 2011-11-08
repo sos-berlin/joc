@@ -98,7 +98,7 @@ function do_onload()
     set_checkbox_checked();
     toggle(parent._scheduler._show_card);
     _is_loaded = true;
-    
+    setTimeout('set_frame_height();', 1000);
     parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_control'); 
 }
 
@@ -114,12 +114,12 @@ function do_onunload()
 
 //---------------------------------------------------------------------------------set_frame_height
 function set_frame_height()
-{
+{ 
   if( _card.search(/^(process_classes|cluster|remote_schedulers|locks)$/) > -1 ) {
   //if( _card.search(/^(cluster|remote_schedulers)$/) > -1 ) {
     _frm.rows  = _frm.rows.replace(/([^,]+,)([^,]+,)[^,]+(.*)/, "$1$20$3");
   } else {
-    _frm.rows  = _frm.rows.replace(/([^,]+,)([^,]+,)[^,]+(.*)/, "$1$2"+(document.getElementById('controls').offsetHeight)+"$3");
+  	_frm.rows  = _frm.rows.replace(/([^,]+,)([^,]+,)[^,]+(.*)/, "$1$2"+(document.getElementById('controls').offsetHeight)+"$3");
   }
 }
 
