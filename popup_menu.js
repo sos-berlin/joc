@@ -132,7 +132,7 @@ Popup_menu_builder.prototype.add_entry = function( html_entry, call, is_active, 
     if( is_active  == undefined )  is_active  = true;
     if( is_submenu == undefined )  is_submenu = false;
     
-    html =  "<tr>";
+    var html =  "<tr>";
     html += "<td style='";
     html +=         "font-family: Tahoma, Sans-Serif; font-size: 11px; ";
     html +=         "color: " + ( is_active? "menutext" : "gray" ) + ";";
@@ -183,8 +183,8 @@ Popup_menu_builder.prototype.add_entry = function( html_entry, call, is_active, 
 
 Popup_menu_builder.prototype.add_bar = function()
 {
-    html =  "<tr>";
-    html += "<td style='background-color:menu;color:gray;'>";
+    var html =  "<tr>";
+    html += "<td style='background-color:menu;color:gray;padding:2px;'>";
     html +=  "<hr size='1'/>";
     html += "</td>";
     html += "</tr>";

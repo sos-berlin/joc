@@ -5045,7 +5045,7 @@
         <xsl:param name="link_text"/>
         
         <xsl:element name="a">
-            <xsl:attribute name="target">_blank</xsl:attribute>
+            <xsl:attribute name="target">jobscheduler_user_link</xsl:attribute>
             <xsl:attribute name="href">
                 <xsl:if test="starts-with($url,'www.')" >
                   <xsl:text>http://</xsl:text>
