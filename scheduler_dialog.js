@@ -563,7 +563,7 @@ function start_task( ret ) {
     } else {
       try {
           var fields        = input_dialog_submit();
-          param_names       = ( fields.param_names == "" ) ? new Array() : fields.param_names.split(",");
+          param_names       = ( fields.param_names == "" ) ? new Array() : fields.param_names.split(";");
           var params        = "";
           if( param_names.length + fields.count_new_params > 0 ) params += '<params>'; 
           for( var i = 0; i < param_names.length; i++ ) {
