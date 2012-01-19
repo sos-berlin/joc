@@ -1347,7 +1347,7 @@ function show_calendar( menu, ret )
       what       = ( !what )        ? "" : " what='orders'";
       limit      = " limit='"+limit+"'";
       var xml_command  = "<show_calendar"+before+from+limit+what+"/>";
-      alert(xml_command);
+      //alert(xml_command);
       _calendar_params = {'xml_command':xml_command,'menu':menu,'format':fields.format,'job':'','order':''};  //die Variable liest die aufgerufende Seite
       switch( menu ) {
         case 'job_chain' : _calendar_params.job   = window.parent.left_frame._job_chain; break;
