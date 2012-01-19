@@ -159,6 +159,7 @@ _translations['(no filtering)']                            = '(ohne Filter)';
 //Table header of jobs list                                
 _translations['Job']                                       = 'Job';
 _translations['Steps']                                     = 'Schritte';
+_translations['Process steps']                             = 'Prozess-Schritte';
 _translations['Next start']                                = 'Nächster Start';
                                                            
 //Labels in detail frame                                   

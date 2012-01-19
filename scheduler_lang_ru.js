@@ -160,6 +160,7 @@ _translations['(no filtering)']                            = '(без фильт
 //Table header of jobs list                                
 _translations['Job']                                       = 'Job';
 _translations['Steps']                                     = 'Шаги';
+_translations['Process steps']                             = 'Процесса шаги';
 _translations['Next start']                                = 'Следующий старт';
                                                            
 //Labels in detail frame                                   

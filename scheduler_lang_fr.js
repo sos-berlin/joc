@@ -160,6 +160,7 @@ _translations['(no filtering)']                            = '(pas de filtre)';
 //Table header of jobs list                                
 _translations['Job']                                       = 'Tâche';
 _translations['Steps']                                     = 'Etapes';
+_translations['Process steps']                             = 'Etapes du processus';
 _translations['Next start']                                = 'Prochain démarrage';
                                                            
 //Labels in detail frame                                   

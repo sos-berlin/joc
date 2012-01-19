@@ -1702,7 +1702,7 @@
                 <tr style="">
                     <td class="head1"><span class="translate">Job</span> </td>
                     <td class="head"> <span class="translate">Time</span> </td>
-                    <td class="head"> <span class="translate">Steps</span> </td>
+                    <td class="head"> <span class="translate">Process steps</span> </td>
                     <td class="head"><span class="translate" style="white-space:nowrap">Next start</span>
                         <xsl:if test="/spooler/@show_jobs_select != 'standalone'">
                             <span>&#160;/&#160;<span class="translate">Orders</span></span>
@@ -1809,7 +1809,7 @@
                   <span class="green_value">&#160;&#160;- &#160;</span><span class="green_label">since</span><span class="green_value">&#160;<xsl:apply-templates mode="date_time_nowrap" select="@running_since__xslt_datetime_diff"/></span>
               </xsl:if>
               <xsl:if test="@steps &gt; 0">
-                <span class="green_value">&#160;&#160;- &#160;<xsl:value-of select="@steps"/></span>&#160;<span class="green_label">Steps</span>
+                <span class="green_value">&#160;&#160;- &#160;<xsl:value-of select="@steps"/></span>&#160;<span class="green_label">Process steps</span>
               </xsl:if>
               <span class="small">&#160;&#160;- &#160;<xsl:apply-templates select="@state" /></span>
               <xsl:if test="order/@path">
@@ -3342,7 +3342,7 @@
                 </tr>
                 
                 <tr>
-                    <td class="label"><span class="label">Steps</span>:</td>
+                    <td class="label"><span class="label">Process steps</span>:</td>
                     <td><xsl:value-of select="@all_steps"/></td>
                     <td class="label"><span class="label">Tasks</span>:</td>
                     <td><xsl:value-of select="@all_tasks"/></td>
@@ -3543,7 +3543,7 @@
                         </xsl:if>
                         <xsl:if test="@steps!=''">
                             <xsl:text>, </xsl:text>
-                            <xsl:value-of select="@steps"/><xsl:text> </xsl:text><span class="translate">steps</span>
+                            <xsl:value-of select="@steps"/><xsl:text> </xsl:text><span class="translate">Process steps</span>
                         </xsl:if>
                     </td>
                 </tr>
@@ -3793,7 +3793,7 @@
                         <td class="head1"><span class="translate">Id</span></td>
                         <td class="head"><span class="translate">Cause</span></td>
                         <td class="head"><span class="translate">Started</span></td>
-                        <td class="head"><span class="translate">Steps</span></td>
+                        <td class="head"><span class="translate">Process steps</span></td>
                         <td class="head" colspan="2"><span class="translate">Ended</span></td>
                     </tr>
                     <xsl:call-template name="after_head_space">
