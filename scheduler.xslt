@@ -4897,8 +4897,7 @@
     
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~show_text_with_url-->
-    <!-- Wickelt http://… in <a href="http://…">http://…</a> ein -->
-
+    
     <xsl:template name="show_text_with_url">
 
         <xsl:param name="text"/>
