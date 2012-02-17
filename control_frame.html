@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2011 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2012 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -61,6 +61,7 @@ _filters.orders_order           = new Array();
 _filters.jobs_details           = '';
 _filters.job_chains_details     = '';
 _filters.orders_details         = '';
+var _cur_filter                 = {'pattern':null,'isFolderFilter':false};
 var _card                       = '';
 var _frm                        = null;
 var _is_loaded                  = false;
@@ -237,20 +238,74 @@ function filter__onclick( selectElem, name )
 }
 
 
+//---------------------------------------------------------------------------------prepare_filter
+function prepare_filter( name, withFolders )
+{
+	  _cur_filter.pattern = null;
+    _cur_filter.isFolderFilter = false;
+    
+	  if( parent._scheduler._show_card != name || ! _filters[name+'_details']) { 
+	  	return true;
+	  }
+    var filter = _filters[name+'_details'];
+    filter = ( filter.substr(0,1) == ">" ) ? filter.substr(1) : "^("+filter+")$";
+    _cur_filter.pattern = new RegExp(filter);
+    _cur_filter.isFolderFilter = isFolderFilter(filter);
+    
+    if(withFolders && _cur_filter.isFolderFilter )
+    { 
+	    var flds = parent.top_frame._state.selectNodes('//folder');
+      for(var i=0; i<flds.length; i++) {
+        var fld = flds[i];
+        if( _cur_filter.pattern.test(fld.getAttribute('path')+'/')) {
+        	fld.setAttribute('filter_marked',0);
+        }
+        else {
+        	fld.setAttribute('filter_marked',1);
+        }
+      }
+    }
+}
+
+function isFolderFilter(filter) 
+{
+		if(filter.substr(0,1) != "^") return false;
+		var f = filter.replace(/[\(\)\[\]]/g, '').replace(/(\.\*)/g, '');
+		if(f.substr(f.length - 1) != '/') return false;
+		return true;
+}
+
+
 //---------------------------------------------------------------------------------apply_filter
 function apply_filter( node, name )
 {   
-    if( parent._scheduler._show_card != name || _filters[name+'_details'] == '') return true;
-    var filter = _filters[name+'_details'];
-    filter = ( filter.substr(0,1) == ">" ) ? filter.substr(1) : "^("+filter+")$";
-    var pattern = new RegExp(filter); 
-    if( !pattern.test(node.getAttribute('path')) && !pattern.test(node.getAttribute('path').replace(/^\//,'')) ) {
-      if( name == 'job_chains' ) {
-        var order_id_space = node.getAttribute('order_id_space');
-        if( order_id_space ) { node.setAttribute('filter_marked',1); return true; }
-      }
-      node.parentNode.removeChild(node);
-      return false;
+    if( parent._scheduler._show_card != name || _cur_filter.pattern == null) { 
+	  	return true;
+	  }
+    
+    if(node.nodeName == 'folder' ) 
+    {  
+    	if( _cur_filter.isFolderFilter ) {
+    	  var fld = parent.top_frame._state.selectSingleNode('//folder[@path="'+node.getAttribute('path')+'"]');
+    	  if(fld.getAttribute('filter_marked') == 1) {
+    	    var filteredChildren = parent.top_frame._state.selectNodes('//folder[@path="'+node.getAttribute('path')+'"]//folder[@filter_marked = "0"]');
+    	    if(filteredChildren.length == 0) {
+    	      node.parentNode.removeChild(node);
+            return false;
+          }
+        }
+      } 
+    } 
+    else 
+    {
+      if( !_cur_filter.pattern.test(node.getAttribute('path')) && !_cur_filter.pattern.test(node.getAttribute('path').replace(/^\//,'')) ) {
+        if( name == 'job_chains' ) {
+          var order_id_space = node.getAttribute('order_id_space');
+          if( order_id_space ) { node.setAttribute('filter_marked',1); return true; }
+        }
+        node.parentNode.removeChild(node);
+        return false;
+      } 
     }
     return true;
 }

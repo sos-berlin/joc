@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2012 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -201,6 +201,7 @@ function update_jobs_frame()
     if( parent._scheduler._tree_view_enabled ) {
       parent._scheduler.logger(3,'SCHEDULER TREE REQUEST','scheduler_tree_execute');
       parent.top_frame.update();
+      parent.control_frame.prepare_filter( _card, true );
       _parent_ul_elems  = [];
       //var req = '<commands>';
       var req = '';
@@ -262,6 +263,7 @@ function update_jobs_frame()
             }
           }
         }
+        
         _open_folders = (open_folders2.length > 0) ? '|'+open_folders2.join('|')+'|' : '||';
         _answer[0] = new Array(open_folders2.length);
         _answer_complete = 0;
@@ -273,6 +275,7 @@ function update_jobs_frame()
       //req += '</commands>';
       //parent._scheduler.executeAsynchron( req, parent.left_frame.update_callback );
     } else {
+    	parent.control_frame.prepare_filter( _card, false );
       parent._scheduler.executeAsynchron( '<show_state what="' + what + '"'+max_attributes+'/>', parent.left_frame.update_callback );
     }
 }
@@ -281,8 +284,17 @@ function update_jobs_frame()
 //--------------------------------------------------------------------------------collect_tree_answer
 
 function collect_tree_answer( response, index )
-{
+{ 
   var stateElem = response.selectSingleNode('/spooler/answer/state');
+  if(_card == 'jobs' || _card == 'job_chains' || _card == 'orders' ) {
+  	var flds = stateElem.selectNodes('//folders/folder');  
+  	if(flds) {
+  		for( var j = 0; j < flds.length; j++ )
+    	{
+        	parent.control_frame.apply_filter( flds[j], _card );  
+    	}
+    } 
+  }
   _answer[0][index] = stateElem.xml;
   _answer_complete++;
   if( _answer_complete == _answer[0].length ) {
@@ -369,6 +381,7 @@ function update_callback( response )
 {
     if( response ) _response = response; 
     if( !parent._scheduler._tree_view_enabled ) set_timeout('parent.top_frame.update();',1);
+    //alert(_response.xml);
     modify_response( _response );
     parent._scheduler.logger(3,'WRITE HTML','scheduler_tree_html');
       
