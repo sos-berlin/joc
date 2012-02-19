@@ -204,7 +204,7 @@ function show_log__onclick( show_log_command, window_name )
                  ", innerheight=" + ( Math.floor( window.screen.availHeight * 0.2 ) - 32 ) +        // Fuer Firefox
                  ", left=0"       +
                  ", top="         + ( Math.floor( window.screen.availHeight * 0.8 ) );
-    if( show_log_command.search(/^http:/) == -1 ) show_log_command = document.location.href.replace( /\/[^\/]*$/, "/" ) + show_log_command;
+    if( show_log_command.search(/^http:/) == -1 ) show_log_command = scheduler_engine_cpp_url+show_log_command+"?base_url="+scheduler_gui_base_url + show_log_command;
     
     if( parent._scheduler && parent._scheduler._dependend_windows[ window_name ] ) parent._scheduler._dependend_windows[ window_name ].close();
         
@@ -1397,7 +1397,7 @@ function scheduler_menu__onclick( elt )
     
     var command         = function( cmd ) { return "<modify_spooler cmd='" + cmd + "'/>"; }
     
-    popup_builder.add_show_log( parent.getTranslation("Show log")                           , "show_log?", "show_log" );
+    popup_builder.add_show_log( parent.getTranslation("Show log")                           , "show_log?main", "show_log" );
     popup_builder.add_entry   ( parent.getTranslation("Show job dependencies")              , "show_job_illustration()" );
     popup_builder.add_entry   ( parent.getTranslation("Show job chain dependencies")        , "show_job_chain_illustration()" );
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {

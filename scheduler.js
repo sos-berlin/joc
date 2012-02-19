@@ -31,7 +31,7 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-//-----------------------------------------------------------------------------------------language  
+//-----------------------------------------------------------------------------------------language
 if( window['_sos_lang'] ) {
   document.writeln('<script type="text/javascript" src="scheduler_lang_'+_sos_lang+'.js"></sc'+'ript>');
 }
@@ -47,7 +47,6 @@ if( !window['_server_settings'] && window['_disable_cookie_settings'] ) {
 
 function Scheduler()
 {
-    this._url                                            = ( document.location.href + "" ).replace( /\/[^\/]*$/, "/" );
     this._dependend_windows                              = new Object();
     this._logger                                         = ( typeof window['SOS_Logger'] == 'function' ) ? SOS_Logger : null;
     this._debug_timer                                    = new Object();
@@ -171,7 +170,7 @@ Scheduler.prototype.executeGet = function( href, txt_mode, callback_on_success )
     var ret       = null;
     var err       = null;
     
-    new Ajax.Request( scheduler._url+href,
+    new Ajax.Request( href,
     {
        asynchronous   : async,
        method         : 'get',
@@ -236,8 +235,8 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
     }
     if( xml.search( /^<modify_spooler cmd=(\'|\")[^\'\"]*(abort|terminate)[^\'\"]*(\'|\")\/>/i ) > -1 ) { err = new Error(); }
     if( xml.search( /^<terminate/i ) > -1 && ( xml.search( /cluster_member_id=/i ) == -1 || this_scheduler ) ) { err = new Error(); }
-    
-    new Ajax.Request( scheduler._url,
+
+    new Ajax.Request( scheduler_engine_cpp_url,
     {
        asynchronous   : async,
        method         : 'post',
@@ -642,7 +641,7 @@ Scheduler.prototype.logger = function(level, msg, timerKey)
 Scheduler.prototype.readGuiVersion = function()
 {
     try {
-      var responseText = this.executeGet( '.version' );
+      var responseText = this.executeGet( scheduler_gui_base_url+'.version' );
       var version = ["0000 0000-00-00","0.0.0.0000"];
       if(responseText) {
         version = responseText.split("\n");
@@ -711,9 +710,9 @@ Scheduler.prototype.loadXSLT = function( url )
 {
     if( window.XSLTProcessor ) {
       this._xslt = new XSLTProcessor();
-      this._xslt.importStylesheet( this.executeGet( url, false ) );       
+      this._xslt.importStylesheet( this.executeGet( scheduler_gui_base_url+url, false ) );       
     } else {
-      this._xslt = this.executeGet( url, false );
+      this._xslt = this.executeGet( scheduler_gui_base_url+url, false );
     }
 }
 

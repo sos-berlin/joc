@@ -37,13 +37,15 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>Job Documentation - JobScheduler</title>
+    <script type="text/javascript" src="base.js"></script>
     <script type="text/javascript" src="scheduler_init.js"></script>
     <script type="text/javascript" src="scheduler.js"></script>
     <script type="text/javascript" src="prototype.js"></script>
     <script type="text/javascript" src="browser_dependencies.js"></script>
     <script type="text/javascript" src="sos_logger.js"></script>
 
-    <script language="javascript"><!--
+    <script language="javascript">
+          <!--
 var _scheduler;
 var _desc_frame;
 var _job_name;
@@ -121,18 +123,18 @@ function showJobDescription( job_name )
                 desc_frame_href = 'live'+include_file_attribute;
               }
               try {
-                _scheduler.executeGet(desc_frame_href);
+                _scheduler.executeGet(scheduler_base_url+desc_frame_href);
               } catch(xxx) { throw new Error( xx.message + "\n" + xxx.message ); }
             }
           }
         }
         if( desc_frame_href ) {
-          _desc_frame.location.href = _scheduler._url+desc_frame_href+'#'+ description_lang;
+          _desc_frame.location.href = scheduler_gui_base_url+desc_frame_href+'#'+ description_lang;
           return true;
         }
       } catch(E) {}
       
-      var desc = _scheduler.executeGet("job_description?job=" + job_name);
+      var desc = _scheduler.executeGet(scheduler_engine_cpp_url+"job_description?job=" + job_name);
       //description in XML format
       if( desc.search(/<\?xml/i) > -1 ) {
         //response of older scheduler versions returns xml as content of html body
