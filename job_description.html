@@ -134,11 +134,7 @@ function showJobDescription( job_name )
         }
       } catch(E) {}
       
-<<<<<<< .mine
-      var desc = _scheduler.executeGet(_scheduler._engine_cpp_url + "job_description?job=" + job_name);
-=======
-      var desc = _scheduler.executeGet(scheduler_engine_cpp_url+"job_description?job=" + job_name);
->>>>>>> .r16551
+			var desc = _scheduler.executeGet(_scheduler._engine_cpp_url + "job_description?job=" + job_name);
       //description in XML format
       if( desc.search(/<\?xml/i) > -1 ) {
         //response of older scheduler versions returns xml as content of html body
