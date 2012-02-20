@@ -31,7 +31,7 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-//-----------------------------------------------------------------------------------------language
+//-----------------------------------------------------------------------------------------language  
 if( window['_sos_lang'] ) {
   document.writeln('<script type="text/javascript" src="scheduler_lang_'+_sos_lang+'.js"></sc'+'ript>');
 }
@@ -47,6 +47,13 @@ if( !window['_server_settings'] && window['_disable_cookie_settings'] ) {
 
 function Scheduler()
 {
+    this._base_url                                       = ( document.location.href + "" ).replace( /\/[^\/]*$/, "/" );
+    this._url                                            = this._base_url;
+    this._engine_cpp_url                                 = this._base_url;
+		if(this._base_url.toLowerCase().indexOf("/jobscheduler/") >= 0) {
+			this._url                                        	 = this._base_url;
+			this._engine_cpp_url                             	 = this._base_url.replace(/\/[^\/]+\/$/, "/") + "engine-cpp/";
+		}
     this._dependend_windows                              = new Object();
     this._logger                                         = ( typeof window['SOS_Logger'] == 'function' ) ? SOS_Logger : null;
     this._debug_timer                                    = new Object();
@@ -169,6 +176,7 @@ Scheduler.prototype.executeGet = function( href, txt_mode, callback_on_success )
     var scheduler = this;
     var ret       = null;
     var err       = null;
+	  if(href.search(/^https?:/) == -1) href = scheduler._url+href;
     
     new Ajax.Request( href,
     {
@@ -235,8 +243,8 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
     }
     if( xml.search( /^<modify_spooler cmd=(\'|\")[^\'\"]*(abort|terminate)[^\'\"]*(\'|\")\/>/i ) > -1 ) { err = new Error(); }
     if( xml.search( /^<terminate/i ) > -1 && ( xml.search( /cluster_member_id=/i ) == -1 || this_scheduler ) ) { err = new Error(); }
-
-    new Ajax.Request( scheduler_engine_cpp_url,
+    
+    new Ajax.Request( scheduler._engine_cpp_url,
     {
        asynchronous   : async,
        method         : 'post',
@@ -641,7 +649,7 @@ Scheduler.prototype.logger = function(level, msg, timerKey)
 Scheduler.prototype.readGuiVersion = function()
 {
     try {
-      var responseText = this.executeGet( scheduler_gui_base_url+'.version' );
+      var responseText = this.executeGet( '.version' );
       var version = ["0000 0000-00-00","0.0.0.0000"];
       if(responseText) {
         version = responseText.split("\n");
@@ -710,9 +718,9 @@ Scheduler.prototype.loadXSLT = function( url )
 {
     if( window.XSLTProcessor ) {
       this._xslt = new XSLTProcessor();
-      this._xslt.importStylesheet( this.executeGet( scheduler_gui_base_url+url, false ) );       
+      this._xslt.importStylesheet( this.executeGet( url, false ) );       
     } else {
-      this._xslt = this.executeGet( scheduler_gui_base_url+url, false );
+      this._xslt = this.executeGet( url, false );
     }
 }
 

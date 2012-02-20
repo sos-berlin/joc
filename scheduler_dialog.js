@@ -204,8 +204,8 @@ function show_log__onclick( show_log_command, window_name )
                  ", innerheight=" + ( Math.floor( window.screen.availHeight * 0.2 ) - 32 ) +        // Fuer Firefox
                  ", left=0"       +
                  ", top="         + ( Math.floor( window.screen.availHeight * 0.8 ) );
-    if( show_log_command.search(/^http:/) == -1 ) show_log_command = scheduler_engine_cpp_url+show_log_command+"?base_url="+scheduler_gui_base_url + show_log_command;
-    
+    //if( show_log_command.search(/^http:/) == -1 ) show_log_command = document.location.href.replace( /\/[^\/]*$/, "/" ) + show_log_command;
+    if( show_log_command.search(/^https?:/) == -1 ) show_log_command = parent._scheduler._engine_cpp_url+"show_log?base_url="+parent._scheduler._url+"show_log&"+show_log_command;
     if( parent._scheduler && parent._scheduler._dependend_windows[ window_name ] ) parent._scheduler._dependend_windows[ window_name ].close();
         
     var log_window = parent.open( show_log_command, window_name, features );
@@ -1397,7 +1397,7 @@ function scheduler_menu__onclick( elt )
     
     var command         = function( cmd ) { return "<modify_spooler cmd='" + cmd + "'/>"; }
     
-    popup_builder.add_show_log( parent.getTranslation("Show log")                           , "show_log?main", "show_log" );
+    popup_builder.add_show_log( parent.getTranslation("Show log")                           , "", "show_log" );
     popup_builder.add_entry   ( parent.getTranslation("Show job dependencies")              , "show_job_illustration()" );
     popup_builder.add_entry   ( parent.getTranslation("Show job chain dependencies")        , "show_job_chain_illustration()" );
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {
@@ -1520,7 +1520,7 @@ function job_menu__onclick( job_name )
     _obj_title        = xml_encode(job_title);
     var hot           = (job_element.selectSingleNode('file_based/@file') && parent._scheduler.versionIsNewerThan( "2008-05-13 09:00:00" ) ) ? 1 : 0;
     
-    popup_builder.add_show_log( parent.getTranslation("Show log")        , "show_log?job=" + encodeComponent(job_name), "show_log_job_" + job_name.replace(/\//g,'_') );
+    popup_builder.add_show_log( parent.getTranslation("Show log")        , "job=" + encodeComponent(job_name), "show_log_job_" + job_name.replace(/\//g,'_') );
     //popup_builder.add_entry   ( parent.getTranslation("Show configuration"),  "show_xml('"+job_name+".job.xml')", hot );
     popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('job', '"+parent.left_frame._job_name+"')", hot );
     
@@ -1560,7 +1560,7 @@ function task_menu__onclick( task_id )
 {
     var popup_builder = new Popup_menu_builder();
 
-    popup_builder.add_show_log( parent.getTranslation("Show log")        , "show_log?task=" + task_id, "show_log_task_" + task_id );
+    popup_builder.add_show_log( parent.getTranslation("Show log")        , "task=" + task_id, "show_log_task_" + task_id );
     popup_builder.add_bar();
     popup_builder.add_command ( parent.getTranslation("End")             , "<kill_task job='" + _job_name + "' id='" + task_id + "'/>" );
     popup_builder.add_command ( parent.getTranslation("Kill immediately"), "<kill_task job='" + _job_name + "' id='" + task_id + "' immediately='yes'/>" );
@@ -1572,7 +1572,7 @@ function task_menu__onclick( task_id )
 
 function history_task_menu__onclick( task_id )
 {
-    var show_log_command = "show_log?task=" + task_id;
+    var show_log_command = "task=" + task_id;
     var window_name      = "show_log_task_" + task_id;
     /* solange es nur einen Eintrag im Menue gibt, wird dieser direkt ausgefuehrt
     var popup_builder = new Popup_menu_builder();
@@ -1651,11 +1651,11 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     
     var popup_builder = new Popup_menu_builder();
     if( menu_caller == 'blacklist' ) {
-      popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "show_log?job_chain=" + encodeComponent(job_chain) +
+      popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "job_chain=" + encodeComponent(job_chain) +
                                                    "&order=" + encodeComponent(order_id), "show_log_order_" + job_chain.replace(/\//g,'_') + "__" + order_id );
       popup_builder.add_command ( parent.getTranslation("Delete order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, parent.getTranslation('Do you really want to delete this order?'), 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
     } else {
-      popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "show_log?job_chain=" + encodeComponent(job_chain) +
+      popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "job_chain=" + encodeComponent(job_chain) +
                                                    "&order=" + encodeComponent(order_id), "show_log_order_" + job_chain.replace(/\//g,'_') + "__" + order_id );
       //popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml('"+job_chain+","+order_id+".order.xml')", hot );
       popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('order','"+job_chain+","+order_id+"')", hot );
