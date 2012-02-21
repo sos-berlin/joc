@@ -1686,9 +1686,9 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
 function order_history_menu__onclick( job_chain, order_id, history_id, end_time )
 {
     if( end_time ) {
-      var show_log_command = "show_log?order=" + encodeComponent(order_id) +"&history_id=" + history_id;
+      var show_log_command = "order=" + encodeComponent(order_id) +"&history_id=" + history_id;
     } else {
-      var show_log_command = "show_log?job_chain=" + encodeComponent(job_chain) + "&order=" + encodeComponent(order_id);
+      var show_log_command = "job_chain=" + encodeComponent(job_chain) + "&order=" + encodeComponent(order_id);
     }
     var window_name      = "show_log_order_" + order_id + "__" + history_id;
     show_log_command = show_log_command.replace( /\\/g, "\\\\" ).replace( /\"/g, "\\&quot;" );
