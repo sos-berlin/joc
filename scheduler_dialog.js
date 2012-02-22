@@ -1646,8 +1646,11 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     if( !end_state ) end_state = "";
     if( !order_title ) order_title = order_id.replace(/\\/g,"\\\\").replace(/^\//,'');
     _obj_title = xml_encode(order_title);
-    if( !occupied_http || occupied_http.search(/^http/) == -1 ) { occupied_http = ''; }
-    occupied_http = occupied_http.replace(/[\/]*$/,'') + '/';
+    if( !occupied_http || occupied_http.search(/^http/) == -1 ) { 
+    	occupied_http = ''; 
+    } else {
+      occupied_http = occupied_http.replace(/[\/]*$/,'') + '/show_log?';
+    }
     
     var popup_builder = new Popup_menu_builder();
     if( menu_caller == 'blacklist' ) {
