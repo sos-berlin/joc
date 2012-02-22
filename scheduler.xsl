@@ -2054,7 +2054,7 @@
                   <xsl:apply-templates mode="normalized_order_id" select="@id" />
               </xsl:variable>
         
-              <xsl:if test="@occupied_by_cluster_member_id">
+              <!--xsl:if test="@occupied_by_cluster_member_id">
                 <tr>
                     <td></td>
                     <td colspan="3" style="padding-left:2ex;">
@@ -2062,7 +2062,7 @@
                     </td>
                     <td></td>
                 </tr>
-              </xsl:if> 
+              </xsl:if--> 
               
               <tr class="list" title="show order details">
                 <xsl:if test="$treeview">
