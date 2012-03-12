@@ -98,8 +98,8 @@ function showJobDescription( job_name )
           include_file_attribute   = include_file_attribute.replace(/\\/g,'/');
           if( path_is_relative( include_file_attribute ) ) {
             desc_frame_href = 'scheduler_data/'+include_file_attribute;
-          } else {
-            desc_frame_href = 'descriptions/'+include_file_attribute.replace( /.*\//, '' );
+          //} else {
+          //  desc_frame_href = 'descriptions/'+include_file_attribute.replace( /.*\//, '' );
           }
           try {
             if( desc_frame_href ) _scheduler.executeGet(desc_frame_href);
@@ -122,7 +122,7 @@ function showJobDescription( job_name )
                 desc_frame_href = 'live'+include_file_attribute;
               }
               try {
-                _scheduler.executeGet(scheduler_base_url+desc_frame_href);
+                _scheduler.executeGet(desc_frame_href);
               } catch(xxx) { throw new Error( xx.message + "\n" + xxx.message ); }
             }
           }
