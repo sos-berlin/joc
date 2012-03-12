@@ -89,7 +89,7 @@ function showJobDescription( job_name )
       var response = null;
       
       try {
-        response         = _scheduler.executeSynchron( '<show_job job="' + job_name + '" what="source"/>', false, false, true );
+      	response         = _scheduler.executeSynchron( '<show_job job="' + job_name + '" what="source"/>', false, false, true );
         var job_elem     = response.selectSingleNode( "/spooler/answer/job" );
         var job_dir      = ( job_elem.getAttribute('path') ) ? job_elem.getAttribute('path').replace(/[^\/]+$/,'') : '/';
         var include_elem = job_elem.selectSingleNode( "source/job/description/include" );
@@ -128,7 +128,7 @@ function showJobDescription( job_name )
           }
         }
         if( desc_frame_href ) {
-          _desc_frame.location.href = scheduler_gui_base_url+desc_frame_href+'#'+ description_lang;
+        	_desc_frame.location.href = _scheduler._url+desc_frame_href+'#'+ description_lang;
           return true;
         }
       } catch(E) {}
