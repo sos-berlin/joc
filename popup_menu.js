@@ -339,7 +339,7 @@ Popup_menu_builder.prototype.show_selectbox_menu = function( element_name )
 
 function Input_dialog() 
 {    
-    //Input_dialog.close();
+    Input_dialog.close();
     this._html_array                    = new Array();
     this._html_hiddens                  = new Array();
     this._with_params                   = false;
