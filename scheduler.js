@@ -50,9 +50,11 @@ function Scheduler()
     this._base_url                                       = ( document.location.href + "" ).replace( /\/[^\/]*$/, "/" );
     this._url                                            = this._base_url;
     this._engine_cpp_url                                 = this._base_url;
-		if(this._base_url.toLowerCase().indexOf("/jobscheduler/") >= 0) {
+		this._port                                           = null;
+    if(this._base_url.toLowerCase().indexOf("/jobscheduler/operations_gui/") >= 0) {
 			this._url                                        	 = this._base_url;
-			this._engine_cpp_url                             	 = this._base_url.replace(/\/[^\/]+\/$/, "/") + "engine-cpp/";
+			this._engine_cpp_url                             	 = this._base_url.replace(/\/jobscheduler\/operations_gui\//, "/jobscheduler/engine-cpp/");
+			this._port                                         = window.location.port;
 		}
     this._dependend_windows                              = new Object();
     this._logger                                         = ( typeof window['SOS_Logger'] == 'function' ) ? SOS_Logger : null;
@@ -90,7 +92,6 @@ function Scheduler()
     this._gui_release_no                                 = '';
     this._id                                             = '';
     this._host                                           = '';
-    this._port                                           = '';
     this._cookie_prefix                                  = 'SOS_SCHEDULER_GUI_'+window.location.host.replace(/:/,'_')+'_';
     this._update_seconds                                 = 5;
     this._show_card                                      = 'jobs';
@@ -675,7 +676,9 @@ Scheduler.prototype.setState = function( state )
           this._version_date  = version[1].replace( /\D*$/, "" ).replace( /^\D*/, "" ); //trim
         }
         this._host            = state.getAttribute('host');
-        this._port            = state.getAttribute('tcp_port');
+        if( this._port == null ) {
+        	this._port          = state.getAttribute('tcp_port');
+        } 
         this._id              = state.getAttribute('id');
         this._cookie_prefix   = 'SOS_SCHEDULER_GUI_'+this._host+'_'+this._port+'_';
     }
