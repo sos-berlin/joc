@@ -163,7 +163,7 @@ function Popup_menu_builder__add_command( html, xml_command, is_active, confirm_
 {
     if( typeof confirm_msg == 'undefined' ) confirm_msg = '';
     if( typeof removeObj   == 'undefined' ) removeObj = '';
-    this.add_entry( html, "callErrorChecked( 'popup_menu__execute', &quot;" + xml_command.replace( /\\/g, "\\\\" ) + "&quot;, &quot;" + confirm_msg + "&quot;, &quot;" + removeObj + "&quot; )", is_active );
+    this.add_entry( html, "callErrorChecked( 'popup_menu__execute', &quot;" + xml_command.replace( /\\/g, "\\\\" ) + "&quot;, &quot;" + confirm_msg + "&quot;, &quot;" + removeObj.replace( /\\/g, "\\\\" ) + "&quot; )", is_active );
 }
 
 //-------------------------------------------------------------------------------popup_menu.execute
