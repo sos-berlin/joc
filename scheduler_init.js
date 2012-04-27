@@ -97,40 +97,59 @@ var ie        = 0;   // Microsoft Internet Explorer
 var gecko     = 0;   // Mozilla Firefox, Seamonkey, Iceweasel, Iceapel, Netscape
 var chrome    = 0;   // Google Chrome
 var safari    = 0;   // Safari
+var xul       = true;   // xulrunner (swt)
 var geckoName = 'Mozilla Browser';
 
 
 function check_browser()
-{   
+{      
     if( window != undefined )
     {                 
-        if( window.navigator != undefined  &&  window.navigator.appName )
+        if( window.navigator != undefined )
         {   
-            if( window.navigator.appName == "Microsoft Internet Explorer" )
+            var appN  =  window.navigator.appName;
+            var userA =  window.navigator.userAgent;
+            
+            if( appN == "Microsoft Internet Explorer" )
             {
                 var match = window.navigator.appVersion.match( /MSIE (\d+\.\d+);/ );
                 if( match )  ie = 1 * RegExp.$1;
             }
             else
-            if( window.navigator.vendor == "Google Inc." || window.navigator.userAgent.indexOf( "Chrome" ) > -1 )
+            if( window.navigator.vendor == "Google Inc." || userA.indexOf( "Chrome" ) > -1 )
             {
                 var match = window.navigator.appVersion.match( /Chrome\/(\d+\.\d+)/ );
                 if( match )  chrome = 1 * RegExp.$1;
             }
             else
-            if( window.navigator.appName == "Netscape" )
+            if( appN == "Netscape" )
             {   
-                var match = window.navigator.userAgent.match( /\).*\b([^\/]+)\/(\d+\.\d+)/ );
-                if( match ) {
+                var match = userA.match( /\).*\b([^\/]+)\/(\d+\.\d+)/ );
+                if( match ) { 
                 	geckoName = RegExp.$1;
                   if( geckoName.toLowerCase() != "epiphany" ) gecko = 1 * RegExp.$2;
-                  if( geckoName.toLowerCase() == "safari" ) safari = 1 * RegExp.$2;
+                  if( geckoName.toLowerCase() == "safari" ) safari = 1 * RegExp.$2; 
+                  if( safari > 520 ) gecko = 2;
+                }
+                else 
+                if( userA.indexOf('Gecko') > -1 && userA.indexOf('KHTML') === -1 ) {   //xulrunner >= 1.8.1.2
+                	match = userA.match( /rv:([\.\d]+)/ );
+                	var minxulversion = [1,8,1,2];
+                	if( match ) {
+                		var xulversion = RegExp.$1.split('.');
+                		for(var i=0; i < Math.max(4,xulversion.length); i++) {
+                			if((1*xulversion[i]) < minxulversion[i]) {
+                				xul = false;
+                			 	break;
+                			}
+                		}
+                	}
                 }
             }
         }
     }
     
-    if( ie < 6 && gecko < 2 && chrome < 0.2 )
+    if( ie < 6 && gecko < 2 && chrome < 0.2 && !xul )
     {
         var allBrowser = ie+gecko+chrome;
         var msg = "The page may not work with this browser.\n\n";
