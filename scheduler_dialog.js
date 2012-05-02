@@ -69,7 +69,8 @@ function showError( x, url, line )
       parent._scheduler.logger(4, "_update_counter=" + parent._scheduler._update_counter + "; _update_finished=" + (parent._scheduler._update_finished) );
       if( parent._scheduler._update_counter < 6 && !parent._scheduler._update_finished ) {
         parent._scheduler._update_counter++;
-        set_timeout( "callErrorChecked( 'update__onclick', false, false );", 15000 );
+        //set_timeout( "callErrorChecked( 'update__onclick', false, false );", 15000 );
+        callErrorChecked( 'update__onclick', false, false, 15000 );
       }
     } 
     else if(typeof window['show_error'] == 'function') {
@@ -140,6 +141,7 @@ function update__onclick( with_reset, force, time )
       if( typeof force      != 'boolean' ) force      = false;
       if( typeof time       != 'number'  ) time       = 200;
       if( with_reset ) resetError();
+      parent.left_frame.clear_update();
       if( parent._scheduler.versionIsNewerThan( "2007-10-28 19:00:00" ) ) {
         if( force ) {
           if( parent._scheduler.executeSynchron( '<check_folders/>', false, false ) ) {

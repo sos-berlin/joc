@@ -137,16 +137,19 @@ function update(with_details)
 {   
     parent._scheduler.logger(1,'UPDATE ' + self.name, 'scheduler_left_frame');
     if( typeof with_details != 'boolean' ) with_details = true;
-    var timer = 0;
-    if( _timer > 0 ) {
-      window.clearTimeout( _timer );  
-      timer   = _timer; 
-      _timer  = 0; 
-    }
+    clear_update();
     update_jobs_frame();
     if( with_details ) callErrorChecked( 'parent.details_frame.update' );
-    if( timer > 0 ) {
+    if( parent._scheduler._update_periodically && parent._scheduler._update_finished ) {
       _timer = set_timeout( "parent.left_frame.repeat_update(true,true)", parent._scheduler._update_seconds * 1000 );
+    }
+}
+
+function clear_update() 
+{
+	  if( _timer > 0 ) {
+      window.clearTimeout( _timer );  
+      _timer  = 0; 
     }
 }
 
@@ -581,14 +584,12 @@ function restore_checkbox_state( spooler_element, name )
 function repeat_update( repeat, call_update )
 {   
     resetError();
-    if( _timer > 0 ) { window.clearTimeout( _timer );  _timer = 0; }
+    clear_update();
     
     try
     {
         if( call_update )
         {
-            //if( parent.top_frame.document.getElementById( "update_periodically_checkbox" ) ) 
-            //    parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked = false;
             update__onclick();    
         }
     }
@@ -609,16 +610,10 @@ function repeat_update( repeat, call_update )
             parent.top_frame.document.getElementById( "update_periodically_checkbox" ).checked = repeat;  // Im Fehlerfall ausschalten
             parent._scheduler._update_periodically = repeat;
         }
-        if( repeat )  set_update_timer();
+        //if( repeat ) {
+        //	_timer = set_timeout( "callErrorChecked('repeat_update',true,true)", parent._scheduler._update_seconds * 1000 );
+        //}
     }
-}
-
-//---------------------------------------------------------------------------------set_update_timer
-
-function set_update_timer()
-{
-    if( _timer > 0 ) { window.clearTimeout( _timer );  _timer = 0; }
-    _timer = set_timeout( "callErrorChecked('repeat_update',true,true)", parent._scheduler._update_seconds * 1000 );
 }
 
 //---------------------------------------------------------------------------------------show_card

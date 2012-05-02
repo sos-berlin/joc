@@ -242,8 +242,12 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
       this_scheduler   = true;
       xml              = xml.replace( /this_scheduler=(\'|\")yes(\'|\")/i, "" );
     }
-    if( xml.search( /^<modify_spooler cmd=(\'|\")[^\'\"]*(abort|terminate)[^\'\"]*(\'|\")\/>/i ) > -1 ) { err = new Error(); }
-    if( xml.search( /^<terminate/i ) > -1 && ( xml.search( /cluster_member_id=/i ) == -1 || this_scheduler ) ) { err = new Error(); }
+    if( xml.search( /^<modify_spooler cmd=(\'|\")[^\'\"]*(abort|terminate)[^\'\"]*(\'|\")\/>/i ) > -1 
+      || (xml.search( /^<terminate/i ) > -1 && ( xml.search( /cluster_member_id=/i ) == -1 || this_scheduler ))) { 
+    	
+    	err = new Error();
+    	parent.left_frame.clear_update();
+    }
     
     new Ajax.Request( scheduler._engine_cpp_url,
     {
@@ -312,7 +316,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
                           if( err || !scheduler._update_finished ) {
                           	var message = '';
-                            var update_counter_txt = ['First','Second','Third','Fourth','Last'];
+                          	var update_counter_txt = ['First','Second','Third','Fourth','Last'];
                             if( scheduler._update_counter == 6 ) {
                                message = scheduler.getTranslation("No connection to JobScheduler") 
                                scheduler._update_finished = true;
