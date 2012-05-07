@@ -69,7 +69,7 @@ function showError( x, url, line )
       parent._scheduler.logger(4, "_update_counter=" + parent._scheduler._update_counter + "; _update_finished=" + (parent._scheduler._update_finished) );
       if( parent._scheduler._update_counter < 6 && !parent._scheduler._update_finished ) {
         parent._scheduler._update_counter++;
-        //set_timeout( "callErrorChecked( 'update__onclick', false, false );", 15000 );
+        //set_timeout( "callErrorChecked( 'update__onclick', false, false );", 15000 ); 
         callErrorChecked( 'update__onclick', false, false, 15000 );
       }
     } 
