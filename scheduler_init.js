@@ -137,7 +137,7 @@ function check_browser()
                 	var minxulversion = [1,8,1,2];
                 	if( match ) {
                 		var xulversion = RegExp.$1.split('.');
-                		for(var i=0; i < Math.max(4,xulversion.length); i++) {
+                		for(var i=0; i < Math.min(4,xulversion.length); i++) {
                 			if((1*xulversion[i]) < minxulversion[i]) {
                 				xul = false;
                 			 	break;
