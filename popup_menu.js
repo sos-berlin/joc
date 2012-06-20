@@ -241,8 +241,8 @@ Popup_menu_builder.prototype.create_popup_menu = function( menu_type, element_na
             div.style.left       = "0px";
             div.style.visibility = "hidden";
             div.style.zIndex     = "999";
-            div.setAttribute( "onmouseout" , "__current_popup_menu._close_timer = setTimeout( '__current_popup_menu.close()' , 400 )" );
-            div.setAttribute( "onmouseover", "clearTimeout( __current_popup_menu._close_timer )" );          
+            div.setAttribute( "onmouseout" , "if(__current_popup_menu) { __current_popup_menu._close_timer = setTimeout( 'try{__current_popup_menu.close();}catch(x){}' , 400 ); }" );
+            div.setAttribute( "onmouseover", "if(__current_popup_menu) { clearTimeout( __current_popup_menu._close_timer ); }" );          
             body.appendChild( div );
           }
         
