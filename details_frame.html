@@ -211,7 +211,7 @@ function update(force, no_left_frame_update )
         
         var max_order_history = ( parent._scheduler.versionIsNewerThan( "2007-08-22 12:00:00" ) ) ? ' max_order_history="' + parent._scheduler._runtime_settings.max_order_history + '"' : '';
         var what = "job_chain_orders job_chain_jobs order_source_files blacklist";
-        if( parent._scheduler._checkbox_states[ 'show_order_history_checkbox' ] ) what += " order_history";
+        if( parent._scheduler._checkbox_states[ 'show_order_history_checkbox' ] ) what += " order_history"; 
         var show_job_chain_query = '<show_job_chain job_chain="[job_chain_name]"' + max_order_history + ' max_orders="' + parent._scheduler._runtime_settings.max_orders + '" what="' + what + '" />';
         
         parent._scheduler.executeAsynchron( show_job_chain_query.replace(/\[job_chain_name\]/,_job_chain_name), parent.details_frame.update_job_chain_callback, true, true, false, show_job_chain_query );
@@ -311,7 +311,7 @@ function update_job_chain_callback( response, show_job_chain_query )
     if( error_element && error_element.getAttribute( "code" ) == "SCHEDULER-161" ) { //wenn remove job_chain im Job_Chain-Menue geklickt wird, DetailFrame schliessen
       hide(); ok = false; 
     } else {
-      _job_chain_element = response.selectSingleNode("//job_chain[@path='"+xml_encode(_job_chain_name.padLeftShlash())+"']");      
+      _job_chain_element = response.selectSingleNode("//job_chain[@path='"+xml_encode(_job_chain_name.padLeftShlash())+"']"); 
       response = normalize_order_history( response, show_job_chain_query );
       modify_response( response );
       document.getElementById( "stylesheet_output" ).innerHTML = _job_chain_element? parent._scheduler.xmlTransform( response ) : "";
@@ -361,9 +361,9 @@ function normalize_order_history( response, show_job_chain_query )
         }
       }
       var dom_xml = '<spooler><answer><state state="'+parent.top_frame._state.getAttribute('state')+'" detail="job_chain" detail_path="'+_job_chain_element.getAttribute('path')+'"><job_chains>'; 
-      dom_xml    += _job_chain_element.xml;
+      dom_xml    += _job_chain_element.xml; 
       for( var i=0; i < job_chain_node_job_chain.length; i++ ) {
-        if( job_chain_node_job_chain[i] ) dom_xml  += job_chain_node_job_chain[i].xml;
+      	if( job_chain_node_job_chain[i] ) dom_xml  += job_chain_node_job_chain[i].xml;
       }
       dom_xml    += '</job_chains></state></answer></spooler>';
       response    = parent._scheduler.loadXML(dom_xml);
