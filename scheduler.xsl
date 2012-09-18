@@ -233,11 +233,11 @@
           </xsl:when>
           <xsl:when test="$children = 'job_chains'">
             <!--xsl:apply-templates select="job_chains/job_chain[not(@order_id_space)] | job_chains/job_chain[@order_id_space and job_chain_node.job_chain]" mode="leaf"-->
-            <xsl:apply-templates select="job_chains/job_chain[concat(ancestor::folder/@path,'/',@name)=@path]" mode="leaf">
+            <xsl:apply-templates select="job_chains/job_chain[concat(ancestor::folder/@path,'/',@name)=@path or concat('/',@name)=@path]" mode="leaf">
               <xsl:sort select="translate( @path, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz' )" order="ascending" />
             </xsl:apply-templates>
             <!--xsl:if test="count(job_chains/job_chain[not(@order_id_space)] | job_chains/job_chain[@order_id_space and job_chain_node.job_chain] | folders/folder) = 0"-->
-            <xsl:if test="count(job_chains/job_chain[concat(ancestor::folder/@path,'/',@name)=@path] | folders/folder) = 0">
+            <xsl:if test="count(job_chains/job_chain[concat(ancestor::folder/@path,'/',@name)=@path or concat('/',@name)=@path] | folders/folder) = 0">
               <xsl:call-template name="no_objects_found">
                  <xsl:with-param name="children" select="$children" />
               </xsl:call-template>
