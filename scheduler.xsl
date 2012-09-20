@@ -397,7 +397,7 @@
       <xsl:variable name="web_services" select="/spooler/answer/state[1]/http_server/web_service[ @job_chain = current()/@path ]" />
       <!--xsl:variable name="jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source))" /-->
       <xsl:variable name="jobs" select="/spooler/@show_job_chain_jobs_checkbox or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source or $cnt_orders_of_big_chain &gt; 0))"/>
-      <xsl:variable name="error" select="ERROR or file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'" />
+      <xsl:variable name="error" select="file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'" />
       
       <li class="tree">
         <div title="show job chain details">  
@@ -601,7 +601,7 @@
         </xsl:if>
       </tr>
       
-      <xsl:if test="job/ERROR or job/file_based/ERROR or job/replacement or job/file_based/removed/ERROR or job/file_based/requisites/requisite/@is_missing='yes' or job/lock.requestor/lock.use/@is_missing='yes'">
+      <xsl:if test="job/file_based/ERROR or job/replacement or job/file_based/removed/ERROR or job/file_based/requisites/requisite/@is_missing='yes' or job/lock.requestor/lock.use/@is_missing='yes'">
         <tr><td colspan="5" style="padding-left:31px;"><xsl:apply-templates mode="file_based_line" select="job"/></td></tr>  
       </xsl:if>
       <xsl:if test="not(/spooler/@my_show_card = 'orders') and /spooler/@show_job_chain_orders_checkbox and order_queue/order">
@@ -704,7 +704,7 @@
             <span>&#160;&#160;-&#160;&#160;<xsl:apply-templates select="@title"/></span>
           </xsl:if>
           
-          <xsl:if test="ERROR or file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
+          <xsl:if test="file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
             <ul style="margin-left:31px;">
               <li><xsl:apply-templates mode="file_based_line" select="."/></li>
             </ul>
@@ -761,7 +761,7 @@
       </xsl:variable>
       <xsl:variable name="substitutes" select="//schedule[@substitute = current()/@path] | self::*[file_based/requisites/requisite/@is_missing='yes']"/>
       <xsl:variable name="used_by" select="schedule.users/schedule.user[@job or @order]"/>
-      <xsl:variable name="file_error" select="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'"/>
+      <xsl:variable name="file_error" select="file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'"/>
       <li class="tree">
         <div title="show schedule details">
           <xsl:attribute name="onclick">show_schedule_details( '<xsl:value-of select="@path"/>' )</xsl:attribute>
@@ -1052,7 +1052,7 @@
           </tr>
         </xsl:if>
         
-        <xsl:if test="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
+        <xsl:if test="file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
           <tr>
               <td colspan="5">
                   <xsl:apply-templates mode="file_based_line" select="."/>
@@ -1127,7 +1127,7 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Schedule-->
     <xsl:template match="schedule | run_time" mode="list">
       <xsl:param name="single" select="false()" />
-      <xsl:variable name="file_error" select="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'"/>
+      <xsl:variable name="file_error" select="file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'"/>
         
       <xsl:if test="position() &gt; 1">
           <tr><td colspan="5" class="line">&#160;</td></tr>
@@ -1221,7 +1221,7 @@
     <xsl:template match="schedule" mode="substitute">
       <xsl:param name="with_header"  select="true()"/>
       <xsl:param name="list_mode"  select="false()"/>
-      <xsl:variable name="file_error" select="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'"/>
+      <xsl:variable name="file_error" select="file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'"/>
       
       
       <xsl:variable name="class">
@@ -1294,7 +1294,7 @@
     
     <xsl:template match="schedule">
         
-      <xsl:variable name="file_error" select="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'"/>
+      <xsl:variable name="file_error" select="file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'"/>
       <xsl:variable name="class">
         <xsl:choose>
           <xsl:when test="@active='yes'">task</xsl:when>
@@ -2146,7 +2146,7 @@
                     </td>
                   </tr>
                 </xsl:if>
-                <xsl:if test="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
+                <xsl:if test="file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
                   <tr>
                     <td></td>
                     <td colspan="4" style="padding-left: 2ex;">
@@ -2304,7 +2304,7 @@
                     </td>
                 </tr>
                 
-                <xsl:if test="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
+                <xsl:if test="file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
                     <tr>
                         <td colspan="5" style="padding-left: 4ex; padding-bottom: 0.5em;">
                             <xsl:apply-templates mode="file_based_line" select="."/>
@@ -2858,10 +2858,10 @@
                         <td><xsl:value-of select="@hostname"/></td>
                         <td><xsl:value-of select="@tcp_port"/></td>
                         <td><xsl:value-of select="@scheduler_id"/></td>
-                        <td><xsl:apply-templates mode="date_time_nowrap" select="@connected_at__xslt_date_or_time_with_diff"/></td>
+                        <td><xsl:apply-templates mode="date_time_nowrap" select="@connected_at__xslt_datetime_zone_support"/></td>
                         <td style="color: crimson">
                             <xsl:if test="@connected='no'">
-                                <xsl:apply-templates mode="date_time_nowrap" select="@disconnected_at__xslt_date_or_time_with_diff"/>
+                                <xsl:apply-templates mode="date_time_nowrap" select="@disconnected_at__xslt_datetime_zone_support"/>
                             </xsl:if>
                         </td>
                         <td><xsl:value-of select="@version"/></td>
@@ -2963,7 +2963,7 @@
             </td>
           </tr>
           
-          <xsl:if test="ERROR or file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
+          <xsl:if test="file_based/ERROR or file_based/removed or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'">
             <tr>
                 <td colspan="5" style="padding-left:4ex;">
                     <xsl:apply-templates mode="file_based_line" select="."/>
@@ -3041,7 +3041,7 @@
                     </td>
                   </tr>
                   
-                  <xsl:if test="$job/ERROR or $job/file_based/ERROR or $job/file_based/removed or $job/replacement or $job/file_based/removed/ERROR or $job/file_based/requisites/requisite/@is_missing='yes' or $job/lock.requestor/lock.use/@is_missing='yes'">
+                  <xsl:if test="$job/file_based/ERROR or $job/file_based/removed or $job/replacement or $job/file_based/removed/ERROR or $job/file_based/requisites/requisite/@is_missing='yes' or $job/lock.requestor/lock.use/@is_missing='yes'">
                       <tr>
                           <td>&#160;</td>
                           <td colspan="4">

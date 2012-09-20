@@ -381,9 +381,6 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
               case "start_time"            : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value ) );
                                              element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
                                              break;
-              case "connected_at"          :
-              case "disconnected_at"       : element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , this.xsltFormatDateOrTimeWithDiff( value, now ) );
-                                             break;
               case "start_at"              :
               case "idle_since"            : element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
                                              break;
@@ -404,6 +401,8 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
               case "setback"               : element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , this.xsltFormatDateOrTimeWithDiff( value, now ) );
                                              element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
                                              break;
+              case "connected_at"          :
+              case "disconnected_at"       : 
               case "last_write_time"       : element.setAttribute( attribute_name + "__xslt_datetime_zone_support"  , this.xsltFormatDatetimeZoneSupport( value ) );
                                              break;
               default                      : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value ) );
