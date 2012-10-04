@@ -485,14 +485,13 @@ function modify_response( response )
       job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain]" );
       
       if( parent._scheduler._view[_card] == 'tree' ) {
-        for( var j = 0; j < job_chain_elements.length; j++ )
+      	for( var j = 0; j < job_chain_elements.length; j++ )
         { 
           var job_chain_nodes = job_chain_elements[j].selectNodes( "job_chain_node.job_chain/@job_chain" );
-          
           for( var k=0; k < job_chain_nodes.length; k++ ) 
-          {
+          {   
               if( job_chain_elements[j].selectSingleNode( "file_based/requisites/requisite[@path = '"+job_chain_nodes[k].nodeValue.toLowerCase()+"' and @is_missing='yes']" ) ) continue;
-              if( spooler_element.selectSingleNode( "//job_chains/job_chain[@path = '"+job_chain_nodes[k].nodeValue+"']" ) ) continue;
+              if( spooler_element.selectSingleNode( "//job_chains/job_chain[@path = '"+job_chain_nodes[k].nodeValue.toLowerCase()+"']" ) ) continue;
               var job_chain_element = parent._scheduler.executeSynchron( '<show_job_chain job_chain="'+job_chain_nodes[k].nodeValue+'" max_orders="'+parent._scheduler._runtime_settings.max_orders+'" what="'+_what+'"/>' );
               if( job_chain_element ) {
                 job_chain_element = job_chain_element.selectSingleNode( '/spooler/answer/job_chain' );
@@ -782,10 +781,14 @@ function apply_jobs_select( node )
 
 function apply_job_chains_select( node )
 {   
+    if( !parent._scheduler._checkbox_states.show_job_chain_orders_checkbox && !parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox ) {
+    	return true;
+    }
     var job_chain_jobs = node.selectNodes( "job_chain_node[@job]" ); 
     var job;
     var found = [(parent._scheduler._select_states[ 'jobs_state_select' ] == 'all'),(parent._scheduler._select_states[ 'jobs_process_class_select' ] == 'all')];
-    var order_id_space = node.getAttribute('order_id_space');
+    //var order_id_space = node.getAttribute('order_id_space');
+    var big_chain      = (node.selectNodes( "job_chain_node.job_chain" ).length > 0);
     for( var i = 0; i < job_chain_jobs.length; i++ )
     {
       job = job_chain_jobs[i].selectSingleNode( "job" );
@@ -814,8 +817,9 @@ function apply_job_chains_select( node )
     }
     
     if( !found[0] || !found[1] ) { 
-      if( order_id_space ) {
-        node.setAttribute('select_marked',1);
+      //if( order_id_space ) {
+      if( big_chain ) {
+      	node.setAttribute('select_marked',1);
       } else {
         node.parentNode.removeChild(node); return false;
       }
@@ -831,27 +835,30 @@ function apply_big_chains_select( node )
     var job_chain      = null;
     var cnts           = [0,0];
     var parent_node    = node.parentNode;
-    for( var i=0; i < job_chains.length; i++ ) {
-      job_chain = parent_node.selectSingleNode( "job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" );
-      if( !job_chain ) { cnts[0]++; cnts[1]++; continue; }
-      if( job_chain.getAttribute('filter_marked') ) { job_chain.removeAttribute('filter_marked'); cnts[0]++; }
-      if( job_chain.getAttribute('select_marked') ) { job_chain.removeAttribute('select_marked'); cnts[1]++; } 
+    if(node.getAttribute('select_marked')) {  
+    	for( var i=0; i < job_chains.length; i++ ) {
+    		job_chain = node.selectSingleNode( "ancestor::spooler//job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" );
+      	if( !job_chain ) { cnts[1]++; }      	 
+    	}
+    	if( cnts[1] == job_chains.length ) {
+      	parent_node.removeChild(node);
+      	return false;
+    	}
     }
-    if( cnts[1] == job_chains.length ) {
-      for( var i=0; i < job_chains.length; i++ ) { 
-        job_chain = parent_node.selectSingleNode( "job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" );
-        if( job_chain ) { parent_node.removeChild(job_chain); }
+    if(node.getAttribute('filter_marked')) {
+    	for( var i=0; i < job_chains.length; i++ ) {
+      	job_chain = parent_node.selectSingleNode( "job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" );
+      	if( !job_chain ) { cnts[0]++; continue; }
+      	if( job_chain.getAttribute('filter_marked') ) { job_chain.removeAttribute('filter_marked'); cnts[0]++; } 
+    	}
+    	if( cnts[0] == job_chains.length ) {
+      	for( var i=0; i < job_chains.length; i++ ) {
+        	job_chain = parent_node.selectSingleNode( "job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" ); 
+        	if( job_chain ) { parent_node.removeChild(job_chain); }
+      	}
+      	parent_node.removeChild(node);
+        return false;
       }
-      parent_node.removeChild(node);
-      return false;
-    }
-    if( cnts[0] == job_chains.length && node.getAttribute('filter_marked') ) {
-      for( var i=0; i < job_chains.length; i++ ) {
-        job_chain = parent_node.selectSingleNode( "job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" ); 
-        if( job_chain ) { parent_node.removeChild(job_chain); }
-      }
-      parent_node.removeChild(node);
-      return false;
     }
     return true;
 }
