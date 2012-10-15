@@ -735,6 +735,9 @@ Scheduler.prototype.loadXSLT = function( url )
 Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_output )
 {   
     this.logger(3,'START TRANSFORM RESPONSE frameset','transform_response');
+    var txtNode = dom_document.createTextNode("\n"); 
+    dom_document.documentElement.insertBefore(txtNode, dom_document.documentElement.firstChild);
+    dom_document.documentElement.appendChild(txtNode.cloneNode(true));
     var result_dom = null;
     if( typeof with_translate != 'boolean' ) with_translate = true;
     if( typeof text_output    != 'boolean' ) text_output    = true;

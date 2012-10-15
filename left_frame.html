@@ -332,7 +332,7 @@ function collect_list_answer( response, index )
   }
   _answer_complete++;
   if( _answer_complete == _answer[0].length ) {
-    var dom_xml  = '<spooler><answer time="'+parent.top_frame._state.getAttribute('time')+'">'
+    var dom_xml  = '<spooler><answer time="'+parent.top_frame._state.getAttribute('time')+'">';
     dom_xml     += '<state state="'+parent.top_frame._state.getAttribute('state')+'">';
     for( var i=0; i < node_name.length; i++ ) {
       dom_xml   += '<'+node_name[i]+'>' + _answer[i].join('') + '</'+node_name[i]+'>';
