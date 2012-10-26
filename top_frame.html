@@ -173,8 +173,8 @@ function set_state(response)
     document.getElementById('spooler_id').innerHTML           = (state.getAttribute('id') || parent.getTranslation('unknown'));
     document.getElementById('spooler_state').innerHTML        = (parent.getTranslation(state.getAttribute('state')) || parent.getTranslation('unknown'));
     document.getElementById('spooler_pid').innerHTML          = (state.getAttribute('pid') || parent.getTranslation('unknown'));
-    document.getElementById('spooler_time').innerHTML         = (state.getAttribute('time').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
-    document.getElementById('spooler_start_time').innerHTML   = (state.getAttribute('spooler_running_since').replace( /\.\d*$/, "" ) || '0000-00-00 00:00:00');
+    document.getElementById('spooler_time').innerHTML         = (parent._scheduler.UTCtoLocal(state.getAttribute('time')) || '0000-00-00 00:00:00');
+    document.getElementById('spooler_start_time').innerHTML   = (parent._scheduler.UTCtoLocal(state.getAttribute('spooler_running_since')) || '0000-00-00 00:00:00');
     
     var jobs_orders_inner                                     = cnt_all_orders + "&#160;" + parent.getTranslation('orders');
     if( cnt_clustered_orders > 0 ) jobs_orders_inner         += "&#160;("+parent.getTranslation('$cnt in cluster',{cnt:cnt_clustered_orders})+")";

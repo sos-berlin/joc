@@ -371,46 +371,47 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
               value = this.getTranslation(value);
               element.setAttribute( attribute_name, value );
             }
+            var schedulerDate = new SchedulerDate(value, this.getTranslation("days"));
             switch (attribute_name) {
               case "valid_from"            : 
               case "valid_to"              : 
               case "spooler_running_since" :
               case "time"                  :
-              case "end_time"              : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value ) );
+              case "end_time"              : element.setAttribute( attribute_name + "__xslt_datetime"               , schedulerDate.toString() );
                                              break;
-              case "start_time"            : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
+              case "start_time"            : element.setAttribute( attribute_name + "__xslt_datetime"               , schedulerDate.toString() );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
                                              break;
               case "start_at"              :
-              case "idle_since"            : element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
+              case "idle_since"            : element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
                                              break;
-              case "in_process_since"      : element.setAttribute( attribute_name + "__xslt_datetime_diff"          , this.xsltFormatDatetimeDiff( value, now, false ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
+              case "in_process_since"      : element.setAttribute( attribute_name + "__xslt_datetime_diff"          , schedulerDate.xsltFormatDatetimeDiff( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
                                              break;
-              case "running_since"         : element.setAttribute( attribute_name + "__xslt_datetime_diff"          , this.xsltFormatDatetimeDiff( value, now, false ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
-                                             element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , this.xsltFormatDateOrTimeWithDiff( value, now ) );
+              case "running_since"         : element.setAttribute( attribute_name + "__xslt_datetime_diff"          , schedulerDate.xsltFormatDatetimeDiff( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , schedulerDate.xsltFormatDateOrTimeWithDiff( now ) );
                                              break;
-              case "next_start_time"       : element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
-                                             element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , this.xsltFormatDateOrTimeWithDiff( value, now ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff_plus", this.xsltFormatDatetimeWithDiff( value, now, true ) );
+              case "next_start_time"       : element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , schedulerDate.xsltFormatDateOrTimeWithDiff( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff_plus", schedulerDate.xsltFormatDatetimeWithDiff( now, true ) );
                                              break;
-              case "enqueued"              : element.setAttribute( attribute_name + "__xslt_date_or_time"           , this.xsltFormatDateOrTime ( value, now ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
+              case "enqueued"              : element.setAttribute( attribute_name + "__xslt_date_or_time"           , schedulerDate.xsltFormatDateOrTime( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
                                              break;
-              case "setback"               : element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , this.xsltFormatDateOrTimeWithDiff( value, now ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
+              case "setback"               : element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , schedulerDate.xsltFormatDateOrTimeWithDiff( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
                                              break;
               case "connected_at"          :
               case "disconnected_at"       : 
-              case "last_write_time"       : element.setAttribute( attribute_name + "__xslt_datetime_zone_support"  , this.xsltFormatDatetimeZoneSupport( value ) );
+              case "last_write_time"       : element.setAttribute( attribute_name + "__xslt_datetime_zone_support"  , schedulerDate.toString() );
                                              break;
-              default                      : element.setAttribute( attribute_name + "__xslt_datetime"               , this.xsltFormatDatetime( value ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_diff"          , this.xsltFormatDatetimeDiff( value, now, false ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , this.xsltFormatDatetimeWithDiff( value, now, false ) );
-                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff_plus", this.xsltFormatDatetimeWithDiff( value, now, true ) );
-                                             element.setAttribute( attribute_name + "__xslt_date_or_time"           , this.xsltFormatDateOrTime ( value, now ) );
-                                             element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , this.xsltFormatDateOrTimeWithDiff( value, now ) );
+              default                      : element.setAttribute( attribute_name + "__xslt_datetime"               , schedulerDate.toString() );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_diff"          , schedulerDate.xsltFormatDatetimeDiff( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_datetime_with_diff_plus", schedulerDate.xsltFormatDatetimeWithDiff( now, true ) );
+                                             element.setAttribute( attribute_name + "__xslt_date_or_time"           , schedulerDate.xsltFormatDateOrTime( now ) );
+                                             element.setAttribute( attribute_name + "__xslt_date_or_time_with_diff" , schedulerDate.xsltFormatDateOrTimeWithDiff( now ) );
             }
         }
     }
@@ -446,10 +447,18 @@ Scheduler.prototype.modifyDatetimeForXSLT = function( response )
 {   
     this.logger(3,'MODIFY DATETIME ATTRIBUTES:','scheduler_datetime');
     // Fuer Firefox, dass kein Skript im Stylesheet zulaesst.
-    var now;
-
+    var now = null;
+    
     var datetime = response.selectSingleNode( "/spooler/answer/@time" );
-    if( datetime )  now = this.dateFromDatetime( datetime.nodeValue );
+    
+    if( datetime ) {
+    	var _now = new SchedulerDate( datetime.nodeValue );
+    	now = _now._date_obj;
+    }
+    else {
+    	now = new Date();
+    }
+    
     
     //task attributes
     this.addDatetimeAttributesForXSLT( response, now, "running_since"         );
@@ -472,152 +481,8 @@ Scheduler.prototype.modifyDatetimeForXSLT = function( response )
     this.addDatetimeAttributesForXSLT( response, now, "valid_to"              );
     //file_based attribute
     this.addDatetimeAttributesForXSLT( response, now, "last_write_time"       );
-    
+  
     this.logger(3,'ELAPSED TIME FOR MODIFY DATETIME ATTRIBUTES','scheduler_datetime');
-}
-
-//---------------------------------------------------------------------xsltFormatDatetime
-
-Scheduler.prototype.xsltFormatDatetime = function( datetime )
-{
-    return ( !datetime ) ? "" : datetime.replace( /\.\d*Z*$/, "" );
-}
-
-//-----------------------------------------------------------------xsltFormatDateOrTime
-
-Scheduler.prototype.xsltFormatDateOrTime = function( datetime )
-{
-    if( !datetime )  return "";
-
-    var now = new Date();
-
-    if(    1*datetime.substr( 0, 4 ) == now.getFullYear()
-        && 1*datetime.substr( 5, 2 ) == now.getMonth() + 1
-        && 1*datetime.substr( 8, 2 ) == now.getDate()  )
-    {
-        return datetime.substr( 11, 8 );
-    }
-    else
-    {
-        return datetime.substr( 0, 10 );
-    }
-}
-
-//---------------------------------------------------------------xsltFormatDatetimeWithDiff
-
-Scheduler.prototype.xsltFormatDatetimeWithDiff = function( datetime, now, show_plus )
-{
-    var date   = this.dateFromDatetime( datetime );
-    var result = this.xsltFormatDatetime( datetime );
-    if( result && now && date )  result += "\xA0(" + this.xsltFormatDatetimeDiff( date, now, show_plus ) + ")";
-
-    return result;
-}
-
-//---------------------------------------------------------------xsltFormatDateOrTimeWithDiff
-
-Scheduler.prototype.xsltFormatDateOrTimeWithDiff = function( datetime, now )
-{
-    var date   = this.dateFromDatetime( datetime );
-    var result = this.xsltFormatDateOrTime( datetime );
-    if( result && now && date )  result += "\xA0(" + this.xsltFormatDatetimeDiff( date, now ) + ")";
-
-    return result;
-}
-
-//----------------------------------------------------------------xsltFormatDatetimeDiff
-
-Scheduler.prototype.xsltFormatDatetimeDiff = function( datetime_earlier, datetime_later, show_plus )
-{
-    var show_ms;
-    if( show_ms   == undefined )  show_ms   = false;
-    if( show_plus == undefined )  show_plus = false;
-
-    var date_later   = typeof datetime_later   == "string"? this.dateFromDatetime( datetime_later )   : datetime_later;
-    var date_earlier = typeof datetime_earlier == "string"? this.dateFromDatetime( datetime_earlier ) : datetime_earlier;
-
-    if( !date_later   )  return "";
-    if( !date_earlier )  return "";
-
-    var diff = ( date_later.getTime() - date_earlier.getTime() ) / 1000.0;
-    var abs  = Math.abs( diff );
-    var result;
-
-    if( abs < 60 )
-    {
-        if( show_ms )
-        {
-            result = abs.toString();
-            if( result.match( "." ) )  result = result.replace( ".", ".<span class='milliseconds'>" ) + "</span>";
-        }
-        else
-        {
-            result = Math.floor( abs );
-        }
-        result += "s";
-    }
-    else
-    if( abs <    60*60 ) { 
-        var minutes = Math.floor( abs / 60 );
-        if( minutes < 60 ) {
-          var seconds = Math.floor(abs - 60*minutes);
-          if( seconds < 10 ) seconds = "0" + seconds; 
-          result = minutes + ":" + seconds + "min";
-        } else {
-          result = minutes + "min";
-        }
-    }
-    else
-    if( abs < 24*60*60 ) {
-        result = Math.floor( abs / (    60*60 ) ) + "h";
-    }
-    else {
-        result = Math.floor( abs / ( 24*60*60 ) ) + this.getTranslation("days");
-    }
-    return diff < 0             ? "-" + result :
-           show_plus && diff > 0? "+" + result
-                                : result;
-}
-
-//-----------------------------------------------------------------------dateFromDatetime
-// datetime == yyyy-mm-dd hh-mm-ss[.mmm]
-
-Scheduler.prototype.dateFromDatetime = function( datetime )
-{
-    if( !datetime )  return null;
-    if( datetime == this.getTranslation("never") ) return null;
-    if( datetime == this.getTranslation("now") ) return null;
-
-    var date = new Date( 1*datetime.substr( 0, 4 ),
-                         1*datetime.substr( 5, 2 ) - 1,
-                         1*datetime.substr( 8, 2 ),
-                         1*datetime.substr( 11, 2 ),
-                         1*datetime.substr( 14, 2 ),
-                         1*datetime.substr( 17, 2 ),
-                         datetime.length < 23? 0 : 1*datetime.substr( 20, 3 ) );
-
-    return date;
-}
-
-
-//-----------------------------------------------------------------------xsltFormatDatetimeZoneSupport
-// datetime == yyyy-mm-ddThh-mm-ss[.mmm]Z
-
-Scheduler.prototype.xsltFormatDatetimeZoneSupport = function( datetime ) 
-{
-    if( datetime.lastIndexOf('Z') == -1 ) return this.xsltFormatDatetime( datetime );
-    var dateobj = this.dateFromDatetime( datetime );
-    if( dateobj ) {
-      dateobj.setTime( dateobj.getTime() - ( dateobj.getTimezoneOffset()*60*1000 ) );
-      return dateobj.getFullYear()+'-'+this.addLeadingZero(dateobj.getMonth()+1)+'-'+this.addLeadingZero(dateobj.getDate())+' '+this.addLeadingZero(dateobj.getHours())+':'+this.addLeadingZero(dateobj.getMinutes())+':'+this.addLeadingZero(dateobj.getSeconds());
-    }
-    return this.xsltFormatDatetime( datetime );
-}
-
-
-Scheduler.prototype.addLeadingZero = function( num ) 
-{
-    return ( num < 10 ) ? '0'+num : num;
 }
 
 
@@ -933,4 +798,138 @@ Scheduler.prototype.treeDisplay = function( li_element )
       img_folder.src    = this._imgFolderClose;
       return false;
     }
+}
+
+
+//--------------------------------------------------------------------------------UTCtoLocal
+Scheduler.prototype.UTCtoLocal = function( datetime )
+{
+    return new SchedulerDate( datetime ).toString();
+}
+
+
+
+
+//--------------------------------------------------------------------------------SchedulerDate class
+function SchedulerDate(datetime, translatedDays) 
+{
+	  this._date_str          = ( datetime ) ? datetime : "";
+	  this._date_obj          = this.getDateObj();
+    this._translated_days   = ( translatedDays == undefined ) ? "days" : translatedDays;  
+}
+
+//--------------------------------------------------------------------------------SchedulerDate.getDateObj
+SchedulerDate.prototype.getDateObj = function() 
+{
+	  var dateobj = this.dateFromDatetime();
+    if( dateobj && this._date_str.lastIndexOf('Z') > -1) {
+    	dateobj.setTime( dateobj.getTime() - ( dateobj.getTimezoneOffset()*60*1000 ) );
+    } 
+    return dateobj;
+}
+
+//--------------------------------------------------------------------------------SchedulerDate.dateFromDatetime
+SchedulerDate.prototype.dateFromDatetime = function()
+{
+    if( !this._date_str )  return null;
+    var pattern = /(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d{0,3})*Z*/;
+    if( pattern.exec(this._date_str) ) {
+      return new Date(parseInt(RegExp.$1,10),(parseInt(RegExp.$2,10)-1),parseInt(RegExp.$3,10),parseInt(RegExp.$4,10),parseInt(RegExp.$5,10),parseInt(RegExp.$6,10));
+    }
+    return null;
+}
+
+//--------------------------------------------------------------------------------SchedulerDate.addLeadingZero
+SchedulerDate.prototype.addLeadingZero = function( num ) 
+{
+    return ( num < 10 ) ? '0'+num : num;
+}
+
+//--------------------------------------------------------------------------------SchedulerDate.toString
+SchedulerDate.prototype.toString = function() 
+{
+    if( this._date_obj ) {
+    	return this._date_obj.getFullYear()+'-'+this.addLeadingZero(this._date_obj.getMonth()+1)+'-'+this.addLeadingZero(this._date_obj.getDate())+' '+this.addLeadingZero(this._date_obj.getHours())+':'+this.addLeadingZero(this._date_obj.getMinutes())+':'+this.addLeadingZero(this._date_obj.getSeconds());
+    }
+    return this._date_str;
+}
+
+//--------------------------------------------------------------------------------SchedulerDate.xsltFormatDateOrTime
+SchedulerDate.prototype.xsltFormatDateOrTime = function( now )
+{
+    if( !this._date_obj )  return this._date_str;
+    if( !now )  return this._date_str;
+
+    if(    this._date_obj.getFullYear() == now.getFullYear()
+        && this._date_obj.getMonth() == now.getMonth()
+        && this._date_obj.getDate() == now.getDate()  )
+    {
+        return this.addLeadingZero(this._date_obj.getHours())+':'+this.addLeadingZero(this._date_obj.getMinutes())+':'+this.addLeadingZero(this._date_obj.getSeconds());
+    }
+    else
+    {
+        return this._date_obj.getFullYear()+'-'+this.addLeadingZero(this._date_obj.getMonth()+1)+'-'+this.addLeadingZero(this._date_obj.getDate());
+    }
+}
+
+//--------------------------------------------------------------------------------SchedulerDate.xsltFormatDatetimeWithDiff
+SchedulerDate.prototype.xsltFormatDatetimeWithDiff = function( now, show_plus )
+{
+    if( show_plus == undefined )  show_plus = false;
+    var result = this.toString();
+    if( now && this._date_obj )  result += "\xA0(" + this.xsltFormatDatetimeDiff( now, show_plus ) + ")";
+
+    return result;
+}
+
+
+//--------------------------------------------------------------------------------SchedulerDate.xsltFormatDateOrTimeWithDiff
+SchedulerDate.prototype.xsltFormatDateOrTimeWithDiff = function( now, show_plus )
+{
+    if( show_plus == undefined )  show_plus = false;
+    var result = this.toString();
+    if( now && this._date_obj )  result += "\xA0(" + this.xsltFormatDatetimeDiff( now, show_plus ) + ")";
+
+    return result;
+}
+
+
+
+//--------------------------------------------------------------------------------SchedulerDate.xsltFormatDatetimeDiff
+SchedulerDate.prototype.xsltFormatDatetimeDiff = function( now, show_plus )
+{
+    if( show_plus == undefined )  show_plus = false;
+
+    if( !now ) return "";
+    if( !this._date_obj )  return "";
+
+    var diff = ( now.getTime() - this._date_obj.getTime() ) / 1000;
+    var abs  = Math.abs( diff );
+    var result;
+
+    if( abs < 60 )
+    {
+        result = Math.floor( abs ) + "s";
+    }
+    else
+    if( abs < 60*60 ) { 
+        var minutes = Math.floor( abs / 60 );
+        if( minutes < 60 ) {
+          var seconds = Math.floor(abs - 60*minutes);
+          if( seconds < 10 ) seconds = "0" + seconds; 
+          result = minutes + ":" + seconds + "min";
+        } else {
+          result = minutes + "min";
+        }
+    }
+    else
+    if( abs < 24*60*60 ) {
+        result = Math.floor( abs / (    60*60 ) ) + "h";
+    }
+    else {
+        result = Math.floor( abs / ( 24*60*60 ) ) + this._translated_days;
+    }
+    return diff < 0             ? "-" + result :
+           show_plus && diff > 0? "+" + result
+                                : result;
 }

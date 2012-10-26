@@ -348,26 +348,17 @@ function realYoffset(element)
 
 function convertUTC( datestr )
 {   
-    if( !datestr ) return getTranslation('never');
-    var pattern      = /^(\d{4})-(\d{2})-(\d{2})(?:T| )(\d{2}):(\d{2}):(\d{2})/;
-    if( pattern.exec(datestr) ) {
-      var timestamp  = Date.UTC(parseInt(RegExp.$1,10),(parseInt(RegExp.$2,10)-1),parseInt(RegExp.$3,10),parseInt(RegExp.$4,10),parseInt(RegExp.$5,10),parseInt(RegExp.$6,10)); 
-      var dateObj    = new Date(timestamp);
-      var now        = new Date();
-      var result     = dateObj.getFullYear()+'-'+setLeading0(dateObj.getMonth()+1)+'-'+setLeading0(dateObj.getDate());
-      result        += ' '+setLeading0(dateObj.getHours())+':'+setLeading0(dateObj.getMinutes())+':'+setLeading0(dateObj.getSeconds());
-      result        += " \xA0(" + _scheduler.xsltFormatDatetimeDiff( dateObj, now ) + ")";
-      var diff       = dateObj.getTime() - now.getTime();
-      if( !_delay_timer && diff > 0 ) _delay_timer = window.setTimeout( 'showCategories(0);', diff + 500 );
-      return result;
+    
+    var scheduler_date = new SchedulerDate(datestr); 
+    if( scheduler_date._date_obj ) {
+    	var now        = new Date();
+    	var diff       = scheduler_date._date_obj.getTime() - now.getTime();
+    	if( !_delay_timer && diff > 0 ) _delay_timer = window.setTimeout( 'showCategories(0);', diff + 500 );
+    	return scheduler_date.xsltFormatDatetimeDiff(now);
     }
     return getTranslation(datestr);
 }
-
-function setLeading0( num ) 
-{  
-  return (num < 10 ? '0'+num : num);
-}
+
 
 //-->    
   </script>

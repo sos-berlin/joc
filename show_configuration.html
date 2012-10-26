@@ -68,7 +68,7 @@ function on_load()
       var response         = _scheduler.executeSynchron( getXMLQuery(params), false, false, true );
       var modified         = response.selectSingleNode("//file_based[@last_write_time]");
       if(modified) {
-      	$('modified').update(getTranslation('File timestamp') + ': ' + _scheduler.xsltFormatDatetimeZoneSupport( modified.getAttribute('last_write_time') ));
+      	$('modified').update(getTranslation('File timestamp') + ': ' + _scheduler.UTCtoLocal( modified.getAttribute('last_write_time') ));
       }
       
       var srcElem          = null;
