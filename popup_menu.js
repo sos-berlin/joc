@@ -64,7 +64,7 @@ function mouse_x( indent )
 function mouse_y( indent )
 {   
     if( typeof indent != "number" ) { indent = 0; }
-    return (typeof window.event != "undefined") ? document.documentElement.scrollTop  + event.clientY + indent
+    return (typeof window.event != "undefined") ? window.pageYOffset + event.clientY + indent
                                                 : _mouse_y + indent;
 }
 
@@ -291,8 +291,9 @@ Popup_menu_builder.prototype.show_popup_menu = function()
     {
         var div              = document.getElementById( "__popup_menu__" );
         var dim              = {width: div.offsetWidth, height: div.offsetHeight, top: mouse_y(-4), left: mouse_x(-4)};
-        if( dim.left + dim.width  > window.innerWidth - 12 ) dim.left -= dim.width - 8;
-        if( dim.top  + dim.height > document.documentElement.scrollTop + window.innerHeight - 16 ) dim.top -= dim.height - 8;
+        if( dim.left + dim.width  > window.innerWidth - 12 ) dim.left -= dim.width - 8; 
+        //if( dim.top  + dim.height > document.documentElement.scrollTop + window.innerHeight - 16 ) dim.top -= dim.height - 8;
+        if( dim.top  + dim.height > window.pageYOffset + window.innerHeight - 16 ) dim.top -= dim.height - 8;
         dim.left             = Math.max( dim.left, 2);
         dim.top              = Math.max( dim.top , 2);
         div.style.left       = dim.left+"px";

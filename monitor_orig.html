@@ -1,8 +1,11 @@
 <html>
+	<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Monitor - JobScheduler</title>
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2012 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -33,17 +36,18 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 //-->
-<body>
-<applet codebase="." archive="monitor.jar" code="MonitorApplet.class" name="monitor" width="100%" height="5000">
-  <b>Error! You must use a Java-enabled browser.</b>
+  </head>
+  <body>
+  <applet codebase="." archive="monitor.jar" code="MonitorApplet.class" name="monitor" width="100%" height="5000">
+    <b>Error! You must use a Java-enabled browser.</b>
 
-  <param name="host0" value="${schedulerHost}"/>
-  <param name="port0" value="${schedulerPort}"/>
-  <!-- Sie können hier weitere Job Scheduler für das Monitoring konfigurieren -->
-  <!-- Here you can configure other Job Scheduler for the monitoring -->
-  <!--param name="host1" value="[host of another Job Scheduler]"/-->
-  <!--param name="port1" value="[port of another Job Scheduler]"/-->
+    <param name="host0" value="${schedulerHost}"/>
+    <param name="port0" value="${schedulerPort}"/>
+    <!-- Sie können hier weitere Job Scheduler für das Monitoring konfigurieren -->
+    <!-- Here you can configure other Job Scheduler for the monitoring -->
+    <!--param name="host1" value="[host of another Job Scheduler]"/-->
+    <!--param name="port1" value="[port of another Job Scheduler]"/-->
   
-</applet>
-</body>
+  </applet>
+  </body>
 </html>
