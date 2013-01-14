@@ -4068,6 +4068,12 @@
         </xsl:variable>
         <xsl:variable name="job_chain_path">
           <xsl:choose>
+            <xsl:when test="order.job_chain_stack/order.job_chain_stack.entry/@job_chain"><xsl:value-of select="order.job_chain_stack/order.job_chain_stack.entry/@job_chain" /></xsl:when>
+            <xsl:otherwise><xsl:value-of select="@job_chain" /></xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="normalized_job_chain_path">
+          <xsl:choose>
             <xsl:when test="order.job_chain_stack/order.job_chain_stack.entry/@job_chain"><xsl:apply-templates mode="trim_slash" select="order.job_chain_stack/order.job_chain_stack.entry/@job_chain" /></xsl:when>
             <xsl:otherwise><xsl:apply-templates mode="trim_slash" select="@job_chain" /></xsl:otherwise>
           </xsl:choose>
@@ -4109,7 +4115,7 @@
                    </tr>
                    <tr>
                        <td colspan="3">
-                           <b><xsl:value-of select="$job_chain_path" />,<xsl:value-of select="@id"/></b>
+                           <b><xsl:value-of select="$normalized_job_chain_path"/>,<xsl:value-of select="@id"/></b>
                            <xsl:if test="@title">
                                <xsl:text>&#160;&#160;- &#160;</xsl:text><xsl:apply-templates select="@title"/>
                            </xsl:if>
@@ -4142,11 +4148,11 @@
               </colgroup>
               <tbody>
                 <tr class="list" title="show job chain details" style="vertical-align:top;">
-                    <xsl:attribute name="onclick" >callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="concat('/',$job_chain_path)"/>' )</xsl:attribute>
+                    <xsl:attribute name="onclick" >callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="$job_chain_path"/>' )</xsl:attribute>
                     
                     <td class="label"><span class="label">Job chain</span>:</td>
                     <td colspan="2">
-                      <xsl:value-of select="$job_chain_path" />
+                      <xsl:value-of select="$normalized_job_chain_path"/>
                     </td>
                 </tr>
                 <tr class="list" title="show job details" style="vertical-align:top;">

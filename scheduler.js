@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2011 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2013 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -56,6 +56,7 @@ function Scheduler()
 			this._engine_cpp_url                             	 = this._base_url.replace(/\/jobscheduler\/operations_gui\//, "/jobscheduler/engine-cpp/");
 			this._port                                         = window.location.port;
 		}
+		this._dom                                            = null;
     this._dependend_windows                              = new Object();
     this._logger                                         = ( typeof window['SOS_Logger'] == 'function' ) ? SOS_Logger : null;
     this._debug_timer                                    = new Object();
@@ -159,7 +160,9 @@ Scheduler.prototype.loadXML = function( xml )
     }
     else
     {   
-        dom_document   = new ActiveXObject( "MSXML2.DOMDocument" );
+        //dom_document   = new ActiveXObject( "MSXML2.DOMDocument" );
+        this.loadDOM( "scheduler_dummy.xml" );
+        dom_document   = this._dom;
         dom_document.validateOnParse = false;
         if( !dom_document.loadXML( xml ) )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.parseError.reason );
     }
@@ -584,9 +587,17 @@ Scheduler.prototype.versionIsNewerThan = function( version_date )
 }
 
 
+//---------------------------------------------------------------------------------------loadDOM
+Scheduler.prototype.loadDOM = function( url )
+{   
+    if(this._dom == null) {      
+    	this._dom = this.executeGet( url, false );
+    }
+}
+
 //---------------------------------------------------------------------------------------loadXSLT
 Scheduler.prototype.loadXSLT = function( url )
-{
+{   
     if( window.XSLTProcessor ) {
       this._xslt = new XSLTProcessor();
       this._xslt.importStylesheet( this.executeGet( url, false ) );       
@@ -605,7 +616,7 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
     	dom_document.documentElement.insertBefore(txtNode, dom_document.documentElement.firstChild);
     	dom_document.documentElement.appendChild(txtNode.cloneNode(true));
     }
-    catch(x) {}
+    catch(x) {} 
     var result_dom = null;
     if( typeof with_translate != 'boolean' ) with_translate = true;
     if( typeof text_output    != 'boolean' ) text_output    = true;
@@ -618,7 +629,9 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
         this.logger(3,'ELAPSED TIME FOR TRANSFORM RESPONSE frameset','transform_response');
         return transformed;
       } else {
-        result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
+        //result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
+        this.loadDOM( "scheduler_dummy.xml" );
+        result_dom = this._dom;
         dom_document.transformNodeToObject( this._xslt, result_dom );
       }
     }

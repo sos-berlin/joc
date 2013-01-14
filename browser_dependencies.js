@@ -68,6 +68,8 @@ if( window.Element  &&  !window.Element.prototype.xml )
 	    } 
 	);
 }
+
+}
 	
 //---------------------------------------------------------------------XMLDocument.selectSingleNode
 // Nachbildung von Microsofts DOMDocument.selectSingleNode
@@ -129,6 +131,6 @@ if( window.XMLDocument  &&  !window.XMLDocument.prototype.transformNode )
     }
 }
 
-} // end of navigator restriction
+//} // end of navigator restriction
 
 //-------------------------------------------------------------------------------------------------
