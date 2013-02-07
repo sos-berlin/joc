@@ -1792,8 +1792,8 @@ function cluster_member__onclick( cluster_member_id )
     if( cluster_member_id+"" != "" )
     {
         var popup_builder = new Popup_menu_builder();
-        var is_dead = _response.selectSingleNode( 'spooler/answer//cluster_member [ @cluster_member_id="' + cluster_member_id + '" ]' ).getAttribute( "dead" ) == "yes";
-        var this_scheduler = (cluster_member_id == _response.selectSingleNode( "spooler/answer//cluster" ).getAttribute( "cluster_member_id" )) ? "this_scheduler='yes'" : "";
+        var is_dead = window.parent.left_frame._response.selectSingleNode( 'spooler/answer//cluster_member[ @cluster_member_id="' + cluster_member_id + '" ]' ).getAttribute( "dead" ) == "yes";
+        var this_scheduler = (cluster_member_id == window.parent.left_frame._response.selectSingleNode( "spooler/answer//cluster" ).getAttribute( "cluster_member_id" )) ? "this_scheduler='yes'" : "";
         
         if( is_dead )
         {

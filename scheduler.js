@@ -57,6 +57,7 @@ function Scheduler()
 			this._port                                         = window.location.port;
 		}
 		this._dom                                            = null;
+    this._result_dom                                     = null;
     this._dependend_windows                              = new Object();
     this._logger                                         = ( typeof window['SOS_Logger'] == 'function' ) ? SOS_Logger : null;
     this._debug_timer                                    = new Object();
@@ -161,8 +162,8 @@ Scheduler.prototype.loadXML = function( xml )
     else
     {   
         //dom_document   = new ActiveXObject( "MSXML2.DOMDocument" );
-        this.loadDOM( "scheduler_dummy.xml" );
-        dom_document   = this._dom;
+        //IE10 returns version conflict
+        dom_document   = this.loadDOM();
         dom_document.validateOnParse = false;
         if( !dom_document.loadXML( xml ) )  throw new Error( this.getTranslation( "Error at XML answer:" ) + " " + dom_document.parseError.reason );
     }
@@ -588,11 +589,21 @@ Scheduler.prototype.versionIsNewerThan = function( version_date )
 
 
 //---------------------------------------------------------------------------------------loadDOM
-Scheduler.prototype.loadDOM = function( url )
+Scheduler.prototype.loadDOM = function()
 {   
     if(this._dom == null) {      
-    	this._dom = this.executeGet( url, false );
+    	this._dom = this.executeGet( "scheduler_dummy.xml", false );
     }
+    return this._dom;
+}
+
+//---------------------------------------------------------------------------------------loadResultDOM
+Scheduler.prototype.loadResultDOM = function()
+{   
+    if(this._result_dom == null) {      
+    	this._result_dom = this.executeGet( "scheduler_dummy.xml", false );
+    }
+    return this._result_dom;
 }
 
 //---------------------------------------------------------------------------------------loadXSLT
@@ -630,8 +641,8 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
         return transformed;
       } else {
         //result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
-        this.loadDOM( "scheduler_dummy.xml" );
-        result_dom = this._dom;
+        //IE10 returns version conflict
+        result_dom = this.loadResultDOM();
         dom_document.transformNodeToObject( this._xslt, result_dom );
       }
     }
