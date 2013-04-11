@@ -1544,7 +1544,7 @@ function job_menu__onclick( job_name )
     popup_builder.add_command ( parent.getTranslation("Unstop")        , "<modify_job job='" + parent.left_frame._job_name + "' cmd='unstop'  />", (stopped && enabled) );
 //  popup_builder.add_command ( parent.getTranslation("Wake")          , "<modify_job job='" + parent.left_frame._job_name + "' cmd='wake'    />" );
 //  popup_builder.add_command ( parent.getTranslation("Start at &lt;runtime&gt;"), "<modify_job job='" + parent.left_frame._job_name + "' cmd='start'   />" );
-    popup_builder.add_command ( parent.getTranslation("Reread")        , "<modify_job job='" + parent.left_frame._job_name + "' cmd='reread'  />", enabled );
+//  popup_builder.add_command ( parent.getTranslation("Reread")        , "<modify_job job='" + parent.left_frame._job_name + "' cmd='reread'  />", enabled );
     popup_builder.add_bar();
     popup_builder.add_command ( parent.getTranslation("End tasks")     , "<modify_job job='" + parent.left_frame._job_name + "' cmd='end'     />", enabled );
     popup_builder.add_command ( parent.getTranslation("Suspend tasks") , "<modify_job job='" + parent.left_frame._job_name + "' cmd='suspend' />", enabled );
