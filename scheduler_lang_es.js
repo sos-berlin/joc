@@ -68,7 +68,6 @@ _translations['Configuration']                             = 'Configuración';
                                                            
 //First line                                  
 _translations['every $secs']                               = 'Todos los $secs';
-_translations['incl. Hot Folders']                         = 'incl. carpetas activas';
                                                       
 //Other lines                            
 _translations['ID']                                        = 'ID';
@@ -111,6 +110,7 @@ _translations['never']                                     = 'nunca';
 _translations['now']                                       = 'ahora';
 _translations['days']                                      = 'Días';
 _translations['The settings dialog is not available,\nbecause $file is used as settings file.'] = 'El dialogo de configuración no está disponible, \nporque $file se utiliza como archivo de configuración.'; 
+//_translations['You can enable the settings dialog \nvia the _enable_cookie_settings flag in the settings file'] = '';
 
 //compact
 _translations['from']                                      = 'de';
@@ -720,7 +720,7 @@ _translations['Level']                                     = 'Nivel';
 //start task/order
 _translations['Start task $task']                          = 'Iniciar tarea $task';
 _translations['Start order $order']                        = 'Iniciar orden $order';
-_translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS] or &quot;now&quot;. The time at which a task is to be started &lt;<p align="left">run</p>_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Introduzca hora de inicio</b><span class="small"> im ISO-Format &quot;yyyy-mm-dd HH:MM[:SS] o &quot;now&quot;. Hora de inicio de &lt;run_time&gt;-Elements est  desactivada. Horas relativas - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - son permitidas.<span>';
+_translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS]&quot; or &quot;now&quot;. The time at which a task is to be started &lt;run_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Introduzca hora de inicio</b><span class="small"> en formato ISO &quot;yyyy-mm-dd HH:MM[:SS] o &quot;now&quot;. Hora de inicio de &lt;run_time&gt;-Elements est  desactivada. Horas relativas - &quot;now + HH:MM[:SS]&quot; y &quot;now + SECONDS&quot; - son permitidas.<span>';
 _translations['<b>Enter a run time</b> or use the $editor'] = 'Para horas de inicio use el campo de texto o use el $editor';
 _translations['Start enforced']                            = 'Inicio forzado';
 _translations['Change parameters']                         = 'Modificar parametros';

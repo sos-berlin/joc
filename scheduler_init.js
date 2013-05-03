@@ -79,6 +79,7 @@ if( _server_settings && location.hash.substr(1) != 'custom' ) {
 //------------------------------------------------------------------------------getTranslation
 var _lang_file_exists           = false;
 var _translations               = new Object();
+var _jobscheduler_menu          = new Object();
 
 function getTranslation( s, args )
 {   

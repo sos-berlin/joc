@@ -74,7 +74,7 @@ function do_onload()
       document.getElementById('backup').innerHTML = parent.getTranslation('THIS IS A BACKUP...').replace(/ /g,'&#160;');
     }
     set_state(parent._response);
-    parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');    
+    parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');   
 }
 
 
@@ -203,46 +203,93 @@ function show_card( what )
 }
 
 
+function repeat_string( str, count ) 
+{
+	  var s = "";
+	  for( var i = 0; i < count; i++ ) {
+	  	s += str;
+	  }
+	  return s;
+}
+
+
+function create_indent( indent ) 
+{
+	  var rest = indent % 3;
+	  var s = "";
+	  switch(rest) {
+	  	case 0: s = repeat_string('&#160;', indent/3 );
+	  	        break;
+	  	case 1: s = repeat_string('&#160;', Math.floor(indent/3)-1 );
+	  	        s += '&#8239;&#8239;';
+	  	        break;
+	  	case 2: s = repeat_string('&#160;', Math.floor(indent/3) );
+	  	        s += '&#8239;';
+	  	        break;
+	  }
+	  return s;
+}
+
+
 //---------------------------------------------------------------------------------------write_menu
 function write_menu( menu_title, menu, align )
 {  //ru 300px; de 200px; es 245px; fr 250; en 200px
   if( window.createPopup == undefined ) {
   	var selectbox_id  = '__selectbox_'+menu+'_'+align+'__';
-  	var blanks = {'menu_left':'','extras_left':'','menu_right':''};
-  	blanks.menu_left    = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
-    blanks.extras_left  = '&#160;&#160;&#160;&#160;&#160;&#160;';
-    blanks.menu_right   = '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
-    var widths = {'menu':220,'extras':200};
-    var leftmove = -120;
+  	var widths = {'menu':220,'menu_indent_left':28,'menu_indent_right':138,'extras':200,'extras_indent_left':16};
+    
     switch(parent._sos_lang) {
-      	case 'ru' : widths.menu = 350;
-      	            leftmove = -250;
-      	            blanks.extras_left = '&#160;&#160;';
-      	            blanks.menu_right += '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+      	case 'ru' : widths.menu += 100;
+      	            widths.extras_indent_left += -12;
+      	            widths.menu_indent_right += 100;
       	            break;
-      	case 'de' : widths.menu = 230;
-      	            leftmove = -130;
-      	            blanks.menu_right += '&#160;&#160;&#160;';
+      	case 'de' : widths.menu += 10;
+      	            widths.menu_indent_right += 10;
       	            break;
-      	case 'fr' : widths.menu = 270;
-      	            leftmove = -170;
-      	            blanks.menu_right += '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
+      	case 'fr' : widths.menu += 50;
+      	            //widths.extras_indent_left += -2;
+      	            widths.menu_indent_right += 50;
       	            break;
-      	case 'es' : widths.menu = 280;
-      	            leftmove = -180;
-      	            blanks.menu_right += '&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;';
-      	            blanks.extras_left = '&#160;&#160;&#160;&#160;';
+      	case 'es' : widths.menu += 20;
+      	            widths.extras_indent_left += -4;
+      	            widths.menu_indent_right += 20;
+      	            break;
+      	case 'ja' : //widths.menu += -30;
+      	            widths.extras_indent_left += -4;
+      	            widths.menu_indent_right += -4;
+      	            widths.menu_indent_left += -4;
       	            break;
     }
+    if( parent._jobscheduler_menu && parent._jobscheduler_menu.menu_options_width ) {
+    	widths.menu += parent._jobscheduler_menu.menu_options_width;
+    }
+    if( parent._jobscheduler_menu && parent._jobscheduler_menu.left_menu_indent ) {
+    	widths.menu_indent_left += parent._jobscheduler_menu.left_menu_indent;
+    }
+    if( parent._jobscheduler_menu && parent._jobscheduler_menu.right_menu_indent ) {
+    	widths.menu_indent_right += parent._jobscheduler_menu.right_menu_indent;
+    	if( parent._jobscheduler_menu && parent._jobscheduler_menu.menu_options_width ) {
+    	  widths.menu_indent_right += parent._jobscheduler_menu.menu_options_width;
+      }
+    }
+    if( parent._jobscheduler_menu && parent._jobscheduler_menu.extras_indent ) {
+    	widths.extras_indent_left += parent._jobscheduler_menu.extras_indent;
+    }
+    
+    var indentSpaces = create_indent(widths[menu+'_indent_'+align]);
+    //var indentSpaces = repeat_string('&#8239;', Math.ceil( widths[menu+'_indent_'+align]/2 ));
+    //var indentSpaces = repeat_string('&#160;', Math.ceil( widths[menu+'_indent_'+align]/3 ) );
+     
     document.writeln('                <div class="selectbox_'+menu+'">');
     if( align == 'left' ) {
-      document.writeln('                  <select class="'+align+'" id="'+selectbox_id+'" name="'+selectbox_id+'" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
-      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+blanks[menu+'_'+align]+menu_title+blanks[menu+'_'+align]+'&#160;&#160;</option>');
+    	document.writeln('                  <select class="'+align+'" id="'+selectbox_id+'" name="'+selectbox_id+'" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+indentSpaces+menu_title+'</option>');
       document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');
       document.writeln('                  </select>');
     } else {
+    	var leftmove = 110 - widths.menu;
       document.writeln('                  <select class="'+align+'" id="'+selectbox_id+'" name="'+selectbox_id+'" size="1" style="width:'+widths[menu]+'px;left:'+leftmove+'px;" onfocus="scheduler_'+menu+'__onclick( this.name );">');
-      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+blanks[menu+'_'+align]+menu_title+'</option>');
+      document.writeln('                    <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">'+indentSpaces+menu_title+'</option>');
       document.writeln('                    <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');                    
       document.writeln('                  </select>');
       document.writeln('                  <div id="hide_arrow_'+menu+'_'+align+'" style="position:relative;top:-18px;height:16px;width:16px;background-color:#CFD7EB">&#160;</div>');
@@ -347,7 +394,7 @@ window.onerror  = function( msg, url, line ) {
                 <thead>
                   <tr> 
                     <td align="right" valign="bottom" class="top" style="padding-top:4px;">
-                        <input id="update_periodically_checkbox" type="checkbox" style="height:14px;margin:0px;padding:0px;" onclick="callErrorChecked( 'update_periodically_checkbox__onclick', this )" name="update_periodically_checkbox"/>
+                        <input id="update_periodically_checkbox" type="checkbox" style="margin:0px;padding:0px;" onclick="callErrorChecked( 'update_periodically_checkbox__onclick', this )" name="update_periodically_checkbox"/>
                     </td>
                     <td valign="middle" width="1px" class="top" style="padding:4px;">
                         <label class="top" for="update_periodically_checkbox"><span id="update_seconds" style="white-space:nowrap;">
@@ -402,7 +449,7 @@ window.onerror  = function( msg, url, line ) {
               document.writeln( '              <td style="white-space:nowrap;"><span id="jobs_need_process">0</span> '+parent.getTranslation('need process')+' </td>' );
               document.writeln( '              <td style="white-space:nowrap;"><span id="jobs_tasks">0</span> '+parent.getTranslation('tasks')+' </td>' );
               document.writeln( '              <td style="white-space:nowrap;"><span id="jobs_orders">0 '+parent.getTranslation('orders')+'</span> </td>' );
-              document.writeln( '              <td style="white-space:nowrap;" align="right"><span class="label">Scheduler '+parent.getTranslation('Start Time')+':&#160;</span><span id="spooler_start_time">0000-00-00 00:00:00</span></td>' );
+              document.writeln( '              <td style="white-space:nowrap;" align="right"><span class="label">'+parent.getTranslation('JobScheduler')+' '+parent.getTranslation('Start Time')+':&#160;</span><span id="spooler_start_time">0000-00-00 00:00:00</span></td>' );
               document.writeln( '            </tr>' );
             </script>
         </thead>   

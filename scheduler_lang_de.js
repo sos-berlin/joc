@@ -716,7 +716,7 @@ _translations['Level']                                     = 'Level';
 //start task/order
 _translations['Start task $task']                          = 'Starte Task $task';
 _translations['Start order $order']                        = 'Starte Auftrag $order';
-_translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS] or &quot;now&quot;. The time at which a task is to be started &lt;<p align="left">run</p>_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Setze eine Startzeit</b><span class="small"> im ISO-Format &quot;yyyy-mm-dd HH:MM[:SS] oder &quot;now&quot;. Startzeiten des &lt;run_time&gt;-Elements sind deaktiviert. Relativive Zeitangaben - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - sind möglich.<span>';
+_translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS]&quot; or &quot;now&quot;. The time at which a task is to be started &lt;run_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Setze eine Startzeit</b><span class="small"> im ISO-Format &quot;yyyy-mm-dd HH:MM[:SS] oder &quot;now&quot;. Startzeiten des &lt;run_time&gt;-Elements sind deaktiviert. Relativive Zeitangaben - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - sind möglich.<span>';
 _translations['<b>Enter a run time</b> or use the $editor'] = 'Für die Startzeiten nutze das Textfeld oder den $editor';
 _translations['Start enforced']                            = ' erzwungender Start';
 _translations['Change parameters']                         = 'Parameter ändern';

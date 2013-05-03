@@ -718,7 +718,7 @@ _translations['Level']                                     = 'Level';
 //start task/order
 _translations['Start task $task']                          = 'Стартовать Task $task';
 _translations['Start order $order']                        = 'Стартовать Ордер $order';
-_translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS] or &quot;now&quot;. The time at which a task is to be started &lt;<p align="left">run</p>_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Ввод времени старта</b><span class="small"> в формате ISO &quot;yyyy-mm-dd HH:MM[:SS] или &quot;now&quot;. Времена старта &lt;run_time&gt;-Елемента недействительны. Относительные задачи времени - &quot;now + HH:MM[:SS]&quot; и &quot;now + SECONDS&quot; - возможны.<span>';
+_translations['<b>Enter a start time</b><span class="small"> in ISO format &quot;yyyy-mm-dd HH:MM[:SS]&quot; or &quot;now&quot;. The time at which a task is to be started &lt;run_time&gt; is deactivated. Relative times - &quot;now + HH:MM[:SS]&quot; and &quot;now + SECONDS&quot; - are allowed.<span>' ] = '<b>Ввод времени старта</b><span class="small"> в формате ISO &quot;yyyy-mm-dd HH:MM[:SS] или &quot;now&quot;. Времена старта &lt;run_time&gt;-Елемента недействительны. Относительные задачи времени - &quot;now + HH:MM[:SS]&quot; и &quot;now + SECONDS&quot; - возможны.<span>';
 _translations['<b>Enter a run time</b> or use the $editor'] = 'Для задачи времени старта используйте текстовое поле или $editor';
 _translations['Start enforced']                            = ' принужденный старт';
 _translations['Change parameters']                         = 'Параметр изменить';
