@@ -334,13 +334,17 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
     dialog._html_array.push( parent.getTranslation('Switch to')+' ' );
-    select_opts                    = new Object();
-    select_opts.jobs               = ' '+parent.getTranslation('Jobs')+' ';
-    select_opts.job_chains         = ' '+parent.getTranslation('Job Chains')+' ';
-    select_opts.orders             = ' '+parent.getTranslation('Orders')+' ';
-    if( parent._scheduler.versionIsNewerThan( "2008-05-06 12:00:00" ) ) select_opts.schedules = ' '+parent.getTranslation('Schedules')+' ';
-    select_opts.process_classes    = ' '+parent.getTranslation('Process Classes')+' ';
-    select_opts.last_activities    = ' '+parent.getTranslation('Last Activities')+' ';
+    
+    select_opts = new Array();
+    select_opts.push( {key:'jobs', display:' '+parent.getTranslation('Jobs')+' '} );
+    select_opts.push( {key:'job_chains', display:' '+parent.getTranslation('Job Chains')+' '} );
+    select_opts.push( {key:'orders', display:' '+parent.getTranslation('Orders')+' '} );
+    if( parent._scheduler.versionIsNewerThan( "2008-05-06 12:00:00" ) ) {
+    	select_opts.push( {key:'schedules', display:' '+parent.getTranslation('Schedules')+' '} );
+    }
+    select_opts.push( {key:'process_classes', display:' '+parent.getTranslation('Process Classes')+' '} );
+    select_opts.push( {key:'last_activities', display:' '+parent.getTranslation('Last Activities')+' '} );
+    
     dialog.add_select( "show_card", select_opts, window.parent.onload_settings.show_card, 1, 0, false );
     dialog._html_array.push( ' '+parent.getTranslation('as the beginning view') );
     dialog._html_array.push( '</td></tr>' );
@@ -350,7 +354,11 @@ function scheduler_settings__onclick(ret)
     if( parent._scheduler._tree_view_enabled ) {  
       dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('View Mode')+'</legend>' );
       dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
-      select_opts                    = {'tree':' '+parent.getTranslation('tree view')+' ','list':' '+parent.getTranslation('list view')+' '};
+      
+      select_opts = new Array();
+    	select_opts.push( {key:'tree', display:' '+parent.getTranslation('tree view')+' '} );
+      select_opts.push( {key:'list', display:' '+parent.getTranslation('list view')+' '} );
+    
       for( var entry in parent._scheduler._supported_tree_views ) {
         dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
         dialog.add_select( "view_"+entry, select_opts, window.parent.onload_settings.view[ entry ], 1, 0, false );
@@ -363,18 +371,22 @@ function scheduler_settings__onclick(ret)
     
     dialog._html_array.push( '<fieldset style="margin-top:4px;"><legend>'+parent.getTranslation('Selects, Checkboxes and Radios')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
-    select_opts                    = new Object();
-    select_opts.all                = ' '+parent.getTranslation('All jobs')+' ';
-    select_opts.standalone         = ' '+parent.getTranslation('Standalone jobs')+' ';
-    select_opts.order              = ' '+parent.getTranslation('Order jobs')+' ';
+    
+    select_opts = new Array();
+    select_opts.push( {key:'all', display:' '+parent.getTranslation('All jobs')+' '} );
+    select_opts.push( {key:'standalone', display:' '+parent.getTranslation('Standalone jobs')+' '} );
+    select_opts.push( {key:'order', display:' '+parent.getTranslation('Order jobs')+' '} );
+    
     dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
     dialog.add_select( "select_states_show_jobs_select", select_opts, window.parent.onload_settings.select_states[ 'show_jobs_select' ], 1, 0, false );
-    select_opts                    = new Object();
-    select_opts.all                = ' '+parent.getTranslation('(all)')+' ';
-    select_opts.running            = ' '+parent.getTranslation('running')+' ';
-    select_opts.stopped            = ' '+parent.getTranslation('stopped')+' ';
-    select_opts.running_or_stopped = ' '+parent.getTranslation('running_or_stopped')+' ';
-    select_opts.other              = ' '+parent.getTranslation('(other)')+' ';
+    
+    select_opts = new Array();
+    select_opts.push( {key:'all', display:' '+parent.getTranslation('(all)')+' '} );
+    select_opts.push( {key:'running', display:' '+parent.getTranslation('running')+' '} );
+    select_opts.push( {key:'stopped', display:' '+parent.getTranslation('stopped')+' '} );
+    select_opts.push( {key:'running_or_stopped', display:' '+parent.getTranslation('running_or_stopped')+' '} );
+    select_opts.push( {key:'other', display:' '+parent.getTranslation('(other)')+' '} );
+    
     dialog._html_array.push( ' '+parent.getTranslation('with state')+' ' );
     dialog.add_select( "select_states_jobs_state_select", select_opts, window.parent.onload_settings.select_states[ 'jobs_state_select' ], 1, 0, false );
     dialog._html_array.push( '</td></tr>' );
@@ -751,7 +763,7 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
         dialog.add_hidden( "run_time", "" );
       }  
       if( typeof states[0] == "object" ) {
-        dialog.add_labeled_select( order_state_prompt, "state", states[0], order_state );
+      	dialog.add_labeled_select( order_state_prompt, "state", states[0], order_state );
       } else {
         dialog.add_hidden( "state", states[0] );
       }
@@ -894,8 +906,8 @@ function set_order_state( order_state, order_end_state, setback, hot, ret )
 function get_order_states( big_chain )
 {    
     if( typeof big_chain == 'undefined' ) big_chain = 0;
-    var states            = new Object();
-    var end_states        = new Object();
+    var states            = new Array();
+    var end_states        = new Array();
     var job_chain_element = window.parent.left_frame._response.selectSingleNode( ".//job_chain[@path='" + window.parent.left_frame._job_chain + "']" );
     if( !job_chain_element ) {
       var response        = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + parent.left_frame._job_chain + '"/>', false );
@@ -907,11 +919,12 @@ function get_order_states( big_chain )
       var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node|.//job_chain_node.end" );
     }
     if( job_chain_nodes.length == 1 ) return new Array(job_chain_nodes[0].getAttribute('state'),"");
-    end_states['']        = '(none)';
+    //end_states['']        = '(none)';
+    end_states.push( {key:'', display:'(none)'} );
     for( var i = 0; i < job_chain_nodes.length; i++ ) {
-        states[job_chain_nodes[i].getAttribute('state')] = job_chain_nodes[i].getAttribute('state');
+    		states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state')} );
         //if( i < job_chain_nodes.length-1 ) {
-          end_states[job_chain_nodes[i].getAttribute('state')] = job_chain_nodes[i].getAttribute('state');
+          end_states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state')} );
         //}
     }
     return new Array(states, end_states); 
@@ -1126,8 +1139,8 @@ function get_run_time( caller, hot )
 function get_schedules()
 {
     var path
-    var schedules = new Object();
-    schedules[''] = '(none)';
+    var schedules = new Array();
+    schedules.push( {key:'', display:'(none)'} );
     parent.left_frame._schedules = new Array();
     var schedule_elems = [];
     if(parent._scheduler._tree_view_enabled) {
@@ -1137,7 +1150,7 @@ function get_schedules()
     }
     for( var i=0; i < schedule_elems.length; i++ ) {
       path = schedule_elems[i].getAttribute('path');
-      schedules[path] = path;
+      schedules.push( {key:path, display:path} );
       parent.left_frame._schedules.push(path);
     }
     return schedules;
@@ -1167,7 +1180,7 @@ function add_job_chain(job_chain,step)
     
     if( step == 1 ) {
       Input_dialog.close();
-      var jobs          = new Object();
+      var jobs          = new Array();
       var job_keys      = new Array();
       var job_elements  = new Array();
       var response      = parent._scheduler.executeSynchron( '<show_jobs max_orders="0" max_task_history="0"/>', false );
@@ -1178,7 +1191,8 @@ function add_job_chain(job_chain,step)
       }
       job_keys.sort(case_insensitive);
       for( var i = 0; i < job_keys.length; i++ ) {
-        jobs[job_keys[i]]  = job_keys[i].replace(/^\//,"");
+      	select_opts = new Array();
+    		jobs.push( {key:job_keys[i], display:job_keys[i].replace(/^\//,"")} );
       }
       var arrows        = (parent.ie > 0 && parent.ie < 8) ? ['&lt;','<span style="font-size:10px;">&and;</span>','&gt;','<span style="font-size:10px;">&or;</span>'] : ['&lt;','<span style="font-size:20px;">&#708;</span>','&gt;','<span style="font-size:20px;">&#709;</span>'];
       var dialog        = new Input_dialog();
@@ -1195,7 +1209,7 @@ function add_job_chain(job_chain,step)
       dialog._html_array.push( '</td>' );
       dialog._html_array.push( '<td align="center" width="80"><button class="arrows" type="button" title="sort up selected job node" onclick="modify_job_chain_node(this.form,\'up\')">'+arrows[1]+'</button></td>' );
       dialog._html_array.push( '<td rowspan="3">' );
-      dialog.add_select( "job_nodes", {}, "", 10, (dialog.width-80)/2, false );
+      dialog.add_select( "job_nodes", [], "", 10, (dialog.width-80)/2, false );
       dialog._html_array.push( '</td></tr>' );
       dialog._html_array.push( '<tr><td valign="middle" align="center"><button class="arrows" type="button" title="remove selected job node" onclick="modify_job_chain_node(this.form,\'remove\')">'+arrows[0]+'</button>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<button class="arrows" type="button" title="add selected job to job chain nodes" onclick="modify_job_chain_node(this.form,\'add\')">'+arrows[2]+'</button></td></tr>' );
       dialog._html_array.push( '<tr><td valign="top" align="center"><button class="arrows" type="button" title="sort down selected job node" onclick="modify_job_chain_node(this.form,\'down\')">'+arrows[3]+'</button></td></tr>' );
@@ -1324,7 +1338,7 @@ function show_calendar( menu, ret )
       dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td><b>&#160;&#160;&#160;'+parent.getTranslation('...from')+'</b></td><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'from\',false,event);" /></td></tr></table>', "from", date_from, 19 );
       dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td><b>&#160;&#160;&#160;'+parent.getTranslation('...to')+'</b></td><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'before\',false,event);" /></td></tr></table>', "before", date_to, 19 );
       dialog.add_labeled_input( '<b>'+parent.getTranslation('Max. hits')+'</b>', "limit", "100", 10 );
-      dialog.add_labeled_select( '<b>'+parent.getTranslation('Output format')+'</b>', "format", {html:'html',xml:'xml',csv:'csv'}, "html" );
+      dialog.add_labeled_select( '<b>'+parent.getTranslation('Output format')+'</b>', "format", [{key:'html', display:'html'},{key:'xml', display:'xml'},{key:'csv', display:'csv'}], "html" );
       switch( menu ) {
         case 'scheduler' : dialog.add_checkbox( "what", '<b>'+parent.getTranslation('Include order start times')+'</b>', true ); break;
         case 'job_chain' :

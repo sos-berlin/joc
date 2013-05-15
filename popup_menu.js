@@ -491,7 +491,7 @@ Input_dialog.prototype.add_settings_input = function( label, name, val, max_leng
  
 Input_dialog.prototype.add_select = function( name, opts, selected_opt, size, width, with_td ) 
 {    
-    if( typeof opts         != "object"  ) opts         = new Object();
+    if( typeof opts         != "object"  ) opts         = new Array();
     if( typeof selected_opt != "string"  ) selected_opt = "";
     if( typeof size         != "number"  ) size         = 1;
     if( typeof width        != "number"  ) width        = this.width;
@@ -499,9 +499,9 @@ Input_dialog.prototype.add_select = function( name, opts, selected_opt, size, wi
     width = (width == 0) ? '' : ' style="width:' + width + 'px"';
     if( with_td ) this._html_array.push( '<tr><td style="padding-bottom:2px;">' );
     this._html_array.push( '<select name="' + name + '" size="' + size + '"' + width +'>' );
-    for( var opt in opts ) {
-      var selected = ( selected_opt == opt ) ? ' selected="true"' : "";
-      this._html_array.push( '<option value="' + opt + '"' + selected + '>' + opts[opt] + '</option>' );
+    for( var i=0; i<opts.length; i++) {
+      var selected = ( selected_opt == opts[i].key ) ? ' selected="true"' : "";
+      this._html_array.push( '<option value="' + opts[i].key + '"' + selected + '>' + opts[i].display + '</option>' );
     }
     this._html_array.push( '</select>' );
     if( with_td ) this._html_array.push( '</td></tr>' );
@@ -510,7 +510,7 @@ Input_dialog.prototype.add_select = function( name, opts, selected_opt, size, wi
 
 Input_dialog.prototype.add_labeled_select = function( label, name, opts, selected_opt, onchange ) 
 {    
-    if( typeof opts         != "object" ) opts         = new Object();
+    if( typeof opts         != "object" ) opts         = new Array();
     if( typeof selected_opt != "string" ) selected_opt = "";
     if( typeof onchange     != "string" ) onchange     = "";
     this._html_array.push( '<tr><td style="padding:0px;">' );
@@ -518,9 +518,9 @@ Input_dialog.prototype.add_labeled_select = function( label, name, opts, selecte
     this._html_array.push( '<tr>' );
     this._html_array.push( '<td class="param_name" style="width:40%;padding-right:2px;"><span style="position:relative;top:-2px;">' + label + '</span></td>' );
     this._html_array.push( '<td style="width:60%;padding-bottom:2px;"><select name="' + name + '" size="1" style="width:' + parseInt((this.width*3/5)+3,10) + 'px" '+onchange+'>' );
-    for( var opt in opts ) {
-      var selected = ( selected_opt == opt ) ? ' selected="true"' : "";
-      this._html_array.push( '<option value="' + opt + '"' + selected + '>' + opts[opt] + '</option>' );
+    for( var i=0; i<opts.length; i++) {
+      var selected = ( selected_opt == opts[i].key ) ? ' selected="true"' : "";
+      this._html_array.push( '<option value="' + opts[i].key + '"' + selected + '>' + opts[i].display + '</option>' );
     }
     this._html_array.push( '</select></td></tr>' );
     this._html_array.push( '</table></td></tr>' );

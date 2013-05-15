@@ -210,7 +210,8 @@ _translations['No tasks in the history']                   = 'Tasks не обн�
 _translations['Started']                                   = 'Запущено';
 _translations['Cause']                                     = 'Причина';
 _translations['Ended']                                     = 'Закончено';
-                                                           
+_translations['Duration']                                  = 'Период';
+
 //Order queue                                              
 _translations['Start']                                     = 'Запущено';
                                                            

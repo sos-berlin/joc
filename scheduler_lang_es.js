@@ -210,6 +210,7 @@ _translations['No tasks in the history']                   = 'No hay tareas en e
 _translations['Started']                                   = 'Iniciado';
 _translations['Cause']                                     = 'Causa';
 _translations['Ended']                                     = 'Finalizado';
+_translations['Duration']                                  = 'Duración';
                                                            
 //Order queue                                              
 _translations['Start']                                     = 'Inicio';

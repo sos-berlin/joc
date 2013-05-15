@@ -382,6 +382,7 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
               case "spooler_running_since" :
               case "time"                  :
               case "end_time"              : element.setAttribute( attribute_name + "__xslt_datetime"               , schedulerDate.toString() );
+              															 element.setAttribute( "duration"               												, schedulerDate.getDuration(element.getAttribute("start_time")) );
                                              break;
               case "start_time"            : element.setAttribute( attribute_name + "__xslt_datetime"               , schedulerDate.toString() );
                                              element.setAttribute( attribute_name + "__xslt_datetime_with_diff"     , schedulerDate.xsltFormatDatetimeWithDiff( now ) );
@@ -420,6 +421,7 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
         }
     }
 }
+
 
 
 //---------------------------------------------------------------Scheduler.addPathAttribute
@@ -873,7 +875,7 @@ SchedulerDate.prototype.addLeadingZero = function( num )
 SchedulerDate.prototype.toString = function() 
 {
     if( this._date_obj ) {
-    	return this._date_obj.getFullYear()+'-'+this.addLeadingZero(this._date_obj.getMonth()+1)+'-'+this.addLeadingZero(this._date_obj.getDate())+' '+this.addLeadingZero(this._date_obj.getHours())+':'+this.addLeadingZero(this._date_obj.getMinutes())+':'+this.addLeadingZero(this._date_obj.getSeconds());
+    	return this.dateToString()+' '+this.timeToString();
     }
     return this._date_str;
 }
@@ -888,12 +890,25 @@ SchedulerDate.prototype.xsltFormatDateOrTime = function( now )
         && this._date_obj.getMonth() == now.getMonth()
         && this._date_obj.getDate() == now.getDate()  )
     {
-        return this.addLeadingZero(this._date_obj.getHours())+':'+this.addLeadingZero(this._date_obj.getMinutes())+':'+this.addLeadingZero(this._date_obj.getSeconds());
+        return this.timeToString();
     }
     else
     {
-        return this._date_obj.getFullYear()+'-'+this.addLeadingZero(this._date_obj.getMonth()+1)+'-'+this.addLeadingZero(this._date_obj.getDate());
+        return this.dateToString();
     }
+}
+
+
+//--------------------------------------------------------------------------------SchedulerDate.timeToString
+SchedulerDate.prototype.timeToString = function()
+{
+	  return this.addLeadingZero(this._date_obj.getHours())+':'+this.addLeadingZero(this._date_obj.getMinutes())+':'+this.addLeadingZero(this._date_obj.getSeconds());
+}
+
+//--------------------------------------------------------------------------------SchedulerDate.dateToString
+SchedulerDate.prototype.dateToString = function()
+{
+	  return this._date_obj.getFullYear()+'-'+this.addLeadingZero(this._date_obj.getMonth()+1)+'-'+this.addLeadingZero(this._date_obj.getDate());
 }
 
 //--------------------------------------------------------------------------------SchedulerDate.xsltFormatDatetimeWithDiff
@@ -929,17 +944,26 @@ SchedulerDate.prototype.xsltFormatDatetimeDiff = function( now, show_plus )
 
     var diff = ( now.getTime() - this._date_obj.getTime() ) / 1000;
     var abs  = Math.abs( diff );
-    var result;
+    var result = this.seconds2TimeString(abs);
+    return diff < 0             ? "-" + result :
+           show_plus && diff > 0? "+" + result
+                                : result;
+}
 
-    if( abs < 60 )
+
+//--------------------------------------------------------------------------------SchedulerDate.seconds2TimeString
+SchedulerDate.prototype.seconds2TimeString = function( secs )
+{
+    var result;
+    if( secs < 60 )
     {
-        result = Math.floor( abs ) + "s";
+        result = Math.floor( secs ) + "s";
     }
     else
-    if( abs < 60*60 ) { 
-        var minutes = Math.floor( abs / 60 );
+    if( secs < 60*60 ) { 
+        var minutes = Math.floor( secs / 60 );
         if( minutes < 60 ) {
-          var seconds = Math.floor(abs - 60*minutes);
+          var seconds = Math.floor(secs - 60*minutes);
           if( seconds < 10 ) seconds = "0" + seconds; 
           result = minutes + ":" + seconds + "min";
         } else {
@@ -947,13 +971,31 @@ SchedulerDate.prototype.xsltFormatDatetimeDiff = function( now, show_plus )
         }
     }
     else
-    if( abs < 24*60*60 ) {
-        result = Math.floor( abs / (    60*60 ) ) + "h";
+    if( secs < 24*60*60 ) {
+        result = Math.floor( secs / (    60*60 ) ) + "h";
     }
     else {
-        result = Math.floor( abs / ( 24*60*60 ) ) + this._translated_days;
+        result = Math.floor( secs / ( 24*60*60 ) ) + this._translated_days;
     }
-    return diff < 0             ? "-" + result :
-           show_plus && diff > 0? "+" + result
-                                : result;
+    return result;
+}
+
+
+//--------------------------------------------------------------------------------SchedulerDate.getDuration
+SchedulerDate.prototype.getDuration = function( datetime )
+{
+   var result = "";
+   var schDate = new SchedulerDate(datetime);
+   if( this._date_obj && schDate._date_obj ) {
+   	 		var duration = Math.abs(this._date_obj.getTime() - schDate._date_obj.getTime());
+   	 		if( duration >= 24*60*60*1000 ) {
+   	 			  result = Math.floor( duration / ( 24*60*60*1000 ) ) + " ";
+   	 		}
+   	 		schDate._date_obj.setHours(0);
+   			schDate._date_obj.setMinutes(0);
+   			schDate._date_obj.setSeconds(0);
+   			schDate._date_obj.setTime(schDate._date_obj.getTime() + duration);
+   	 		result += schDate.timeToString();
+   }
+   return result;
 }

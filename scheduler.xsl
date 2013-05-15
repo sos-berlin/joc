@@ -1555,6 +1555,7 @@
             <col width="*"/>
             <col width="110"/>
             <col width="110"/>
+            <col width="10"/>
             <col width="*"/>  
             <col width="1%"/>  
             <col width="40" align="right"/>  
@@ -1562,7 +1563,7 @@
           
           <thead>
               <tr>
-                  <td colspan="6" class="before_head_space">&#160;</td>
+                  <td colspan="7" class="before_head_space">&#160;</td>
               </tr>
               <tr>
                   <xsl:choose>
@@ -1570,6 +1571,7 @@
                       <td class="head1"><span class="translate" style="white-space:nowrap;">Order ID</span>&#160;/&#160;<span class="translate" style="color:#808080;white-space:nowrap;">Job name</span></td>
                       <td class="head"><span class="translate">Started</span></td>
                       <td class="head"><span class="translate">Ended</span></td>
+                      <td class="head"><span class="translate">Duration</span></td>
                       <td class="head"><span class="translate" style="white-space:nowrap;">Job chain</span>&#160;/&#160;<span class="translate" style="color:#009933;">Cause</span></td>
                       <td class="head" colspan="2"><span class="translate" style="white-space:nowrap;">Order state</span>&#160;/&#160;<span class="translate" style="color:crimson;white-space:nowrap;">Exitcode</span></td>
                     </xsl:when>
@@ -1577,6 +1579,7 @@
                       <td class="head1"><span class="translate" style="white-space:nowrap;">Order ID</span></td>
                       <td class="head"><span class="translate">Started</span></td>
                       <td class="head"><span class="translate">Ended</span></td>
+                      <td class="head"><span class="translate">Duration</span></td>
                       <td class="head"><span class="translate" style="white-space:nowrap;">Job chain</span></td>
                       <td class="head" colspan="2"><span class="translate" style="white-space:nowrap;">Order state</span></td>
                     </xsl:when>
@@ -1584,13 +1587,14 @@
                       <td class="head1"><span class="translate" style="white-space:nowrap;">Job name</span></td>
                       <td class="head"><span class="translate">Started</span></td>
                       <td class="head"><span class="translate">Ended</span></td>
+                      <td class="head"><span class="translate">Duration</span></td>
                       <td class="head"><span class="translate">Cause</span></td>
                       <td class="head" colspan="2"><span class="translate" style="white-space:nowrap;">Exitcode</span></td>
                     </xsl:when>
                   </xsl:choose>
               </tr>
               <xsl:call-template name="after_head_space">
-                  <xsl:with-param name="colspan" select="'6'"/>
+                  <xsl:with-param name="colspan" select="'7'"/>
               </xsl:call-template>
           </thead>
                  
@@ -1605,7 +1609,7 @@
                 <xsl:choose>
                   <xsl:when test="/spooler/@show_error_checkbox">
                     <xsl:if test="not( $ohistoryerr | $thistoryerr )">
-                       <tr><td colspan="6"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
+                       <tr><td colspan="7"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
                     </xsl:if>
                     <xsl:for-each select="$ohistoryerr | $thistoryerr">
                       <xsl:sort select="@start_time" order="descending"/>
@@ -1618,7 +1622,7 @@
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:if test="not( $ohistory | $thistory )">
-                       <tr><td colspan="6"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
+                       <tr><td colspan="7"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
                     </xsl:if>
                     <xsl:for-each select="$ohistory | $thistory">
                       <xsl:sort select="@start_time" order="descending"/>
@@ -1635,7 +1639,7 @@
                 <xsl:choose>
                   <xsl:when test="/spooler/@show_error_checkbox">
                     <xsl:if test="not( $ohistoryerr )">
-                       <tr><td colspan="6"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
+                       <tr><td colspan="7"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
                     </xsl:if>
                     <xsl:for-each select="$ohistoryerr">
                       <xsl:sort select="@start_time" order="descending"/>
@@ -1646,7 +1650,7 @@
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:if test="not( $ohistory )">
-                       <tr><td colspan="6"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
+                       <tr><td colspan="7"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
                     </xsl:if>
                     <xsl:for-each select="$ohistory">
                       <xsl:sort select="@start_time" order="descending"/>
@@ -1661,7 +1665,7 @@
                 <xsl:choose>
                   <xsl:when test="/spooler/@show_error_checkbox">
                     <xsl:if test="not( $thistoryerr )">
-                       <tr><td colspan="6"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
+                       <tr><td colspan="7"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
                     </xsl:if>
                     <xsl:for-each select="$thistoryerr">
                       <xsl:sort select="@start_time" order="descending"/>
@@ -1672,7 +1676,7 @@
                   </xsl:when>
                   <xsl:otherwise>
                     <xsl:if test="not( $thistory )">
-                       <tr><td colspan="6"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
+                       <tr><td colspan="7"><span class="translate" style="font-weight:bold;">No last activities found</span></td></tr>
                     </xsl:if>
                     <xsl:for-each select="$thistory">
                       <xsl:sort select="@start_time" order="descending"/>
@@ -1688,7 +1692,7 @@
           
           <tfoot>
               <xsl:call-template name="after_body_space">
-                  <xsl:with-param name="colspan" select="'6'"/>
+                  <xsl:with-param name="colspan" select="'7'"/>
               </xsl:call-template>
           </tfoot>
         </table>
@@ -3791,9 +3795,10 @@
           <colgroup>
             <col align="left" width="10"/>
             <col align="left" width="10"/>
-            <col align="left" width="*"/>
             <col align="right" width="10"/>
             <col align="left" width="*"/>
+            <col align="left" width="*"/>
+            <col align="left" width="10"/>
             <col align="left" width="80"/>
           </colgroup>
           
@@ -3801,12 +3806,12 @@
               <xsl:when test="count(history.entry)=0"> 
                 <thead>
                   <xsl:call-template name="after_head_space">
-                    <xsl:with-param name="colspan" select="'6'"/>
+                    <xsl:with-param name="colspan" select="'7'"/>
                   </xsl:call-template>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="6"><span class="translate" style="font-weight:bold;">No tasks in the history</span></td>
+                    <td colspan="7"><span class="translate" style="font-weight:bold;">No tasks in the history</span></td>
                   </tr>
                 </tbody>
               </xsl:when>
@@ -3814,18 +3819,19 @@
                 
                 <thead>
                     <tr>
-                        <td colspan="6" class="before_head_space">&#160;</td>
+                        <td colspan="7" class="before_head_space">&#160;</td>
                     </tr>
                 
                     <tr>
                         <td class="head1"><span class="translate">Id</span></td>
                         <td class="head"><span class="translate">Cause</span></td>
-                        <td class="head"><span class="translate">Started</span></td>
                         <td class="head"><span class="translate">Process steps</span></td>
-                        <td class="head" colspan="2"><span class="translate">Ended</span></td>
+                        <td class="head"><span class="translate">Started</span></td>
+                        <td class="head"><span class="translate">Ended</span></td>
+                        <td class="head" colspan="2"><span class="translate">Duration</span></td>
                     </tr>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'6'"/>
+                      <xsl:with-param name="colspan" select="'7'"/>
                     </xsl:call-template>
                 </thead>
                 <tbody>
@@ -3834,10 +3840,11 @@
                     <tr>
                         <td><xsl:value-of select="@task"/>&#160;</td>
                         <td><nobr><span class="translate"><xsl:value-of select="@cause"/></span></nobr>&#160;</td>
-                        <td><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime"/></td>
                         <td align="right"><xsl:value-of select="@steps"/>&#160;</td>
+                        <td><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime"/></td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>
-                
+                        <td><xsl:apply-templates mode="date_time_nowrap" select="@duration"/></td>
+                				
                         <td align="right" valign="top" style="padding:0px 2px;">
                             
                             <xsl:call-template name="command_menu">
@@ -3851,7 +3858,7 @@
                     <xsl:if test="ERROR">
                         <tr>
                             <td>&#160;</td>
-                            <td colspan="4" class="job_error"><xsl:apply-templates select="ERROR"/></td>
+                            <td colspan="5" class="job_error"><xsl:apply-templates select="ERROR"/></td>
                             <td>&#160;</td>
                         </tr>
                     </xsl:if>
@@ -3862,7 +3869,7 @@
             
             <tfoot>
               <xsl:call-template name="after_body_space">
-                  <xsl:with-param name="colspan" select="'6'"/>
+                  <xsl:with-param name="colspan" select="'7'"/>
               </xsl:call-template>
             </tfoot>
         </table>
@@ -3966,6 +3973,7 @@
                 <col width="*"/>
                 <col width="*"/>
                 <col width="*"/>
+                <col width="10"/>
                 <col width="*"/>  
                 <col width="40"/>  
                 <col width="60" align="right"/>  
@@ -3973,19 +3981,19 @@
               <xsl:if test="count(child::*)=0">
                 <thead>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'6'"/>
+                      <xsl:with-param name="colspan" select="'7'"/>
                     </xsl:call-template>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="6"><span class="translate" style="font-weight:bold;">No orders in the history</span></td>
+                        <td colspan="7"><span class="translate" style="font-weight:bold;">No orders in the history</span></td>
                     </tr>
                 </tbody>
               </xsl:if>
               <xsl:if test="not(count(child::*)=0)">
                 <thead>
                     <tr>
-                        <td colspan="6" class="before_head_space">&#160;</td>
+                        <td colspan="7" class="before_head_space">&#160;</td>
                     </tr>
                     <tr>
                         <td class="head1"><span class="translate">Id</span></td>
@@ -3993,24 +4001,26 @@
                           <xsl:when test="$big_chain">
                             <td class="head"><span class="translate">Started</span></td>  
                             <td class="head"><span class="translate">Ended</span></td>  
-                            <td class="head"><span class="translate">Job chain</span></td>
+                            <td class="head"><span class="translate">Duration</span></td>  
+                        		<td class="head"><span class="translate">Job chain</span></td>
                           </xsl:when>
                           <xsl:otherwise>
                             <td class="head"><span class="translate">Started</span></td>  
-                            <td colspan="2" class="head"><span class="translate">Ended</span></td>
+                            <td class="head"><span class="translate">Ended</span></td>
+                            <td colspan="2" class="head"><span class="translate">Duration</span></td>  
                           </xsl:otherwise>
                         </xsl:choose>
                         <td class="head"><span class="translate">State</span></td>
                         <td class="head1">&#160;</td>
                     </tr>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'6'"/>
+                      <xsl:with-param name="colspan" select="'7'"/>
                     </xsl:call-template>
                 </thead>
                 
                 <tbody>
                     <xsl:if test="ERROR">
-                        <tr><td colspan="6" class="job_error"><xsl:value-of select="ERROR/@text"/></td></tr>
+                        <tr><td colspan="7" class="job_error"><xsl:value-of select="ERROR/@text"/></td></tr>
                     </xsl:if> 
                     <xsl:for-each select="order[ position() &lt;= $max_order_history ]">
                         <xsl:sort select="concat(@end_time,@start_time)" order="descending"/>
@@ -4023,13 +4033,15 @@
                             </td>
                             <xsl:choose>
                               <xsl:when test="$big_chain">
-                                <td><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime"/></td>  
-                                <td><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>  
+                              	<td><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime"/></td>  
+                                <td><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>
+                                <td><xsl:apply-templates mode="date_time_nowrap" select="@duration"/></td>
                                 <td><xsl:apply-templates mode="trim_slash" select="@job_chain" /></td>
                               </xsl:when>
                               <xsl:otherwise>
                                 <td><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime"/></td>  
-                                <td colspan="2"><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>
+                                <td><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>
+                                <td colspan="2"><xsl:apply-templates mode="date_time_nowrap" select="@duration"/></td>
                               </xsl:otherwise>
                             </xsl:choose>
                             <td><nobr><xsl:value-of select="@state"/></nobr></td>
@@ -4050,7 +4062,7 @@
                 </xsl:if>
                 <tfoot>
                   <xsl:call-template name="after_body_space">
-                      <xsl:with-param name="colspan" select="'6'"/>
+                      <xsl:with-param name="colspan" select="'7'"/>
                   </xsl:call-template>
                 </tfoot>
           </table>
@@ -4266,6 +4278,10 @@
               <xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
               <xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/>
             </td>
+            <td>
+            	<xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
+              <xsl:apply-templates mode="date_time_nowrap" select="@duration"/>
+            </td>
             <td style="padding-right:2px;">
               <xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
               <xsl:apply-templates mode="trim_slash" select="@job_chain" />
@@ -4313,6 +4329,10 @@
             <td>
               <xsl:attribute name="onclick">callErrorChecked( 'show_job_details', '<xsl:value-of select="@job_name"/>' )</xsl:attribute>
               <xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/>
+            </td>
+            <td>
+            	<xsl:attribute name="onclick">callErrorChecked( 'show_job_details', '<xsl:value-of select="@job_name"/>' )</xsl:attribute>
+              <xsl:apply-templates mode="date_time_nowrap" select="@duration"/>
             </td>
             <td style="padding-right:2px;">
               <xsl:attribute name="onclick">callErrorChecked( 'show_job_details', '<xsl:value-of select="@job_name"/>' )</xsl:attribute>

@@ -1,4 +1,3 @@
-//alert('Version 130501');
 //Control flag (if false then default language is used)
 _lang_file_exists = true;
 
@@ -210,6 +209,7 @@ _translations['No tasks in the history']                   = 'タスク履歴は
 _translations['Started']                                   = '開始時刻';
 _translations['Cause']                                     = '理由';
 _translations['Ended']                                     = '終了時刻';
+_translations['Duration']                                  = '時間';
                                                            
 //Order queue                                              
 _translations['Start']                                     = '開始時刻';
