@@ -690,8 +690,8 @@ function start_order( ret )
           	 params += '<param name="' + param_names[i] + '" value="' + xml_encode(fields[param_names[i]]) + '"/>';
           }
           for( var new_param in fields.new_params ) {
-            var value = (new_param == "command") ? fields.new_params[new_param].bin2hex() : xml_encode(fields.new_params[new_param]);
-            params += '<param name="' + new_param + '" value="' + value + '"/>';
+            //var value = (new_param == "command") ? fields.new_params[new_param].bin2hex() : xml_encode(fields.new_params[new_param]);
+            params += '<param name="' + new_param + '" value="' + xml_encode(fields.new_params[new_param]) + '"/>';
           }
           if( param_names.length + fields.count_new_params > 0 ) params += '</params>';
       }
@@ -805,8 +805,8 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
              params += '<param name="' + param_names[i] + '" value="' + xml_encode(fields[param_names[i]]) + '"/>';
           }
           for( var new_param in fields.new_params ) {
-             var value = (new_param == "command") ? fields.new_params[new_param].bin2hex() : xml_encode(fields.new_params[new_param]);
-             params += '<param name="' + new_param + '" value="' + value + '"/>';
+             //var value = (new_param == "command") ? fields.new_params[new_param].bin2hex() : xml_encode(fields.new_params[new_param]);
+             params += '<param name="' + new_param + '" value="' + xml_encode(fields.new_params[new_param]) + '"/>';
           }
           if( param_names.length + fields.count_new_params > 0 ) params += '</params>';
       }
@@ -1964,6 +1964,15 @@ String.prototype.hex2bin = function() {
         hex = hex.slice( 2 );
     }
 	  return tmp;
+}
+
+
+String.prototype.ishex = function() {
+	
+	  var hex = this;
+	  if( hex.search(/[^0123456789abcdefABCDEF]/) > -1 ) { return false; }
+	  if( hex.length % 2 != 0 ) { return false; }
+	  return true;
 }
 
 String.prototype.bin2hex = function() {

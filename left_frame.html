@@ -687,7 +687,7 @@ function input_dialog_submit()
           case "submit"  : break;
           case "button"  : break;
           case "checkbox": fields[ element.name ] = element.checked; break;
-          case "textarea": fields[ element.name ] = (element.name=="command") ? element.value.bin2hex() : element.value; break;
+          case "textarea": fields[ element.name ] = (element.name=="command" && element.getAttribute('sos_value_ishex') == 'true') ? element.value.bin2hex() : element.value; break;
           default        :
               if( element.name.search( /^new_param_/ ) == -1 ) {
                 fields[ element.name ] = element.value;

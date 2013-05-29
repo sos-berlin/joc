@@ -572,11 +572,12 @@ Input_dialog.prototype.add_params = function( params, param_names )
             this._html_array.push( '<table cellspacing="0" cellpadding="0" width="100%" border="0">' );  
         }
         if( param_names[i] == "command" ) {
+        		var isHex = params[param_names[i]].ishex() ? "true" : "false";
             this._html_array.push( '<tr>' );
             this._html_array.push( '<td class="param_name" colspan="2" style="width:100%;padding-right:2px;"><span style="position:relative;top:-2px;">' + param_names[i] + '</span></td></tr>' );
             this._html_array.push( '<tr>' );
             this._html_array.push( '<td colspan="2" style="width:100%;padding-bottom:2px;">' );
-            this._html_array.push( '<textarea name="' + param_names[i] + '" style="width:' + (this.width-1) + 'px" rows="4" onfocus="this.select();">' + params[param_names[i]].hex2bin() + '</textarea>' );
+            this._html_array.push( '<textarea sos_value_ishex="'+isHex+'" name="' + param_names[i] + '" style="width:' + (this.width-1) + 'px" rows="4" onfocus="this.select();">' + params[param_names[i]].hex2bin() + '</textarea>' );
             this._html_array.push( '</td></tr>' );
         } else {
             this._html_array.push( '<tr>' );
