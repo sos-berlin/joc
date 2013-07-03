@@ -260,7 +260,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
        postBody       : xml,
        contentType    : 'text/xml',
        requestHeaders : { 'Cache-Control':'no-cache', 
-                          'Pragma':'no-cache', 
+                          'Pragma':'no-cache',
                           //'Transfer-Encoding':'identity', 
                           'Content-Length': xml.length 
                         },
@@ -371,7 +371,10 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
         var value   = element.getAttribute( attribute_name );
         if( value )
         {   
-            if( value == "never" || value == "now" ) {
+            if( value.indexOf("2038-") > -1 ) {
+            	value = "never";
+            }
+            if( value == "never" || value == "now") {
               value = this.getTranslation(value);
               element.setAttribute( attribute_name, value );
             }
@@ -999,3 +1002,4 @@ SchedulerDate.prototype.getDuration = function( datetime )
    }
    return result;
 }
+

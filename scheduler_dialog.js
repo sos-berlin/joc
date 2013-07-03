@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2011 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2013 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -984,6 +984,7 @@ function set_run_time( caller, hot, ret )
       switch( caller ) {
         case 'order'          : Input_dialog.close();
                                 xml_command = '<modify_order job_chain="' + window.parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '">' + fields.run_time + '</modify_order>';
+                                /* modify should not be stored persistent
                                 if( parent._source != undefined ) {
                                   parent._source.setAttribute('id', window.parent.left_frame._order_id);
                                   parent._source.setAttribute('job_chain', basename(window.parent.left_frame._job_chain));
@@ -998,10 +999,11 @@ function set_run_time( caller, hot, ret )
                                     parent._source.appendChild(run_time_to_import);
                                   }
                                   hot_command   = '<modify_hot_folder folder="'+dirname(window.parent.left_frame._job_chain)+'">'+osNewline(parent._source.xml)+'</modify_hot_folder>';
-                                }
+                                } */
                                 break;
         case 'job'            : Input_dialog.close();
                                 xml_command = '<modify_job job="' + window.parent.left_frame._job_name + '">' + fields.run_time + '</modify_job>';
+                                /* modify should not be stored persistent
                                 if( parent._source != undefined ) {
                                   parent._source.setAttribute('name', basename(window.parent.left_frame._job_name));
                                   var new_run_time  = parent._scheduler.loadXML(fields.run_time);
@@ -1015,7 +1017,7 @@ function set_run_time( caller, hot, ret )
                                     parent._source.appendChild(run_time_to_import);
                                   }
                                   hot_command   = '<modify_hot_folder folder="'+dirname(window.parent.left_frame._job_name)+'">'+osNewline(parent._source.xml)+'</modify_hot_folder>';
-                                }
+                                } */
                                 break;
         case 'add_schedule'   : 
         case 'add_substitute' : var msg = mandatory_field( fields.name, parent.getTranslation('Name') );
