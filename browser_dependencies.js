@@ -33,7 +33,7 @@
 
 // $Id: browser_dependencies.js 3303 2005-01-11 23:22:22Z jz $
 
-// Anpassungen für DOM und XSL-T
+// Anpassungen fÃ¼r DOM und XSL-T
 
 if(!navigator.appVersion.match(/\bMSIE\b/)) {
 

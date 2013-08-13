@@ -1586,9 +1586,10 @@ function task_menu__onclick( task_id )
     _popup_menu = popup_builder.show_popup_menu();
 }
 
+
 //-----------------------------------------------------------------------history_task_menu__onclick
 
-function history_task_menu__onclick( task_id )
+function show_task_log( task_id )
 {
     var show_log_command = "task=" + task_id;
     var window_name      = "show_log_task_" + task_id;
@@ -1601,6 +1602,17 @@ function history_task_menu__onclick( task_id )
     window_name      = window_name.replace( /\\/g, "\\\\" ).replace( /\"/g, "\\&quot;" );
     show_log__onclick( show_log_command, window_name );
 }
+
+
+//------------------------------------------------------------------------------history_task_menu__onclick
+
+function history_task_menu__onclick( task_id )
+{
+    var popup_builder = new Popup_menu_builder();
+    popup_builder.add_entry ( parent.getTranslation("Show log")  , "show_task_log('"+task_id+"')" );
+    _popup_menu = popup_builder.show_popup_menu();
+}
+
 
 //-----------------------------------------------------------------------queued_task_menu__onclick
 
@@ -1702,19 +1714,75 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     _popup_menu = popup_builder.show_popup_menu();
 } 
 
-//------------------------------------------------------------------------------order_history_menu__onclick
 
-function order_history_menu__onclick( job_chain, order_id, history_id, end_time )
+//------------------------------------------------------------------------------get_show_log_command
+
+function get_show_log_command( job_chain, order_id, history_id, end_time )
 {
     if( end_time ) {
       var show_log_command = "order=" + encodeComponent(order_id) +"&history_id=" + history_id;
     } else {
       var show_log_command = "job_chain=" + encodeComponent(job_chain) + "&order=" + encodeComponent(order_id);
     }
-    var window_name      = "show_log_order_" + order_id + "__" + history_id;
-    show_log_command = show_log_command.replace( /\\/g, "\\\\" ).replace( /\"/g, "\\&quot;" );
+    return show_log_command.replace( /\\/g, "\\\\" ).replace( /\"/g, "\\&quot;" );
+}
+
+
+//------------------------------------------------------------------------------order_history_menu__onclick
+
+function show_order_log( job_chain, order_id, history_id, end_time )
+{
+    var window_name  = "show_log_order_" + order_id + "__" + history_id;
     window_name      = window_name.replace( /\\/g, "\\\\" ).replace( /\"/g, "\\&quot;" );
-    show_log__onclick( show_log_command, window_name );
+    show_log__onclick( get_show_log_command( job_chain, order_id, history_id, end_time ), window_name );
+}
+
+
+//------------------------------------------------------------------------------get_stdout_stderr_links
+
+function get_stdout_stderr_links( job_chain, order_id, history_id, end_time )
+{
+    var stdout_stderr_links = [null,null];
+    if(parent._stdout_link || parent._stderr_link) {
+    	var show_log_command = get_show_log_command( job_chain, order_id, history_id, end_time );
+    	show_log_command = parent._scheduler._engine_cpp_url+"show_log?base_url="+parent._scheduler._url+"show_log&"+show_log_command;
+    
+    	var responseText = parent._scheduler.executeGet(show_log_command);
+    	var pattern;
+      var result;
+      if(parent._stdout_link) {
+      	pattern = new RegExp( parent._stdout_link + ".*\\s+href\\s*=\\s*(?:'|\")([^'\"]+)(?:'|\")" );
+      	result = pattern.exec(responseText);
+      	if(result && result[1]) {
+    	    stdout_stderr_links[0] = result[1];
+        }
+      }
+      if(parent._stderr_link) {
+      	pattern = new RegExp( parent._stderr_link + ".*\\s+href\\s*=\\s*(?:'|\")([^'\"]+)(?:'|\")" );
+      	result = pattern.exec(responseText);
+      	if(result && result[1]) {
+    	    stdout_stderr_links[1] = result[1];
+        }
+      }
+    }
+    return stdout_stderr_links;
+}
+
+
+//------------------------------------------------------------------------------order_history_menu__onclick
+
+function order_history_menu__onclick( job_chain, order_id, history_id, end_time )
+{
+    var popup_builder = new Popup_menu_builder();
+    var stdout_stderr_links = get_stdout_stderr_links( job_chain, order_id, history_id, end_time );
+    popup_builder.add_entry ( parent.getTranslation("Show log")  , "show_order_log('"+job_chain+"', '"+order_id+"', '"+history_id+"', '"+end_time+"')" );
+    if( parent._stdout_link ) {
+      popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('"+stdout_stderr_links[0]+"', '_blank')", (stdout_stderr_links[0]!=null) );
+    }
+    if( parent._stderr_link ) {
+      popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('"+stdout_stderr_links[1]+"', '_blank')", (stdout_stderr_links[1]!=null) );
+    }
+    _popup_menu = popup_builder.show_popup_menu();
 }
 
 //------------------------------------------------------------------------------job_chain_menu__onclick

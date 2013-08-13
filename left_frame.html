@@ -137,7 +137,7 @@ function update(with_details)
     if( typeof with_details != 'boolean' ) with_details = true;
     clear_update();
     update_jobs_frame();
-    if( with_details ) callErrorChecked( 'parent.details_frame.update' );
+    if( with_details && typeof parent.details_frame.update == 'function' ) callErrorChecked( 'parent.details_frame.update' );
     if( parent._scheduler._update_periodically && parent._scheduler._update_finished ) {
       _timer = set_timeout( "parent.left_frame.repeat_update(true,true)", parent._scheduler._update_seconds * 1000 );
     }

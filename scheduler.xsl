@@ -367,17 +367,52 @@
     <xsl:template match="job_chain" mode="leaf">
       <xsl:param name="name" select="@name" />
       <xsl:variable name="cnt_orders_of_big_chain" select="count(//order.job_chain_stack.entry[@job_chain = current()/@path])"/>
+      <xsl:variable name="web_services" select="/spooler/answer/state[1]/http_server/web_service[ @job_chain = current()/@path ]" />
+      <!--xsl:variable name="jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source))" /-->
+      <xsl:variable name="jobs" select="/spooler/@show_job_chain_jobs_checkbox or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source or $cnt_orders_of_big_chain &gt; 0))"/>
+      <xsl:variable name="error" select="file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'" />
       <xsl:variable name="icon_color">
         <xsl:choose>
           <xsl:when test="file_based/ERROR or file_based/removed or replacement">crimson</xsl:when>
           <xsl:when test="file_based/requisites/requisite/@is_missing='yes'">crimson</xsl:when>
-          <!--xsl:when test="job_chain_node[ @job ] and not(job_chain_node/job)">crimson</xsl:when-->
+          
+          <!--xsl:when test="not(job_chain_node[ @job ]/job)">crimson</xsl:when>
+          <xsl:when test="job_chain_node[ @job ]/@action='stop'">crimson</xsl:when>
+          <xsl:when test="job_chain_node[ @job ]/job/file_based/ERROR or job_chain_node[ @job ]/job/file_based/removed or job_chain_node[ @job ]/job/replacement">crimson</xsl:when>
+          <xsl:when test="job_chain_node[ @job ]/job/file_based/requisites/requisite/@is_missing = 'yes'">crimson</xsl:when>
+          <xsl:when test="job_chain_node[ @job ]/job/@remove = 'yes'">crimson</xsl:when>
+          <xsl:when test="job_chain_node[ @job ]/job/lock.requestor/lock.use/@is_missing = 'yes'">crimson</xsl:when>
+          <xsl:when test="not(job_chain_node[ @job ]/job/@order) or job_chain_node[ @job ]/job/@order = 'no'">crimson</xsl:when>
+          
+          <xsl:when test="job_chain_node[ @job ]/job/@state = 'running' and ">darkorange</xsl:when>
+          <xsl:when test="job_chain_node[ @job ]/job/@delay_until">darkorange</xsl:when>
+          
+          <xsl:when test="job_chain_node[ @job ]/@action='next_state'">darkorange</xsl:when>
+          <xsl:when test="job_chain_node[ @job ]/job/@delay_until">darkorange</xsl:when-->
+          
           <xsl:when test="@state = 'running' or @state = 'active'">gold</xsl:when>
           <xsl:when test="@state = 'not_initialized'">gray</xsl:when>
           <xsl:when test="not(@state)">white</xsl:when>
           <xsl:otherwise>crimson</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+      
+      <!--xsl:variable name="icon_color">
+        <xsl:choose>
+          <xsl:when test="job/@state = 'pending' or job/@state = 'initialized' or job/@state = 'loaded'">gold</xsl:when>
+          <xsl:when test="job/@state = 'running'">
+            <xsl:choose>
+              <xsl:when test="job/@order = 'yes' and $task_id &gt; 0 and job/tasks/task/@id = $task_id">forestgreen</xsl:when>
+              <xsl:when test="job/@order = 'yes' and $task_id = 0 and order_queue/order/@task = job/tasks/task/@id">forestgreen</xsl:when>
+              <xsl:otherwise>gold</xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:when test="job/@state = 'not_initialized'">gray</xsl:when>
+          <xsl:when test="not(job/@state)">white</xsl:when>
+          <xsl:otherwise>crimson</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable-->
+      
       <xsl:variable name="font_color">
         <xsl:choose>
           <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
@@ -394,10 +429,6 @@
           <xsl:otherwise>error</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:variable name="web_services" select="/spooler/answer/state[1]/http_server/web_service[ @job_chain = current()/@path ]" />
-      <!--xsl:variable name="jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source))" /-->
-      <xsl:variable name="jobs" select="/spooler/@show_job_chain_jobs_checkbox or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source or $cnt_orders_of_big_chain &gt; 0))"/>
-      <xsl:variable name="error" select="file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'" />
       
       <li class="tree">
         <div title="show job chain details">  
@@ -3799,19 +3830,19 @@
             <col align="left" width="*"/>
             <col align="left" width="*"/>
             <col align="left" width="10"/>
-            <col align="left" width="80"/>
+            <!--col align="left" width="80"/-->
           </colgroup>
           
             <xsl:choose>
               <xsl:when test="count(history.entry)=0"> 
                 <thead>
                   <xsl:call-template name="after_head_space">
-                    <xsl:with-param name="colspan" select="'7'"/>
+                    <xsl:with-param name="colspan" select="'6'"/>
                   </xsl:call-template>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="7"><span class="translate" style="font-weight:bold;">No tasks in the history</span></td>
+                    <td colspan="6"><span class="translate" style="font-weight:bold;">No tasks in the history</span></td>
                   </tr>
                 </tbody>
               </xsl:when>
@@ -3819,7 +3850,7 @@
                 
                 <thead>
                     <tr>
-                        <td colspan="7" class="before_head_space">&#160;</td>
+                        <td colspan="6" class="before_head_space">&#160;</td>
                     </tr>
                 
                     <tr>
@@ -3828,16 +3859,21 @@
                         <td class="head"><span class="translate">Process steps</span></td>
                         <td class="head"><span class="translate">Started</span></td>
                         <td class="head"><span class="translate">Ended</span></td>
-                        <td class="head" colspan="2"><span class="translate">Duration</span></td>
+                        <!--td class="head" colspan="2"><span class="translate">Duration</span></td-->
+                        <td class="head"><span class="translate">Duration</span></td>
                     </tr>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'7'"/>
+                      <xsl:with-param name="colspan" select="'6'"/>
                     </xsl:call-template>
                 </thead>
                 <tbody>
                 
                 <xsl:for-each select="history.entry">
-                    <tr>
+                    <tr title="Show log">
+                    		<xsl:attribute name="onclick">show_task_log( '<xsl:value-of select="@task"/>' )</xsl:attribute>
+                        <xsl:attribute name="oncontextmenu">history_task_menu__onclick( '<xsl:value-of select="@task"/>' );return false;</xsl:attribute>
+          							<xsl:attribute name="class">list</xsl:attribute>
+                            
                         <td><xsl:value-of select="@task"/>&#160;</td>
                         <td><nobr><span class="translate"><xsl:value-of select="@cause"/></span></nobr>&#160;</td>
                         <td align="right"><xsl:value-of select="@steps"/>&#160;</td>
@@ -3845,20 +3881,20 @@
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@duration"/></td>
                 				
-                        <td align="right" valign="top" style="padding:0px 2px;">
+                        <!--td align="right" valign="top" style="padding:0px 2px;">
                             
                             <xsl:call-template name="command_menu">
                                 <xsl:with-param name="title"              select="'Show log'"/>
-                                <xsl:with-param name="onclick_call"       select="'history_task_menu__onclick'"/>
+                                <xsl:with-param name="onclick_call"       select="'show_task_log'"/>
                                 <xsl:with-param name="onclick_param1_str" select="@task"/>
                             </xsl:call-template>                    
-                        </td>
+                        </td-->
                     </tr>
                 
                     <xsl:if test="ERROR">
                         <tr>
                             <td>&#160;</td>
-                            <td colspan="5" class="job_error"><xsl:apply-templates select="ERROR"/></td>
+                            <td colspan="4" class="job_error"><xsl:apply-templates select="ERROR"/></td>
                             <td>&#160;</td>
                         </tr>
                     </xsl:if>
@@ -3869,7 +3905,7 @@
             
             <tfoot>
               <xsl:call-template name="after_body_space">
-                  <xsl:with-param name="colspan" select="'7'"/>
+                  <xsl:with-param name="colspan" select="'6'"/>
               </xsl:call-template>
             </tfoot>
         </table>
@@ -3976,24 +4012,24 @@
                 <col width="10"/>
                 <col width="*"/>  
                 <col width="40"/>  
-                <col width="60" align="right"/>  
+                <!--col width="60" align="right"/-->  
               </colgroup>
               <xsl:if test="count(child::*)=0">
                 <thead>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'7'"/>
+                      <xsl:with-param name="colspan" select="'6'"/>
                     </xsl:call-template>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="7"><span class="translate" style="font-weight:bold;">No orders in the history</span></td>
+                        <td colspan="6"><span class="translate" style="font-weight:bold;">No orders in the history</span></td>
                     </tr>
                 </tbody>
               </xsl:if>
               <xsl:if test="not(count(child::*)=0)">
                 <thead>
                     <tr>
-                        <td colspan="7" class="before_head_space">&#160;</td>
+                        <td colspan="6" class="before_head_space">&#160;</td>
                     </tr>
                     <tr>
                         <td class="head1"><span class="translate">Id</span></td>
@@ -4011,20 +4047,23 @@
                           </xsl:otherwise>
                         </xsl:choose>
                         <td class="head"><span class="translate">State</span></td>
-                        <td class="head1">&#160;</td>
+                        <!--td class="head1">&#160;</td-->
                     </tr>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'7'"/>
+                      <xsl:with-param name="colspan" select="'6'"/>
                     </xsl:call-template>
                 </thead>
                 
                 <tbody>
                     <xsl:if test="ERROR">
-                        <tr><td colspan="7" class="job_error"><xsl:value-of select="ERROR/@text"/></td></tr>
+                        <tr><td colspan="6" class="job_error"><xsl:value-of select="ERROR/@text"/></td></tr>
                     </xsl:if> 
                     <xsl:for-each select="order[ position() &lt;= $max_order_history ]">
                         <xsl:sort select="concat(@end_time,@start_time)" order="descending"/>
-                        <tr>
+                        <tr title="Show log" > 
+                        		<xsl:attribute name="onclick">show_order_log( '<xsl:value-of select="@job_chain"/>','<xsl:value-of select="@id"/>','<xsl:value-of select="@history_id"/>','<xsl:value-of select="@end_time"/>' )</xsl:attribute>
+                            <xsl:attribute name="oncontextmenu">order_history_menu__onclick( '<xsl:value-of select="@job_chain"/>','<xsl:value-of select="@id"/>','<xsl:value-of select="@history_id"/>','<xsl:value-of select="@end_time"/>' );return false;</xsl:attribute>
+          									<xsl:attribute name="class">list</xsl:attribute>
                             <td>                
                               <xsl:if test="@state = ancestor::job_chain[@path=current()/@job_chain or substring(@path,2)=current()/@job_chain]/job_chain_node/@error_state">
                                 <xsl:attribute name="style">color: crimson</xsl:attribute>
@@ -4046,23 +4085,23 @@
                             </xsl:choose>
                             <td><nobr><xsl:value-of select="@state"/></nobr></td>
                             
-                            <td tyle="padding:0px 2px;text-align:right;">
+                            <!--td tyle="padding:0px 2px;text-align:right;">
                                 <xsl:call-template name="command_menu">
                                     <xsl:with-param name="title"              select="'Show log'"/>
-                                    <xsl:with-param name="onclick_call"       select="'order_history_menu__onclick'"/>
+                                    <xsl:with-param name="onclick_call"       select="'show_order_log'"/>
                                     <xsl:with-param name="onclick_param1_str" select="@job_chain"/>
                                     <xsl:with-param name="onclick_param2_str" select="@id"/>
                                     <xsl:with-param name="onclick_param3"     select="@history_id"/>
                                     <xsl:with-param name="onclick_param4_str" select="@end_time"/>
                                 </xsl:call-template>
-                            </td>
+                            </td-->
                         </tr>
                     </xsl:for-each>
                 </tbody>
                 </xsl:if>
                 <tfoot>
                   <xsl:call-template name="after_body_space">
-                      <xsl:with-param name="colspan" select="'7'"/>
+                      <xsl:with-param name="colspan" select="'6'"/>
                   </xsl:call-template>
                 </tfoot>
           </table>
@@ -4294,7 +4333,7 @@
             <td style="padding:0px 2px;text-align:right;" title="Show order log">
                 <xsl:call-template name="command_menu">
                     <xsl:with-param name="title"              select="'Show order log'"/>
-                    <xsl:with-param name="onclick_call"       select="'order_history_menu__onclick'"/>
+                    <xsl:with-param name="onclick_call"       select="'show_order_log'"/>
                     <xsl:with-param name="onclick_param1_str" select="@job_chain"/>
                     <xsl:with-param name="onclick_param2_str" select="@id"/>
                     <xsl:with-param name="onclick_param3"     select="@history_id"/>
@@ -4352,7 +4391,7 @@
             <td style="padding:0px 2px;text-align:right;" title="Show task log">
                 <xsl:call-template name="command_menu">
                     <xsl:with-param name="title"              select="'Show task log'"/>
-                    <xsl:with-param name="onclick_call"       select="'history_task_menu__onclick'"/>
+                    <xsl:with-param name="onclick_call"       select="'show_task_log'"/>
                     <xsl:with-param name="onclick_param1_str" select="@task"/>
                 </xsl:call-template>
             </td>

@@ -64,6 +64,8 @@ var _active_job_filter          = -1;
 var _active_job_chain_filter    = -1;
 var _active_order_filter        = -1;
 var _active_project_filter      = -1;
+var _stdout_link                = "";
+var _stderr_link                = "";
 
 
 
