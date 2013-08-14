@@ -1776,11 +1776,11 @@ function order_history_menu__onclick( job_chain, order_id, history_id, end_time 
     var popup_builder = new Popup_menu_builder();
     var stdout_stderr_links = get_stdout_stderr_links( job_chain, order_id, history_id, end_time );
     popup_builder.add_entry ( parent.getTranslation("Show log")  , "show_order_log('"+job_chain+"', '"+order_id+"', '"+history_id+"', '"+end_time+"')" );
-    if( parent._stdout_link ) {
-      popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('"+stdout_stderr_links[0]+"', '_blank')", (stdout_stderr_links[0]!=null) );
+    if( stdout_stderr_links[0] ) {
+      popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('"+stdout_stderr_links[0]+"', '_blank')" );
     }
-    if( parent._stderr_link ) {
-      popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('"+stdout_stderr_links[1]+"', '_blank')", (stdout_stderr_links[1]!=null) );
+    if( stdout_stderr_links[1] ) {
+      popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('"+stdout_stderr_links[1]+"', '_blank')" );
     }
     _popup_menu = popup_builder.show_popup_menu();
 }
