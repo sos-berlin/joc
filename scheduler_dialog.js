@@ -1775,13 +1775,15 @@ function get_stdout_stderr( job_chain, order_id, history_id, end_time )
 function order_history_menu__onclick( job_chain, order_id, history_id, end_time )
 {
     var popup_builder = new Popup_menu_builder();
-    var stdout_stderr = get_stdout_stderr( job_chain, order_id, history_id, end_time );
     popup_builder.add_entry ( parent.getTranslation("Show log")  , "show_order_log('"+job_chain+"', '"+order_id+"', '"+history_id+"', '"+end_time+"')" );
-    if( _stdout_stderr.stdout ) {
-      popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('show_stdout_stderr.html#stdout', '_blank')" );
-    }
-    if( _stdout_stderr.stderr ) {
-      popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('show_stdout_stderr.html#stderr', '_blank')" );
+    if( end_time ) {
+    	var stdout_stderr = get_stdout_stderr( job_chain, order_id, history_id, end_time );
+    	if( _stdout_stderr.stdout ) {
+      	popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('show_stdout_stderr.html#stdout', '_blank')" );
+    	}
+    	if( _stdout_stderr.stderr ) {
+      	popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('show_stdout_stderr.html#stderr', '_blank')" );
+    	}
     }
     _popup_menu = popup_builder.show_popup_menu();
 }
