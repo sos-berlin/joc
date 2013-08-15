@@ -64,9 +64,10 @@ var _active_job_filter          = -1;
 var _active_job_chain_filter    = -1;
 var _active_order_filter        = -1;
 var _active_project_filter      = -1;
-var _stdout_link                = "";
-var _stderr_link                = "";
-
+var _stdout_begin               = "";
+var _stdout_end                 = "";
+var _stderr_begin               = "";
+var _stderr_end                 = ""
 
 
 //--------------------------------------------------------------------------custom.js per hash  

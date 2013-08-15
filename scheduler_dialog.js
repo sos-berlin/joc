@@ -35,7 +35,7 @@
 var _open_url_features       = "menubar=no, toolbar=no, location=no, directories=no, scrollbars=yes, resizable=yes, status=no, dependent=yes";
 var _popup_menu;
 var _obj_title               = "";
-
+var _stdout_stderr           = {stdout:null,stderr:null,stdout_header:null,stderr_header:null};
 
 //---------------------------------------------------------------------------------showError
 function showError( x, url, line )
@@ -1738,34 +1738,35 @@ function show_order_log( job_chain, order_id, history_id, end_time )
 }
 
 
-//------------------------------------------------------------------------------get_stdout_stderr_links
+//------------------------------------------------------------------------------get_stdout_stderr
 
-function get_stdout_stderr_links( job_chain, order_id, history_id, end_time )
+function get_stdout_stderr( job_chain, order_id, history_id, end_time )
 {
-    var stdout_stderr_links = [null,null];
-    if(parent._stdout_link || parent._stderr_link) {
+    _stdout_stderr = {stdout:null,stderr:null};
+    if((parent._stdout_begin && parent._stdout_end) || (parent._stderr_begin && parent._stderr_end)) {
     	var show_log_command = get_show_log_command( job_chain, order_id, history_id, end_time );
     	show_log_command = parent._scheduler._engine_cpp_url+"show_log?base_url="+parent._scheduler._url+"show_log&"+show_log_command;
     
     	var responseText = parent._scheduler.executeGet(show_log_command);
     	var pattern;
       var result;
-      if(parent._stdout_link) {
-      	pattern = new RegExp( parent._stdout_link + ".*\\s+href\\s*=\\s*(?:'|\")([^'\"]+)(?:'|\")" );
+      if(parent._stdout_begin && parent._stdout_end) {
+      	pattern = new RegExp( parent._stdout_begin + "(.*)[\r\n](([\r\n]|.)*)" + parent._stdout_end, "gm" );
       	result = pattern.exec(responseText);
-      	if(result && result[1]) {
-    	    stdout_stderr_links[0] = result[1];
+      	if(result && result[2]) {
+      		_stdout_stderr.stdout_header = result[1].replace(/<\/span>/, "");
+      		_stdout_stderr.stdout = result[2].replace(/<span[^\)]+\)/gm, "").replace(/<\/span>([\r\n])/gm, "$1");
         }
       }
-      if(parent._stderr_link) {
-      	pattern = new RegExp( parent._stderr_link + ".*\\s+href\\s*=\\s*(?:'|\")([^'\"]+)(?:'|\")" );
+      if(parent._stderr_begin && parent._stderr_end) {
+      	pattern = new RegExp( parent._stderr_begin + "(.*)[\r\n](([\r\n]|.)*)" + parent._stderr_end, "gm" );
       	result = pattern.exec(responseText);
-      	if(result && result[1]) {
-    	    stdout_stderr_links[1] = result[1];
+      	if(result && result[2]) {
+    	    _stdout_stderr.stderr_header = result[1].replace(/<\/span>/, "");
+      		_stdout_stderr.stderr = result[2].replace(/<span[^\)]+\)/gm, "").replace(/<\/span>([\r\n])/gm, "$1");
         }
       }
     }
-    return stdout_stderr_links;
 }
 
 
@@ -1774,13 +1775,13 @@ function get_stdout_stderr_links( job_chain, order_id, history_id, end_time )
 function order_history_menu__onclick( job_chain, order_id, history_id, end_time )
 {
     var popup_builder = new Popup_menu_builder();
-    var stdout_stderr_links = get_stdout_stderr_links( job_chain, order_id, history_id, end_time );
+    var stdout_stderr = get_stdout_stderr( job_chain, order_id, history_id, end_time );
     popup_builder.add_entry ( parent.getTranslation("Show log")  , "show_order_log('"+job_chain+"', '"+order_id+"', '"+history_id+"', '"+end_time+"')" );
-    if( stdout_stderr_links[0] ) {
-      popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('"+stdout_stderr_links[0]+"', '_blank')" );
+    if( _stdout_stderr.stdout ) {
+      popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('show_stdout_stderr.html#stdout', '_blank')" );
     }
-    if( stdout_stderr_links[1] ) {
-      popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('"+stdout_stderr_links[1]+"', '_blank')" );
+    if( _stdout_stderr.stderr ) {
+      popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('show_stdout_stderr.html#stderr', '_blank')" );
     }
     _popup_menu = popup_builder.show_popup_menu();
 }
@@ -1924,7 +1925,7 @@ function open_url( url, window_name, with_hash, features )
     
     var my_window = parent.open( url, window_name, '' );
     my_window.focus();
-    if( window_name  &&  parent._scheduler )  parent._scheduler._dependend_windows[ window_name ] = my_window;
+    if( window_name && window_name != '_blank' &&  parent._scheduler )  parent._scheduler._dependend_windows[ window_name ] = my_window;
 }
 
 
