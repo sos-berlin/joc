@@ -38,17 +38,10 @@
 ********************************************************** end of preamble*/
 //-->
     <style type="text/css">
+      @import url(scheduler.css);
+      @import url(scheduler_data/config/operations_gui/custom.css);
       html          { overflow-y:scroll; overflow-x:auto; }
-      body          { font-family:Arial,Helvetica,Sans-Serif;font-size:12px;background-color:#F6F6FF;margin:0px 8px; }
-      code          { font-size:14px;color:crimson; }
-      div.header    { font-family:"Trebuchet MS",Arial,Helvetica,Sans-Serif; font-size:18px; font-weight:bold; color:#EA7A14; text-align:center; white-space:nowrap; } 
-      div.subheader { font-size:14px;width:100%;color:#808080;font-weight:bold; }
-      div.calendar  { width:100%;color:#EA7A14; }
-      td            { font-size:12px;background-color:#F6F6FF;vertical-align:top }
-      th            { font-size:16px;background-color:#C0C0C0;color:white }
-      table         { background-color:#808080; }
-      select        { font-size:12px;width:60px; }
-      option        { font-size:12px;padding-left:4px;padding-right:4px; } 
+      body          { background-color:#F6F6FF;margin:0px 8px; } 
     </style>
     <script type="text/javascript" src="scheduler_init.js"></script>
     <script type="text/javascript" src="scheduler.js"></script>
@@ -129,25 +122,26 @@ function calendar_show_callback(response)
       }
       
       var calendar_node = _response.selectSingleNode("/spooler/answer/calendar");
-      _at_nodes     = calendar_node.selectNodes("at");
-      
       if(calendar_params.menu != 'scheduler' ) {
-        var ok = true;
         var removables = new Array();
-        for( var i=0; i < _at_nodes.length; i++ ) {
-          switch(calendar_params.menu) {
-            case 'job_chain' : ok = (_at_nodes[i].getAttribute('job_chain') == calendar_params.job || '/'+_at_nodes[i].getAttribute('job_chain') == calendar_params.job);
-                               break;
-            case 'job'       : ok = (_at_nodes[i].getAttribute('job') == calendar_params.job || '/'+_at_nodes[i].getAttribute('job') == calendar_params.job);
-                               break;
-            case 'order'     : ok = ((_at_nodes[i].getAttribute('job_chain') == calendar_params.job || '/'+_at_nodes[i].getAttribute('job_chain') == calendar_params.job) && (_at_nodes[i].getAttribute('order') == calendar_params.order || '/'+_at_nodes[i].getAttribute('order') == calendar_params.order));
-                               break;
-          }
-          if( !ok ) removables.push(_at_nodes[i]);
+        switch(calendar_params.menu) {
+          case 'job_chain' : removables = calendar_node.selectNodes("child::*[not(@job_chain='"+calendar_params.job+"' or @job_chain='/"+calendar_params.job+"')]");
+                             break;
+          case 'job'       : removables = calendar_node.selectNodes("child::*[not(@job='"+calendar_params.job+"' or @job='/"+calendar_params.job+"')]");
+                             break;
+          case 'order'     : removables = calendar_node.selectNodes("child::*[not(@job_chain='"+calendar_params.job+"' or @job_chain='/"+calendar_params.job+"') or not(@order='"+calendar_params.order+"' or @order='/"+calendar_params.order+"')]");
+                             break;
         }
         for( var i=0; i < removables.length; i++ ) { calendar_node.removeChild(removables[i]); }
-        if( removables.length > 0 ) _at_nodes  = calendar_node.selectNodes("at");       
       }
+      
+      _at_nodes     = calendar_node.selectNodes("child::*");
+      for( var i=0; i < _at_nodes.length; i++ ) {
+      	UTCtoLocal( _at_nodes[i], 'at' );
+      	UTCtoLocal( _at_nodes[i], 'begin' );
+      	UTCtoLocal( _at_nodes[i], 'end' );
+      }
+      
       get_output(calendar_params.format);
       return true;
     }
@@ -157,22 +151,60 @@ function calendar_show_callback(response)
 }
 
 
+function UTCtoLocal( element, attribute_name ) {
+			if( element.getAttribute(attribute_name) ) {
+				var localTime = _scheduler.UTCtoLocal(element.getAttribute(attribute_name));
+				if(attribute_name == 'end' && localTime.indexOf('00:00:00') > -1 && element.getAttribute('begin')) {
+					localTime = getDate(element.getAttribute('begin')) + " 24:00:00"; 
+				}
+      	element.setAttribute(attribute_name, localTime);
+      }
+}
+
+
+function getDate(datetime) {
+	    return datetime.replace(/\s*\d{2}:\d{2}:\d{2}\s*$/, '');
+}
+
+
+function getTime(datetime) {
+	    return datetime.replace(/^\s*\d{4}-\d{2}-\d{2}\s*/, '');
+}
+
+
+function getAt(element) {
+	    var at = element.getAttribute('at');
+      if(element.getAttribute('begin') && element.getAttribute('end')) {
+      	at = element.getAttribute('begin') + "-" + getTime(element.getAttribute('end')) + " (" + getTranslation("repeat") + ": " + null2empty(element.getAttribute('repeat'))+null2empty(element.getAttribute('absolute_repeat')) + "s)"; 
+      }
+      return null2empty(at);
+}
+
+function getFormatString(element, sep) {
+	    return getAt(element) + sep + null2empty(element.getAttribute('job')) + sep + null2empty(element.getAttribute('job_chain')) + sep + null2empty(element.getAttribute('order'));
+}
+
+function getFormatHeaderString(sep) {
+	    return getTranslation("at") + sep + getTranslation("job") + sep + getTranslation("job chain") + sep + getTranslation("order");
+}
+
+
 function get_output(format) { 
       switch(format) { 
         case 'html' : str  = '<table cellspacing="1" cellpadding="2" border="0" width="100%">';
-                      str += '<colgroup><col width="16%" /><col width="28%" span="3" /></colgroup>';
-                      str += '<tr><th>' + getTranslation("at") + '</th><th>' + getTranslation("job") + '</th><th>' + getTranslation("job chain") + '</th><th>' + getTranslation("order") + '</th></tr>';
+                      str += '<colgroup><col width="25%" span="4" /></colgroup>';
+                      str += '<tr><th>' + getFormatHeaderString('</th><th>') + '</th></tr>';
                       for( var i=0; i < _at_nodes.length; i++ ) {
-                        str += '<tr><td style="text-align:center">'+null2empty(_at_nodes[i].getAttribute('at')).replace(/T/g,' ')+'</td><td>'+null2empty(_at_nodes[i].getAttribute('job'))+'</td><td>'+null2empty(_at_nodes[i].getAttribute('job_chain'))+'</td><td>'+null2empty(_at_nodes[i].getAttribute('order'))+'</td></tr>';
+                      	str += '<tr><td>'+getFormatString(_at_nodes[i], '</td><td>')+'</td></tr>';
                       }
                       str += '</table>';
                       document.getElementById("calendar").innerHTML = str;
                       break;
         case 'xml'  : document.getElementById("calendar").innerHTML = '<pre>'+xml_encode(_response.xml.replace(/\r/g,"").replace(/[ \t]*\n/g,"\n").replace(/\n{2,}/g,"\n").replace(/\t/g,"  "))+'</pre>';
                       break;
-        case 'csv'  : str = '<pre>' + getTranslation("at") + ';' + getTranslation("job") + ';' + getTranslation("job chain") + ';' + getTranslation("order") + '\n';
+        case 'csv'  : str = '<pre>' + getFormatHeaderString(';') + '\n';
                       for( var i=0; i < _at_nodes.length; i++ ) {
-                        str += null2empty(_at_nodes[i].getAttribute('at')).replace(/T/g,' ')+';'+null2empty(_at_nodes[i].getAttribute('job'))+';'+null2empty(_at_nodes[i].getAttribute('job_chain'))+';'+null2empty(_at_nodes[i].getAttribute('order'))+'\n';
+                        str += getFormatString(_at_nodes[i], ';')+'\n';
                       }
                       str += '</pre>';
                       document.getElementById("calendar").innerHTML = str; 

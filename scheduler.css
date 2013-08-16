@@ -168,6 +168,16 @@ span.element_name               {color:purple;}
 span.cdata                      {color:blue;font-family:Arial,Helvetica,Sans-Serif;}
 pre.cdata                       {color:grey;}
 
+/* For Show Calendar */
+div.header                      {font-family:"Trebuchet MS",Arial,Helvetica,Sans-Serif; font-size:18px; font-weight:bold; color:#EA7A14; text-align:center; white-space:nowrap; } 
+div.subheader                   {font-size:14px;width:100%;color:#808080;font-weight:bold; }
+div.calendar                    {width:100%;color:#EA7A14; }
+div.header select               {font-size:12px;width:60px; }
+div.header option               {font-size:12px;padding-left:4px;padding-right:4px; }
+div.calendar td                 {font-size:12px;background-color:#F6F6FF;vertical-align:top;padding:0px 10px;color:#EA7A14; }
+div.calendar th                 {font-size:16px;background-color:#C0C0C0;color:white; }
+div.calendar table              {background-color:#808080; }
+
 /* For Protocol */
 body.log                        {margin-left:0;padding-left:0}
 pre.log                         {font-family:"Lucida Console",monospace;font-size:12px;line-height:1.1em;margin-left:2px;padding-left:0}
