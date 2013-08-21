@@ -914,7 +914,7 @@ function get_order_states( big_chain )
       if( response ) job_chain_element = response.selectSingleNode('//job_chain');
     }
     if( big_chain ) {
-      var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node.job_chain" );
+      var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node.job_chain|.//job_chain_node[@job_chain]" );
     } else {
       var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node|.//job_chain_node.end" );
     }

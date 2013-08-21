@@ -175,9 +175,10 @@ function update_jobs_frame()
       case 'jobs'              : if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled ) what = 'schedules'; 
                                  break;
       case 'job_chains'        : max_orders       = ' max_orders="' + parent._scheduler._runtime_settings.max_orders + '"';
-                                 what             = 'job_chains';
-                                 if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox ) what += ' job_chain_orders order_source_files blacklist';
-                                 if( (parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox || parent._scheduler._checkbox_states.show_job_chain_orders_checkbox) && parent._scheduler._tree_view_enabled ) what += " job_chain_jobs";
+                                 //what             = 'job_chains';
+                                 //if( parent._scheduler._checkbox_states.show_job_chain_orders_checkbox ) what += ' job_chain_orders order_source_files blacklist';
+                                 //if( (parent._scheduler._checkbox_states.show_job_chain_jobs_checkbox || parent._scheduler._checkbox_states.show_job_chain_orders_checkbox) && parent._scheduler._tree_view_enabled ) what += " job_chain_jobs";
+                                 what             = 'job_chains job_chain_orders order_source_files blacklist job_chain_jobs';
                                  if( parent._scheduler.versionIsNewerThan( "2008-05-02 11:00:00" ) && !parent._scheduler._tree_view_enabled  ) what += ' schedules';
                                  break;
       case 'orders'            : what             = 'job_chain_orders order_source_files blacklist';
@@ -472,7 +473,7 @@ function modify_response( response )
         if( !parent.left_frame.apply_job_chains_select( job_chain_elements[j] ) ) continue;
       }
       
-      job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain]" );
+      job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain or job_chain_node/@job_chain]" );
       for( var j = 0; j < job_chain_elements.length; j++ )
       { 
         if( !parent.left_frame.apply_big_chains_select( job_chain_elements[j] ) ) continue;
@@ -480,12 +481,12 @@ function modify_response( response )
       
       //special for nested job chain support in tree view
       //add job chains from node if it is not in _response
-      job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain]" );
+      job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain or job_chain_node/@job_chain]" );
       
       if( parent._scheduler._view[_card] == 'tree' ) {
       	for( var j = 0; j < job_chain_elements.length; j++ )
         { 
-          var job_chain_nodes = job_chain_elements[j].selectNodes( "job_chain_node.job_chain/@job_chain" );
+          var job_chain_nodes = job_chain_elements[j].selectNodes( "job_chain_node.job_chain/@job_chain|job_chain_node/@job_chain" );
           for( var k=0; k < job_chain_nodes.length; k++ ) 
           {   
               if( job_chain_elements[j].selectSingleNode( "file_based/requisites/requisite[@path = '"+job_chain_nodes[k].nodeValue.toLowerCase()+"' and @is_missing='yes']" ) ) continue;
@@ -786,7 +787,7 @@ function apply_job_chains_select( node )
     var job;
     var found = [(parent._scheduler._select_states[ 'jobs_state_select' ] == 'all'),(parent._scheduler._select_states[ 'jobs_process_class_select' ] == 'all')];
     //var order_id_space = node.getAttribute('order_id_space');
-    var big_chain      = (node.selectNodes( "job_chain_node.job_chain" ).length > 0);
+    var big_chain      = (node.selectNodes( "job_chain_node.job_chain|job_chain_node[@job_chain]" ).length > 0);
     for( var i = 0; i < job_chain_jobs.length; i++ )
     {
       job = job_chain_jobs[i].selectSingleNode( "job" );
@@ -829,7 +830,7 @@ function apply_job_chains_select( node )
 
 function apply_big_chains_select( node )
 {   
-    var job_chains     = node.selectNodes( "job_chain_node.job_chain" );
+    var job_chains     = node.selectNodes( "job_chain_node.job_chain|job_chain_node[@job_chain]" );
     var job_chain      = null;
     var cnts           = [0,0];
     var parent_node    = node.parentNode;

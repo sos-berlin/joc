@@ -368,27 +368,23 @@
       <xsl:param name="name" select="@name" />
       <xsl:variable name="cnt_orders_of_big_chain" select="count(//order.job_chain_stack.entry[@job_chain = current()/@path])"/>
       <xsl:variable name="web_services" select="/spooler/answer/state[1]/http_server/web_service[ @job_chain = current()/@path ]" />
-      <!--xsl:variable name="jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source))" /-->
-      <xsl:variable name="jobs" select="/spooler/@show_job_chain_jobs_checkbox or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source or $cnt_orders_of_big_chain &gt; 0))"/>
+      <!--xsl:variable name="with_jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source))" /-->
+      <xsl:variable name="with_jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or job_chain_node[@job_chain] or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source or $cnt_orders_of_big_chain &gt; 0))"/>
+      <!--xsl:variable name="job_chain_nodes" select="job_chain_node[ @job ]"/-->
+      <!--xsl:variable name="jobs" select="job_chain_nodes/job"/-->
       <xsl:variable name="error" select="file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'" />
+      
+      <!--xsl:variable name="node_icon_color">
+      		<xsl:apply-templates mode="icon_color" select="job_chain_node[ @job ]"/>
+      </xsl:variable-->
+      
       <xsl:variable name="icon_color">
         <xsl:choose>
           <xsl:when test="file_based/ERROR or file_based/removed or replacement">crimson</xsl:when>
           <xsl:when test="file_based/requisites/requisite/@is_missing='yes'">crimson</xsl:when>
-          
-          <!--xsl:when test="not(job_chain_node[ @job ]/job)">crimson</xsl:when>
-          <xsl:when test="job_chain_node[ @job ]/@action='stop'">crimson</xsl:when>
-          <xsl:when test="job_chain_node[ @job ]/job/file_based/ERROR or job_chain_node[ @job ]/job/file_based/removed or job_chain_node[ @job ]/job/replacement">crimson</xsl:when>
-          <xsl:when test="job_chain_node[ @job ]/job/file_based/requisites/requisite/@is_missing = 'yes'">crimson</xsl:when>
-          <xsl:when test="job_chain_node[ @job ]/job/@remove = 'yes'">crimson</xsl:when>
-          <xsl:when test="job_chain_node[ @job ]/job/lock.requestor/lock.use/@is_missing = 'yes'">crimson</xsl:when>
-          <xsl:when test="not(job_chain_node[ @job ]/job/@order) or job_chain_node[ @job ]/job/@order = 'no'">crimson</xsl:when>
-          
-          <xsl:when test="job_chain_node[ @job ]/job/@state = 'running' and ">darkorange</xsl:when>
-          <xsl:when test="job_chain_node[ @job ]/job/@delay_until">darkorange</xsl:when>
-          
-          <xsl:when test="job_chain_node[ @job ]/@action='next_state'">darkorange</xsl:when>
-          <xsl:when test="job_chain_node[ @job ]/job/@delay_until">darkorange</xsl:when-->
+          <!--xsl:when test="contains($node_icon_color,'crimson')">crimson</xsl:when>
+          <xsl:when test="contains($node_icon_color,'forestgreen')">forestgreen</xsl:when>
+          <xsl:when test="contains($node_icon_color,'darkorange')">darkorange</xsl:when-->
           
           <xsl:when test="@state = 'running' or @state = 'active'">gold</xsl:when>
           <xsl:when test="@state = 'not_initialized'">gray</xsl:when>
@@ -396,22 +392,6 @@
           <xsl:otherwise>crimson</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      
-      <!--xsl:variable name="icon_color">
-        <xsl:choose>
-          <xsl:when test="job/@state = 'pending' or job/@state = 'initialized' or job/@state = 'loaded'">gold</xsl:when>
-          <xsl:when test="job/@state = 'running'">
-            <xsl:choose>
-              <xsl:when test="job/@order = 'yes' and $task_id &gt; 0 and job/tasks/task/@id = $task_id">forestgreen</xsl:when>
-              <xsl:when test="job/@order = 'yes' and $task_id = 0 and order_queue/order/@task = job/tasks/task/@id">forestgreen</xsl:when>
-              <xsl:otherwise>gold</xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <xsl:when test="job/@state = 'not_initialized'">gray</xsl:when>
-          <xsl:when test="not(job/@state)">white</xsl:when>
-          <xsl:otherwise>crimson</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable-->
       
       <xsl:variable name="font_color">
         <xsl:choose>
@@ -433,7 +413,7 @@
       <li class="tree">
         <div title="show job chain details">  
           <xsl:attribute name="onclick">show_job_chain_details( '<xsl:value-of select="@path"/>' )</xsl:attribute>
-          <xsl:attribute name="oncontextmenu">job_chain_menu__onclick( '<xsl:value-of select="@path"/>', <xsl:value-of select="1+@orders"/>, <xsl:value-of select="1+number(boolean(@order_id_space and job_chain_node.job_chain))"/> );return false;</xsl:attribute>
+          <xsl:attribute name="oncontextmenu">job_chain_menu__onclick( '<xsl:value-of select="@path"/>', <xsl:value-of select="1+@orders"/>, <xsl:value-of select="1+number(boolean(@order_id_space and (job_chain_node.job_chain or job_chain_node[@job_chain])))"/> );return false;</xsl:attribute>
           
           <span class="status" title="{$icon_title}" style="{concat('background-color:',$icon_color)}">&#160;</span>
           <span class="bold" style="{concat('color:',$font_color)}"><xsl:value-of select="$name" /></span>
@@ -474,12 +454,12 @@
         </div>
       </li>
       
-      <xsl:if test="$jobs">
+      <xsl:if test="$with_jobs">
           <xsl:choose>
-            <xsl:when test="job_chain_node.job_chain">
+            <xsl:when test="job_chain_node.job_chain or job_chain_node[@job_chain]">
               <li class="job_chains">
                 <ul style="margin-left:9px;">
-                   <xsl:apply-templates mode="leaf" select="job_chain_node.job_chain"/>
+                   <xsl:apply-templates mode="leaf" select="job_chain_node.job_chain|job_chain_node[@job_chain]"/>
                 </ul>
               </li>  
             </xsl:when>
@@ -527,7 +507,7 @@
     </xsl:template>
     
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tree-Leaf for job_chain_node.job_chain-->
-    <xsl:template match="job_chain_node.job_chain" mode="leaf">
+    <xsl:template match="job_chain_node.job_chain|job_chain_node[@job_chain]" mode="leaf">
       <xsl:variable name="job_chain" select="/spooler/answer/state//job_chains/job_chain[@path = current()/@job_chain]" />
       <xsl:choose>
         <xsl:when test="$job_chain">
@@ -551,11 +531,11 @@
       </xsl:choose>
     </xsl:template>
     
+    
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tree-Leaf for job_chain_node-->
-    <!--xsl:template match="job_chain_node | job_chain_node.job_chain" mode="leaf"-->
-    <xsl:template match="job_chain_node" mode="leaf">
-      <xsl:param name="task_id" select="0" />
-      <xsl:variable name="icon_color">
+    <xsl:template match="job_chain_node" mode="icon_color">
+    	  <xsl:param name="task_id" select="0" />
+      
         <xsl:choose>
           <xsl:when test="not(job)">crimson</xsl:when>
           <xsl:when test="@action='next_state'">darkorange</xsl:when>
@@ -578,7 +558,42 @@
           <xsl:when test="not(job/@state)">white</xsl:when>
           <xsl:otherwise>crimson</xsl:otherwise>
         </xsl:choose>
+      
+    </xsl:template>  
+    
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tree-Leaf for job_chain_node-->
+    <!--xsl:template match="job_chain_node | job_chain_node.job_chain" mode="leaf"-->
+    <xsl:template match="job_chain_node" mode="leaf">
+      <xsl:param name="task_id" select="0" />
+      <xsl:variable name="icon_color">
+      		<xsl:apply-templates mode="icon_color" select=".">
+          		<xsl:with-param name="task_id" select="$task_id" />
+      		</xsl:apply-templates>
       </xsl:variable>
+      <!--xsl:variable name="icon_color">
+        <xsl:choose>
+          <xsl:when test="not(job)">crimson</xsl:when>
+          <xsl:when test="@action='next_state'">darkorange</xsl:when>
+          <xsl:when test="@action='stop'">crimson</xsl:when>
+          <xsl:when test="job/file_based/ERROR or job/file_based/removed or job/replacement">crimson</xsl:when>
+          <xsl:when test="job/file_based/requisites/requisite/@is_missing = 'yes'">crimson</xsl:when>
+          <xsl:when test="job/@remove = 'yes'">crimson</xsl:when>
+          <xsl:when test="job/lock.requestor/lock.use/@is_missing = 'yes'">crimson</xsl:when>
+          <xsl:when test="not(job/@order) or job/@order = 'no'">crimson</xsl:when>
+          <xsl:when test="job/@delay_until">darkorange</xsl:when>
+          <xsl:when test="job/@state = 'pending' or job/@state = 'initialized' or job/@state = 'loaded'">gold</xsl:when>
+          <xsl:when test="job/@state = 'running'">
+            <xsl:choose>
+              <xsl:when test="job/@order = 'yes' and $task_id &gt; 0 and job/tasks/task/@id = $task_id">forestgreen</xsl:when>
+              <xsl:when test="job/@order = 'yes' and $task_id = 0 and order_queue/order/@task = job/tasks/task/@id">forestgreen</xsl:when>
+              <xsl:otherwise>gold</xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:when test="job/@state = 'not_initialized'">gray</xsl:when>
+          <xsl:when test="not(job/@state)">white</xsl:when>
+          <xsl:otherwise>crimson</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable-->
       <xsl:variable name="font_color">
         <xsl:choose>
           <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
@@ -620,7 +635,7 @@
         <xsl:attribute name="oncontextmenu">job_chain_node_menu__onclick( '<xsl:value-of select="@state"/>', '<xsl:value-of select="../@path"/>' );return false;</xsl:attribute>
         
         <td><span class="order_job_status" title="{$icon_title}" style="{concat('margin-top:4px;background-color:',$icon_color)}">&#160;</span></td>
-        <td><xsl:value-of select="@state"/></td>
+        <td class="nowrap"><xsl:value-of select="@state"/></td>
         <td colspan="{$colspan}" style="{concat('padding:0px 4px;color:',$font_color)}">
           <xsl:apply-templates mode="trim_slash" select="@job" />
         </td>
@@ -1042,7 +1057,7 @@
                     <xsl:with-param name="onclick_call"         select="'job_chain_menu__onclick'"/>
                     <xsl:with-param name="onclick_param1_str"   select="@job_chain"/>
                     <xsl:with-param name="onclick_param2"       select="1+$job_chain/@orders"/>
-                    <xsl:with-param name="onclick_param3"       select="1+number(boolean($job_chain/@order_id_space and $job_chain/job_chain_node.job_chain))"/>
+                    <xsl:with-param name="onclick_param3"       select="1+number(boolean($job_chain/@order_id_space and ($job_chain/job_chain_node.job_chain or $job_chain/job_chain_node[@job_chain])))"/>
                 </xsl:call-template>
           </td>
         </tr>
@@ -2939,7 +2954,7 @@
             
             
             <xsl:if test="$big_chain">
-            	<td>
+            	<td class="nowrap">
               	<xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@path"/>' )</xsl:attribute>
               	<xsl:value-of select="$node_state"/>
               </td>
@@ -2978,7 +2993,7 @@
                 <xsl:attribute name="style">padding-right:8px;</xsl:attribute>
               </xsl:if>
               <xsl:choose>
-                <xsl:when test="@order_id_space and job_chain_node.job_chain">  
+                <xsl:when test="@order_id_space and (job_chain_node.job_chain or job_chain_node[@job_chain])">  
                   <xsl:value-of select="$cnt_orders_of_big_chain"/>
                 </xsl:when>
                 <xsl:otherwise>  
@@ -2993,7 +3008,7 @@
                     <xsl:with-param name="onclick_call"         select="'job_chain_menu__onclick'"/>
                     <xsl:with-param name="onclick_param1_str"   select="@path"/>
                     <xsl:with-param name="onclick_param2"       select="1+@orders"/>
-                    <xsl:with-param name="onclick_param3"       select="1+number(boolean(@order_id_space and job_chain_node.job_chain))"/>
+                    <xsl:with-param name="onclick_param3"       select="1+number(boolean(@order_id_space and (job_chain_node.job_chain or job_chain_node[@job_chain])))"/>
                 </xsl:call-template>
             </td>
           </tr>
@@ -3018,8 +3033,8 @@
             </tr>
           </xsl:if>          
           <!--xsl:if test="$single or /spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/descendant::order_queue/order or file_order_source))"-->
-          <xsl:if test="$single or /spooler/@show_job_chain_jobs_checkbox or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/descendant::order_queue/order or file_order_source or $cnt_orders_of_big_chain &gt; 0))">
-            <xsl:for-each select="job_chain_node[ @job ] | job_chain_node.job_chain">
+          <xsl:if test="$single or /spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or job_chain_node[@job_chain] or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/descendant::order_queue/order or file_order_source or $cnt_orders_of_big_chain &gt; 0))">
+            <xsl:for-each select="job_chain_node[ @job ] | job_chain_node.job_chain | job_chain_node[@job_chain]">
                 <!-- $show_orders vergroessert den Abstand zwischen den Job_chain_nodes. Aber nur, wenn ueberhaupt ein Order in der Jobkette ist -->
                 <xsl:variable name="show_orders" select="( /spooler/@show_job_chain_orders_checkbox or $single )"/>
                 <xsl:variable name="job" select="/spooler/answer/state/jobs/job[ @path = current()/@job ] | job[ @path = current()/@job ]"/>
@@ -3039,7 +3054,7 @@
                   <tr class="list" title="show job details">                                
                     <td>
                         <xsl:attribute name="onclick">callErrorChecked( 'show_job_details','<xsl:value-of select="@job"/>' )</xsl:attribute>
-                        <span style="margin-left: 2ex;white-space:nowrap;"><xsl:value-of select="@state"/></span>
+                        <span class="nowrap" style="margin-left: 2ex;"><xsl:value-of select="@state"/></span>
                     </td>
         
                     <td>

@@ -40,6 +40,7 @@ a:visited        								{color:#000066;text-decoration:none;font-size:12px;}
 .head                           {border-bottom:1px solid #8B919F;border-left:1px solid #8B919F;vertical-align:bottom;}
 .before_head_space              {margin:0px;line-height:6px;height:6px;}
 .link        								    {color:#000066;text-decoration:none;font-size:12px;cursor:pointer;}
+.nowrap        								  {white-space:nowrap;}
 td.after_head_space1            {background-color:#CFD7EB;margin:0px;line-height:3px;height:3px;}
 td.after_head_space2            {background-color:#D4DBEE;margin:0px;line-height:1px;height:1px;}
 td.after_head_space3            {background-color:#DADFF0;margin:0px;line-height:1px;height:1px;}

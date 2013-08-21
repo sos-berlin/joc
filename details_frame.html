@@ -327,7 +327,7 @@ function normalize_order_history( response, show_job_chain_query )
       _job_chain_element.appendChild( order_history_element );
     }
     //if nested job chain
-    var job_chain_node_job_chains = _job_chain_element.selectNodes( 'job_chain_node.job_chain' );
+    var job_chain_node_job_chains = _job_chain_element.selectNodes( 'job_chain_node.job_chain|job_chain_node[@job_chain]' );
     if( job_chain_node_job_chains.length > 0 ) {
       var job_chain_node_job_chain  = [];  
       var job_chain_node_history    = null;
