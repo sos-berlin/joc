@@ -726,13 +726,13 @@
       <li class="tree">
         <div title="show job chain details" style="float:right;">
           <xsl:attribute name="onclick">show_job_chain_details( '<xsl:value-of select="$job_chain_path"/>' )</xsl:attribute>
-          <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="@id"/>', '<xsl:value-of select="$menu_caller"/>' );return false;</xsl:attribute>
+          <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="$normalized_order_id"/>', '<xsl:value-of select="$menu_caller"/>' );return false;</xsl:attribute>
           <xsl:apply-templates select="ancestor::job_chain/@state"/>
         </div>
         <div title="show job chain details">
           <!--xsl:attribute name="onclick">show_order_details( '<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute-->
           <xsl:attribute name="onclick">show_job_chain_details( '<xsl:value-of select="$job_chain_path"/>' )</xsl:attribute>
-          <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="@id"/>', '<xsl:value-of select="$menu_caller"/>' );return false;</xsl:attribute>
+          <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="$normalized_order_id"/>', '<xsl:value-of select="$menu_caller"/>' );return false;</xsl:attribute>
           
           <span class="status" title="{$icon_title}" style="{concat('background-color:',$icon_color)}">&#160;</span>
           <xsl:choose>
@@ -2128,7 +2128,7 @@
               
               <tr class="list" title="show order details">
                 <xsl:if test="$treeview">
-                  <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="@id"/>', '<xsl:value-of select="name(parent::*)"/>' );return false;</xsl:attribute>
+                  <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="$normalized_order_id"/>', '<xsl:value-of select="name(parent::*)"/>' );return false;</xsl:attribute>
                   <xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
                 </xsl:if> 
                 <td>
@@ -4075,9 +4075,12 @@
                     </xsl:if> 
                     <xsl:for-each select="order[ position() &lt;= $max_order_history ]">
                         <xsl:sort select="concat(@end_time,@start_time)" order="descending"/>
+                        <xsl:variable name="normalized_order_id">
+        									<xsl:apply-templates mode="normalized_order_id" select="@id" />
+      									</xsl:variable>
                         <tr title="Show log" > 
-                        		<xsl:attribute name="onclick">show_order_log( '<xsl:value-of select="@job_chain"/>','<xsl:value-of select="@id"/>','<xsl:value-of select="@history_id"/>','<xsl:value-of select="@end_time"/>' )</xsl:attribute>
-                            <xsl:attribute name="oncontextmenu">order_history_menu__onclick( '<xsl:value-of select="@job_chain"/>','<xsl:value-of select="@id"/>','<xsl:value-of select="@history_id"/>','<xsl:value-of select="@end_time"/>' );return false;</xsl:attribute>
+                        		<xsl:attribute name="onclick">show_order_log( '<xsl:value-of select="@job_chain"/>','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@history_id"/>','<xsl:value-of select="@end_time"/>' )</xsl:attribute>
+                            <xsl:attribute name="oncontextmenu">order_history_menu__onclick( '<xsl:value-of select="@job_chain"/>','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@history_id"/>','<xsl:value-of select="@end_time"/>' );return false;</xsl:attribute>
           									<xsl:attribute name="class">list</xsl:attribute>
                             <td>                
                               <xsl:if test="@state = ancestor::job_chain[@path=current()/@job_chain or substring(@path,2)=current()/@job_chain]/job_chain_node/@error_state">

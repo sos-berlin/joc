@@ -1728,10 +1728,10 @@ function get_show_log_command( job_chain, order_id, history_id, end_time )
 }
 
 
-//------------------------------------------------------------------------------order_history_menu__onclick
+//------------------------------------------------------------------------------show_order_log
 
 function show_order_log( job_chain, order_id, history_id, end_time )
-{
+{   
     var window_name  = "show_log_order_" + order_id + "__" + history_id;
     window_name      = window_name.replace( /\\/g, "\\\\" ).replace( /\"/g, "\\&quot;" );
     show_log__onclick( get_show_log_command( job_chain, order_id, history_id, end_time ), window_name );
@@ -1773,9 +1773,9 @@ function get_stdout_stderr( job_chain, order_id, history_id, end_time )
 //------------------------------------------------------------------------------order_history_menu__onclick
 
 function order_history_menu__onclick( job_chain, order_id, history_id, end_time )
-{
+{   
     var popup_builder = new Popup_menu_builder();
-    popup_builder.add_entry ( parent.getTranslation("Show log")  , "show_order_log('"+job_chain+"', '"+order_id+"', '"+history_id+"', '"+end_time+"')" );
+    popup_builder.add_entry ( parent.getTranslation("Show log")  , "show_order_log('"+job_chain+"', '"+order_id.replace( /\\/g, "\\\\" )+"', '"+history_id+"', '"+end_time+"')" );
     if( end_time ) {
     	var stdout_stderr = get_stdout_stderr( job_chain, order_id, history_id, end_time );
     	if( _stdout_stderr.stdout ) {
