@@ -119,8 +119,8 @@ function Popup_menu_builder()
     this._selectbox_array = new Array();
     
     this._html_array.push( "<table cellpadding='0' cellspacing='0' " +
-                                 " style='background-color: menu; border: thin outset'>" );
-    this._html_array.push( "<tr><td style='background-color: menu; line-height: 4px'>&#160;</td></tr>" );
+                                 " style='background-color: menu; border: thin outset; padding:4px 0px 6px;'>" );
+    //this._html_array.push( "<tr><td style='background-color: menu; line-height: 4px;'>&#160;</td></tr>" );
     
     this._finished = false;
 }
@@ -211,7 +211,7 @@ Popup_menu_builder.prototype.html = function()
 {
     if( !this._finished )
     {
-      this._html_array.push( "<tr><td style='background-color: menu; line-height: 6px'>&#160;</td></tr>" );
+      //this._html_array.push( "<tr><td style='background-color: menu; line-height: 6px;'>&#160;</td></tr>" );
       this._html_array.push( "</table>" );
       this._finished = true;
     }
@@ -383,8 +383,9 @@ Input_dialog.prototype.show = function()
     parent.left_frame.focus();
     Input_dialog._element.style.top     = "70px";
     Input_dialog._element.style.zIndex  = "20";
-    if( parent.left_frame.document.documentElement.scrollTop > 60 ) {
-      Input_dialog._element.style.top   = (10 + parent.left_frame.document.documentElement.scrollTop) + "px";
+    var _scrollTop = parent.left_frame.document.documentElement.scrollTop + parent.left_frame.document.body.scrollTop; 
+    if( _scrollTop > 60 ) {
+      Input_dialog._element.style.top   = (10 + _scrollTop) + "px";
     }
     Input_dialog._element.innerHTML     = this.html();
     Input_dialog._element.style.display = "block";

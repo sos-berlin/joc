@@ -383,14 +383,14 @@ function update_callback( response )
 {
     if( response ) _response = response; 
     if( !parent._scheduler._tree_view_enabled ) set_timeout('parent.top_frame.update();',1);
-    //alert(_response.xml);
+    //alert(_response.xml);    
     modify_response( _response );
     parent._scheduler.logger(3,'WRITE HTML','scheduler_tree_html');
       
     var output_tree = $( _card+'_tree_output' );
     var output_list = $( _card+'_list_output' );
     if( parent._scheduler._view[_card] == 'tree' ) {
-      var tbodytree    = output_tree.down('tbody',1);
+      //var tbodytree    = output_tree.down('tbody',1);
       output_tree.down('thead').update(set_table_header());
       
       var dom = parent._scheduler.xmlTransform( _response, true, false );
@@ -404,7 +404,6 @@ function update_callback( response )
         var elem = $(item.id);
         if( elem ) elem.innerHTML = item.innerHTML;
       });
-      
       output_list.hide();
       output_tree.show();
     } else {

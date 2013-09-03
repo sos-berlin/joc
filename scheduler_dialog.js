@@ -35,6 +35,7 @@
 var _open_url_features       = "menubar=no, toolbar=no, location=no, directories=no, scrollbars=yes, resizable=yes, status=no, dependent=yes";
 var _popup_menu;
 var _obj_title               = "";
+var _obj_name                = "";
 var _stdout_stderr           = {stdout:null,stderr:null,stdout_header:null,stderr_header:null};
 
 //---------------------------------------------------------------------------------showError
@@ -507,7 +508,7 @@ function start_task_at( ret ) {
     dialog.close_after_submit = false;
     dialog.width      = 384;
     dialog.submit_fct = "callErrorChecked( 'start_task_at' ,true )";
-    dialog.add_title( "Start task $task", {task:'<br/>'+_obj_title} );
+    dialog.add_title( "Start task $task", {task:'<br/>'+_obj_name+'<br/>'+_obj_title} );
     if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) && parent._scheduler._runtime_settings.start_next_period_enabled ) {
       dialog.add_checkbox( 'force', '<b>'+parent.getTranslation('Start enforced')+'</b>', false );
     } else {
@@ -563,7 +564,7 @@ function start_task( ret ) {
       dialog.close_after_submit = false;
       dialog.width      = 384;
       dialog.submit_fct = "callErrorChecked( 'start_task', true )";
-      dialog.add_title( "Start task $task", {task:'<br/>'+_obj_title} );
+      dialog.add_title( "Start task $task", {task:'<br/>'+_obj_name+'<br/>'+_obj_title} );
       if( parent._scheduler.versionIsNewerThan( "2008-11-04 12:30:00" ) && parent._scheduler._runtime_settings.start_next_period_enabled ) {
         dialog.add_checkbox( 'force', '<b>'+parent.getTranslation('Start enforced')+'</b>', false );
       } else {
@@ -617,7 +618,7 @@ function start_order_at( now ) {
               dialog.width      = 360;
               dialog.close_after_submit = false;
               dialog.submit_fct = "callErrorChecked( 'start_order_at', 2 )";
-              dialog.add_title( "Start order $order", {order:'<br/>'+_obj_title} );
+              dialog.add_title( "Start order $order", {order:'<br/>'+_obj_name+'<br/>'+_obj_title} );
               dialog.add_prompt( get_start_at_prompt() );
               dialog.add_prompt( "" );
               dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
@@ -674,7 +675,7 @@ function start_order( ret )
       dialog.close_after_submit = false;
       dialog.width      = 384;
       dialog.submit_fct = "callErrorChecked( 'start_order', true )";
-      dialog.add_title( "Start order $order", {order:'<br/>'+_obj_title} );
+      dialog.add_title( "Start order $order", {order:'<br/>'+_obj_name+'<br/>'+_obj_title} );
       dialog.add_prompt( get_start_at_prompt() );
       dialog.add_labeled_input( '<table cellspacing="0" cellpadding="0" width="100%"><tr><td align="right"><img src="icon_calendar.gif" alt="calendar" title="calendar" onclick="Input_dialog.show_calendar(\'at\',true,event);" /></td></tr></table>', "at", ((parent._scheduler._runtime_settings.start_at_default_is_now) ? "now" : "") );
       dialog.add_params( params, param_names.sort() );
@@ -855,7 +856,7 @@ function set_order_state( order_state, order_end_state, setback, hot, ret )
       var states        = get_order_states();
       dialog.width      = 240;
       dialog.submit_fct = "callErrorChecked( 'set_order_state', '" + order_state + "', '" + order_end_state + "', " + setback + ", " + hot + ", true )";
-      dialog.add_title( "Set order state of $order", {order:'<br/>'+_obj_title} );
+      dialog.add_title( "Set order state of $order", {order:'<br/>'+_obj_name+'<br/>'+_obj_title} );
       dialog.add_prompt( '<b>Select a new order state</b>' );
       dialog.add_prompt( '<span class="small">The current order state is $state.</span>', {state:'&quot;'+order_state+'&quot;'} );
       dialog.add_prompt( "" );
@@ -945,7 +946,7 @@ function set_run_time( caller, hot, ret )
       var has_run_options = ( caller == 'job' ) ? 'false' : 'false'; //z.Zt. werden noch keine run options unterstuetzt
       switch( caller ) {
         case 'order'          : 
-        case 'job'            : dialog.add_title( "Set run time of $job", {job:'<br/>'+_obj_title} );
+        case 'job'            : dialog.add_title( "Set run time of $job", {job:'<br/>'+_obj_name+'<br/>'+_obj_title} );
                                 dialog.add_prompt( '<b>Enter a run time</b> or use the $editor', {editor:'<input class="buttonbar" type="button" value=" '+parent.getTranslation('run time editor')+' " onclick="runtime_editor(\'run_time\', ' + has_run_options + ')"/>'} );
                                 dialog.add_prompt( "" );
                                 break;
@@ -1534,8 +1535,9 @@ function job_menu__onclick( job_name )
     var stopped       = (state == 'stopped' || state == "stopping");
     var order_job     = (job_element.getAttribute( "order" ) == "yes");
     var job_title     = job_element.getAttribute( "title" );
-    if( !job_title ) job_title = job_name.replace(/^\//,'');
-    _obj_title        = xml_encode(job_title);
+    //if( !job_title ) job_title = job_name.replace(/^\//,'');
+    _obj_title        = title_encode(job_title);
+    _obj_name         = xml_encode(job_name.replace(/^\//,''));
     var hot           = (job_element.selectSingleNode('file_based/@file') && parent._scheduler.versionIsNewerThan( "2008-05-13 09:00:00" ) ) ? 1 : 0;
     
     popup_builder.add_show_log( parent.getTranslation("Show log")        , "job=" + encodeComponent(job_name), "show_log_job_" + job_name.replace(/\//g,'_') );
@@ -1674,8 +1676,9 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       } */
     }
     if( !end_state ) end_state = "";
-    if( !order_title ) order_title = order_id.replace(/\\/g,"\\\\").replace(/^\//,'');
-    _obj_title = xml_encode(order_title);
+    //if( !order_title ) order_title = order_id.replace(/\\/g,"\\\\").replace(/^\//,'');
+    _obj_title = title_encode(order_title);
+    _obj_name  = xml_encode(order_id.replace(/\\/g,"\\\\").replace(/^\//,''));
     if( !occupied_http || occupied_http.search(/^http/) == -1 ) { 
     	occupied_http = ''; 
     } else {
@@ -1974,6 +1977,17 @@ function xml_encode( text )
     if( text == null )  return "";
     if( text.toString().search(/&(amp|lt|gt|quot|#039);/) > -1 ) return text;
     return text.toString().replace( /&/g, "&amp;" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace( /\"/g, "&quot;" ).replace( /\'/g, "&#039;" );
+}
+
+
+//---------------------------------------------------------------------------------------title_encode
+
+function title_encode( text )
+{
+    if( text == null )  return "";
+    if( text.toString().search(/(www.|https?:\/\/)/) > -1 ) return text;
+    //TODO generate links
+    return text;
 }
 
 

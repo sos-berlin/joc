@@ -814,17 +814,20 @@ Scheduler.prototype.getCookie = function(name, default_value)
 Scheduler.prototype.treeDisplay = function( li_element )
 {
     var ul          = li_element.down('ul');
-    var img_folder  = li_element.down('img');
+    //var img_folder  = li_element.down('img');
+    var img_folder  = li_element.down('span');
     if( ul.getAttribute('sos_mode') == 'closed' ) {
       ul.setAttribute('sos_mode','open');
       ul.style.display  = 'block';
-      img_folder.src    = this._imgFolderOpen;
+      //img_folder.src    = this._imgFolderOpen;
+      img_folder.style.backgroundImage = "url('"+this._imgFolderOpen+"')";
       return true;
     }
     else {
       ul.style.display  = 'none';
       ul.setAttribute('sos_mode','closed');
-      img_folder.src    = this._imgFolderClose;
+      //img_folder.src    = this._imgFolderClose;
+      img_folder.style.backgroundImage = "url('"+this._imgFolderClose+"')";
       return false;
     }
 }
