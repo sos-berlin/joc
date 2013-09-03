@@ -820,14 +820,14 @@ Scheduler.prototype.treeDisplay = function( li_element )
       ul.setAttribute('sos_mode','open');
       ul.style.display  = 'block';
       //img_folder.src    = this._imgFolderOpen;
-      img_folder.style.backgroundImage = "url('"+this._imgFolderOpen+"')";
+      img_folder.className="open_folder";
       return true;
     }
     else {
       ul.style.display  = 'none';
       ul.setAttribute('sos_mode','closed');
       //img_folder.src    = this._imgFolderClose;
-      img_folder.style.backgroundImage = "url('"+this._imgFolderClose+"')";
+      img_folder.className="closed_folder";
       return false;
     }
 }

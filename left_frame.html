@@ -133,9 +133,9 @@ function do_onunload()
 
 function update(with_details)
 {   
+    clear_update();
     parent._scheduler.logger(1,'UPDATE ' + self.name, 'scheduler_left_frame');
     if( typeof with_details != 'boolean' ) with_details = true;
-    clear_update();
     update_jobs_frame();
     if( with_details && typeof parent.details_frame.update == 'function' ) callErrorChecked( 'parent.details_frame.update' );
     if( parent._scheduler._update_periodically && parent._scheduler._update_finished ) {
