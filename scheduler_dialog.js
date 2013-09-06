@@ -305,7 +305,9 @@ function scheduler_settings__onclick(ret)
     return false;
   }
   if( typeof ret != "boolean" ) ret = false;
-  parent.details_frame.hide();
+  if(typeof parent.details_frame.hide == 'function') {
+  	parent.details_frame.hide();
+  }
     
   if( !ret ) {
     _popup_menu.close();
@@ -1179,7 +1181,9 @@ function add_job_chain(job_chain,step)
     }
     
     if( typeof step != "number" ) step = 1;
-    parent.details_frame.hide();
+    if(typeof parent.details_frame.hide == 'function') {
+  		parent.details_frame.hide();
+  	}
     
     if( step == 1 ) {
       Input_dialog.close();
@@ -1545,8 +1549,8 @@ function job_menu__onclick( job_name )
     popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('job', '"+parent.left_frame._job_name+"')", hot );
     
     var has_description = (job_element.getAttribute( "has_description" ) == "yes");
-    popup_builder.add_entry   ( parent.getTranslation("Show description"), "show_job_desc()", has_description );
-    popup_builder.add_entry   ( parent.getTranslation("Show dependency") , "show_job_illustration()", true );
+    popup_builder.add_entry   ( parent.getTranslation("Show documentation"), "show_job_desc()", has_description );
+    popup_builder.add_entry   ( parent.getTranslation("Show dependencies") , "show_job_illustration()", true );
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {
       popup_builder.add_entry ( parent.getTranslation("Show start times"), "callErrorChecked('show_calendar','job')" );
     }
@@ -1809,7 +1813,7 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
     
     //popup_builder.add_entry ( parent.getTranslation("Show configuration")  , "show_xml('"+job_chain+".job_chain.xml')", hot );
     popup_builder.add_entry ( parent.getTranslation("Show configuration")  , "show_xml2('job_chain', '"+job_chain+"')", hot );
-    popup_builder.add_entry ( parent.getTranslation("Show dependency")     , "show_job_chain_illustration()", !big_chain );
+    popup_builder.add_entry ( parent.getTranslation("Show dependencies")   , "show_job_chain_illustration()", !big_chain );
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {
       popup_builder.add_entry ( parent.getTranslation("Show start times")  , "callErrorChecked('show_calendar','job_chain')", !big_chain );
     }

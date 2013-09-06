@@ -193,7 +193,7 @@ function show_card( what )
     {
         document.getElementById(what+'_inner_tab').className = 'active'+tabs[what].pos;
         document.getElementById(parent._scheduler._show_card+'_inner_tab').className = 'inactive'+tabs[parent._scheduler._show_card].pos;
-        if( what == "process_classes" || what == "remote_schedulers" || what == "cluster" )
+        if( typeof parent.details_frame.hide == 'function' && (what == "process_classes" || what == "remote_schedulers" || what == "cluster") )
         {
             parent.details_frame.hide();
         }

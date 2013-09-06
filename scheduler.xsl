@@ -204,7 +204,7 @@
               <xsl:when test="($grandchildren != '' and count(descendant::*[name() = $grandchildren]) &gt; 0 ) or ($grandchildren = '' and count(descendant::*) &gt; 0)">
                 <!--img class="folder" src="explorer_folder_open.gif" onclick="callErrorChecked('toggle_tree_node',this.parentNode);" /-->
                 <span class="open_folder" onclick="callErrorChecked('toggle_tree_node',this.parentNode);">&#160;</span>
-                <span class="bold"><xsl:value-of select="@name" /></span>
+                <span class="bold pointer" style="cursor:pointer;" onclick="callErrorChecked('toggle_tree_node',this.parentNode);"><xsl:value-of select="@name" />&#160;</span>
                 <xsl:apply-templates select="." mode="tree">
                   <xsl:with-param name="children"      select="$children" />
                   <xsl:with-param name="grandchildren" select="$grandchildren" />
@@ -213,13 +213,13 @@
               <xsl:when test = "contains( /spooler/@my_open_folders, concat('|',@path,'|') )">
                 <!--img class="folder" src="explorer_folder_open.gif" onclick="callErrorChecked('toggle_tree_node',this.parentNode);" /-->
                 <span class="open_folder" onclick="callErrorChecked('toggle_tree_node',this.parentNode);">&#160;</span>
-                <span class="bold"><xsl:value-of select="@name" /></span>
+                <span class="bold pointer"  style="cursor:pointer;" onclick="callErrorChecked('toggle_tree_node',this.parentNode);"><xsl:value-of select="@name" />&#160;</span>
                 <ul id="{concat($children,@path)}" style="display:none;" sos_mode="closed">&#160;</ul>
               </xsl:when>
               <xsl:otherwise>
                 <!--img class="folder" src="explorer_folder_closed.gif" onclick="callErrorChecked('toggle_tree_node',this.parentNode);" /-->
                 <span class="closed_folder" onclick="callErrorChecked('toggle_tree_node',this.parentNode);">&#160;</span>
-                <span class="bold"><xsl:value-of select="@name" /></span>
+                <span class="bold pointer" onclick="callErrorChecked('toggle_tree_node',this.parentNode);"><xsl:value-of select="@name" />&#160;</span>
                 <ul id="{concat($children,@path)}" style="display:none;" sos_mode="closed">&#160;</ul>
               </xsl:otherwise>
             </xsl:choose>
