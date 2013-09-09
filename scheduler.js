@@ -815,7 +815,7 @@ Scheduler.prototype.treeDisplay = function( li_element )
 {
     var ul          = li_element.down('ul');
     //var img_folder  = li_element.down('img');
-    var img_folder  = li_element.down('span');
+    var img_folder  = li_element.down('div');
     if( ul.getAttribute('sos_mode') == 'closed' ) {
       ul.setAttribute('sos_mode','open');
       ul.style.display  = 'block';
