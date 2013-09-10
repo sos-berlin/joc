@@ -377,17 +377,22 @@
       <!--xsl:variable name="jobs" select="job_chain_nodes/job"/-->
       <xsl:variable name="error" select="file_based/ERROR or replacement or file_based/removed/ERROR or file_based/requisites/requisite/@is_missing='yes'" />
       
-      <!--xsl:variable name="node_icon_color">
+      <xsl:variable name="node_icon_color">
       		<xsl:apply-templates mode="icon_color" select="job_chain_node[ @job ]"/>
-      </xsl:variable-->
+      </xsl:variable>
+      
+      <!--xsl:variable name="order_is_running" select="count(job_chain_node/job/tasks/task/order[@job_chain=current()/@path])"/>
+      <xsl:variable name="order_is_suspended" select="count(job_chain_node/order_queue/order[@suspended='yes'])"/-->
       
       <xsl:variable name="icon_color">
         <xsl:choose>
           <xsl:when test="file_based/ERROR or file_based/removed or replacement">crimson</xsl:when>
           <xsl:when test="file_based/requisites/requisite/@is_missing='yes'">crimson</xsl:when>
-          <!--xsl:when test="contains($node_icon_color,'crimson')">crimson</xsl:when>
+          <xsl:when test="contains($node_icon_color,'crimson')">crimson</xsl:when>
+          <!--xsl:when test="$order_is_suspended &gt; 0">crimson</xsl:when>
+          <xsl:when test="$order_is_running &gt; 0">forestgreen</xsl:when-->
           <xsl:when test="contains($node_icon_color,'forestgreen')">forestgreen</xsl:when>
-          <xsl:when test="contains($node_icon_color,'darkorange')">darkorange</xsl:when-->
+          <xsl:when test="contains($node_icon_color,'darkorange')">darkorange</xsl:when>
           
           <xsl:when test="@state = 'running' or @state = 'active'">gold</xsl:when>
           <xsl:when test="@state = 'not_initialized'">gray</xsl:when>
@@ -538,22 +543,27 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tree-Leaf for job_chain_node-->
     <xsl:template match="job_chain_node" mode="icon_color">
     	  <xsl:param name="task_id" select="0" />
-      
+        <xsl:variable name="job_chain_path" select="parent::job_chain/@path"/>
+        <xsl:variable name="state" select="@state"/>
+        
         <xsl:choose>
           <xsl:when test="not(job)">crimson</xsl:when>
           <xsl:when test="@action='next_state'">darkorange</xsl:when>
           <xsl:when test="@action='stop'">crimson</xsl:when>
+          <xsl:when test="order_queue/order/@suspended = 'yes'">crimson</xsl:when>
           <xsl:when test="job/file_based/ERROR or job/file_based/removed or job/replacement">crimson</xsl:when>
           <xsl:when test="job/file_based/requisites/requisite/@is_missing = 'yes'">crimson</xsl:when>
           <xsl:when test="job/@remove = 'yes'">crimson</xsl:when>
           <xsl:when test="job/lock.requestor/lock.use/@is_missing = 'yes'">crimson</xsl:when>
-          <xsl:when test="not(job/@order) or job/@order = 'no'">crimson</xsl:when>
+          <!-- JS-906 shell job don't require @order='yes' -->
+          <!--xsl:when test="not(job/@order) or job/@order = 'no'">crimson</xsl:when-->
           <xsl:when test="job/@delay_until">darkorange</xsl:when>
           <xsl:when test="job/@state = 'pending' or job/@state = 'initialized' or job/@state = 'loaded'">gold</xsl:when>
           <xsl:when test="job/@state = 'running'">
             <xsl:choose>
-              <xsl:when test="job/@order = 'yes' and $task_id &gt; 0 and job/tasks/task/@id = $task_id">forestgreen</xsl:when>
-              <xsl:when test="job/@order = 'yes' and $task_id = 0 and order_queue/order/@task = job/tasks/task/@id">forestgreen</xsl:when>
+              <xsl:when test="job/tasks/task/order[@job_chain = $job_chain_path and @state = $state]">forestgreen</xsl:when>
+              <!--xsl:when test="job/@order = 'yes' and $task_id &gt; 0 and job/tasks/task/@id = $task_id">forestgreen</xsl:when>
+              <xsl:when test="job/@order = 'yes' and $task_id = 0 and order_queue/order/@task = job/tasks/task/@id">forestgreen</xsl:when-->
               <xsl:otherwise>gold</xsl:otherwise>
             </xsl:choose>
           </xsl:when>
@@ -573,33 +583,9 @@
           		<xsl:with-param name="task_id" select="$task_id" />
       		</xsl:apply-templates>
       </xsl:variable>
-      <!--xsl:variable name="icon_color">
-        <xsl:choose>
-          <xsl:when test="not(job)">crimson</xsl:when>
-          <xsl:when test="@action='next_state'">darkorange</xsl:when>
-          <xsl:when test="@action='stop'">crimson</xsl:when>
-          <xsl:when test="job/file_based/ERROR or job/file_based/removed or job/replacement">crimson</xsl:when>
-          <xsl:when test="job/file_based/requisites/requisite/@is_missing = 'yes'">crimson</xsl:when>
-          <xsl:when test="job/@remove = 'yes'">crimson</xsl:when>
-          <xsl:when test="job/lock.requestor/lock.use/@is_missing = 'yes'">crimson</xsl:when>
-          <xsl:when test="not(job/@order) or job/@order = 'no'">crimson</xsl:when>
-          <xsl:when test="job/@delay_until">darkorange</xsl:when>
-          <xsl:when test="job/@state = 'pending' or job/@state = 'initialized' or job/@state = 'loaded'">gold</xsl:when>
-          <xsl:when test="job/@state = 'running'">
-            <xsl:choose>
-              <xsl:when test="job/@order = 'yes' and $task_id &gt; 0 and job/tasks/task/@id = $task_id">forestgreen</xsl:when>
-              <xsl:when test="job/@order = 'yes' and $task_id = 0 and order_queue/order/@task = job/tasks/task/@id">forestgreen</xsl:when>
-              <xsl:otherwise>gold</xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <xsl:when test="job/@state = 'not_initialized'">gray</xsl:when>
-          <xsl:when test="not(job/@state)">white</xsl:when>
-          <xsl:otherwise>crimson</xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable-->
       <xsl:variable name="font_color">
         <xsl:choose>
-          <xsl:when test="$icon_color = 'crimson'">crimson</xsl:when>
+          <xsl:when test="$icon_color = 'crimson' and not(order_queue/order/@suspended = 'yes')">crimson</xsl:when>
           <xsl:when test="$icon_color = 'darkorange'">crimson</xsl:when>
           <xsl:when test="$icon_color = 'gray'">gray</xsl:when>
         </xsl:choose>
@@ -613,7 +599,8 @@
           <xsl:when test="job/file_based/requisites/requisite/@is_missing = 'yes'">error</xsl:when>
           <xsl:when test="job/@remove = 'yes'">error</xsl:when>
           <xsl:when test="job/lock.requestor/lock.use/@is_missing = 'yes'">error</xsl:when>
-          <xsl:when test="not(job/@order) or job/@order = 'no'">not an order job</xsl:when>
+          <!-- JS-906 shell job don't require @order='yes' -->
+          <!--xsl:when test="not(job/@order) or job/@order = 'no'">not an order job</xsl:when-->
           <xsl:when test="job/@delay_until">delayed after error</xsl:when>
           <xsl:when test="job/@state"><xsl:value-of select="job/@state" /></xsl:when>
           <xsl:when test="not(job/@state)">none</xsl:when>
@@ -3184,9 +3171,10 @@
           <xsl:when test="not($job)">
             <span class="red_label">is missing</span>
           </xsl:when>
-          <xsl:when test="not($job/@order) or $job/@order='no'">
+          <!-- JS-906 shell job don't require @order='yes' -->
+          <!--xsl:when test="not($job/@order) or $job/@order='no'">
             <span class="red_label">not an order job</span>
-          </xsl:when>
+          </xsl:when-->
           <xsl:when test="$job/@state='not_initialized' or $job/@state='stopped' or $job/@state='read_error' or $job/@state='error'">
             <span class="red_label"><xsl:value-of select="$job/@state"/></span>
           </xsl:when>
@@ -3768,42 +3756,43 @@
               <col align="left" width="40"/>
               <col align="left" width="70"/>
               <col align="left" width="*"/>
-              <col align="left" width="80"/>
           </colgroup>
             
           <xsl:if test="not( queued_task )">
             <thead>
               <xsl:call-template name="after_head_space">
-                  <xsl:with-param name="colspan" select="'4'"/>
+                  <xsl:with-param name="colspan" select="'3'"/>
               </xsl:call-template>
             </thead>
             <tbody>
               <tr>
-                <td colspan="4"><b> <xsl:value-of select="@length"/>&#160; <span class="translate">enqueued tasks</span></b></td>
+                <td colspan="3"><b> <xsl:value-of select="@length"/>&#160; <span class="translate">enqueued tasks</span></b></td>
               </tr>
               <xsl:call-template name="after_body_space">
-                  <xsl:with-param name="colspan" select="'4'"/>
+                  <xsl:with-param name="colspan" select="'3'"/>
               </xsl:call-template>
             </tbody>
           </xsl:if>
           <xsl:if test="queued_task"> 
             <thead>
                <tr>
-                   <td colspan="4" class="before_head_space">&#160;</td>
+                   <td colspan="3" class="before_head_space">&#160;</td>
                </tr>
                <tr>
                    <td class="head1"><span class="translate">Id</span></td>
                    <td class="head"><span class="translate" style="white-space:nowrap;">Enqueued</span></td>
                    <td class="head"><span class="translate" style="white-space:nowrap;">Start at</span></td>
-                   <td class="head1">&#160;</td>
                </tr>
                <xsl:call-template name="after_head_space">
-                  <xsl:with-param name="colspan" select="'4'"/>
+                  <xsl:with-param name="colspan" select="'3'"/>
               </xsl:call-template>
             </thead>
             <tbody>
                 <xsl:for-each select="queued_task">
-                    <tr>
+                    <tr title="Delete">
+                        <xsl:attribute name="onclick">kill_task_immediately( '<xsl:value-of select="@task"/>' )</xsl:attribute>
+                        <xsl:attribute name="oncontextmenu">queued_task_menu__onclick( '<xsl:value-of select="@task"/>' );return false;</xsl:attribute>
+          							<xsl:attribute name="class">list</xsl:attribute>
                         <td>
                             <xsl:value-of select="@task"/>
                             <xsl:if test="@name!=''">
@@ -3813,19 +3802,12 @@
 
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@enqueued__xslt_date_or_time"/></td>
                         <td class="task"><xsl:apply-templates mode="date_time_nowrap" select="@start_at__xslt_datetime_with_diff"/></td>
-                        <td align="right" valign="top" style="padding:0px 2px;">
-                            <xsl:call-template name="command_menu">
-                                <xsl:with-param name="title"              select="'Delete'"/>
-                                <xsl:with-param name="onclick_call"       select="'queued_task_menu__onclick'"/>
-                                <xsl:with-param name="onclick_param1_str" select="@task"/>
-                            </xsl:call-template>                    
-                        </td>
                     </tr>
                 </xsl:for-each> 
               </tbody>
               <tfoot>
                 <xsl:call-template name="after_body_space">
-                  <xsl:with-param name="colspan" select="'4'"/>
+                  <xsl:with-param name="colspan" select="'3'"/>
                 </xsl:call-template>
              </tfoot>
           </xsl:if>
@@ -3848,7 +3830,6 @@
             <col align="left" width="*"/>
             <col align="left" width="*"/>
             <col align="left" width="10"/>
-            <!--col align="left" width="80"/-->
           </colgroup>
           
             <xsl:choose>
@@ -3877,7 +3858,6 @@
                         <td class="head"><span class="translate">Process steps</span></td>
                         <td class="head"><span class="translate">Started</span></td>
                         <td class="head"><span class="translate">Ended</span></td>
-                        <!--td class="head" colspan="2"><span class="translate">Duration</span></td-->
                         <td class="head"><span class="translate">Duration</span></td>
                     </tr>
                     <xsl:call-template name="after_head_space">
@@ -3898,16 +3878,7 @@
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime"/></td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@duration"/></td>
-                				
-                        <!--td align="right" valign="top" style="padding:0px 2px;">
-                            
-                            <xsl:call-template name="command_menu">
-                                <xsl:with-param name="title"              select="'Show log'"/>
-                                <xsl:with-param name="onclick_call"       select="'show_task_log'"/>
-                                <xsl:with-param name="onclick_param1_str" select="@task"/>
-                            </xsl:call-template>                    
-                        </td-->
-                    </tr>
+                		</tr>
                 
                     <xsl:if test="ERROR">
                         <tr>
@@ -3943,62 +3914,52 @@
             
               <colgroup>
                 <col width="*"/>
-                <col width="1%"/>
-                <col width="1%"/>  
-                <col width="80" align="right"/>  
+                <col width="*"/>
+                <col width="*"/>    
               </colgroup> 
               <xsl:if test="@length=0">
                 <thead>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'4'"/>
+                      <xsl:with-param name="colspan" select="'3'"/>
                     </xsl:call-template>
                 </thead>
                 <tbody>
                     <tr>
-                        <td colspan="4"><b>0&#160; <span class="translate">orders to process</span></b></td>
+                        <td colspan="3"><b>0&#160; <span class="translate">orders to process</span></b></td>
                     </tr>
                 </tbody>
               </xsl:if>
               <xsl:if test="not(@length=0)">
                 <thead>
                     <tr>
-                        <td colspan="4" class="before_head_space">&#160;</td>
+                        <td colspan="3" class="before_head_space">&#160;</td>
                     </tr>
                     <tr>
                         <td class="head1"><span class="translate">Id</span></td>
                         <td class="head"><span class="translate">Next start</span></td>
                         <td class="head"><span class="translate">State</span></td>
-                        <td class="head1">&#160;</td>
                     </tr>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'4'"/>
+                      <xsl:with-param name="colspan" select="'3'"/>
                     </xsl:call-template>
                 </thead>
                 
                 <tbody>
                     <xsl:for-each select="order[ position() &lt;= $max_orders ]">
+                    		<xsl:variable name="normalized_order_id">
+        									<xsl:apply-templates mode="normalized_order_id" select="@id" />
+      									</xsl:variable>
                         <tr class="list" title="show job chain details">
+                        	  <xsl:attribute name="onclick" >callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
+                        		<xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>','<xsl:value-of select="$normalized_order_id"/>','order_queue' );return false;</xsl:attribute>
                             <td>
-                              <xsl:attribute name="onclick" >callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
                               <xsl:apply-templates mode="trim_slash" select="@job_chain" />,<xsl:value-of select="@id"/>
                             </td>
                             <td>
-                              <xsl:attribute name="onclick" >callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
                               <xsl:apply-templates mode="properties" select="." />
                             </td>
                             <td style="white-space:nowrap;">
-                              <xsl:attribute name="onclick" >callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
                               <xsl:value-of select="@state"/>
-                            </td>
-                            
-                            <td style="padding:0px 2px;text-align:right;" title="Order menu">
-                                <xsl:call-template name="command_menu">
-                                    <xsl:with-param name="title"              select="'Order menu'"/>
-                                    <xsl:with-param name="onclick_call"       select="'order_menu__onclick'"/>
-                                    <xsl:with-param name="onclick_param1_str" select="@job_chain"/>
-                                    <xsl:with-param name="onclick_param2_str" select="@id"/>
-                                    <xsl:with-param name="onclick_param3_str" select="'order_queue'"/>
-                                </xsl:call-template>
                             </td>
                         </tr>
                     </xsl:for-each>
@@ -4006,7 +3967,7 @@
                 </xsl:if>
                 <tfoot>
                   <xsl:call-template name="after_body_space">
-                      <xsl:with-param name="colspan" select="'4'"/>
+                      <xsl:with-param name="colspan" select="'3'"/>
                   </xsl:call-template>
                 </tfoot>
           </table>
@@ -4030,7 +3991,6 @@
                 <col width="10"/>
                 <col width="*"/>  
                 <col width="40"/>  
-                <!--col width="60" align="right"/-->  
               </colgroup>
               <xsl:if test="count(child::*)=0">
                 <thead>
@@ -4065,7 +4025,6 @@
                           </xsl:otherwise>
                         </xsl:choose>
                         <td class="head"><span class="translate">State</span></td>
-                        <!--td class="head1">&#160;</td-->
                     </tr>
                     <xsl:call-template name="after_head_space">
                       <xsl:with-param name="colspan" select="'6'"/>
@@ -4105,17 +4064,6 @@
                               </xsl:otherwise>
                             </xsl:choose>
                             <td><nobr><xsl:value-of select="@state"/></nobr></td>
-                            
-                            <!--td tyle="padding:0px 2px;text-align:right;">
-                                <xsl:call-template name="command_menu">
-                                    <xsl:with-param name="title"              select="'Show log'"/>
-                                    <xsl:with-param name="onclick_call"       select="'show_order_log'"/>
-                                    <xsl:with-param name="onclick_param1_str" select="@job_chain"/>
-                                    <xsl:with-param name="onclick_param2_str" select="@id"/>
-                                    <xsl:with-param name="onclick_param3"     select="@history_id"/>
-                                    <xsl:with-param name="onclick_param4_str" select="@end_time"/>
-                                </xsl:call-template>
-                            </td-->
                         </tr>
                     </xsl:for-each>
                 </tbody>
@@ -4930,7 +4878,8 @@
                 <xsl:when test="@state='not_initialized' or @state='stopped' or @state='read_error' or @state='error'">red</xsl:when>
                 <xsl:when test="lock.requestor/lock.use/@is_missing='yes'">red</xsl:when>
                 <xsl:when test="file_based/requisites/requisite/@is_missing ='yes'">red</xsl:when>
-                <xsl:when test="$order_job and (not(@order) or @order='no')">red</xsl:when>
+                <!-- JS-906 shell job don't require @order='yes' -->
+                <!--xsl:when test="$order_job and (not(@order) or @order='no')">red</xsl:when-->
                 <!--xsl:when test="$job/@state='pending' or $job/@state='running'"></xsl:when-->
             </xsl:choose>
         </xsl:variable>

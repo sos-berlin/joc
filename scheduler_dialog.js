@@ -1622,12 +1622,21 @@ function history_task_menu__onclick( task_id )
 
 //-----------------------------------------------------------------------queued_task_menu__onclick
 
+function kill_task_immediately( task_id )
+{
+    if( confirm(parent.getTranslation('Do you really want to delete this task?'))) {
+    	var xml_command = '<kill_task job="' + _job_name + '" id="' + task_id + '" immediately="yes"/>';
+    	if( scheduler_exec( xml_command, false ) ) { 
+        set_timeout("parent.left_frame.update()",1);
+    	}
+    }
+}
+
 function queued_task_menu__onclick( task_id )
 {
-    var xml_command = '<kill_task job="' + _job_name + '" id="' + task_id + '" immediately="yes"/>';
-    if( scheduler_exec( xml_command, false ) ) { 
-        set_timeout("parent.left_frame.update()",1);
-    }
+    var popup_builder = new Popup_menu_builder();
+    popup_builder.add_command ( parent.getTranslation("Delete") , "<kill_task job='" + _job_name + "' id='" + task_id + "' immediately='yes'/>", true, parent.getTranslation('Do you really want to delete this task?') );
+    _popup_menu = popup_builder.show_popup_menu();
 }
 
 

@@ -246,6 +246,7 @@ _translations['Do you really want to delete this job?']    = '本当にジョブ
 _translations['Task menu']                                 = 'タスクメニュー';
 _translations['End']                                       = 'タスク終了';
 _translations['Kill immediately']                          = 'タスク強制終了';
+_translations['Do you really want to delete this task?']    = '本当にジョブ削除しますか';
                                                            
                                                            
 //Mouseover-Title                                          

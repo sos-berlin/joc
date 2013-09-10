@@ -247,6 +247,7 @@ _translations['Do you really want to delete this job?']    = 'Вы действ�
 _translations['Task menu']                                 = 'Task-Меню';
 _translations['End']                                       = 'Закончить работу';
 _translations['Kill immediately']                          = 'Прекратить работу немедленно';
+_translations['Do you really want to delete this task?']   = 'Вы действительно хотите удалить этот Task?';
                                                            
                                                            
 //Mouseover-Title                                          
