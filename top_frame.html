@@ -199,7 +199,7 @@ function show_card( what )
         }
         parent._scheduler._show_card = what;
     }
-    window.setTimeout("parent.left_frame.update()",5);
+    if( typeof parent.left_frame.update == 'function' ) window.setTimeout("parent.left_frame.update()",5);
 }
 
 

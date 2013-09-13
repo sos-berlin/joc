@@ -141,18 +141,20 @@ function update__onclick( with_reset, force, time )
       if( typeof with_reset != 'boolean' ) with_reset = true;
       if( typeof force      != 'boolean' ) force      = false;
       if( typeof time       != 'number'  ) time       = 200;
-      if( with_reset ) resetError();
-      parent.left_frame.clear_update();
-      if( parent._scheduler.versionIsNewerThan( "2007-10-28 19:00:00" ) ) {
-        if( force ) {
-          if( parent._scheduler.executeSynchron( '<check_folders/>', false, false ) ) {
-            set_timeout("parent.left_frame.update()",time);
-          }
-        } else {
-          set_timeout("parent.left_frame.update()",time);
-        }
-      } else {
-         set_timeout("parent.left_frame.update()",1);
+      if( with_reset ) resetError(); 
+      if( parent.left_frame ) {
+      	parent.left_frame.clear_update();
+      	if( parent._scheduler.versionIsNewerThan( "2007-10-28 19:00:00" ) ) {
+        	if( force ) {
+          	if( parent._scheduler.executeSynchron( '<check_folders/>', false, false ) ) {
+            	set_timeout("parent.left_frame.update()",time);
+          	}
+        	} else {
+          	set_timeout("parent.left_frame.update()",time);
+        	}
+      	} else {
+         	set_timeout("parent.left_frame.update()",1);
+      	}
       }
     //} catch(E) {
     //  showError(E);
@@ -176,7 +178,7 @@ function popup_menu__execute( xml_command, confirm_msg, removeObj )
 {   
     _popup_menu.close();
     if( confirm_msg == '' || confirm(confirm_msg) ) {
-      if( scheduler_exec( xml_command, false ) ) {
+      if( scheduler_exec( xml_command.replace(/&/g,"&amp;"), false ) ) {
         parent.details_frame._removed_obj = removeObj;
         set_timeout("parent.left_frame.update()",1);
       }

@@ -209,7 +209,7 @@ function set_filter_selects( name, with_update )
           selectElem.options[i+1].selected = ( parent._scheduler._select_states['filter_'+name+'_select'] == _filters[name][entry] );
         }
         if(with_update && selectElem.length > 1 && selectElem.value != curfilter) {
-          set_timeout('parent.left_frame.update(false)',1,1);
+          if( typeof parent.left_frame.update == 'function' ) set_timeout('parent.left_frame.update(false)',1,1);
         }
         selectElem.parentNode.style.display  = (selectElem.length > 1) ? 'inline' : 'none';
         parent._scheduler.logger(2,name.toUpperCase()+ ' FILTER SELECTBOX DISPLAY: '+ (selectElem.parentNode.style.display=='none' ? 'hidden' : 'visible'));
@@ -446,7 +446,7 @@ function select__onclick( selectElem )
         parent._scheduler._select_states[ selectElem.name ] = selectElem.value;
     }
     resetError();
-    set_timeout('parent.left_frame.update();',1);
+    if( typeof parent.left_frame.update == 'function' ) set_timeout('parent.left_frame.update();',1);
 }
 
 
@@ -455,7 +455,7 @@ function radios__onclick( radioElem )
 {
     parent._scheduler._radio_states[ radioElem.name ] = radioElem.value;
     resetError();
-    set_timeout('parent.left_frame.update();',1);
+    if( typeof parent.left_frame.update == 'function' ) set_timeout('parent.left_frame.update();',1);
 }
 
 
@@ -464,7 +464,7 @@ function checkbox__onclick( checkElem )
 {
     parent._scheduler._checkbox_states[ checkElem.name ] = checkElem.checked;
     resetError();
-    set_timeout('parent.left_frame.update();',1);
+    if( typeof parent.left_frame.update == 'function' ) set_timeout('parent.left_frame.update();',1);
 }
 
 
@@ -696,13 +696,6 @@ window.onresize = set_frame_height;
                   </span>
                 </span>
               </td>
-              <!--td sos_class="job_chains" id="add_job_chain" style="display:none; padding:2px 0px;">
-                <div class="button" style="margin:0px 2px;" onclick="callErrorChecked( 'parent.left_frame.add_job_chain', '/' )"-->
-                  <!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
-                  <!--span class="translate">Create job chain</span-->
-                  <!--[if lte IE 6]></a><![endif]-->
-                <!--/div>
-              </td-->
               <!--td sos_class="schedules" style="display:none;padding:2px 0px;">
                 <div class="button" style="margin:0px 2px;" onclick="parent.left_frame.add_schedule('')"-->
                   <!--[if lte IE 6]><a href="javascript:void(0);"><![endif]-->
