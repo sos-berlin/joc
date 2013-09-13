@@ -385,6 +385,7 @@ function update_callback( response )
     if( !parent._scheduler._tree_view_enabled ) set_timeout('parent.top_frame.update();',1);
     //alert(_response.xml);    
     modify_response( _response );
+    //alert(_response.xml);
     parent._scheduler.logger(3,'WRITE HTML','scheduler_tree_html');
       
     var output_tree = $( _card+'_tree_output' );

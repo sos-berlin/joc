@@ -236,11 +236,11 @@
           </xsl:when>
           <xsl:when test="$children = 'job_chains'">
             <!--xsl:apply-templates select="job_chains/job_chain[not(@order_id_space)] | job_chains/job_chain[@order_id_space and job_chain_node.job_chain]" mode="leaf"-->
-            <xsl:apply-templates select="job_chains/job_chain[concat(ancestor::folder/@path,'/',@name)=@path or ancestor::folder/@path='/']" mode="leaf">
+            <xsl:apply-templates select="job_chains/job_chain[concat(ancestor::folder/@path,'/',@name)=@path or (ancestor::folder/@path='/' and concat('/',@name) = @path)]" mode="leaf">
               <xsl:sort select="translate( @path, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz' )" order="ascending" />
             </xsl:apply-templates>
             <!--xsl:if test="count(job_chains/job_chain[not(@order_id_space)] | job_chains/job_chain[@order_id_space and job_chain_node.job_chain] | folders/folder) = 0"-->
-            <xsl:if test="count(job_chains/job_chain[concat(ancestor::folder/@path,'/',@name)=@path or ancestor::folder/@path='/'] | folders/folder) = 0">
+            <xsl:if test="count(job_chains/job_chain[concat(ancestor::folder/@path,'/',@name)=@path or (ancestor::folder/@path='/' and concat('/',@name) = @path)] | folders/folder) = 0">
               <xsl:call-template name="no_objects_found">
                  <xsl:with-param name="children" select="$children" />
               </xsl:call-template>
@@ -369,6 +369,8 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Tree-Leaf for job_chain-->
     <xsl:template match="job_chain" mode="leaf">
       <xsl:param name="name" select="@name" />
+      <xsl:param name="state" select="''" />
+      <xsl:param name="big_chain_path" select="''"/>
       <xsl:variable name="cnt_orders_of_big_chain" select="count(//order.job_chain_stack.entry[@job_chain = current()/@path])"/>
       <xsl:variable name="web_services" select="/spooler/answer/state[1]/http_server/web_service[ @job_chain = current()/@path ]" />
       <!--xsl:variable name="with_jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source))" /-->
@@ -424,17 +426,18 @@
           <xsl:attribute name="oncontextmenu">job_chain_menu__onclick( '<xsl:value-of select="@path"/>', <xsl:value-of select="1+@orders"/>, <xsl:value-of select="1+number(boolean(@order_id_space and (job_chain_node.job_chain or job_chain_node[@job_chain])))"/> );return false;</xsl:attribute>
           
           <span class="status" title="{$icon_title}" style="{concat('background-color:',$icon_color)}">&#160;</span>
+          <span><xsl:value-of select="$state" /></span>
           <span class="bold" style="{concat('color:',$font_color)}"><xsl:value-of select="$name" /></span>
           
-          <xsl:if test="@orders &gt; 0 or $cnt_orders_of_big_chain &gt; 0" >
+          <xsl:if test="(@orders &gt; 0 and $big_chain_path='') or $cnt_orders_of_big_chain &gt; 0" >
             <span class="status_text">&#160;&#160;-&#160;
               <span class="label" style="white-space:nowrap;">Orders</span><span class="small">: </span>
               <xsl:choose>
-              	<xsl:when test="@orders &gt; 0">
-              		<xsl:value-of select="@orders"/>
+              	<xsl:when test="$cnt_orders_of_big_chain &gt; 0">
+              	  <xsl:value-of select="$cnt_orders_of_big_chain"/>
               	</xsl:when>
               	<xsl:otherwise>
-              	  <xsl:value-of select="$cnt_orders_of_big_chain"/>
+              	  <xsl:value-of select="@orders"/>
               	</xsl:otherwise>
               </xsl:choose>
             </span>
@@ -481,7 +484,9 @@
                     <col width="1%"/>
                     <col width="1%"/>
                   </colgroup>
-                  <xsl:apply-templates mode="leaf" select="job_chain_node[ @job ]"/>
+                  <xsl:apply-templates mode="leaf" select="job_chain_node[ @job ]">
+                  	<xsl:with-param name="big_chain_path" select="$big_chain_path"/>
+                  </xsl:apply-templates>
                   <xsl:if test="/spooler/@show_job_chain_orders_checkbox and file_order_source">    
                     <tr>
                       <td colspan="2" style="vertical-align:top;border-right:1px solid #8B919F">
@@ -523,6 +528,8 @@
             <xsl:with-param name="name">
               <xsl:apply-templates mode="trim_slash" select="@job_chain" />
             </xsl:with-param>
+            <xsl:with-param name="state" select="concat(@state,' - ')" />
+            <xsl:with-param name="big_chain_path" select="parent::job_chain/@path" />
           </xsl:apply-templates>
         </xsl:when>
         <xsl:otherwise>
@@ -578,6 +585,7 @@
     <!--xsl:template match="job_chain_node | job_chain_node.job_chain" mode="leaf"-->
     <xsl:template match="job_chain_node" mode="leaf">
       <xsl:param name="task_id" select="0" />
+      <xsl:param name="big_chain_path" select="''"/>
       <xsl:variable name="icon_color">
       		<xsl:apply-templates mode="icon_color" select=".">
           		<xsl:with-param name="task_id" select="$task_id" />
@@ -619,6 +627,15 @@
           <xsl:otherwise>1</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
+      <xsl:variable name="normal_orders" select="order_queue/order[ @job_chain = current()/parent::job_chain/@path and @state = current()/@state ]"/>
+      <!--xsl:variable name="big_chain_orders" select="order_queue/order[ @path = concat($big_chain_path,',',@id) and @state = current()/@state ]"/-->
+      <xsl:variable name="big_chain_orders" select="order_queue/order[ order.job_chain_stack/order.job_chain_stack.entry/@job_chain = $big_chain_path and @state = current()/@state ]"/>
+      <xsl:variable name="order_queue_length">
+      	<xsl:choose>
+          <xsl:when test="$big_chain_path = ''"><xsl:value-of select="count($normal_orders)"/></xsl:when>
+          <xsl:otherwise><xsl:value-of select="count($big_chain_orders)"/></xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       
       <tr class="tree" title="show job details">
         <xsl:attribute name="onclick">show_job_details( '<xsl:value-of select="@job"/>' )</xsl:attribute>
@@ -633,7 +650,7 @@
           <td style="white-space:nowrap;text-align:right;"><xsl:copy-of select="$node_action" /></td>
         </xsl:if>
         <xsl:if test="not(/spooler/@my_show_card = 'orders')">
-          <td style="padding-left:4px;text-align:right;"><xsl:value-of select="order_queue/@length"/></td>
+          <td style="padding-left:4px;text-align:right;"><!--xsl:value-of select="order_queue/@length"/--><xsl:value-of select="$order_queue_length"/></td>
         </xsl:if>
       </tr>
       
@@ -649,12 +666,22 @@
               <col width="1"/>
               <col width="1"/>
             </colgroup>
-          <xsl:apply-templates select="order_queue" mode="job_chain_list">
-          <!--xsl:apply-templates select="order_queue" mode="job_chain_leaf"-->
-              <xsl:with-param name="max_orders" select="/spooler/@my_max_orders"/>
-              <xsl:with-param name="orders"     select="order_queue/order[ @job_chain = current()/parent::job_chain/@path and @state = current()/@state ]"/>
-              <xsl:with-param name="treeview"   select="true()"/>
-          </xsl:apply-templates>
+          <xsl:choose>
+            <xsl:when test="$big_chain_path = ''">
+              <xsl:apply-templates select="order_queue" mode="job_chain_list">
+              	<xsl:with-param name="max_orders" select="/spooler/@my_max_orders"/>
+              	<xsl:with-param name="orders" select="$normal_orders"/>
+              	<xsl:with-param name="treeview" select="true()"/>
+          		</xsl:apply-templates>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="order_queue" mode="job_chain_list">
+              	<xsl:with-param name="max_orders" select="/spooler/@my_max_orders"/>
+              	<xsl:with-param name="orders" select="$big_chain_orders"/>
+              	<xsl:with-param name="treeview" select="true()"/>
+          		</xsl:apply-templates>
+            </xsl:otherwise>
+          </xsl:choose>
           </table></td></tr>
       </xsl:if>                  
     </xsl:template>
@@ -2926,6 +2953,7 @@
         <xsl:param name="single" select="false()" />
         <xsl:param name="max_orders" select="999999999"/>
         <xsl:param name="big_chain" select="false()"/>
+        <xsl:param name="big_chain_path" select="''"/>
         <xsl:param name="node_state" select="''"/>
         <xsl:variable name="cnt_orders_of_big_chain" select="count(//order.job_chain_stack.entry[@job_chain = current()/@path])"/>
         
@@ -3029,6 +3057,11 @@
                 <xsl:variable name="show_orders" select="( /spooler/@show_job_chain_orders_checkbox or $single )"/>
                 <xsl:variable name="job" select="/spooler/answer/state/jobs/job[ @path = current()/@job ] | job[ @path = current()/@job ]"/>
                 <xsl:variable name="job_chain" select="/spooler/answer/state/job_chains/job_chain[ @path = current()/@job_chain ][1]"/>
+                <xsl:variable name="normal_orders" select="order_queue/order[ @job_chain = current()/parent::job_chain/@path and @state = current()/@state ]"/>
+      					<!--xsl:variable name="big_chain_orders" select="order_queue/order[ @path = concat($big_chain_path,',',@id) and @state = current()/@state ]"/-->
+      					<xsl:variable name="big_chain_orders" select="order_queue/order[ order.job_chain_stack/order.job_chain_stack.entry/@job_chain = $big_chain_path and @state = current()/@state ]"/>
+      
+      
                 
                 <xsl:if test="$job_chain">
                   <xsl:apply-templates mode="list" select="$job_chain" >
@@ -3036,6 +3069,7 @@
                       <xsl:with-param name="single" select="$single" />
                       <xsl:with-param name="max_orders" select="$max_orders"/>
                       <xsl:with-param name="big_chain" select="true()"/>
+                      <xsl:with-param name="big_chain_path" select="ancestor::job_chain/@path"/>
                       <xsl:with-param name="node_state" select="current()/@state"/>
                   </xsl:apply-templates>
                 </xsl:if>
@@ -3088,23 +3122,23 @@
                               <xsl:apply-templates mode="file_based_line" select="$job"/>
                           </td>
                       </tr>
-                  </xsl:if>
+                  </xsl:if>                 
                   
                   <xsl:choose>
-                    <xsl:when test="$show_orders and self::job_chain_node/job/order_queue/order">
-                      <tr><td colspan="5"><xsl:value-of select="$show_orders" /></td></tr>
-                      <xsl:apply-templates select="job/order_queue" mode="job_chain_list">
-                          <xsl:with-param name="max_orders" select="$max_orders"/>
-                          <xsl:with-param name="orders" select="job/order_queue/order[ @job_chain = current()/parent::job_chain/@path  and  @state = current()/@state ]"/>
-                      </xsl:apply-templates>
-                    </xsl:when>
-                    <xsl:when test="$show_orders and self::job_chain_node/order_queue/order">
+                    <xsl:when test="$big_chain_path = ''">
                       <xsl:apply-templates select="order_queue" mode="job_chain_list">
                           <xsl:with-param name="max_orders" select="$max_orders"/>
                           <xsl:with-param name="state_text" select="$single"/>
-                          <xsl:with-param name="orders" select="order_queue/order[ @job_chain = current()/parent::job_chain/@path  and  @state = current()/@state ]"/>
+                          <xsl:with-param name="orders" select="$normal_orders"/>
                       </xsl:apply-templates>
                     </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:apply-templates select="order_queue" mode="job_chain_list">
+                          <xsl:with-param name="max_orders" select="$max_orders"/>
+                          <xsl:with-param name="state_text" select="$single"/>
+                          <xsl:with-param name="orders" select="$big_chain_orders"/>
+                      </xsl:apply-templates>
+                    </xsl:otherwise>
                   </xsl:choose>
                   
                 </xsl:if>
