@@ -86,6 +86,7 @@ function Scheduler()
                                                             'cluster'          :'',
                                                             'remote_schedulers':'',
                                                             'last_activities'  :'job order'};
+    this._terminate_command															 = false;
     this._update_counter                                 = 1;
     this._update_finished                                = true;
     this._version_date                                   = '';
@@ -249,7 +250,8 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
     if( xml.search( /^<modify_spooler cmd=(\'|\")[^\'\"]*(abort|terminate)[^\'\"]*(\'|\")\/>/i ) > -1 
       || (xml.search( /^<terminate/i ) > -1 && ( xml.search( /cluster_member_id=/i ) == -1 || this_scheduler ))) { 
     	
-    	err = new Error();
+    	//err = new Error(); 
+    	scheduler._terminate_command = true;
     	parent.left_frame.clear_update();
     }
     
@@ -273,12 +275,10 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                         },
        onSuccess      : function(transport) { 
        	                  //alert(document.documentMode);
-       	                  //alert(transport.getAllResponseHeaders());
-                          if( !transport.responseText ) err = new Error();
-                          if( err ) throw err;
-                          var with_reset = (!scheduler._update_finished);
-                          scheduler._update_counter  = 1;
-                          scheduler._update_finished = true;
+       	                  //alert(transport.getAllResponseHeaders()); 
+       	                  if( !transport.responseText ) err = new Error();
+       	                  if( err ) throw err;
+       	                  //alert(transport.responseText);
                           scheduler.logger(6,'SCHEDULER RESPONSE:\n' + transport.responseXML.xml);  
                           if( xml == '<check_folders/>' ) {
                             ret = true;
@@ -295,13 +295,26 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           }
                           var error_element = transport.responseXML.selectSingleNode( "spooler/answer/ERROR" );
                           if( error_element )
-                          {
+                          {   
+                              if( scheduler._terminate_command && error_element.getAttribute( "code" ).search(/SCHEDULER-121/i) > -1 ) {
+                              		scheduler._terminate_command = false;
+                              		scheduler._update_finished = true;
+                              		throw new Error( error_element.getAttribute( "text" ) );
+                              }
                               //Per default no exception is thrown if remove job, job_chain, order is clicked
                               if( with_all_errors || error_element.getAttribute( "code" ).search(/SCHEDULER-(108|161|162)/i) == -1 ) {
                                   throw new Error( error_element.getAttribute( "text" ) );
                               } 
                           }
                           scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
+                          
+                          if(scheduler._terminate_command) err = new Error();
+                          if( err ) throw err;
+                          
+                          var with_reset = (!scheduler._update_finished);
+                          scheduler._update_counter  = 1;
+                          scheduler._update_finished = true;
+                          
                           if( with_modify_datetime ) scheduler.modifyDatetimeForXSLT( transport.responseXML );  
                           if( with_add_path && !scheduler.versionIsNewerThan( "2007-10-08 14:00:00" ) ) scheduler.addPathAttribute( transport.responseXML );
                           if( with_reset && parent.top_frame && typeof parent.top_frame.resetError == 'function' ) {
@@ -318,7 +331,8 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                         },
        onException:     function(requester, x) {
                           scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
-                          if( err || !scheduler._update_finished ) {
+                          if( scheduler._terminate_command || err || !scheduler._update_finished ) {
+                          	scheduler._terminate_command = false;
                           	var message = '';
                           	var update_counter_txt = ['First','Second','Third','Fourth','Last'];
                             if( scheduler._update_counter == 6 ) {
