@@ -60,13 +60,12 @@ window.onload = function()
     if( window.name == "" ) window.name = "scheduler_calendar";
     _scheduler = new Scheduler();
     
-    if( !_calendar_params ) {
-      try {
+    try {
         _calendar_params  = window.opener.left_frame._calendar_params;
-      } catch(E) {
+    } catch(E) {
         _calendar_params  = {'xml_command':'','menu':'scheduler','format':'html','job':'','order':''};;
-      }
     }
+    
     calendar_show();
 }
 

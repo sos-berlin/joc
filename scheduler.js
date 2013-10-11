@@ -99,6 +99,7 @@ function Scheduler()
     this._update_seconds                                 = 5;
     this._show_card                                      = 'jobs';
     this._update_periodically                            = false;
+    this._display_last_activities_tab										 = false;
     
     this._runtime_settings                               = new Object();
     this._runtime_settings.debug_level                   = 0;
@@ -278,8 +279,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
        	                  //alert(transport.getAllResponseHeaders()); 
        	                  if( !transport.responseText ) err = new Error();
        	                  if( err ) throw err;
-       	                  //alert(transport.responseText);
-                          scheduler.logger(6,'SCHEDULER RESPONSE:\n' + transport.responseXML.xml);  
+       	                  scheduler.logger(6,'SCHEDULER RESPONSE:\n' + transport.responseXML.xml);  
                           if( xml == '<check_folders/>' ) {
                             ret = true;
                             return null;
@@ -668,7 +668,7 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
       
     if( with_translate && this._lang_file_exists )
     {
-      var spans = result_dom.selectNodes("//label|//option|//span[@class='translate' or @class='label' or @class='red_label' or @class='green_label' or @class='caption' or @class='job_error' or @class='file_based_error']|//a[@class='translate']");
+      var spans = result_dom.selectNodes("//label|//option|//span[contains(@class,'translate') or @class='label' or @class='red_label' or @class='green_label' or @class='caption' or @class='job_error' or @class='file_based_error']|//a[@class='translate']");
       for( var i=0; i<spans.length; i++ ) {
         if( !spans[i].firstChild || !spans[i].firstChild.nodeValue ) continue;
         spans[i].firstChild.nodeValue = this.getTranslation(spans[i].firstChild.nodeValue); 
@@ -739,6 +739,9 @@ Scheduler.prototype.readCustomSettings = function()
     if( typeof _update_periodically == 'boolean' ) {
       this._update_periodically                      = _update_periodically;
     }
+    if( typeof _display_last_activities_tab == 'boolean' ) {
+      this._display_last_activities_tab              = _display_last_activities_tab;
+    }
 }
 
 
@@ -775,7 +778,10 @@ Scheduler.prototype.readCookies = function()
     for( var state in this._radio_states ) {                      
         this._radio_states[state]                    = this.getCookie( state, this._radio_states[state]);
     }
-    var cookie_entries = ['max_orders','max_last_activities','max_order_history','max_task_history','terminate_timeout'];
+    var cookie_entries = ['max_orders','max_order_history','max_task_history','terminate_timeout'];
+    if(_display_last_activities_tab) {
+    	cookie_entries.push('max_last_activities');
+    }
     for( var i=0; i < cookie_entries.length; i++ ) {
       this._runtime_settings[cookie_entries[i]]      = parseInt(this.getCookie( cookie_entries[i], this._runtime_settings[cookie_entries[i]]),10);
     }

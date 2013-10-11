@@ -79,9 +79,10 @@
             _scheduler.readCustomVersionedSettings();
             if( !_server_settings ) _scheduler.readCookies();
             
-            onload_settings.update_seconds             = _scheduler._update_seconds;
-            onload_settings.update_periodically        = _scheduler._update_periodically;
-            onload_settings.show_card                  = _scheduler._show_card;
+            onload_settings.update_seconds               = _scheduler._update_seconds;
+            onload_settings.update_periodically          = _scheduler._update_periodically;
+            onload_settings.show_card                    = _scheduler._show_card;
+            onload_settings.display_last_activities_tab  = _scheduler._display_last_activities_tab;
             
             for( var state in _scheduler._checkbox_states ) {                   
                 onload_settings.checkbox_states[state] = _scheduler._checkbox_states[state];

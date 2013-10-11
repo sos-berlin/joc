@@ -38,7 +38,7 @@ _update_seconds          = 5;
 
 /*****************************************************************
 *  You can switch between the tabs 'jobs', 'job_chains',
-*  'process_classes' and 'last_activities' 
+*  and 'process_classes' 
 *  (default = 'jobs') as the beginning view.
 */
 _show_card               = 'jobs';
@@ -132,6 +132,12 @@ _start_next_period_enabled  = false;
 *  level for debugging: 0-9
 */
 _debug_level             = 0;
+
+
+/*****************************************************************
+*  flag wether the "Last Activities" tab is shown
+*/
+_display_last_activities_tab = false;
 
 
 /*****************************************************************

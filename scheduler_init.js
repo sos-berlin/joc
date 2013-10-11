@@ -67,7 +67,9 @@ var _active_project_filter      = -1;
 var _stdout_begin               = "";
 var _stdout_end                 = "";
 var _stderr_begin               = "";
-var _stderr_end                 = ""
+var _stderr_end                 = "";
+var _display_last_activities_tab = false; 
+
 
 
 //--------------------------------------------------------------------------custom.js per hash  

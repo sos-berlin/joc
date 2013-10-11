@@ -62,7 +62,9 @@ tabs['process_classes']   = {title:'Process Classes'  ,pos:'' , display:'inline'
 tabs['locks']             = {title:'Locks'            ,pos:'' , display:'none'  };
 tabs['cluster']           = {title:'Cluster'          ,pos:'' , display:'none'  };
 tabs['remote_schedulers'] = {title:'Remote Schedulers',pos:'' , display:'none'  };
-tabs['last_activities']   = {title:'Last Activities'  ,pos:'' , display:'inline'};
+if(window.parent.onload_settings.display_last_activities_tab) {
+	tabs['last_activities'] = {title:'Last Activities'  ,pos:'' , display:'inline'};
+}
 
 //----------------------------------------------------------------------------------------do_onload
 function do_onload()

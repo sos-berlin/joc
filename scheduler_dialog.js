@@ -348,7 +348,9 @@ function scheduler_settings__onclick(ret)
     	select_opts.push( {key:'schedules', display:' '+parent.getTranslation('Schedules')+' '} );
     }
     select_opts.push( {key:'process_classes', display:' '+parent.getTranslation('Process Classes')+' '} );
-    select_opts.push( {key:'last_activities', display:' '+parent.getTranslation('Last Activities')+' '} );
+    if(window.parent.onload_settings.display_last_activities_tab) {
+    	select_opts.push( {key:'last_activities', display:' '+parent.getTranslation('Last Activities')+' '} );
+    }
     
     dialog.add_select( "show_card", select_opts, window.parent.onload_settings.show_card, 1, 0, false );
     dialog._html_array.push( ' '+parent.getTranslation('as the beginning view') );
@@ -399,17 +401,20 @@ function scheduler_settings__onclick(ret)
     dialog.add_checkbox( "show_job_chain_orders_checkbox", parent.getTranslation('Show orders')+' '+parent.getTranslation('in the <i>job chains</i> tab')                             , window.parent.onload_settings.checkbox_states[ "show_job_chain_orders_checkbox" ] );
     dialog.add_checkbox( "show_job_chain_jobs_checkbox"  , parent.getTranslation('Show jobs')+' '+parent.getTranslation('in the <i>job chains</i> tab')                               , window.parent.onload_settings.checkbox_states[ "show_job_chain_jobs_checkbox" ] );
     dialog.add_checkbox( "show_order_history_checkbox"   , parent.getTranslation('Show order history')+' '+parent.getTranslation('in the <i>job chain</i> details')                   , window.parent.onload_settings.checkbox_states[ "show_order_history_checkbox" ] );
-    dialog.add_checkbox( "show_error_checkbox"           , parent.getTranslation('Show only faulty tasks and orders')+' '+parent.getTranslation('in the <i>last activities</i> tab'), window.parent.onload_settings.checkbox_states[ "show_error_checkbox" ] );
-    dialog.add_checkbox( "show_task_error_checkbox"      , parent.getTranslation('Show last tasks error')+' '+parent.getTranslation('in the <i>last activities</i> tab')              , window.parent.onload_settings.checkbox_states[ "show_task_error_checkbox" ] );
-    select_opts                    = new Object();
-    select_opts.all                = ' '+parent.getTranslation('Show all')+' ';
-    select_opts.orders             = ' '+parent.getTranslation('Show only orders')+' ';
-    select_opts.tasks              = ' '+parent.getTranslation('Show only tasks')+' ';
-    dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
-    dialog.add_select( "last_activities_radios", select_opts, window.parent.onload_settings.radio_states[ 'last_activities_radios' ], 1, 0, false );
-    dialog._html_array.push( ' '+parent.getTranslation('in the <i>last activities</i> tab')+'</td></tr>' );
-    dialog._html_array.push( '</table>' );
-    dialog._html_array.push( '</fieldset>' );  
+    if(window.parent.onload_settings.display_last_activities_tab) {
+    	dialog.add_checkbox( "show_error_checkbox"         , parent.getTranslation('Show only faulty tasks and orders')+' '+parent.getTranslation('in the <i>last activities</i> tab')  , window.parent.onload_settings.checkbox_states[ "show_error_checkbox" ] );
+    	dialog.add_checkbox( "show_task_error_checkbox"    , parent.getTranslation('Show last tasks error')+' '+parent.getTranslation('in the <i>last activities</i> tab')              , window.parent.onload_settings.checkbox_states[ "show_task_error_checkbox" ] );
+    
+    	select_opts                    = new Object();
+    	select_opts.all                = ' '+parent.getTranslation('Show all')+' ';
+    	select_opts.orders             = ' '+parent.getTranslation('Show only orders')+' ';
+    	select_opts.tasks              = ' '+parent.getTranslation('Show only tasks')+' ';
+    	dialog._html_array.push( '<tr><td style="padding:0px;padding-left:2px;">' );
+    	dialog.add_select( "last_activities_radios", select_opts, window.parent.onload_settings.radio_states[ 'last_activities_radios' ], 1, 0, false );
+    	dialog._html_array.push( ' '+parent.getTranslation('in the <i>last activities</i> tab')+'</td></tr>' );
+    }
+		dialog._html_array.push( '</table>' );
+		dialog._html_array.push( '</fieldset>' );  
     
     dialog._html_array.push( '</fieldset>' );  
     dialog._html_array.push( '</td><td width="50%" valign="top">' );
@@ -418,7 +423,9 @@ function scheduler_settings__onclick(ret)
     dialog._html_array.push( '<fieldset><legend>'+parent.getTranslation('Limits')+'</legend>' );
     dialog._html_array.push( '<table cellspacing="'+cellspacing+'" cellpadding="0" width="100%" border="0">' );
     dialog.add_settings_input( parent.getTranslation('Max. number of orders per job chain')+':',      'max_orders',          parent._scheduler._runtime_settings.max_orders, 3 );
-    dialog.add_settings_input( parent.getTranslation('Max. number of last activities')+':',           'max_last_activities', parent._scheduler._runtime_settings.max_last_activities, 3 );
+    if(window.parent.onload_settings.display_last_activities_tab) {
+    	dialog.add_settings_input( parent.getTranslation('Max. number of last activities')+':',         'max_last_activities', parent._scheduler._runtime_settings.max_last_activities, 3 );
+    }
     dialog.add_settings_input( parent.getTranslation('Max. number of history entries per order')+':', 'max_order_history',   parent._scheduler._runtime_settings.max_order_history, 3 );
     dialog.add_settings_input( parent.getTranslation('Max. number of history entries per task')+':',  'max_task_history',    parent._scheduler._runtime_settings.max_task_history, 3 );
     dialog._html_array.push( '</table>' );
@@ -453,6 +460,7 @@ function scheduler_settings__onclick(ret)
     var fields    = parent.left_frame.input_dialog_submit();
     var numFields = ['max_orders','max_task_history','max_order_history','max_last_activities','terminate_timeout','debug_level','update_seconds'];
     for( var i=0; i < numFields.length; i++ ) {
+    	if( !window.parent.onload_settings.display_last_activities_tab && numFields[i] == 'max_last_activities') continue; 
       if( !isFinite(parseInt(fields[numFields[i]], 10)) ) plausi.push( numFields[i].replace(/_/g," ") + " must be numeric!" );
     }
     if( plausi.length == 0 ) {
