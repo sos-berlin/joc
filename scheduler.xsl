@@ -2921,17 +2921,17 @@
                           </xsl:otherwise>
                         </xsl:choose>
                            
-                        <td><xsl:value-of select="@ip"/></td>
-                        <td><xsl:value-of select="@hostname"/></td>
-                        <td><xsl:value-of select="@tcp_port"/></td>
-                        <td><xsl:value-of select="@scheduler_id"/></td>
-                        <td><xsl:apply-templates mode="date_time_nowrap" select="@connected_at__xslt_datetime_zone_support"/></td>
-                        <td style="color: crimson">
+                        <td class="remote_scheduler remote_scheduler_ip"><xsl:value-of select="@ip"/></td>
+                        <td class="remote_scheduler remote_scheduler_hostname"><xsl:value-of select="@hostname"/></td>
+                        <td class="remote_scheduler remote_scheduler_port"><xsl:value-of select="@tcp_port"/></td>
+                        <td class="remote_scheduler remote_scheduler_id"><xsl:value-of select="@scheduler_id"/></td>
+                        <td class="remote_scheduler remote_scheduler_connected"><xsl:apply-templates mode="date_time_nowrap" select="@connected_at__xslt_datetime_zone_support"/></td>
+                        <td class="remote_scheduler remote_scheduler_disconnected" style="color: crimson;">
                             <xsl:if test="@connected='no'">
                                 <xsl:apply-templates mode="date_time_nowrap" select="@disconnected_at__xslt_datetime_zone_support"/>
                             </xsl:if>
                         </td>
-                        <td><xsl:value-of select="@version"/></td>
+                        <td class="remote_scheduler remote_scheduler_version"><xsl:value-of select="@version"/></td>
                     </tr>
                 </xsl:for-each>
             </tbody>
@@ -3083,13 +3083,15 @@
         
                     <td>
                         <xsl:attribute name="onclick">callErrorChecked( 'show_job_details','<xsl:value-of select="@job"/>' )</xsl:attribute>
-                        <xsl:if test="not($job)">
-                           <xsl:attribute name="class">job_error</xsl:attribute>
+                        <xsl:if test="not($job) and @job">
+                           <span class="red"><xsl:apply-templates mode="trim_slash" select="@job" /></span>
                         </xsl:if>
+                        <xsl:if test="$job">
                         <xsl:apply-templates mode="job_path" select="$job">
                            <xsl:with-param name="style" select="''"/>
                            <xsl:with-param name="order_job" select="true()"/>
                         </xsl:apply-templates>
+                        </xsl:if>
                         <xsl:apply-templates mode="trim_slash" select="@job_chain" />
                     </td>                            
                     
