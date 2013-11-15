@@ -747,7 +747,6 @@
           <xsl:apply-templates select="ancestor::job_chain/@state"/>
         </div>
         <div title="show job chain details">
-          <!--xsl:attribute name="onclick">show_order_details( '<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute-->
           <xsl:attribute name="onclick">show_job_chain_details( '<xsl:value-of select="$job_chain_path"/>' )</xsl:attribute>
           <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="$normalized_order_id"/>', '<xsl:value-of select="$menu_caller"/>' );return false;</xsl:attribute>
           
@@ -1031,9 +1030,14 @@
            <tr><td colspan="5" class="line">&#160;</td></tr>
         </xsl:if>
          
-        <tr class="list" title="show order details">
+        <tr class="list">
+        	<xsl:if test="not(@occupied_by_cluster_member_id)">
+           		<xsl:attribute name="title">show order details</xsl:attribute>
+          </xsl:if>
           <td colspan="4">
-              <xsl:attribute name="onclick">callErrorChecked( 'show_order_details', '<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
+          		<xsl:if test="not(@occupied_by_cluster_member_id)">
+                  <xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
+              </xsl:if>
               <b><xsl:apply-templates mode="trim_slash" select="@order"/></b>
               <xsl:if test="@title">&#160;&#160;- &#160;<xsl:apply-templates select="@title"/></xsl:if>
           </td>
@@ -2143,13 +2147,18 @@
                 </tr>
               </xsl:if--> 
               
-              <tr class="list" title="show order details">
+              <tr class="list">
+              	<xsl:if test="not(@occupied_by_cluster_member_id)">
+              		<xsl:attribute name="title">show order details</xsl:attribute>
+              	</xsl:if>
                 <xsl:if test="$treeview">
                   <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="$normalized_order_id"/>', '<xsl:value-of select="name(parent::*)"/>' );return false;</xsl:attribute>
-                  <xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
+                  <xsl:if test="not(@occupied_by_cluster_member_id)">
+                    	<xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
+                  </xsl:if>
                 </xsl:if> 
                 <td>
-                  <xsl:if test="not($treeview)">
+                  <xsl:if test="not($treeview) and not(@occupied_by_cluster_member_id)">
                     <xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
                   </xsl:if>
                   <xsl:if test="name(parent::*) = 'blacklist'">
@@ -2178,8 +2187,10 @@
                   </xsl:when>
                   <xsl:otherwise>
                     <td colspan="3" style="padding-left:2ex;white-space:nowrap;">
-                      <xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
-                      <span class="label">Order</span><span class="small">:&#160;</span>
+                      <xsl:if test="not(@occupied_by_cluster_member_id)">
+                    		<xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
+                  		</xsl:if>
+                  		<span class="label">Order</span><span class="small">:&#160;</span>
                       <span style="white-space:normal;">
                           <xsl:apply-templates mode="trim_slash" select="@id" />
                       </span>
