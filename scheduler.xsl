@@ -2894,25 +2894,26 @@
             
             <thead>
                 <tr>
-                    <td colspan="7" class="before_head_space">&#160;</td>
+                    <td colspan="8" class="before_head_space">&#160;</td>
                 </tr>
-                <tr>
-                    <td colspan="7">
+                <!--tr>
+                    <td colspan="8">
                         <xsl:value-of select="@count" />&#160;<span class="translate">Scheduler(s)</span>&#160;
                         (<xsl:value-of select="@connected" />&#160;<span class="translate">connected</span>)
                     </td>
-                </tr>
+                </tr-->
                 <tr style="">
                     <td class="head1" style="padding-left: 2ex"><span class="translate">IP</span><xsl:text> </xsl:text></td>
                     <td class="head"><span class="translate">Hostname</span></td>
                     <td class="head"><span class="translate">Port</span></td>
                     <td class="head"><span class="translate">Id</span></td>
+                    <td class="head"><span class="translate">Last Update</span></td>
                     <td class="head"><span class="translate">Connected</span></td>
                     <td class="head"><span class="translate">Disconnected</span></td>
                     <td class="head"><span class="translate">Version</span></td>
                 </tr>
                 <xsl:call-template name="after_head_space">
-                  <xsl:with-param name="colspan" select="'7'"/>
+                  <xsl:with-param name="colspan" select="'8'"/>
                 </xsl:call-template>
             </thead>
             
@@ -2936,11 +2937,17 @@
                         <td class="remote_scheduler remote_scheduler_hostname"><xsl:value-of select="@hostname"/></td>
                         <td class="remote_scheduler remote_scheduler_port"><xsl:value-of select="@tcp_port"/></td>
                         <td class="remote_scheduler remote_scheduler_id"><xsl:value-of select="@scheduler_id"/></td>
+                        <td class="remote_scheduler remote_scheduler_update"><xsl:apply-templates mode="date_time_nowrap" select="@configuration_transfered_at__xslt_datetime_zone_support"/></td>
                         <td class="remote_scheduler remote_scheduler_connected"><xsl:apply-templates mode="date_time_nowrap" select="@connected_at__xslt_datetime_zone_support"/></td>
-                        <td class="remote_scheduler remote_scheduler_disconnected" style="color: crimson;">
-                            <xsl:if test="@connected='no'">
-                                <xsl:apply-templates mode="date_time_nowrap" select="@disconnected_at__xslt_datetime_zone_support"/>
-                            </xsl:if>
+                        <td class="remote_scheduler remote_scheduler_disconnected red">
+                        		<xsl:choose>
+                        			<xsl:when test="@active='no' and @deactivate_at">
+                        				<xsl:apply-templates mode="date_time_nowrap" select="@deactivate_at__xslt_datetime_zone_support"/>
+                        			</xsl:when>
+                        			<xsl:when test="@connected='no' and not(@deactivate_at)">
+                        				<xsl:apply-templates mode="date_time_nowrap" select="@disconnected_at__xslt_datetime_zone_support"/>
+                        			</xsl:when>
+                            </xsl:choose>
                         </td>
                         <td class="remote_scheduler remote_scheduler_version"><xsl:value-of select="@version"/></td>
                     </tr>
@@ -2949,7 +2956,7 @@
             
             <tfoot>
               <xsl:call-template name="after_body_space">
-                  <xsl:with-param name="colspan" select="'7'"/>
+                  <xsl:with-param name="colspan" select="'8'"/>
               </xsl:call-template>
             </tfoot>
             

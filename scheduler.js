@@ -426,6 +426,8 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
                                              break;
               case "connected_at"          :
               case "disconnected_at"       : 
+              case "configuration_transfered_at" :
+              case "deactivate_at"         : 
               case "last_write_time"       : element.setAttribute( attribute_name + "__xslt_datetime_zone_support"  , schedulerDate.toString() );
                                              break;
               default                      : element.setAttribute( attribute_name + "__xslt_datetime"               , schedulerDate.toString() );
@@ -497,6 +499,8 @@ Scheduler.prototype.modifyDatetimeForXSLT = function( response )
     //remote_scheduler attributes
     this.addDatetimeAttributesForXSLT( response, now, "connected_at"          );
     this.addDatetimeAttributesForXSLT( response, now, "disconnected_at"       );
+    this.addDatetimeAttributesForXSLT( response, now, "deactivate_at"         );
+    this.addDatetimeAttributesForXSLT( response, now, "configuration_transfered_at" );
     //schedule attributes
     this.addDatetimeAttributesForXSLT( response, now, "start_time"            );
     this.addDatetimeAttributesForXSLT( response, now, "end_time"              );
