@@ -65,7 +65,9 @@ function Scheduler()
     this._lang_file_exists                               = ( typeof window['_lang_file_exists'] == 'boolean' ) ? _lang_file_exists : false;
     this._tree_view_enabled                              = false; //2.1.0.6101  (2010-04-06 11:53:57)
     this._activeRequestCount                             = 0;
-    this._ie                                             = navigator.appVersion.match(/\bMSIE\b/);
+    this._ie                                             = navigator.appVersion.match(/\bTrident\b/);
+    this._chrome                                         = 0;
+    this._safari                                         = 0;
     this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains','orders':'Orders','schedules':'Schedules'}; 
     this._view                                           = {'jobs'             :'list',
                                                             'job_chains'       :'list',
@@ -384,7 +386,7 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
         if( element.tagName == 'order_queue') continue;
         var value   = element.getAttribute( attribute_name );
         if( value )
-        {   
+        {   //2038-01-19 03:14:07.000Z
             if( value.indexOf("2038-") > -1 ) {
             	value = "never";
             }
@@ -861,6 +863,104 @@ Scheduler.prototype.treeDisplay = function( li_element )
 Scheduler.prototype.UTCtoLocal = function( datetime )
 {
     return new SchedulerDate( datetime ).toString();
+}
+
+
+//--------------------------------------------------------------------------------checkBrowser
+Scheduler.prototype.checkBrowser = function( withWarning )
+{      
+    this._ie        = 0;   // Internet Explorer
+		var gecko       = 0;   // Mozilla Firefox, Seamonkey, Iceweasel, Iceapel, Netscape
+		this._chrome    = 0;   // Google Chrome
+		this._safari    = 0;   // Safari
+		var xul         = true;   // xulrunner (swt)
+		var geckoName   = 'Mozilla Browser';
+		
+		if( typeof withWarning != "boolean"  ) { withWarning = true;  }
+    
+    if( window.navigator != undefined )
+    {   
+        var appN  =  window.navigator.appName;
+        var userA =  window.navigator.userAgent; 
+        
+        if( !!(userA.match(/Trident/) && !userA.match(/MSIE/)) ) 
+        {
+        		this._ie = 11; //atleast 11
+        		var match = window.navigator.appVersion.match(/\brv:(\d+)/);
+        		if( match )  this._ie = 1 * RegExp.$1;
+        }
+        else
+        if( appN == "Microsoft Internet Explorer" )
+        {
+            var match = window.navigator.appVersion.match( /MSIE (\d+\.\d+);/ );
+            if( match )  this._ie = 1 * RegExp.$1;
+        }
+        else
+        if( window.navigator.vendor == "Google Inc." || userA.indexOf( "Chrome" ) > -1 )
+        {
+            var match = window.navigator.appVersion.match( /Chrome\/(\d+\.\d+)/ );
+            if( match )  this._chrome = 1 * RegExp.$1;
+        }
+        else
+        if( appN == "Netscape" )
+        {   
+            var match = userA.match( /\).*\b([^\/]+)\/(\d+\.\d+)/ );
+            if( match ) { 
+            	geckoName = RegExp.$1;
+              if( geckoName.toLowerCase() != "epiphany" ) gecko = 1 * RegExp.$2;
+              if( geckoName.toLowerCase() == "safari" ) this._safari = 1 * RegExp.$2; 
+              if( this._safari > 520 ) gecko = 2;
+            }
+            else 
+            if( userA.indexOf('Gecko') > -1 && userA.indexOf('KHTML') === -1 ) {   //xulrunner >= 1.8.1.2
+            	match = userA.match( /rv:([\.\d]+)/ );
+            	var minxulversion = [1,8,1,2];
+            	if( match ) {
+            		var xulversion = RegExp.$1.split('.');
+            		for(var i=0; i < Math.min(4,xulversion.length); i++) {
+            			if((1*xulversion[i]) < minxulversion[i]) {
+            				xul = false;
+            			 	break;
+            			}
+            		}
+            	}
+            }
+        }
+    }
+    
+    if( withWarning && this._ie < 6 && gecko < 2 && this._chrome < 0.2 && !xul )
+    {
+        var allBrowser = this._ie+gecko+this._chrome;
+        var msg = "The page may not work with this browser.\n\n";
+        if( allBrowser == 0 ) 
+        {
+          msg += "Please use\n";
+          msg += "  - Microsoft Internet Explorer\n";
+          msg += "  - Mozilla Firefox\n";
+          msg += "  - Google Chrome\n";
+          msg += "  - SeaMonkey";
+        } 
+        else 
+        { 
+          if( allBrowser-this._ie      == 0 ) msg += "Your Microsoft Internet Explorer version should be at least 6.0";
+          if( allBrowser-gecko         == 0 ) msg += "Your " + geckoName + " version should be at least 2.0";
+          if( allBrowser-this._chrome  == 0 ) msg += "Your Google Chrome version should be at least 0.2";
+        }
+
+        if( window.navigator != undefined )
+        {
+            msg += "\n\n\n";
+            msg += "userAgent="       + window.navigator.userAgent          + "\n";
+            msg += "appName="         + window.navigator.appName            + "\n";
+            msg += "appVersion="      + window.navigator.appVersion         + "\n";
+            msg += "appMinorVersion=" + window.navigator.appMinorVersion    + "\n";
+            msg += "vendor="          + window.navigator.vendor             + "\n";
+            msg += "product="         + window.navigator.product            + "\n";
+            msg += "productSub="      + window.navigator.productSub         + "\n";
+        }
+
+        alert( msg );
+    }
 }
 
 

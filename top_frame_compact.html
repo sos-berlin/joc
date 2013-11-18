@@ -61,19 +61,19 @@ tabs['remote_schedulers'] = {title:'Remote Schedulers',pos:'' , display:'none'  
 if(window.parent.onload_settings.display_last_activities_tab) {
 	tabs['last_activities'] = {title:'Last Activities'  ,pos:'' , display:'inline'};
 }
-var ie = (navigator.appVersion.indexOf("MSIE") > -1);
-    
+
 //----------------------------------------------------------------------------------------do_onload
 function do_onload()
 {   
     parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
     scheduler_init();
     
-    if( document.getElementById( "update_periodically_checkbox" ) && !ie ) {
+    if( document.getElementById( "update_periodically_checkbox" ) && navigator.appVersion.indexOf("Trident") == -1 ) {
       document.getElementById( "update_periodically_checkbox" ).style.top = '2px';
     }
     document.getElementById(parent._scheduler._show_card+'_inner_tab').className = 'active'+tabs[parent._scheduler._show_card].pos;
     set_state(parent._response);
+    
     parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
 }
 
@@ -163,7 +163,7 @@ function set_state(response)
     document.getElementById('spooler_pid').innerHTML          = (state.getAttribute('pid') || parent.getTranslation('unknown'));
     document.getElementById('spooler_release').innerHTML      = parent._scheduler._gui_release_no;
     var spooler_build                                         = parent._scheduler._gui_subversion_no.replace(/[ ]+[^ ]*/,"");
-    if(parent._scheduler._version_date) {
+    if(parent._scheduler._version_no) {
     	spooler_build                                          += '/' + parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1");
     }
     document.getElementById('spooler_build').innerHTML        = spooler_build;
@@ -202,13 +202,21 @@ function show_card( what )
 function write_menu(menu)
 {
   var menu_title = parent.getTranslation(menu.substr(0,1).toUpperCase() + menu.substring(1));
-  if( window.createPopup == undefined ) {
+  var menu_id = '__selectbox_'+menu+'__';
+  if( window.createPopup == undefined ) { 
     document.writeln('          <td align="left" title="scheduler '+menu+'" style="white-space:nowrap;height:16px;padding:0px 4px;">');
-    document.writeln('            <div class="selectbox_titlebar_'+menu+'"><select id="__selectbox_'+menu+'__" name="__selectbox_'+menu+'__" size="1" onfocus="scheduler_'+menu+'__onclick( this.name );">');
+    document.writeln('            <div class="selectbox_titlebar_'+menu+'" ><select id="'+menu_id+'" name="'+menu_id+'" size="1">');
     document.writeln('              <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">&#9658;'+menu_title+'</option>');
     document.writeln('              <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');
     document.writeln('            </select></div>');
     document.writeln('          </td>');
+    var menuElem = document.getElementById(menu_id); 
+    if(typeof menuElem.onfocusin == 'object') {
+    	menuElem.setAttribute('onfocusin','scheduler_'+menu+'__onclick( this.name );'); 
+    }
+    else {
+    	menuElem.setAttribute('onfocus','scheduler_'+menu+'__onclick( this.name );');
+    }
   } else {
     document.writeln('          <td align="left" title="scheduler '+menu+'" style="white-space:nowrap;padding:0px 4px;">');
     document.writeln('            <a class="titlebar" href="javascript:void(0);" onclick="scheduler_'+menu+'__onclick()">');
@@ -220,7 +228,7 @@ function write_menu(menu)
 //---------------------------------------------------------------------------------------write_tabs
 function write_tabs()
 {
-  var ie6     = (ie && navigator.appVersion.match(/\bMSIE\s+(\d+)/)[1] < 7);
+  var ie6     = (navigator.appVersion.indexOf("MSIE") > -1 && navigator.appVersion.match(/\bMSIE\s+(\d+)/)[1] < 7);
   var elem    = (ie6) ? {tagName:'a',href:' href="javascript:void(0);"'} : {tagName:'span',href:''}
   for( var entry in tabs ) {
     document.writeln('                <li id="'+entry+'_tab" style="display:'+tabs[entry].display+'" onclick="callErrorChecked( \'show_card\', \''+entry+'\' );">');

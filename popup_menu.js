@@ -192,7 +192,7 @@ Popup_menu_builder.prototype.add_bar = function()
     this._html_array.push( html );
     
     if( window.createPopup == undefined ) {
-      if( parent.chrome > 0 || parent.safari > 0 ) {
+      if( parent._scheduler._chrome > 0 || parent._scheduler._safari > 0 ) {
         var opt         = new Option( '--------------------------------------------', '' );
       } else {
         var opt         = new Option( '---------------------------------------------------------------------------------------', '' );
@@ -256,7 +256,7 @@ Popup_menu_builder.prototype.create_popup_menu = function( menu_type, element_na
             this._finished = true;
           
             for( var i=0; i < this._selectbox_array.length; i++ ) {
-              selectbox.options[i+2] = this._selectbox_array[i];  
+              selectbox.options[i+2] = this._selectbox_array[i];
             }
             selectbox.options[this._selectbox_array.length+1].style.fontSize = '0px';
             selectbox.options[this._selectbox_array.length+1].style.height = '3px';
@@ -264,6 +264,7 @@ Popup_menu_builder.prototype.create_popup_menu = function( menu_type, element_na
             //selectbox.setAttribute( "onclick", "parent._scheduler._update_periodically=document.getElementById( 'update_periodically_checkbox' ).checked;document.getElementById( 'update_periodically_checkbox' ).checked=false;window.clearTimeout( window.parent.left_frame._timer )" );
             //selectbox.setAttribute( "onclick", "window.clearTimeout( window.parent.left_frame._timer )" );
             selectbox.setAttribute( "onchange", "eval(this.value);this.selectedIndex=0;" );
+            //alert( $(selectbox).getWidth() );
           }
         }
     }
@@ -374,7 +375,7 @@ Input_dialog.close = function()
       shadowElem2.style.display         = "none";
     }
     var iframeElem                      = parent.left_frame.document.getElementById('__input_iframe__');
-    if( parent.ie && iframeElem ) { iframeElem.style.display  = "none"; }
+    if( parent._scheduler._ie > 0 && iframeElem ) { iframeElem.style.display  = "none"; }
 }
  
 
@@ -409,7 +410,7 @@ Input_dialog.prototype.show = function()
 Input_dialog.add_shadow = function()
 {   
     var iframeElem                      = parent.left_frame.document.getElementById('__input_iframe__');
-    if( parent.ie && iframeElem ) {
+    if( parent._scheduler._ie > 0 && iframeElem ) {
       iframeElem.style.top              = Input_dialog._element.offsetTop+'px';
       iframeElem.style.zIndex           = Input_dialog._element.style.zIndex-3;
       iframeElem.style.left             = Input_dialog._element.offsetLeft+'px';  
@@ -613,8 +614,8 @@ Input_dialog.add_new_params = function( width, input_form, with_shadow )
     if( count_new_params == 0 ) {
       var input_new_parameters_title = parent.left_frame.document.getElementById('__input_new_parameters_title__');
       var input_new_parameters_tr    = parent.left_frame.document.getElementById('__input_new_parameters_tr__');
-      if( input_new_parameters_title ) input_new_parameters_title.style.display = ( parent.ie ) ? "block" : "table-row";
-      if( input_new_parameters_tr    ) input_new_parameters_tr.style.display    = ( parent.ie ) ? "block" : "table-row";
+      if( input_new_parameters_title ) input_new_parameters_title.style.display = ( parent._scheduler._ie > 0 ) ? "block" : "table-row";
+      if( input_new_parameters_tr    ) input_new_parameters_tr.style.display    = ( parent._scheduler._ie > 0 ) ? "block" : "table-row";
       if( input_new_parameters       ) { 
         var new_param_html = '<table cellspacing="0" cellpadding="0" width="100%" border="0"><tbody id="__input_new_parameters_body__">';
         new_param_html    += '<tr><th >'+parent.getTranslation('name')+'</th><th >'+parent.getTranslation('value')+'</th></tr>';
@@ -649,7 +650,7 @@ Input_dialog.add_new_param = function( width, idx )
     var newTD2                = newTD.cloneNode(false);
     newTR.appendChild(newTD2);
     newTD2.style.width        = "60%";
-    if( parent.ie ) {
+    if( parent._scheduler._ie > 0 ) {
       newTD.innerHTML  = '<input type="text" name="new_param_name_' + idx + '" value="" style="width:' + parseInt((width*2/5)-4,10) + 'px;" />';
       newTD2.innerHTML = '<input type="text" name="new_param_value_' + idx + '" value="" style="width:' + parseInt((width*3/5)-1,10) + 'px;" />';
     } else {

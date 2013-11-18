@@ -87,7 +87,7 @@
   /** Hintergrundfarbe für ausgewählten Tag */  
   SOS_Calendar.bgDaySelected                = '#dddddd';  
   /** Styles für die Navigationselemente ("Monat vor" usw)*/
-  var sosCalendarBsAdd                      = (navigator.appVersion.match(/\bMSIE\b/)) ? 'border:1 solid #d8d6c7;width:100%;margin:3px;' : 'border:1 solid #d8d6c7;width:96%;padding:0px 3px;';
+  var sosCalendarBsAdd                      = (navigator.appVersion.match(/\bTrident\b/)) ? 'border:1 solid #d8d6c7;width:100%;margin:3px;' : 'border:1 solid #d8d6c7;width:96%;padding:0px 3px;';
   SOS_Calendar.buttonStyle                  = 'style="'+sosCalendarBsAdd+'cursor:pointer;background:#ebe8d5;color: black;font-family: tahoma, arial;font-size:13px;height:70%;" ';
   /** */
   SOS_Calendar.buttonOnMouseEffect          = 'onmouseover="this.style.backgroundColor=\'#D8D2AB\'" onmouseout="this.style.backgroundColor=\'#ebe8d5\'"';
@@ -187,7 +187,7 @@
         elDiv.id                    = SOS_Calendar.id;
         elDiv.style.position        = SOS_Calendar.defaultStylePosition;
         elDiv.style.width           = SOS_Calendar.defaultStyleWidth;
-        if(navigator.appVersion.match(/\bMSIE\b/)) elDiv.style.Height = SOS_Calendar.defaultStyleHeight;
+        if(navigator.appVersion.match(/\bTrident\b/)) elDiv.style.Height = SOS_Calendar.defaultStyleHeight;
         elDiv.style.top             = SOS_Calendar.defaultStyleTop;
         elDiv.style.left            = SOS_Calendar.defaultStyleLeft;
         elDiv.style.border          = SOS_Calendar.defaultStyleBorderActiv;

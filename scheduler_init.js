@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2010 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2013 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -97,97 +97,4 @@ function getTranslation( s, args )
     }
     return s;
 }
-
-//------------------------------------------------------------------------------------check_browser
-var ie        = 0;   // Microsoft Internet Explorer
-var gecko     = 0;   // Mozilla Firefox, Seamonkey, Iceweasel, Iceapel, Netscape
-var chrome    = 0;   // Google Chrome
-var safari    = 0;   // Safari
-var xul       = true;   // xulrunner (swt)
-var geckoName = 'Mozilla Browser';
-
-
-function check_browser()
-{      
-    if( window != undefined )
-    {                 
-        if( window.navigator != undefined )
-        {   
-            var appN  =  window.navigator.appName;
-            var userA =  window.navigator.userAgent;
-            
-            if( appN == "Microsoft Internet Explorer" )
-            {
-                var match = window.navigator.appVersion.match( /MSIE (\d+\.\d+);/ );
-                if( match )  ie = 1 * RegExp.$1;
-            }
-            else
-            if( window.navigator.vendor == "Google Inc." || userA.indexOf( "Chrome" ) > -1 )
-            {
-                var match = window.navigator.appVersion.match( /Chrome\/(\d+\.\d+)/ );
-                if( match )  chrome = 1 * RegExp.$1;
-            }
-            else
-            if( appN == "Netscape" )
-            {   
-                var match = userA.match( /\).*\b([^\/]+)\/(\d+\.\d+)/ );
-                if( match ) { 
-                	geckoName = RegExp.$1;
-                  if( geckoName.toLowerCase() != "epiphany" ) gecko = 1 * RegExp.$2;
-                  if( geckoName.toLowerCase() == "safari" ) safari = 1 * RegExp.$2; 
-                  if( safari > 520 ) gecko = 2;
-                }
-                else 
-                if( userA.indexOf('Gecko') > -1 && userA.indexOf('KHTML') === -1 ) {   //xulrunner >= 1.8.1.2
-                	match = userA.match( /rv:([\.\d]+)/ );
-                	var minxulversion = [1,8,1,2];
-                	if( match ) {
-                		var xulversion = RegExp.$1.split('.');
-                		for(var i=0; i < Math.min(4,xulversion.length); i++) {
-                			if((1*xulversion[i]) < minxulversion[i]) {
-                				xul = false;
-                			 	break;
-                			}
-                		}
-                	}
-                }
-            }
-        }
-    }
-    
-    if( ie < 6 && gecko < 2 && chrome < 0.2 && !xul )
-    {
-        var allBrowser = ie+gecko+chrome;
-        var msg = "The page may not work with this browser.\n\n";
-        if( allBrowser == 0 ) 
-        {
-          msg += "Please use\n";
-          msg += "  - Microsoft Internet Explorer\n";
-          msg += "  - Mozilla Firefox\n";
-          msg += "  - Google Chrome\n";
-          msg += "  - SeaMonkey";
-        } 
-        else 
-        { 
-          if( allBrowser-ie        == 0 ) msg += "Your Microsoft Internet Explorer version should be at least 6.0";
-          if( allBrowser-gecko     == 0 ) msg += "Your " + geckoName + " version should be at least 2.0";
-          if( allBrowser-chrome    == 0 ) msg += "Your Google Chrome version should be at least 0.2";
-        }
-
-        if( window.navigator != undefined )
-        {
-            msg += "\n\n\n";
-            msg += "userAgent="       + window.navigator.userAgent          + "\n";
-            msg += "appName="         + window.navigator.appName            + "\n";
-            msg += "appVersion="      + window.navigator.appVersion         + "\n";
-            msg += "appMinorVersion=" + window.navigator.appMinorVersion    + "\n";
-            msg += "vendor="          + window.navigator.vendor             + "\n";
-            msg += "product="         + window.navigator.product            + "\n";
-            msg += "productSub="      + window.navigator.productSub         + "\n";
-        }
-
-        alert( msg );
-    }
-}
-
 

@@ -76,8 +76,6 @@ Scheduler_Filter.active_jobs_filter             = '';
 Scheduler_Filter.active_job_chains_filter       = '';
 Scheduler_Filter.active_orders_filter           = '';
 
-Scheduler_Filter.ie                             = (navigator.appVersion.match(/\bMSIE\b/));
-Scheduler_Filter.ie8                            = (Scheduler_Filter.ie && navigator.appVersion.match(/\bMSIE\s+(\d+)/)[1] > 7);
 Scheduler_Filter.pattern                        = {'jobs':'','job_chains':'','orders':''};
 
 /***/
@@ -90,6 +88,7 @@ window.onload = function(){
     } 
     else {
       Scheduler_Filter.scheduler              = new Scheduler();
+      Scheduler_Filter.scheduler.checkBrowser(false);
       Scheduler_Filter.is_inherited_scheduler = false;
     }
   }
@@ -208,7 +207,7 @@ Scheduler_Filter.fill_table = function(range,arr,table){
     
     var td_checkbox         = document.createElement("td");
     td_checkbox.style.paddingLeft = "3px";
-    if( Scheduler_Filter.ie ) {
+    if( Scheduler_Filter.scheduler._ie ) {
       td_checkbox.innerHTML = '<input type="checkbox" name="'+range+'" onclick="Scheduler_Filter.pattern[this.name]=\'\';" />';
     } else {
       var chckbox           = document.createElement("input");
@@ -242,7 +241,7 @@ Scheduler_Filter.reg_quote = function(path){
 
 /***/
 Scheduler_Filter.display_path = function(path){
-  var delim = Scheduler_Filter.ie8 ? '&#8203;' : '<wbr />';
+  var delim = (Scheduler_Filter.scheduler._ie > 7) ? '&#8203;' : '<wbr />';
   return Scheduler_Filter.normalize_path(path).replace(/\//g,'/'+delim).replace(/_/g,'_'+delim);  
 }
 

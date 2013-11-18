@@ -68,8 +68,6 @@ var _hint_timer                = 0;
 var _delay_timer               = 0;
 var _delay                     = 0;
 var _scrollOffset              = 0;
-//var ie6                        = (navigator.appVersion.match(/\bMSIE\b/) && navigator.appVersion.match(/\bMSIE\s+(\d+)/)[1] < 7);
-var _ie_version                = navigator.appVersion.match(/\bMSIE\b/) ? navigator.appVersion.match(/\bMSIE\s+(\d+)/)[1] : 0;
 
 var error_div;
 var default_categories         = {exception:'not explicit',scheduler:'implicit'};
@@ -83,6 +81,7 @@ window.onload = function()
         _scheduler       = window.opener.parent._scheduler;
       } else {
         _scheduler       = new Scheduler();
+        _scheduler.checkBrowser(false);
         _scheduler.readCustomSettings();
         _scheduler.loadXSLT( "scheduler.xsl" );
         _inherited_scheduler = false;
@@ -116,7 +115,7 @@ function showCategories(cur_delay)
       var log_element_elems    = log_elements_elem.selectNodes( "log_category" );
       if( !log_element_elems || log_element_elems.length == 0 ) throw new Error( "No log categories found" );
       var spooler_element      = response.selectSingleNode( "spooler" );
-      spooler_element.setAttribute( "my_ie_version", _ie_version );
+      spooler_element.setAttribute( "my_ie_version", _scheduler._ie );
       spooler_element.setAttribute( "reset_delay", (_delay ? _delay : 0) );
       spooler_element.setAttribute( "next_reset", cur_delay );
       if( cur_delay > -2 ) {
@@ -305,7 +304,7 @@ function reset_error()
 //------------------------------------------------------------set_corner (onresize-Event only for IE<7)
 function setCornerPosition()
 {
-  if( _ie_version > 0 && _ie_version < 7 ) {
+  if( _scheduler._ie > 0 && _scheduler._ie < 7 ) {
     var imgs = document.getElementsByTagName("img");
     for( var i=0; i < imgs.length; i++ ) {
       if( imgs[i].src.search(/corner_tr.gif$/) > -1 && imgs[i].className.search(/^corner_tr$/) > -1 ) {

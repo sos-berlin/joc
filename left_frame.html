@@ -216,10 +216,14 @@ function update_jobs_frame()
           _answer[0] = new Array(folders.length);
           if( _card == 'last_activities' ) _answer[1] = new Array(folders.length);
           _answer_complete = 0;
+          var reqs = "<commands>";
           for( var i=0; i < folders.length; i++ ) {
             req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+folders[i].getAttribute('path')+'"'+max_attributes+'/>'; 
+            reqs += req;
             parent._scheduler.executeAsynchron( req, parent.left_frame.collect_list_answer, false, false, false, i );
           }
+          reqs += "</commands>";
+          parent._scheduler.executeAsynchron( reqs, parent.left_frame.collect_list_answer3, false, false, false );
           //req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders '+what+'" path="/" ' + max_orders + ' max_task_history="'+ max_task_history +'" />'; 
         }
       }
@@ -231,12 +235,17 @@ function update_jobs_frame()
         _open_all_folders = false;
         _open_folders = '||';
         var open_folders = [];
+        var reqs = "<commands>";
         for( var i=0; i < folders.length; i++ ) {
           open_folders.push(folders[i].getAttribute('path'));
           if( i == folders.length-1 ) _open_folders = '|'+open_folders.join('|')+'|';
           req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+folders[i].getAttribute('path')+'"'+max_attributes+'/>'; 
-          parent._scheduler.executeAsynchron( req, parent.left_frame.collect_tree_answer, false, false, false, i );
+          reqs += req;
+          //parent._scheduler.executeAsynchron( req, parent.left_frame.collect_tree_answer, false, false, false, i );
         }
+        reqs += "</commands>";
+        parent._scheduler.executeAsynchron( reqs, parent.left_frame.collect_tree_answer2, false, false, false );
+          
         //req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders '+what+'" path="/" ' + max_orders + ' max_task_history="'+ max_task_history +'" />'; 
       } 
       else 
@@ -269,10 +278,15 @@ function update_jobs_frame()
         _open_folders = (open_folders2.length > 0) ? '|'+open_folders2.join('|')+'|' : '||';
         _answer[0] = new Array(open_folders2.length);
         _answer_complete = 0;
+        var reqs = "<commands>";
         for( var i=0; i < open_folders2.length; i++ ) {
           req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+open_folders2[i]+'"'+max_attributes+'/>'; 
-          parent._scheduler.executeAsynchron( req, parent.left_frame.collect_tree_answer, false, false, false, i );
+          reqs += req;
+          //parent._scheduler.executeAsynchron( req, parent.left_frame.collect_tree_answer, false, false, false, i );
         }
+        reqs += "</commands>";
+        parent._scheduler.executeAsynchron( reqs, parent.left_frame.collect_tree_answer2, false, false, false );
+        
       }
       //req += '</commands>';
       //parent._scheduler.executeAsynchron( req, parent.left_frame.update_callback );
@@ -313,6 +327,27 @@ function collect_tree_answer( response, index )
 }
 
 
+//--------------------------------------------------------------------------------collect_tree_answer2
+
+function collect_tree_answer2( response )
+{ 
+  if( response ) _response = response;
+  if(_card == 'jobs' || _card == 'job_chains' || _card == 'orders' ) {
+  	var flds = _response.selectNodes('//folders/folder');  
+  	if(flds) {
+  		for( var j = 0; j < flds.length; j++ )
+    	{
+        	parent.control_frame.apply_filter( flds[j], _card );  
+    	}
+    } 
+  }
+  parent._scheduler.modifyDatetimeForXSLT( _response );
+  parent._scheduler.logger(9,'SCHEDULER TREE RESPONSE:\n' + _response.xml);
+  parent._scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER TREE REQUEST','scheduler_tree_execute');
+  update_callback();
+}
+
+
 //--------------------------------------------------------------------------------collect_list_answer
 
 function collect_list_answer( response, index )
@@ -342,10 +377,17 @@ function collect_list_answer( response, index )
     _response    = parent._scheduler.loadXML(dom_xml);
     dom_xml      = '';
     parent._scheduler.modifyDatetimeForXSLT( _response );
-    parent._scheduler.logger(9,'SCHEDULER LIST RESPONSE:\n' + _response.xml);
+    parent._scheduler.logger(1,'SCHEDULER LIST RESPONSE:\n' + _response.xml);
     parent._scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER TREE REQUEST','scheduler_tree_execute');
     update_callback();
   }
+}
+
+//--------------------------------------------------------------------------------collect_list_answer3
+
+function collect_list_answer3( response )
+{ 
+  parent._scheduler.logger(1,'SCHEDULER LIST RESPONSE3:\n' + response.xml);
 }
 
 

@@ -35,7 +35,7 @@
 
 // Anpassungen für DOM und XSL-T
 
-if(!navigator.appVersion.match(/\bMSIE\b/)) {
+if(!navigator.appVersion.match(/\bTrident\b/)) {
 
 //----------------------------------------------------------------------------------XMLDocument.xml
 // Nachbildung von Microsofts DOMDocument.xml
@@ -70,6 +70,15 @@ if( window.Element  &&  !window.Element.prototype.xml )
 }
 
 }
+
+
+//implement evaluate method if not exists; e.g. IE11
+//wgxpath.install.js have to be included
+if( (typeof wgxpath == 'object') && window.XMLDocument && 
+		(typeof window.XMLDocument.prototype.evaluate == 'undefined') ) 
+{
+		wgxpath.install();
+}
 	
 //---------------------------------------------------------------------XMLDocument.selectSingleNode
 // Nachbildung von Microsofts DOMDocument.selectSingleNode
@@ -77,7 +86,7 @@ if( window.Element  &&  !window.Element.prototype.xml )
 if( window.XMLDocument  &&  !window.XMLDocument.prototype.selectSingleNode )
 {
     window.XMLDocument.prototype.selectSingleNode = function( path )
-    {
+    {   
         return this.evaluate( path, this, null, 0, null ).iterateNext();
     }
 }
