@@ -4535,26 +4535,32 @@
         </xsl:if>
 
         <xsl:if test="@mail_to">
-            <span style="white-space:nowrap;">
             <span class="label">To</span><span class="small">:</span>
-            <xsl:value-of select="@mail_to"/>
-            </span>
+            <xsl:call-template name="replace">
+               <xsl:with-param name="string" select="@mail_to"/>
+               <xsl:with-param name="old" select="','"/>
+               <xsl:with-param name="new" select="', '"/>
+            </xsl:call-template>
             <span>&#160; </span> 
         </xsl:if>
         
         <xsl:if test="@mail_cc">
-            <span style="white-space:nowrap;">
             <span class="label">CC</span><span class="small">:</span>
-            <xsl:value-of select="@mail_cc"/>
-            </span>
+            <xsl:call-template name="replace">
+               <xsl:with-param name="string" select="@mail_cc"/>
+               <xsl:with-param name="old" select="','"/>
+               <xsl:with-param name="new" select="', '"/>
+            </xsl:call-template>
             <span>&#160; </span> 
         </xsl:if>
         
         <xsl:if test="@mail_bcc">
-            <span style="white-space:nowrap;">
             <span class="label">BCC</span><span class="small">:</span>
-            <xsl:value-of select="@mail_bcc"/>
-            </span>
+            <xsl:call-template name="replace">
+               <xsl:with-param name="string" select="@mail_bcc"/>
+               <xsl:with-param name="old" select="','"/>
+               <xsl:with-param name="new" select="', '"/>
+            </xsl:call-template>
             <span>&#160; </span>
         </xsl:if>
         
