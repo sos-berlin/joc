@@ -558,6 +558,7 @@
           <xsl:when test="@action='next_state'">darkorange</xsl:when>
           <xsl:when test="@action='stop'">crimson</xsl:when>
           <xsl:when test="order_queue/order/@suspended = 'yes'">crimson</xsl:when>
+          <xsl:when test="order_queue/order/@occupied_by_cluster_member_id">forestgreen</xsl:when>
           <xsl:when test="job/file_based/ERROR or job/file_based/removed or job/replacement">crimson</xsl:when>
           <xsl:when test="job/file_based/requisites/requisite/@is_missing = 'yes'">crimson</xsl:when>
           <xsl:when test="job/@remove = 'yes'">crimson</xsl:when>
