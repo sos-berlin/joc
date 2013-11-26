@@ -490,6 +490,7 @@ _translations['ago']                                       = 'hace';
 _translations['IP']                                        = 'IP';
 _translations['Hostname']                                  = 'Host';
 _translations['Port']                                      = 'Puerto';
+_translations['Last Update']                               = 'Ultima Actualización';
 _translations['Connected']                                 = 'Conectado';
 _translations['Disconnected']                              = 'Desconectado';
 _translations['Version']                                   = 'Version';

@@ -488,6 +488,7 @@ _translations['ago']                                       = 'vergangen';
 _translations['IP']                                        = 'IP';
 _translations['Hostname']                                  = 'Host';
 _translations['Port']                                      = 'Port';
+_translations['Last Update']                               = 'letzte Aktualisierung';
 _translations['Connected']                                 = 'Verbunden';
 _translations['Disconnected']                              = 'Getrennt';
 _translations['Version']                                   = 'Version';
