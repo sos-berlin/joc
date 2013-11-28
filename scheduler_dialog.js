@@ -1769,27 +1769,38 @@ function show_order_log( job_chain, order_id, history_id, end_time )
 function get_stdout_stderr( job_chain, order_id, history_id, end_time )
 {
     _stdout_stderr = {stdout:null,stderr:null};
-    if((parent._stdout_begin && parent._stdout_end) || (parent._stderr_begin && parent._stderr_end)) {
-    	var show_log_command = get_show_log_command( job_chain, order_id, history_id, end_time );
-    	show_log_command = parent._scheduler._engine_cpp_url+"show_log?base_url="+parent._scheduler._url+"show_log&"+show_log_command;
-    
-    	var responseText = parent._scheduler.executeGet(show_log_command);
+    var stdout_begin = parent._stdout_begin.replace(/^\s*/,"").replace(/\s*$/,"");
+    var stdout_end   = parent._stdout_end.replace(/^\s*/,"").replace(/\s*$/,"");
+    var stderr_begin = parent._stderr_begin.replace(/^\s*/,"").replace(/\s*$/,"");
+    var stderr_end   = parent._stderr_end.replace(/^\s*/,"").replace(/\s*$/,"");
+    var show_log_command;
+    var responseText;
+    if((stdout_begin && stdout_end) || (stderr_begin && stderr_end)) {
+    	if( end_time ) {
+    	  show_log_command = get_show_log_command( job_chain, order_id, history_id, end_time );
+    	  show_log_command = parent._scheduler._engine_cpp_url+"show_log?base_url="+parent._scheduler._url+"show_log&"+show_log_command;
+    	  responseText = parent._scheduler.executeGet(show_log_command);
+    	} else {
+    	  show_log_command = '<show_order job_chain="' + xml_encode(job_chain) + '" order="' + xml_encode(order_id) + '" what="log"/>';
+    	  var response = parent._scheduler.executeSynchron(show_log_command, false);
+    	  responseText = resoponse.xml;
+    	}
     	var pattern;
       var result;
-      if(parent._stdout_begin && parent._stdout_end) {
-      	pattern = new RegExp( parent._stdout_begin + "(.*)[\r\n](([\r\n]|.)*)" + parent._stdout_end, "gm" );
+      if(stdout_begin && stdout_end) {
+      	pattern = new RegExp( stdout_begin + "(.*)[\r\n]+(([\r\n]|.)*)" + stdout_end, "gm" );
       	result = pattern.exec(responseText);
       	if(result && result[2]) {
-      		_stdout_stderr.stdout_header = result[1].replace(/<\/span>/, "");
-      		_stdout_stderr.stdout = result[2].replace(/<span[^\)]+\)/gm, "").replace(/<\/span>([\r\n])/gm, "$1");
+      		_stdout_stderr.stdout_header = result[1].replace(/\s*<\/span>\s*/, "").replace(/^\s*/,"");
+      		_stdout_stderr.stdout = result[2].replace(/<span[^\)]+\)\s*/gm, "").replace(/\s*<\/span>\s*([\r\n]+)*/gm, "$1");
         }
       }
-      if(parent._stderr_begin && parent._stderr_end) {
-      	pattern = new RegExp( parent._stderr_begin + "(.*)[\r\n](([\r\n]|.)*)" + parent._stderr_end, "gm" );
+      if(stderr_begin && stderr_end) {
+      	pattern = new RegExp( stderr_begin + "(.*)[\r\n]+(([\r\n]|.)*)" + stderr_end, "gm" );
       	result = pattern.exec(responseText);
       	if(result && result[2]) {
-    	    _stdout_stderr.stderr_header = result[1].replace(/<\/span>/, "");
-      		_stdout_stderr.stderr = result[2].replace(/<span[^\)]+\)/gm, "").replace(/<\/span>([\r\n])/gm, "$1");
+      		_stdout_stderr.stderr_header = result[1].replace(/\s*<\/span>\s*/, "").replace(/^\s*/,"");
+      		_stdout_stderr.stderr = result[2].replace(/<span[^\)]+\)\s*/gm, "").replace(/\s*<\/span>\s*([\r\n]+)*/gm, "$1");
         }
       }
     }
@@ -1802,7 +1813,8 @@ function order_history_menu__onclick( job_chain, order_id, history_id, end_time 
 {   
     var popup_builder = new Popup_menu_builder();
     popup_builder.add_entry ( parent.getTranslation("Show log")  , "show_order_log('"+job_chain+"', '"+order_id.replace( /\\/g, "\\\\" )+"', '"+history_id+"', '"+end_time+"')" );
-    if( end_time ) {
+    //if( end_time ) {
+    try {
     	var stdout_stderr = get_stdout_stderr( job_chain, order_id, history_id, end_time );
     	if( _stdout_stderr.stdout ) {
       	popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('show_stdout_stderr.html#stdout', '_blank')" );
@@ -1810,7 +1822,10 @@ function order_history_menu__onclick( job_chain, order_id, history_id, end_time 
     	if( _stdout_stderr.stderr ) {
       	popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('show_stdout_stderr.html#stderr', '_blank')" );
     	}
+    catch(x) {
+    	showError( x );
     }
+    //}
     _popup_menu = popup_builder.show_popup_menu();
 }
 
