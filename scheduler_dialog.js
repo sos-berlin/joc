@@ -1783,7 +1783,7 @@ function get_stdout_stderr( job_chain, order_id, history_id, end_time )
     	} else {
     	  show_log_command = '<show_order job_chain="' + xml_encode(job_chain) + '" order="' + xml_encode(order_id) + '" what="log"/>';
     	  var response = parent._scheduler.executeSynchron(show_log_command, false);
-    	  responseText = resoponse.xml;
+    	  responseText = response.xml;
     	}
     	var pattern;
       var result;
@@ -1822,7 +1822,7 @@ function order_history_menu__onclick( job_chain, order_id, history_id, end_time 
     	if( _stdout_stderr.stderr ) {
       	popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('show_stdout_stderr.html#stderr', '_blank')" );
     	}
-    catch(x) {
+    } catch(x) {
     	showError( x );
     }
     //}
