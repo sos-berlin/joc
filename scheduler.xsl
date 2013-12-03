@@ -2890,19 +2890,19 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~remote_schedulers-->
 
     <xsl:template match="remote_schedulers">
-        
+          <xsl:variable name="connected" select="count(remote_scheduler[@active='yes' and @deactivate_at])+count(remote_scheduler[@connected='yes' and not(@deactivate_at)])"/>
           <table width="100%" cellpadding="0" cellspacing="0" border="0" class="bottom">
             
             <thead>
                 <tr>
                     <td colspan="8" class="before_head_space">&#160;</td>
                 </tr>
-                <!--tr>
+                <tr>
                     <td colspan="8">
                         <xsl:value-of select="@count" />&#160;<span class="translate">Scheduler(s)</span>&#160;
-                        (<xsl:value-of select="@connected" />&#160;<span class="translate">connected</span>)
+                        (<xsl:value-of select="$connected" />&#160;<span class="translate">connected</span>)
                     </td>
-                </tr-->
+                </tr>
                 <tr style="">
                     <td class="head1" style="padding-left: 2ex"><span class="translate">IP</span><xsl:text> </xsl:text></td>
                     <td class="head"><span class="translate">Hostname</span></td>
