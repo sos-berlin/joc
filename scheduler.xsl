@@ -623,9 +623,9 @@
       </xsl:variable>
       <xsl:variable name="colspan">
         <xsl:choose>
-          <xsl:when test="$node_action = '' and /spooler/@my_show_card = 'orders'">3</xsl:when>
-          <xsl:when test="$node_action = '' or /spooler/@my_show_card = 'orders'">2</xsl:when>
-          <xsl:otherwise>1</xsl:otherwise>
+          <xsl:when test="$node_action = '' and /spooler/@my_show_card = 'orders'">4</xsl:when>
+          <xsl:when test="$node_action = '' or /spooler/@my_show_card = 'orders'">3</xsl:when>
+          <xsl:otherwise>2</xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
       <xsl:variable name="normal_orders" select="order_queue/order[ @job_chain = current()/parent::job_chain/@path and @state = current()/@state ]"/>
@@ -650,9 +650,9 @@
         <xsl:if test="$node_action != ''">
           <td style="white-space:nowrap;text-align:right;"><xsl:copy-of select="$node_action" /></td>
         </xsl:if>
-        <xsl:if test="not(/spooler/@my_show_card = 'orders')">
-          <td style="padding-left:4px;text-align:right;"><!--xsl:value-of select="order_queue/@length"/--><xsl:value-of select="$order_queue_length"/></td>
-        </xsl:if>
+        <!--xsl:if test="not(/spooler/@my_show_card = 'orders')">
+          <td style="padding-left:4px;text-align:right;"><xsl:value-of select="$order_queue_length"/></td>
+        </xsl:if-->
       </tr>
       
       <xsl:if test="job/file_based/ERROR or job/replacement or job/file_based/removed/ERROR or job/file_based/requisites/requisite/@is_missing='yes' or job/lock.requestor/lock.use/@is_missing='yes'">

@@ -434,7 +434,7 @@ function update_callback( response )
     var output_list = $( _card+'_list_output' );
     if( parent._scheduler._view[_card] == 'tree' ) {
       //var tbodytree    = output_tree.down('tbody',1);
-      output_tree.down('thead').update(set_table_header());
+      //output_tree.down('thead').update(set_table_header());
       
       var dom = parent._scheduler.xmlTransform( _response, true, false );
       var children = dom.documentElement.childNodes;
@@ -991,7 +991,7 @@ window.onerror  = function( msg, url, line ) {
       
       <script type="text/javascript" language="javascript">
           write_tables(1, 'jobs');
-          write_tables(2, 'job_chains');
+          write_tables(1, 'job_chains');
           write_tables(1, 'orders');
           write_tables(1, 'process_classes');
           write_tables(1, 'schedules');
