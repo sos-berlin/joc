@@ -135,6 +135,8 @@ function Scheduler()
     
     this._imgFolderOpen                                  = 'explorer_folder_open.gif';
     this._imgFolderClose                                 = 'explorer_folder_closed.gif';
+    
+    this._ie_network_error                               = 0;
 }
 
 
@@ -178,10 +180,11 @@ Scheduler.prototype.loadXML = function( xml )
 
 //------------------------------------------------------------------------------Scheduler.executeGet
 
-Scheduler.prototype.executeGet = function( href, txt_mode, callback_on_success )
+Scheduler.prototype.executeGet = function( href, txt_mode, callback_on_success, ie_network_error )
 {         
     if( typeof txt_mode == "undefined" ) txt_mode = true;
     var async     = ( typeof callback_on_success == "function"  );
+    if( typeof ie_network_error     != "boolean"  ) { ie_network_error     = false; }
     var scheduler = this;
     var ret       = null;
     var err       = null;
@@ -226,14 +229,22 @@ Scheduler.prototype.executeGet = function( href, txt_mode, callback_on_success )
                           } 
                         }  
     });
-    if( err ) throw err;
+    if( err ) {
+    	if(err.code && err.code == 19 && !ie_network_error) {
+        //IE11 NetworkError bug
+       	ret = this.executeGet(href, txt_mode, callback_on_success, true);
+      }
+      else { 
+        throw err;
+      }
+    }
     return ret;
 }
 
 
 //------------------------------------------------------------------------------Scheduler.executePost
 
-Scheduler.prototype.executePost = function( xml, callback_on_success, async, with_modify_datetime, with_add_path, with_all_errors, params )
+Scheduler.prototype.executePost = function( xml, callback_on_success, async, with_modify_datetime, with_add_path, with_all_errors, params, ie_network_error )
 {         
     var rand = Math.random();
     this.logger(3,'START SCHEDULER REQUEST: ' + xml,rand);
@@ -242,6 +253,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
     if( typeof with_modify_datetime != "boolean"  ) { with_modify_datetime = true;  }
     if( typeof with_all_errors      != "boolean"  ) { with_all_errors      = false; }
     if( typeof async                != "boolean"  ) { async                = true;  }
+    if( typeof ie_network_error     != "boolean"  ) { ie_network_error     = false; }
     var scheduler      = this;
     var ret            = null;
     var err            = null;
@@ -278,7 +290,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                         },
        onSuccess      : function(transport) { 
        	                  //alert(document.documentMode);
-       	                  //alert(transport.getAllResponseHeaders()); 
+       	                  //alert(transport.getAllResponseHeaders());
        	                  if( !transport.responseText ) err = new Error();
        	                  if( err ) throw err;
        	                  scheduler.logger(6,'SCHEDULER RESPONSE:\n' + transport.responseXML.xml);  
@@ -332,7 +344,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           throw new Error( scheduler.getTranslation( "Error at XML answer:" ) + " " + transport.statusText + " (" + transport.status + ")" );
                         },
        onException:     function(requester, x) {
-                          scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
+       	                  scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER REQUEST',rand);
                           if( scheduler._terminate_command || err || !scheduler._update_finished ) {
                           	scheduler._terminate_command = false;
                           	var message = '';
@@ -359,7 +371,15 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           }
                         }  
     }); 
-    if( err ) throw err;
+    if( err ) {
+    	if(err.code && err.code == 19 && !ie_network_error) {
+        //IE11 NetworkError bug
+        ret = this.executePost(xml, callback_on_success, async, with_modify_datetime, with_add_path, with_all_errors, params, true);
+      }
+      else {
+        throw err;
+      }
+    }
     return ret;
 }
 
