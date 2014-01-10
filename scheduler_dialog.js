@@ -218,6 +218,7 @@ function show_log__onclick( show_log_command, window_name )
     if( log_window )   // null, wenn Popups blockiert sind.
     {
         log_window.focus();
+        //log_window.location.reload();
         if( parent._scheduler )  parent._scheduler._dependend_windows[ window_name ] = log_window;
     }
 }
@@ -1792,7 +1793,7 @@ function get_stdout_stderr( job_chain, order_id, history_id, end_time )
       	result = pattern.exec(responseText);
       	if(result && result[2]) {
       		_stdout_stderr.stdout_header = result[1].replace(/\s*<\/span>\s*/, "").replace(/^\s*/,"");
-      		_stdout_stderr.stdout = result[2].replace(/<span[^\)]+\)\s*/gm, "").replace(/\s*<\/span>\s*([\r\n]+)*/gm, "$1");
+      		_stdout_stderr.stdout = result[2].replace(/<span[^\)]+\)\s*/gm, "").replace(/\s*<\/span>([\s\r\n]+)*/gm, "$1");
         }
       }
       if(stderr_begin && stderr_end) {
@@ -1800,7 +1801,7 @@ function get_stdout_stderr( job_chain, order_id, history_id, end_time )
       	result = pattern.exec(responseText);
       	if(result && result[2]) {
       		_stdout_stderr.stderr_header = result[1].replace(/\s*<\/span>\s*/, "").replace(/^\s*/,"");
-      		_stdout_stderr.stderr = result[2].replace(/<span[^\)]+\)\s*/gm, "").replace(/\s*<\/span>\s*([\r\n]+)*/gm, "$1");
+      		_stdout_stderr.stderr = result[2].replace(/<span[^\)]+\)\s*/gm, "").replace(/\s*<\/span>([\s\r\n]+)*/gm, "$1");
         }
       }
     }
@@ -2003,7 +2004,7 @@ function open_remote_scheduler( host, port )
     port = host.replace(/^[^:]+:(.+)$/,"$1");
     host = host.replace(/^([^:]+):.+/,"$1");
   }
-  var host_port = map_url( host, port, null );
+  var host_port = map_url( host, port, null ); 
   open_url( host_port, host_port.replace(/[^a-zA-Z0-9_]/g,"_") );
 }
 
