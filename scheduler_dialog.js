@@ -318,8 +318,8 @@ function scheduler_settings__onclick(ret)
     var dialog                     = new Input_dialog();
     dialog._with_reload            = true;
     dialog.width                   = 768;
-    //var fieldset_height            = (parent.ie) ? 320 : (parent.chrome ? 311 : 317);
-    var cellspacing                = (parent.ie) ? 0   : 2;
+    //var fieldset_height            = (parent._scheduler._ie > 0 && parent._scheduler._ie < 8) ? 320 : (parent._scheduler._chrome ? 311 : 317);
+    var cellspacing                = (parent._scheduler._ie > 0 && parent._scheduler._ie < 8) ? 0   : 2;
     var select_opts;               
     dialog.submit_fct              = "callErrorChecked( 'scheduler_settings__onclick', true )";
     dialog.close_after_submit      = false;
@@ -1006,7 +1006,7 @@ function set_run_time( caller, hot, ret )
                                   var old_run_time  = parent._source.selectSingleNode('run_time');
                                   var payload_elem  = parent._source.selectSingleNode('xml_payload');
                                   if( old_run_time ) parent._source.removeChild(old_run_time);
-                                  var run_time_to_import = (parent.ie) ? new_run_time.documentElement : parent._source.ownerDocument.importNode(new_run_time.documentElement, true);
+                                  var run_time_to_import = (parent._scheduler._ie) ? new_run_time.documentElement : parent._source.ownerDocument.importNode(new_run_time.documentElement, true);
                                   if( payload_elem ) {
                                     parent._source.insertBefore(run_time_to_import,payload_elem);
                                   } else {
@@ -1024,7 +1024,7 @@ function set_run_time( caller, hot, ret )
                                   var old_run_time  = parent._source.selectSingleNode('run_time');
                                   var commands_elem = parent._source.selectSingleNode('commands');
                                   if( old_run_time ) parent._source.removeChild(old_run_time);
-                                  var run_time_to_import = (parent.ie) ? new_run_time.documentElement : parent._source.ownerDocument.importNode(new_run_time.documentElement, true);
+                                  var run_time_to_import = (parent._scheduler._ie) ? new_run_time.documentElement : parent._source.ownerDocument.importNode(new_run_time.documentElement, true);
                                   if( commands_elem ) {
                                     parent._source.insertBefore(run_time_to_import,commands_elem);
                                   } else {
@@ -1212,7 +1212,7 @@ function add_job_chain(job_chain,step)
       	select_opts = new Array();
     		jobs.push( {key:job_keys[i], display:job_keys[i].replace(/^\//,"")} );
       }
-      var arrows        = (parent.ie > 0 && parent.ie < 8) ? ['&lt;','<span style="font-size:10px;">&and;</span>','&gt;','<span style="font-size:10px;">&or;</span>'] : ['&lt;','<span style="font-size:20px;">&#708;</span>','&gt;','<span style="font-size:20px;">&#709;</span>'];
+      var arrows        = (parent._scheduler._ie > 0 && parent._scheduler._ie < 8) ? ['&lt;','<span style="font-size:10px;">&and;</span>','&gt;','<span style="font-size:10px;">&or;</span>'] : ['&lt;','<span style="font-size:20px;">&#708;</span>','&gt;','<span style="font-size:20px;">&#709;</span>'];
       var dialog        = new Input_dialog();
       dialog.width      = 744;
       dialog.submit_fct = "callErrorChecked( 'add_job_chain', '"+job_chain+"', 2 )";
@@ -1964,7 +1964,7 @@ function open_url( url, window_name, with_hash, features )
 {   
     if( features == undefined  )  features  = "";
     if( with_hash == undefined )  with_hash = false;
-    if( parent.ie  ) features = _open_url_features;
+    if( parent._scheduler._ie  ) features = _open_url_features;
     if( with_hash && parent._server_settings && url.search(/#/) == -1 ) url += parent.location.hash;  
     
     var my_window = parent.open( url, window_name, '' );

@@ -380,8 +380,8 @@ function modify_response( response )
     if(spooler_element) {
         if( parent._scheduler._checkbox_states[ "show_order_history_checkbox" ] )  spooler_element.setAttribute( "show_order_history_checkbox", "yes" ); 
         spooler_element.setAttribute( "my_frame"            , 'detail' );
-        spooler_element.setAttribute( "my_ie_version"       , parseInt(parent.ie,10) );
-        spooler_element.setAttribute( "my_chrome_version"   , parent.chrome );
+        spooler_element.setAttribute( "my_ie_version"       , parseInt(parent._scheduler._ie,10) );
+        spooler_element.setAttribute( "my_chrome_version"   , parseInt(parent._scheduler._chrome,10) );
         spooler_element.setAttribute( "my_max_order_history", parent._scheduler._runtime_settings.max_order_history );
     }  
     
@@ -399,7 +399,7 @@ function show_card( what )
 //--------------------------------------------------------set_corner (onresize-Event only for IE<7)
 function set_corner_position()
 {
-    if( parent.ie > 0 && parent.ie < 7 ) {
+    if( parent._scheduler._ie > 0 && parent._scheduler._ie < 7 ) {
       var imgs = document.getElementsByTagName("img");
       for( var i=0; i < imgs.length; i++ ) {
         if( imgs[i].src.search(/corner_t(l|r).gif$/) > -1 && imgs[i].id != "corner_tr" ) {

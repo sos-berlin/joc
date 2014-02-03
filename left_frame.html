@@ -536,7 +536,7 @@ function modify_response( response )
               var job_chain_element = parent._scheduler.executeSynchron( '<show_job_chain job_chain="'+job_chain_nodes[k].nodeValue+'" max_orders="'+parent._scheduler._runtime_settings.max_orders+'" what="'+_what+'"/>' );
               if( job_chain_element ) {
                 job_chain_element = job_chain_element.selectSingleNode( '/spooler/answer/job_chain' );
-                if( !parent.ie ) job_chain_element = job_chain_elements[j].ownerDocument.importNode(job_chain_element, true);
+                if( !parent._scheduler._ie ) job_chain_element = job_chain_elements[j].ownerDocument.importNode(job_chain_element, true);
                 job_chain_elements[j].parentNode.appendChild(job_chain_element);
               }
           }
@@ -588,8 +588,8 @@ function modify_response( response )
       spooler_element.setAttribute( "my_open_folders"     , _open_folders );
       //spooler_element.setAttribute( "my_url_base"         , document.location.href.replace( /\/[^\/]*$/, "/" )     );   // Alles bis zum letzten Schraeger
       //spooler_element.setAttribute( "my_url_path_base"    , document.location.pathname.replace( /\/[^\/]*$/, "/" ) );   // Pfad bis zum letzten Schraeger
-      spooler_element.setAttribute( "my_ie_version"       , parseInt(parent.ie,10) );
-      spooler_element.setAttribute( "my_chrome_version"   , parent.chrome );
+      spooler_element.setAttribute( "my_ie_version"       , parseInt(parent._scheduler._ie,10) );
+      spooler_element.setAttribute( "my_chrome_version"   , parseInt(parent._scheduler._chrome,10) );
       spooler_element.setAttribute( "my_lang"             , parent._sos_lang );
       
       spooler_element.setAttribute( "my_update_seconds"   , parent._scheduler._update_seconds );
