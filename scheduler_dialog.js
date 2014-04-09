@@ -200,7 +200,7 @@ function Popup_menu_builder__add_show_log( html, show_log_command, window_name, 
 
 function show_log__onclick( show_log_command, window_name )
 {
-    window_name = "show_log";  // Nur ein Fenster. ie6 will nicht mehrere Logs gleichzeitig lesen, nur nacheinander
+    //window_name = "show_log";  // Nur ein Fenster. ie6 will nicht mehrere Logs gleichzeitig lesen, nur nacheinander
     
     var features = _open_url_features;
     features +=  ", width="       + ( window.screen.availWidth - 11 ) +
@@ -210,17 +210,26 @@ function show_log__onclick( show_log_command, window_name )
                  ", left=0"       +
                  ", top="         + ( Math.floor( window.screen.availHeight * 0.8 ) );
     //if( show_log_command.search(/^http:/) == -1 ) show_log_command = document.location.href.replace( /\/[^\/]*$/, "/" ) + show_log_command;
-    if( show_log_command.search(/^https?:/) == -1 ) show_log_command = parent._scheduler._engine_cpp_url+"show_log?base_url="+parent._scheduler._url+"show_log&"+show_log_command;
-    if( parent._scheduler && parent._scheduler._dependend_windows[ window_name ] ) parent._scheduler._dependend_windows[ window_name ].close();
-        
-    var log_window = parent.open( show_log_command, window_name, features );
-    
-    if( log_window )   // null, wenn Popups blockiert sind.
+    if( show_log_command.search(/^https?:/) == -1 ) show_log_command = parent._scheduler._engine_cpp_url+"show_log?"+show_log_command;
+    if( parent._scheduler && parent._scheduler._dependend_windows[ window_name ] ) 
     {
+    	parent._scheduler._dependend_windows[ window_name ].close();
+    	//alert(window_name);
+    	//parent._scheduler._dependend_windows[ window_name ].location.reload();
+    	//parent._scheduler._dependend_windows[ window_name ].alert(window_name);
+    	//parent._scheduler._dependend_windows[ window_name ].focus();
+    }
+    //else {  
+    	var log_window = parent.open( show_log_command, window_name, features );
+      //var log_window = parent.open( show_log_command, window_name );
+    
+    	if( log_window )   // null, wenn Popups blockiert sind.
+    	{
         log_window.focus();
         //log_window.location.reload();
         if( parent._scheduler )  parent._scheduler._dependend_windows[ window_name ] = log_window;
-    }
+    	}
+    //}
 }
 
 function popup_menu__show_log__onclick( show_log_command, window_name )
@@ -852,6 +861,35 @@ function add_order( persistent, big_chain, order_state, order_end_state, ret )
           set_timeout("parent.left_frame.update()",1);
         }
       }      
+    }    
+}
+
+
+//-----------------------------------------------------------------------------delete_orders
+// Fuer job_chain_menu__onclick()
+
+function delete_orders( ret )
+{   
+    if( typeof ret             != "boolean"   ) ret             = false;
+    var hot                    = (parent._scheduler.versionIsNewerThan( "2008-05-13 09:00:00" )) ? 1 : 0;
+        
+    if( !ret ) {
+      
+      _popup_menu.close();
+      
+      var dialog        = new Input_dialog();
+      dialog.width      = 384;
+      dialog.close_after_submit = false;
+      dialog.submit_fct = "callErrorChecked( 'delete_orders', true )";
+      dialog.add_title( "Remove temporary orders from $job_chain", {job_chain:'<br/>'+window.parent.left_frame._job_chain.replace(/^\//,'')} );
+      //TODO list of temp orders and checkbox for all
+      dialog.add_checkbox( "all", parent.getTranslation('all'), false );
+      dialog.show();
+    } else {
+      var fields = input_dialog_submit();
+      //TODO plausi 
+      Input_dialog.close();
+      //TODO command
     }    
 }
 
@@ -1505,7 +1543,9 @@ function scheduler_extras__onclick( elt )
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Downloads"), "open_url( 'http://sourceforge.net/projects/jobscheduler/files/', 'scheduler_download' )" );
     popup_builder.add_entry( parent.getTranslation("Follow us on Twitter"), "open_url( 'http://twitter.com/#!/job_scheduler', 'scheduler_twitter' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Release Notes"), "open_url( 'http://www.sos-berlin.com/jira/browse/JS#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel', 'scheduler_jira' )" );
-    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Home"), "open_url( 'http://www.sos-berlin.com/scheduler', 'scheduler_wiki' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Home"), "open_url( 'http://www.sos-berlin.com/scheduler', 'scheduler_home' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Jira"), "open_url( 'http://www.sos-berlin.com/jira', 'scheduler_jira' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("OTRS"), "open_url( 'http://www.sos-berlin.com/otrs/customer.pl?Lang=en', 'scheduler_otrs' )" );
     
     popup_builder.add_bar();
     popup_builder.add_entry( parent.getTranslation("Settings")      , "callErrorChecked('scheduler_settings__onclick')", parent.left_frame );
@@ -1749,6 +1789,9 @@ function get_show_log_command( job_chain, order_id, history_id, end_time )
     if( end_time ) {
       var show_log_command = "order=" + encodeComponent(order_id) +"&history_id=" + history_id;
     } else {
+    	if(job_chain.substr(0,1) != "/") {
+    	  job_chain = "/"+job_chain;
+    	}
       var show_log_command = "job_chain=" + encodeComponent(job_chain) + "&order=" + encodeComponent(order_id);
     }
     return show_log_command.replace( /\\/g, "\\\\" ).replace( /\"/g, "\\&quot;" );
@@ -1779,7 +1822,7 @@ function get_stdout_stderr( job_chain, order_id, history_id, end_time )
     if((stdout_begin && stdout_end) || (stderr_begin && stderr_end)) {
     	if( end_time ) {
     	  show_log_command = get_show_log_command( job_chain, order_id, history_id, end_time );
-    	  show_log_command = parent._scheduler._engine_cpp_url+"show_log?base_url="+parent._scheduler._url+"show_log&"+show_log_command;
+    	  show_log_command = parent._scheduler._engine_cpp_url+"show_log?"+show_log_command;
     	  responseText = parent._scheduler.executeGet(show_log_command);
     	} else {
     	  show_log_command = '<show_order job_chain="' + xml_encode(job_chain) + '" order="' + xml_encode(order_id) + '" what="log"/>';
@@ -1841,10 +1884,12 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
     parent.left_frame._job_chain = xml_encode(job_chain);
     var job_chain_element        = parent.left_frame._response.selectSingleNode( './/job_chain[@path="' + parent.left_frame._job_chain + '"]' );
     if( !job_chain_element ) {
-      var response               = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + parent.left_frame._job_chain + '"/>', false );
+      //var response               = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + parent.left_frame._job_chain + '" max_order_history="0" max_orders="999" what="job_chain_orders blacklist"/>', false );
+      var response               = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + parent.left_frame._job_chain + '" max_order_history="0"/>', false );
       if( response ) job_chain_element = response.selectSingleNode('//job_chain');
     }
     var hot                      = (job_chain_element.selectSingleNode('file_based/@file') && parent._scheduler.versionIsNewerThan( "2008-05-13 09:00:00" ) ) ? 1 : 0;
+    
     
     //popup_builder.add_entry ( parent.getTranslation("Show configuration")  , "show_xml('"+job_chain+".job_chain.xml')", hot );
     popup_builder.add_entry ( parent.getTranslation("Show configuration")  , "show_xml2('job_chain', '"+job_chain+"')", hot );
@@ -1855,6 +1900,10 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
     popup_builder.add_bar();
     popup_builder.add_entry ( parent.getTranslation("Add order")           , "callErrorChecked('add_order',false," + big_chain + ")" );
     //popup_builder.add_entry ( parent.getTranslation("Add persistent order"), "callErrorChecked('add_order',true," + big_chain + ")" );
+    /*if( big_chain == 0) {
+    	var tempOrders               = job_chain_element.selectNodes('//order[not(file_based/@file)]');
+      popup_builder.add_entry ( parent.getTranslation("Delete orders")           , "callErrorChecked('delete_orders')", (tempOrders.length > 0) );
+    }*/
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {
       var state             = job_chain_element.getAttribute( "state" );
       var command           = function( cmd ) { return "<job_chain.modify job_chain='"+parent.left_frame._job_chain+"' state='"+cmd+"'/>"; }

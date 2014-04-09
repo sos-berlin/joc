@@ -93,6 +93,7 @@ function Scheduler()
     this._update_finished                                = true;
     this._version_date                                   = '';
     this._version_no                                     = '';
+    this._git_commit                                     = '';
     this._gui_subversion_no                              = '';
     this._gui_release_no                                 = '';
     this._id                                             = '';
@@ -591,6 +592,10 @@ Scheduler.prototype.setState = function( state )
         this._version_no      = version[0];
         if(version.length > 1) {
           this._version_date  = version[1].replace( /\D*$/, "" ).replace( /^\D*/, "" ); //trim
+        }
+        var git_commit        = state.getAttribute( "version_commit_hash" );
+        if(git_commit && git_commit.length > 0) {
+          this._git_commit    = git_commit; //trim
         }
         this._host            = state.getAttribute('host');
         if( this._port == null ) {
