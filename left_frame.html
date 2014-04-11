@@ -474,6 +474,11 @@ function modify_response( response )
       hidden_elements[j].parentNode.removeChild(hidden_elements[j]);
     }
     
+    var removed_elements = spooler_element.selectNodes( "//*[file_based/@removed='yes']" );
+    for( var j = 0; j < removed_elements.length; j++ ) {
+      removed_elements[j].parentNode.removeChild(removed_elements[j]);
+    }
+    
     var unimportant_elements = spooler_element.selectNodes( "//connections" );
     for( var j = 0; j < unimportant_elements.length; j++ )
     {
