@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2013 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -30,6 +30,8 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
+
+// $Id$
 
 //-----------------------------------------------------------------------------------------language  
 if( window['_sos_lang'] ) {
@@ -280,16 +282,16 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
        requestHeaders : { 'Cache-Control':'no-cache', 
                           'Pragma':'no-cache',
                           //'Transfer-Encoding':'identity', 
-                          'Content-Length': xml.length 
+                          //'Content-Length': xml.length 
                         },
-       onCreate       : function() { scheduler._activeRequestCount++; },
-       onComplete     : function(transport) { 
+       onCreate       : function() { scheduler._activeRequestCount++;},
+       onComplete     : function(transport) {
                           //scheduler.logger(6,'ACTIVE CONNECTIONS:' + scheduler._activeRequestCount);
                           scheduler._activeRequestCount--; 
                           if(scheduler._activeRequestCount == 0) window.status = ''; 
                           scheduler.logger(3,'HTTP REQUEST STATUS onComplete '+transport.status);
                         },
-       onSuccess      : function(transport) { 
+       onSuccess      : function(transport) {
        	                  //alert(document.documentMode);
        	                  //alert(transport.getAllResponseHeaders());
        	                  if( !transport.responseText ) err = new Error();

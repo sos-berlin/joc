@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -31,15 +31,19 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-// $Id: browser_dependencies.js 3303 2005-01-11 23:22:22Z jz $
+// $Id$
 
-// Anpassungen für DOM und XSL-T
+// Anpassungen für DOM und XSL-T 
+
+var prototypeDocument = false;
+if( window.Document && ((window.XMLDocument && window.XMLDocument !== window.Document) || !window.XMLDocument) ) {
+	 prototypeDocument = true;
+}
 
 if(!navigator.appVersion.match(/\bTrident\b/)) {
 
 //----------------------------------------------------------------------------------XMLDocument.xml
 // Nachbildung von Microsofts DOMDocument.xml
-
 if( window.XMLDocument  &&  !window.XMLDocument.prototype.xml )
 {
 	XMLDocument.prototype.__defineGetter__
@@ -52,6 +56,22 @@ if( window.XMLDocument  &&  !window.XMLDocument.prototype.xml )
 	    } 
 	);
 }
+
+//------------------------------------------------------------------------------------Document.xml
+// Nachbildung von Microsofts DOMDocument.xml
+// necessary for Google Chrome since 34.x
+if( prototypeDocument && !window.Document.prototype.xml )
+{
+	Document.prototype.__defineGetter__
+	( 
+	    "xml", 
+	    
+	    function()
+	    {
+		      return new XMLSerializer().serializeToString( this );
+	    } 
+	);
+} 
 	
 //--------------------------------------------------------------------------------------Element.xml
 // Nachbildung von Microsofts IXMLDOMElement.xml
@@ -89,12 +109,24 @@ if( window.XMLDocument  &&  !window.XMLDocument.prototype.selectSingleNode )
     {   
         return this.evaluate( path, this, null, 0, null ).iterateNext();
     }
+} 
+
+//---------------------------------------------------------------------Document.selectSingleNode
+// Nachbildung von Microsofts DOMDocument.selectSingleNode
+// necessary for Google Chrome since 34.x
+
+if( prototypeDocument && !window.Document.prototype.selectSingleNode )
+{
+    window.Document.prototype.selectSingleNode = function( path )
+    {   
+        return this.evaluate( path, this, null, 0, null ).iterateNext();
+    }
 }
 
 //-------------------------------------------------------------------------Element.selectSingleNode
 // Nachbildung von Microsofts IXMLDOMElement.selectSingleNode
 
-if( window.Element  &&  !window.Element.prototype.selectSingleNode )
+if( window.Element && !window.Element.prototype.selectSingleNode )
 {
     window.Element.prototype.selectSingleNode = function( path )
     {
@@ -108,6 +140,18 @@ if( window.Element  &&  !window.Element.prototype.selectSingleNode )
 if( window.XMLDocument  &&  !window.XMLDocument.prototype.selectNodes )
 {
     window.XMLDocument.prototype.selectNodes = function( path )
+    {
+        return this.documentElement.selectNodes( path );
+    }
+}
+
+//--------------------------------------------------------------------------Document.selectNodes
+// Nachbildung von Microsofts DOMDocument.selectNodes
+// necessary for Google Chrome since 34.x
+
+if( prototypeDocument && !window.Document.prototype.selectNodes )
+{
+    window.Document.prototype.selectNodes = function( path )
     {
         return this.documentElement.selectNodes( path );
     }
