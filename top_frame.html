@@ -6,7 +6,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2013 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -35,7 +35,9 @@
 ** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
-********************************************************** end of preamble*/
+********************************************************** end of preamble*/ 
+
+// $Id$
 //-->
 <style type="text/css">
     @import url("scheduler.css");
@@ -71,6 +73,7 @@ function do_onload()
 {      
     parent._scheduler.logger(2,'START LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
     scheduler_init();
+    
     document.getElementById(parent._scheduler._show_card+'_inner_tab').className = 'active'+tabs[parent._scheduler._show_card].pos;
     if( parent._response.selectNodes("/spooler/answer/state/cluster[@backup='yes']").length > 0 ) {
       document.getElementById('backup').innerHTML = parent.getTranslation('THIS IS A BACKUP...').replace(/ /g,'&#160;');

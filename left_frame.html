@@ -6,7 +6,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2013 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -36,6 +36,8 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
+
+// $Id$
 //-->
 
     <style type="text/css">
@@ -203,7 +205,7 @@ function update_jobs_frame()
     if( parent._scheduler._tree_view_enabled ) {
       parent._scheduler.logger(3,'SCHEDULER TREE REQUEST','scheduler_tree_execute');
       parent.top_frame.update();
-      parent.control_frame.prepare_filter( _card, true );
+      if( parent.control_frame ) parent.control_frame.prepare_filter( _card, true );
       _parent_ul_elems  = [];
       //var req = '<commands>';
       var req = '';
@@ -220,7 +222,7 @@ function update_jobs_frame()
           for( var i=0; i < folders.length; i++ ) {
             req = '<show_state subsystems="'+parent._scheduler._subsystems[_card]+' folder" what="folders no_subfolders '+what+'" path="'+folders[i].getAttribute('path')+'"'+max_attributes+'/>'; 
             reqs += req;
-            parent._scheduler.executeAsynchron( req, parent.left_frame.collect_list_answer, false, false, false, i );
+            //parent._scheduler.executeAsynchron( req, parent.left_frame.collect_list_answer, false, false, false, i );
           }
           reqs += "</commands>";
           parent._scheduler.executeAsynchron( reqs, parent.left_frame.collect_list_answer3, false, false, false );
@@ -291,7 +293,7 @@ function update_jobs_frame()
       //req += '</commands>';
       //parent._scheduler.executeAsynchron( req, parent.left_frame.update_callback );
     } else {
-    	parent.control_frame.prepare_filter( _card, false );
+    	if( parent.control_frame ) parent.control_frame.prepare_filter( _card, false );
       parent._scheduler.executeAsynchron( '<show_state what="' + what + '"'+max_attributes+'/>', parent.left_frame.update_callback );
     }
 }
@@ -387,7 +389,28 @@ function collect_list_answer( response, index )
 
 function collect_list_answer3( response )
 { 
-  parent._scheduler.logger(1,'SCHEDULER LIST RESPONSE3:\n' + response.xml);
+  var node_name  = [parent._scheduler._show_card];
+  var nodes      = null;
+  if( parent._scheduler._show_card == 'orders' ) node_name[0] = 'job_chains';
+  if( parent._scheduler._show_card == 'last_activities' ) node_name = ['jobs','job_chains'];
+  
+  var dom_xml  = '<spooler><answer time="'+parent.top_frame._state.getAttribute('time')+'">';
+  dom_xml     += '<state state="'+parent.top_frame._state.getAttribute('state')+'">';
+  for( var i=0; i < node_name.length; i++ ) {
+   	nodes        = response.selectNodes('/spooler/answer/state//'+node_name[i]+'/*');
+   	dom_xml   += '<'+node_name[i]+'>';
+    for( var j=0; j < nodes.length; j++ ) {
+     	dom_xml   += nodes[j].xml; 
+    }
+    dom_xml   += '</'+node_name[i]+'>';
+  }
+  dom_xml     += '</state></answer></spooler>';
+  _response    = parent._scheduler.loadXML(dom_xml);
+  dom_xml      = '';
+  parent._scheduler.modifyDatetimeForXSLT( _response );
+  parent._scheduler.logger(1,'SCHEDULER LIST RESPONSE:\n' + _response.xml);
+  parent._scheduler.logger(3,'ELAPSED TIME FOR SCHEDULER TREE REQUEST','scheduler_tree_execute');
+  update_callback();
 }
 
 

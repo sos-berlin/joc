@@ -1,3 +1,4 @@
+// $Id$
 //Control flag (if false then default language is used)
 _lang_file_exists = true;
 

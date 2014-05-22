@@ -6,7 +6,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2013 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -36,6 +36,8 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
+
+// $Id$
 //-->
     <style type="text/css">
         @import url(scheduler.css);
@@ -45,6 +47,7 @@
     
     <script type="text/javascript" src="scheduler_dialog.js"></script>
     <script type="text/javascript" src="browser_dependencies.js"></script>
+        
     
 <script type="text/javascript" language="javascript"><!--
 
@@ -85,6 +88,7 @@ function do_onload()
     _frm = parent.document.getElementById( "top_and_bottom_frameset" ); 
     
     translate();
+    parent._scheduler.moveFilterCookies();
     get_filters( 'jobs' );
     get_filters( 'job_chains' );
     get_filters( 'orders' );
@@ -97,16 +101,13 @@ function do_onload()
     toggle(parent._scheduler._show_card);
     _is_loaded = true;
     setTimeout('set_frame_height();', 1000);
-    parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_control'); 
+    parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_control');
 }
 
 
-
-
-//-----------------------------------------------------------------------------------------onunload
 function do_onunload()
-{   
-    if( !parent.server_settings ) write_cookies();
+{
+	  parent._scheduler.deleteAllOldCookies();
 }
 
 
@@ -225,7 +226,7 @@ function set_filter_selects( name, with_update )
 //---------------------------------------------------------------------------------filter__onclick
 function filter__onclick( selectElem, name )
 {   
-    set_cookie( Scheduler_Filter['cookie_name_'+name+'_active'], selectElem.value );
+    parent._scheduler.setCookie( Scheduler_Filter['cookie_name_'+name+'_active'], selectElem.value );
     _filters[name+'_details'] = "";
     eval( 'var server_filters = parent._'+name.replace(/s$/,'')+'_filter;' );
     if( typeof parent._project_filter[selectElem.value] != 'undefined' ) _filters[name+'_details'] = '>'+parent._project_filter[selectElem.value];
@@ -401,43 +402,6 @@ function toggle(card)
 }
 
 
-//------------------------------------------------------------------------------write_cookies
-function write_cookies()
-{ 
-  for( var entry in parent._scheduler._select_states ) {
-    if( entry.search(/^filter_(jobs|job_chains|orders)_select$/) > -1 ) continue;
-    set_cookie( 'select_states_'+entry, parent._scheduler._select_states[entry] );
-  }
-  for( var entry in parent._scheduler._supported_tree_views ) {
-    set_cookie( 'view_'+entry, parent._scheduler._view[entry] );
-  }
-  //set_cookie( Scheduler_Filter['cookie_name_jobs_active'], parent._scheduler._select_states.filter_jobs_select );
-  //set_cookie( Scheduler_Filter['cookie_name_job_chains_active'], parent._scheduler._select_states.filter_job_chains_select );
-  //set_cookie( Scheduler_Filter['cookie_name_orders_active'], parent._scheduler._select_states.filter_orders_select );
-}
-
-
-//------------------------------------------------------------------------------set_cookie
-function set_cookie(name, value, expire) 
-{
-    name = parent._scheduler._cookie_prefix + name;
-    try {
-      var today   = new Date();
-      var expires = new Date();
-      if( typeof expire != 'number' ) expire = 1000*60*60*24*365;
-      if ( value == null ) {
-        expires.setTime(today.getTime());
-        document.cookie = name+"=; expires="+expires.toGMTString()+"; path=/";
-      } else {
-        expires.setTime(today.getTime() + expire);
-        document.cookie = name+"="+escape(value)+"; expires="+expires.toGMTString()+"; path=/";
-      }
-      parent._scheduler.logger(2,'COOKIE WRITE: ' + name + '=' + value);
-    } catch(x) {
-      parent._scheduler.logger(1,'ERROR OCCURS AT COOKIE WRITE: ' + name + '=' + value + '\n' + x.message);
-    }      
-}
-
 
 //---------------------------------------------------------------------------------select__onclick
 function select__onclick( selectElem )
@@ -544,7 +508,7 @@ function close_all_folders()
 
 
 window.onload   = do_onload;
-window.onunload = do_onunload;
+window.onunload   = do_onunload;
 window.onresize = set_frame_height;
 //-->
 </script>

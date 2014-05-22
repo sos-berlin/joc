@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -30,6 +30,8 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
+
+// $Id$
 
 var Scheduler_Filter                            = function(){}
 Scheduler_Filter.debug_level                    = 0;
@@ -121,7 +123,7 @@ window.onload = function(){
   }
   //Scheduler_Filter.remove_all_cookies();
   //Scheduler_Filter.remove_cookie(Scheduler_Filter.cookie_name_jobs_active);
-  //Scheduler_Filter.set_cookie(Scheduler_Filter.cookie_name_jobs_active,'1');  
+  //Scheduler_Filter.scheduler.setCookie(Scheduler_Filter.cookie_name_jobs_active,'1');  
 }
 
 /***/
@@ -441,7 +443,7 @@ Scheduler_Filter.store_filter = function(range,is_store_as){
           val = Scheduler_Filter.reg_quote(val);
         }
         var cookie_prefix = Scheduler_Filter['cookie_name_'+range+'_prefix'];
-        Scheduler_Filter.set_cookie(cookie_prefix+String(cookie_key),val);
+        Scheduler_Filter.scheduler.setCookie(cookie_prefix+String(cookie_key),val);
         Scheduler_Filter.update_general_cookie(range,false,cookie_key,filter_name);
         try {
           window.opener.control_frame.get_filters( range, true );
@@ -496,7 +498,7 @@ Scheduler_Filter.update_general_cookie = function(range,is_remove,cookie_key,fil
       cookie_general_value = cookie_key+'=>'+filter_name;
     }
   }
-  Scheduler_Filter.set_cookie(cookie_general_name,cookie_general_value);
+  Scheduler_Filter.scheduler.setCookie(cookie_general_name,cookie_general_value);
   
   var val = cookie_general_value.replace(/"/g,'\\"');
   Scheduler_Filter['cookie_'+range+'_general'] = val;
@@ -630,12 +632,12 @@ Scheduler_Filter.case_insensitive = function(a,b){
 }
 
 /***/
-Scheduler_Filter.set_cookie = function (name, value) 
+/*Scheduler_Filter.set_cookie = function (name, value) 
 {
     try {
       var today   = new Date();
       var expires = new Date();
-      var expire  = 1000*60*60*24*365;
+      var expire  = 1000*60*60*24*30;
       name        = Scheduler_Filter.scheduler._cookie_prefix+name;
       if ( value == null ) {
         expires.setTime(today.getTime());
@@ -648,12 +650,13 @@ Scheduler_Filter.set_cookie = function (name, value)
     } catch(x) {
       Scheduler_Filter.scheduler.logger(1,'ERROR OCCURS AT COOKIE WRITE: ' + name + '=' + value + '\n' + x.message);
     }      
-}
+} */
 
 /***/
 Scheduler_Filter.get_cookie = function(name) 
 {   
-    name        = Scheduler_Filter.scheduler._cookie_prefix+name;
+    return Scheduler_Filter.scheduler.getCookie(name);
+    /*name        = Scheduler_Filter.scheduler._cookie_prefix+name;
     Scheduler_Filter.scheduler.logger(1,'LOOKING FOR COOKIE: ' + name);
     var value   = "";
     var pattern = new RegExp(name+"=([^;]*);");
@@ -666,7 +669,7 @@ Scheduler_Filter.get_cookie = function(name)
     } else {
       Scheduler_Filter.scheduler.logger(1,'COOKIE NOT FOUND (default value is "")');
     }
-    return value;
+    return value; */
 }
 
 /***/

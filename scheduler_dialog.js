@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2013 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -30,6 +30,8 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
+
+//$Id$
 
 //-------------------------------------------------------------------------------------private vars
 var _open_url_features       = "menubar=no, toolbar=no, location=no, directories=no, scrollbars=yes, resizable=yes, status=no, dependent=yes";
@@ -219,7 +221,7 @@ function show_log__onclick( show_log_command, window_name )
     	//parent._scheduler._dependend_windows[ window_name ].alert(window_name);
     	//parent._scheduler._dependend_windows[ window_name ].focus();
     }
-    //else {  
+    //else { 
     	var log_window = parent.open( show_log_command, window_name, features );
       //var log_window = parent.open( show_log_command, window_name );
     
@@ -324,7 +326,7 @@ function scheduler_settings__onclick(ret)
   if( !ret ) {
     _popup_menu.close();
     Input_dialog.close();
-    var dialog                     = new Input_dialog();
+    var dialog                     = new Input_dialog(); 
     dialog._with_reload            = true;
     dialog.width                   = 768;
     //var fieldset_height            = (parent._scheduler._ie > 0 && parent._scheduler._ie < 8) ? 320 : (parent._scheduler._chrome ? 311 : 317);
@@ -475,8 +477,8 @@ function scheduler_settings__onclick(ret)
     }
     if( plausi.length == 0 ) {
       Input_dialog.close();
-      for( var entry in fields ) {
-        if( entry.search(/new_params/) == -1 ) parent.control_frame.set_cookie( entry, fields[entry] );
+      /*for( var entry in fields ) {
+        //if( entry.search(/new_params/) == -1 ) parent._scheduler.setCookie( entry, fields[entry] );
         if( entry.search(/^select_states_/) > -1 ) parent._scheduler._select_states[entry.replace(/^select_states_/,'')] = fields[entry];
         if( entry.search(/^view_/) > -1 ) parent._scheduler._view[entry.replace(/^view_/,'')] = fields[entry];
       }
@@ -487,6 +489,12 @@ function scheduler_settings__onclick(ret)
           parent._scheduler._runtime_settings[entry] = parseInt(fields[entry],10);
         }
       }
+      for( var entry in parent._scheduler._checkbox_states ) {
+        parent._scheduler._checkbox_states[entry] = fields[entry];
+      } */ 
+      parent._scheduler.setCookie('settings',$H(fields).toJSON());
+      
+      //parent._scheduler.setCookie('settings',$H({'_update_periodically':fields.update_periodically,'_update_seconds':fields.update_seconds,'_show_card':fields.show_card,'_view':$H(parent._scheduler._view), '_runtime_settings': $H(parent._scheduler._runtime_settings), '_checkbox_states':$H(parent._scheduler._checkbox_states), '_select_states':$H(parent._scheduler._select_states)}).toJSON());
       return true;
     } else {
       alert( plausi.join("\n") );

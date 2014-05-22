@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2008 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -31,7 +31,7 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-// $Id: show_log.js 3303 2005-01-11 23:22:22Z jz $
+// $Id$
 
 // Javascript-Code für HTTP Show log des Schedulers.
 // Der Scheduler liefert über HTTP die Ausgaben eines Protokolls bis dieses geschlossen wird.
@@ -142,7 +142,7 @@ function window__onscroll()
 
 function modify_title()
 {
-    if( title != undefined )  document.title = "Scheduler - " + title;
+    if( title != undefined )  document.title = "JobScheduler - " + title;
 
     var title_state;
     

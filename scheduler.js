@@ -52,11 +52,26 @@ function Scheduler()
     this._base_url                                       = ( document.location.href + "" ).replace( /\/[^\/]*$/, "/" );
     this._url                                            = this._base_url;
     this._engine_cpp_url                                 = this._base_url;
+		this._command_url                                    = this._base_url;
+		this._cookie_path																		 = "/";
 		this._port                                           = null;
+		this._with_jetty																		 = false;
+		 
     if(this._base_url.toLowerCase().indexOf("/jobscheduler/operations_gui/") >= 0) {
 			this._url                                        	 = this._base_url;
 			this._engine_cpp_url                             	 = this._base_url.replace(/\/jobscheduler\/operations_gui\//, "/jobscheduler/engine-cpp/");
 			this._port                                         = window.location.port;
+			this._with_jetty																	 = true;
+			this._command_url                                  = this._base_url.replace(/\/jobscheduler\/operations_gui\//, "/jobscheduler/engine/command");
+			this._cookie_path																	 = "/jobscheduler";
+		}
+		else if(this._base_url.toLowerCase().indexOf("/jobscheduler/joc/") >= 0) {
+			this._url                                        	 = this._base_url;
+			this._engine_cpp_url                             	 = this._base_url.replace(/\/jobscheduler\/joc\//, "/jobscheduler/engine-cpp/");
+			this._port                                         = window.location.port;
+			this._with_jetty																	 = true;
+			this._command_url                                  = this._base_url.replace(/\/jobscheduler\/joc\//, "/jobscheduler/engine/command");
+			this._cookie_path																	 = "/jobscheduler";
 		}
 		this._dom                                            = null;
     this._result_dom                                     = null;
@@ -100,7 +115,8 @@ function Scheduler()
     this._gui_release_no                                 = '';
     this._id                                             = '';
     this._host                                           = '';
-    this._cookie_prefix                                  = 'SOS_SCHEDULER_GUI_'+window.location.host.replace(/:/,'_')+'_';
+    this._old_cookie_prefix                              = 'SOS_SCHEDULER_GUI_'+window.location.host.replace(/:/,'_')+'_';
+    this._cookie_prefix                                  = 'JOC_'+window.location.host.replace(/:/,'_')+'_';
     this._update_seconds                                 = 5;
     this._show_card                                      = 'jobs';
     this._update_periodically                            = false;
@@ -273,16 +289,18 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
     	parent.left_frame.clear_update();
     }
     
-    new Ajax.Request( scheduler._engine_cpp_url,
+    //new Ajax.Request( scheduler._engine_cpp_url,   
+    new Ajax.Request( scheduler._command_url,
     {
        asynchronous   : async,
        method         : 'post',
        postBody       : xml,
+       //parameters     : ( scheduler._with_jetty ) ? $H({command:xml}) : $H(),
        contentType    : 'text/xml',
-       requestHeaders : { 'Cache-Control':'no-cache', 
-                          'Pragma':'no-cache',
-                          //'Transfer-Encoding':'identity', 
-                          //'Content-Length': xml.length 
+       requestHeaders : { //'Transfer-Encoding':'identity', 
+                          //'Content-Length': xml.length,
+                          'Cache-Control':'no-cache', 
+                          'Pragma':'no-cache'
                         },
        onCreate       : function() { scheduler._activeRequestCount++;},
        onComplete     : function(transport) {
@@ -292,7 +310,6 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           scheduler.logger(3,'HTTP REQUEST STATUS onComplete '+transport.status);
                         },
        onSuccess      : function(transport) {
-       	                  //alert(document.documentMode);
        	                  //alert(transport.getAllResponseHeaders());
        	                  if( !transport.responseText ) err = new Error();
        	                  if( err ) throw err;
@@ -388,7 +405,7 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
 
 
 Scheduler.prototype.executeSynchron = function( xml, with_modify_datetime, with_add_path, with_all_errors )
-{
+{ 
   return this.executePost( xml, null, false, with_modify_datetime, with_add_path, with_all_errors );
 }
 
@@ -604,7 +621,8 @@ Scheduler.prototype.setState = function( state )
         	this._port          = state.getAttribute('tcp_port');
         } 
         this._id              = state.getAttribute('id');
-        this._cookie_prefix   = 'SOS_SCHEDULER_GUI_'+this._host+'_'+this._port+'_';
+        this._cookie_prefix   = 'JOC_'+this._host+'_'+this._port+'_';
+        this._old_cookie_prefix   = 'SOS_SCHEDULER_GUI_'+this._host+'_'+this._port+'_';
     }
 }
 
@@ -695,6 +713,7 @@ Scheduler.prototype.xmlTransform = function( dom_document, with_translate, text_
         //result_dom = new ActiveXObject( "MSXML2.DOMDocument" );
         //IE10 returns version conflict
         result_dom = this.loadResultDOM();
+        result_dom.setProperty("SelectionLanguage", "XPath");
         dom_document.transformNodeToObject( this._xslt, result_dom );
       }
     }
@@ -789,50 +808,134 @@ Scheduler.prototype.readCustomVersionedSettings = function()
 }
 
 
+Scheduler.prototype.deleteAllOldCookies = function() 
+{
+    var cookies = document.cookie.split(";");
+    
+    for (var i = 0; i < cookies.length; i++) {
+    	var cookie = cookies[i];
+    	var eqPos = cookie.indexOf("=");
+    	var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie; 
+    	if(name.indexOf(this._old_cookie_prefix) > -1) {
+    		this.deleteCookie(name);
+    	}
+    }
+}
+
+
+Scheduler.prototype.deleteCookie = function(name) 
+{
+    		document.cookie = name + "=; Expires=Thu, 01 Jan 1970 00:00:00 GMT;"; //delete old cookies without Path
+      	document.cookie = name + "=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path=/"; //delete old cookies from /
+}
+
+
+Scheduler.prototype.moveFilterCookies = function() 
+{
+    var cookies = document.cookie.split(";");
+    for (var i = 0; i < cookies.length; i++) {
+    	var cookie = cookies[i];
+    	var eqPos = cookie.indexOf("=");
+    	var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie; 
+    	if(name.indexOf(this._old_cookie_prefix) > -1 && name.indexOf('filter') > -1) {
+    		var value = this.getOldCookie(name.substr(this._old_cookie_prefix.length+1));
+    		this.setCookie(name.substr(this._old_cookie_prefix.length+1), value);
+    		this.deleteCookie(name);
+    	}
+    }
+}
+
+
 //---------------------------------------------------------------------------------getDebugLevel
 Scheduler.prototype.setDebugLevel = function()
 {
     if( typeof window['_debug_level'] != 'undefined' ) {
       this._runtime_settings.debug_level             = _debug_level;
     }
-    this._runtime_settings.debug_level               = Math.max(_debug_level,parseInt(this.getCookie( 'debug_level', this._runtime_settings.debug_level),10)); 
+    //this._runtime_settings.debug_level               = Math.max(_debug_level,parseInt(this.getCookie( 'debug_level', this._runtime_settings.debug_level),10));
+    try {
+    	eval('var fields = ' + this.getCookie('settings') + ';');
+    	if( typeof fields['debug_level'] != "undefined" ) {
+    		this._runtime_settings.debug_level = Math.max(_debug_level,parseInt(fields['debug_level'],10));
+    	}
+    }
+    catch(E){}
 }
   
 //---------------------------------------------------------------------------------readCookies
 Scheduler.prototype.readCookies = function()
-{  
+{   
+    try {
+    	eval('var fields = ' + this.getCookie('settings','{}') + ';');
+    	
+    	if($H(fields).size() > 0) {
+    	
+    	  for( var entry in fields ) {
+          if( entry.search(/^select_states_/) > -1 ) this._select_states[entry.replace(/^select_states_/,'')] = fields[entry];
+          if( entry.search(/^view_/) > -1 ) this._view[entry.replace(/^view_/,'')] = fields[entry];
+          if( entry == "update_periodically" ) this._update_periodically = fields[entry];
+          if( entry == "update_seconds" ) this._update_seconds = parseInt(fields[entry],10);;
+          if( entry == "show_card" ) this._show_card = fields[entry];
+        }
+        for( var entry in this._runtime_settings ) {
+        	if( typeof fields[entry] == "undefined" ) {
+        		continue;
+        	}
+          if( typeof fields[entry] == "boolean" ) {
+            this._runtime_settings[entry] = fields[entry];
+          } else { 
+            this._runtime_settings[entry] = parseInt(fields[entry],10);
+          }
+        }
+        for( var entry in this._checkbox_states ) {
+        	if( typeof fields[entry] == "undefined" ) {
+        		continue;
+        	}
+          this._checkbox_states[entry] = fields[entry];
+        }
+      }
+      else {
+      	this.readOldCookies();
+      } 
+    }
+    catch(E){}
+}
+
+
+Scheduler.prototype.readOldCookies = function()
+{   
     var logged = this.logger(3,'START READING COOKIES frameset','scheduler_read_cookies');
-    this._runtime_settings.debug_level               = Math.max(_debug_level,parseInt(this.getCookie( 'debug_level', this._runtime_settings.debug_level),10));
+    this._runtime_settings.debug_level               = Math.max(_debug_level,parseInt(this.getOldCookie( 'debug_level', this._runtime_settings.debug_level),10));
     if(!logged) this.logger(3,'START READING COOKIES frameset','scheduler_read_cookies');
-    this._update_periodically                        = (this.getCookie( 'update_periodically', this._update_periodically.toString()) == 'true');
-    this._update_seconds                             = parseInt(this.getCookie( 'update_seconds', this._update_seconds),10);
-    this._show_card                                  = this.getCookie( 'show_card', this._show_card);
-    
+    this._update_periodically                        = (this.getOldCookie( 'update_periodically', this._update_periodically.toString()) == 'true');
+    this._update_seconds                             = parseInt(this.getOldCookie( 'update_seconds', this._update_seconds),10);
+    this._show_card                                  = this.getOldCookie( 'show_card', this._show_card);
+     
     for( var state in this._radio_states ) {                      
-        this._radio_states[state]                    = this.getCookie( state, this._radio_states[state]);
+        this._radio_states[state]                    = this.getOldCookie( state, this._radio_states[state]);
     }
     var cookie_entries = ['max_orders','max_order_history','max_task_history','terminate_timeout'];
     if(_display_last_activities_tab) {
     	cookie_entries.push('max_last_activities');
     }
     for( var i=0; i < cookie_entries.length; i++ ) {
-      this._runtime_settings[cookie_entries[i]]      = parseInt(this.getCookie( cookie_entries[i], this._runtime_settings[cookie_entries[i]]),10);
+      this._runtime_settings[cookie_entries[i]]      = parseInt(this.getOldCookie( cookie_entries[i], this._runtime_settings[cookie_entries[i]]),10);
     }
-    this._runtime_settings.start_at_default_is_now   = (this.getCookie( 'start_at_default_is_now', this._runtime_settings.start_at_default_is_now.toString()) == 'true');
-    this._runtime_settings.start_next_period_enabled = (this.getCookie( 'start_next_period_enabled', this._runtime_settings.start_next_period_enabled.toString()) == 'true');
+    this._runtime_settings.start_at_default_is_now   = (this.getOldCookie( 'start_at_default_is_now', this._runtime_settings.start_at_default_is_now.toString()) == 'true');
+    this._runtime_settings.start_next_period_enabled = (this.getOldCookie( 'start_next_period_enabled', this._runtime_settings.start_next_period_enabled.toString()) == 'true');
     
     for( var state in this._checkbox_states ) {                   
-      this._checkbox_states[state]                   = (this.getCookie( state, this._checkbox_states[state].toString()) == 'true');
+      this._checkbox_states[state]                   = (this.getOldCookie( state, this._checkbox_states[state].toString()) == 'true');
     }                                                      
     for( var state in this._select_states ) {
       if( state.search(/^filter_(jobs|job_chains|orders)_select$/) > -1 ) continue;
-      var value = this.getCookie( 'select_states_'+state );
+      var value = this.getOldCookie( 'select_states_'+state );
       if( value != '' ) this._select_states[state]   = value;
     }
     if( this._tree_view_enabled ) {
       for( var entry in this._supported_tree_views ) {
-        var value = this.getCookie( 'view_'+entry );
-        if( value != '' ) this._view[entry]            = value;
+        var value = this.getOldCookie( 'view_'+entry );
+        if( value != '' ) this._view[entry]          = value;
       }
     }                                                      
                                                           
@@ -842,10 +945,11 @@ Scheduler.prototype.readCookies = function()
 
 
 //------------------------------------------------------------------------------getCookies
-Scheduler.prototype.getCookie = function(name, default_value) 
+Scheduler.prototype.getCookie = function(name, default_value, prefix) 
 {   
-    name = this._cookie_prefix + name;
-    this.logger(3,'LOOKING FOR COOKIE: ' + name);
+		if( typeof prefix == 'undefined' ) prefix = this._cookie_prefix;
+    name = prefix + name;
+    this.logger(3,'LOOKING FOR COOKIE: ' + name); 
     if( typeof default_value == 'undefined' ) default_value = "";
     var value   = "";
     var pattern = new RegExp(name+"=([^;]*);");
@@ -861,6 +965,32 @@ Scheduler.prototype.getCookie = function(name, default_value)
     if( value == "" ) value = default_value;
     return value;
 }
+
+Scheduler.prototype.getOldCookie = function(name, default_value)
+{
+		return this.getCookie(name, default_value, this._old_cookie_prefix);
+}
+
+
+//------------------------------------------------------------------------------set_cookie
+Scheduler.prototype.setCookie = function(name, value, expire) 
+{   
+    name = this._cookie_prefix + name;
+    try {
+      var today   = new Date();
+      var expires = new Date();
+      if( typeof expire != 'number' ) expire = 1000*60*60*24*30;
+      if ( value == null ) {
+      	document.cookie = name + "=; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Path="+this._cookie_path; //delete cookie
+      } else {
+      	expires.setTime(today.getTime() + expire);
+        document.cookie = name+"="+escape(value)+"; Expires="+expires.toGMTString()+"; Path="+this._cookie_path;
+      }
+      this.logger(2,'COOKIE WRITE: ' + name + '=' + value);
+    } catch(x) {
+      this.logger(1,'ERROR OCCURS AT COOKIE WRITE: ' + name + '=' + value + '\n' + x.message);
+    }      
+} 
 
 
 //--------------------------------------------------------------------------------treeDisplay

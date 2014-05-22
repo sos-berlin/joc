@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2011 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -32,6 +32,8 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
+
+// $Id$
 //-->
 <xsl:stylesheet xmlns:xsl   = "http://www.w3.org/1999/XSL/Transform" 
                 version     = "1.0">
