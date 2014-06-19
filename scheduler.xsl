@@ -2922,23 +2922,36 @@
             
             <tbody>
                 <xsl:for-each select="remote_scheduler">
-                    <tr class="list">
-                        <xsl:choose>
-                          <xsl:when test="@hostname">
-                            <xsl:attribute name="title"><xsl:value-of select="concat( 'http://', @hostname, ':', @tcp_port, '/' )"/></xsl:attribute>
-                            <xsl:attribute name="onclick">open_remote_scheduler( '<xsl:value-of select="@hostname"/>', '<xsl:value-of select="@tcp_port"/>' )</xsl:attribute>
-                            <xsl:attribute name="onmouseover">map_url( '<xsl:value-of select="@hostname"/>', '<xsl:value-of select="@tcp_port"/>', this );</xsl:attribute>
+                		<xsl:variable name="port">
+                				<xsl:choose>
+                          <xsl:when test="@tcp_port">
+                            <xsl:value-of select="@tcp_port"/>
+                          </xsl:when>
+                          <xsl:when test="@udp_port">
+                            <xsl:value-of select="@udp_port"/>
                           </xsl:when>
                           <xsl:otherwise>
-                            <xsl:attribute name="title"><xsl:value-of select="concat( 'http://', @ip, ':', @tcp_port, '/' )"/></xsl:attribute>
-                            <xsl:attribute name="onclick">open_remote_scheduler( '<xsl:value-of select="@ip"/>', '<xsl:value-of select="@tcp_port"/>' )</xsl:attribute>
-                            <xsl:attribute name="onmouseover">map_url( '<xsl:value-of select="@ip"/>', '<xsl:value-of select="@tcp_port"/>', this );</xsl:attribute>
+                            <xsl:value-of select="''"/>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:variable>
+                    <tr class="list">
+                        <xsl:choose>
+                          <xsl:when test="@hostname and $port">
+                            <xsl:attribute name="title"><xsl:value-of select="concat( 'http://', @hostname, ':', $port, '/' )"/></xsl:attribute>
+                            <xsl:attribute name="onclick">open_remote_scheduler( '<xsl:value-of select="@hostname"/>', '<xsl:value-of select="$port"/>' )</xsl:attribute>
+                            <xsl:attribute name="onmouseover">map_url( '<xsl:value-of select="@hostname"/>', '<xsl:value-of select="$port"/>', this );</xsl:attribute>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:attribute name="title"><xsl:value-of select="concat( 'http://', @ip, ':', $port, '/' )"/></xsl:attribute>
+                            <xsl:attribute name="onclick">open_remote_scheduler( '<xsl:value-of select="@ip"/>', '<xsl:value-of select="$port"/>' )</xsl:attribute>
+                            <xsl:attribute name="onmouseover">map_url( '<xsl:value-of select="@ip"/>', '<xsl:value-of select="$port"/>', this );</xsl:attribute>
                           </xsl:otherwise>
                         </xsl:choose>
                            
                         <td class="remote_scheduler remote_scheduler_ip"><xsl:value-of select="@ip"/></td>
                         <td class="remote_scheduler remote_scheduler_hostname"><xsl:value-of select="@hostname"/></td>
-                        <td class="remote_scheduler remote_scheduler_port"><xsl:value-of select="@tcp_port"/></td>
+                        <td class="remote_scheduler remote_scheduler_port"><xsl:value-of select="$port"/></td>
                         <td class="remote_scheduler remote_scheduler_id"><xsl:value-of select="@scheduler_id"/></td>
                         <td class="remote_scheduler remote_scheduler_update"><xsl:apply-templates mode="date_time_nowrap" select="@configuration_transfered_at__xslt_datetime_zone_support"/></td>
                         <td class="remote_scheduler remote_scheduler_connected"><xsl:apply-templates mode="date_time_nowrap" select="@connected_at__xslt_datetime_zone_support"/></td>
