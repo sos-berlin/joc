@@ -3903,6 +3903,18 @@
           </colgroup>
           
             <xsl:choose>
+              <xsl:when test="ERROR"> 
+                <thead>
+                  <xsl:call-template name="after_head_space">
+                    <xsl:with-param name="colspan" select="'6'"/>
+                  </xsl:call-template>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="6" class="job_error"><xsl:value-of select="ERROR/@text"/></td>
+                  </tr>
+                </tbody>
+              </xsl:when>
               <xsl:when test="count(history.entry)=0"> 
                 <thead>
                   <xsl:call-template name="after_head_space">
