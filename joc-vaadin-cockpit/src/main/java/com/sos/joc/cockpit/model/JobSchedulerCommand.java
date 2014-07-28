@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.scheduler.model.LiveConnector;
 import com.sos.scheduler.model.SchedulerHotFolder;
@@ -22,7 +23,7 @@ public class JobSchedulerCommand implements Serializable {
 	
 	private static final long serialVersionUID = 5355906604171033202L;
 	private final String conClassName = "JOCCockpitUI";
-	private final static Logger logger = Logger.getLogger(JobSchedulerCommand.class.getName());
+	private final static Logger logger = LoggerFactory.getLogger(JobSchedulerCommand.class.getName());
 	private SchedulerObjectFactory objSchedulerObjectFactory = null;
 	
 	public JobSchedulerCommand() {

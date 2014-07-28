@@ -1,14 +1,13 @@
 package com.sos.joc.cockpit;
 
-import java.util.logging.Logger;
-
 import javax.servlet.annotation.WebServlet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vaadin.peter.contextmenu.ContextMenu;
 
 import com.sos.joc.cockpit.model.JOCState;
 import com.sos.joc.cockpit.model.JobSchedulerCommand;
-import com.sos.scheduler.model.SchedulerObjectFactoryOptions;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -16,8 +15,6 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
@@ -45,7 +42,7 @@ public class JOCCockpitUI extends UI implements JobSchedulerCommand.StateListene
 	private final String conSVNVersion = "$Id: JOCCockpitUI.java 21535 2014-01-23 08:57:04Z oh $";
 	@SuppressWarnings("unused")
 	private final String conClassName = "JOCCockpitUI";
-	private final static Logger logger = Logger.getLogger(JOCCockpitUI.class.getName());
+	private final static Logger logger = LoggerFactory.getLogger(JOCCockpitUI.class.getName());
 	private Label statusLabel;
 	private Label errorLabel;
 	private ProgressBar progressIndicator;
