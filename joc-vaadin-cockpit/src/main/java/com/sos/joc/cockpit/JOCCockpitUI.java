@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.peter.contextmenu.ContextMenu;
 
+import com.sos.joc.cockpit.components.AddServerLayout;
 import com.sos.joc.cockpit.model.JOCState;
 import com.sos.joc.cockpit.model.JobSchedulerCommand;
 import com.vaadin.annotations.Push;
@@ -20,6 +21,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 @Theme("joc")
 @Title("JOC")
@@ -46,6 +48,8 @@ public class JOCCockpitUI extends UI implements JobSchedulerCommand.StateListene
 	private Label statusLabel;
 	private Label errorLabel;
 	private ProgressBar progressIndicator;
+	private Window addServerWindow;
+	private HorizontalSplitPanel hLayout;
 	
 
     @Override
@@ -96,11 +100,15 @@ public class JOCCockpitUI extends UI implements JobSchedulerCommand.StateListene
 		progressIndicator.setEnabled(false);
 		progressIndicator.setVisible(false);
 		layout.addComponent(progressIndicator);
+		addServerWindow = new Window();
+		addServerWindow.setWidth(600.0f, Unit.PIXELS);
+		addServerWindow.setHeight(600.0f, Unit.PIXELS);
+		addServerWindow.setModal(true);
+		addServerWindow.center();
+		addServerWindow.setContent(new AddServerLayout());
 		
 		
-		
-		
-		HorizontalSplitPanel hLayout = new HorizontalSplitPanel(new HotFolders(), layout);
+		hLayout = new HorizontalSplitPanel(new HotFolders(), layout);
 		hLayout.setSizeFull();
 //		HorizontalLayout hLayout = new HorizontalLayout();
 //		hLayout.setSizeFull();
@@ -142,6 +150,14 @@ public class JOCCockpitUI extends UI implements JobSchedulerCommand.StateListene
 				progressIndicator.setVisible(false);
 			}
 		});
+	}
+
+	public Window getAddServerWindow() {
+		return addServerWindow;
+	}
+
+	public HorizontalSplitPanel getHLayout() {
+		return hLayout;
 	}
 
 }
