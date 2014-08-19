@@ -20,6 +20,9 @@
             <resource>
                 <directory>src/main/scripts</directory>
             </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
         </resources>
     </build>
 
