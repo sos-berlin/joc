@@ -120,9 +120,9 @@ function showJobDescription( job_name )
               if( desc_frame_href ) _scheduler.executeGet(desc_frame_href);
             } catch(xx) { 
               if( path_is_relative( include_file_attribute ) ) {
-                desc_frame_href = 'live'+job_dir+include_file_attribute;
+                desc_frame_href = 'scheduler_data/config/cache'+job_dir+include_file_attribute;
               } else {
-                desc_frame_href = 'live'+include_file_attribute;
+                desc_frame_href = 'scheduler_data/config/cache'+include_file_attribute;
               }
               try {
                 _scheduler.executeGet(desc_frame_href);
@@ -136,37 +136,18 @@ function showJobDescription( job_name )
         }
       } catch(E) {}
       
-			var desc = _scheduler.executeGet(_scheduler._engine_cpp_url + "job_description?job=" + job_name);
-      //description in XML format
-      if( desc.search(/<\?xml/i) > -1 ) {
-        //response of older scheduler versions returns xml as content of html body
-        if( desc.search( /<body[^>]*>[^<]*<\?xml/i > -1 ) ) {
-          desc = desc.substring( desc.indexOf("<?xml") );
-          desc = desc.substring(0,desc.lastIndexOf("</body>"));
-        }
-        //clean up
-        desc   = desc.replace( /^[^<]*</, "<" );
-        desc   = desc.replace( />[^>]*$/, ">" );
-        //read name of stylesheet (default: scheduler_job_documentation.xsl)
-        var stylesheet_url         = "scheduler_job_documentation.xsl";
-        if( desc.search( /<\?xml-stylesheet[^>]+href\s*=\s*(?:\"|\')([^=]+)(?:\"|\')/i ) > -1 ) {
-            stylesheet_url         = desc.match( /<\?xml-stylesheet[^>]+href\s*=\s*(?:\"|\')([^=]+)(?:\"|\')/i )[1];
-        }
-        //Trying to substitute paths of xml includes (v1.1)
-        if( stylesheet_url == 'scheduler_job_documentation_v1.1.xsl' ) {
-          desc = desc.replace( /(<xi:include[^>]+href\s*=\s*[\"\'])(?:\.\/)?/g, "$1"+_scheduler._url+"scheduler/jobs/" );
-        }
-        response        = _scheduler.loadXML( desc );
-        _scheduler.loadXSLT( stylesheet_url );
-        desc            = _scheduler.xmlTransform(response,false);
-        if( desc == "" ) throw new Error( getTranslation("unknown error") ); 
-        desc            = desc.replace(/^<\?xml[^>]*>\s*<!DOCTYPE/i,'<!DOCTYPE');
-        desc            = desc.replace( /(select_lang\s*\(\s*[\'])[^\']*([\']\s*\))/, "$1"+description_lang+"$2" );
-      }
+      _desc_frame.location.href = _scheduler._engine_cpp_url + "job_description?job=" + job_name;
+      /*
+      var desc = _scheduler.executeGet(_scheduler._engine_cpp_url + "job_description?job=" + job_name);
+      var htmlCoverStart = desc.indexOf("<body id='job_description'>");
+      if( htmlCoverStart > -1 ) {
+          desc = desc.substring( (htmlCoverStart+27), (desc.length-14));
+      } 
       _desc_frame.document.open();
       _desc_frame.document.write(desc);
       _desc_frame.document.close(); 
       if( window.navigator.appName == "Microsoft Internet Explorer" ) _desc_frame.location.reload();
+      */
       return true;
     }
     catch( x )

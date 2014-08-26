@@ -289,13 +289,13 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
     	parent.left_frame.clear_update();
     }
     
-    //new Ajax.Request( scheduler._engine_cpp_url,   
+    //new Ajax.Request( scheduler._engine_cpp_url,
+    //since 1.7.x new url; plugin com.sos.scheduler.engine.plugins.webservice.WebServicePlugin required in scheduler.xml
     new Ajax.Request( scheduler._command_url,
     {
        asynchronous   : async,
        method         : 'post',
        postBody       : xml,
-       //parameters     : ( scheduler._with_jetty ) ? $H({command:xml}) : $H(),
        contentType    : 'text/xml',
        requestHeaders : { //'Transfer-Encoding':'identity', 
                           //'Content-Length': xml.length,

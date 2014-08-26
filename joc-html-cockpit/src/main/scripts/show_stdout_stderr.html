@@ -63,19 +63,21 @@ window.onload = function()
     } catch(E) {
       _stdout_stderr  = {stdout:null,stderr:null};
     }
-    var queryParams   = window.location.hash.substring(1);  //stdout or stderr
-    var header        = _stdout_stderr[queryParams+'_header']; 
-    if(header) {
-    	header            = header.replace(/<[^>]+>/g, "").replace(/\\/, "/").replace(/.*\/([^\/]*)$/, "$1");
-    	document.title    = header;
-    	$('header').update(_stdout_stderr[queryParams+'_header']);
-    }
-    if(_stdout_stderr[queryParams]) {
-    	$('output').update(_stdout_stderr[queryParams]);
-    }
-    else {
-    	$('output').setStyle({ color: 'red' });
-    	$('output').update("Error while reading " + queryParams);
+    var queryParams   = window.location.hash.substring(2);  //stdout or stderr
+    if( queryParams == 'stdout' || queryParams == 'stderr' ) { 
+        var header        = _stdout_stderr[queryParams+'_header']; 
+        if(header) {
+        	   header            = header.replace(/<[^>]+>/g, "").replace(/\\/, "/").replace(/.*\/([^\/]*)$/, "$1");
+        	   document.title    = header;
+        	   $('header').update(_stdout_stderr[queryParams+'_header']);
+        }
+        if(_stdout_stderr[queryParams]) {
+        	   $('output').update(_stdout_stderr[queryParams]);
+        }
+        else {
+        	   $('output').setStyle({ color: 'red' });
+        	   $('output').update("Error while reading " + queryParams);
+        }
     }
 }
 

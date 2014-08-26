@@ -1869,10 +1869,10 @@ function order_history_menu__onclick( job_chain, order_id, history_id, end_time 
     try {
     	var stdout_stderr = get_stdout_stderr( job_chain, order_id, history_id, end_time );
     	if( _stdout_stderr.stdout ) {
-      	popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('show_stdout_stderr.html#stdout', '_blank')" );
+      	popup_builder.add_entry ( parent.getTranslation("Show stdout"), "open_url('show_stdout_stderr.html#=stdout', '_blank')" );
     	}
     	if( _stdout_stderr.stderr ) {
-      	popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('show_stdout_stderr.html#stderr', '_blank')" );
+      	popup_builder.add_entry ( parent.getTranslation("Show stderr"), "open_url('show_stdout_stderr.html#=stderr', '_blank')" );
     	}
     } catch(x) {
     	showError( x );
