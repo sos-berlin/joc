@@ -76,9 +76,9 @@ var _display_last_activities_tab = false;
 
 //--------------------------------------------------------------------------custom.js per hash  
 var _server_settings            = ( location.hash && location.hash.length > 1 && (location.hash.substr(1).replace(/[_a-zA-Z0-9.~()-]/g,'').length == 0));
-document.writeln('<script type="text/javascript" src="scheduler_data/config/operations_gui/custom.js"></sc'+'ript>');
+document.writeln('<script type="text/javascript" src="scheduler_data/custom/custom.js"></sc'+'ript>');
 if( _server_settings && location.hash.substr(1) != 'custom') {
-  document.writeln('<script type="text/javascript" src="scheduler_data/config/operations_gui/'+encodeURIComponent(location.hash.substr(1))+'.js"></sc'+'ript>');
+  document.writeln('<script type="text/javascript" src="scheduler_data/custom/'+encodeURIComponent(location.hash.substr(1))+'.js"></sc'+'ript>');
 }
 
 

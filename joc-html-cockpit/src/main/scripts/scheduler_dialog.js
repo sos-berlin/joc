@@ -1558,7 +1558,7 @@ function scheduler_extras__onclick( elt )
     popup_builder.add_bar();
     popup_builder.add_entry( parent.getTranslation("Settings")      , "callErrorChecked('scheduler_settings__onclick')", parent.left_frame );
     if( parent._extra_items.monitor )       popup_builder.add_entry( parent.getTranslation("Monitor")       , "open_url( 'monitor.html', 'monitor_applet' )" );
-    if( parent._extra_items.configuration ) popup_builder.add_entry( parent.getTranslation("Configuration") , "open_url( 'scheduler_data/config/scheduler_documentation.html', 'config_xml' )" );
+//    if( parent._extra_items.configuration ) popup_builder.add_entry( parent.getTranslation("Configuration") , "open_url( 'scheduler_data/config/scheduler_documentation.html', 'config_xml' )" );
     
     var first_extra_urls = true;
     for(var entry in parent._extra_urls ) {
