@@ -23,7 +23,7 @@ public class JobSchedulerCommand implements Serializable {
 	
 	private static final long serialVersionUID = 5355906604171033202L;
 	private final String conClassName = "JOCCockpitUI";
-	private final static Logger logger = LoggerFactory.getLogger(JobSchedulerCommand.class.getName());
+	private final static Logger logger = LoggerFactory.getLogger(JobSchedulerCommand.class);
 	private SchedulerObjectFactory objSchedulerObjectFactory = null;
 	
 	public JobSchedulerCommand() {
