@@ -17,6 +17,7 @@
 		<vaadin.version>7.1.15</vaadin.version>
 		<vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
 	</properties>
+	
 	<repositories>
 		<repository>
 			<id>vaadin-addons</id>
@@ -33,6 +34,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>vaadin-snapshots</id>
@@ -45,70 +47,7 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-	<dependencies>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-server</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiled</artifactId>
-		</dependency>
-		<!--
-		  Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
-		  
-		  For widgetset compilation, vaadin-client-compiler is automatically added on the
-		  compilation classpath by vaadin-maven-plugin so normally there is no need for an
-		  explicit dependency.
-		-->
-		<!--
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiler</artifactId>
-			<version>${vaadin.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		-->
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-push</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-themes</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-        
-        <dependency>
-            <groupId>com.sos-berlin.jobscheduler</groupId>
-            <artifactId>jobscheduler-object-model</artifactId>
-            <version>${project.version}</version>
-            <!-- scope>provided</scope -->
-        </dependency>
-        
-        <dependency>
-			<groupId>com.sos-berlin.jid</groupId>
-			<artifactId>scheduler-instances</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.vaadin.addons</groupId>
-            <artifactId>contextmenu</artifactId>
-            <version>4.4.0</version>
-        </dependency>
-	</dependencies>
-    
-
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -136,6 +75,16 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
+					<!-- some cascaded dependencies still get into war file, e.g. servlet-api-2.4.jar through jcifs.jar through virtual-file-system.jar 
+							 configure <packagingExcludes/> to remove them after compile; 
+							 comment the complete <packagingExcludes/> if build war with all jars is needed -->
+	        <!--packagingExcludes-->
+					<!-- the regex will remove all dependencies except for vaadin-server-<version>.jar,
+						 because it is needed for the servlets class loader to function correctly. Otherwise
+						 classes from WEB-INF/classes won´t be found -->        
+						<!-- %regex[WEB-INF/lib/(?!vaadin-server).*.jar] -->
+						<!-- WEB-INF/lib/servlet-api*.jar -->
+					<!--/packagingExcludes-->
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
@@ -239,4 +188,68 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client-compiled</artifactId>
+		</dependency>
+		<!--
+		  Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory).
+		  
+		  For widgetset compilation, vaadin-client-compiler is automatically added on the
+		  compilation classpath by vaadin-maven-plugin so normally there is no need for an
+		  explicit dependency.
+		-->
+		<!--
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client-compiler</artifactId>
+			<version>${vaadin.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-push</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-themes</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+        
+    <dependency>
+        <groupId>com.sos-berlin.jobscheduler</groupId>
+        <artifactId>jobscheduler-object-model</artifactId>
+        <version>${project.version}</version>
+        <!-- scope>provided</scope -->
+    </dependency>
+        
+    <dependency>
+			<groupId>com.sos-berlin.jid</groupId>
+			<artifactId>scheduler-instances</artifactId>
+      <version>${project.version}</version>
+	  </dependency>
+        
+    <dependency>
+        <groupId>org.vaadin.addons</groupId>
+        <artifactId>contextmenu</artifactId>
+        <version>4.4.0</version>
+    </dependency>
+	</dependencies>
+    
 </project>
