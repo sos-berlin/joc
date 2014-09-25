@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<title>JobScheduler</title>
+<!--
+/********************************************************* begin of preamble
+**
+** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** All rights reserved.
+**
+** This file may be used under the terms of either the 
+**
+**   GNU General Public License version 2.0 (GPL)
+**
+**   as published by the Free Software Foundation
+**   http://www.gnu.org/licenses/gpl-2.0.txt and appearing in the file
+**   LICENSE.GPL included in the packaging of this file. 
+**
+** or the
+**  
+**   Agreement for Purchase and Licensing
+**
+**   as offered by Software- und Organisations-Service GmbH
+**   in the respective terms of supply that ship with this file.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+** IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+** THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+** PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+** BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+********************************************************** end of preamble*/
+
+// $Id$
+//-->		
+		<style type="text/css">
+        @import url(scheduler.css);
+        @import url(scheduler_data/custom/custom.css);
+    </style>
+    
+    <script type="text/javascript" src="scheduler_init.js"></script>
+    <script type="text/javascript" src="scheduler.js"></script>
+    <script type="text/javascript" src="prototype.js"></script>
+    <script type="text/javascript" src="browser_dependencies.js"></script>
+    <script type="text/javascript" src="sos_logger.js"></script>
+
+<script type="text/javascript" language="javascript"><!--
+
+var _scheduler;
+var _supported_commands  = $H({
+	                         job:'<show_job job="%path%" what="source"/>',
+	                         //request to get job_chain source with jobs and orders
+	                         //job_chain:'<show_job_chain job_chain="%path%" what="source job_chain_orders job_chain_jobs" max_order_history="0"/>', 
+	                         job_chain:'<show_job_chain job_chain="%path%" what="source" max_order_history="0" max_orders="0"/>',
+	                         order:'<show_order order="%order_id%" job_chain="%job_chain%" what="source"/>',
+	                         schedule:'<show_state what="folders source" subsystems="schedule folder"/>',
+	                         process_class:'<show_state what="folders source" subsystems="process_class folder"/>',
+	                         lock:'<show_state what="folders source" subsystems="lock folder"/>'
+	                         });
+
+function on_load()
+{
+    try {
+      var supported_objs   = $A(_supported_commands.keys());
+      var queryParams      = window.location.hash.substring(1).toQueryParams();
+      var params           = $H({type:'',path:'',name:'',job_chain:'',order_id:''});
+      params.update(queryParams);
+      
+      if(!params.get('path') || !params.get('type')) {
+      	throw new Error('The parameter of the JobScheduler object are incomplete!\nParams: '+window.location.hash.substring(1));
+      }
+      
+      if(params.get('path').substring(0,1) != '/') {
+      	params.set('path', '/' + params.get('path'));
+      }
+      
+      if( supported_objs.indexOf(params.get('type')) == -1 ) {
+      	throw new Error('The type parameter of the JobScheduler object must be a value of\nParams: ' + supported_objs.inspect());
+      }
+      
+      if(params.get('type') == 'order') {
+      	if(params.get('path').indexOf(',') == -1) {
+      		throw new Error('The parameter of the order object must be in the form [job_chain path,order id]\nPath: ' + params.get('path'));
+      	}
+      	var paths          = params.get('path').split(',');
+      	params.set('order_id', paths[1]);
+      	params.set('job_chain', paths[0]);
+      }
+      
+      params.set('name', params.get('path').replace(/.*\/([^\/]+)$/,"$1"));
+      
+      document.title       = params.get('name') + " - JobScheduler";
+      setHeader(params);
+      
+      _scheduler           = new Scheduler();
+      
+      var response         = _scheduler.executeSynchron( getXMLQuery(params), false, false, true );
+      var modified         = response.selectSingleNode("//file_based[@last_write_time]");
+      if(modified) {
+      	$('modified').update(getTranslation('File timestamp') + ': ' + _scheduler.UTCtoLocal( modified.getAttribute('last_write_time') ));
+      }
+      
+      var srcElem          = null;
+      if(params.get('type') == 'order') {
+        srcElem            = response.selectSingleNode("//order[@id='"+params.get('order_id')+"' and @job_chain='"+params.get('job_chain')+"']/source");
+      } else {
+      	srcElem            = response.selectSingleNode("//"+params.get('type')+"[@path='"+params.get('path')+"']/source");
+      }
+      if(!srcElem) {
+        throw new Error('The source of the '+params.get('type')+' object ' + params.get('path') + ' could not be read.');
+      }
+      try {
+        _scheduler.loadXSLT( "./show_configuration.xsl" );     
+        srcChildContent    = _scheduler.xmlTransform(srcElem, false, true);
+        srcChildContent    = srcChildContent.replace(/&amp;(#x?[0-9a-f]{1,4});/ig, "&$1;");
+        $('src').update(srcChildContent);
+      }
+      catch(xx) {
+      	srcChildContent    = srcElem.xml.replace(/^\s*<source>/,'').replace(/<\/source>\s*$/,'');
+        srcChildContent    = htmlEncode(srcChildContent);
+        $('src2').update(srcChildContent);
+      }
+    }
+    catch( x )
+    { 
+      show_error( x );
+      return false;
+    }   
+}
+
+function htmlEncode( text )
+{
+    if( text == null )  return "";
+    if( text.toString().search(/&(amp|lt|gt);/) > -1 ) return text;
+    return text.toString().replace( /&$/, "&amp;" ).replace( /&([^#])/g, "&amp;$1" ).replace( /</g, "&lt;" ).replace( />/g, "&gt;" ).replace(/&amp;(#x?[0-9a-f]{1,4});/ig, "&$1;");
+}
+
+function getXMLQuery( params ) 
+{
+	  var command   = _supported_commands.get( params.get('type') );
+	  params.each( function(pair){
+	  	var pattern = new RegExp('('+ RegExp.escape('%'+ pair.key + '%') + ')', 'g' );
+	  	command     = command.replace(pattern, pair.value);
+	  });
+	  return command;
+}
+
+function setHeader( params ) 
+{
+	  var objType = params.get('type');
+	  objType     = objType.substring(0,1).toUpperCase() + objType.substring(1);
+	  $('header').update(getTranslation(objType) + ': ' + params.get('path'));
+}
+
+function show_error( x ) 
+{   
+	  var msg = htmlEncode(x.message);
+	  msg     = msg.replace( /\n/g, "<br/>" ).replace( /"  "/g, "&nbsp; " );
+	  $('error_message').update(msg);
+}
+
+window.onload = on_load;
+
+window.onunload = function()
+{
+    if( _scheduler ) _scheduler.close();
+}
+
+//-->
+</script>    
+	</head>
+	<body  class="configuration">
+		<h2  id="header"></h2>
+		<div id="modified"></div>
+		<div id="src" class="src"></div>
+		<div id="error_message"></div>
+		<pre id="src2"></pre>
+	</body>
+</html>
