@@ -7,13 +7,14 @@
         <version>1.7-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.sos-berlin.products</groupId>
+    <groupId>com.sos-berlin</groupId>
     <artifactId>joc</artifactId>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
 
     <modules>
-        <module>joc-vaadin-cockpit</module>
+        <module>joc-html-cockpit</module>
+        <!-- module>joc-vaadin-cockpit</module -->
     </modules>
 
 </project>
