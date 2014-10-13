@@ -655,7 +655,7 @@ function start_order_at( now ) {
               dialog.show();
               break;
       case 1: _popup_menu.close();
-              var xml_command = '<modify_order at="now" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"/>';
+              var xml_command = '<modify_order at="now" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"/>';
               if( scheduler_exec( xml_command, false ) ) {
                 set_timeout("parent.left_frame.update()",1);
               }
@@ -664,7 +664,7 @@ function start_order_at( now ) {
               var msg           = mandatory_field( fields.at, parent.getTranslation('Start time') );
               if( msg == '' ) {
                 Input_dialog.close();
-                var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"/>';
+                var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"/>';
                 if( scheduler_exec( xml_command, false ) ) {
                   set_timeout("parent.left_frame.update()",1);
                 }
@@ -732,7 +732,7 @@ function start_order( ret )
       var msg = mandatory_field( fields.at, parent.getTranslation('Start time') );
       if( msg == '' ) {
         Input_dialog.close();
-        var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '">' + params + '</modify_order>';
+        var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id + '">' + params + '</modify_order>';
         if( scheduler_exec( xml_command, false ) ) { 
             set_timeout("parent.left_frame.update()",1);
         }
@@ -941,7 +941,7 @@ function set_order_state( order_state, order_end_state, setback, hot, ret )
       var sback = fields.remove_setback ? ' setback="no"' : '';
       //var end_state = (fields.new_end_state != "") ? ' end_state="'+fields.new_end_state+'"' : '';
       var end_state = parent._scheduler.versionIsNewerThan( "2008-04-08 00:00:00" ) ? ' end_state="'+fields.new_end_state+'"' : '';  
-      var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id.replace(/\\/g,"\\\\") + '"' + sback + ' state="' + fields.new_state + '"' + end_state + '/>'; 
+      var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"' + sback + ' state="' + fields.new_state + '"' + end_state + '/>'; 
       if( scheduler_exec( xml_command, false ) ) { 
           set_timeout("parent.left_frame.update()",1);
       }
@@ -1043,7 +1043,7 @@ function set_run_time( caller, hot, ret )
       if( !fields.run_time ) fields.run_time = '<run_time/>'; 
       switch( caller ) {
         case 'order'          : Input_dialog.close();
-                                xml_command = '<modify_order job_chain="' + window.parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id.replace(/\\/g,"\\\\") + '">' + fields.run_time + '</modify_order>';
+                                xml_command = '<modify_order job_chain="' + window.parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id + '">' + fields.run_time + '</modify_order>';
                                 /* modify should not be stored persistent
                                 if( parent._source != undefined ) {
                                   parent._source.setAttribute('id', window.parent.left_frame._order_id);
@@ -1748,9 +1748,9 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       } */
     }
     if( !end_state ) end_state = "";
-    //if( !order_title ) order_title = order_id.replace(/\\/g,"\\\\").replace(/^\//,'');
+    //if( !order_title ) order_title = order_id.replace(/^\//,'');
     _obj_title = title_encode(order_title);
-    _obj_name  = xml_encode(order_id.replace(/\\/g,"\\\\").replace(/^\//,''));
+    _obj_name  = xml_encode(order_id.replace(/^\//,''));
     if( !occupied_http || occupied_http.search(/^http/) == -1 ) { 
     	occupied_http = ''; 
     } else {
