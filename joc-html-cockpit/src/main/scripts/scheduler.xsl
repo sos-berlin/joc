@@ -373,7 +373,7 @@
       <xsl:param name="name" select="@name" />
       <xsl:param name="state" select="''" />
       <xsl:param name="big_chain_path" select="''"/>
-      <xsl:variable name="cnt_orders_of_big_chain" select="count(//order.job_chain_stack.entry[@job_chain = current()/@path])"/>
+      <xsl:variable name="cnt_orders_of_big_chain" select="count(//order_queue/order/order.job_chain_stack/order.job_chain_stack.entry[@job_chain = current()/@path])"/>
       <xsl:variable name="web_services" select="/spooler/answer/state[1]/http_server/web_service[ @job_chain = current()/@path ]" />
       <!--xsl:variable name="with_jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source))" /-->
       <xsl:variable name="with_jobs" select="/spooler/@show_job_chain_jobs_checkbox or job_chain_node.job_chain or job_chain_node[@job_chain] or (/spooler/@show_job_chain_orders_checkbox and (job_chain_node/order_queue/order or file_order_source or $cnt_orders_of_big_chain &gt; 0))"/>
@@ -2989,7 +2989,7 @@
         <xsl:param name="big_chain" select="false()"/>
         <xsl:param name="big_chain_path" select="''"/>
         <xsl:param name="node_state" select="''"/>
-        <xsl:variable name="cnt_orders_of_big_chain" select="count(//order.job_chain_stack.entry[@job_chain = current()/@path])"/>
+        <xsl:variable name="cnt_orders_of_big_chain" select="count(//order_queue/order/order.job_chain_stack/order.job_chain_stack.entry[@job_chain = current()/@path])"/>
         
         <!--xsl:if test="$single or $big_chain or not(@order_id_space) or (@order_id_space and job_chain_node.job_chain)"-->
         <xsl:if test="true()">
