@@ -215,11 +215,15 @@ function show_log__onclick( show_log_command, window_name )
     if( show_log_command.search(/^https?:/) == -1 ) show_log_command = parent._scheduler._engine_cpp_url+"show_log?"+show_log_command;
     if( parent._scheduler && parent._scheduler._dependend_windows[ window_name ] ) 
     {
-    	parent._scheduler._dependend_windows[ window_name ].close();
-    	//alert(window_name);
-    	//parent._scheduler._dependend_windows[ window_name ].location.reload();
-    	//parent._scheduler._dependend_windows[ window_name ].alert(window_name);
-    	//parent._scheduler._dependend_windows[ window_name ].focus();
+    	try {
+    		parent._scheduler._dependend_windows[ window_name ].close();
+    		//parent._scheduler._dependend_windows[ window_name ].location.reload();
+        	//parent._scheduler._dependend_windows[ window_name ].alert(window_name);
+        	//parent._scheduler._dependend_windows[ window_name ].focus();
+    	}
+    	catch(x) {
+    		
+    	}
     }
     //else { 
     	var log_window = parent.open( show_log_command, window_name, features );
@@ -246,7 +250,12 @@ function open_window( window_name, window_url, with_hash )
 {
     try
     { 
-      if( parent._scheduler._dependend_windows[ window_name ] ) { parent._scheduler._dependend_windows[ window_name ].close(); }
+      if( parent._scheduler._dependend_windows[ window_name ] ) { 
+    	  try {
+    		  parent._scheduler._dependend_windows[ window_name ].close();
+    	  }
+    	  catch(xx) {}
+      }
       open_url( window_url, window_name, with_hash );
       _popup_menu.close();
     }
@@ -1436,7 +1445,12 @@ function show_calendar( menu, ret )
         case 'job'       : _calendar_params.job   = window.parent.left_frame._job_name; break;
       }
       var window_name  = "scheduler_calendar"; 
-      if( parent._scheduler._dependend_windows[ window_name ] ) { parent._scheduler._dependend_windows[ window_name ].close(); }
+      if( parent._scheduler._dependend_windows[ window_name ] ) { 
+    	  try {
+    		  parent._scheduler._dependend_windows[ window_name ].close(); 
+    	  }
+    	  catch(x) {}
+      }
       open_url( "scheduler_calendar.html", window_name, true );    
     } 
 }
