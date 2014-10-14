@@ -913,7 +913,7 @@ function delete_orders( ret )
 //-----------------------------------------------------------------------------set_order_state
 // Fuer order_menu__onclick()
 
-function set_order_state( order_state, order_end_state, setback, hot, ret ) 
+function set_order_state( order_state, order_end_state, setback, suspended, hot, ret ) 
 {   
     if( typeof ret != "boolean" ) ret = false;
     
@@ -922,7 +922,7 @@ function set_order_state( order_state, order_end_state, setback, hot, ret )
       var dialog        = new Input_dialog();
       var states        = get_order_states();
       dialog.width      = 240;
-      dialog.submit_fct = "callErrorChecked( 'set_order_state', '" + order_state + "', '" + order_end_state + "', " + setback + ", " + hot + ", true )";
+      dialog.submit_fct = "callErrorChecked( 'set_order_state', '" + order_state + "', '" + order_end_state + "', " + setback + ", " + suspended + ", " + hot + ", true )";
       dialog.add_title( "Set order state of $order", {order:'<br/>'+_obj_name+'<br/>'+_obj_title} );
       dialog.add_prompt( '<b>Select a new order state</b>' );
       dialog.add_prompt( '<span class="small">The current order state is $state.</span>', {state:'&quot;'+order_state+'&quot;'} );
@@ -943,13 +943,26 @@ function set_order_state( order_state, order_end_state, setback, hot, ret )
         dialog.add_hidden( "new_end_state", "" );
       }
       if( setback ) dialog.add_checkbox( "remove_setback", '<span class="small">'+parent.getTranslation('Remove setback')+'</span>', false );
+      if( suspended ) dialog.add_checkbox( "resume", '<span class="small">'+parent.getTranslation('Resume order')+'</span>', false );
       dialog.show();
     } else {
-      var fields = input_dialog_submit();
+    	var fields = input_dialog_submit();
       var sback = fields.remove_setback ? ' setback="no"' : '';
-      //var end_state = (fields.new_end_state != "") ? ' end_state="'+fields.new_end_state+'"' : '';
+      //temporary suspended orders which new state is an end state will be resumed to avoid blacklist; https://change.sos-berlin.com/browse/JOC-18
+      if( suspended && !hot && !fields.resume ) {  
+      	var states  = get_order_states(); 
+      	for(var i=0; i < states[0].length; i++ ) {
+      		if( states[0][i]['key'] == fields.new_state ) {
+      			if( states[0][i]['endnode'] ) { 
+      				fields.resume = true;
+      			}
+      			break;
+      		}
+      	} 
+      }
+      var resume = fields.resume ? ' suspended="no"' : '';
       var end_state = parent._scheduler.versionIsNewerThan( "2008-04-08 00:00:00" ) ? ' end_state="'+fields.new_end_state+'"' : '';  
-      var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"' + sback + ' state="' + fields.new_state + '"' + end_state + '/>'; 
+      var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"' + sback + resume + ' state="' + fields.new_state + '"' + end_state + '/>'; 
       if( scheduler_exec( xml_command, false ) ) { 
           set_timeout("parent.left_frame.update()",1);
       }
@@ -983,17 +996,20 @@ function get_order_states( big_chain )
     }
     if( big_chain ) {
       var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node.job_chain|.//job_chain_node[@job_chain]" );
+      var job_chain_endnodes   = [];
     } else {
-      var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node|.//job_chain_node.end" );
+      var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node[@job]|.//file_order_sink" );
+      var job_chain_endnodes   = job_chain_element.selectNodes( ".//job_chain_node[not(@job)]|.//job_chain_node.end" );
     }
     if( job_chain_nodes.length == 1 ) return new Array(job_chain_nodes[0].getAttribute('state'),"");
-    //end_states['']        = '(none)';
     end_states.push( {key:'', display:'(none)'} );
     for( var i = 0; i < job_chain_nodes.length; i++ ) {
-    		states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state')} );
-        //if( i < job_chain_nodes.length-1 ) {
-          end_states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state')} );
-        //}
+    		states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state'), endnode:false} );
+        end_states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state'), endnode:false} );
+    }
+    for( var i = 0; i < job_chain_endnodes.length; i++ ) {
+    		states.push( {key:job_chain_endnodes[i].getAttribute('state'), display:job_chain_endnodes[i].getAttribute('state'), endnode:true} );
+        end_states.push( {key:job_chain_endnodes[i].getAttribute('state'), display:job_chain_endnodes[i].getAttribute('state'), endnode:true} );
     }
     return new Array(states, end_states); 
 }
@@ -1787,7 +1803,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       popup_builder.add_entry   ( parent.getTranslation("Start order parametrized"), "callErrorChecked('start_order',0)", (suspended != "yes") );
       popup_builder.add_entry   ( parent.getTranslation("Add order")            , "callErrorChecked('add_order',false,0,'" + state + "','" + end_state + "')" );
       //popup_builder.add_entry   ( parent.getTranslation("Add persistent order") , "callErrorChecked('add_order',true,0,'" + state + "','" + end_state + "')" );
-      popup_builder.add_entry   ( parent.getTranslation("Set order state") , "callErrorChecked('set_order_state','" + state + "','" + end_state + "'," + (setback != null) + "," + hot + ")", (state != null) );
+      popup_builder.add_entry   ( parent.getTranslation("Set order state") , "callErrorChecked('set_order_state','" + state + "','" + end_state + "'," + (setback != null) + "," + (suspended == "yes") + "," + hot + ")", (state != null) );
       popup_builder.add_entry   ( parent.getTranslation("Set run time")    , "callErrorChecked('set_run_time','order'," + hot + ")" );
       popup_builder.add_command ( parent.getTranslation("Suspend order")   , "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' suspended='yes'/>", (suspended != "yes") );
       popup_builder.add_command ( parent.getTranslation("Resume order")    , "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' suspended='no'/>", (suspended == "yes") );
@@ -1918,19 +1934,37 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {
       popup_builder.add_entry ( parent.getTranslation("Show start times")  , "callErrorChecked('show_calendar','job_chain')", !big_chain );
     }
+    
     popup_builder.add_bar();
     popup_builder.add_entry ( parent.getTranslation("Add order")           , "callErrorChecked('add_order',false," + big_chain + ")" );
+    
+    /* if( !parent._hide.add_order ) { 
+    	popup_builder.add_bar();
+    	popup_builder.add_entry ( parent.getTranslation("Add order")           , "callErrorChecked('add_order',false," + big_chain + ")", true, parent._confirm.add_order ? 'Do you really want to add" an order?' : '' );
+    }*/
     //popup_builder.add_entry ( parent.getTranslation("Add persistent order"), "callErrorChecked('add_order',true," + big_chain + ")" );
     /*if( big_chain == 0) {
     	var tempOrders               = job_chain_element.selectNodes('//order[not(file_based/@file)]');
       popup_builder.add_entry ( parent.getTranslation("Delete orders")           , "callErrorChecked('delete_orders')", (tempOrders.length > 0) );
     }*/
     if( parent._scheduler.versionIsNewerThan( "2007-04-09 15:00:00" ) ) {
-      var state             = job_chain_element.getAttribute( "state" );
+    	var state             = job_chain_element.getAttribute( "state" );
       var command           = function( cmd ) { return "<job_chain.modify job_chain='"+parent.left_frame._job_chain+"' state='"+cmd+"'/>"; }
       popup_builder.add_bar();
       popup_builder.add_command ( parent.getTranslation("Stop")            , command('stopped'), state != 'stopped' );
       popup_builder.add_command ( parent.getTranslation("Unstop")          , command('running'), state == 'stopped' );
+      
+    	/*if(!parent._hide.stop_job_chain || !parent._hide.unstop_job_chain) {
+      	var state             = job_chain_element.getAttribute( "state" );
+      	var command           = function( cmd ) { return "<job_chain.modify job_chain='"+parent.left_frame._job_chain+"' state='"+cmd+"'/>"; }
+      	popup_builder.add_bar();
+      	if( !parent._hide.stop_job_chain ) {
+      		popup_builder.add_command ( parent.getTranslation("Stop")            , command('stopped'), state != 'stopped', parent._confirm.stop_job_chain ? 'Do you really want to stop the job chain?' : '');
+      	}
+      	if( !parent._hide.unstop_job_chain ) {
+      		popup_builder.add_command ( parent.getTranslation("Unstop")          , command('running'), state == 'stopped', parent._confirm.unstop_job_chain ? 'Do you really want to unstop the job chain?' : '');
+      	}
+      } */
     }
     //popup_builder.add_command ( parent.getTranslation("Delete job chain")  , "<remove_job_chain job_chain='" + parent.left_frame._job_chain + "'/>", orders==1, parent.getTranslation('Do you really want to delete this job chain?'), 'job_chain|'+parent.left_frame._job_chain );
     
