@@ -166,7 +166,12 @@ Scheduler.prototype.close = function()
 {
     this._logger           = null;
     
-    for( var window_name in this._dependend_windows )  this._dependend_windows[ window_name ].close();
+    for( var window_name in this._dependend_windows )  {
+    	try {
+    		this._dependend_windows[ window_name ].close();
+    	}
+    	catch(x) {}
+    }
     this._depended_windows = new Object();    
 }
 

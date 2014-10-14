@@ -732,7 +732,7 @@ function show_job_chain_details( path )
 
 function show_order_details( order_id, job_chain_name )
 {   
-    set_timeout('window.parent.details_frame.show_order_details( "'+order_id+'", "'+job_chain_name+'" );',1);
+    set_timeout('window.parent.details_frame.show_order_details( "'+order_id.replace(/\\/g,"\\\\")+'", "'+job_chain_name+'" );',1);
 }
 
 //-------------------------------------------------------------------------------toggle_tree_node
