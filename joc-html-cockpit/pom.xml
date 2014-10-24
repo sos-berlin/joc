@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     
     <parent>
-        <groupId>com.sos-berlin</groupId>
+        <groupId>com.sos-berlin.products</groupId>
         <artifactId>joc</artifactId>
         <version>1.7-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.sos-berlin.joc</groupId>
+    <groupId>com.sos-berlin.products.joc</groupId>
     <artifactId>joc-html-cockpit</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
