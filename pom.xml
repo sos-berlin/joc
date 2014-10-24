@@ -7,7 +7,7 @@
         <version>1.7-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.sos-berlin</groupId>
+    <groupId>com.sos-berlin.products</groupId>
     <artifactId>joc</artifactId>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
