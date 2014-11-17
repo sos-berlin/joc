@@ -600,8 +600,10 @@ Scheduler.prototype.readGuiVersion = function()
       this._gui_release_no = version[1].replace(/^\s+/,'').replace(/\s+$/,'');
       this._gui_subversion_no = version[0].replace(/[^-0-9:\. ]/g,'');
       var pattern = /([0-9\.]+)\s+(\d{4}-\d{2}-\d{2})*/;
-      pattern.exec(this._gui_subversion_no);
-      this._gui_subversion_no = RegExp.$1 + ' (' + RegExp.$2 + ')';
+      if( pattern.test(this._gui_subversion_no) ) {
+    	  pattern.exec(this._gui_subversion_no);
+    	  this._gui_subversion_no = RegExp.$1 + ' (' + RegExp.$2 + ')';
+      }
     }
     catch(x) {
     }
