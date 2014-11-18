@@ -14,6 +14,13 @@
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>A lightweight WEB GUI to control JobScheduler based on HTML / Javascript.</description>
+    
+    <properties>
+        <!-- see http://rterp.wordpress.com/2012/03/16/stamping-version-number-and-build-time-in-properties-file-with-maven/ for details -->
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+
+    </properties>
 
     <build>
         <resources>
@@ -24,6 +31,52 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+        <plugins>
+        <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                    		<id>get-svn-revision</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+				                <configuration>
+				                    <buildNumberPropertyName>svn.build.number</buildNumberPropertyName>
+				                    <doCheck>false</doCheck>
+				                    <doUpdate>false</doUpdate>
+				                </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/templates</directory>
+                                    <includes>
+                                        <include>.version</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            </plugins>
     </build>
 
 </project>
