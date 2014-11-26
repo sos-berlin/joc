@@ -129,23 +129,25 @@ function Popup_menu_builder()
 
 //---------------------------------------------------------------------Popup_menu_builder.add_entry
 
-Popup_menu_builder.prototype.add_entry = function( html_entry, call, is_active, is_submenu )
+Popup_menu_builder.prototype.add_entry = function( html_entry, call, is_active, is_hidden, is_submenu )
 {
     if( is_active  == undefined )  is_active  = true;
+    if( is_hidden  == undefined )  is_hidden  = false;
     if( is_submenu == undefined )  is_submenu = false;
     
-    var html =  "<tr>";
-    html += "<td style='";
-    html +=         "font-family: Tahoma, Sans-Serif; font-size: 11px; ";
-    html +=         "color: " + ( is_active? "menutext" : "gray" ) + ";";
-    html +=         "cursor: default; white-space: nowrap; ";
-    html +=         "background-color: menu; ";
-    html +=         "padding-left:10px; padding-right:10px; ";
-    //if( window.createPopup == undefined ) html +=         "line-height:12px; ";
-    html +=         "'";
+    if(!is_hidden) {
+    	var html =  "<tr>";
+    	html += "<td style='";
+    	html +=         "font-family: Tahoma, Sans-Serif; font-size: 11px; ";
+    	html +=         "color: " + ( is_active? "menutext" : "gray" ) + ";";
+    	html +=         "cursor: default; white-space: nowrap; ";
+    	html +=         "background-color: menu; ";
+    	html +=         "padding-left:10px; padding-right:10px; ";
+    	//if( window.createPopup == undefined ) html +=         "line-height:12px; ";
+    	html +=         "'";
 
-    if( call != undefined  &&  is_active )
-    {
+    	if( call != undefined  &&  is_active )
+    	{
         html +=   " onmouseover='this.style.backgroundColor=\"highlight\"; this.style.color=\"highlighttext\";'";
         html +=   " onmouseout='this.style.backgroundColor=\"menu\"; this.style.color=\"menutext\"'";
         html +=   " onclick=\"";
@@ -158,26 +160,27 @@ Popup_menu_builder.prototype.add_entry = function( html_entry, call, is_active, 
         }
         
         html +=    "\"";
-    }
+    	}
     
-    html +=  ">";
-    html +=  html_entry;
-    html += "</td>";
-    html += "</tr>";
-    this._html_array.push( html );
+    	html +=  ">";
+    	html +=  html_entry;
+    	html += "</td>";
+    	html += "</tr>";
+    	this._html_array.push( html );
     
-    if( window.createPopup == undefined ) {
-      var opt         = new Option( html_entry, call.replace( /&quot;/g, '"' ) );  
-      if( opt.innerHTML ) {   //im IE leer
-        opt.innerHTML = '&#160;&#160;' + opt.text;
-      } else {
-        opt.text      = '  '+ opt.text;
-      } 
+    	if( window.createPopup == undefined ) {
+      	var opt         = new Option( html_entry, call.replace( /&quot;/g, '"' ) );  
+      	if( opt.innerHTML ) {   //im IE leer
+        	opt.innerHTML = '&#160;&#160;' + opt.text;
+      	} else {
+        	opt.text      = '  '+ opt.text;
+      	} 
       
-      opt.setAttribute( 'class', 'selectbox_menu' );    
-      opt.disabled    = ( !is_active );
+      	opt.setAttribute( 'class', 'selectbox_menu' );    
+      	opt.disabled    = ( !is_active );
        
-      this._selectbox_array.push( opt );
+      	this._selectbox_array.push( opt );
+      }
     }
 } 
 

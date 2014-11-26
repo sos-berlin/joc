@@ -141,11 +141,77 @@ _display_last_activities_tab = false;
 
 
 /*****************************************************************
-*  You can add two items to the popup menu of the extras button:
-*  monitor and configuration. These functons are deprecated.
+*  You can hide some functions.
+*  'end_or_continue_or_suspend_tasks_of_api_job' and 
+*  'end_task_of_api_job' are true per default because these function
+*  have an effect only for API jobs with more then one prodes step.
 */
-_extra_items.monitor       = false;
-_extra_items.configuration = false;
+_hide.terminate_jobscheduler = false;
+_hide.pause_jobscheduler     = false;
+_hide.continue_jobscheduler  = false;
+_hide.restart_jobscheduler   = false;
+_hide.stop_job_chain         = false;
+_hide.unstop_job_chain       = false;
+_hide.stop_job_chain_node    = false;
+_hide.unstop_job_chain_node  = false;
+_hide.skip_job_chain_node    = false;
+_hide.unskip_job_chain_node  = false;
+_hide.start_job              = false;
+_hide.stop_job               = false;
+_hide.unstop_job             = false;
+_hide.set_job_run_time       = false;
+_hide.kill_running_task      = false;
+_hide.remove_enqueued_task   = false;
+_hide.end_or_continue_or_suspend_tasks_of_api_job = true;
+_hide.end_task_of_api_job    = true;
+_hide.start_order            = false;
+_hide.add_order              = false;
+_hide.reset_order            = false;
+_hide.set_order_state        = false;
+_hide.suspend_order          = false;
+_hide.resume_order           = false;
+_hide.remove_order           = false;
+_hide.remove_blacklist_order = false;
+_hide.remove_setback         = false;
+_hide.set_order_run_time     = false;
+_hide.add_schedule           = false;
+_hide.modify_schedule        = false;
+
+
+/*****************************************************************
+*  You can force a confirm for some functions before they are 
+*  executed 
+*/
+_confirm.terminate_jobscheduler = false;
+_confirm.pause_jobscheduler     = false;
+_confirm.continue_jobscheduler  = false;
+_confirm.restart_jobscheduler   = false;
+_confirm.stop_job_chain         = false;
+_confirm.unstop_job_chain       = false;
+_confirm.stop_job_chain_node    = false;
+_confirm.unstop_job_chain_node  = false;
+_confirm.skip_job_chain_node    = false;
+_confirm.unskip_job_chain_node  = false;
+_confirm.start_job              = false;
+_confirm.stop_job               = false;
+_confirm.unstop_job             = false;
+_confirm.set_job_run_time       = false;
+_confirm.kill_running_task      = false;
+_confirm.remove_enqueued_task   = true;
+_confirm.end_or_continue_or_suspend_tasks_of_api_job = false;
+_confirm.end_task_of_api_job    = false;
+_confirm.start_order            = false;
+_confirm.add_order              = false;
+_confirm.reset_order            = false;
+_confirm.set_order_state        = false;
+_confirm.suspend_order          = false;
+_confirm.resume_order           = false;
+_confirm.remove_order           = true;
+_confirm.remove_blacklist_order = false;
+_confirm.remove_setback         = false;
+_confirm.set_order_run_time     = false;
+_confirm.add_schedule           = false;
+_confirm.modify_schedule        = false;
 
 
 /*****************************************************************

@@ -385,6 +385,7 @@ function modify_response( response )
         spooler_element.setAttribute( "my_ie_version"       , parseInt(parent._scheduler._ie,10) );
         spooler_element.setAttribute( "my_chrome_version"   , parseInt(parent._scheduler._chrome,10) );
         spooler_element.setAttribute( "my_max_order_history", parent._scheduler._runtime_settings.max_order_history );
+        spooler_element.setAttribute( "my_remove_enqueued_task", (parent._hide.remove_enqueued_task) ? 1:0 );
     }  
     
     parent._scheduler.logger(3,'ELAPSED TIME FOR MODIFY RESPONSE','modify_response');

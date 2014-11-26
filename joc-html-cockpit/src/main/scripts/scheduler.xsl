@@ -2866,16 +2866,18 @@
             <td>
                 <xsl:value-of select="@backup_precedence"/>
             </td>
-
+            
             <td class="cluster" style="text-align:right;padding:0px 2px;">
                 <!--xsl:if test="@cluster_member_id != ancestor::cluster/@cluster_member_id"-->
+                <xsl:if test="/spooler/@my_cluster_menu &gt; 0">
                 <xsl:call-template name="command_menu">
                     <xsl:with-param name="style"              select="'width:120px;'"/>
                     <xsl:with-param name="title"              select="'Cluster member menu'"/>
                     <xsl:with-param name="onclick_call"       select="'cluster_member__onclick'"/>
                     <xsl:with-param name="onclick_param1_str" select="@cluster_member_id"/>
                 </xsl:call-template>
-                <!--/xsl:if-->
+                </xsl:if>
+                <xsl:if test="/spooler/@my_cluster_menu = 0">&#160;</xsl:if>
             </td>
         </tr>
 
@@ -3859,9 +3861,12 @@
             </thead>
             <tbody>
                 <xsl:for-each select="queued_task">
-                    <tr title="Delete">
+                    <tr>
+                    	<xsl:if test="/spooler/@my_remove_enqueued_task &gt; 0" >
+                        <xsl:attribute name="title">Delete</xsl:attribute>
                         <xsl:attribute name="onclick">kill_task_immediately( '<xsl:value-of select="@task"/>' )</xsl:attribute>
                         <xsl:attribute name="oncontextmenu">queued_task_menu__onclick( '<xsl:value-of select="@task"/>' );return false;</xsl:attribute>
+                      </xsl:if>
           							<xsl:attribute name="class">list</xsl:attribute>
                         <td>
                             <xsl:value-of select="@task"/>

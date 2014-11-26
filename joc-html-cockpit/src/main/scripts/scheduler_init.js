@@ -70,7 +70,42 @@ var _stdout_begin               = "";
 var _stdout_end                 = "";
 var _stderr_begin               = "";
 var _stderr_end                 = "";
-var _display_last_activities_tab = false; 
+var _display_last_activities_tab = false;
+var _hide                       = {
+	'stop_job_chain':false, 'unstop_job_chain':false, 
+	'stop_job_chain_node':false, 'unstop_job_chain_node':false,
+  'skip_job_chain_node':false, 'unskip_job_chain_node':false, 
+  'stop_job':false, 'unstop_job':false, 'start_job':false, 
+  'start_order':true, 'add_order':false, 'reset_order':true, 
+  'set_order_state':false, 'suspend_order':false, 
+  'resume_order':false, 'remove_order':false,
+  'remove_blacklist_order':false, 'remove_setback':false, 
+  'kill_running_task':true, 'remove_enqueued_task':false,
+  'set_job_run_time':false, 'set_order_run_time':false,
+  'end_or_continue_or_suspend_tasks_of_api_job':true, 
+  'end_task_of_api_job':true, 'terminate_jobscheduler':false,
+  'pause_jobscheduler':false, 'continue_jobscheduler':false,
+  'restart_jobscheduler':false, 'add_schedule':false,
+  'modify_schedule':false
+}
+var _confirm                    = {
+  'stop_job_chain':false, 'unstop_job_chain':false, 
+  'stop_job_chain_node':false, 'unstop_job_chain_node':false, 
+  'skip_job_chain_node':false, 'unskip_job_chain_node':false, 
+  'stop_job':true, 'unstop_job':false, 'start_job':true, 
+  'start_order':false, 'add_order':false, 'reset_order':false, 
+  'set_order_state':false, 'suspend_order':false, 
+  'resume_order':false, 'remove_order':true, 
+  'remove_blacklist_order':true, 'remove_setback':false, 
+  'kill_running_task':false, 'remove_enqueued_task':true,
+  'end_or_continue_or_suspend_tasks_of_api_job':false, 
+  'end_task_of_api_job':false, 'terminate_jobscheduler':false,
+  'pause_jobscheduler':false, 'continue_jobscheduler':false,
+  'restart_jobscheduler':false, 'add_schedule':false,
+  'modify_schedule':false
+}
+
+ 
 
 
 

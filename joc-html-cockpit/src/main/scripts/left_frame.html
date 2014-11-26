@@ -622,6 +622,8 @@ function modify_response( response )
       
       spooler_element.setAttribute( "my_update_seconds"   , parent._scheduler._update_seconds );
       spooler_element.setAttribute( "host"                , window.location.host              );
+      
+      spooler_element.setAttribute( "my_cluster_menu"     , (parent._hide.terminate_jobscheduler && parent._hide.restart_jobscheduler) ? 0:1 );
       if( parent._scheduler._update_periodically ) spooler_element.setAttribute( "update_periodically_checkbox", "yes" );
       if( window.createPopup != undefined        ) spooler_element.setAttribute( "my_popup_menu"               , "1" );
     }
