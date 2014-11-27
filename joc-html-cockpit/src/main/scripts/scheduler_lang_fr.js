@@ -47,8 +47,8 @@ _translations['Terminate']                                 = 'Arrêter';
 _translations['Terminate within ~$secs']                   = 'Arrêter dans $secs';
 _translations['Terminate and restart']                     = 'Arrêter et redémarrer';
 _translations['Terminate and restart within ~$secs']       = 'Arrêter et redémarrer dans $secs';
-_translations['Abort immediately']                         = 'Arrêter immédiatement';
-_translations['Abort immediately and restart']             = 'Arrêter immédiatement et redémarrer';
+_translations['Abort immediately']                         = 'Avorter immédiatement';
+_translations['Abort immediately and restart']             = 'Avorter immédiatement et redémarrer';
 _translations['Terminate cluster']                         = 'Arrêter le cluster';
 _translations['Terminate cluster within ~$secs']           = 'Arrêter le cluster dans $secs';
 _translations['Terminate and restart cluster']             = 'Arrêter le cluster et redémarrer le cluster';
@@ -241,14 +241,12 @@ _translations['End tasks']                                 = 'Terminer instances
 _translations['Suspend tasks']                             = 'Suspendre instances';
 _translations['Continue tasks']                            = 'Continuer instances';
 _translations['Delete job']                                = 'Supprimer tâche';
-_translations['Do you really want to delete this job?']    = 'Voules-vous vraiment supprimer cette instance?';
                                                            
                                                            
 //Menu content of task menu                                
 _translations['Task menu']                                 = 'Menu Instance';
 _translations['End']                                       = 'Terminer';
 _translations['Kill immediately']                          = 'Tuer immédiatement';
-_translations['Do you really want to delete this task?']    = 'Voules-vous vraiment supprimer cette instance?';
                                                            
                                                            
 //Mouseover-Title                                          
@@ -354,7 +352,6 @@ _translations['Skip node']                                 = 'Skip le noeud';
 _translations['Stop node']                                 = 'Désactiver le noeud';
 _translations['Stop job']                                  = 'Désactiver la tâche';
 _translations['Unstop job']                                = 'Activer la tâche';
-_translations['Do you really want to delete this job chain?']  = 'Voulez-vous vraiment supprimer cette chaîne des tâches?';
 
 //Mouseover-Title
 _translations['show job chain details']                    = 'Voir les détails de la chaîne des tâches';
@@ -408,7 +405,6 @@ _translations['Resume order']                              = 'Reprendre l\'ordre
 _translations['Reset order']                               = 'Réinitialiser l\'ordre';
 _translations['Delete order']                              = 'Supprimer l\'ordre';
 _translations['Remove setback']                            = 'Supprimer le report';
-_translations['Do you really want to delete this order?']  = 'Voulez-vous vraiment supprimer cet ordre?';
 
 //misc
 _translations['No orders found']                           = 'Aucun ordre trouvé';
@@ -561,7 +557,6 @@ _translations['Substitute menu']                           = 'Menu Substituts';
 _translations['Add substitute']                            = 'Ajouter un substitut';
 _translations['Edit schedule']                             = 'Editer la programmation';
 _translations['Delete schedule']                           = 'Supprimer la programmation';
-_translations['Do you really want to delete this scheduler?']  = 'Voulez-vous vraiment supprimer cette programmation?';
 
 //Table header of job chains list                          
 _translations['Schedule']                                  = 'Programmation';
@@ -788,3 +783,51 @@ _translations['The JobScheduler $scheduler has no jobs with a description.']    
 _translations['Because of a security sanction of your browser you must reload this site!'] = 'Because of a security sanction of your browser you must reload this site!';
 _translations['Please select a job to display its description.']                           = 'Please select a job to display its description.';
 _translations['Please enter a job name to display its description.']                       = 'Please enter a job name to display its description.';
+
+
+/******************************************************************************
+*                           CONFIRMS                                          *
+******************************************************************************/
+
+_translations['Do you really want to terminate the JobScheduler?']          = 'Voules-vous vraiment arrêter le JobScheduler?';
+_translations['Do you really want to restart the JobScheduler?']            = 'Voules-vous vraiment redémarrer le JobScheduler?';
+_translations['Do you really want to abort the JobScheduler?']              = 'Voules-vous vraiment avorter le JobScheduler?';
+_translations['Do you really want to pause the JobScheduler?']              = 'Voules-vous vraiment mettre en pause?';
+_translations['Do you really want to continue the JobScheduler?']           = 'Voules-vous vraiment continuer le JobScheduler?';
+_translations['Do you really want to terminate the JobScheduler cluster?']  = 'Voules-vous vraiment arrêter le JobScheduler cluster?';
+_translations['Do you really want to restart the JobScheduler cluster?']    = 'Voules-vous vraiment redémarrer le JobScheduler cluster?';
+_translations['Do you really want to delete the dead entry?']               = 'Voules-vous vraiment supprimer la entrée morts?';
+
+_translations['Do you really want to stop this job chain?']                 = 'Voulez-vous vraiment désactiver cette chaîne des tâches?';
+_translations['Do you really want to unstop this job chain?']               = 'Voulez-vous vraiment activer cette chaîne des tâches?';
+_translations['Do you really want to delete this job chain?']               = 'Voulez-vous vraiment supprimer cette chaîne des tâches?';
+_translations['Do you really want to stop this job chain node?']            = 'Voulez-vous vraiment désactiver cette chaîne des tâches?';
+_translations['Do you really want to unstop this job chain node?']          = 'Voulez-vous vraiment activer cette chaîne des tâches?';
+_translations['Do you really want to skip this job chain node?']            = 'Voulez-vous vraiment sauter cette noeud de chaîne des tâches?';
+_translations['Do you really want to unskip this job chain node?']          = 'Voulez-vous vraiment annuler la saute cette noeud de chaîne des tâches?';
+
+_translations['Do you really want to start this job?']                      = 'Voules-vous vraiment lancer cette tâche?';
+_translations['Do you really want to stop this job?']                       = 'Voules-vous vraiment désactiver cette tâche?';
+_translations['Do you really want to unstop this job?']                     = 'Voules-vous vraiment activer cette tâche?';
+_translations['Do you really want to delete this job?']                     = 'Voules-vous vraiment supprimer cette tâche?';
+_translations['Do you really want to kill this task?']                      = 'Voules-vous vraiment tuer cette instance?';
+_translations['Do you really want to delete this task?']                    = 'Voules-vous vraiment supprimer cette instance?';
+_translations['Do you really want to end this task?']                       = 'Voules-vous vraiment terminer cette instance?';
+_translations['Do you really want to end the tasks?']                       = 'Voules-vous vraiment terminer instances?';
+_translations['Do you really want to suspend the tasks?']                   = 'Voules-vous vraiment suspendre instances?';
+_translations['Do you really want to continue the tasks?']                  = 'Voules-vous vraiment continuer instances?';
+
+_translations['Do you really want to start this order?']                    = 'Voules-vous vraiment lancer cet ordre?';
+_translations['Do you really want to add an order?']                        = 'Voules-vous vraiment ajouter un ordre?';
+_translations['Do you really want to reset this order?']                    = 'Voules-vous vraiment lancer cet ordre?';
+_translations['Do you really want to suspend this order?']                  = 'Voules-vous vraiment suspendre cet ordre?';
+_translations['Do you really want to resume this order?']                   = 'Voules-vous vraiment reprendre cet ordre?';
+_translations['Do you really want to change the order state?']              = 'Voulez-vous vraiment modifier l\'etat de l\'ordre?';
+_translations['Do you really want to delete this order?']                   = 'Voulez-vous vraiment supprimer cet ordre?';
+_translations['Do you really want to remove the setback?']                  = 'Voulez-vous vraiment supprimer le report?';
+
+_translations['Do you really want to set the run time?']                    = 'Voulez-vous vraiment modifier la date de démarrage?';
+_translations['Do you really want to add a substituting schedule?']         = 'Voulez-vous vraiment ajouter un substitut?';
+_translations['Do you really want to modify this schedule?']                = 'Voulez-vous vraiment modifier cette programmation?';
+_translations['Do you really want to delete this schedule?']                = 'Voulez-vous vraiment supprimer cette programmation?';
+

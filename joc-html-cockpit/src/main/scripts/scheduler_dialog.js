@@ -1585,7 +1585,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     if( menu_caller == 'blacklist' ) {
       popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "job_chain=" + encodeComponent(job_chain) +
                                                    "&order=" + encodeComponent(order_id), "show_log_order_" + job_chain.replace(/\//g,'_') + "__" + order_id );
-      popup_builder.add_command ( parent.getTranslation("Delete order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, parent._hide.remove_blacklist_order, parent._confirm.remove_blacklist_order, parent.getTranslation('Do you really want to delete this order?'), 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
+      popup_builder.add_command ( parent.getTranslation("Delete order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, parent._hide.remove_blacklist_order, parent._confirm.remove_blacklist_order, 'delete this order', 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
     } else {
       popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "job_chain=" + encodeComponent(job_chain) +
                                                    "&order=" + encodeComponent(order_id), "show_log_order_" + job_chain.replace(/\//g,'_') + "__" + order_id );

@@ -241,14 +241,12 @@ _translations['End tasks']                                 = 'Tasks законч
 _translations['Suspend tasks']                             = 'Tasks приостановить';
 _translations['Continue tasks']                            = 'Tasks продолжить';
 _translations['Delete job']                                = 'Job удалить';
-_translations['Do you really want to delete this job?']    = 'Вы действительно хотите удалить этот Job?';
                                                            
                                                            
 //Menu content of task menu                                
 _translations['Task menu']                                 = 'Task-Меню';
 _translations['End']                                       = 'Закончить работу';
 _translations['Kill immediately']                          = 'Прекратить работу немедленно';
-_translations['Do you really want to delete this task?']   = 'Вы действительно хотите удалить этот Task?';
                                                            
                                                            
 //Mouseover-Title                                          
@@ -354,9 +352,8 @@ _translations['Skip']                                      = 'Перепрыгн
 _translations['Unskip']                                    = 'Добавить';
 _translations['Skip node']                                 = 'Узел перепрыгнуть';
 _translations['Stop node']                                 = 'Узел остановить';
-_translations['Stop job']                                  = 'Узел продолжить';
+_translations['Stop job']                                  = 'Job остановить';
 _translations['Unstop job']                                = 'Job продолжить';
-_translations['Do you really want to delete this job chain?']  = 'Вы действительно хотите удалить эту Job-Цепочку?';
 
 //Mouseover-Title
 _translations['show job chain details']                    = 'показать Job-Цепочка-Детали';
@@ -407,10 +404,9 @@ _translations['Start order parametrized']                  = 'Стартоват
 _translations['Set order state']                           = 'Установить статус';
 _translations['Suspend order']                             = 'Ордер приостановить';
 _translations['Resume order']                              = 'Ордер продолжить';
-_translations['Reset order']                               = 'Ордер возвратить';
+_translations['Reset order']                               = 'Ордер сбросить';
 _translations['Delete order']                              = 'Ордер удалить';
 _translations['Remove setback']                            = 'Задержку удалить';
-_translations['Do you really want to delete this order?']  = 'Вы действительно хотите удалить этот Ордер?';
 
 //misc
 _translations['No orders found']                           = 'Ордера не найдены';
@@ -563,7 +559,6 @@ _translations['Substitute menu']                           = 'Субститут
 _translations['Add substitute']                            = 'Субститут добавить';
 _translations['Edit schedule']                             = 'Schedule редактировать';
 _translations['Delete schedule']                           = 'Schedule удалить';
-_translations['Do you really want to delete this scheduler?']  = 'Вы действительно хотите удалить этот Schedule?';
 
 //Table header of job chains list                          
 _translations['Schedule']                                  = 'Schedule';
@@ -789,4 +784,49 @@ _translations['Because of a security sanction of your browser you must reload th
 _translations['Please select a job to display its description.']                           = 'Выберети пожалуйста Joб для показа его описания.';
 _translations['Please enter a job name to display its description.']                       = 'Для показа описания задайте пожалуйста Job-Имя.';
 
-                           
+
+/******************************************************************************
+*                           CONFIRMS                                          *
+******************************************************************************/
+
+_translations['Do you really want to terminate the JobScheduler?']          = 'Вы действительно хотите завершить работу JobScheduler?';
+_translations['Do you really want to restart the JobScheduler?']            = 'Вы действительно хотите перезагрузить работу JobScheduler?';
+_translations['Do you really want to abort the JobScheduler?']              = 'Вы действительно хотите прервать работу JobScheduler?';
+_translations['Do you really want to pause the JobScheduler?']              = 'Вы действительно хотите приостановить работу JobScheduler?';
+_translations['Do you really want to continue the JobScheduler?']           = 'Вы действительно хотите продолжить работу JobScheduler?';
+_translations['Do you really want to terminate the JobScheduler cluster?']  = 'Вы действительно хотите завершить работу JobScheduler кластер?';
+_translations['Do you really want to restart the JobScheduler cluster?']    = 'Вы действительно хотите перезагрузить работу JobScheduler кластер?';
+_translations['Do you really want to delete the dead entry?']               = 'Вы действительно хотите удалить мёртвую запись?';
+
+_translations['Do you really want to stop this job chain?']                 = 'Вы действительно хотите остановить эту Job-Цепочку?';
+_translations['Do you really want to unstop this job chain?']               = 'Вы действительно хотите остановить эту Job-Цепочку?';
+_translations['Do you really want to delete this job chain?']               = 'Вы действительно хотите продолжить работу этой Job-Цепочки?';
+_translations['Do you really want to stop this job chain node?']            = 'Вы действительно хотите остановить этот узел в Job-Цепочке?';
+_translations['Do you really want to unstop this job chain node?']          = 'Вы действительно хотите продолжить работу этого узла в Job-Цепочке?';
+_translations['Do you really want to skip this job chain node?']            = 'Вы действительно хотите перепрыгнуть этот узел в Job-Цепочке?';
+_translations['Do you really want to unskip this job chain node?']          = 'Вы действительно хотите добавить снова этот узел в Job-Цепочку?';
+
+_translations['Do you really want to start this job?']                      = 'Вы действительно хотите стартовать этот Job?';
+_translations['Do you really want to stop this job?']                       = 'Вы действительно хотите остановить этот Job?';
+_translations['Do you really want to unstop this job?']                     = 'Вы действительно хотите продолжить работу этого Job?';
+_translations['Do you really want to delete this job?']                     = 'Вы действительно хотите удалить этот Job?';
+_translations['Do you really want to kill this task?']                      = 'Вы действительно хотите прервать и удалить этот Task?';
+_translations['Do you really want to delete this task?']                    = 'Вы действительно хотите удалить этот Task?';
+_translations['Do you really want to end this task?']                       = 'Вы действительно хотите завершить работу этого Task?';
+_translations['Do you really want to end the tasks?']                       = 'Вы действительно хотите завершить работу этих Tasks?';
+_translations['Do you really want to suspend the tasks?']                   = 'Вы действительно хотите приостановить работу этих Tasks?';
+_translations['Do you really want to continue the tasks?']                  = 'Вы действительно хотите продолжить работу этих Tasks?';
+
+_translations['Do you really want to start this order?']                    = 'Вы действительно хотите стартовать этот Ордер?';
+_translations['Do you really want to add an order?']                        = 'Вы действительно хотите добавить Ордер?';
+_translations['Do you really want to reset this order?']                    = 'Вы действительно хотите сбросить этот Ордер?';
+_translations['Do you really want to suspend this order?']                  = 'Вы действительно хотите приостановить этот Ордер?';
+_translations['Do you really want to resume this order?']                   = 'Вы действительно хотите резюмировать этот Ордер?';
+_translations['Do you really want to change the order state?']              = 'Вы действительно хотите поменять статус этого Ордера?';
+_translations['Do you really want to delete this order?']                   = 'Вы действительно хотите удалить этот Ордер?';
+_translations['Do you really want to remove the setback?']                  = 'Вы действительно хотите удалить эту Задержку?';
+
+_translations['Do you really want to set the run time?']                    = 'Вы действительно хотите изменить время старта?';
+_translations['Do you really want to add a substituting schedule?']         = 'Вы действительно хотите добавить субституированный Schedule?';
+_translations['Do you really want to modify this schedule?']                = 'Вы действительно хотите изменить этот Schedule?';
+_translations['Do you really want to delete this schedule?']                = 'Вы действительно хотите удалить этот Schedule?';

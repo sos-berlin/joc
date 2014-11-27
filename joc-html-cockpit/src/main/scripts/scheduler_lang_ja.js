@@ -240,14 +240,12 @@ _translations['End tasks']                                 = 'タスク終了';
 _translations['Suspend tasks']                             = 'タスク保留';
 _translations['Continue tasks']                            = 'タスク再開';
 _translations['Delete job']                                = 'ジョブ削除';
-_translations['Do you really want to delete this job?']    = '本当にジョブ削除しますか';
                                                            
                                                            
 //Menu content of task menu                                
 _translations['Task menu']                                 = 'タスクメニュー';
 _translations['End']                                       = 'タスク終了';
 _translations['Kill immediately']                          = 'タスク強制終了';
-_translations['Do you really want to delete this task?']    = '本当にジョブ削除しますか';
                                                            
                                                            
 //Mouseover-Title                                          
@@ -354,7 +352,6 @@ _translations['Stop node']                                 = 'ノード停止';
 _translations['Stop job']                                  = 'ジョブ停止';
 _translations['Unstop job']                                = 'ジョブ再開';
 _translations['Unskip']                                    = 'スキップしない';
-_translations['Do you really want to delete this job chain?']  = '本当にジョブチェーン削除しますか?';
 
 //Mouseover-Title
 _translations['show job chain details']                    = 'ジョブチェーン詳細表示';
@@ -408,7 +405,6 @@ _translations['Resume order']                              = 'オーダー再開
 _translations['Reset order']                               = 'オーダー初期化';
 _translations['Delete order']                              = 'オーダー削除';
 _translations['Remove setback']                            = '再試行設定削除';
-_translations['Do you really want to delete this order?']  = '本当にオーダー削除しますか?';
 
 //misc
 _translations['No orders found']                           = 'オーダーはありません';
@@ -561,7 +557,6 @@ _translations['Substitute menu']                           = '置換スケジュ
 _translations['Add substitute']                            = '置換スケジュール作成';
 _translations['Edit schedule']                             = 'スケジュール編集';
 _translations['Delete schedule']                           = 'スケジュール作成';
-_translations['Do you really want to delete this scheduler?']  = '本当にスケジュール削除しますか?';
 
 //Table header of job chains list                          
 _translations['Schedule']                                  = 'スケジュール';
@@ -792,3 +787,48 @@ _translations['Please select a job to display its description.']                
 _translations['Please enter a job name to display its description.']                       = '説明を表示するジョブ名を入力してください';
 
                            
+/******************************************************************************
+*                           CONFIRMS                                          *
+******************************************************************************/
+
+_translations['Do you really want to terminate the JobScheduler?']          = 'Do you really want to terminate the JobScheduler?';
+_translations['Do you really want to restart the JobScheduler?']            = 'Do you really want to restart the JobScheduler?';
+_translations['Do you really want to abort the JobScheduler?']              = 'Do you really want to abort the JobScheduler?';
+_translations['Do you really want to pause the JobScheduler?']              = 'Do you really want to pause the JobScheduler?';
+_translations['Do you really want to continue the JobScheduler?']           = 'Do you really want to continue the JobScheduler?';
+_translations['Do you really want to terminate the JobScheduler cluster?']  = 'Do you really want to terminate the JobScheduler cluster?';
+_translations['Do you really want to restart the JobScheduler cluster?']    = 'Do you really want to restart the JobScheduler cluster?';
+_translations['Do you really want to delete the dead entry?']               = 'Do you really want to delete the dead entry?';
+
+_translations['Do you really want to stop this job chain?']                 = 'Do you really want to stop this job chain?';
+_translations['Do you really want to unstop this job chain?']               = 'Do you really want to unstop this job chain?';
+_translations['Do you really want to delete this job chain?']               = '本当にジョブチェーン削除しますか?';
+_translations['Do you really want to stop this job chain node?']            = 'Do you really want to stop this job chain node?';
+_translations['Do you really want to unstop this job chain node?']          = 'Do you really want to unstop this job chain node?';
+_translations['Do you really want to skip this job chain node?']            = 'Do you really want to skip this job chain node?';
+_translations['Do you really want to unskip this job chain node?']          = 'Do you really want to unskip this job chain node?';
+
+_translations['Do you really want to start this job?']                      = 'Do you really want to start this job?';
+_translations['Do you really want to stop this job?']                       = 'Do you really want to stop this job?';
+_translations['Do you really want to unstop this job?']                     = 'Do you really want to unstop this job?';
+_translations['Do you really want to delete this job?']                     = '本当にジョブ削除しますか';
+_translations['Do you really want to kill this task?']                      = 'Do you really want to kill this task?';
+_translations['Do you really want to delete this task?']                    = '本当にジョブ削除しますか';
+_translations['Do you really want to end this task?']                       = 'Do you really want to end this task?';
+_translations['Do you really want to end the tasks?']                       = 'Do you really want to end the tasks?';
+_translations['Do you really want to suspend the tasks?']                   = 'Do you really want to suspend the tasks?';
+_translations['Do you really want to continue the tasks?']                  = 'Do you really want to continue the tasks?';
+
+_translations['Do you really want to start this order?']                    = 'Do you really want to start this order?';
+_translations['Do you really want to add an order?']                        = 'Do you really want to add an order?';
+_translations['Do you really want to reset this order?']                    = 'Do you really want to reset this order?';
+_translations['Do you really want to suspend this order?']                  = 'Do you really want to suspend this order?';
+_translations['Do you really want to resume this order?']                   = 'Do you really want to resume this order?';
+_translations['Do you really want to change the order state?']              = 'Do you really want to change the order state?';
+_translations['Do you really want to delete this order?']                   = '本当にオーダー削除しますか?';
+_translations['Do you really want to remove the setback?']                  = 'Do you really want to remove the setback?';
+
+_translations['Do you really want to set the run time?']                    = 'Do you really want to set the run time?';
+_translations['Do you really want to add a substituting schedule?']         = 'Do you really want to add a substituting schedule?';
+_translations['Do you really want to modify this schedule?']                = 'Do you really want to modify this schedule?';
+_translations['Do you really want to delete this schedule?']                = '本当にスケジュール削除しますか?';

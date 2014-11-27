@@ -144,7 +144,8 @@ _display_last_activities_tab = false;
 *  You can hide some functions.
 *  'end_or_continue_or_suspend_tasks_of_api_job' and 
 *  'end_task_of_api_job' are true per default because these function
-*  have an effect only for API jobs with more then one prodes step.
+*  have only an effect for API jobs with more then one process steps.
+*  Normally you do not have such jobs.
 */
 _hide.terminate_jobscheduler = false;
 _hide.pause_jobscheduler     = false;
@@ -180,7 +181,7 @@ _hide.modify_schedule        = false;
 
 /*****************************************************************
 *  You can force a confirm for some functions before they are 
-*  executed 
+*  executed. 
 */
 _confirm.terminate_jobscheduler = false;
 _confirm.pause_jobscheduler     = false;

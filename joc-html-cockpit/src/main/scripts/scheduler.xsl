@@ -3862,7 +3862,7 @@
             <tbody>
                 <xsl:for-each select="queued_task">
                     <tr>
-                    	<xsl:if test="/spooler/@my_remove_enqueued_task &gt; 0" >
+                    	<xsl:if test="/spooler/@my_remove_enqueued_task = 0" >
                         <xsl:attribute name="title">Delete</xsl:attribute>
                         <xsl:attribute name="onclick">kill_task_immediately( '<xsl:value-of select="@task"/>' )</xsl:attribute>
                         <xsl:attribute name="oncontextmenu">queued_task_menu__onclick( '<xsl:value-of select="@task"/>' );return false;</xsl:attribute>
