@@ -78,9 +78,44 @@ function do_onload()
     if( parent._response.selectNodes("/spooler/answer/state/cluster[@backup='yes']").length > 0 ) {
       document.getElementById('backup').innerHTML = parent.getTranslation('THIS IS A BACKUP...').replace(/ /g,'&#160;');
     }
+    setTimezones(parent._response.selectSingleNode('/spooler/answer/state/@time_zone'));
     set_state(parent._response);
     
     parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');   
+}
+
+
+//----------------------------------------------------------------------------------------setTimezones
+function setTimezones(jobSchedulerTimeZoneAttribute) 
+{ 
+	  var timezones = document.getElementById('timezones');
+	  timezones.options[0] = new Option( parent.getTranslation('local') + ' (' + parent._scheduler.showOffsetOfLocalTime()+ ')', 'local' );
+	  var optIndex = 1;
+	  if ( jobSchedulerTimeZoneAttribute != null && parent._scheduler.checkTimezone(jobSchedulerTimeZoneAttribute.nodeValue)) {
+	  	timezones.options[1] = new Option( 'JobScheduler (' + jobSchedulerTimeZoneAttribute.nodeValue + ')', jobSchedulerTimeZoneAttribute.nodeValue );
+	  	optIndex++;
+	  } 
+	  var unsupportedTimezones = '';
+	  for(var key in parent._timezones ) {
+	  	if ( parent._scheduler.checkTimezone(parent._timezones[key])) { 
+	  		timezones.options[optIndex] = new Option( key, parent._timezones[key] );
+	  		optIndex++;
+	  	}
+	  	else {
+	  		unsupportedTimezones += key +'='+ parent._timezones[key] + "\n";
+	  	}
+    }
+    if(unsupportedTimezones.length > 0) {
+    	alert( "You have configured unsupported timezones: \n" + unsupportedTimezones );
+    }
+}
+
+
+//----------------------------------------------------------------------------------------setTimezone
+function setTimezone(timezone)
+{
+	parent._scheduler._timezone = timezone;
+	if( typeof parent.left_frame.update == 'function' ) window.setTimeout("parent.left_frame.update()",5);	
 }
 
 
@@ -176,8 +211,8 @@ function set_state(response)
     document.getElementById('spooler_id').innerHTML           = (state.getAttribute('id') || parent.getTranslation('unknown'));
     document.getElementById('spooler_state').innerHTML        = (parent.getTranslation(state.getAttribute('state')) || parent.getTranslation('unknown'));
     document.getElementById('spooler_pid').innerHTML          = (state.getAttribute('pid') || parent.getTranslation('unknown'));
-    document.getElementById('spooler_time').innerHTML         = (parent._scheduler.UTCtoLocal(state.getAttribute('time')) || '0000-00-00 00:00:00');
-    document.getElementById('spooler_start_time').innerHTML   = (parent._scheduler.UTCtoLocal(state.getAttribute('spooler_running_since')) || '0000-00-00 00:00:00');
+    document.getElementById('spooler_time').innerHTML         = (parent._scheduler.UTCtoTimezone(state.getAttribute('time')) || '0000-00-00 00:00:00');
+    document.getElementById('spooler_start_time').innerHTML   = (parent._scheduler.UTCtoTimezone(state.getAttribute('spooler_running_since')) || '0000-00-00 00:00:00');
     
     var jobs_orders_inner                                     = cnt_all_orders + "&#160;" + parent.getTranslation('orders');
     if( cnt_clustered_orders > 0 ) jobs_orders_inner         += "&#160;("+parent.getTranslation('$cnt in cluster',{cnt:cnt_clustered_orders})+")";
@@ -371,40 +406,58 @@ window.onerror  = function( msg, url, line ) {
                    
       <table cellpadding="0" cellspacing="0" width="100%" border="0" class="top">
           <colgroup>
-            <col width="20"/>
-            <col width="30"/>
-            <col width="150"/>
-            <col width="*"/>
-            <col width="20"/>
-            <col width="150"/>
-            <col width="30"/>
+            <col width="43%"/>
+            <col width="14%"/>
+            <col width="43%"/>
           </colgroup>
           <thead>
           <tr>
-              <td align="left" style="padding-top:2px;">
-                <script language="javascript" type="text/javascript">
-                  write_menu(parent.getTranslation('Menu'), 'menu', 'left'); 
-                </script>
-              </td>
-              <td align="right" width="20" style="padding-top:2px;padding-right:2px;">
-                <script language="javascript" type="text/javascript">
-                  write_menu(parent.getTranslation('Help') + ' |  ' + parent.getTranslation('Extras'), 'extras', 'left'); 
-                </script>  
-              </td>
-              <td align="left" style="white-space:nowrap">&#160;<span id="backup"></span></td>
-              <td align="center">
-                <span style="white-space:nowrap;">
-                  <a href="javascript:parent.left_frame.showInfo();" style="text-decoration:none;">
-                     <img src="job_scheduler_rabbit_colour.gif" border="0" style="margin-top:2px;"/>
-                     <img src="job_scheduler_typo_colour.gif" border="0"/>
-                  </a>
-                </span>
-              </td>
-              <td>&#160;</td>
-              <td align="right">
-              <table cellspacing="0" cellpadding="0" border="0" align="center">
-                <thead>
-                  <tr> 
+          	<td>
+          		<table cellpadding="0" cellspacing="0" width="100%" border="0">
+          			<colgroup>
+            			<col width="20"/>
+            			<col width="20"/>
+            			<col width="*"/>
+          			</colgroup>
+          			<thead>
+          				<tr>
+             				<td align="left" style="padding-top:2px;">
+               				<script language="javascript" type="text/javascript">
+                 				write_menu(parent.getTranslation('Menu'), 'menu', 'left'); 
+               				</script>
+             				</td>
+             				<td align="right" style="padding-top:2px;padding-right:2px;">
+               				<script language="javascript" type="text/javascript">
+                 				write_menu(parent.getTranslation('Help') + ' |  ' + parent.getTranslation('Extras'), 'extras', 'left'); 
+               				</script>  
+             				</td>
+             				<td align="left" style="white-space:nowrap">&#160;<span id="backup"></span></td>
+            			</tr>
+            		</head>
+            	</table>
+            </td>
+            <td align="center">
+              <span style="white-space:nowrap;">
+                <a href="javascript:parent.left_frame.showInfo();" style="text-decoration:none;">
+                   <img src="job_scheduler_rabbit_colour.gif" border="0" style="margin-top:2px;"/>
+                   <img src="job_scheduler_typo_colour.gif" border="0"/>
+                </a>
+              </span>
+            </td>
+            <td align="right">
+            	<table cellpadding="0" cellspacing="0" width="100%" border="0">  
+            	  <colgroup>
+            			<col width="*"/>
+            			<col width="1"/>
+            			<col width="1"/>
+            			<col width="20"/>
+            			<col width="*"/>
+            			<col width="1"/>
+            			<col width="1"/>
+          			</colgroup>
+          			<thead>
+          				<tr>
+                    <td>&#160;</td>
                     <td align="right" valign="bottom" class="top" style="padding-top:4px;">
                         <input id="update_periodically_checkbox" type="checkbox" style="margin:0px;padding:0px;" onclick="callErrorChecked( 'update_periodically_checkbox__onclick', this )" name="update_periodically_checkbox"/>
                     </td>
@@ -422,15 +475,30 @@ window.onerror  = function( msg, url, line ) {
                       </script>
                       <noscript>Update</noscript>
                       <!--[if lte IE 7]></a><![endif]--></div></td>
-                    </tr>
-                </thead>
+                    <td>&#160;</td>
+                    <td align="right" valign="bottom" class="top" style="padding-top:4px;padding-right:2px;">
+                    	<label class="top" for="timezone"><span style="white-space:nowrap;">
+                          <script language="javascript" type="text/javascript">
+                              document.write(parent.getTranslation('Timezone'));
+                          </script>
+                          <noscript>Timezone</noscript>
+                        </span></label>
+                    </td>
+                    <td align="right" style="padding-top:1px;">
+                    	<script language="javascript" type="text/javascript">
+                         document.write('<select id="timezones" name="timezones" size="1" onchange="setTimezone(this.value);">');
+                         document.write('</select>');
+                      </script>
+              			</td>  
+                  </tr>
+                </head>
               </table>  
-              </td>
-              <td align="right" style="padding-right:2px;padding-top:2px;">
+             </td>
+              <!--td align="right" style="padding-right:2px;padding-top:2px;">
                 <script language="javascript" type="text/javascript">
                   write_menu(parent.getTranslation('Menu'), 'menu', 'right'); 
                 </script>
-              </td>
+              </td-->
           </tr>
           </thead>
       </table>

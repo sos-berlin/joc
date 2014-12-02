@@ -69,6 +69,9 @@ _translations['Configuration']                             = 'Конфигура
                                                            
 //First line                                  
 _translations['every $secs']                               = 'каждые $sec секунд';
+_translations['Timezone']                                  = 'Часовой пояс;
+_translations['local']                                     = 'местное';
+
                                                       
 //Other lines                            
 _translations['ID']                                        = 'ID';

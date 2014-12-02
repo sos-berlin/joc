@@ -156,6 +156,7 @@ function Scheduler()
     this._imgFolderClose                                 = 'explorer_folder_closed.gif';
     
     this._ie_network_error                               = 0;
+    this._timezone                                       = 'local';
 }
 
 
@@ -439,7 +440,8 @@ Scheduler.prototype.addDatetimeAttributesForXSLT = function( response, now, attr
               value = this.getTranslation(value);
               element.setAttribute( attribute_name, value );
             }
-            var schedulerDate = new SchedulerDate(value, this.getTranslation("days"));
+            var timezone = null; //TODO set timezone 
+            var schedulerDate = new SchedulerDate(value, this._timezone, this.getTranslation("days"));
             switch (attribute_name) {
               case "valid_from"            : 
               case "valid_to"              : 
@@ -524,11 +526,10 @@ Scheduler.prototype.modifyDatetimeForXSLT = function( response )
     var datetime = response.selectSingleNode( "/spooler/answer/@time" );
     
     if( datetime ) {
-    	var _now = new SchedulerDate( datetime.nodeValue );
-    	now = _now._date_obj;
+    	now = moment( datetime.nodeValue );
     }
-    else {
-    	now = new Date();
+    if( now == null || !now.isValid() ) {
+    	now = moment();
     }
     
     
@@ -555,7 +556,7 @@ Scheduler.prototype.modifyDatetimeForXSLT = function( response )
     this.addDatetimeAttributesForXSLT( response, now, "valid_to"              );
     //file_based attribute
     this.addDatetimeAttributesForXSLT( response, now, "last_write_time"       );
-  
+    
     this.logger(3,'ELAPSED TIME FOR MODIFY DATETIME ATTRIBUTES','scheduler_datetime');
 }
 
@@ -1021,11 +1022,26 @@ Scheduler.prototype.treeDisplay = function( li_element )
 }
 
 
-//--------------------------------------------------------------------------------UTCtoLocal
-Scheduler.prototype.UTCtoLocal = function( datetime )
+//--------------------------------------------------------------------------------UTCtoTimezone
+Scheduler.prototype.UTCtoTimezone = function( datetime )
 {
-    return new SchedulerDate( datetime ).toString();
+    return new SchedulerDate( datetime, this._timezone ).toString();
 }
+
+
+//--------------------------------------------------------------------------------showOffsetOfLocalTime
+Scheduler.prototype.showOffsetOfLocalTime = function( datetime, timezone )
+{
+    return moment().format("[UTC]Z");
+}
+
+
+//--------------------------------------------------------------------------------checkTimezone
+Scheduler.prototype.checkTimezone = function( timezone )
+{
+    return (moment.tz.zone(timezone) != null);
+}
+
 
 
 //--------------------------------------------------------------------------------checkBrowser
@@ -1129,86 +1145,51 @@ Scheduler.prototype.checkBrowser = function( withWarning )
 
 
 //--------------------------------------------------------------------------------SchedulerDate class
-function SchedulerDate(datetime, translatedDays) 
+function SchedulerDate(datetime, timezone, translatedDays) 
 {
-	  this._date_str          = ( datetime ) ? datetime : "";
-	  this._date_obj          = this.getDateObj();
-    this._translated_days   = ( translatedDays == undefined ) ? "days" : translatedDays;  
-}
-
-//--------------------------------------------------------------------------------SchedulerDate.getDateObj
-SchedulerDate.prototype.getDateObj = function() 
-{
-	  var dateobj = this.dateFromDatetime();
-    if( dateobj && this._date_str.lastIndexOf('Z') > -1) {
-    	dateobj.setTime( dateobj.getTime() - ( dateobj.getTimezoneOffset()*60*1000 ) );
-    } 
-    return dateobj;
-}
-
-//--------------------------------------------------------------------------------SchedulerDate.dateFromDatetime
-SchedulerDate.prototype.dateFromDatetime = function()
-{
-    if( !this._date_str )  return null;
-    var pattern = /(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d{0,3})*Z*/;
-    if( pattern.exec(this._date_str) ) {
-      return new Date(parseInt(RegExp.$1,10),(parseInt(RegExp.$2,10)-1),parseInt(RegExp.$3,10),parseInt(RegExp.$4,10),parseInt(RegExp.$5,10),parseInt(RegExp.$6,10));
-    }
-    return null;
-}
-
-//--------------------------------------------------------------------------------SchedulerDate.addLeadingZero
-SchedulerDate.prototype.addLeadingZero = function( num ) 
-{
-    return ( num < 10 ) ? '0'+num : num;
+	  this._dateStr           = datetime || "";
+	  //this._date_obj          = this.getDateObj();
+    this._moment            = moment(datetime);
+    this._isValid           = this._moment.isValid();
+    //if( !this._moment.isValid() ) {
+    //	this._moment          = moment();
+    //}
+    this._timezone          = timezone || "local";
+    this._translatedDays    = translatedDays || "days";
+    this._dateFormat        = "YYYY-MM-DD";
+    this._timeFormat        = "HH:mm:ss";
+    this._datetimeFormat    = this._dateFormat + " " + this._timeFormat;  
 }
 
 //--------------------------------------------------------------------------------SchedulerDate.toString
 SchedulerDate.prototype.toString = function() 
 {
-    if( this._date_obj ) {
-    	return this.dateToString()+' '+this.timeToString();
+    if( this._isValid ) {
+    	return this._moment.tz(this._timezone).format(this._datetimeFormat);
     }
-    return this._date_str;
+    return this._dateStr;
 }
 
 //--------------------------------------------------------------------------------SchedulerDate.xsltFormatDateOrTime
 SchedulerDate.prototype.xsltFormatDateOrTime = function( now )
 {
-    if( !this._date_obj )  return this._date_str;
-    if( !now )  return this._date_str;
-
-    if(    this._date_obj.getFullYear() == now.getFullYear()
-        && this._date_obj.getMonth() == now.getMonth()
-        && this._date_obj.getDate() == now.getDate()  )
-    {
-        return this.timeToString();
-    }
-    else
-    {
-        return this.dateToString();
+    if( !this._isValid || !moment.isMoment(now) )  return this._dateStr;
+    
+    if( this._moment.isSame(now, 'day') ) {
+    	return this._moment.tz(this._timezone).format(this._timeFormat);
+    } 
+    else {
+    	return this._moment.tz(this._timezone).format(this._dateFormat);
     }
 }
 
-
-//--------------------------------------------------------------------------------SchedulerDate.timeToString
-SchedulerDate.prototype.timeToString = function()
-{
-	  return this.addLeadingZero(this._date_obj.getHours())+':'+this.addLeadingZero(this._date_obj.getMinutes())+':'+this.addLeadingZero(this._date_obj.getSeconds());
-}
-
-//--------------------------------------------------------------------------------SchedulerDate.dateToString
-SchedulerDate.prototype.dateToString = function()
-{
-	  return this._date_obj.getFullYear()+'-'+this.addLeadingZero(this._date_obj.getMonth()+1)+'-'+this.addLeadingZero(this._date_obj.getDate());
-}
 
 //--------------------------------------------------------------------------------SchedulerDate.xsltFormatDatetimeWithDiff
 SchedulerDate.prototype.xsltFormatDatetimeWithDiff = function( now, show_plus )
 {
     if( show_plus == undefined )  show_plus = false;
     var result = this.toString();
-    if( now && this._date_obj )  result += "\xA0(" + this.xsltFormatDatetimeDiff( now, show_plus ) + ")";
+    if( moment.isMoment(now) && this._isValid )  result += "\xA0(" + this.xsltFormatDatetimeDiff( now, show_plus ) + ")";
 
     return result;
 }
@@ -1217,11 +1198,7 @@ SchedulerDate.prototype.xsltFormatDatetimeWithDiff = function( now, show_plus )
 //--------------------------------------------------------------------------------SchedulerDate.xsltFormatDateOrTimeWithDiff
 SchedulerDate.prototype.xsltFormatDateOrTimeWithDiff = function( now, show_plus )
 {
-    if( show_plus == undefined )  show_plus = false;
-    var result = this.toString();
-    if( now && this._date_obj )  result += "\xA0(" + this.xsltFormatDatetimeDiff( now, show_plus ) + ")";
-
-    return result;
+    return this.xsltFormatDatetimeWithDiff( now, show_plus );
 }
 
 
@@ -1230,11 +1207,9 @@ SchedulerDate.prototype.xsltFormatDateOrTimeWithDiff = function( now, show_plus 
 SchedulerDate.prototype.xsltFormatDatetimeDiff = function( now, show_plus )
 {
     if( show_plus == undefined )  show_plus = false;
+    if( !moment.isMoment(now) || !this._isValid ) return "";
 
-    if( !now ) return "";
-    if( !this._date_obj )  return "";
-
-    var diff = ( now.getTime() - this._date_obj.getTime() ) / 1000;
+    var diff = now.diff(this._moment, 'seconds'); ;
     var abs  = Math.abs( diff );
     var result = this.seconds2TimeString(abs);
     return diff < 0             ? "-" + result :
@@ -1267,7 +1242,7 @@ SchedulerDate.prototype.seconds2TimeString = function( secs )
         result = Math.floor( secs / (    60*60 ) ) + "h";
     }
     else {
-        result = Math.floor( secs / ( 24*60*60 ) ) + this._translated_days;
+        result = Math.floor( secs / ( 24*60*60 ) ) + this._translatedDays;
     }
     return result;
 }
@@ -1277,17 +1252,14 @@ SchedulerDate.prototype.seconds2TimeString = function( secs )
 SchedulerDate.prototype.getDuration = function( datetime )
 {
    var result = "";
-   var schDate = new SchedulerDate(datetime);
-   if( this._date_obj && schDate._date_obj ) {
-   	 		var duration = Math.abs(this._date_obj.getTime() - schDate._date_obj.getTime());
-   	 		if( duration >= 24*60*60*1000 ) {
-   	 			  result = Math.floor( duration / ( 24*60*60*1000 ) ) + " ";
+   var schDate = moment(datetime);
+   if( this.isValid && schDate.isValid() ) {
+   	 		var duration = Math.abs(this._moment.diff(schDate._moment));
+   	 		var durationDays = Math.abs(this._moment.diff(schDate._moment, "days"));
+   	 		if( durationDays > 0 ) {
+   	 			  result = durationDays + " ";
    	 		}
-   	 		schDate._date_obj.setHours(0);
-   			schDate._date_obj.setMinutes(0);
-   			schDate._date_obj.setSeconds(0);
-   			schDate._date_obj.setTime(schDate._date_obj.getTime() + duration);
-   	 		result += schDate.timeToString();
+   	 		result += schDate.startOf('day').add(duration, 'milliseconds').tz(this._timezone).format(this._timeFormat);
    }
    return result;
 }

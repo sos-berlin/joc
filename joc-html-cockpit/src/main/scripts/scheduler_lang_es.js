@@ -69,6 +69,8 @@ _translations['Configuration']                             = 'Configuración';
                                                            
 //First line                                  
 _translations['every $secs']                               = 'Todos los $secs';
+_translations['Timezone']                                  = 'Zona horaria;
+_translations['local']                                     = 'local';
                                                       
 //Other lines                            
 _translations['ID']                                        = 'ID';

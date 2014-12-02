@@ -48,6 +48,8 @@
   <link rel="stylesheet" type="text/css" href="scheduler_data/custom/custom.css" />
   
   <script type="text/javascript" src="scheduler_init.js"></script>
+  <script type="text/javascript" src="moment.js"></script>
+  <script type="text/javascript" src="moment-timezone-with-data.js"></script>
   <script type="text/javascript" src="browser_dependencies.js"></script>
   <script type="text/javascript" src="scheduler.js"></script>
   <script type="text/javascript" src="sos_logger.js"></script>
@@ -350,10 +352,10 @@ function realYoffset(element)
 function convertUTC( datestr )
 {   
     
-    var scheduler_date = new SchedulerDate(datestr); 
-    if( scheduler_date._date_obj ) {
-    	var now        = new Date();
-    	var diff       = scheduler_date._date_obj.getTime() - now.getTime();
+    var scheduler_date = new SchedulerDate(datestr, _scheduler._timezone); 
+    if( scheduler_date.isValid ) {
+    	var now        = moment();
+    	var diff       = scheduler_date._moment.diff(now);
     	if( !_delay_timer && diff > 0 ) _delay_timer = window.setTimeout( 'showCategories(0);', diff + 500 );
     	return scheduler_date.xsltFormatDatetimeDiff(now);
     }

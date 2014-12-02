@@ -281,7 +281,7 @@ function show_xml(obj_name)
 function show_xml2(type, path)
 {
     var window_name       = 'show_xml' + path.replace(/[^a-zA-Z_]/g,'_');
-    open_window( window_name, "show_configuration.html#type=" + type + "&path=" + encodeURIComponent(path), false );
+    open_window( window_name, "show_configuration.html#type=" + type + "&path=" + encodeURIComponent(path)+ "&timezone=" + encodeURIComponent(parent._scheduler._timezone), false );
 }
 
 
@@ -1250,7 +1250,7 @@ function show_calendar( menu, ret )
       limit      = " limit='"+limit+"'";
       var xml_command  = "<show_calendar"+before+from+limit+what+"/>";
       //alert(xml_command);
-      _calendar_params = {'xml_command':xml_command,'menu':menu,'format':fields.format,'job':'','order':''};  //die Variable liest die aufgerufende Seite
+      _calendar_params = {'xml_command':xml_command,'menu':menu,'format':fields.format,'job':'','order':'','timezone':parent._scheduler._timezone};  //die Variable liest die aufgerufende Seite
       switch( menu ) {
         case 'job_chain' : _calendar_params.job   = window.parent.left_frame._job_chain; break;
         case 'order'     : _calendar_params.job   = window.parent.left_frame._job_chain;
@@ -1284,6 +1284,13 @@ function check_date( datetime )
 function get_2digits( num )
 {
     return (num < 10) ? "0"+num : num;
+}
+
+
+//--------------------------------------------------------------------------addTimezone
+function addTimezone()
+{
+	alert('addTimezone');
 }
 
 
@@ -1366,13 +1373,13 @@ function scheduler_extras__onclick( elt )
     //popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(de)") + '<img src="banner_german.gif" style="position:relative;top:3px;left:2px;"/>'      , "open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )" );
     popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(en)")     , "open_url( 'scheduler_home/doc/en/reference/index.xml', 'scheduler_documentation' )" );
     popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(de)")     , "open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )" );
-    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("FAQ"), "open_url( 'http://www.sos-berlin.com/mediawiki/index.php/JobScheduler_FAQ', 'scheduler_wiki' )" );
-    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Forum"), "open_url( 'http://sourceforge.net/projects/jobscheduler/forums/forum/486122', 'scheduler_forum' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("FAQ"), "open_url( 'https://kb.sos-berlin.com/x/JoBB', 'scheduler_wiki' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Forum"), "open_url( 'https://sourceforge.net/p/jobscheduler/discussion/', 'scheduler_forum' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Downloads"), "open_url( 'http://sourceforge.net/projects/jobscheduler/files/', 'scheduler_download' )" );
     popup_builder.add_entry( parent.getTranslation("Follow us on Twitter"), "open_url( 'http://twitter.com/#!/job_scheduler', 'scheduler_twitter' )" );
-    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Release Notes"), "open_url( 'http://www.sos-berlin.com/jira/browse/JS#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel', 'scheduler_jira' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Release Notes"), "open_url( 'https://kb.sos-berlin.com/x/s4BB', 'scheduler_release_info' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Home"), "open_url( 'http://www.sos-berlin.com/scheduler', 'scheduler_home' )" );
-    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Jira"), "open_url( 'http://www.sos-berlin.com/jira', 'scheduler_jira' )" );
+    //popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Jira"), "open_url( 'https://change.sos-berlin.com/', 'scheduler_jira' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("OTRS"), "open_url( 'http://www.sos-berlin.com/otrs/customer.pl?Lang=en', 'scheduler_otrs' )" );
     
     popup_builder.add_bar();

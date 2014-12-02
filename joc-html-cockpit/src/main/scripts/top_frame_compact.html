@@ -74,9 +74,44 @@ function do_onload()
       document.getElementById( "update_periodically_checkbox" ).style.top = '2px';
     } 
     document.getElementById(parent._scheduler._show_card+'_inner_tab').className = 'active'+tabs[parent._scheduler._show_card].pos;
+    setTimezones(parent._response.selectSingleNode('/spooler/answer/state/@time_zone'));
     set_state(parent._response);
     
     parent._scheduler.logger(2,'ELAPSED TIME FOR LOADING SCHEDULER INTERFACE ' + self.name,'scheduler_load_top');
+}
+
+
+//----------------------------------------------------------------------------------------setTimezones
+function setTimezones(jobSchedulerTimeZoneAttribute) 
+{ 
+	  var timezones = document.getElementById('timezones');
+	  timezones.options[0] = new Option( parent.getTranslation('local') + ' (' + parent._scheduler.showOffsetOfLocalTime()+ ')', 'local' );
+	  var optIndex = 1;
+	  if ( jobSchedulerTimeZoneAttribute != null && parent._scheduler.checkTimezone(jobSchedulerTimeZoneAttribute.nodeValue)) {
+	  	timezones.options[1] = new Option( 'JobScheduler (' + jobSchedulerTimeZoneAttribute.nodeValue + ')', jobSchedulerTimeZoneAttribute.nodeValue );
+	  	optIndex++;
+	  } 
+	  var unsupportedTimezones = '';
+	  for(var key in parent._timezones ) {
+	  	if ( parent._scheduler.checkTimezone(parent._timezones[key])) { 
+	  		timezones.options[optIndex] = new Option( key, parent._timezones[key] );
+	  		optIndex++;
+	  	}
+	  	else {
+	  		unsupportedTimezones += key +'='+ parent._timezones[key] + "\n";
+	  	}
+    }
+    if(unsupportedTimezones.length > 0) {
+    	alert( "You have configured unsupported timezones: \n" + unsupportedTimezones );
+    }
+}
+
+
+//----------------------------------------------------------------------------------------setTimezone
+function setTimezone(timezone)
+{
+	parent._scheduler._timezone = timezone;
+	if( typeof parent.left_frame.update == 'function' ) window.setTimeout("parent.left_frame.update()",5);	
 }
 
 
@@ -169,8 +204,8 @@ function set_state(response)
     	spooler_build                                          += '/' + parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1");
     }
     document.getElementById('spooler_build').innerHTML        = spooler_build;
-    document.getElementById('spooler_time').innerHTML         = (parent._scheduler.UTCtoLocal(state.getAttribute('time')) || '0000-00-00 00:00:00');
-    document.getElementById('spooler_start_time').innerHTML   = (parent._scheduler.UTCtoLocal(state.getAttribute('spooler_running_since')) || '0000-00-00 00:00:00');
+    document.getElementById('spooler_time').innerHTML         = (parent._scheduler.UTCtoTimezone(state.getAttribute('time')) || '0000-00-00 00:00:00');
+    document.getElementById('spooler_start_time').innerHTML   = (parent._scheduler.UTCtoTimezone(state.getAttribute('spooler_running_since')) || '0000-00-00 00:00:00');
       
     var jobs_orders_inner                                     = cnt_all_orders + '&#160;<span class="label">' + parent.getTranslation('orders');
     if( cnt_clustered_orders > 0 ) jobs_orders_inner         += "&#160;("+parent.getTranslation('$cnt in cluster',{cnt:cnt_clustered_orders})+")";
@@ -206,7 +241,7 @@ function write_menu(menu)
   var menu_title = parent.getTranslation(menu.substr(0,1).toUpperCase() + menu.substring(1));
   var menu_id = '__selectbox_'+menu+'__';
   if( window.createPopup == undefined ) { 
-    document.writeln('          <td align="left" title="scheduler '+menu+'" style="white-space:nowrap;height:16px;padding:0px 4px;">');
+    document.writeln('          <td align="left" title="scheduler '+menu+'" style="white-space:nowrap;height:17px;padding:1px 4px 0px;">');
     document.writeln('            <div class="selectbox_titlebar_'+menu+'" ><select id="'+menu_id+'" name="'+menu_id+'" size="1">');
     document.writeln('              <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">&#9658;'+menu_title+'</option>');
     document.writeln('              <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');
@@ -267,6 +302,7 @@ window.onerror  = function( msg, url, line ) {
       <colgroup>
         <col width="30%"/>
         <col width="1%" span="6"/>
+        <col width="20%"/>
         <col width="*"/>
         <col width="86"/>
       </colgroup>
@@ -298,6 +334,11 @@ window.onerror  = function( msg, url, line ) {
               document.writeln('          </td>');
               document.writeln('          <td class="titlebar" style="padding:0px 2px;">');
               document.writeln('              <span class="label" style="white-space:nowrap;">'+parent.getTranslation('every $secs',{sec:parent._scheduler._update_seconds})+'</span>');
+              document.writeln('          </td>');
+              document.writeln('          <td class="titlebar" align="right" style="padding:0px;">');
+              document.writeln('            <label for="timezones"><span style="white-space:nowrap;">'+parent.getTranslation('Timezone')+'</span></label>');
+    					document.writeln('            <select name="timezones" id="timezones" size="1" onchange="setTimezone(this.value);">');
+    					document.writeln('          	</select>');
               document.writeln('          </td>');
               document.writeln('          <td class="titlebar" align="right" style="padding:0px 2px;">');
               document.writeln('              <span class="label">&#160;'+parent.getTranslation('last update')+':</span><span id="spooler_time">0000-00-00 00:00:00</span>');

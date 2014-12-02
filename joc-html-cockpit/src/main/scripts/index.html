@@ -41,6 +41,8 @@
 //-->
 
         <script type="text/javascript" src="scheduler_init.js"></script>
+        <script type="text/javascript" src="moment.js"></script>
+        <script type="text/javascript" src="moment-timezone-with-data.js"></script>
         <script type="text/javascript" src="wgxpath.install.js"></script>
         <script type="text/javascript" src="browser_dependencies.js"></script>
         <script type="text/javascript" src="prototype.js"></script>
@@ -73,7 +75,7 @@
               _response = _scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster" subsystems="lock schedule process_class folder"/></commands>', false, false ); 
               _scheduler._tree_view_enabled = true;
             } catch(x) {
-              _response = _scheduler.executeSynchron( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
+              _response = _scheduler.executeSynchron( '<show_state max_orders="0" max_task_history="0" what="job_chain_orders"/>', false, false ); 
             }
             _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
             document.title  = _scheduler._host + ":" + _scheduler._port;

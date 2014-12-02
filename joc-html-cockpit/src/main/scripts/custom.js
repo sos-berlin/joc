@@ -216,6 +216,15 @@ _confirm.modify_schedule        = false;
 
 
 /*****************************************************************
+*  You can add timezones in the form:
+*  _timezones[ 'display name' ] = 'timezone';
+*  These timezones are options in the timezones selectbox for an
+*  easy timezone switch in JOC.
+*  Example: _timezones[ 'Berlin IT' ] = 'EUROPE/BERLIN';
+*/
+
+
+/*****************************************************************
 *  You can add arbitrary URLs to the popup menu of the extras
 *  button in the form:
 *  _extra_urls[ 'display name' ] = 'url';

@@ -71,6 +71,7 @@ var _stdout_end                 = "";
 var _stderr_begin               = "";
 var _stderr_end                 = "";
 var _display_last_activities_tab = false;
+var _timezones									= {};
 var _hide                       = {
 	'stop_job_chain':false, 'unstop_job_chain':false, 
 	'stop_job_chain_node':false, 'unstop_job_chain_node':false,

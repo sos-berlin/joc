@@ -46,6 +46,8 @@
       body          { background-color:#F6F6FF;margin:0px 8px; } 
     </style>
     <script type="text/javascript" src="scheduler_init.js"></script>
+    <script type="text/javascript" src="moment.js"></script>
+    <script type="text/javascript" src="moment-timezone-with-data.js"></script>
     <script type="text/javascript" src="scheduler.js"></script>
     <script type="text/javascript" src="browser_dependencies.js"></script>
     <script type="text/javascript" src="prototype.js"></script>
@@ -65,9 +67,9 @@ window.onload = function()
     try {
         _calendar_params  = window.opener.left_frame._calendar_params;
     } catch(E) {
-        _calendar_params  = {'xml_command':'','menu':'scheduler','format':'html','job':'','order':''};;
+        _calendar_params  = {'xml_command':'','menu':'scheduler','format':'html','job':'','order':'','timezone':'local'};
     }
-    
+    _scheduler._timezone = _calendar_params.timezone;
     calendar_show();
 }
 
@@ -138,9 +140,9 @@ function calendar_show_callback(response)
       
       _at_nodes     = calendar_node.selectNodes("child::*");
       for( var i=0; i < _at_nodes.length; i++ ) {
-      	UTCtoLocal( _at_nodes[i], 'at' );
-      	UTCtoLocal( _at_nodes[i], 'begin' );
-      	UTCtoLocal( _at_nodes[i], 'end' );
+      	UTCtoTimezone( _at_nodes[i], 'at' );
+      	UTCtoTimezone( _at_nodes[i], 'begin' );
+      	UTCtoTimezone( _at_nodes[i], 'end' );
       }
       
       get_output(calendar_params.format);
@@ -152,9 +154,9 @@ function calendar_show_callback(response)
 }
 
 
-function UTCtoLocal( element, attribute_name ) {
+function UTCtoTimezone( element, attribute_name ) {
 			if( element.getAttribute(attribute_name) ) {
-				var localTime = _scheduler.UTCtoLocal(element.getAttribute(attribute_name));
+				var localTime = _scheduler.UTCtoTimezone(element.getAttribute(attribute_name));
 				if(attribute_name == 'end' && localTime.indexOf('00:00:00') > -1 && element.getAttribute('begin')) {
 					localTime = getDate(element.getAttribute('begin')) + " 24:00:00"; 
 				}

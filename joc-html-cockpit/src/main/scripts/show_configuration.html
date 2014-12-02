@@ -45,6 +45,8 @@
     </style>
     
     <script type="text/javascript" src="scheduler_init.js"></script>
+    <script type="text/javascript" src="moment.js"></script>
+    <script type="text/javascript" src="moment-timezone-with-data.js"></script>
     <script type="text/javascript" src="scheduler.js"></script>
     <script type="text/javascript" src="prototype.js"></script>
     <script type="text/javascript" src="browser_dependencies.js"></script>
@@ -69,7 +71,7 @@ function on_load()
     try {
       var supported_objs   = $A(_supported_commands.keys());
       var queryParams      = window.location.hash.substring(1).toQueryParams();
-      var params           = $H({type:'',path:'',name:'',job_chain:'',order_id:''});
+      var params           = $H({type:'',path:'',name:'',job_chain:'',order_id:'',timezone:'local'});
       params.update(queryParams);
       
       if(!params.get('path') || !params.get('type')) {
@@ -99,11 +101,12 @@ function on_load()
       setHeader(params);
       
       _scheduler           = new Scheduler();
+      _scheduler._timezone = params.get('timezone');
       
       var response         = _scheduler.executeSynchron( getXMLQuery(params), false, false, true );
       var modified         = response.selectSingleNode("//file_based[@last_write_time]");
       if(modified) {
-      	$('modified').update(getTranslation('File timestamp') + ': ' + _scheduler.UTCtoLocal( modified.getAttribute('last_write_time') ));
+      	$('modified').update(getTranslation('File timestamp') + ': ' + _scheduler.UTCtoTimezone( modified.getAttribute('last_write_time')));
       }
       
       var srcElem          = null;
