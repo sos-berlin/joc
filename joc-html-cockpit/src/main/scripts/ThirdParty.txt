@@ -1,0 +1,30 @@
+
+                                             Software- und Organisations-Service GmbH
+
+                                             Giesebrechtstr. 15
+                                             D-10629 Berlin
+                                             tel  +49 30 86 47 90-0
+                                             fax  +49 30 8 61 33 35
+                                             mail info@sos-berlin.com
+                                             web   www.sos-berlin.com 
+
+This document lists 3rd party software components that are used in JOC. 
+
+File:    prototype.js 
+Source:  http://www.prototypejs.org
+License: MIT-style license, see http://prototypejs.org/license.html
+
+File:    wgxpath.install.js 
+Source:  http://code.google.com/p/wicked-good-xpath/
+License: MIT license, see http://opensource.org/licenses/MIT
+
+File:    wz_jsgraphics.js 
+Source:  http://www.walterzorn.com 
+License: LGPL 2.1, see http://www.gnu.org/licenses/lgpl-2.1.txt
+
+File:    momentjs 
+File:    moment-timezone-with-data.js 
+Source:  http://momentjs.com/ 
+License: MIT license, see http://opensource.org/licenses/MIT
+
+
