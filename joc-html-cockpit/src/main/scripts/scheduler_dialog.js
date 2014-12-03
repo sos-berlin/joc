@@ -178,9 +178,13 @@ function popup_menu__execute( xml_command, with_confirm, confirm_msg, removeObj 
 {   
     _popup_menu.close();
     if( !with_confirm ||  confirm(parent.getTranslation('Do you really want to '+confirm_msg+'?')) ) {
-      if( scheduler_exec( xml_command.replace(/&/g,"&amp;"), false ) ) {
+    	var ret = scheduler_exec( xml_command.replace(/&/g,"&amp;"), false );
+      if( ret == 1 ) {
         parent.details_frame._removed_obj = removeObj;
         set_timeout("parent.left_frame.update()",1);
+      } 
+      else if(ret == 379) {
+      	set_timeout("parent.left_frame.update()",2000);
       }
     }
 }
@@ -560,7 +564,7 @@ function start_task_at( ret ) {
       	var force = fields.force ? '' : ' force="no"';
       	var at    = fields.at == 'now' ? '' : ' at="' + fields.at + '"';
       	var xml_command = '<start_job job="' + parent.left_frame._job_name + '"'+ at + force +'/>';
-      	if( fields.at && scheduler_exec( xml_command, false ) ) { 
+      	if( fields.at && scheduler_exec( xml_command, false ) == 1 ) { 
           set_timeout("parent.left_frame.update()",1);
       	}
       }
@@ -638,7 +642,7 @@ function start_task( ret ) {
         	var force = fields.force ? '' : ' force="no"';
         	var at    = fields.at == 'now' ? '' : ' at="' + fields.at + '"';
         	var xml_command = '<start_job job="' + parent.left_frame._job_name + '"'+ at + force +'>' + params + '</start_job>';
-        	if( fields.at && scheduler_exec( xml_command, false ) ) { 
+        	if( fields.at && scheduler_exec( xml_command, false ) == 1 ) { 
             set_timeout("parent.left_frame.update()",1);
         	}
         } else {
@@ -670,9 +674,7 @@ function start_order_at( now ) {
       case 1: if( !parent._confirm.start_order || confirm(parent.getTranslation('Do you really want to start this order?'))) {
       					_popup_menu.close();
               	var xml_command = '<modify_order at="now" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"/>';
-              	if( scheduler_exec( xml_command, false ) ) {
-                	set_timeout("parent.left_frame.update()",1);
-              	}
+              	exec_modify_order(xml_command);
               } else {
               	_popup_menu.close();
               }
@@ -683,9 +685,7 @@ function start_order_at( now ) {
               	if( !parent._confirm.start_order || confirm(parent.getTranslation('Do you really want to start this order?'))) {
                 	Input_dialog.close();
                 	var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"/>';
-                	if( scheduler_exec( xml_command, false ) ) {
-                  	set_timeout("parent.left_frame.update()",1);
-                	}
+                	exec_modify_order(xml_command);
                 } else {
                 	Input_dialog.close();
                 }
@@ -755,9 +755,7 @@ function start_order( ret )
       	if( !parent._confirm.start_order || confirm(parent.getTranslation('Do you really want to start this order?'))) {
         	Input_dialog.close();
         	var xml_command = '<modify_order at="' + fields.at + '" job_chain="' + parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id + '">' + params + '</modify_order>';
-        	if( scheduler_exec( xml_command, false ) ) { 
-            set_timeout("parent.left_frame.update()",1);
-        	}
+        	exec_modify_order(xml_command);
         } else {
         	Input_dialog.close();
         }
@@ -856,7 +854,7 @@ function add_order( big_chain, order_state, order_end_state, ret )
       if( !parent._confirm.add_order || confirm(parent.getTranslation('Do you really want to add an order?'))) {
         	Input_dialog.close();
         	var xml_command  = '<add_order' + fields.at + fields.id + ' job_chain="' + parent.left_frame._job_chain + '" state="' + fields.state + '"' + fields.end_state + ' title="' + fields.title + '" replace="no">' + params + fields.run_time + '</add_order>';
-        	if( scheduler_exec( xml_command, false ) ) { 
+        	if( scheduler_exec( xml_command, false ) == 1 ) { 
           	set_timeout("parent.left_frame.update()",1);
         	}
       } else {
@@ -947,9 +945,10 @@ function set_order_state( order_state, order_end_state, setback, suspended, hot,
       if( !parent._confirm.set_order_state || confirm(parent.getTranslation('Do you really want to change the order state?'))) {
         Input_dialog.close();  
       	var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"' + sback + resume + ' state="' + fields.new_state + '"' + end_state + '/>'; 
-      	if( scheduler_exec( xml_command, false ) ) { 
+      	if( scheduler_exec( xml_command, false ) == 1 ) { 
           set_timeout("parent.left_frame.update()",1);
-      	} 
+      	}
+      	//TODO 379 
       } else {
       	Input_dialog.close();
       }  
@@ -1074,11 +1073,11 @@ function set_run_time( caller, hot, ret )
                                 break;
       }
       
-      if( hot_command == "" && xml_command != "" && scheduler_exec( xml_command, false ) ) {
-        set_timeout("parent.left_frame.update()",1);
+      if( hot_command == "" && xml_command != "" ) {
+        exec_modify_order(xml_command);
       }
       
-      if( hot_command != "" && scheduler_exec( hot_command, false ) ) {
+      if( hot_command != "" && scheduler_exec( hot_command, false ) == 1 ) {
         switch( caller ) { 
           case 'order'          :
           case 'job'            : //break;
@@ -1513,7 +1512,7 @@ function kill_task_immediately( task_id )
 		if( !parent._hide.remove_enqueued_task ) {
 			if( !parent._confirm.remove_enqueued_task || confirm(parent.getTranslation('Do you really want to delete this task?')) ) {
     		var xml_command = '<kill_task job="' + _job_name + '" id="' + task_id + '" immediately="yes"/>';
-    		if( scheduler_exec( xml_command, false ) ) { 
+    		if( scheduler_exec( xml_command, false ) == 1 ) { 
         	set_timeout("parent.left_frame.update()",1);
     		}
     	}
@@ -1951,12 +1950,29 @@ function scheduler_exec( xml, with_modify_datetime, with_add_path, with_all_erro
 {
     try {
       resetError();
-      parent._scheduler.executeSynchron( xml, with_modify_datetime, with_add_path, with_all_errors )
-      return true;
+      var ret = parent._scheduler.executeSynchron( xml, with_modify_datetime, with_add_path, with_all_errors );
+      // https://change.sos-berlin.com/browse/JOC-40
+      if( xml.search(/^<modify_order /i) > -1 ) {
+      	var error_element = ret.selectSingleNode( "spooler/answer/ERROR" ); 
+      	if( error_element && error_element.getAttribute( "code" ).search(/SCHEDULER-379/i) > -1 ) {
+      		return 379;
+      	}
+      }
+      return 1;
     }
     catch( x ) {
       showError( x );
-      return false;
+      return 0;
+    }
+}
+
+function exec_modify_order(xml_command) {
+		var ret = scheduler_exec( xml_command, false );
+    if( ret == 1 ) {
+    	set_timeout("parent.left_frame.update()",1);
+    }
+    else if(ret == 379) {  // https://change.sos-berlin.com/browse/JOC-40
+      set_timeout("parent.left_frame.update()",2500);
     }
 }
 

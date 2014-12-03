@@ -342,7 +342,8 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                               		throw new Error( error_element.getAttribute( "text" ) );
                               }
                               //Per default no exception is thrown if remove job, job_chain, order is clicked
-                              if( with_all_errors || error_element.getAttribute( "code" ).search(/SCHEDULER-(108|161|162)/i) == -1 ) {
+                              //no exception when order is occpied (SCHEDULER-379)
+                              if( with_all_errors || error_element.getAttribute( "code" ).search(/SCHEDULER-(108|161|162|379)/i) == -1 ) {
                                   throw new Error( error_element.getAttribute( "text" ) );
                               } 
                           }
@@ -602,7 +603,7 @@ Scheduler.prototype.readGuiVersion = function()
       this._gui_subversion_no = version[0].replace(/[^-0-9:\. ]/g,'');
       var pattern = /([0-9\.]+)\s+(\d{4}-\d{2}-\d{2})*/;
       pattern.exec(this._gui_subversion_no);
-      this._gui_subversion_no = RegExp.$1 + ' (' + RegExp.$2 + ')';
+      this._gui_subversion_no = RegExp.$1 + ' (' + RegExp.$2 + ')'; 
     }
     catch(x) {
     }
@@ -1027,6 +1028,12 @@ Scheduler.prototype.UTCtoTimezone = function( datetime )
 {
     return new SchedulerDate( datetime, this._timezone ).toString();
 }
+
+
+/*Scheduler.prototype.getTimezones = function()
+{
+	return moment.tz.names();
+}*/
 
 
 //--------------------------------------------------------------------------------showOffsetOfLocalTime
