@@ -220,8 +220,19 @@ _confirm.modify_schedule        = false;
 *  _timezones[ 'display name' ] = 'timezone';
 *  These timezones are options in the timezones selectbox for an
 *  easy timezone switch in JOC.
+*  Look at https://kb.sos-berlin.com/x/HIp9 for supported timezones.
 *  Example: _timezones[ 'Berlin IT' ] = 'EUROPE/BERLIN';
 */
+
+
+/*****************************************************************
+*  Set the timezone which is used when JOC starts 
+*  You can use one of the keys from the above specified timezones.
+*  Further there are the keys 'local' for the local time of the 
+*  browser and 'JobScheduler' for the time zone in which the 
+*  JobScheduler works.
+*/
+_timezone_preselected = 'local';
 
 
 /*****************************************************************

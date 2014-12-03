@@ -90,15 +90,24 @@ function setTimezones(jobSchedulerTimeZoneAttribute)
 { 
 	  var timezones = document.getElementById('timezones');
 	  timezones.options[0] = new Option( parent.getTranslation('local') + ' (' + parent._scheduler.showOffsetOfLocalTime()+ ')', 'local' );
+	  if( parent._timezone_preselected == 'local' ) {
+	  	timezones.selectedIndex = 0;
+	  }
 	  var optIndex = 1;
 	  if ( jobSchedulerTimeZoneAttribute != null && parent._scheduler.checkTimezone(jobSchedulerTimeZoneAttribute.nodeValue)) {
 	  	timezones.options[1] = new Option( 'JobScheduler (' + jobSchedulerTimeZoneAttribute.nodeValue + ')', jobSchedulerTimeZoneAttribute.nodeValue );
+	  	if( parent._timezone_preselected == 'JobScheduler' ) {
+	  		timezones.selectedIndex = optIndex;
+	  	}
 	  	optIndex++;
 	  } 
 	  var unsupportedTimezones = '';
 	  for(var key in parent._timezones ) {
 	  	if ( parent._scheduler.checkTimezone(parent._timezones[key])) { 
 	  		timezones.options[optIndex] = new Option( key, parent._timezones[key] );
+	  		if( parent._timezone_preselected == key ) {
+	  			timezones.selectedIndex = optIndex;
+	  		}
 	  		optIndex++;
 	  	}
 	  	else {
