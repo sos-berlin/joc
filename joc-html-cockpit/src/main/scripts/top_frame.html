@@ -106,7 +106,7 @@ function setTimezones(jobSchedulerTimeZoneAttribute)
 	  	}
     }
     if(unsupportedTimezones.length > 0) {
-    	alert( "You have configured unsupported timezones: \n" + unsupportedTimezones );
+    	alert( "You have configured unsupported time zones: \n" + unsupportedTimezones );
     }
 }
 
@@ -479,9 +479,9 @@ window.onerror  = function( msg, url, line ) {
                     <td align="right" valign="bottom" class="top" style="padding-top:4px;padding-right:2px;">
                     	<label class="top" for="timezone"><span style="white-space:nowrap;">
                           <script language="javascript" type="text/javascript">
-                              document.write(parent.getTranslation('Timezone'));
+                              document.write(parent.getTranslation('Time zone'));
                           </script>
-                          <noscript>Timezone</noscript>
+                          <noscript>Time zone</noscript>
                         </span></label>
                     </td>
                     <td align="right" style="padding-top:1px;">

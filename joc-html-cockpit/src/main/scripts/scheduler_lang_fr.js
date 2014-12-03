@@ -69,7 +69,7 @@ _translations['Configuration']                             = 'Configuration';
                                                            
 //First line                                  
 _translations['every $secs']                               = 'toutes les $secs';
-_translations['Timezone']                                  = 'Fuseau horaire;
+_translations['Time zone']                                 = 'Fuseau horaire;
 _translations['local']                                     = 'local';
                                                       
 //Other lines                            

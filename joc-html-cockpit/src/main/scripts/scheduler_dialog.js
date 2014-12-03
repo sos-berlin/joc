@@ -1288,10 +1288,10 @@ function get_2digits( num )
 
 
 //--------------------------------------------------------------------------addTimezone
-function addTimezone()
+/*function addTimezone()
 {
-	alert('addTimezone');
-}
+	
+}*/
 
 
 //--------------------------------------------------------------------------scheduler_menu__onclick

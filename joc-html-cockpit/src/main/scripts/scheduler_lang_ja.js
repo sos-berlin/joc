@@ -68,7 +68,7 @@ _translations['Configuration']                             = 'Configuration';
                                                            
 //First line                                  
 _translations['every $secs']                               = '$sec秒毎';
-_translations['Timezone']                                  = 'タイムゾーン';
+_translations['Time zone']                                 = 'タイムゾーン';
 _translations['local']                                     = 'ローカル';
 
                                                       
