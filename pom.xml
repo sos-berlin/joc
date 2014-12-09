@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>com.sos-berlin</groupId>
-		    <artifactId>products</artifactId>
+        <artifactId>products</artifactId>
         <version>1.8-SNAPSHOT</version>
     </parent>
 
@@ -11,6 +12,12 @@
     <artifactId>joc</artifactId>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
+
+    <scm>
+        <connection>scm:git:git@github.com:sos-berlin/joc.git</connection>
+        <developerConnection>scm:git:git@github.com:sos-berlin/joc.git</developerConnection>
+        <url>https://github.com/sos-berlin/joc</url>
+    </scm>
 
     <modules>
         <module>joc-html-cockpit</module>
