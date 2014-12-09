@@ -31,7 +31,7 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-//$Id$
+//$Id: scheduler_dialog.js 28482 2014-12-03 16:47:06Z oh $
 
 //-------------------------------------------------------------------------------------private vars
 var _open_url_features       = "menubar=no, toolbar=no, location=no, directories=no, scrollbars=yes, resizable=yes, status=no, dependent=yes";
@@ -184,7 +184,7 @@ function popup_menu__execute( xml_command, with_confirm, confirm_msg, removeObj 
         set_timeout("parent.left_frame.update()",1);
       } 
       else if(ret == 379) {
-      	set_timeout("parent.left_frame.update()",2000);
+      	set_timeout("parent.left_frame.update()",2500);
       }
     }
 }
@@ -945,10 +945,7 @@ function set_order_state( order_state, order_end_state, setback, suspended, hot,
       if( !parent._confirm.set_order_state || confirm(parent.getTranslation('Do you really want to change the order state?'))) {
         Input_dialog.close();  
       	var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + parent.left_frame._order_id + '"' + sback + resume + ' state="' + fields.new_state + '"' + end_state + '/>'; 
-      	if( scheduler_exec( xml_command, false ) == 1 ) { 
-          set_timeout("parent.left_frame.update()",1);
-      	}
-      	//TODO 379 
+      	exec_modify_order( xml_command );
       } else {
       	Input_dialog.close();
       }  
@@ -973,8 +970,6 @@ function get_order_states( big_chain )
       var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node[@job]|.//file_order_sink" );
       var job_chain_endnodes   = job_chain_element.selectNodes( ".//job_chain_node[not(@job)]|.//job_chain_node.end" );
     }
-    if( job_chain_nodes.length == 1 ) return new Array(job_chain_nodes[0].getAttribute('state'),"");
-    end_states.push( {key:'', display:'(none)'} );
     for( var i = 0; i < job_chain_nodes.length; i++ ) {
     		states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state'), endnode:false} );
         end_states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state'), endnode:false} );
@@ -1287,10 +1282,34 @@ function get_2digits( num )
 
 
 //--------------------------------------------------------------------------addTimezone
-/*function addTimezone()
+/*function addTimezone(ret)
 {
-	
-}*/
+	 if( typeof ret != "boolean" ) ret = false;
+   if( !ret ) {
+      _popup_menu.close();
+      var dialog        = new Input_dialog();
+      dialog.width      = 200;
+      dialog.submit_fct = "callErrorChecked( 'addTimezone', true )";
+      //dialog.add_title( "Add a timezone" );
+    var select_opts = [{'key':'','display':'Add time zone'}];
+      var availTimezones = parent._scheduler.getTimezones();
+      for( i=0; i < availTimezones.length; i++ ) {
+      	select_opts.push({'key':availTimezones[i],'display':availTimezones[i]});
+      }
+      dialog.add_select( "timezone", select_opts );
+      dialog.show();
+    } else {
+    	var fields = input_dialog_submit(); 
+    	if( fields.timezone != '' ) {
+    		//alert(fields.timezone);
+    		var timezonesSelect = parent.top_frame.document.getElementById('timezones');
+    		var selectedIdx = timezonesSelect.options.length;
+	  		timezonesSelect.options[selectedIdx] = new Option( fields.timezone, fields.timezone );
+	  		timezonesSelect.selectedIndex = selectedIdx;
+	  		parent.top_frame.setTimezone(fields.timezone);
+    	}
+    }
+} */
 
 
 //--------------------------------------------------------------------------scheduler_menu__onclick
@@ -1313,9 +1332,10 @@ function scheduler_menu__onclick( elt )
     popup_builder.add_show_log( parent.getTranslation("Show log")                           , "", "show_log" );
     popup_builder.add_entry   ( parent.getTranslation("Show job dependencies")              , "show_job_illustration()" );
     popup_builder.add_entry   ( parent.getTranslation("Show job chain dependencies")        , "show_job_chain_illustration()" );
-    popup_builder.add_entry ( parent.getTranslation("Show start times")                   , "callErrorChecked('show_calendar','scheduler')" );
+    popup_builder.add_entry ( parent.getTranslation("Show start times")                     , "callErrorChecked('show_calendar','scheduler')" );
     popup_builder.add_entry ( parent.getTranslation("Manage filters")                       , "callErrorChecked('show_administration','filter')" );
-    popup_builder.add_entry ( parent.getTranslation("Manage log categories")              , "callErrorChecked('show_administration','log_categories')" );
+    popup_builder.add_entry ( parent.getTranslation("Manage log categories")                , "callErrorChecked('show_administration','log_categories')" );
+    //popup_builder.add_entry ( parent.getTranslation("Add time zone")                        , "addTimezone()" );
     if( !parent._hide.terminate_jobscheduler || !parent._hide.restart_jobscheduler || !parent._hide.pause_jobscheduler || !!parent._hide.continue_jobscheduler ) {
     	popup_builder.add_bar();
     }
