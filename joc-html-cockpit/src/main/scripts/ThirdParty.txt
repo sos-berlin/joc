@@ -22,7 +22,7 @@ File:    wz_jsgraphics.js
 Source:  http://www.walterzorn.com 
 License: LGPL 2.1, see http://www.gnu.org/licenses/lgpl-2.1.txt
 
-File:    momentjs 
+File:    moment.js 
 File:    moment-timezone-with-data.js 
 Source:  http://momentjs.com/ 
 License: MIT license, see http://opensource.org/licenses/MIT

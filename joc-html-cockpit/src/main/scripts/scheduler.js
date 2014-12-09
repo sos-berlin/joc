@@ -31,7 +31,7 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-// $Id$
+// $Id: scheduler.js 28482 2014-12-03 16:47:06Z oh $
 
 //-----------------------------------------------------------------------------------------language  
 if( window['_sos_lang'] ) {
@@ -600,10 +600,11 @@ Scheduler.prototype.readGuiVersion = function()
         version = responseText.split("\n");
       }
       this._gui_release_no = version[1].replace(/^\s+/,'').replace(/\s+$/,'');
-      this._gui_subversion_no = version[0].replace(/[^-0-9:\. ]/g,'');
-      var pattern = /([0-9\.]+)\s+(\d{4}-\d{2}-\d{2})*/;
-      pattern.exec(this._gui_subversion_no);
-      this._gui_subversion_no = RegExp.$1 + ' (' + RegExp.$2 + ')'; 
+      this._gui_subversion_no = version[0];
+      //this._gui_subversion_no = version[0].replace(/[^-0-9:\. ]/g,''); 
+      //var pattern = /([0-9\.]+)\s+[\(]?(\d{4}-\d{2}-\d{2})*[\)]?/;
+      //pattern.exec(this._gui_subversion_no);
+      //this._gui_subversion_no = RegExp.$1 + ' (' + RegExp.$2 + ')'; 
     }
     catch(x) {
     }
@@ -1030,10 +1031,10 @@ Scheduler.prototype.UTCtoTimezone = function( datetime )
 }
 
 
-/*Scheduler.prototype.getTimezones = function()
+Scheduler.prototype.getTimezones = function()
 {
 	return moment.tz.names();
-}*/
+}
 
 
 //--------------------------------------------------------------------------------showOffsetOfLocalTime
