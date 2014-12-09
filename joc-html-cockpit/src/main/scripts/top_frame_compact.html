@@ -37,7 +37,7 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-// $Id$
+// $Id: top_frame_compact.html 28465 2014-12-03 11:55:24Z oh $
 //-->
     <style type="text/css">
         @import url(scheduler.css);
@@ -85,42 +85,68 @@ function do_onload()
 function setTimezones(jobSchedulerTimeZoneAttribute) 
 { 
 	  var timezones = document.getElementById('timezones');
+	  var preSelectedOptionFound = false;
 	  timezones.options[0] = new Option( parent.getTranslation('local') + ' (' + parent._scheduler.showOffsetOfLocalTime()+ ')', 'local' );
 	  if( parent._timezone_preselected == 'local' ) {
 	  	timezones.selectedIndex = 0;
+	  	preSelectedOptionFound = true;
 	  }
 	  var optIndex = 1;
 	  if ( jobSchedulerTimeZoneAttribute != null && parent._scheduler.checkTimezone(jobSchedulerTimeZoneAttribute.nodeValue)) {
 	  	timezones.options[1] = new Option( 'JobScheduler (' + jobSchedulerTimeZoneAttribute.nodeValue + ')', jobSchedulerTimeZoneAttribute.nodeValue );
-	  	if( parent._timezone_preselected == 'JobScheduler' ) {
+	  	if( !preSelectedOptionFound && parent._timezone_preselected.toLowerCase() == 'jobscheduler' ) {
 	  		timezones.selectedIndex = optIndex;
+	  		preSelectedOptionFound = true;
 	  	}
 	  	optIndex++;
 	  } 
-	  var unsupportedTimezones = '';
+	  var unsupportedTimezones = [];
 	  for(var key in parent._timezones ) {
 	  	if ( parent._scheduler.checkTimezone(parent._timezones[key])) { 
 	  		timezones.options[optIndex] = new Option( key, parent._timezones[key] );
-	  		if( parent._timezone_preselected == key ) {
+	  		if( !preSelectedOptionFound && parent._timezone_preselected == key ) {
 	  			timezones.selectedIndex = optIndex;
+	  			preSelectedOptionFound = true;
 	  		}
 	  		optIndex++;
 	  	}
 	  	else {
-	  		unsupportedTimezones += key +'='+ parent._timezones[key] + "\n";
+	  		unsupportedTimezones.push( key +' = '+ parent._timezones[key] );
+	  	}
+    }
+    var optionBar = new Option( '-------------------------------------------', '' );
+    optionBar.disabled = true;
+    timezones.options[optIndex] = optionBar;
+    var availTimezones = parent._scheduler.getTimezones();
+    for( i=0; i < availTimezones.length; i++ ) {
+    	timezones.options[optIndex+i+1] = new Option( availTimezones[i], availTimezones[i] );
+    	if( !preSelectedOptionFound && parent._timezone_preselected.toLowerCase() == availTimezones[i].toLowerCase() ) {
+	  		timezones.selectedIndex = optIndex+i+1;
+	  		preSelectedOptionFound = true;
 	  	}
     }
     if(unsupportedTimezones.length > 0) {
-    	alert( "You have configured unsupported time zones: \n" + unsupportedTimezones );
+    	alert( "You have configured unsupported time zones: \n" + unsupportedTimezones.split("\n") );
     }
 }
 
 
 //----------------------------------------------------------------------------------------setTimezone
-function setTimezone(timezone)
+function setTimezone(timezones)
 {
-	parent._scheduler._timezone = timezone;
-	if( typeof parent.left_frame.update == 'function' ) window.setTimeout("parent.left_frame.update()",5);	
+	var timezone = timezones.value;
+	if(timezone == '') {
+		for( i=0; i < timezones.length; i++ ) {
+			if( parent._scheduler._timezone == timezones.options[i].value ) {
+				timezones.selectedIndex = i;
+				break;
+			}
+		}
+	}
+	else {
+		parent._scheduler._timezone = timezone;
+		if( typeof parent.left_frame.update == 'function' ) window.setTimeout("parent.left_frame.update()",5);
+	}
 }
 
 
@@ -210,7 +236,7 @@ function set_state(response)
     document.getElementById('spooler_release').innerHTML      = parent._scheduler._gui_release_no;
     var spooler_build                                         = parent._scheduler._gui_subversion_no.replace(/[ ]+[^ ]*/,"");
     if(parent._scheduler._version_no) {
-    	spooler_build                                          += '/' + parent._scheduler._version_no.replace(/.*\.([^\.]+)$/,"$1");
+    	spooler_build                                          += '/' + parent._scheduler._version_no;
     }
     document.getElementById('spooler_build').innerHTML        = spooler_build;
     document.getElementById('spooler_time').innerHTML         = (parent._scheduler.UTCtoTimezone(state.getAttribute('time')) || '0000-00-00 00:00:00');
