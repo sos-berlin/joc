@@ -1258,12 +1258,12 @@ SchedulerDate.prototype.seconds2TimeString = function( secs )
 
 //--------------------------------------------------------------------------------SchedulerDate.getDuration
 SchedulerDate.prototype.getDuration = function( datetime )
-{
+{  
    var result = "";
-   var schDate = moment(datetime);
-   if( this.isValid && schDate.isValid() ) {
-   	 		var duration = Math.abs(this._moment.diff(schDate._moment));
-   	 		var durationDays = Math.abs(this._moment.diff(schDate._moment, "days"));
+   var schDate = moment(datetime); 
+   if( this._isValid && schDate.isValid() ) {
+   	 		var duration = Math.abs(this._moment.diff(schDate));
+   	 		var durationDays = Math.abs(this._moment.diff(schDate, "days"));
    	 		if( durationDays > 0 ) {
    	 			  result = durationDays + " ";
    	 		}
