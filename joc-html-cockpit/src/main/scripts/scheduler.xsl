@@ -33,7 +33,7 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-// $Id$
+// $Id: scheduler.xsl 28365 2014-11-27 12:29:01Z oh $
 //-->
 <xsl:stylesheet xmlns:xsl   = "http://www.w3.org/1999/XSL/Transform" 
                 version     = "1.0">
@@ -1034,13 +1034,13 @@
         </xsl:if>
          
         <tr class="list">
-        	<xsl:if test="not(@occupied_by_cluster_member_id)">
+        	<!--xsl:if test="not(@occupied_by_cluster_member_id)"-->
            		<xsl:attribute name="title">show order details</xsl:attribute>
-          </xsl:if>
+          <!--/xsl:if-->
           <td colspan="4">
-          		<xsl:if test="not(@occupied_by_cluster_member_id)">
+          		<!--xsl:if test="not(@occupied_by_cluster_member_id)"-->
                   <xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
-              </xsl:if>
+              <!--/xsl:if-->
               <b><xsl:apply-templates mode="trim_slash" select="@order"/></b>
               <xsl:if test="@title">&#160;&#160;- &#160;<xsl:apply-templates select="@title"/></xsl:if>
           </td>
@@ -2151,17 +2151,18 @@
               </xsl:if--> 
               
               <tr class="list">
-              	<xsl:if test="not(@occupied_by_cluster_member_id)">
+              	<!--xsl:if test="not(@occupied_by_cluster_member_id)"-->
               		<xsl:attribute name="title">show order details</xsl:attribute>
-              	</xsl:if>
+              	<!--/xsl:if-->
                 <xsl:if test="$treeview">
                   <xsl:attribute name="oncontextmenu">order_menu__onclick( '<xsl:value-of select="@job_chain"/>', '<xsl:value-of select="$normalized_order_id"/>', '<xsl:value-of select="name(parent::*)"/>' );return false;</xsl:attribute>
-                  <xsl:if test="not(@occupied_by_cluster_member_id)">
+                  <!--xsl:if test="not(@occupied_by_cluster_member_id)"-->
                     	<xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
-                  </xsl:if>
+                  <!--/xsl:if-->
                 </xsl:if> 
                 <td>
-                  <xsl:if test="not($treeview) and not(@occupied_by_cluster_member_id)">
+                  <!--xsl:if test="not($treeview) and not(@occupied_by_cluster_member_id)"-->
+                  <xsl:if test="not($treeview)">
                     <xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
                   </xsl:if>
                   <xsl:if test="name(parent::*) = 'blacklist'">
@@ -2190,9 +2191,9 @@
                   </xsl:when>
                   <xsl:otherwise>
                     <td colspan="3" style="padding-left:2ex;white-space:nowrap;">
-                      <xsl:if test="not(@occupied_by_cluster_member_id)">
+                      <!--xsl:if test="not(@occupied_by_cluster_member_id)"-->
                     		<xsl:attribute name="onclick">callErrorChecked( 'show_order_details','<xsl:value-of select="$normalized_order_id"/>','<xsl:value-of select="@job_chain"/>' )</xsl:attribute>
-                  		</xsl:if>
+                  		<!--/xsl:if-->
                   		<span class="label">Order</span><span class="small">:&#160;</span>
                       <span style="white-space:normal;">
                           <xsl:apply-templates mode="trim_slash" select="@id" />
@@ -2288,17 +2289,26 @@
         <xsl:param name="with_datetimes"     select="true()"/>
         
         <xsl:choose>
-           <xsl:when test="@occupied_by_cluster_member_id">
+           <!--xsl:when test="@occupied_by_cluster_member_id">
                <xsl:apply-templates mode="cluster_member" select="." />
-           </xsl:when>
+           </xsl:when-->
            <xsl:when test="@on_blacklist='yes'">
                <span class="red_label">on blacklist</span>
            </xsl:when>
-           <xsl:when test="@suspended = 'yes'">
-               <span style="white-space:nowrap;"><span class="red_label">suspended</span>
-               <xsl:if test="$with_datetimes">
-                 &#160;( <xsl:apply-templates mode="datetimes" select="."/>)
-               </xsl:if></span>
+           <xsl:when test="@suspended = 'yes' or @occupied_by_cluster_member_id">
+           			<span style="white-space:nowrap;">
+           			<xsl:if test="@occupied_by_cluster_member_id">
+            				<xsl:apply-templates mode="cluster_member" select="." />
+            		</xsl:if>
+            		<xsl:if test="@suspended = 'yes' and @occupied_by_cluster_member_id">
+            		   <xsl:value-of select="' - '"/>
+            		</xsl:if>
+            		<xsl:if test="@suspended = 'yes'">
+               		 <span class="red_label">suspended</span>
+               	</xsl:if>
+               	<xsl:if test="$with_datetimes">
+                 		&#160;( <xsl:apply-templates mode="datetimes" select="."/>)
+               		</xsl:if></span>
            </xsl:when>
            <xsl:when test="@removed">
                <span class="red_label">deleted</span>
