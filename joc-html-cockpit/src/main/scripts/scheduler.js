@@ -54,7 +54,7 @@ function Scheduler()
     this._engine_cpp_url                                 = this._base_url;
 		this._command_url                                    = this._base_url;
 		this._cookie_path																		 = "/";
-		this._port                                           = null;
+		this._port                                           = "";
 		this._with_jetty																		 = false;
 		 
     if(this._base_url.toLowerCase().indexOf("/jobscheduler/operations_gui/") >= 0) {
@@ -62,7 +62,7 @@ function Scheduler()
 			this._engine_cpp_url                             	 = this._base_url.replace(/\/jobscheduler\/operations_gui\//, "/jobscheduler/engine-cpp/");
 			this._port                                         = window.location.port;
 			this._with_jetty																	 = true;
-			this._command_url                                  = this._base_url.replace(/\/jobscheduler\/operations_gui\//, "/jobscheduler/engine/command");
+			this._command_url                                  = this._base_url.replace(/\/jobscheduler\/operations_gui\//, "/jobscheduler/engine/command/");
 			this._cookie_path																	 = "/jobscheduler";
 		}
 		else if(this._base_url.toLowerCase().indexOf("/jobscheduler/joc/") >= 0) {
@@ -70,7 +70,15 @@ function Scheduler()
 			this._engine_cpp_url                             	 = this._base_url.replace(/\/jobscheduler\/joc\//, "/jobscheduler/engine-cpp/");
 			this._port                                         = window.location.port;
 			this._with_jetty																	 = true;
-			this._command_url                                  = this._base_url.replace(/\/jobscheduler\/joc\//, "/jobscheduler/engine/command");
+			this._command_url                                  = this._base_url.replace(/\/jobscheduler\/joc\//, "/jobscheduler/engine/command/");
+			this._cookie_path																	 = "/jobscheduler";
+		}
+		else if(this._base_url.toLowerCase().search("\/jobscheduler\/$") >= 0) {
+			this._url                                        	 = this._base_url;
+			this._engine_cpp_url                             	 = this._base_url + "engine-cpp/";
+			this._port                                         = window.location.port;
+			this._with_jetty																	 = true;
+			this._command_url                                  = this._base_url + "engine/command/";
 			this._cookie_path																	 = "/jobscheduler";
 		}
 		this._dom                                            = null;
@@ -625,7 +633,7 @@ Scheduler.prototype.setState = function( state )
           this._git_commit    = git_commit; //trim
         }
         this._host            = state.getAttribute('host');
-        if( this._port == null ) {
+        if( this._port == "" ) {
         	this._port          = state.getAttribute('tcp_port');
         } 
         this._id              = state.getAttribute('id');
