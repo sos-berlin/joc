@@ -970,6 +970,7 @@ function get_order_states( big_chain )
       var job_chain_nodes   = job_chain_element.selectNodes( ".//job_chain_node[@job]|.//file_order_sink" );
       var job_chain_endnodes   = job_chain_element.selectNodes( ".//job_chain_node[not(@job)]|.//job_chain_node.end" );
     }
+    end_states.push( {key:'', display:'(none)'} );
     for( var i = 0; i < job_chain_nodes.length; i++ ) {
     		states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state'), endnode:false} );
         end_states.push( {key:job_chain_nodes[i].getAttribute('state'), display:job_chain_nodes[i].getAttribute('state'), endnode:false} );
