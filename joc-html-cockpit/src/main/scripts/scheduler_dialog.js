@@ -1446,7 +1446,7 @@ function job_menu__onclick( job_name )
     //if( !job_title ) job_title = job_name.replace(/^\//,'');
     _obj_title        = title_encode(job_title);
     _obj_name         = xml_encode(job_name.replace(/^\//,''));
-    var hot           = job_element.selectSingleNode('file_based/@file');
+    var hot           = job_element.selectSingleNode('file_based/@file') ? 1 : 0;
     
     popup_builder.add_show_log( parent.getTranslation("Show log")        , "job=" + encodeComponent(job_name), "show_log_job_" + job_name.replace(/\//g,'_') );
     popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('job', '"+parent.left_frame._job_name+"')", hot );
