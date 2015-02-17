@@ -753,7 +753,7 @@ function input_dialog_submit()
     var fields = new Object();
     var dialog_form = document.forms["__input_dialog__"];
     if( dialog_form ) {
-      for( var i = 0; i < dialog_form.length; i++ ) {
+    	for( var i = 0; i < dialog_form.length; i++ ) {
         var element = dialog_form.elements[i];
         if( !element.type ) continue;
         switch( element.type ) {
@@ -768,16 +768,27 @@ function input_dialog_submit()
               break;
         }
       }
+      fields.param_names = [];
+      if(fields._param_names) {
+      	var param_names  = ( fields._param_names == "" ) ? new Array() : fields._param_names.split(";");
+      	for( var i = 0; i < param_names.length; i++ ) {
+      		if(dialog_form.elements[ param_names[i] ]) {
+      			fields.param_names.push(param_names[i]);
+      		} 
+      	}
+      }
       fields.count_new_params = 0;
       var count_new_params_element = dialog_form.elements["count_new_params"];
       if( count_new_params_element ) {
         var count_new_params = parseInt( count_new_params_element.value, 10 );
         fields.new_params = new Object();
         for( var i = 0; i < count_new_params; i++ ) {
-          var new_param_name = dialog_form.elements["new_param_name_" + i].value;
-          if( new_param_name != "" ) { 
-            fields.new_params[ new_param_name ] = dialog_form.elements["new_param_value_" + i].value;
-            fields.count_new_params++;
+        	if(dialog_form.elements["new_param_name_" + i]) { 
+          	var new_param_name = dialog_form.elements["new_param_name_" + i].value;
+          	if( new_param_name != "" ) { 
+            	fields.new_params[ new_param_name ] = dialog_form.elements["new_param_value_" + i].value;
+            	fields.count_new_params++;
+          	}
           }
         }
       }
@@ -1041,10 +1052,10 @@ window.onerror  = function( msg, url, line ) {
   </td></tr></table>
     
   <!-- iframe for IE to display div above without any listboxes shine through -->  
-  <iframe id="__input_iframe__" style="display:none;top:70px;position:absolute;" src="about:blank"></iframe>
+  <!--iframe id="__input_iframe__" style="display:none;top:70px;position:absolute;" src="about:blank"></iframe>
   <div id="__input_shadow1__" class="shadow1"></div>
-  <div id="__input_shadow2__" class="shadow2"></div>
-  <div id="__input__" class="input"></div>
+  <div id="__input_shadow2__" class="shadow2"></div-->
+  <div id="__input__" class="input shadow"></div>
   
   <!-- info box -->
   <div id="info" style="display:none;position:absolute;top:54px;left:40px;z-index:100;">

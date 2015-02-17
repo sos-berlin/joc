@@ -373,14 +373,14 @@ Input_dialog.close = function()
     }
     Input_dialog._element.innerHTML     = "";
     Input_dialog._element.style.display = "none";
-    var shadowElem1                     = parent.left_frame.document.getElementById('__input_shadow1__');
-    var shadowElem2                     = parent.left_frame.document.getElementById('__input_shadow2__');
-    if( shadowElem1 && shadowElem2 ) {
-      shadowElem1.style.display         = "none";
-      shadowElem2.style.display         = "none";
-    }
-    var iframeElem                      = parent.left_frame.document.getElementById('__input_iframe__');
-    if( parent._scheduler._ie > 0 && iframeElem ) { iframeElem.style.display  = "none"; }
+    //var shadowElem1                     = parent.left_frame.document.getElementById('__input_shadow1__');
+    //var shadowElem2                     = parent.left_frame.document.getElementById('__input_shadow2__');
+    //if( shadowElem1 && shadowElem2 ) {
+    //  shadowElem1.style.display         = "none";
+    //  shadowElem2.style.display         = "none";
+    //}
+    //var iframeElem                      = parent.left_frame.document.getElementById('__input_iframe__');
+    //if( parent._scheduler._ie > 0 && iframeElem ) { iframeElem.style.display  = "none"; }
 }
  
 
@@ -408,7 +408,7 @@ Input_dialog.prototype.show = function()
       first_elem.focus();
       if( first_elem.type.search( /^text/ ) > -1 && first_elem.name != 'run_time' ) first_elem.select();
     }
-    Input_dialog.add_shadow();
+    //Input_dialog.add_shadow();
 }
 
 
@@ -561,7 +561,7 @@ Input_dialog.prototype.add_textarea = function( name, val, rows )
 
 Input_dialog.prototype.add_params = function( params, param_names ) 
 {    
-    this.add_hidden( "param_names", param_names.join(";") );
+    this.add_hidden( "_param_names", param_names.join(";") );
       
     this._with_params = true;
     var first = true;
@@ -576,26 +576,27 @@ Input_dialog.prototype.add_params = function( params, param_names )
             this._html_array.push( '<td style="padding-top:8px;"><b>'+parent.getTranslation('Change parameters')+'</b></td>' );
             this._html_array.push( '</tr>' );
             this._html_array.push( '<tr><td style="padding:0px;">' );
-            this._html_array.push( '<table cellspacing="0" cellpadding="0" width="100%" border="0">' );  
+            this._html_array.push( '<table cellspacing="0" cellpadding="0" width="100%" border="0">' );
+            this._html_array.push( '<colgroup><col width="40%"><col width="*"><col width="1%"></colgroup><tbody>' );  
         }
         if( param_names[i] == "command" ) {
         		var isHex = params[param_names[i]].ishex() ? "true" : "false";
             this._html_array.push( '<tr>' );
-            this._html_array.push( '<td class="param_name" colspan="2" style="width:100%;padding-right:2px;"><span style="position:relative;top:-2px;">' + param_names[i] + '</span></td></tr>' );
+            this._html_array.push( '<td class="param_name" colspan="3" style="width:100%;padding-right:2px;"><span style="position:relative;top:-2px;">' + param_names[i] + '</span></td></tr>' );
             this._html_array.push( '<tr>' );
             this._html_array.push( '<td colspan="2" style="width:100%;padding-bottom:2px;">' );
             this._html_array.push( '<textarea sos_value_ishex="'+isHex+'" name="' + param_names[i] + '" style="width:' + (this.width-1) + 'px" rows="4" onfocus="this.select();">' + params[param_names[i]].hex2bin() + '</textarea>' );
-            this._html_array.push( '</td></tr>' );
+            this._html_array.push( '</td><td onclick="this.parentNode.parentNode.removeChild(this.parentNode);"><div class="delete"></div></td></tr>' );
         } else {
             this._html_array.push( '<tr>' );
-            this._html_array.push( '<td class="param_name" style="width:40%;padding-right:2px;"><span style="position:relative;top:-2px;">' + param_names[i] + '</span></td>' );
-            this._html_array.push( '<td style="width:60%;padding-bottom:2px;">' );
+            this._html_array.push( '<td class="param_name" style="padding-right:2px;"><span style="position:relative;top:-2px;">' + param_names[i] + '</span></td>' );
+            this._html_array.push( '<td style="padding-bottom:2px;text-align:right;">' );
             this._html_array.push( '<input type="text" name="' + param_names[i] + '" value="' + params[param_names[i]] + '" style="width:' + parseInt((this.width*3/5)-1,10) + 'px"/>' );
-            this._html_array.push( '</td></tr>' );
+            this._html_array.push( '</td><td onclick="this.parentNode.parentNode.removeChild(this.parentNode);"><div class="delete"></div></td></tr>' );
         }
     }
     if( !first ) {
-      this._html_array.push( '</table></td></tr>' );
+      this._html_array.push( '</tbody></table></td></tr>' );
     } else {
       this._with_new_params = true;
     }
@@ -622,8 +623,9 @@ Input_dialog.add_new_params = function( width, input_form, with_shadow )
       if( input_new_parameters_title ) input_new_parameters_title.style.display = ( parent._scheduler._ie > 0 ) ? "block" : "table-row";
       if( input_new_parameters_tr    ) input_new_parameters_tr.style.display    = ( parent._scheduler._ie > 0 ) ? "block" : "table-row";
       if( input_new_parameters       ) { 
-        var new_param_html = '<table cellspacing="0" cellpadding="0" width="100%" border="0"><tbody id="__input_new_parameters_body__">';
-        new_param_html    += '<tr><th >'+parent.getTranslation('name')+'</th><th >'+parent.getTranslation('value')+'</th></tr>';
+        var new_param_html = '<table cellspacing="0" cellpadding="0" width="100%" border="0">';
+        new_param_html    += '<colgroup><col width="40%"><col width="*"><col width="1%"></colgroup><tbody id="__input_new_parameters_body__">';
+        new_param_html    += '<tr><th style="width:40%" >'+parent.getTranslation('name')+'</th><th colspan="2" style="width:*">'+parent.getTranslation('value')+'</th></tr>';
         new_param_html    += '</tbody></table>';
         input_new_parameters.innerHTML = new_param_html;
       }
@@ -650,11 +652,20 @@ Input_dialog.add_new_param = function( width, idx )
     var newTD                 = parent.left_frame.document.createElement("td");
     newTR.appendChild(newTD);
     newTD.setAttribute('style', '');
-    newTD.style.width         = "40%";
+    //newTD.style.width         = "40%";
+    newTD.style.paddingRight  = "2px";
     newTD.style.paddingBottom = "2px";
-    var newTD2                = newTD.cloneNode(false);
+    var newTD2                = parent.left_frame.document.createElement("td");
     newTR.appendChild(newTD2);
-    newTD2.style.width        = "60%";
+    newTD2.setAttribute('style', '');
+    //newTD2.style.width         = "*";
+    newTD2.style.textAlign = "right";
+    var newTD3                 = parent.left_frame.document.createElement("td");
+    newTR.appendChild(newTD3);
+    newTD3.setAttribute('onclick',"this.parentNode.parentNode.removeChild(this.parentNode);");
+    var newDeleteDiv          = parent.left_frame.document.createElement("div");
+    newTD3.appendChild(newDeleteDiv);
+    newDeleteDiv.className    = "delete";
     if( parent._scheduler._ie > 0 ) {
       newTD.innerHTML  = '<input type="text" name="new_param_name_' + idx + '" value="" style="width:' + parseInt((width*2/5)-4,10) + 'px;" />';
       newTD2.innerHTML = '<input type="text" name="new_param_value_' + idx + '" value="" style="width:' + parseInt((width*3/5)-1,10) + 'px;" />';
@@ -666,7 +677,7 @@ Input_dialog.add_new_param = function( width, idx )
       newINPUT.setAttribute('value', '');
       newINPUT.setAttribute('style', '');
       newINPUT.style.width      = parseInt((width*2/5)-4,10) + 'px';
-      newTR.appendChild(newTD);
+      //newTR.appendChild(newTD);
       var newINPUT2 = parent.left_frame.document.createElement("input");
       newTD2.appendChild(newINPUT2);
       newINPUT2.setAttribute('type', 'text');
@@ -674,7 +685,7 @@ Input_dialog.add_new_param = function( width, idx )
       newINPUT2.setAttribute('value', '');
       newINPUT2.setAttribute('style', '');
       newINPUT2.style.width     = parseInt((width*3/5)-1,10) + 'px';
-      newTR.appendChild(newTD2);
+      //newTR.appendChild(newTD2);
     }
 }    
 

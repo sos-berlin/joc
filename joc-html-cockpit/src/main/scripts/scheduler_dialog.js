@@ -621,16 +621,7 @@ function start_task( ret ) {
     } else {
       try {
           var fields        = input_dialog_submit();
-          param_names       = ( fields.param_names == "" ) ? new Array() : fields.param_names.split(";");
-          var params        = "";
-          if( param_names.length + fields.count_new_params > 0 ) params += '<params>'; 
-          for( var i = 0; i < param_names.length; i++ ) {
-             params += '<param name="' + param_names[i] + '" value="' + xml_encode(fields[param_names[i]]) + '"/>';
-          }
-          for( var new_param in fields.new_params ) {
-             params += '<param name="' + new_param + '" value="' + xml_encode(fields.new_params[new_param]) + '"/>';
-          }
-          if( param_names.length + fields.count_new_params > 0 ) params += '</params>';
+          var params        = getParamsXML(fields);
       }
       catch( x ) {
           return showError( x );
@@ -735,17 +726,7 @@ function start_order( ret )
     } else {
       try {
           var fields        = input_dialog_submit();
-          param_names       = ( fields.param_names == "" ) ? new Array() : fields.param_names.split(";");
-          var params        = "";
-          if( param_names.length + fields.count_new_params > 0 ) params += '<params>'; 
-          for( var i = 0; i < param_names.length; i++ ) {
-          	 params += '<param name="' + param_names[i] + '" value="' + xml_encode(fields[param_names[i]]) + '"/>';
-          }
-          for( var new_param in fields.new_params ) {
-            //var value = (new_param == "command") ? fields.new_params[new_param].bin2hex() : xml_encode(fields.new_params[new_param]);
-            params += '<param name="' + new_param + '" value="' + xml_encode(fields.new_params[new_param]) + '"/>';
-          }
-          if( param_names.length + fields.count_new_params > 0 ) params += '</params>';
+          var params        = getParamsXML(fields);
       }
       catch( x ) {
           return showError( x );
@@ -831,17 +812,8 @@ function add_order( big_chain, order_state, order_end_state, ret )
       var msg    = "";
       
       try {
-          param_names       = ( fields.param_names == "" ) ? new Array() : fields.param_names.split(";");
-          var params        = "";
-          if( param_names.length + fields.count_new_params > 0 ) params += '<params>'; 
-          for( var i = 0; i < param_names.length; i++ ) {
-             params += '<param name="' + param_names[i] + '" value="' + xml_encode(fields[param_names[i]]) + '"/>';
-          }
-          for( var new_param in fields.new_params ) {
-             //var value = (new_param == "command") ? fields.new_params[new_param].bin2hex() : xml_encode(fields.new_params[new_param]);
-             params += '<param name="' + new_param + '" value="' + xml_encode(fields.new_params[new_param]) + '"/>';
-          }
-          if( param_names.length + fields.count_new_params > 0 ) params += '</params>';
+          var fields        = input_dialog_submit();
+          var params        = getParamsXML(fields);
       }
       catch( x ) {
       		Input_dialog.close();
@@ -861,6 +833,21 @@ function add_order( big_chain, order_state, order_end_state, ret )
       	Input_dialog.close();
       }
     }   
+}
+
+
+function getParamsXML(fields)
+{
+		var params        = "";
+    if( fields.param_names.length + fields.count_new_params > 0 ) params += '<params>'; 
+    for( var i = 0; i < fields.param_names.length; i++ ) {
+    	params += '<param name="' + fields.param_names[i] + '" value="' + xml_encode(fields[fields.param_names[i]]) + '"/>';
+    }
+    for( var new_param in fields.new_params ) {
+    	params += '<param name="' + new_param + '" value="' + xml_encode(fields.new_params[new_param]) + '"/>';
+    }
+    if( fields.param_names.length + fields.count_new_params > 0 ) params += '</params>';
+    return params;
 }
 
 

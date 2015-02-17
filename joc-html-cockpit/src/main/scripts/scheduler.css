@@ -157,7 +157,11 @@ a.list:hover                    {background-color:#F2F5FA;}
 
 
 /* Dialog for Inputs of menu functions */
-.input                          {padding:0px;margin:0px;font-size:12px;}
+.input                          {padding:0px;margin:0px;font-size:12px;} 
+.shadow                         {-webkit-box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.5);
+                                 -moz-box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.5);
+                                 box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.5); }
+div.delete                       {background-image:url('delete_14x19.gif');background-repeat:no-repeat; width:14px; height:19px; line-height:19px; cursor:pointer;}
 div.shadow1                     {display:none;position:absolute;background-color:#333333;left:34px;top:78px;z-index:18;-moz-opacity:0.4;}
 div.shadow2                     {display:none;position:absolute;background-color:#AAAAAA;left:32px;top:76px;z-index:19;-moz-opacity:0.4;}
 div.input                       {background-color:#F2F5FA;border:1px solid #8B919F;display:none;position:absolute;top:70px;left:26px;z-index:20;}
