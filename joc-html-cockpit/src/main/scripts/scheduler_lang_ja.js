@@ -374,6 +374,8 @@ _translations['pattern']                                   = '条件';
 _translations['delay']                                     = '間隔';
 _translations['repeat']                                    = '繰返回数';
 _translations['blacklist']                                 = 'ブラックリスト';
+_translations['max. Orders']                               = '最大のオーダー';
+
 
 /******************************************************************************
 *                         ORDERS/ORDERQUEUE/BLACKLIST                         *

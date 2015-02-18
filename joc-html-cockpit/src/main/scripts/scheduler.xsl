@@ -393,6 +393,8 @@
           <xsl:when test="file_based/ERROR or file_based/removed or replacement">crimson</xsl:when>
           <xsl:when test="file_based/requisites/requisite/@is_missing='yes'">crimson</xsl:when>
           <xsl:when test="contains($node_icon_color,'crimson')">crimson</xsl:when>
+          <xsl:when test="@state='stopped'">crimson</xsl:when>
+          <xsl:when test="@max_orders=0">crimson</xsl:when>
           <!--xsl:when test="$order_is_suspended &gt; 0">crimson</xsl:when>
           <xsl:when test="$order_is_running &gt; 0">forestgreen</xsl:when-->
           <xsl:when test="contains($node_icon_color,'forestgreen')">forestgreen</xsl:when>
@@ -432,7 +434,7 @@
           <span class="bold" style="{concat('color:',$font_color)}"><xsl:value-of select="$name" /></span>
           
           <xsl:if test="(@orders &gt; 0 and $big_chain_path='') or $cnt_orders_of_big_chain &gt; 0" >
-            <span class="status_text">&#160;&#160;-&#160;
+              <span class="status_text">&#160;&#160;-&#160;
               <span class="label" style="white-space:nowrap;">Orders</span><span class="small">: </span>
               <xsl:choose>
               	<xsl:when test="$cnt_orders_of_big_chain &gt; 0">
@@ -443,6 +445,10 @@
               	</xsl:otherwise>
               </xsl:choose>
             </span>
+          </xsl:if>
+          <xsl:if test="@max_orders" >
+              <span class="status_text">&#160;&#160;-&#160;
+              <span class="label" style="white-space:nowrap;">max. Orders</span><span class="small">: </span><xsl:value-of select="@max_orders"/></span>
           </xsl:if>
           <xsl:if test="@title">
             <span>&#160;&#160;-&#160;&#160;<xsl:apply-templates select="@title"/></span>
@@ -3003,6 +3009,7 @@
         <xsl:param name="node_state" select="''"/>
         <xsl:variable name="cnt_orders_of_big_chain" select="count(//order_queue/order/order.job_chain_stack/order.job_chain_stack.entry[@job_chain = current()/@path])"/>
         
+        
         <!--xsl:if test="$single or $big_chain or not(@order_id_space) or (@order_id_space and job_chain_node.job_chain)"-->
         <xsl:if test="true()">
         
@@ -3035,12 +3042,19 @@
                 <xsl:attribute name="style">padding-left:4px;</xsl:attribute>
                 <span style="font-size:8pt;font-family:Courier;">&#8594; </span>
               </xsl:if-->
-              <xsl:if test="@state='stopped' or @state='under_construction'">
-                <xsl:attribute name="class">red</xsl:attribute>    
-              </xsl:if>
-              <b><xsl:apply-templates mode="trim_slash" select="@path" /></b>&#160;
+              <b>
+              	<xsl:if test="@state='stopped' or @state='under_construction' or @max_orders=0">
+                	<xsl:attribute name="class">red</xsl:attribute>    
+              	</xsl:if>
+              	<xsl:apply-templates mode="trim_slash" select="@path" />
+              </b>
+              <xsl:if test="@max_orders" >
+              	<span class="status_text">&#160;&#160;-&#160;
+              	<span class="label">max. Orders</span><span class="small">: </span><xsl:value-of select="@max_orders"/></span>
+          		</xsl:if>
               <xsl:if test="@title">
-                 <xsl:apply-templates select="@title"/>
+                 <span>&#160;&#160;-&#160;
+                 </span><xsl:apply-templates select="@title"/>
               </xsl:if>
             </td>
             
@@ -3048,7 +3062,14 @@
               <xsl:if test="not( $single ) or $big_chain">
                 <xsl:attribute name="onclick">callErrorChecked( 'show_job_chain_details', '<xsl:value-of select="@path"/>' )</xsl:attribute>       
               </xsl:if>
-              <xsl:apply-templates select="@state"/>
+              <xsl:choose>
+              	<xsl:when test="@max_orders=0">
+              	  <span class="red_value">max_orders==0</span>
+              	</xsl:when>
+              	<xsl:otherwise>
+              		<xsl:apply-templates select="@state"/>
+              	</xsl:otherwise>
+              </xsl:choose>
             </td>
             
             <td>

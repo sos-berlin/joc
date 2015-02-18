@@ -374,6 +374,7 @@ _translations['pattern']                                   = 'Muster';
 _translations['delay']                                     = 'Verzögerung';
 _translations['repeat']                                    = 'Wiederholung';
 _translations['blacklist']                                 = 'Blacklist';
+_translations['max. Orders']                               = 'Max. Aufträge';
 
 /******************************************************************************
 *                         ORDERS/ORDERQUEUE/BLACKLIST                         *
