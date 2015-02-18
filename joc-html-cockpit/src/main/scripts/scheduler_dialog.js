@@ -747,6 +747,59 @@ function start_order( ret )
     }   
 }
 
+
+function resume_order( ret )
+{
+    if( typeof ret != "boolean" ) ret = false;
+    var params_element = null;
+    var param_names = new Array();
+      
+    if( !ret ) {
+      
+      _popup_menu.close(); 
+      
+      var params      = new Object();
+      try { 
+          var response       = parent._scheduler.executeSynchron( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="payload"/>', false );
+          var params_element = response.selectSingleNode('//order/payload/params'); 
+      }
+      catch( x ) { 
+          return showError( x );
+      }
+      if( params_element ) {  
+          var param_elements = params_element.selectNodes('param');
+          for( var i = 0; i < param_elements.length; i++ ) {  
+              params[param_elements[i].getAttribute( "name" )] = xml_encode(param_elements[i].getAttribute( "value" ).replace( /\\\\/g, "\\"));
+              param_names.push(param_elements[i].getAttribute( "name" ));
+          }
+      }
+      var dialog        = new Input_dialog();
+      dialog.close_after_submit = false;
+      dialog.width      = 384;
+      dialog.submit_fct = "callErrorChecked( 'resume_order', true )";
+      dialog.add_title( "Resume order $order", {order:'<br/>'+_obj_name+'<br/>'+_obj_title} );
+      dialog.add_params( params, param_names.sort() );
+      dialog.show();
+    
+    } else {
+      try {
+          var fields        = input_dialog_submit();
+          var params        = getParamsXML(fields);
+      }
+      catch( x ) {
+          return showError( x );
+      }
+      
+      if( !parent._confirm.resume_order || confirm(parent.getTranslation('Do you really want to resume this order?'))) {
+        	Input_dialog.close();
+        	var xml_command = '<modify_order job_chain="' + parent.left_frame._job_chain + '" order="' + window.parent.left_frame._order_id + '" suspended="no">' + params + '</modify_order>';
+        	exec_modify_order(xml_command);
+      } else {
+        	Input_dialog.close();
+      }
+    }   
+}
+
 //-----------------------------------------------------------------------------add_order
 // Fuer order_menu__onclick()
 
@@ -1617,6 +1670,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       popup_builder.add_entry   ( parent.getTranslation("Set run time")    , "callErrorChecked('set_run_time','order'," + hot + ")", true, parent._hide.set_order_run_time );
       popup_builder.add_command ( parent.getTranslation("Suspend order")   , "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' suspended='yes'/>", (suspended != "yes"), parent._hide.suspend_order, parent._confirm.suspend_order, 'suspend this order' );
       popup_builder.add_command ( parent.getTranslation("Resume order")    , "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' suspended='no'/>", (suspended == "yes"), parent._hide.resume_order, parent._confirm.resume_order, 'resume this order' );
+      popup_builder.add_entry   ( parent.getTranslation("Resume order parametrized"), "callErrorChecked('resume_order',0)", (suspended == "yes"), parent._hide.resume_order );
       popup_builder.add_command ( parent.getTranslation("Reset order")     , "<modify_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "' action='reset'/>", true, parent._hide.reset_order, parent._confirm.reset_order, 'reset this order' );
       if(!hot) {
       	popup_builder.add_command ( parent.getTranslation("Delete order")    , "<remove_order job_chain='" + parent.left_frame._job_chain + "' order='" + parent.left_frame._order_id + "'/>", true, parent._hide.remove_order, parent._confirm.remove_order, 'delete this order', 'job_chain|'+parent.left_frame._job_chain+'|order|'+parent.left_frame._order_id );
