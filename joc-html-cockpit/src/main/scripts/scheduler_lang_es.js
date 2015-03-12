@@ -349,6 +349,7 @@ _translations['Job chain menu']                            = 'Menú de cadenas d
 _translations['Job node menu']                             = 'Menú de nodo de trabajo';
 _translations['Add order']                                 = 'Añadir orden';
 _translations['Add persistent order']                      = 'Añadir orden persistente';
+_translations['Delete temp. orders']                       = 'Eliminar temp. ordenes';
 _translations['Delete job chain']                          = 'Eliminar cadena de trabajo';
 _translations['Skip']                                      = 'Omitir';
 _translations['Unskip']                                    = 'No omitir';
@@ -735,7 +736,6 @@ _translations['Declare new parameters']                    = 'Establecer nuevo p
 _translations['name']                                      = 'Nombre';
 _translations['value']                                     = 'Valor';
 
-
 //add order
 _translations['Add order to $job_chain']                   = 'Añada orden a $job_chain';
 _translations['Enter an order id']                         = 'Ingrese la id de la orden';
@@ -750,6 +750,10 @@ _translations['<b>Select a new order state</b>']           = '<b>Seleccione un n
 _translations['<span class="small">The current order state is $state.</span>'] = '<span class="small">El estado actual es $state.</span>';
 _translations['<b>Select a new order end state</b>']       = '<b>Seleccione un nuevo estado final de orden.</b>';
 _translations['<span class="small">The current order end state is $state.</span>'] = '<span class="small">El estado final de orden actual es $state.</span>';
+
+//remove temp. orders
+_translations['Delete temporary orders from $job_chain']   = 'Eliminar ordenes temporales de $job_chain';
+_translations['all']                                       = 'todos'; 
 
 //set run time
 _translations['Set run time of $job']                      = 'Establezca tiempo de la ejecución de $job';
@@ -833,6 +837,7 @@ _translations['Do you really want to suspend this order?']                  = 'D
 _translations['Do you really want to resume this order?']                   = 'Desea usted realmente continuar esta orden?';
 _translations['Do you really want to change the order state?']              = 'Desea usted realmente cambiar el estado de orden?';
 _translations['Do you really want to delete this order?']                   = 'Desea usted realmente eliminar esta orden?';
+_translations['Do you really want to delete selected orders?']              = 'Desea usted realmente eliminar ordenes seleccionadas?';
 _translations['Do you really want to remove the setback?']                  = 'Desea usted realmente eliminar el contratiempo?';
 
 _translations['Do you really want to set the run time?']                    = 'Desea usted realmente modificar el tiempo de ejecución?';

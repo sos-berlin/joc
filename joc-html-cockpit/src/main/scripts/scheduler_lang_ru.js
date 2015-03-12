@@ -351,6 +351,7 @@ _translations['Job node menu']                             = 'Job-Узел-Ме�
 _translations['Add order']                                 = 'Добавить Ордер';
 _translations['Add persistent order']                      = 'Добавить персистентный Ордер';
 _translations['Delete job chain']                          = 'Job-Цепочку удалить';
+_translations['Delete temp. orders']                       = 'Удаление временных заказы';
 _translations['Skip']                                      = 'Перепрыгнуть';
 _translations['Unskip']                                    = 'Добавить';
 _translations['Skip node']                                 = 'Узел перепрыгнуть';
@@ -734,7 +735,6 @@ _translations['Declare new parameters']                    = 'Задать но�
 _translations['name']                                      = 'Имя';
 _translations['value']                                     = 'Значение';
 
-
 //add order
 _translations['Add order to $job_chain']                   = 'Добавить Ордер к $job_chain';
 _translations['Enter an order id']                         = 'Id Ордера';
@@ -742,6 +742,10 @@ _translations['Enter an order title']                      = 'Название �
 _translations['Select an order state']                     = 'Статус Ордера';
 _translations['Select an order end state']                 = 'Конечный статус Ордера';
 _translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?'] = 'Для передачи Ордера в Hot Folder нужно указать Ордер-ID\n.Иначе этот Ордер действителен только в течении актуальной JobScheduler Session.\nПродолжить?';
+
+//remove temp. orders
+_translations['Delete temporary orders from $job_chain']   = 'Удаление временных заказы от $job_chain';
+_translations['all']                                       = 'все'; 
 
 //set order state
 _translations['Set order state of $order']                 = 'Задать статус для $order';
@@ -831,6 +835,7 @@ _translations['Do you really want to suspend this order?']                  = '�
 _translations['Do you really want to resume this order?']                   = 'Вы действительно хотите резюмировать этот Ордер?';
 _translations['Do you really want to change the order state?']              = 'Вы действительно хотите поменять статус этого Ордера?';
 _translations['Do you really want to delete this order?']                   = 'Вы действительно хотите удалить этот Ордер?';
+_translations['Do you really want to delete selected orders?']              = 'Вы действительно хотите удалить выбранные заказы?';
 _translations['Do you really want to remove the setback?']                  = 'Вы действительно хотите удалить эту Задержку?';
 
 _translations['Do you really want to set the run time?']                    = 'Вы действительно хотите изменить время старта?';

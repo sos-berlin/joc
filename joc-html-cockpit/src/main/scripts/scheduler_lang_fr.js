@@ -349,6 +349,7 @@ _translations['Job node menu']                             = 'Menu Tâche Noeud'
 _translations['Add order']                                 = 'Ajouter un ordre';
 _translations['Add persistent order']                      = 'Ajouter un ordre persistent';
 _translations['Delete job chain']                          = 'Supprimer une chaîne des tâches';
+_translations['Delete temp. orders']                       = 'Supprimer temp. ordres';
 _translations['Unskip']                                    = 'Annuler la saute';
 _translations['Skip node']                                 = 'Skip le noeud';
 _translations['Stop node']                                 = 'Désactiver le noeud';
@@ -731,7 +732,6 @@ _translations['Declare new parameters']                    = 'Déclarer de nouve
 _translations['name']                                      = 'nom';
 _translations['value']                                     = 'valeur';
 
-
 //add order
 _translations['Add order to $job_chain']                   = 'Ajouter un ordre à $job_chain';
 _translations['Enter an order id']                         = 'Id ordre';
@@ -740,6 +740,9 @@ _translations['Select an order state']                     = 'Etat de l\'ordre';
 _translations['Select an order end state']                 = 'Etat de fin de l\'ordre';
 _translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?'] = 'Dans le but d\'enregistrer cet ordre dans le \"Hot Folder\" vous devez paramétrer un id d\'ordre.\nVotre ordre sera enregistré de manière permanent mais il sera valide\n pour la durée de validité de la session JobScheduler. Voulez-vous continuer?';
 
+//remove temp. orders
+_translations['Delete temporary orders from $job_chain']   = 'Supprimer ordres temporaires de la chaîne $job_chain';
+_translations['all']                                       = 'tous'; 
 
 //set order state
 _translations['Set order state of $order']                 = 'Fixez l\'état de $order';
@@ -830,6 +833,7 @@ _translations['Do you really want to suspend this order?']                  = 'V
 _translations['Do you really want to resume this order?']                   = 'Voules-vous vraiment reprendre cet ordre?';
 _translations['Do you really want to change the order state?']              = 'Voulez-vous vraiment modifier l\'etat de l\'ordre?';
 _translations['Do you really want to delete this order?']                   = 'Voulez-vous vraiment supprimer cet ordre?';
+_translations['Do you really want to delete selected orders?']              = 'Voulez-vous vraiment supprimer ordres sélectionnés?';
 _translations['Do you really want to remove the setback?']                  = 'Voulez-vous vraiment supprimer le report?';
 
 _translations['Do you really want to set the run time?']                    = 'Voulez-vous vraiment modifier la date de démarrage?';

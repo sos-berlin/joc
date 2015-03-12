@@ -350,6 +350,7 @@ _translations['Job node menu']                             = 'ジョブノード
 _translations['Add order']                                 = 'オーダー作成';
 _translations['Add persistent order']                      = '永続オーダー作成';
 _translations['Delete job chain']                          = 'ジョブチェーン削除';
+_translations['Delete temp. orders']                       = '一時的な受注を削除';
 _translations['Skip node']                                 = 'ノードスキップ';
 _translations['Stop node']                                 = 'ノード停止';
 _translations['Stop job']                                  = 'ジョブ停止';
@@ -735,7 +736,6 @@ _translations['Declare new parameters']                    = '新規パラメー
 _translations['name']                                      = 'パラメータ名';
 _translations['value']                                     = '値';
 
-
 //add order
 _translations['Add order to $job_chain']                   = 'オーダーを$job_chainに登録';
 _translations['Enter an order id']                         = 'オーダーIDを入力';
@@ -743,6 +743,10 @@ _translations['Enter an order title']                      = 'オーダー名を
 _translations['Select an order state']                     = 'オーダーのステートを選択';
 _translations['Select an order end state']                 = 'オーダーの終了ステートを選択';
 _translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?'] = 'ホットフォルダにこのオーダーを保存するためにはオーダーIDが必要です。\n保存されたオーダーはこのJobSchedulerセッション中有効になります。\n保存しますか?';
+
+//remove temp. orders
+_translations['Delete temporary orders from $job_chain']   = '$job_chainから一時的な受注を削除';
+_translations['all']                                       = 'すべて'; 
 
 //set order state
 _translations['Set order state of $order']                 = '$orderにステートを設定';
@@ -833,6 +837,7 @@ _translations['Do you really want to suspend this order?']                  = 'D
 _translations['Do you really want to resume this order?']                   = 'Do you really want to resume this order?';
 _translations['Do you really want to change the order state?']              = 'Do you really want to change the order state?';
 _translations['Do you really want to delete this order?']                   = '本当にオーダー削除しますか?';
+_translations['Do you really want to delete selected orders?']              = 'Do you really want to delete selected orders?';
 _translations['Do you really want to remove the setback?']                  = 'Do you really want to remove the setback?';
 
 _translations['Do you really want to set the run time?']                    = 'Do you really want to set the run time?';

@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -907,28 +907,47 @@ function getParamsXML(fields)
 //-----------------------------------------------------------------------------delete_orders
 // Fuer job_chain_menu__onclick()
 
-function delete_orders( ret )
+function delete_orders( tempOrders, ret )
 {   
-    if( typeof ret             != "boolean"   ) ret             = false;
-    var hot                    = 1;
+    if( typeof ret != "boolean"   ) ret = false;
         
     if( !ret ) {
-      
       _popup_menu.close();
-      
       var dialog        = new Input_dialog();
-      dialog.width      = 384;
-      dialog.close_after_submit = false;
-      dialog.submit_fct = "callErrorChecked( 'delete_orders', true )";
-      dialog.add_title( "Remove temporary orders from $job_chain", {job_chain:'<br/>'+window.parent.left_frame._job_chain.replace(/^\//,'')} );
-      //TODO list of temp orders and checkbox for all
-      dialog.add_checkbox( "all", parent.getTranslation('all'), false );
+      dialog.width      = 300;
+      dialog.submit_fct = "callErrorChecked( 'delete_orders', '"+tempOrders+"', true )";
+      dialog.add_title( "Delete temporary orders from $job_chain", {job_chain:'<br/>'+window.parent.left_frame._job_chain+'<br/>'} );
+      dialog.add_checkbox( "all", '<span class="input_title">'+parent.getTranslation('all')+'</span>', false );
+      dialog.add_prompt("<hr size='1'/>");
+      var orders = tempOrders.split(","); 
+      for( var i=0; i< orders.length; i++ ) {
+      	 dialog.add_checkbox( orders[i], orders[i], false );
+      }
       dialog.show();
     } else {
       var fields = input_dialog_submit();
-      //TODO plausi 
-      Input_dialog.close();
-      //TODO command
+      var orders = tempOrders.split(",");
+      var xml_commands = [];
+      var orderIsOpenInDetailFrame = (parent.details_frame && !parent.details_frame._hidden && parent.details_frame._job_chain_name == parent.left_frame._job_chain);
+      var selectedOrderIsOpenInDetailFrame = false;
+      
+      for( var i=0; i< orders.length; i++ ) {
+      	if( fields.all || fields[orders[i]] ) {
+      	 	xml_commands.push( '<remove_order job_chain="' + parent.left_frame._job_chain + '" order="' + orders[i] + '"/>' );
+      	 	if( orderIsOpenInDetailFrame && parent.details_frame._order_id == fields[orders[i]] ) {
+      	 		selectedOrderIsOpenInDetailFrame = true;
+      	 	}
+      	}
+      }
+      if( xml_commands.length > 0 && (!parent._confirm.remove_order || confirm(parent.getTranslation('Do you really want to delete selected orders?')))) {
+      	Input_dialog.close(); 
+      	if( selectedOrderIsOpenInDetailFrame ) {
+      		parent.details_frame.hide();
+      	}
+      	exec_modify_order( '<commands>' + xml_commands.join('') + '</commands>' );
+      } else {
+      	Input_dialog.close();
+      } 
     }    
 }
 
@@ -1787,30 +1806,35 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
       var response               = parent._scheduler.executeSynchron( '<show_job_chain job_chain="' + parent.left_frame._job_chain + '" max_order_history="0"/>', false );
       if( response ) job_chain_element = response.selectSingleNode('//job_chain');
     }
-    var hot                      = job_chain_element.selectSingleNode('file_based/@file');
+    var hot                      = job_chain_element.selectSingleNode('file_based/@file') ? 1 : 0;
     
     
     popup_builder.add_entry ( parent.getTranslation("Show configuration")  , "show_xml2('job_chain', '"+job_chain+"')", hot );
     popup_builder.add_entry ( parent.getTranslation("Show dependencies")   , "show_job_chain_illustration()", !big_chain );
-    popup_builder.add_entry ( parent.getTranslation("Show start times")  , "callErrorChecked('show_calendar','job_chain')", !big_chain );
+    popup_builder.add_entry ( parent.getTranslation("Show start times")    , "callErrorChecked('show_calendar','job_chain')", !big_chain );
     
-    if(!parent._hide.add_order) {
+    if(!parent._hide.add_order || (!parent._hide.remove_order && big_chain == 0)) {
     	popup_builder.add_bar();
     }
     popup_builder.add_entry ( parent.getTranslation("Add order")           , "callErrorChecked('add_order'," + big_chain + ")", true, parent._hide.add_order );
     
-    /*if( big_chain == 0) {
-    	var tempOrders               = job_chain_element.selectNodes('//order[not(file_based/@file)]');
-      popup_builder.add_entry ( parent.getTranslation("Delete orders")           , "callErrorChecked('delete_orders')", (tempOrders.length > 0) );
-    }*/
+    if( big_chain == 0) {
+    	//temp. order which are not running
+    	var tempOrderElements      = job_chain_element.selectNodes('//order[not(file_based/@file) and not(@occupied_by_cluster_member_id) and not(@task)]');
+    	var tempOrders             = [];
+    	for( var i= 0; i < tempOrderElements.length; i++ ) {
+    		tempOrders.push( tempOrderElements[i].getAttribute('id') );
+    	}
+    	popup_builder.add_entry ( parent.getTranslation("Delete temp. orders"), "callErrorChecked('delete_orders','" + tempOrders.join(",") + "')", (tempOrders.length > 0), parent._hide.remove_order );
+    }
 
-    	var state             = job_chain_element.getAttribute( "state" );
-      var command           = function( cmd ) { return "<job_chain.modify job_chain='"+parent.left_frame._job_chain+"' state='"+cmd+"'/>"; }
-      if(!parent._hide.stop_job_chain || !parent._hide.unstop_job_chain) {
-      	popup_builder.add_bar();
-      }
-      popup_builder.add_command ( parent.getTranslation("Stop")            , command('stopped'), state != 'stopped', parent._hide.stop_job_chain, parent._confirm.stop_job_chain, 'stop this job chain'  );
-      popup_builder.add_command ( parent.getTranslation("Unstop")          , command('running'), state == 'stopped', parent._hide.unstop_job_chain, parent._confirm.unstop_job_chain, 'unstop this job chain'  );
+    var state             = job_chain_element.getAttribute( "state" );
+    var command           = function( cmd ) { return "<job_chain.modify job_chain='"+parent.left_frame._job_chain+"' state='"+cmd+"'/>"; }
+    if(!parent._hide.stop_job_chain || !parent._hide.unstop_job_chain) {
+    	popup_builder.add_bar();
+    }
+    popup_builder.add_command ( parent.getTranslation("Stop")            , command('stopped'), state != 'stopped', parent._hide.stop_job_chain, parent._confirm.stop_job_chain, 'stop this job chain'  );
+    popup_builder.add_command ( parent.getTranslation("Unstop")          , command('running'), state == 'stopped', parent._hide.unstop_job_chain, parent._confirm.unstop_job_chain, 'unstop this job chain'  );
 
     //popup_builder.add_command ( parent.getTranslation("Delete job chain")  , "<remove_job_chain job_chain='" + parent.left_frame._job_chain + "'/>", orders==1, parent.getTranslation('Do you really want to delete this job chain?'), 'job_chain|'+parent.left_frame._job_chain );
     
@@ -1839,7 +1863,7 @@ function job_chain_node_menu__onclick( state, job_chain )
     }
     if( job_element ) {
       	job_name       = job_element.getAttribute('path');
-      	hot            = job_element.selectSingleNode('file_based/@file');    
+      	hot            = job_element.selectSingleNode('file_based/@file') ? 1 : 0;    
       	enabled        = ( !job_element.getAttribute( "enabled" ) || job_element.getAttribute( "enabled" ) != "no" );
         job_stopped    = (job_element.getAttribute( "state" ) == 'stopped' || job_element.getAttribute( "state" ) == "stopping");
     }

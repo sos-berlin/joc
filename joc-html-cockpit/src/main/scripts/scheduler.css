@@ -169,6 +169,7 @@ div.inner_input                 {padding:0px;margin:0px;border:1px solid white;}
 div.inner_input tbody           {background-color:#F2F5FA;} 
 div.inner_input th, div.inner_input div.inner td {padding-left:1px;padding-right:1px;vertical-align:middle; }
 div.inner_input th.input_title  {font-size:12px;font-weight:bold;color:#808080;text-align:center; }  
+div.inner_input span.input_title {font-weight:bold;color:#808080; }  
 div.inner_input input, div.inner_input select, div.inner_input option {font-size:11px;}
 div.inner_input textarea        {font-size:12px;}
 div.inner_input input.buttonbar {cursor:pointer; padding:0px 1px;margin:0px 1px;font-size:11px;background-color:#E5EAF5;border:1px outset #FFFFFF;color:#444444; }

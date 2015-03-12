@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -539,7 +539,7 @@ Input_dialog.prototype.add_checkbox = function( name, label, checked )
     if( typeof checked      != "boolean" ) checked = false;
     checked = ( checked ) ? ' checked="true"' : "";
     this._html_array.push( '<tr>' );
-    this._html_array.push( '<td style="padding-bottom:2px;"><input type="checkbox" name="' + name + '" value="1"' + checked + '/>&#160;'+label+'</td>' );
+    this._html_array.push( '<td style="padding-bottom:2px;"><span style="white-space:nowrap;"><input type="checkbox" name="' + name + '" value="1"' + checked + '/>&#160;'+label+'</span></td>' );
     this._html_array.push( '</tr>' );
 }
 

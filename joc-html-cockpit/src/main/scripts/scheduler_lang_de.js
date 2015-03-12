@@ -349,6 +349,7 @@ _translations['Job chain menu']                            = 'Job-Ketten-Menü';
 _translations['Job node menu']                             = 'Job-Knoten-Menü';
 _translations['Add order']                                 = 'Auftrag hinzufügen';
 _translations['Add persistent order']                      = 'Auftrag persistent hinzufügen';
+_translations['Delete temp. orders']                       = 'Temp. Aufträge löschen';
 _translations['Delete job chain']                          = 'Job-Kette löschen';
 _translations['Skip node']                                 = 'Knoten überspringen';
 _translations['Stop node']                                 = 'Knoten stoppen';
@@ -731,7 +732,6 @@ _translations['Declare new parameters']                    = 'Neue Parameter ang
 _translations['name']                                      = 'Name';
 _translations['value']                                     = 'Wert';
 
-
 //add order
 _translations['Add order to $job_chain']                   = 'Füge Auftrag hinzu für $job_chain';
 _translations['Enter an order id']                         = 'Id des Auftrags';
@@ -739,6 +739,10 @@ _translations['Enter an order title']                      = 'Title des Auftrags
 _translations['Select an order state']                     = 'Status des Auftrags';
 _translations['Select an order end state']                 = 'Endstatus des Auftrags';
 _translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?'] = 'Um den Auftrag dem Hot Folder zu übergeben, muss eine Auftrags-ID angegeben\nwerden. Ansonsten hat dieser nur die Lebenszeit der aktuellen JobScheduler Session.\nWollen Sie fortfahren?';
+
+//remove temp. orders
+_translations['Delete temporary orders from $job_chain']   = 'Temporäre Aufträge der Job-Kette $job_chain löschen';
+_translations['all']                                       = 'alle'; 
 
 //set order state
 _translations['Set order state of $order']                 = 'Setze Status für $order';
@@ -828,6 +832,7 @@ _translations['Do you really want to suspend this order?']                  = 'W
 _translations['Do you really want to resume this order?']                   = 'Wollen Sie wirklich diesen Auftrag fortsetzen?';
 _translations['Do you really want to change the order state?']              = 'Wollen Sie wirklich den Auftragsstatus ändern?';
 _translations['Do you really want to delete this order?']                   = 'Wollen Sie wirklich diesen Auftrag löschen?';
+_translations['Do you really want to delete selected orders?']              = 'Wollen Sie wirklich die ausgewählten Aufträge löschen?';
 _translations['Do you really want to remove the setback?']                  = 'Wollen Sie wirklich die Verzögerung löschen?';
 
 _translations['Do you really want to set the run time?']                    = 'Wollen Sie wirklich die Startzeiten ändern?';
