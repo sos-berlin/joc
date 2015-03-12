@@ -212,6 +212,7 @@ _translations['Delete']                                    = 'Удалить';
 //Task history                                             
 _translations['No tasks in the history']                   = 'Tasks не обнаружены в истории';
 _translations['Started']                                   = 'Запущено';
+_translations['Started by']                                = 'Автор';
 _translations['Cause']                                     = 'Причина';
 _translations['Ended']                                     = 'Закончено';
 _translations['Duration']                                  = 'Период';

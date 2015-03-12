@@ -211,6 +211,7 @@ _translations['Delete']                                    = 'Eliminar';
 //Task history                                             
 _translations['No tasks in the history']                   = 'No hay tareas en el historial';
 _translations['Started']                                   = 'Iniciado';
+_translations['Started by']                                = 'Iniciado por';
 _translations['Cause']                                     = 'Causa';
 _translations['Ended']                                     = 'Finalizado';
 _translations['Duration']                                  = 'Duración';

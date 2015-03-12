@@ -211,6 +211,7 @@ _translations['Delete']                                    = '削除';
 //Task history                                             
 _translations['No tasks in the history']                   = 'タスク履歴はありません';
 _translations['Started']                                   = '開始時刻';
+_translations['Started by']                                = 'によって開始';
 _translations['Cause']                                     = '理由';
 _translations['Ended']                                     = '終了時刻';
 _translations['Duration']                                  = '時間';

@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -3927,12 +3927,21 @@
 
     <xsl:template match="history" mode="list">
 
+      <xsl:variable name="has_cluster" select="boolean(history.entry/@cluster_member_id)" />
+      <xsl:variable name="colspan">
+        <xsl:choose>
+         	<xsl:when test="$has_cluster">7</xsl:when>
+          <xsl:otherwise>6</xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
       <div class="bottom">
         <table valign="top" cellpadding="0" cellspacing="0" width="100%" class="bottom">
           <colgroup>
             <col align="left" width="10"/>
             <col align="left" width="10"/>
             <col align="right" width="10"/>
+            <xsl:if test="$has_cluster"><col align="left" width="*"/></xsl:if>
             <col align="left" width="*"/>
             <col align="left" width="*"/>
             <col align="left" width="10"/>
@@ -3942,24 +3951,24 @@
               <xsl:when test="ERROR"> 
                 <thead>
                   <xsl:call-template name="after_head_space">
-                    <xsl:with-param name="colspan" select="'6'"/>
+                    <xsl:with-param name="colspan" select="$colspan"/>
                   </xsl:call-template>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="6" class="job_error"><xsl:value-of select="ERROR/@text"/></td>
+                    <td colspan="{$colspan}" class="job_error"><xsl:value-of select="ERROR/@text"/></td>
                   </tr>
                 </tbody>
               </xsl:when>
               <xsl:when test="count(history.entry)=0"> 
                 <thead>
                   <xsl:call-template name="after_head_space">
-                    <xsl:with-param name="colspan" select="'6'"/>
+                    <xsl:with-param name="colspan" select="$colspan"/>
                   </xsl:call-template>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="6"><span class="translate" style="font-weight:bold;">No tasks in the history</span></td>
+                    <td colspan="{$colspan}"><span class="translate" style="font-weight:bold;">No tasks in the history</span></td>
                   </tr>
                 </tbody>
               </xsl:when>
@@ -3967,19 +3976,20 @@
                 
                 <thead>
                     <tr>
-                        <td colspan="6" class="before_head_space">&#160;</td>
+                        <td colspan="{$colspan}" class="before_head_space">&#160;</td>
                     </tr>
                 
                     <tr>
                         <td class="head1"><span class="translate">Id</span></td>
                         <td class="head"><span class="translate">Cause</span></td>
                         <td class="head"><span class="translate">Process steps</span></td>
+                        <xsl:if test="$has_cluster"><td class="head"><span class="translate">Started by</span></td></xsl:if>
                         <td class="head"><span class="translate">Started</span></td>
                         <td class="head"><span class="translate">Ended</span></td>
                         <td class="head"><span class="translate">Duration</span></td>
                     </tr>
                     <xsl:call-template name="after_head_space">
-                      <xsl:with-param name="colspan" select="'6'"/>
+                      <xsl:with-param name="colspan" select="$colspan"/>
                     </xsl:call-template>
                 </thead>
                 <tbody>
@@ -3993,6 +4003,7 @@
                         <td><xsl:value-of select="@task"/>&#160;</td>
                         <td><nobr><span class="translate"><xsl:value-of select="@cause"/></span></nobr>&#160;</td>
                         <td align="right"><xsl:value-of select="@steps"/>&#160;</td>
+                        <xsl:if test="$has_cluster"><td><xsl:value-of select="substring-after(@cluster_member_id,'/')"/>&#160;</td></xsl:if>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@start_time__xslt_datetime"/></td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@end_time__xslt_datetime"/></td>
                         <td><xsl:apply-templates mode="date_time_nowrap" select="@duration"/></td>
@@ -4001,7 +4012,7 @@
                     <xsl:if test="ERROR">
                         <tr>
                             <td>&#160;</td>
-                            <td colspan="4" class="job_error"><xsl:apply-templates select="ERROR"/></td>
+                            <td colspan="{number($colspan) - 2}" class="job_error"><xsl:apply-templates select="ERROR"/></td>
                             <td>&#160;</td>
                         </tr>
                     </xsl:if>
@@ -4012,7 +4023,7 @@
             
             <tfoot>
               <xsl:call-template name="after_body_space">
-                  <xsl:with-param name="colspan" select="'6'"/>
+                  <xsl:with-param name="colspan" select="$colspan"/>
               </xsl:call-template>
             </tfoot>
         </table>

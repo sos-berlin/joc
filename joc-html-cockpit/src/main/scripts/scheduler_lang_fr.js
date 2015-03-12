@@ -211,6 +211,7 @@ _translations['Delete']                                    = 'Supprimer';
 //Task history                                             
 _translations['No tasks in the history']                   = 'Pas d\'instance de tâche dans l\'historique';
 _translations['Started']                                   = 'Démarré';
+_translations['Started by']                                = 'Démarré par';
 _translations['Cause']                                     = 'Cause';
 _translations['Ended']                                     = 'Terminé';
 _translations['Duration']                                  = 'Durée';
