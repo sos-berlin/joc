@@ -759,6 +759,13 @@ _translations['<span class="small">The current order end state is $state.</span>
 _translations['Set run time of $job']                      = '$jobのランタイム設定';
 _translations['or choose a schedule']                      = '又はスケジュールを選択';
 
+//terminate task
+_translations['Terminate task $task_id']                   = 'Terminate task $task_id';
+_translations['with timeout']                              = 'with timeout';
+_translations['Should the task not terminate within the specified timeout then it will be killed.'] = 'Should the task not terminate within the specified timeout then it will be killed.';
+_translations['Please enter a number for the timeout.']    = 'Please enter a number for the timeout.';
+
+
 //schedules
 _translations['Add schedule']                              = 'スケジュールを追加';
 _translations['Add substitute for $schedule']              = '$scheduleを置換';
@@ -824,6 +831,7 @@ _translations['Do you really want to stop this job?']                       = 'D
 _translations['Do you really want to unstop this job?']                     = 'Do you really want to unstop this job?';
 _translations['Do you really want to delete this job?']                     = '本当にジョブ削除しますか';
 _translations['Do you really want to kill this task?']                      = 'Do you really want to kill this task?';
+_translations['Do you really want to terminate this task?']                 = 'Do you really want to terminate this task?';
 _translations['Do you really want to delete this task?']                    = '本当にジョブ削除しますか';
 _translations['Do you really want to end this task?']                       = 'Do you really want to end this task?';
 _translations['Do you really want to end the tasks?']                       = 'Do you really want to end the tasks?';

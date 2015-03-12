@@ -489,6 +489,23 @@ Input_dialog.prototype.add_labeled_input = function( label, name, val, max_lengt
 }
 
 
+Input_dialog.prototype.add_labeled_input_with_unit = function( label, name, val, max_length, evt, unit ) 
+{    
+    if( typeof val != "string" ) val = "";
+    if( typeof max_length != "number" ) max_length = 0;
+    if( typeof evt != "string" ) evt = '';
+    var max_length_attr = "";
+    if( max_length > 0 ) max_length_attr = ' maxlength="' + max_length + '"';
+    this._html_array.push( '<tr><td style="padding:0px;">' );
+    this._html_array.push( '<table cellspacing="0" cellpadding="0" width="100%" border="0">' );
+    this._html_array.push( '<tr>' );
+    this._html_array.push( '<td class="param_name" style="width:40%;padding-right:2px;">' + label + '</td>' );
+    this._html_array.push( '<td style="width:60%;padding-bottom:2px;"><input type="text" name="' + name + '" value="' + val + '"' + max_length_attr + ' style="text-align:right;width:' + (max_length+1) + 'em" ' + evt + '/>' );
+    this._html_array.push( '<span style="padding:0px 2px;">' + unit + '</span></td></tr>' );
+    this._html_array.push( '</table></td></tr>' );
+}
+
+
 Input_dialog.prototype.add_settings_input = function( label, name, val, max_length ) {
     this._html_array.push( '<tr><td style="padding-bottom:2px;">'+label+'</td><td style="padding-bottom:2px;text-align:right;">' );
     this.add_input( name, val, max_length, false, 'text-align:right;width:28px;padding:0px 2px;font-size:12px;' );

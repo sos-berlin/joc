@@ -49,6 +49,7 @@ var _max_order_history          = 50;
 var _max_task_history           = 10;
 var _description_lang           = 'en';
 var _terminate_timeout          = 60;
+var _task_terminate_timeout     = 10;
 var _start_at_default_is_now    = true;
 var _start_next_period_enabled  = false;
 var _debug_level                = 0;

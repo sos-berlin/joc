@@ -758,6 +758,12 @@ _translations['<span class="small">The current order end state is $state.</span>
 _translations['Set run time of $job']                      = 'Задать время старта для $job';
 _translations['or choose a schedule']                      = 'или Schedule выбрать';
 
+//terminate task
+_translations['Terminate task $task_id']                   = 'Завершить работу Task $task_id';
+_translations['with timeout']                              = 'с таймаутом';
+_translations['Should the task not terminate within the specified timeout then it will be killed.'] = 'Если задача не прекращается в течение указанного времени ожидания, то он будет немедленно убит.';
+_translations['Please enter a number for the timeout.']    = 'Пожалуйста, введите число для таймаутом.';
+
 //schedules
 _translations['Add schedule']                              = 'Новый Schedule';
 _translations['Add substitute for $schedule']              = 'Субститут для $schedule';
@@ -822,6 +828,7 @@ _translations['Do you really want to stop this job?']                       = '�
 _translations['Do you really want to unstop this job?']                     = 'Вы действительно хотите продолжить работу этого Job?';
 _translations['Do you really want to delete this job?']                     = 'Вы действительно хотите удалить этот Job?';
 _translations['Do you really want to kill this task?']                      = 'Вы действительно хотите прервать и удалить этот Task?';
+_translations['Do you really want to terminate this task?']                 = 'Вы действительно хотите завершить работу этот Task?';
 _translations['Do you really want to delete this task?']                    = 'Вы действительно хотите удалить этот Task?';
 _translations['Do you really want to end this task?']                       = 'Вы действительно хотите завершить работу этого Task?';
 _translations['Do you really want to end the tasks?']                       = 'Вы действительно хотите завершить работу этих Tasks?';

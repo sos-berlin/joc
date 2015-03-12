@@ -759,6 +759,12 @@ _translations['all']                                       = 'todos';
 _translations['Set run time of $job']                      = 'Establezca tiempo de la ejecución de $job';
 _translations['or choose a schedule']                      = 'o elija una planificacion';
 
+//terminate task
+_translations['Terminate task $task_id']                   = 'Terminar tarea $task_id';
+_translations['with timeout']                              = 'con tiempo de espera';
+_translations['Should the task not terminate within the specified timeout then it will be killed.'] = 'En caso de que la tarea no termina dentro del tiempo de espera especificado entonces se detendrá inmediatamente.';
+_translations['Please enter a number for the timeout.']    = 'Por favor introduzca un número para el tiempo de espera.';
+
 //schedules
 _translations['Add schedule']                              = 'Añadir planificación';
 _translations['Add substitute for $schedule']              = 'Añadir sustituto para $schedule';
@@ -824,6 +830,7 @@ _translations['Do you really want to stop this job?']                       = 'D
 _translations['Do you really want to unstop this job?']                     = 'Desea usted realmente reanudar esta trabajo?';
 _translations['Do you really want to delete this job?']                     = 'Desea usted realmente eliminar esta trabajo?';
 _translations['Do you really want to kill this task?']                      = 'Desea usted realmente detener esta tarea?';
+_translations['Do you really want to terminate this task?']                 = 'Desea usted realmente terminar esta tarea?';
 _translations['Do you really want to delete this task?']                    = 'Desea usted realmente eliminar esta tarea?';
 _translations['Do you really want to end this task?']                       = 'Desea usted realmente finalizar esta tarea?';
 _translations['Do you really want to end the tasks?']                       = 'Desea usted realmente finalizar las tareas?';

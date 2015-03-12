@@ -755,6 +755,12 @@ _translations['<span class="small">The current order end state is $state.</span>
 _translations['Set run time of $job']                      = 'Fixez une date de lancement de $job';
 _translations['or choose a schedule']                      = 'ou choisissez une programmation';
 
+//terminate task
+_translations['Terminate task $task_id']                   = 'Terminer l\'instance $task_id';
+_translations['with timeout']                              = 'avec le délai d\'attente';
+_translations['Should the task not terminate within the specified timeout then it will be killed.'] = 'Si l\'instance ne terminer dans le délai spécifié alors il sera tué immédiatement.';
+_translations['Please enter a number for the timeout.']    = 'S\'il vous plaît entrer un numéro pour le délai d\'attente.';
+
 //schedules
 _translations['Add schedule']                              = 'Ajouter une programmation';
 _translations['Add substitute for $schedule']              = 'Ajouter un substitut pour $schedule';
@@ -820,6 +826,7 @@ _translations['Do you really want to stop this job?']                       = 'V
 _translations['Do you really want to unstop this job?']                     = 'Voules-vous vraiment activer cette tâche?';
 _translations['Do you really want to delete this job?']                     = 'Voules-vous vraiment supprimer cette tâche?';
 _translations['Do you really want to kill this task?']                      = 'Voules-vous vraiment tuer cette instance?';
+_translations['Do you really want to terminate this task?']                 = 'Voules-vous vraiment arrêter cette instance?';
 _translations['Do you really want to delete this task?']                    = 'Voules-vous vraiment supprimer cette instance?';
 _translations['Do you really want to end this task?']                       = 'Voules-vous vraiment terminer cette instance?';
 _translations['Do you really want to end the tasks?']                       = 'Voules-vous vraiment terminer instances?';

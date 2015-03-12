@@ -755,6 +755,12 @@ _translations['<span class="small">The current order end state is $state.</span>
 _translations['Set run time of $job']                      = 'Setze Startzeit für $job setzen';
 _translations['or choose a schedule']                      = 'oder wähle einen Schedule';
 
+//terminate task
+_translations['Terminate task $task_id']                   = 'Task $task_id beenden';
+_translations['with timeout']                              = 'mit Timeout';
+_translations['Should the task not terminate within the specified timeout then it will be killed.'] = 'Sollte die Task innerhalb des angegebenen Timeouts nicht beendet ein, dann wird sie sofort abgebrochen.';
+_translations['Please enter a number for the timeout.']    = 'Bitte geben Sie eine Zahl für das Timeout an.';
+
 //schedules
 _translations['Add schedule']                              = 'Neuer Schedule';
 _translations['Add substitute for $schedule']              = 'Neues Substitut für $schedule';
@@ -819,6 +825,7 @@ _translations['Do you really want to stop this job?']                       = 'W
 _translations['Do you really want to unstop this job?']                     = 'Wollen Sie wirklich diesen Job fortsetzen?';
 _translations['Do you really want to delete this job?']                     = 'Wollen Sie wirklich diesen Job löschen?';
 _translations['Do you really want to kill this task?']                      = 'Wollen Sie wirklich diese Task abbrechen?';
+_translations['Do you really want to terminate this task?']                 = 'Wollen Sie wirklich diese Task beenden?';
 _translations['Do you really want to delete this task?']                    = 'Wollen Sie wirklich diese Task löschen?';
 _translations['Do you really want to end this task?']                       = 'Wollen Sie wirklich diese Task beenden?';
 _translations['Do you really want to end the tasks?']                       = 'Wollen Sie wirklich die Tasks beenden?';
@@ -839,6 +846,5 @@ _translations['Do you really want to set the run time?']                    = 'W
 _translations['Do you really want to add a substituting schedule?']         = 'Wollen Sie wirklich einen substituierenden Schedule hinzufügen?';
 _translations['Do you really want to modify this schedule?']                = 'Wollen Sie wirklich diesen Schedule ändern?';
 _translations['Do you really want to delete this schedule?']                = 'Wollen Sie wirklich diesen Schedule löschen?';
-
 
                            
