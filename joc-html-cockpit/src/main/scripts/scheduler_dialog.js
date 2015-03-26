@@ -1859,7 +1859,7 @@ function job_chain_menu__onclick( job_chain, orders, big_chain )
     
     if( big_chain == 0) {
     	//temp. order which are not running
-    	var tempOrderElements      = job_chain_element.selectNodes('//order[not(file_based/@file) and not(@occupied_by_cluster_member_id) and not(@task)]');
+    	var tempOrderElements      = job_chain_element.selectNodes('.//order[not(file_based/@file) and not(@occupied_by_cluster_member_id) and not(@task)]');
     	var tempOrders             = [];
     	for( var i= 0; i < tempOrderElements.length; i++ ) {
     		tempOrders.push( tempOrderElements[i].getAttribute('id') );
