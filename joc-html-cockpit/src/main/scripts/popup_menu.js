@@ -594,7 +594,8 @@ Input_dialog.prototype.add_params = function( params, param_names )
             this._html_array.push( '</tr>' );
             this._html_array.push( '<tr><td style="padding:0px;">' );
             this._html_array.push( '<table cellspacing="0" cellpadding="0" width="100%" border="0">' );
-            this._html_array.push( '<colgroup><col width="40%"><col width="*"><col width="1%"></colgroup><tbody>' );  
+            //this._html_array.push( '<colgroup><col width="40%"><col width="*"><col width="1%"></colgroup><tbody>' );
+            this._html_array.push( '<colgroup><col width="40%"><col width="60%"></colgroup><tbody>' );  
         }
         if( param_names[i] == "command" ) {
         		var isHex = params[param_names[i]].ishex() ? "true" : "false";
@@ -603,13 +604,15 @@ Input_dialog.prototype.add_params = function( params, param_names )
             this._html_array.push( '<tr>' );
             this._html_array.push( '<td colspan="2" style="width:100%;padding-bottom:2px;">' );
             this._html_array.push( '<textarea sos_value_ishex="'+isHex+'" name="' + param_names[i] + '" style="width:' + (this.width-1) + 'px" rows="4" onfocus="this.select();">' + params[param_names[i]].hex2bin() + '</textarea>' );
-            this._html_array.push( '</td><td onclick="this.parentNode.parentNode.removeChild(this.parentNode);"><div class="delete"></div></td></tr>' );
+            //this._html_array.push( '</td><td onclick="this.parentNode.parentNode.removeChild(this.parentNode);"><div class="delete"></div></td></tr>' );
+            this._html_array.push( '</td></tr>' );
         } else {
             this._html_array.push( '<tr>' );
             this._html_array.push( '<td class="param_name" style="padding-right:2px;"><span style="position:relative;top:-2px;">' + param_names[i] + '</span></td>' );
             this._html_array.push( '<td style="padding-bottom:2px;text-align:right;">' );
             this._html_array.push( '<input type="text" name="' + param_names[i] + '" value="' + params[param_names[i]] + '" style="width:' + parseInt((this.width*3/5)-1,10) + 'px"/>' );
-            this._html_array.push( '</td><td onclick="this.parentNode.parentNode.removeChild(this.parentNode);"><div class="delete"></div></td></tr>' );
+            //this._html_array.push( '</td><td onclick="this.parentNode.parentNode.removeChild(this.parentNode);"><div class="delete"></div></td></tr>' );
+            this._html_array.push( '</td></tr>' );
         }
     }
     if( !first ) {
@@ -669,20 +672,20 @@ Input_dialog.add_new_param = function( width, idx )
     var newTD                 = parent.left_frame.document.createElement("td");
     newTR.appendChild(newTD);
     newTD.setAttribute('style', '');
-    //newTD.style.width         = "40%";
+    newTD.style.width         = "40%";
     newTD.style.paddingRight  = "2px";
     newTD.style.paddingBottom = "2px";
     var newTD2                = parent.left_frame.document.createElement("td");
     newTR.appendChild(newTD2);
     newTD2.setAttribute('style', '');
-    //newTD2.style.width         = "*";
+    newTD2.style.width         = "60%";
     newTD2.style.textAlign = "right";
     var newTD3                 = parent.left_frame.document.createElement("td");
     newTR.appendChild(newTD3);
     newTD3.setAttribute('onclick',"this.parentNode.parentNode.removeChild(this.parentNode);");
-    var newDeleteDiv          = parent.left_frame.document.createElement("div");
-    newTD3.appendChild(newDeleteDiv);
-    newDeleteDiv.className    = "delete";
+    //var newDeleteDiv          = parent.left_frame.document.createElement("div");
+    //newTD3.appendChild(newDeleteDiv);
+    //newDeleteDiv.className    = "delete";
     if( parent._scheduler._ie > 0 ) {
       newTD.innerHTML  = '<input type="text" name="new_param_name_' + idx + '" value="" style="width:' + parseInt((width*2/5)-4,10) + 'px;" />';
       newTD2.innerHTML = '<input type="text" name="new_param_value_' + idx + '" value="" style="width:' + parseInt((width*3/5)-1,10) + 'px;" />';
