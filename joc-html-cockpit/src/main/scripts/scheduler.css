@@ -180,6 +180,8 @@ button.arrows                   {padding:0px;margin:0px;font-size:14px;backgroun
 span.bracket                    {color:black;}
 span.attribute_name             {color:black;}
 span.attribute_val              {color:blue;}
+span.namespace_name             {color:black;}
+span.namespace_val              {color:green;font-style:italic}
 span.element_name               {color:purple;}
 span.cdata                      {color:blue;font-family:Arial,Helvetica,Sans-Serif;}
 pre.cdata                       {color:grey;}

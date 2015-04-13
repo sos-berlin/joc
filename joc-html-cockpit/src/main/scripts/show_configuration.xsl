@@ -23,9 +23,17 @@
   <xsl:text> </xsl:text><span class="attribute_name"><xsl:value-of select="name()" />=</span><span class="attribute_val">&quot;<xsl:value-of select="." />&quot;</span>
 </xsl:template>
 
+<xsl:template name="namespace">
+  <xsl:variable name="namespace" select="namespace-uri()"/>
+	<xsl:if test="$namespace">
+    <xsl:text> </xsl:text><span class="namespace_name">xmlns=</span><span class="namespace_val">&quot;<xsl:value-of select="$namespace" />&quot;</span>
+  </xsl:if>
+</xsl:template>
+
 <xsl:template match="*" mode="copy_node">
   <xsl:param name="indent" select="20"/>
   <br/><span class="bracket" style="padding-left:{$indent}px;">&lt;</span><span class="element_name"><xsl:value-of select="name()" /></span>
+  <xsl:call-template name="namespace"/>
   <xsl:apply-templates select="@*" />
   <xsl:if test="child::* or text()">
       <span class="bracket">&gt;</span>
