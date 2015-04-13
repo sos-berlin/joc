@@ -324,9 +324,12 @@ Scheduler.prototype.executePost = function( xml, callback_on_success, async, wit
                           scheduler.logger(3,'HTTP REQUEST STATUS onComplete '+transport.status);
                         },
        onSuccess      : function(transport) {
-       	                  //alert(transport.getAllResponseHeaders());
+       	                  //alert(transport.getAllResponseHeaders());    
        	                  if( !transport.responseText ) err = new Error();
        	                  if( err ) throw err;
+       	                  if( transport.responseXML == null ) { //Chrome JOC-53
+       	                  	transport.responseXML = scheduler.loadXML(transport.responseText);
+       	                  } 
        	                  scheduler.logger(6,'SCHEDULER RESPONSE:\n' + transport.responseXML.xml);  
                           if( xml == '<check_folders/>' ) {
                             ret = true;
