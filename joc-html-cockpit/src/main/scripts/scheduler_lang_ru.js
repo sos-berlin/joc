@@ -99,6 +99,7 @@ _translations['unknown']                                   = 'неизвестн
 _translations['THIS IS A BACKUP...']                       = 'ЭТО BACKUP...';
 _translations['Backup JobScheduler:']                      = 'Backup JobScheduler:';
 _translations['JobScheduler is waiting for database ...']  = 'JobScheduler ждёт базу данных ...';
+_translations['JobScheduler is waiting for activation.']   = 'JobScheduler ждёт активизации.';
 _translations['Waiting for response from JobScheduler ...'] = 'Ждётся ответ от JobScheduler ...';
 _translations['No connection to JobScheduler']            = 'Связь с JobScheduler отсутствует';
 _translations['Error at XML answer:']                      = 'Ошибка в XML-Ответе:';
