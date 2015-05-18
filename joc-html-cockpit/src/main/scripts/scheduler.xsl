@@ -48,7 +48,7 @@
           <xsl:when test="/spooler/@my_frame='list'">
             <xsl:choose>
                 
-                <xsl:when test="state/@state='waiting_for_activation and /spooler/@my_show_card != 'cluster' and /spooler/@my_show_card != 'remote_schedulers'">
+                <xsl:when test="state/@state='waiting_for_activation' and /spooler/@my_show_card != 'cluster' and /spooler/@my_show_card != 'remote_schedulers'">
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" class="bottom">
                          <thead>
                              <xsl:call-template name="after_head_space">
