@@ -44,14 +44,11 @@
 
     <xsl:template match="/spooler/answer">
         
-        <!--xsl:variable name="is_inactive_backup_scheduler" select="state/cluster/@backup='yes' and not(state/cluster/@active='yes')"/-->
-        <xsl:variable name="is_inactive_backup_scheduler" select="state/@state='waiting_for_activation'"/>
-    
         <xsl:choose>
           <xsl:when test="/spooler/@my_frame='list'">
             <xsl:choose>
                 
-                <xsl:when test="$is_inactive_backup_scheduler and /spooler/@my_show_card != 'cluster' and /spooler/@my_show_card != 'remote_schedulers'">
+                <xsl:when test="state/@state='waiting_for_activation and /spooler/@my_show_card != 'cluster' and /spooler/@my_show_card != 'remote_schedulers'">
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" class="bottom">
                          <thead>
                              <xsl:call-template name="after_head_space">
@@ -59,7 +56,10 @@
                              </xsl:call-template>
                          </thead>      
                          <tbody><tr><td>
-                           <span class="translate" style="font-weight:bold;">Backup JobScheduler:</span>
+                           <xsl:choose>
+                             <xsl:when test="state/cluster/@backup='yes'"><span class="translate" style="font-weight:bold;">Backup JobScheduler:</span></xsl:when>
+                             <xsl:otherwise><span class="translate" style="font-weight:bold;">JobScheduler is waiting for activation.</span></xsl:otherwise>
+                           </xsl:choose>
                            <xsl:text> </xsl:text>
                            <span class="translate" style="font-weight:bold;">No <xsl:value-of select="translate(/spooler/@my_show_card,'_',' ')"/> found</span>
                          </td></tr></tbody>
@@ -92,9 +92,12 @@
           <xsl:when test="/spooler/@my_frame='tree'">
             <xsl:choose>
                 
-                <xsl:when test="$is_inactive_backup_scheduler and /spooler/@my_show_card != 'cluster' and /spooler/@my_show_card != 'remote_schedulers'">
+                <xsl:when test="state/@state='waiting_for_activation' and /spooler/@my_show_card != 'cluster' and /spooler/@my_show_card != 'remote_schedulers'">
                   <div><ul id="{concat(/spooler/@my_show_card,'/')}" class="tree" style="display:block" sos_mode="open"><li>
-                    <span class="translate" style="font-weight:bold;">Backup JobScheduler:</span>
+                    <xsl:choose>
+                      <xsl:when test="state/cluster/@backup='yes'"><span class="translate" style="font-weight:bold;">Backup JobScheduler:</span></xsl:when>
+                      <xsl:otherwise><span class="translate" style="font-weight:bold;">JobScheduler is waiting for activation.</span></xsl:otherwise>
+                    </xsl:choose>
                     <xsl:text> </xsl:text>
                     <span class="translate" style="font-weight:bold;">No <xsl:value-of select="translate(/spooler/@my_show_card,'_',' ')"/> found</span>
                   </li></ul></div>
