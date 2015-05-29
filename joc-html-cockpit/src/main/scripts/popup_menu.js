@@ -96,11 +96,10 @@ Popup_menu.prototype.close = function( menu_type, element_name )
           var selectbox = document.getElementById( element_name );
           if( selectbox )
           {
-            for( var i=2; i < selectbox.length; i++ ) {
+            for( var i=0; i < selectbox.length; i++ ) {
               selectbox.options[i] = null;
             }
           }
-          //document.getElementById( 'update_periodically_checkbox' ).checked=parent._scheduler._update_periodically;
         }
     }
     else
@@ -171,9 +170,9 @@ Popup_menu_builder.prototype.add_entry = function( html_entry, call, is_active, 
     	if( window.createPopup == undefined ) {
       	var opt         = new Option( html_entry, call.replace( /&quot;/g, '"' ) );  
       	if( opt.innerHTML ) {   //im IE leer
-        	opt.innerHTML = '&#160;&#160;' + opt.text;
+        	opt.innerHTML = '&#160;&#160;' + opt.text + '&#160;&#160;';
       	} else {
-        	opt.text      = '  '+ opt.text;
+        	opt.text      = '  '+ opt.text +'  ';
       	} 
       
       	opt.setAttribute( 'class', 'selectbox_menu' );    
@@ -197,7 +196,7 @@ Popup_menu_builder.prototype.add_bar = function()
     this._html_array.push( html );
     
     if( window.createPopup == undefined ) {
-      if( parent._scheduler._chrome > 0 || parent._scheduler._safari > 0 ) {
+      if( parent._scheduler._safari > 0 ) {
         var opt         = new Option( '--------------------------------------------', '' );
       } else {
         var opt         = new Option( '---------------------------------------------------------------------------------------', '' );
@@ -257,19 +256,13 @@ Popup_menu_builder.prototype.create_popup_menu = function( menu_type, element_na
         {
           var selectbox = document.getElementById( element_name );
           if( selectbox ) {
-            this.add_entry('','',false);
             this._finished = true;
           
             for( var i=0; i < this._selectbox_array.length; i++ ) {
-              selectbox.options[i+2] = this._selectbox_array[i];
+              selectbox.options[i] = this._selectbox_array[i];
             }
-            selectbox.options[this._selectbox_array.length+1].style.fontSize = '0px';
-            selectbox.options[this._selectbox_array.length+1].style.height = '3px';
             selectbox.setAttribute( "onblur", "try{ __current_popup_menu.close('selectbox','" + element_name + "'); }catch(x){}" );
-            //selectbox.setAttribute( "onclick", "parent._scheduler._update_periodically=document.getElementById( 'update_periodically_checkbox' ).checked;document.getElementById( 'update_periodically_checkbox' ).checked=false;window.clearTimeout( window.parent.left_frame._timer )" );
-            //selectbox.setAttribute( "onclick", "window.clearTimeout( window.parent.left_frame._timer )" );
             selectbox.setAttribute( "onchange", "eval(this.value);this.selectedIndex=0;" );
-            //alert( $(selectbox).getWidth() );
           }
         }
     }
