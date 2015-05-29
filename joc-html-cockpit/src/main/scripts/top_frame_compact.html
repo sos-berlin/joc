@@ -6,7 +6,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -37,7 +37,6 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-// $Id: top_frame_compact.html 28465 2014-12-03 11:55:24Z oh $
 //-->
     <style type="text/css">
         @import url(scheduler.css);
@@ -277,10 +276,8 @@ function write_menu(menu)
   var menu_id = '__selectbox_'+menu+'__';
   if( window.createPopup == undefined ) { 
     document.writeln('          <td align="left" title="scheduler '+menu+'" style="white-space:nowrap;height:17px;padding:1px 4px 0px;">');
-    document.writeln('            <div class="selectbox_titlebar_'+menu+'" ><select id="'+menu_id+'" name="'+menu_id+'" size="1">');
-    document.writeln('              <option class="selected" style="font-size:0pt;height:0pt;" value="" selected="true">&#9658;'+menu_title+'</option>');
-    document.writeln('              <option style="font-size:0pt;height:2pt;" value="" disabled="true"></option>');
-    document.writeln('            </select></div>');
+    document.writeln('            <label class="selectbox_titlebar_'+menu+'" title="&#9658;'+menu_title+'" ><select class="titlebar_menu" id="'+menu_id+'" name="'+menu_id+'" size="1">');
+    document.writeln('            </select></label>');
     document.writeln('          </td>');
     var menuElem = document.getElementById(menu_id); 
     if(typeof menuElem.onfocusin == 'object') {

@@ -1,4 +1,3 @@
-/* $Id$ */
 body                            {font-family:Arial,Helvetica,Sans-Serif;font-size:12px;margin:0px;} 
 body.top                        {background-color:#FFFFFF;margin:6px 17px 0px 12px;}                         
 body.left                       {background-color:#FFFFFF;margin:0px 0px 0px 0px;}                         
@@ -85,21 +84,18 @@ div.button:hover                {color:#EA7A14;}
 div.button a                    {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#444444; }
 div.button a:visited            {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#444444; }
 div.button a:hover              {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#EA7A14; }
-div.selectbox_menu              {width:88px;height:15px;overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;}
-div.selectbox_menu select       {cursor:pointer;position:relative;left:-3px;top:-1px;font-family:Arial,Helvetica,Sans-Serif;font-size:11px;font-weight:normal;height:14px;margin:0px;padding:0px;background-color:#CFD7EB;border:0px;color:#444444;}
-div.selectbox_menu select.left  {width:120px;}
-div.selectbox_menu select.right {width:220px;}
-div.selectbox_menu select:hover {color:#EA7A14;}
-div.selectbox_menu option       {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu;}
-div.selectbox_menu option:hover {color:highlighttext; background-color:highlight;}
-div.selectbox_menu option.selected:hover {color:#EA7A14;}
-div.selectbox_extras              {width:98px;height:15px;overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;}
-div.selectbox_extras select       {cursor:pointer;position:relative;left:-3px;top:-1px;font-family:Arial,Helvetica,Sans-Serif;font-size:11px;font-weight:normal;height:14px;width:130px;margin:0px;padding:0px;background-color:#CFD7EB;border:0px;color:#444444;}
-div.selectbox_extras select:hover {color:#EA7A14;}
-div.selectbox_extras option       {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu;}
-div.selectbox_extras option:hover {color:highlighttext; background-color:highlight;}
-div.selectbox_extras option.selected:hover {color:#EA7A14;}
-
+select.menu                     {padding:0; margin:0; font-size:11px;font-weight:normal;height:17px;line-height:13px; overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;
+                                 background: #CFD7EB; color:#444; display:inline-block; -webkit-appearance:none; -moz-appearance:none; appearance:none; cursor:pointer;text-overflow:'';} 
+select.menu::-ms-expand         {display:none;} 
+select.menu:hover               {color:#EA7A14;}
+select.menu option              {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0;margin:0;text-align:left;height:16px;background-color:menu;}
+select.menu option:hover        {color:highlighttext; background-color:highlight;}
+select.menu option.first:hover  {color:menu;background-color:menu;}
+select.menu option.first        {color:menu;}
+#__selectbox_menu, #__selectbox_extras  {width:98px;} 
+label.menu, label.extras        {position:relative;font-size:11px;}
+label.menu:hover, label.extras:hover   {color:#EA7A14;}
+label.menu:before, label.extras:before {content:attr(title);pointer-events:none;display:block;position:absolute;left:2px;top:-1px;width:94px;text-align:center;background:#CFD7EB;}
 
 
 /* Tabs */
@@ -157,7 +153,10 @@ a.list:hover                    {background-color:#F2F5FA;}
 
 
 /* Dialog for Inputs of menu functions */
-.input                          {padding:0px;margin:0px;font-size:12px;}
+.input                          {padding:0px;margin:0px;font-size:12px;} 
+.shadow                         {-webkit-box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.5);
+                                 -moz-box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.5);
+                                 box-shadow: 6px 6px 6px 0px rgba(0,0,0,0.5); }
 div.shadow1                     {display:none;position:absolute;background-color:#333333;left:34px;top:78px;z-index:18;-moz-opacity:0.4;}
 div.shadow2                     {display:none;position:absolute;background-color:#AAAAAA;left:32px;top:76px;z-index:19;-moz-opacity:0.4;}
 div.input                       {background-color:#F2F5FA;border:1px solid #8B919F;display:none;position:absolute;top:70px;left:26px;z-index:20;}
@@ -165,6 +164,7 @@ div.inner_input                 {padding:0px;margin:0px;border:1px solid white;}
 div.inner_input tbody           {background-color:#F2F5FA;} 
 div.inner_input th, div.inner_input div.inner td {padding-left:1px;padding-right:1px;vertical-align:middle; }
 div.inner_input th.input_title  {font-size:12px;font-weight:bold;color:#808080;text-align:center; }  
+div.inner_input span.input_title {font-weight:bold;color:#808080; }  
 div.inner_input input, div.inner_input select, div.inner_input option {font-size:11px;}
 div.inner_input textarea        {font-size:12px;}
 div.inner_input input.buttonbar {cursor:pointer; padding:0px 1px;margin:0px 1px;font-size:11px;background-color:#E5EAF5;border:1px outset #FFFFFF;color:#444444; }
@@ -175,6 +175,8 @@ button.arrows                   {padding:0px;margin:0px;font-size:14px;backgroun
 span.bracket                    {color:black;}
 span.attribute_name             {color:black;}
 span.attribute_val              {color:blue;}
+span.namespace_name             {color:black;}
+span.namespace_val              {color:green;font-style:italic}
 span.element_name               {color:purple;}
 span.cdata                      {color:blue;font-family:Arial,Helvetica,Sans-Serif;}
 pre.cdata                       {color:grey;}
@@ -215,15 +217,12 @@ td.titlebar                     {font-size:12px; font-family:Arial,Helvetica,san
 a.titlebar:link                 {color:#FFFFFF;font-weight:bold;}
 a.titlebar:visited              {color:#FFFFFF;font-weight:bold;}
 a.titlebar:hover                {color:#FFFF66;font-weight:bold;}
-div.selectbox_titlebar_menu              {width:41px;height:10px;overflow:hidden;position:relative; top:3px;}
-div.selectbox_titlebar_menu select       {cursor:pointer;position:relative;left:-8px;top:-6px;color:#FFFFFF;font-family:Arial,Helvetica,Sans-Serif;font-size:12px;font-weight: bold;width:90px;height:18px;margin:0px;padding:0px;background-color:#0162FA;}
-div.selectbox_titlebar_menu select:hover {color:#FFFF66;}
-div.selectbox_titlebar_menu option       {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu; }
-div.selectbox_titlebar_menu option:hover {color:highlighttext; background-color:highlight;}
-div.selectbox_titlebar_menu option.selected:hover {color:#FFFF66;}
-div.selectbox_titlebar_extras            {width:46px;height:10px;overflow:hidden;position:relative; top:3px;}
-div.selectbox_titlebar_extras select     {cursor:pointer;position:relative;left:-8px;top:-6px;color:#FFFFFF;font-family:Arial,Helvetica,Sans-Serif;font-size:12px;font-weight: bold;width:90px;height:18px;margin:0px;padding:0px;background-color:#0162FA;}
-div.selectbox_titlebar_extras select:hover {color:#FFFF66;}
-div.selectbox_titlebar_extras option     {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0px;margin:0px;text-align:left;height:16px;background-color:menu; }
-div.selectbox_titlebar_extras option:hover {color:highlighttext; background-color:highlight;}
-div.selectbox_titlebar_extras option.selected:hover {color:#FFFF66;}
+select.titlebar_menu            {padding:0; margin:0;height:13px;line-height:13px; overflow:hidden;width:54px;
+                                 display:inline-block; -webkit-appearance:none; -moz-appearance:none; appearance:none; cursor:pointer; text-overflow:'';} 
+select.titlebar_menu::-ms-expand         {display:none;} 
+select.titlebar_menu:hover      {color:#FFFF66;}
+select.titlebar_menu option              {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0;margin:0;text-align:left;height:16px;background-color:menu;}
+select.titlebar_menu option:hover        {color:highlighttext; background-color:highlight;}
+label.selectbox_titlebar_menu, label.selectbox_titlebar_extras        {position:relative;font-size:12px;}
+label.selectbox_titlebar_menu:hover, label.selectbox_titlebar_extras:hover   {color:#FFFF66;}
+label.selectbox_titlebar_menu:before, label.selectbox_titlebar_extras:before {content:attr(title);pointer-events:none;display:block;position:absolute;left:0;top:-2px;width:54px;height:14px;font-weight:bold;background:#0162FA;}
