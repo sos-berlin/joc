@@ -85,14 +85,11 @@ div.button a                    {display:block;width:88px;text-decoration:none;f
 div.button a:visited            {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#444444; }
 div.button a:hover              {display:block;width:88px;text-decoration:none;font-weight:normal;font-size:11px;color:#EA7A14; }
 select.menu                     {padding:0; margin:0; font-size:11px;font-weight:normal;height:17px;line-height:13px; overflow:hidden;border-right:1px solid #8B919F;border-bottom:1px solid #8B919F;border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;
-                                 background: #CFD7EB; color:#444; display:inline-block; -webkit-appearance:none; -moz-appearance:none; appearance:none; cursor:pointer;text-overflow:'';} 
+                                 background: #CFD7EB; color:#444; display:inline-block; -webkit-appearance:none; -moz-appearance:none; appearance:none; cursor:pointer;text-overflow:'';width:98px;} 
 select.menu::-ms-expand         {display:none;} 
 select.menu:hover               {color:#EA7A14;}
 select.menu option              {font-family:Tahoma,Arial,Helvetica,Sans-Serif;color:menutext;font-size:11px;font-weight:normal;padding:0;margin:0;text-align:left;height:16px;background-color:menu;}
 select.menu option:hover        {color:highlighttext; background-color:highlight;}
-select.menu option.first:hover  {color:menu;background-color:menu;}
-select.menu option.first        {color:menu;}
-#__selectbox_menu, #__selectbox_extras  {width:98px;} 
 label.menu, label.extras        {position:relative;font-size:11px;}
 label.menu:hover, label.extras:hover   {color:#EA7A14;}
 label.menu:before, label.extras:before {content:attr(title);pointer-events:none;display:block;position:absolute;left:2px;top:-1px;width:94px;text-align:center;background:#CFD7EB;}
