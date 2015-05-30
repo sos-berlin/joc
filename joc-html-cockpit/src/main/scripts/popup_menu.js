@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -96,7 +96,7 @@ Popup_menu.prototype.close = function( menu_type, element_name )
           var selectbox = document.getElementById( element_name );
           if( selectbox )
           {
-            for( var i=2; i < selectbox.length; i++ ) {
+            for( var i=0; i < selectbox.length; i++ ) {
               selectbox.options[i] = null;
             }
           }
@@ -169,9 +169,9 @@ Popup_menu_builder.prototype.add_entry = function( html_entry, call, is_active, 
     if( window.createPopup == undefined ) {
       var opt         = new Option( html_entry, call.replace( /&quot;/g, '"' ) );  
       if( opt.innerHTML ) {   //im IE leer
-        opt.innerHTML = '&#160;&#160;' + opt.text;
+        opt.innerHTML = '&#160;&#160;' + opt.text + '&#160;&#160;';
       } else {
-        opt.text      = '  '+ opt.text;
+        opt.text      = '  '+ opt.text +'  ';
       } 
       
       opt.setAttribute( 'class', 'selectbox_menu' );    
@@ -194,7 +194,7 @@ Popup_menu_builder.prototype.add_bar = function()
     this._html_array.push( html );
     
     if( window.createPopup == undefined ) {
-      if( parent._scheduler._chrome > 0 || parent._scheduler._safari > 0 ) {
+      if( parent._scheduler._safari > 0 || parent._scheduler._opera > 0 ) {
         var opt         = new Option( '--------------------------------------------', '' );
       } else {
         var opt         = new Option( '---------------------------------------------------------------------------------------', '' );
@@ -254,19 +254,13 @@ Popup_menu_builder.prototype.create_popup_menu = function( menu_type, element_na
         {
           var selectbox = document.getElementById( element_name );
           if( selectbox ) {
-            this.add_entry('','',false);
             this._finished = true;
           
             for( var i=0; i < this._selectbox_array.length; i++ ) {
-              selectbox.options[i+2] = this._selectbox_array[i];
+              selectbox.options[i] = this._selectbox_array[i];
             }
-            selectbox.options[this._selectbox_array.length+1].style.fontSize = '0px';
-            selectbox.options[this._selectbox_array.length+1].style.height = '3px';
             selectbox.setAttribute( "onblur", "try{ __current_popup_menu.close('selectbox','" + element_name + "'); }catch(x){}" );
-            //selectbox.setAttribute( "onclick", "parent._scheduler._update_periodically=document.getElementById( 'update_periodically_checkbox' ).checked;document.getElementById( 'update_periodically_checkbox' ).checked=false;window.clearTimeout( window.parent.left_frame._timer )" );
-            //selectbox.setAttribute( "onclick", "window.clearTimeout( window.parent.left_frame._timer )" );
-            selectbox.setAttribute( "onchange", "eval(this.value);this.selectedIndex=0;" );
-            //alert( $(selectbox).getWidth() );
+            selectbox.setAttribute( "onchange", "eval(this.value);" );
           }
         }
     }
@@ -370,14 +364,14 @@ Input_dialog.close = function()
     }
     Input_dialog._element.innerHTML     = "";
     Input_dialog._element.style.display = "none";
-    var shadowElem1                     = parent.left_frame.document.getElementById('__input_shadow1__');
-    var shadowElem2                     = parent.left_frame.document.getElementById('__input_shadow2__');
-    if( shadowElem1 && shadowElem2 ) {
-      shadowElem1.style.display         = "none";
-      shadowElem2.style.display         = "none";
-    }
-    var iframeElem                      = parent.left_frame.document.getElementById('__input_iframe__');
-    if( parent._scheduler._ie > 0 && iframeElem ) { iframeElem.style.display  = "none"; }
+    //var shadowElem1                     = parent.left_frame.document.getElementById('__input_shadow1__');
+    //var shadowElem2                     = parent.left_frame.document.getElementById('__input_shadow2__');
+    //if( shadowElem1 && shadowElem2 ) {
+    //  shadowElem1.style.display         = "none";
+    //  shadowElem2.style.display         = "none";
+    //}
+    //var iframeElem                      = parent.left_frame.document.getElementById('__input_iframe__');
+    //if( parent._scheduler._ie > 0 && iframeElem ) { iframeElem.style.display  = "none"; }
 }
  
 
@@ -405,7 +399,7 @@ Input_dialog.prototype.show = function()
       first_elem.focus();
       if( first_elem.type.search( /^text/ ) > -1 && first_elem.name != 'run_time' ) first_elem.select();
     }
-    Input_dialog.add_shadow();
+    //Input_dialog.add_shadow();
 }
 
 
@@ -536,7 +530,7 @@ Input_dialog.prototype.add_checkbox = function( name, label, checked )
     if( typeof checked      != "boolean" ) checked = false;
     checked = ( checked ) ? ' checked="true"' : "";
     this._html_array.push( '<tr>' );
-    this._html_array.push( '<td style="padding-bottom:2px;"><input type="checkbox" name="' + name + '" value="1"' + checked + '/>&#160;'+label+'</td>' );
+    this._html_array.push( '<td style="padding-bottom:2px;"><span style="white-space:nowrap;"><input type="checkbox" name="' + name + '" value="1"' + checked + '/>&#160;'+label+'</span></td>' );
     this._html_array.push( '</tr>' );
 }
 
