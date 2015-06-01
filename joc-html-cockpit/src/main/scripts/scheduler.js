@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -31,7 +31,6 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-// $Id$
 
 //-----------------------------------------------------------------------------------------language  
 if( window['_sos_lang'] ) {
@@ -85,6 +84,8 @@ function Scheduler()
     this._ie                                             = navigator.appVersion.match(/\bTrident\b/);
     this._chrome                                         = 0;
     this._safari                                         = 0;
+    this._firefox                                        = 0;
+    this._opera                                          = 0;
     this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains','orders':'Orders','schedules':'Schedules'}; 
     this._view                                           = {'jobs'             :'list',
                                                             'job_chains'       :'list',
@@ -1060,6 +1061,12 @@ Scheduler.prototype.checkBrowser = function( withWarning )
             if( match )  this._ie = 1 * RegExp.$1;
         }
         else
+        if( appN == "Netscape" && userA.indexOf( "OPR" ) > -1 )
+        {
+            var match = window.navigator.appVersion.match( /OPR\/(\d+\.\d+)/ );
+            if( match )  this._opera = 1 * RegExp.$1;
+        }
+        else
         if( window.navigator.vendor == "Google Inc." || userA.indexOf( "Chrome" ) > -1 )
         {
             var match = window.navigator.appVersion.match( /Chrome\/(\d+\.\d+)/ );
@@ -1073,6 +1080,7 @@ Scheduler.prototype.checkBrowser = function( withWarning )
             	geckoName = RegExp.$1;
               if( geckoName.toLowerCase() != "epiphany" ) gecko = 1 * RegExp.$2;
               if( geckoName.toLowerCase() == "safari" ) this._safari = 1 * RegExp.$2; 
+              if( geckoName.toLowerCase() == "firefox" ) this._firefox = 1 * RegExp.$2;  
               if( this._safari > 520 ) gecko = 2;
             }
             else 
@@ -1092,9 +1100,9 @@ Scheduler.prototype.checkBrowser = function( withWarning )
         }
     }
     
-    if( withWarning && this._ie < 6 && gecko < 2 && this._chrome < 0.2 && !xul )
+    if( withWarning && this._ie < 6 && gecko < 2 && this._chrome < 0.2 && this._opera < 16 && !xul )
     {
-        var allBrowser = this._ie+gecko+this._chrome;
+        var allBrowser = this._ie+gecko+this._chrome+this._opera;
         var msg = "The page may not work with this browser.\n\n";
         if( allBrowser == 0 ) 
         {
@@ -1102,6 +1110,7 @@ Scheduler.prototype.checkBrowser = function( withWarning )
           msg += "  - Microsoft Internet Explorer\n";
           msg += "  - Mozilla Firefox\n";
           msg += "  - Google Chrome\n";
+          msg += "  - Opera\n";
           msg += "  - SeaMonkey";
         } 
         else 
@@ -1109,6 +1118,7 @@ Scheduler.prototype.checkBrowser = function( withWarning )
           if( allBrowser-this._ie      == 0 ) msg += "Your Microsoft Internet Explorer version should be at least 6.0";
           if( allBrowser-gecko         == 0 ) msg += "Your " + geckoName + " version should be at least 2.0";
           if( allBrowser-this._chrome  == 0 ) msg += "Your Google Chrome version should be at least 0.2";
+          if( allBrowser-this._opera   == 0 ) msg += "Your Opera version should be at least 16.0";
         }
 
         if( window.navigator != undefined )
