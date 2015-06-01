@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -30,8 +30,6 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
-
-//$Id: scheduler_dialog.js 28482 2014-12-03 16:47:06Z oh $
 
 //-------------------------------------------------------------------------------------private vars
 var _open_url_features       = "menubar=no, toolbar=no, location=no, directories=no, scrollbars=yes, resizable=yes, status=no, dependent=yes";
@@ -1566,6 +1564,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     var suspended         = null;
     var occupied_http     = null;
     var hot               = 0;
+    var config_enabled    = 0;
     //var real_job_chain    = parent.left_frame._job_chain;
     
     if( job_chain_element ) {
@@ -1584,7 +1583,8 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
       setback             = order_element.getAttribute('setback');
       suspended           = order_element.getAttribute('suspended');
       occupied_http       = order_element.getAttribute('occupied_by_http_url');
-      hot                 = (order_element.selectSingleNode('file_based/@file')) ? 1 : 0;
+      hot                 = (order_element.selectSingleNode('file_based/@last_write_time')) ? 1 : 0;
+      config_enabled      = (order_element.selectSingleNode('file_based/@file')) ? 1 : 0;
       //real_job_chain      = order_element.getAttribute('path').replace(/([^,]+),[^,]+$/,"$1");
       /*
       var job_chain_stack = order_element.selectSingleNode('order.job_chain_stack/order.job_chain_stack.entry');
@@ -1616,7 +1616,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     } else {
       popup_builder.add_show_log( parent.getTranslation("Show log")         , occupied_http + "job_chain=" + encodeComponent(job_chain) +
                                                    "&order=" + encodeComponent(order_id), "show_log_order_" + job_chain.replace(/\//g,'_') + "__" + order_id );
-      popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('order','"+job_chain+","+order_id+"')", hot );
+      popup_builder.add_entry   ( parent.getTranslation("Show configuration"), "show_xml2('order','"+job_chain+","+order_id+"')", config_enabled );
       popup_builder.add_entry   ( parent.getTranslation("Show start times") , "callErrorChecked('show_calendar','order')" );
       if( !parent._hide.start_order || !parent._hide.add_order || !parent._hide.set_order_state || !parent._hide.set_order_run_time || !parent._hide.suspend_order ||
       	!parent._hide.resume_order || !parent._hide.reset_order || (!hot && !parent._hide.remove_order) || !parent._hide.remove_setback) {
