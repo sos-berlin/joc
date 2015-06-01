@@ -1664,6 +1664,7 @@ function order_menu__onclick( job_chain, order_id, menu_caller )
     var suspended         = null;
     var occupied_http     = null;
     var hot               = 0;
+    var config_enabled    = 0;
     //var real_job_chain    = parent.left_frame._job_chain;
     
     if( job_chain_element ) {
