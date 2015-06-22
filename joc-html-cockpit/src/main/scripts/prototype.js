@@ -1418,7 +1418,7 @@ Ajax.Request = Class.create(Ajax.Base, {
       this.setRequestHeaders();
 
       this.body = this.method == 'post' ? (this.options.postBody || params) : null;
-      try { if(Prototype.Browser.IE) this.transport.responseType = 'msxml-document'; } catch(E){}
+      try { if(Prototype.Browser.IE || !!(navigator.userAgent.match(/Trident/))) this.transport.responseType = 'msxml-document'; } catch(E){}
       this.transport.send(this.body);
 
       /* Force Firefox to handle ready state 4 for synchronous requests */
