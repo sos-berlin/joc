@@ -31,8 +31,6 @@
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
 
-//$Id: scheduler_dialog.js 28482 2014-12-03 16:47:06Z oh $
-
 //-------------------------------------------------------------------------------------private vars
 var _open_url_features       = "menubar=no, toolbar=no, location=no, directories=no, scrollbars=yes, resizable=yes, status=no, dependent=yes";
 var _popup_menu;
