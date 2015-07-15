@@ -177,6 +177,7 @@ _translations['Error in configuration file']               = 'Error en archivo d
 _translations['Error in changed file']                     = 'Error en archivo modificado';
 _translations['(not loaded)']                              = '(no cargado)';
 _translations['Removing delayed']                          = 'Eliminar retrasados';
+_translations['Max. Tasks']                                = 'Max. Tareas';
 _translations['Tasks']                                     = 'Tareas';
 _translations['Run time defined by']                       = 'Tiempo de ejecución definido por';
 _translations['orders to process']                         = 'Ordenar por procesar';

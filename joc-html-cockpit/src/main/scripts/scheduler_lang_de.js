@@ -177,6 +177,7 @@ _translations['Error in configuration file']               = 'Fehler in Konfigur
 _translations['Error in changed file']                     = 'Fehler in geänderter Datei';
 _translations['(not loaded)']                              = '(nicht geladen)';
 _translations['Removing delayed']                          = 'Löschen verzögert';
+_translations['Max. Tasks']                                = 'Max. Tasks';
 _translations['Tasks']                                     = 'Tasks';
 _translations['Run time defined by']                       = 'Startzeiten gesetzt in';
 _translations['orders to process']                         = 'Aufträge in Warteschlange';

@@ -177,6 +177,7 @@ _translations['Error in configuration file']               = 'Erreur dans le fic
 _translations['Error in changed file']                     = 'Erreur dans le fichier modifié';
 _translations['(not loaded)']                              = '(non chargé)';
 _translations['Removing delayed']                          = 'Suppression repoussée';
+_translations['Max. Tasks']                                = 'Nombre max. d\'instance de tâche';
 _translations['Tasks']                                     = 'Instance de tâche';
 _translations['Run time defined by']                       = 'Date de démarrage définie par';
 _translations['orders to process']                         = 'ordres à exécuter';

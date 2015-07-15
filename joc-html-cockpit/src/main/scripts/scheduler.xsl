@@ -3517,6 +3517,13 @@
                 </tr>
                 
                 <tr>
+                    <td class="label"><span class="label">Max. Tasks</span>:</td>
+                    <td class="task" colspan="3" valign="top">
+                        <xsl:apply-templates mode="date_time_nowrap" select="@tasks"/>
+                    </td>
+                </tr>
+                
+                <tr>
                     <td class="label"><span class="label">Process steps</span>:</td>
                     <td><xsl:value-of select="@all_steps"/></td>
                     <td class="label"><span class="label">Tasks</span>:</td>

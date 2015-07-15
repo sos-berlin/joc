@@ -177,6 +177,7 @@ _translations['Error in configuration file']               = 'ジョブ定義エ
 _translations['Error in changed file']                     = 'ファイル変更エラー';
 _translations['(not loaded)']                              = '(not loaded)';
 _translations['Removing delayed']                          = 'Removing delayed';
+_translations['Max. Tasks']                                = '最大タスク';
 _translations['Tasks']                                     = 'タスク';
 _translations['Run time defined by']                       = 'Run time defined by';
 _translations['orders to process']                         = '実行予定オーダー';

@@ -178,6 +178,7 @@ _translations['Error in configuration file']               = 'Ошибка в к
 _translations['Error in changed file']                     = 'Ошибка в изменённом файле';
 _translations['(not loaded)']                              = '(не загружено)';
 _translations['Removing delayed']                          = 'Удаление задержать';
+_translations['Max. Tasks']                                = 'Макс. Tasks';
 _translations['Tasks']                                     = 'Tasks';
 _translations['Run time defined by']                       = 'Время старта установлено в';
 _translations['orders to process']                         = 'Ордера к обработке';
