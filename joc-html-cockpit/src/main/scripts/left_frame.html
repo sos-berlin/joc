@@ -557,13 +557,23 @@ function modify_response( response )
       	for( var j = 0; j < job_chain_elements.length; j++ )
         { 
           var job_chain_nodes = job_chain_elements[j].selectNodes( "job_chain_node.job_chain/@job_chain|job_chain_node/@job_chain" );
+          var missing_job_chain_nodes = job_chain_elements[j].selectNodes( "file_based/requisites/requisite[@is_missing='yes']/@path" );
           for( var k=0; k < job_chain_nodes.length; k++ ) 
           {   
-              if( job_chain_elements[j].selectSingleNode( "file_based/requisites/requisite[@path = '"+job_chain_nodes[k].nodeValue.toLowerCase()+"' and @is_missing='yes']" ) ) continue;
               if( spooler_element.selectSingleNode( "//job_chains/job_chain[@path = '"+job_chain_nodes[k].nodeValue+"']" ) ) continue;
+              var cur_job_chain_node_is_missing = false;
+              for( var n=0; n < missing_job_chain_nodes.length; n++ ) {
+              	if( job_chain_nodes[k].nodeValue.toLowerCase() == missing_job_chain_nodes[n].nodeValue.toLowerCase() ) {
+              		cur_job_chain_node_is_missing = true;
+              		break;
+              	}
+              }
+              if( cur_job_chain_node_is_missing ) continue;
               var job_chain_element = parent._scheduler.executeSynchron( '<show_job_chain job_chain="'+job_chain_nodes[k].nodeValue+'" max_orders="'+parent._scheduler._runtime_settings.max_orders+'" what="'+_what+'"/>' );
               if( job_chain_element ) {
                 job_chain_element = job_chain_element.selectSingleNode( '/spooler/answer/job_chain' );
+              }
+              if( job_chain_element ) {
                 if( !parent._scheduler._ie ) job_chain_element = job_chain_elements[j].ownerDocument.importNode(job_chain_element, true);
                 job_chain_elements[j].parentNode.appendChild(job_chain_element);
               }
