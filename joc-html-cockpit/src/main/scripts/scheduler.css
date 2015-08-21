@@ -194,6 +194,7 @@ pre.log                         {font-family:"Lucida Console",monospace;font-siz
 .log_error                      {color:red;}
 .log_warn                       {color:tomato;}
 .log_info                       {color:black;}
+.log_stderr                     {color:red;}
 .log_debug                      {color:darkgreen;}
 .log_debug2                     {color:#408040;}
 .log_debug3                     {color:#808080;}
