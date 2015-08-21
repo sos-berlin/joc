@@ -257,9 +257,10 @@ Popup_menu_builder.prototype.create_popup_menu = function( menu_type, element_na
           var selectbox = document.getElementById( element_name );
           if( selectbox ) {
             this._finished = true;
-          
+            selectbox.options[0] = new Option("","");
+            selectbox.options[0].setAttribute("style","display:none;");
             for( var i=0; i < this._selectbox_array.length; i++ ) {
-              selectbox.options[i] = this._selectbox_array[i];
+              selectbox.options[i+1] = this._selectbox_array[i];
             }
             selectbox.setAttribute( "onblur", "try{ __current_popup_menu.close('selectbox','" + element_name + "'); }catch(x){}" );
             selectbox.setAttribute( "onchange", "eval(this.value);this.selectedIndex=0;" );
