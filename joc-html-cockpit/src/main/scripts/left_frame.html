@@ -546,7 +546,7 @@ function modify_response( response )
       job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain or job_chain_node/@job_chain]" );
       for( var j = 0; j < job_chain_elements.length; j++ )
       { 
-        if( !parent.left_frame.apply_big_chains_select( job_chain_elements[j] ) ) continue;
+        if( !parent.left_frame.apply_big_chains_select( job_chain_elements[j] ), spooler_element ) continue;
       }
       
       //special for nested job chain support in tree view
@@ -921,7 +921,7 @@ function apply_job_chains_select( node )
 }
 
 
-function apply_big_chains_select( node )
+function apply_big_chains_select( node, spooler_element )
 {   
     var job_chains     = node.selectNodes( "job_chain_node.job_chain|job_chain_node[@job_chain]" );
     var job_chain      = null;
@@ -929,7 +929,7 @@ function apply_big_chains_select( node )
     var parent_node    = node.parentNode;
     if(node.getAttribute('select_marked')) {  
     	for( var i=0; i < job_chains.length; i++ ) {
-    		job_chain = node.selectSingleNode( "ancestor::spooler//job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" );
+    		job_chain = spooler_element.selectSingleNode( "//job_chain[@path='"+job_chains[i].getAttribute('job_chain')+"']" );
       	if( !job_chain ) { cnts[1]++; }      	 
     	}
     	if( cnts[1] == job_chains.length ) {
