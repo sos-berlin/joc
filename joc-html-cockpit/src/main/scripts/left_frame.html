@@ -546,7 +546,7 @@ function modify_response( response )
       job_chain_elements = spooler_element.selectNodes( "//job_chains/job_chain[job_chain_node.job_chain or job_chain_node/@job_chain]" );
       for( var j = 0; j < job_chain_elements.length; j++ )
       { 
-        if( !parent.left_frame.apply_big_chains_select( job_chain_elements[j] ), spooler_element ) continue;
+        if( !parent.left_frame.apply_big_chains_select( job_chain_elements[j], spooler_element )) continue;
       }
       
       //special for nested job chain support in tree view
