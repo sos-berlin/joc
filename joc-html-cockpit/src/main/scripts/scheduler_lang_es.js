@@ -425,8 +425,9 @@ _translations['Order']                                     = 'Orden';
 _translations['Setback']                                   = 'Contratiempo';
 _translations['deleted']                                   = 'eliminada';
 _translations['Replacement']                               = 'Reemplazo';
-_translations['currently processed by']                    = 'procesada ahora por'
-_translations['on blacklist']                              = 'en lista negra'
+_translations['currently processed by']                    = 'procesada ahora por';
+_translations['on blacklist']                              = 'en lista negra';
+_translations['Priority']                                  = 'Prioridad';
                                                            
 
                                                            

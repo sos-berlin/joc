@@ -424,8 +424,9 @@ _translations['Order']                                     = 'オーダー';
 _translations['Setback']                                   = '再試行';
 _translations['deleted']                                   = '削除';
 _translations['Replacement']                               = '置換';
-_translations['currently processed by']                    = '処理中'
-_translations['on blacklist']                              = 'ブラックリスト内'
+_translations['currently processed by']                    = '処理中';
+_translations['on blacklist']                              = 'ブラックリスト内';
+_translations['Priority']                                  = '優先順位';
                                                            
 
                                                            

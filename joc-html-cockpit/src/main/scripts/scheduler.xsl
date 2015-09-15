@@ -2361,6 +2361,9 @@
                <span class="green_value"><xsl:value-of select="@task"/></span>
            </xsl:when-->
         </xsl:choose>
+        <xsl:if test="@priority &gt; 0"><xsl:text> - </xsl:text>
+      		<span class="green_label">Priority</span><span class="green_value">:&#160;<xsl:value-of select="@priority"/></span>
+      	</xsl:if>
     </xsl:template>
     
     
@@ -4371,6 +4374,15 @@
                      </xsl:when>
                   </xsl:choose>
                 </tr>
+                
+                <xsl:if test="@priority &gt; 0">
+                  <tr>
+                        <td class="label"><span class="label">Priority</span>:</td>
+                        <td colspan="2">
+                            <xsl:value-of select="@priority"/>
+                        </td>
+                    </tr>
+                </xsl:if>
                 
                 <tr>
                   <td>&#160;</td>

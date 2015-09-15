@@ -426,8 +426,9 @@ _translations['Order']                                     = 'Ордер';
 _translations['Setback']                                   = 'Задержка';
 _translations['deleted']                                   = 'удалено';
 _translations['Replacement']                               = 'Замена';
-_translations['currently processed by']                    = 'в настоящее время обрабатывается'
-_translations['on blacklist']                              = 'в Blacklist'
+_translations['currently processed by']                    = 'в настоящее время обрабатывается';
+_translations['on blacklist']                              = 'в Blacklist';
+_translations['Priority']                                  = 'Приоритет';
                                                            
 
                                                            
