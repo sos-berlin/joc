@@ -423,8 +423,9 @@ _translations['Order']                                     = 'Auftrag';
 _translations['Setback']                                   = 'Verzögerung';
 _translations['deleted']                                   = 'gelöscht';
 _translations['Replacement']                               = 'Ersatz';
-_translations['currently processed by']                    = 'momentan verarbeitet von'
-_translations['on blacklist']                              = 'in der Blacklist'
+_translations['currently processed by']                    = 'momentan verarbeitet von';
+_translations['on blacklist']                              = 'in der Blacklist';
+_translations['Priority']                                  = 'Priorität';
                                                            
 
                                                            
