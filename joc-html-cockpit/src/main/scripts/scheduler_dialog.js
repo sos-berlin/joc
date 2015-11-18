@@ -765,7 +765,7 @@ function resume_order( ret )
           return showError( x );
       }
       if( params_element ) {  
-          var param_elements = params_element.selectNodes('param');
+          var param_elements = params_element.selectNodes('param[@name and @value]');
           for( var i = 0; i < param_elements.length; i++ ) {  
               params[param_elements[i].getAttribute( "name" )] = xml_encode(param_elements[i].getAttribute( "value" ).replace( /\\\\/g, "\\"));
               param_names.push(param_elements[i].getAttribute( "name" ));
