@@ -1447,16 +1447,15 @@ function scheduler_extras__onclick( elt )
     
     var popup_builder   = new Popup_menu_builder();
     
-    //popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(en)") + '<img src="banner_english.gif" style="position:relative;top:3px;left:2px;"/>'     , "open_url( 'scheduler_home/doc/en/reference/index.xml', 'scheduler_documentation' )" );
-    //popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(de)") + '<img src="banner_german.gif" style="position:relative;top:3px;left:2px;"/>'      , "open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )" );
-    popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(en)")     , "open_url( 'scheduler_home/doc/en/reference/index.xml', 'scheduler_documentation' )" );
-    popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(de)")     , "open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )" );
-    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("FAQ"), "open_url( 'https://kb.sos-berlin.com/x/JoBB', 'scheduler_wiki' )" );
+    //popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(en)")     , "open_url( 'scheduler_home/doc/en/reference/index.xml', 'scheduler_documentation' )" );
+    //popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(de)")     , "open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )" );
+    popup_builder.add_entry( parent.getTranslation("Documentation"), "open_url( 'scheduler_home/doc/reference/index.xml', 'scheduler_documentation' )" );
+	popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("FAQ"), "open_url( 'https://kb.sos-berlin.com/x/JoBB', 'scheduler_wiki' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Forum"), "open_url( 'https://sourceforge.net/p/jobscheduler/discussion/', 'scheduler_forum' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Downloads"), "open_url( 'http://sourceforge.net/projects/jobscheduler/files/', 'scheduler_download' )" );
     popup_builder.add_entry( parent.getTranslation("Follow us on Twitter"), "open_url( 'http://twitter.com/#!/job_scheduler', 'scheduler_twitter' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Release Notes"), "open_url( 'https://kb.sos-berlin.com/x/s4BB', 'scheduler_release_info' )" );
-    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Home"), "open_url( 'http://www.sos-berlin.com/scheduler', 'scheduler_home' )" );
+    popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Home"), "open_url( 'http://www.sos-berlin.com/jobscheduler', 'scheduler_home' )" );
     //popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Jira"), "open_url( 'https://change.sos-berlin.com/', 'scheduler_jira' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("OTRS"), "open_url( 'http://www.sos-berlin.com/otrs/customer.pl?Lang=en', 'scheduler_otrs' )" );
     
