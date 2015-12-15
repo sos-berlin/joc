@@ -13,8 +13,8 @@ _translations['-id']                                       = '-ID';
 //Product info
 _translations['Operations GUI']                            = 'Operations GUI';
 _translations['Build']                                     = 'Build';
-_translations['All rights reserved.']                      = 'All rights reserved.'
-_translations['OK']                                        = 'OK'
+_translations['All rights reserved.']                      = 'All rights reserved.';
+_translations['OK']                                        = 'OK';
 
 //Tabs
 _translations['Jobs']                                      = 'ジョブ';
@@ -63,8 +63,8 @@ _translations['Downloads']                                 = 'ダウンロード
 _translations['Follow us on Twitter']                      = 'Twitterでフォロー';
 _translations['About']                                     = '情報';
 _translations['Settings']                                  = '環境設定';
-_translations['Monitor']                                   = 'Monitor';
-_translations['Configuration']                             = 'Configuration';
+_translations['Monitor']                                   = 'モニタ';
+_translations['Configuration']                             = '設定';
                                                            
 //First line                                  
 _translations['every $secs']                               = '$sec秒毎';
@@ -118,8 +118,8 @@ _translations['You can enable the settings dialog \nvia the _disable_cookie_sett
 
 //compact
 _translations['from']                                      = 'from';
-_translations['update']                                    = 'update';
-_translations['last update']                               = 'last update';
+_translations['update']                                    = '更新';
+_translations['last update']                               = '最終更新';
 _translations['Scheduler is running since']                = 'JobScheduler起動日時';
 
 
@@ -176,7 +176,8 @@ _translations['Error']                                     = 'エラー';
 _translations['Error in configuration file']               = 'ジョブ定義エラー';
 _translations['Error in changed file']                     = 'ファイル変更エラー';
 _translations['(not loaded)']                              = '(not loaded)';
-_translations['Removing delayed']                          = 'Removing delayed';
+_translations['Removing delayed']                          = '遅延を削除';
+_translations['Max. Tasks']                                = '最大タスク';
 _translations['Tasks']                                     = 'タスク';
 _translations['Run time defined by']                       = 'Run time defined by';
 _translations['orders to process']                         = '実行予定オーダー';
@@ -212,6 +213,7 @@ _translations['Delete']                                    = '削除';
 //Task history                                             
 _translations['No tasks in the history']                   = 'タスク履歴はありません';
 _translations['Started']                                   = '開始時刻';
+_translations['Started by']                                = 'によって開始';
 _translations['Cause']                                     = '理由';
 _translations['Ended']                                     = '終了時刻';
 _translations['Duration']                                  = '時間';
@@ -239,7 +241,7 @@ _translations['Start task parametrized']                   = 'タスク実行パ
 _translations['Set run time']                              = 'スケジュール設定';
 _translations['Stop']                                      = '停止';
 _translations['Unstop']                                    = '再開';
-_translations['Reread']                                    = '';
+_translations['Reread']                                    = '再読込';
 _translations['End tasks']                                 = 'タスク終了';
 _translations['Suspend tasks']                             = 'タスク保留';
 _translations['Continue tasks']                            = 'タスク再開';
@@ -351,6 +353,7 @@ _translations['Job node menu']                             = 'ジョブノード
 _translations['Add order']                                 = 'オーダー作成';
 _translations['Add persistent order']                      = '永続オーダー作成';
 _translations['Delete job chain']                          = 'ジョブチェーン削除';
+_translations['Delete temp. orders']                       = '一時的オーダーを削除';
 _translations['Skip node']                                 = 'ノードスキップ';
 _translations['Stop node']                                 = 'ノード停止';
 _translations['Stop job']                                  = 'ジョブ停止';
@@ -375,6 +378,8 @@ _translations['pattern']                                   = '条件';
 _translations['delay']                                     = '間隔';
 _translations['repeat']                                    = '繰返回数';
 _translations['blacklist']                                 = 'ブラックリスト';
+_translations['max. Orders']                               = '最大のオーダー';
+
 
 /******************************************************************************
 *                         ORDERS/ORDERQUEUE/BLACKLIST                         *
@@ -406,6 +411,8 @@ _translations['Start order parametrized']                  = 'オーダー実行
 _translations['Set order state']                           = 'オーダーステート設定';
 _translations['Suspend order']                             = 'オーダー保留';
 _translations['Resume order']                              = 'オーダー再開';
+_translations['Resume order parametrized']                 = 'オーダー再開パラメータ設定';
+_translations['Resume order $order']                       = 'オーダー再開 $order';
 _translations['Reset order']                               = 'オーダー初期化';
 _translations['Delete order']                              = 'オーダー削除';
 _translations['Remove setback']                            = '再試行設定削除';
@@ -417,8 +424,9 @@ _translations['Order']                                     = 'オーダー';
 _translations['Setback']                                   = '再試行';
 _translations['deleted']                                   = '削除';
 _translations['Replacement']                               = '置換';
-_translations['currently processed by']                    = '処理中'
-_translations['on blacklist']                              = 'ブラックリスト内'
+_translations['currently processed by']                    = '処理中';
+_translations['on blacklist']                              = 'ブラックリスト内';
+_translations['Priority']                                  = '優先順位';
                                                            
 
                                                            
@@ -489,7 +497,7 @@ _translations['ago']                                       = '前';
 _translations['IP']                                        = 'IP';
 _translations['Hostname']                                  = 'ホスト名';
 _translations['Port']                                      = 'ポート';
-_translations['Last Update']                               = 'Last Update';
+_translations['Last Update']                               = '最終更新';
 _translations['Connected']                                 = '接続';
 _translations['Disconnected']                              = '切断';
 _translations['Version']                                   = 'バージョン';
@@ -626,7 +634,7 @@ _translations['job']                                       = 'ジョブ';
 _translations['job chain']                                 = 'ジョブチェーン';
 _translations['of job chain']                              = 'ジョブチェーン';
 _translations['all jobs']                                  = '全ジョブ';
-_translations['all jobs and orders']                       = '全てのJob/Order';
+_translations['all jobs and orders']                       = '全てのジョブとオーダー';
 _translations['Start times for']                           = '実行予定';
 _translations['by calling']                                = '出力条件';
 _translations['with output format']                        = '出力形式';
@@ -732,7 +740,6 @@ _translations['Declare new parameters']                    = '新規パラメー
 _translations['name']                                      = 'パラメータ名';
 _translations['value']                                     = '値';
 
-
 //add order
 _translations['Add order to $job_chain']                   = 'オーダーを$job_chainに登録';
 _translations['Enter an order id']                         = 'オーダーIDを入力';
@@ -740,6 +747,10 @@ _translations['Enter an order title']                      = 'オーダー名を
 _translations['Select an order state']                     = 'オーダーのステートを選択';
 _translations['Select an order end state']                 = 'オーダーの終了ステートを選択';
 _translations['In order to store this order in a hot folder you have to state an order id.\nYour order will only be stored permanently, however, it is valid for\nthe lifetime of this JobScheduler session. Do you want to continue?'] = 'ホットフォルダにこのオーダーを保存するためにはオーダーIDが必要です。\n保存されたオーダーはこのJobSchedulerセッション中有効になります。\n保存しますか?';
+
+//remove temp. orders
+_translations['Delete temporary orders from $job_chain']   = '$job_chainから一時的な受注を削除';
+_translations['all']                                       = 'すべて'; 
 
 //set order state
 _translations['Set order state of $order']                 = '$orderにステートを設定';
@@ -751,6 +762,13 @@ _translations['<span class="small">The current order end state is $state.</span>
 //set run time
 _translations['Set run time of $job']                      = '$jobのランタイム設定';
 _translations['or choose a schedule']                      = '又はスケジュールを選択';
+
+//terminate task
+_translations['Terminate task $task_id']                   = 'タスク$task_idを終了';
+_translations['with timeout']                              = 'タイムアウト値';
+_translations['Should the task not terminate within the specified timeout then it will be killed.'] = 'タスクは設定したタイムアウト値を超えるまで終了されず、その後に強制終了されます';
+_translations['Please enter a number for the timeout.']    = 'タイムアウト値（秒）を入力して下さい';
+
 
 //schedules
 _translations['Add schedule']                              = 'スケジュールを追加';
@@ -795,44 +813,46 @@ _translations['Please enter a job name to display its description.']            
 *                           CONFIRMS                                          *
 ******************************************************************************/
 
-_translations['Do you really want to terminate the JobScheduler?']          = 'Do you really want to terminate the JobScheduler?';
-_translations['Do you really want to restart the JobScheduler?']            = 'Do you really want to restart the JobScheduler?';
-_translations['Do you really want to abort the JobScheduler?']              = 'Do you really want to abort the JobScheduler?';
-_translations['Do you really want to pause the JobScheduler?']              = 'Do you really want to pause the JobScheduler?';
-_translations['Do you really want to continue the JobScheduler?']           = 'Do you really want to continue the JobScheduler?';
-_translations['Do you really want to terminate the JobScheduler cluster?']  = 'Do you really want to terminate the JobScheduler cluster?';
-_translations['Do you really want to restart the JobScheduler cluster?']    = 'Do you really want to restart the JobScheduler cluster?';
-_translations['Do you really want to delete the dead entry?']               = 'Do you really want to delete the dead entry?';
+_translations['Do you really want to terminate the JobScheduler?']          = '本当にJobSchedulerを終了しますか?';
+_translations['Do you really want to restart the JobScheduler?']            = '本当にJobSchedulerを再起動しますか?';
+_translations['Do you really want to abort the JobScheduler?']              = '本当にJobSchedulerを停止しますか?';
+_translations['Do you really want to pause the JobScheduler?']              = '本当にJobSchedulerを一時停止しますか?';
+_translations['Do you really want to continue the JobScheduler?']           = '本当にJobSchedulerを継続しますか?';
+_translations['Do you really want to terminate the JobScheduler cluster?']  = '本当にJobSchedulerクラスタを終了しますか?';
+_translations['Do you really want to restart the JobScheduler cluster?']    = '本当にJobSchedulerクラスタを再起動しますか?';
+_translations['Do you really want to delete the dead entry?']               = '本当にdead entryを削除しますか?';
 
-_translations['Do you really want to stop this job chain?']                 = 'Do you really want to stop this job chain?';
-_translations['Do you really want to unstop this job chain?']               = 'Do you really want to unstop this job chain?';
-_translations['Do you really want to delete this job chain?']               = '本当にジョブチェーン削除しますか?';
-_translations['Do you really want to stop this job chain node?']            = 'Do you really want to stop this job chain node?';
-_translations['Do you really want to unstop this job chain node?']          = 'Do you really want to unstop this job chain node?';
-_translations['Do you really want to skip this job chain node?']            = 'Do you really want to skip this job chain node?';
-_translations['Do you really want to unskip this job chain node?']          = 'Do you really want to unskip this job chain node?';
+_translations['Do you really want to stop this job chain?']                 = '本当にこのジョブチェーンを停止しますか?';
+_translations['Do you really want to unstop this job chain?']               = '本当にこのジョブチェーンを再開しますか?';
+_translations['Do you really want to delete this job chain?']               = '本当にこのジョブチェーンを削除しますか?';
+_translations['Do you really want to stop this job chain node?']            = '本当にこのジョブチェーンノードを停止しますか?';
+_translations['Do you really want to unstop this job chain node?']          = '本当にこのジョブチェーンノードを再開しますか?';
+_translations['Do you really want to skip this job chain node?']            = '本当にこのジョブチェーンノードをスキップしますか?';
+_translations['Do you really want to unskip this job chain node?']          = '本当にこのジョブチェーンノードをスキップしませんか?';
 
-_translations['Do you really want to start this job?']                      = 'Do you really want to start this job?';
-_translations['Do you really want to stop this job?']                       = 'Do you really want to stop this job?';
-_translations['Do you really want to unstop this job?']                     = 'Do you really want to unstop this job?';
-_translations['Do you really want to delete this job?']                     = '本当にジョブ削除しますか';
-_translations['Do you really want to kill this task?']                      = 'Do you really want to kill this task?';
-_translations['Do you really want to delete this task?']                    = '本当にジョブ削除しますか';
-_translations['Do you really want to end this task?']                       = 'Do you really want to end this task?';
-_translations['Do you really want to end the tasks?']                       = 'Do you really want to end the tasks?';
-_translations['Do you really want to suspend the tasks?']                   = 'Do you really want to suspend the tasks?';
-_translations['Do you really want to continue the tasks?']                  = 'Do you really want to continue the tasks?';
+_translations['Do you really want to start this job?']                      = '本当にこのジョブを開始しますか?';
+_translations['Do you really want to stop this job?']                       = '本当にこのジョブを停止しますか?';
+_translations['Do you really want to unstop this job?']                     = '本当にこのジョブを再開しますか?';
+_translations['Do you really want to delete this job?']                     = '本当にこのジョブを削除しますか?';
+_translations['Do you really want to kill this task?']                      = '本当にこのタスクを強制終了しますか?';
+_translations['Do you really want to terminate this task?']                 = '本当にこのタスクを中止しますか?';
+_translations['Do you really want to delete this task?']                    = '本当にこのタスクを削除しますか?';
+_translations['Do you really want to end this task?']                       = '本当にこのタスクを終了しますか?';
+_translations['Do you really want to end the tasks?']                       = '本当にそのタスクを終了しますか?';
+_translations['Do you really want to suspend the tasks?']                   = '本当にそのタスクを延期しますか?';
+_translations['Do you really want to continue the tasks?']                  = '本当にそのタスクを継続しますか?';
 
-_translations['Do you really want to start this order?']                    = 'Do you really want to start this order?';
-_translations['Do you really want to add an order?']                        = 'Do you really want to add an order?';
-_translations['Do you really want to reset this order?']                    = 'Do you really want to reset this order?';
-_translations['Do you really want to suspend this order?']                  = 'Do you really want to suspend this order?';
-_translations['Do you really want to resume this order?']                   = 'Do you really want to resume this order?';
-_translations['Do you really want to change the order state?']              = 'Do you really want to change the order state?';
-_translations['Do you really want to delete this order?']                   = '本当にオーダー削除しますか?';
-_translations['Do you really want to remove the setback?']                  = 'Do you really want to remove the setback?';
+_translations['Do you really want to start this order?']                    = '本当にこのオーダーを開始しますか?';
+_translations['Do you really want to add an order?']                        = '本当にこのオーダーを追加しますか?';
+_translations['Do you really want to reset this order?']                    = '本当にこのオーダーを初期化しますか?';
+_translations['Do you really want to suspend this order?']                  = '本当にこのオーダーを延期しますか?';
+_translations['Do you really want to resume this order?']                   = '本当にこのオーダーを一時停止しますか?';
+_translations['Do you really want to change the order state?']              = '本当にこのオーダーのステートを変更しますか?';
+_translations['Do you really want to delete this order?']                   = '本当にこのオーダーを削除しますか?';
+_translations['Do you really want to delete selected orders?']              = '本当に選択したオーダーを削除しますか?';
+_translations['Do you really want to remove the setback?']                  = '本当にこの再試行を削除しますか?';
 
-_translations['Do you really want to set the run time?']                    = 'Do you really want to set the run time?';
-_translations['Do you really want to add a substituting schedule?']         = 'Do you really want to add a substituting schedule?';
-_translations['Do you really want to modify this schedule?']                = 'Do you really want to modify this schedule?';
-_translations['Do you really want to delete this schedule?']                = '本当にスケジュール削除しますか?';
+_translations['Do you really want to set the run time?']                    = '本当にこのランタイムを設定しますか?';
+_translations['Do you really want to add a substituting schedule?']         = '本当にこの代替スケジュールを追加しますか?';
+_translations['Do you really want to modify this schedule?']                = '本当にこのスケジュールを変更しますか?';
+_translations['Do you really want to delete this schedule?']                = '本当にこのスケジュールを削除しますか?';
