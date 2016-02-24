@@ -123,7 +123,7 @@ function calendar_show_callback(response)
       if( !_response ) {
         throw new Error( "unknown error - please close this window, reload the calling window and try it again" );
       }
-      
+      _response.setProperty("SelectionLanguage", "XPath");
       var calendar_node = _response.selectSingleNode("/spooler/answer/calendar");
       if(calendar_params.menu != 'scheduler' ) {
         var removables = new Array();
