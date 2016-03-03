@@ -250,8 +250,10 @@ _translations['Delete job']                                = 'Job löschen';
                                                            
 //Menu content of task menu                                
 _translations['Task menu']                                 = 'Task-Menü';
-_translations['End']                                       = 'Beenden';
+_translations['End (API job)']                             = 'Beenden (API job)';
 _translations['Kill immediately']                          = 'Sofort abbrechen';
+_translations['Terminate (UNIX)']                          = 'Beenden (UNIX)';
+_translations['Terminate with timeout (UNIX)']             = 'Beenden mit Timeout (UNIX)';
                                                            
                                                            
 //Mouseover-Title                                          

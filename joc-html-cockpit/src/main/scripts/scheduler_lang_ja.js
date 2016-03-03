@@ -250,9 +250,11 @@ _translations['Delete job']                                = 'ジョブ削除';
                                                            
 //Menu content of task menu                                
 _translations['Task menu']                                 = 'タスクメニュー';
-_translations['End']                                       = 'タスク終了';
+_translations['End (API job)']                             = 'タスク終了 (API ジョブ)';
 _translations['Kill immediately']                          = 'タスク強制終了';
-                                                           
+_translations['Terminate (UNIX)']                          = '終了 (UNIX)';
+_translations['Terminate with timeout (UNIX)']             = 'タイムアウト値終了 (UNIX)';
+                                                            
                                                            
 //Mouseover-Title                                          
 _translations['show job details']                          = 'ジョブ詳細表示';
