@@ -142,9 +142,9 @@ _display_last_activities_tab = false;
 
 /*****************************************************************
 *  You can hide some functions.
-*  'end_or_continue_or_suspend_tasks_of_api_job' and 
-*  'end_task_of_api_job' are true per default because these function
-*  have only an effect for API jobs with more then one process steps.
+*  'end_or_continue_or_suspend_tasks_of_api_job' are true per
+*  default because these function have only an effect for API 
+*  jobs with more then one process steps.
 *  Normally you do not have such jobs.
 */
 _hide.terminate_jobscheduler = false;
@@ -164,7 +164,7 @@ _hide.set_job_run_time       = false;
 _hide.kill_running_task      = false;
 _hide.remove_enqueued_task   = false;
 _hide.end_or_continue_or_suspend_tasks_of_api_job = true;
-_hide.end_task_of_api_job    = true;
+_hide.end_task_of_api_job    = false;
 _hide.start_order            = false;
 _hide.add_order              = false;
 _hide.reset_order            = false;

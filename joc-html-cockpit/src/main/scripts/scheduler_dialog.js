@@ -1549,9 +1549,9 @@ function task_menu__onclick( task_id )
     	popup_builder.add_bar();
     }
     //Makes only sense for API jobs, which runs in multiple process steps
-    popup_builder.add_command ( parent.getTranslation("End")                    , "<kill_task job='" + _job_name + "' id='" + task_id + "'/>", true, parent._hide.end_task_of_api_job, parent._confirm.end_task_of_api_job, 'end this task' );
-    popup_builder.add_command ( parent.getTranslation("Terminate")              , "<kill_task job='" + _job_name + "' id='" + task_id + "' immediately='yes' timeout='never'/>", true, parent._hide.kill_running_task, parent._confirm.kill_running_task, 'terminate this task' );
-		popup_builder.add_entry   ( parent.getTranslation("Terminate with timeout") , "callErrorChecked('terminate_task','"+task_id+"')", true, parent._hide.kill_running_task );
+    popup_builder.add_command ( parent.getTranslation("End (API job)")          , "<kill_task job='" + _job_name + "' id='" + task_id + "'/>", true, parent._hide.end_task_of_api_job, parent._confirm.end_task_of_api_job, 'end this task' );
+    popup_builder.add_command ( parent.getTranslation("Terminate (UNIX)")       , "<kill_task job='" + _job_name + "' id='" + task_id + "' immediately='yes' timeout='never'/>", true, parent._hide.kill_running_task, parent._confirm.kill_running_task, 'terminate this task' );
+		popup_builder.add_entry   ( parent.getTranslation("Terminate with timeout (UNIX)") , "callErrorChecked('terminate_task','"+task_id+"')", true, parent._hide.kill_running_task );
     popup_builder.add_command ( parent.getTranslation("Kill immediately")       , "<kill_task job='" + _job_name + "' id='" + task_id + "' immediately='yes'/>", true, parent._hide.kill_running_task, parent._confirm.kill_running_task, 'kill this task' );
 
     _popup_menu = popup_builder.show_popup_menu();
