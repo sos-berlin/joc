@@ -250,8 +250,10 @@ _translations['Delete job']                                = 'Job удалить
                                                            
 //Menu content of task menu                                
 _translations['Task menu']                                 = 'Task-Меню';
-_translations['End']                                       = 'Закончить работу';
+_translations['End (API job)']                             = 'Закончить работу (API Job)';
 _translations['Kill immediately']                          = 'Прекратить работу немедленно';
+_translations['Terminate (UNIX)']                          = 'Завершить работу (UNIX)';
+_translations['Terminate with timeout (UNIX)']             = 'Завершить работу с таймаутом (UNIX)';
                                                            
                                                            
 //Mouseover-Title                                          

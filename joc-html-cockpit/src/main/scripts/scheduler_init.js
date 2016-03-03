@@ -86,7 +86,7 @@ var _hide                       = {
   'kill_running_task':false, 'remove_enqueued_task':false,
   'set_job_run_time':false, 'set_order_run_time':false,
   'end_or_continue_or_suspend_tasks_of_api_job':true, 
-  'end_task_of_api_job':true, 'terminate_jobscheduler':false,
+  'end_task_of_api_job':false, 'terminate_jobscheduler':false,
   'pause_jobscheduler':false, 'continue_jobscheduler':false,
   'restart_jobscheduler':false, 'add_schedule':false,
   'modify_schedule':false

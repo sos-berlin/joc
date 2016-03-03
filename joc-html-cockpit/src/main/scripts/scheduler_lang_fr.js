@@ -249,8 +249,10 @@ _translations['Delete job']                                = 'Supprimer tâche';
                                                            
 //Menu content of task menu                                
 _translations['Task menu']                                 = 'Menu Instance';
-_translations['End']                                       = 'Terminer';
+_translations['End (API job)']                             = 'Terminer (API tâche)';
 _translations['Kill immediately']                          = 'Tuer immédiatement';
+_translations['Terminate (UNIX)']                          = 'Arrêter (UNIX)';
+_translations['Terminate with timeout (UNIX)']             = 'Arrêter avec le délai d\'attente (UNIX)';
                                                            
                                                            
 //Mouseover-Title                                          
