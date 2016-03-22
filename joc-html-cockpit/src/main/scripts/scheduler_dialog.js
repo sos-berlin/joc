@@ -1540,19 +1540,20 @@ function job_menu__onclick( job_name )
 
 //-------------------------------------------------------------------------------task_menu__onclick
 
-function task_menu__onclick( task_id )
+function task_menu__onclick( task_id, job_name )
 {
     var popup_builder = new Popup_menu_builder();
+    job_name = xml_encode(job_name);
 
     popup_builder.add_show_log( parent.getTranslation("Show log")        , "task=" + task_id, "show_log_task_" + task_id );
     if( !parent._hide.end_task_of_api_job || !parent._hide.kill_running_task ) {
     	popup_builder.add_bar();
     }
     //Makes only sense for API jobs, which runs in multiple process steps
-    popup_builder.add_command ( parent.getTranslation("End (API job)")          , "<kill_task job='" + _job_name + "' id='" + task_id + "'/>", true, parent._hide.end_task_of_api_job, parent._confirm.end_task_of_api_job, 'end this task' );
-    popup_builder.add_command ( parent.getTranslation("Terminate (UNIX)")       , "<kill_task job='" + _job_name + "' id='" + task_id + "' immediately='yes' timeout='never'/>", true, parent._hide.kill_running_task, parent._confirm.kill_running_task, 'terminate this task' );
-		popup_builder.add_entry   ( parent.getTranslation("Terminate with timeout (UNIX)") , "callErrorChecked('terminate_task','"+task_id+"')", true, parent._hide.kill_running_task );
-    popup_builder.add_command ( parent.getTranslation("Kill immediately")       , "<kill_task job='" + _job_name + "' id='" + task_id + "' immediately='yes'/>", true, parent._hide.kill_running_task, parent._confirm.kill_running_task, 'kill this task' );
+    popup_builder.add_command ( parent.getTranslation("End (API job)")          , "<kill_task job='" + job_name + "' id='" + task_id + "'/>", true, parent._hide.end_task_of_api_job, parent._confirm.end_task_of_api_job, 'end this task' );
+    popup_builder.add_command ( parent.getTranslation("Terminate (UNIX)")       , "<kill_task job='" + job_name + "' id='" + task_id + "' immediately='yes' timeout='never'/>", true, parent._hide.kill_running_task, parent._confirm.kill_running_task, 'terminate this task' );
+		popup_builder.add_entry   ( parent.getTranslation("Terminate with timeout (UNIX)") , "callErrorChecked('terminate_task','"+task_id+"','"+job_name+"')", true, parent._hide.kill_running_task );
+    popup_builder.add_command ( parent.getTranslation("Kill immediately")       , "<kill_task job='" + job_name + "' id='" + task_id + "' immediately='yes'/>", true, parent._hide.kill_running_task, parent._confirm.kill_running_task, 'kill this task' );
 
     _popup_menu = popup_builder.show_popup_menu();
 }
@@ -1587,11 +1588,12 @@ function history_task_menu__onclick( task_id )
 
 //-----------------------------------------------------------------------queued_task_menu__onclick
 
-function kill_task_immediately( task_id )
-{   
-		if( !parent._hide.remove_enqueued_task ) {
+function kill_task_immediately( task_id, job_name )
+{       
+        job_name = xml_encode(job_name);
+        if( !parent._hide.remove_enqueued_task ) {
 			if( !parent._confirm.remove_enqueued_task || confirm(parent.getTranslation('Do you really want to delete this task?')) ) {
-    		var xml_command = '<kill_task job="' + _job_name + '" id="' + task_id + '" immediately="yes"/>';
+    		var xml_command = '<kill_task job="' + job_name + '" id="' + task_id + '" immediately="yes"/>';
     		if( scheduler_exec( xml_command, false ) == 1 ) { 
         	set_timeout("parent.left_frame.update()",1);
     		}
@@ -1599,25 +1601,26 @@ function kill_task_immediately( task_id )
     }
 }
 
-function queued_task_menu__onclick( task_id )
-{   
-		if( !parent._hide.remove_enqueued_task ) {
+function queued_task_menu__onclick( task_id, job_name )
+{       
+        job_name = xml_encode(job_name);
+        if( !parent._hide.remove_enqueued_task ) {
     	var popup_builder = new Popup_menu_builder();
-    	popup_builder.add_command ( parent.getTranslation("Delete") , "<kill_task job='" + _job_name + "' id='" + task_id + "' immediately='yes'/>", true, parent._hide.remove_enqueued_task, parent._confirm.remove_enqueued_task, 'delete this task' );
+    	popup_builder.add_command ( parent.getTranslation("Delete") , "<kill_task job='" + job_name + "' id='" + task_id + "' immediately='yes'/>", true, parent._hide.remove_enqueued_task, parent._confirm.remove_enqueued_task, 'delete this task' );
     	_popup_menu = popup_builder.show_popup_menu();
     }
 } 
 
-function terminate_task( task_id, ret ) {
+function terminate_task( task_id, job_name, ret ) {
 		
-		if( typeof ret != "boolean" ) ret = false;
+	if( typeof ret != "boolean" ) ret = false;
     if( !ret ) {
       _popup_menu.close();
       var dialog        = new Input_dialog();
     	dialog.close_after_submit = false;
     	dialog.width      = 384;
-    	dialog.submit_fct = "callErrorChecked( 'terminate_task','"+ task_id + "',true )";
-    	dialog.add_title( "Terminate task $task_id", {task_id:'<br/>' + _job_name + ':' + task_id + '<br/>'} );
+    	dialog.submit_fct = "callErrorChecked( 'terminate_task','"+ task_id + "','"+ job_name + "',true )";
+    	dialog.add_title( "Terminate task $task_id", {task_id:'<br/>' + job_name + ':' + task_id + '<br/>'} );
     	dialog.add_labeled_input_with_unit( parent.getTranslation("with timeout"), "timeout", "" + parent._task_terminate_timeout, 5, "", "s" );
     	dialog.add_prompt("Should the task not terminate within the specified timeout then it will be killed.");
       dialog.show();
@@ -1632,7 +1635,7 @@ function terminate_task( task_id, ret ) {
     
     		if( !parent._confirm.kill_running_task || confirm(parent.getTranslation('Do you really want to terminate this task?'))) {
       		Input_dialog.close();
-      		var xml_command = '<kill_task job="' + _job_name + '" id="' + task_id + '" immediately="yes" timeout="' + fields.timeout + '"/>';
+      		var xml_command = '<kill_task job="' + job_name + '" id="' + task_id + '" immediately="yes" timeout="' + fields.timeout + '"/>';
       		if( scheduler_exec( xml_command, false ) == 1 ) { 
           	set_timeout("parent.left_frame.update()",1);
       		}
@@ -1642,7 +1645,7 @@ function terminate_task( task_id, ret ) {
       	}
       }
     }
-	}
+}
 
 
 //------------------------------------------------------------------------------order_menu__onclick
