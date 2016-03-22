@@ -2,7 +2,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2015 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2016 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -2490,11 +2490,10 @@
                     <td title="show task details">
                         <xsl:attribute name="onclick">callErrorChecked( 'show_task_details', '<xsl:value-of select="@task"/>' )</xsl:attribute>
                         <span style="padding-right: 2ex">
-                            <xsl:text>Task</xsl:text>
                             <xsl:value-of select="@job"/>:<xsl:value-of select="@task"/>
                         </span>
                         <span>
-                            <xsl:apply-templates select="/spooler/answer/state/jobs/job [ @path=current()/@job ]/tasks/task[ @task=current()/@task ]" mode="task_line"/>
+                            <xsl:apply-templates select="/spooler/answer/state/jobs/job[ @path=current()/@job ]/tasks/task[ @task=current()/@task ]" mode="task_line"/>
                         </span>
                     </td>
                 </tr>
@@ -3678,6 +3677,7 @@
                             <xsl:with-param name="title"              select="'Task menu'"/>
                             <xsl:with-param name="onclick_call"       select="'task_menu__onclick'"/>
                             <xsl:with-param name="onclick_param1_str" select="@id"/>
+                            <xsl:with-param name="onclick_param2_str" select="@job"/>
                         </xsl:call-template>
                         </xsl:if>
                     </td>
@@ -3690,6 +3690,7 @@
                             <xsl:with-param name="title"              select="'Task menu'"/>
                             <xsl:with-param name="onclick_call"       select="'task_menu__onclick'"/>
                             <xsl:with-param name="onclick_param1_str" select="@id"/>
+                            <xsl:with-param name="onclick_param2_str" select="@job"/>
                         </xsl:call-template>
                         </xsl:if>
                     </td>
@@ -3908,8 +3909,8 @@
                     <tr>
                     	<xsl:if test="/spooler/@my_remove_enqueued_task = 0" >
                         <xsl:attribute name="title">Delete</xsl:attribute>
-                        <xsl:attribute name="onclick">kill_task_immediately( '<xsl:value-of select="@task"/>' )</xsl:attribute>
-                        <xsl:attribute name="oncontextmenu">queued_task_menu__onclick( '<xsl:value-of select="@task"/>' );return false;</xsl:attribute>
+                        <xsl:attribute name="onclick">kill_task_immediately( '<xsl:value-of select="@task"/>', '<xsl:value-of select="../../@path"/>' )</xsl:attribute>
+                        <xsl:attribute name="oncontextmenu">queued_task_menu__onclick( '<xsl:value-of select="@task"/>', '<xsl:value-of select="../../@path"/>' );return false;</xsl:attribute>
                       </xsl:if>
           							<xsl:attribute name="class">list</xsl:attribute>
                         <td>
