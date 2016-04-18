@@ -43,6 +43,7 @@ var _checkbox_states            = new Object();
 var _radio_states               = new Object();
 var _select_states              = new Object();
 var _view                       = new Object();
+var _left_frame_update          = true;
 var _max_orders                 = 10;
 var _max_last_activities        = 30;
 var _max_order_history          = 50;

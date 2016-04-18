@@ -54,6 +54,16 @@ _view.schedules          = 'tree';
 
 
 /*****************************************************************
+* If you click on the left hand side in a list or table view on  
+* one object to get its detailed view in the right side then list 
+* or tree on the left is udated too. 
+* You can suppress this update with this option. It can be useful  
+* if you have a large number of objects in the list or tree.
+*/
+_left_frame_update       = true;
+
+
+/*****************************************************************
 *  You can specify which checkboxes are on (true) or off (false).
 *  Defaults: 'show order jobs' and 'show tasks' are on and the
 *  others are off.
