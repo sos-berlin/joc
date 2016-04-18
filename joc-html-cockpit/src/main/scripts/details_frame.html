@@ -243,6 +243,7 @@ function update(force, no_left_frame_update )
 //--------------------------------------------------------------------------update_left_frame
 function update_left_frame() 
 {   
+    if( !parent._left_frame_update ) return true;
     if( _no_left_frame_update ) return true;
     _no_left_frame_update = true;
     if( !parent._scheduler._update_periodically || (parent._scheduler._update_periodically && parent.left_frame._timer > 30)) {
