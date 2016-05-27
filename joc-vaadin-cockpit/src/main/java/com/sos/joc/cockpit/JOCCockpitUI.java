@@ -145,7 +145,7 @@ public class JOCCockpitUI extends UI implements JobSchedulerCommand.StateListene
 			@Override
 			public void run() {
 				statusLabel.setCaption("");
-				errorLabel.setCaption(e.getLocalizedMessage());
+				errorLabel.setCaption(e.getMessage());
 				progressIndicator.setEnabled(false);
 				progressIndicator.setVisible(false);
 			}
