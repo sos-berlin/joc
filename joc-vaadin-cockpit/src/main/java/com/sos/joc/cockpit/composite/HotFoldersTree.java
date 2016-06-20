@@ -216,7 +216,7 @@ public class HotFoldersTree extends Tree implements JobSchedulerCommand.StateLis
 
 			@Override
 			public void run() {
-				Notification.show(e.getLocalizedMessage(), Notification.Type.ERROR_MESSAGE);
+				Notification.show(e.getMessage(), Notification.Type.ERROR_MESSAGE);
 			}
 		});
 	}
