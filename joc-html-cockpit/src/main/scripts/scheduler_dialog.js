@@ -1155,12 +1155,12 @@ function get_run_time( caller, hot )
         switch( caller ) {
           case 'order'          : if( typeof window.parent.left_frame._order_id != 'string' || window.parent.left_frame._order_id == '' ) return ['&lt;run_time/&gt;',''];
                                   var response   = parent._scheduler.executeSynchron( '<show_order order="' + window.parent.left_frame._order_id + '" job_chain="' + window.parent.left_frame._job_chain + '" what="' + what + '"/>', false, false );
-                                  run_time       = response.selectSingleNode('//order/run_time');
+                                  run_time       = response.selectSingleNode('/spooler/answer/order/run_time');
                                   parent._source = response.selectSingleNode('/spooler/answer/order/source/order');
                                   schedule       = (run_time) ? run_time.getAttribute('schedule') : '';
                                   break;
           case 'job'            : var response   = parent._scheduler.executeSynchron( '<show_job job="' + window.parent.left_frame._job_name + '" what="' + what + '"/>', false, false );
-                                  run_time       = response.selectSingleNode('//job/run_time');
+                                  run_time       = response.selectSingleNode('/spooler/answer/job/run_time');
                                   parent._source = response.selectSingleNode('/spooler/answer/job/source/job');
                                   schedule       = (run_time) ? run_time.getAttribute('schedule') : '';
                                   break;
