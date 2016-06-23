@@ -1,6 +1,7 @@
 package com.sos.joc.jobscheduler.post;
 
 public class JobSchedulerStatisticsBody {
+    String protocol;
     String host;
     Long port;
     String accessToken;
@@ -23,7 +24,13 @@ public class JobSchedulerStatisticsBody {
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
-    
+    public String getProtocol() {
+        return protocol;
+    }
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+ 
     
     
 
