@@ -9,12 +9,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import com.sos.joc.jobscheduler.model.ErrorObjectWithDeliveryDate;
-import com.sos.joc.jobscheduler.model.FiltersForDateFromAndDateTo;
-import com.sos.joc.jobscheduler.model.JobschedulerPermanentPart;
-import com.sos.joc.jobscheduler.model.JobschedulerStatistics;
-import com.sos.joc.jobscheduler.model.JobschedulerVolatilePart;
+import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
 
+ 
 @Path("Ijobscheduler")
 public interface IJobschedulerResource {
 
@@ -32,7 +29,7 @@ public interface IJobschedulerResource {
         }
 
          
-        public static IJobschedulerResource.GetJobschedulerResponse responseStatus200(JobschedulerVolatilePart entity) {
+        public static IJobschedulerResource.GetJobschedulerResponse responseStatus200(Jobscheduler200VSchema entity) {
             Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
             responseBuilder.entity(entity);
             return new IJobschedulerResource.GetJobschedulerResponse(responseBuilder.build());
