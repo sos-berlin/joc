@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class State__ {
 
     /**
-     *  0=running, 1=active
+     *  0=running, 4=active, 3=initialized
      * 
      */
     @JsonProperty("severity")
@@ -36,7 +36,7 @@ public class State__ {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     *  0=running, 1=active
+     *  0=running, 4=active, 3=initialized
      * 
      * @return
      *     The severity
@@ -47,7 +47,7 @@ public class State__ {
     }
 
     /**
-     *  0=running, 1=active
+     *  0=running, 4=active, 3=initialized
      * 
      * @param severity
      *     The severity
@@ -113,7 +113,8 @@ public class State__ {
     public enum Severity {
 
         _0("0"),
-        _1("1"),
+        _4("4"),
+        _3("3"),
         _2("2");
         private final String value;
         private final static Map<String, State__.Severity> CONSTANTS = new HashMap<String, State__.Severity>();
@@ -150,8 +151,9 @@ public class State__ {
     public enum Text {
 
         NOT_INITIALIZED("not_initialized"),
+        INITIALIZED("initialized"),
         ACTIVE("active"),
-        RUNNING("running"),
+        UNDER_CONSTRUCTION("under_construction"),
         STOPPED("stopped");
         private final String value;
         private final static Map<String, State__.Text> CONSTANTS = new HashMap<String, State__.Text>();

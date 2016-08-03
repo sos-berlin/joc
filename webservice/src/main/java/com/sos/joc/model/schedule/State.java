@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.order;
+package com.sos.joc.model.schedule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,52 +22,70 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "severity",
     "_text"
 })
-public class ProcessingState____ {
+public class State {
 
+    /**
+     *  0=active; 1=inactive
+     * (Required)
+     * 
+     */
     @JsonProperty("severity")
-    private ProcessingState____.Severity severity;
+    private Integer severity;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("_text")
-    private ProcessingState____.Text text;
+    private State.Text text;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
+     *  0=active; 1=inactive
+     * (Required)
      * 
      * @return
      *     The severity
      */
     @JsonProperty("severity")
-    public ProcessingState____.Severity getSeverity() {
+    public Integer getSeverity() {
         return severity;
     }
 
     /**
+     *  0=active; 1=inactive
+     * (Required)
      * 
      * @param severity
      *     The severity
      */
     @JsonProperty("severity")
-    public void setSeverity(ProcessingState____.Severity severity) {
+    public void setSeverity(Integer severity) {
         this.severity = severity;
     }
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The text
      */
     @JsonProperty("_text")
-    public ProcessingState____.Text getText() {
+    public State.Text getText() {
         return text;
     }
 
     /**
      * 
+     * (Required)
+     * 
      * @param text
      *     The _text
      */
     @JsonProperty("_text")
-    public void setText(ProcessingState____.Text text) {
+    public void setText(State.Text text) {
         this.text = text;
     }
 
@@ -96,57 +114,23 @@ public class ProcessingState____ {
         if (other == this) {
             return true;
         }
-        if ((other instanceof ProcessingState____) == false) {
+        if ((other instanceof State) == false) {
             return false;
         }
-        ProcessingState____ rhs = ((ProcessingState____) other);
+        State rhs = ((State) other);
         return new EqualsBuilder().append(severity, rhs.severity).append(text, rhs.text).append(additionalProperties, rhs.additionalProperties).isEquals();
-    }
-
-    @Generated("org.jsonschema2pojo")
-    public enum Severity {
-
-        _2("2");
-        private final String value;
-        private final static Map<String, ProcessingState____.Severity> CONSTANTS = new HashMap<String, ProcessingState____.Severity>();
-
-        static {
-            for (ProcessingState____.Severity c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Severity(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static ProcessingState____.Severity fromValue(String value) {
-            ProcessingState____.Severity constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        SETBACK("setback");
+        ACTIVE("active"),
+        INACTIVE("inactive");
         private final String value;
-        private final static Map<String, ProcessingState____.Text> CONSTANTS = new HashMap<String, ProcessingState____.Text>();
+        private final static Map<String, State.Text> CONSTANTS = new HashMap<String, State.Text>();
 
         static {
-            for (ProcessingState____.Text c: values()) {
+            for (State.Text c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -162,8 +146,8 @@ public class ProcessingState____ {
         }
 
         @JsonCreator
-        public static ProcessingState____.Text fromValue(String value) {
-            ProcessingState____.Text constant = CONSTANTS.get(value);
+        public static State.Text fromValue(String value) {
+            State.Text constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

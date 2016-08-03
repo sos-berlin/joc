@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.jobscheduler;
+package com.sos.joc.model.schedule;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * jobscheduler cluster (permanent part)
+ * schedule with delivery date (volatile part)
  * <p>
  * 
  * 
@@ -26,26 +26,26 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "cluster"
+    "schedule"
 })
-public class ClusterPSchema {
+public class Schedule200VSchema {
 
     /**
      * delivery date
      * <p>
      * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      */
     @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
+     * schedule
+     * <p>
      * 
-     * (Required)
      * 
      */
-    @JsonProperty("cluster")
-    private Cluster cluster;
+    @JsonProperty("schedule")
+    private Schedule_ schedule;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -53,7 +53,6 @@ public class ClusterPSchema {
      * delivery date
      * <p>
      * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      * @return
      *     The deliveryDate
@@ -67,7 +66,6 @@ public class ClusterPSchema {
      * delivery date
      * <p>
      * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      * @param deliveryDate
      *     The deliveryDate
@@ -78,27 +76,29 @@ public class ClusterPSchema {
     }
 
     /**
+     * schedule
+     * <p>
      * 
-     * (Required)
      * 
      * @return
-     *     The cluster
+     *     The schedule
      */
-    @JsonProperty("cluster")
-    public Cluster getCluster() {
-        return cluster;
+    @JsonProperty("schedule")
+    public Schedule_ getSchedule() {
+        return schedule;
     }
 
     /**
+     * schedule
+     * <p>
      * 
-     * (Required)
      * 
-     * @param cluster
-     *     The cluster
+     * @param schedule
+     *     The schedule
      */
-    @JsonProperty("cluster")
-    public void setCluster(Cluster cluster) {
-        this.cluster = cluster;
+    @JsonProperty("schedule")
+    public void setSchedule(Schedule_ schedule) {
+        this.schedule = schedule;
     }
 
     @Override
@@ -118,7 +118,7 @@ public class ClusterPSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(cluster).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(schedule).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -126,11 +126,11 @@ public class ClusterPSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof ClusterPSchema) == false) {
+        if ((other instanceof Schedule200VSchema) == false) {
             return false;
         }
-        ClusterPSchema rhs = ((ClusterPSchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(cluster, rhs.cluster).append(additionalProperties, rhs.additionalProperties).isEquals();
+        Schedule200VSchema rhs = ((Schedule200VSchema) other);
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(schedule, rhs.schedule).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

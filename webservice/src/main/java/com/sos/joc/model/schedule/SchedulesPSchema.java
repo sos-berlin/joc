@@ -1,8 +1,10 @@
 
-package com.sos.joc.model.jobscheduler;
+package com.sos.joc.model.schedule;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -17,7 +19,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * jobscheduler cluster (volatile part)
+ * schedules (permanent part)
  * <p>
  * 
  * 
@@ -26,9 +28,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "cluster"
+    "schedules"
 })
-public class ClusterVSchema {
+public class SchedulesPSchema {
 
     /**
      * delivery date
@@ -44,8 +46,8 @@ public class ClusterVSchema {
      * (Required)
      * 
      */
-    @JsonProperty("cluster")
-    private Cluster_ cluster;
+    @JsonProperty("schedules")
+    private List<Schedule> schedules = new ArrayList<Schedule>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -82,23 +84,23 @@ public class ClusterVSchema {
      * (Required)
      * 
      * @return
-     *     The cluster
+     *     The schedules
      */
-    @JsonProperty("cluster")
-    public Cluster_ getCluster() {
-        return cluster;
+    @JsonProperty("schedules")
+    public List<Schedule> getSchedules() {
+        return schedules;
     }
 
     /**
      * 
      * (Required)
      * 
-     * @param cluster
-     *     The cluster
+     * @param schedules
+     *     The schedules
      */
-    @JsonProperty("cluster")
-    public void setCluster(Cluster_ cluster) {
-        this.cluster = cluster;
+    @JsonProperty("schedules")
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 
     @Override
@@ -118,7 +120,7 @@ public class ClusterVSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(cluster).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(schedules).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -126,11 +128,11 @@ public class ClusterVSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof ClusterVSchema) == false) {
+        if ((other instanceof SchedulesPSchema) == false) {
             return false;
         }
-        ClusterVSchema rhs = ((ClusterVSchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(cluster, rhs.cluster).append(additionalProperties, rhs.additionalProperties).isEquals();
+        SchedulesPSchema rhs = ((SchedulesPSchema) other);
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(schedules, rhs.schedules).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

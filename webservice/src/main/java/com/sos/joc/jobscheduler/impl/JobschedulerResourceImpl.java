@@ -1,32 +1,20 @@
 package com.sos.joc.jobscheduler.impl;
 
-import java.util.Date;
 import javax.ws.rs.Path;
 
- 
-import com.sos.joc.jobscheduler.resource.IJobschedulerResource;
-import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
-import com.sos.joc.model.jobscheduler.Jobscheduler_;
+import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
+import com.sos.joc.jobscheduler.resource.IJobSchedulerResource;
+import com.sos.joc.response.JobschedulerResponse;
 
 @Path("jobscheduler")
-public class JobschedulerResourceImpl implements IJobschedulerResource {
+public class JobSchedulerResourceImpl implements IJobSchedulerResource {
 
-   
     @Override
-    public GetJobschedulerResponse getJobscheduler(String host, Integer port) throws Exception {
-        Jobscheduler200VSchema entity = new Jobscheduler200VSchema();
-        entity.setDeliveryDate(new Date());
-        Jobscheduler_ jobscheduler = new Jobscheduler_();
-        jobscheduler.setHost(host);
-        jobscheduler.setJobschedulerId("id");
-        jobscheduler.setPort(port);
-        entity.setJobscheduler(jobscheduler);
-        GetJobschedulerResponse getJobschedulerResponse = GetJobschedulerResponse.responseStatus200(entity);
-        return getJobschedulerResponse;
+    public JobschedulerResponse postJobscheduler(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
+        
+        JobSchedulerResource jobSchedulerResource = new JobSchedulerResource(accessToken, jobSchedulerDefaultBody);
+        return jobSchedulerResource.postJobscheduler();
+       
     }
 
-  
-
-    
- 
 }

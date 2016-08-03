@@ -1,11 +1,11 @@
 package com.sos.joc.jobscheduler.post;
 
-public class JobSchedulerTerminateBody {
+public class JobSchedulerModifyJobSchedulerClusterBody {
 
     String jobschedulerId;
     Integer timeout;
 
-    public Integer getTimeout() {
+     public Integer getTimeout() {
         return timeout;
     }
 

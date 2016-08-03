@@ -255,7 +255,7 @@ public class Order {
         RUNNING("running"),
         SUSPENDED("suspended"),
         SETBACK("setback"),
-        WAITING_FOR_RESSOURCE("waitingForRessource"),
+        WAITING_FOR_RESOURCE("waitingForResource"),
         BLACKLIST("blacklist");
         private final String value;
         private final static Map<String, Order.State> CONSTANTS = new HashMap<String, Order.State>();

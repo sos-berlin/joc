@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ConfigurationStatusSchema {
 
     /**
-     *  0=ok, 1=warning, 2=error
+     *  4=ok; 5=replacement_is_standing_by,removing_delayed; 2=error_in_configuration_file,changed_file_not_loaded,resource_is_missing
      * (Required)
      * 
      */
@@ -56,7 +56,7 @@ public class ConfigurationStatusSchema {
     private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
-     *  0=ok, 1=warning, 2=error
+     *  4=ok; 5=replacement_is_standing_by,removing_delayed; 2=error_in_configuration_file,changed_file_not_loaded,resource_is_missing
      * (Required)
      * 
      * @return
@@ -68,7 +68,7 @@ public class ConfigurationStatusSchema {
     }
 
     /**
-     *  0=ok, 1=warning, 2=error
+     *  4=ok; 5=replacement_is_standing_by,removing_delayed; 2=error_in_configuration_file,changed_file_not_loaded,resource_is_missing
      * (Required)
      * 
      * @param severity
@@ -160,8 +160,8 @@ public class ConfigurationStatusSchema {
     @Generated("org.jsonschema2pojo")
     public enum Severity {
 
-        _0("0"),
-        _1("1"),
+        _4("4"),
+        _5("5"),
         _2("2");
         private final String value;
         private final static Map<String, ConfigurationStatusSchema.Severity> CONSTANTS = new HashMap<String, ConfigurationStatusSchema.Severity>();

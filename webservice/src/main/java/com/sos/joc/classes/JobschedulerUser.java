@@ -1,5 +1,6 @@
 package com.sos.joc.classes;
 
+import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.classes.SOSShiroProperties;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
@@ -7,13 +8,13 @@ import com.sos.scheduler.db.SchedulerInstancesDBItem;
 import com.sos.scheduler.db.SchedulerInstancesDBLayer;
 
 
-public class SOSJobschedulerUser {
+public class JobschedulerUser {
 
     private String accessToken;
     private boolean wasAuthenticated;
     private SOSShiroCurrentUser sosShiroCurrentUser;
 
-    public SOSJobschedulerUser(String accessToken) {
+    public JobschedulerUser(String accessToken) {
         super();
         this.wasAuthenticated=false;
         this.accessToken = accessToken;
@@ -44,13 +45,17 @@ public class SOSJobschedulerUser {
         return (wasAuthenticated && (sosShiroCurrentUser == null));
     }
  
-    public SchedulerInstancesDBItem getSchedulerInstance(String schedulerId){
-        if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(schedulerId) == null) {
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public SchedulerInstancesDBItem getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier){
+        if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier) == null) {
             SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
-            SchedulerInstancesDBLayer schedulerInstancesDBLayer = new SchedulerInstancesDBLayer(sosShiroProperties.getProperty("hibernate_configuration_file"));
-            getSosShiroCurrentUser().addSchedulerInstanceDBItem (schedulerId,schedulerInstancesDBLayer.getFirstInstanceById(schedulerId));
+            SchedulerInstancesDBLayer schedulerInstancesDBLayer = new SchedulerInstancesDBLayer(sosShiroCurrentUser.getSosHibernateDBLayer().getConnection());
+            getSosShiroCurrentUser().addSchedulerInstanceDBItem (jobSchedulerIdentifier,schedulerInstancesDBLayer.getInstance(jobSchedulerIdentifier.getSchedulerId(),jobSchedulerIdentifier.getHost(),jobSchedulerIdentifier.getPort()));
         }
-        return getSosShiroCurrentUser().getSchedulerInstanceDBItem(schedulerId);
+        return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier);
     }
     
     private void resetTimeOut(){

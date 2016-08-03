@@ -60,7 +60,7 @@ public class OrdersFilterSchema {
     @JsonProperty("regex")
     private String regex;
     @JsonProperty("processingState")
-    private List<ProcessingState_> processingState = new ArrayList<ProcessingState_>();
+    private List<ProcessingState> processingState = new ArrayList<ProcessingState>();
     @JsonProperty("type")
     private List<Type> type = new ArrayList<Type>();
     @JsonProperty("dateFrom")
@@ -174,7 +174,7 @@ public class OrdersFilterSchema {
      *     The processingState
      */
     @JsonProperty("processingState")
-    public List<ProcessingState_> getProcessingState() {
+    public List<ProcessingState> getProcessingState() {
         return processingState;
     }
 
@@ -184,7 +184,7 @@ public class OrdersFilterSchema {
      *     The processingState
      */
     @JsonProperty("processingState")
-    public void setProcessingState(List<ProcessingState_> processingState) {
+    public void setProcessingState(List<ProcessingState> processingState) {
         this.processingState = processingState;
     }
 

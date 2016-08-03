@@ -3,7 +3,6 @@ package com.sos.joc.model.jobscheduler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -26,15 +25,24 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "clusterMember",
+    "host",
+    "port",
     "timeout"
 })
 public class UrlTimeoutParamSchema {
 
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
-    @JsonProperty("clusterMember")
-    private Pattern clusterMember;
+    @JsonProperty("host")
+    private String host;
+    /**
+     * port
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("port")
+    private Integer port;
     /**
      * non negative integer
      * <p>
@@ -69,21 +77,47 @@ public class UrlTimeoutParamSchema {
     /**
      * 
      * @return
-     *     The clusterMember
+     *     The host
      */
-    @JsonProperty("clusterMember")
-    public Pattern getClusterMember() {
-        return clusterMember;
+    @JsonProperty("host")
+    public String getHost() {
+        return host;
     }
 
     /**
      * 
-     * @param clusterMember
-     *     The clusterMember
+     * @param host
+     *     The host
      */
-    @JsonProperty("clusterMember")
-    public void setClusterMember(Pattern clusterMember) {
-        this.clusterMember = clusterMember;
+    @JsonProperty("host")
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    /**
+     * port
+     * <p>
+     * 
+     * 
+     * @return
+     *     The port
+     */
+    @JsonProperty("port")
+    public Integer getPort() {
+        return port;
+    }
+
+    /**
+     * port
+     * <p>
+     * 
+     * 
+     * @param port
+     *     The port
+     */
+    @JsonProperty("port")
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
     /**
@@ -129,7 +163,7 @@ public class UrlTimeoutParamSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(clusterMember).append(timeout).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(host).append(port).append(timeout).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -141,7 +175,7 @@ public class UrlTimeoutParamSchema {
             return false;
         }
         UrlTimeoutParamSchema rhs = ((UrlTimeoutParamSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(clusterMember, rhs.clusterMember).append(timeout, rhs.timeout).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(timeout, rhs.timeout).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

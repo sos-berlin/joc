@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.order;
+package com.sos.joc.model.schedule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,24 +8,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @Generated("org.jsonschema2pojo")
-public enum ProcessingState_ {
+public enum State_ {
 
-    PENDING("pending"),
-    RUNNING("running"),
-    WAITING_FOR_RESSOURCE("waitingForRessource"),
-    SUSPENDED("suspended"),
-    SETBACK("setback"),
-    BLACKLIST("blacklist");
+    ACTIVE("active"),
+    INACTIVE("inactive");
     private final String value;
-    private final static Map<String, ProcessingState_> CONSTANTS = new HashMap<String, ProcessingState_>();
+    private final static Map<String, State_> CONSTANTS = new HashMap<String, State_>();
 
     static {
-        for (ProcessingState_ c: values()) {
+        for (State_ c: values()) {
             CONSTANTS.put(c.value, c);
         }
     }
 
-    private ProcessingState_(String value) {
+    private State_(String value) {
         this.value = value;
     }
 
@@ -36,8 +32,8 @@ public enum ProcessingState_ {
     }
 
     @JsonCreator
-    public static ProcessingState_ fromValue(String value) {
-        ProcessingState_ constant = CONSTANTS.get(value);
+    public static State_ fromValue(String value) {
+        State_ constant = CONSTANTS.get(value);
         if (constant == null) {
             throw new IllegalArgumentException(value);
         } else {

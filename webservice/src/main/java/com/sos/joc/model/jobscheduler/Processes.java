@@ -22,7 +22,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "job",
     "taskId",
     "pid",
-    "runningSince"
+    "runningSince",
+    "agent"
 })
 public class Processes {
 
@@ -62,6 +63,13 @@ public class Processes {
      */
     @JsonProperty("runningSince")
     private Date runningSince;
+    /**
+     * url
+     * (Required)
+     * 
+     */
+    @JsonProperty("agent")
+    private Pattern agent;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -177,6 +185,30 @@ public class Processes {
         this.runningSince = runningSince;
     }
 
+    /**
+     * url
+     * (Required)
+     * 
+     * @return
+     *     The agent
+     */
+    @JsonProperty("agent")
+    public Pattern getAgent() {
+        return agent;
+    }
+
+    /**
+     * url
+     * (Required)
+     * 
+     * @param agent
+     *     The agent
+     */
+    @JsonProperty("agent")
+    public void setAgent(Pattern agent) {
+        this.agent = agent;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -194,7 +226,7 @@ public class Processes {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(taskId).append(pid).append(runningSince).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(job).append(taskId).append(pid).append(runningSince).append(agent).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -206,7 +238,7 @@ public class Processes {
             return false;
         }
         Processes rhs = ((Processes) other);
-        return new EqualsBuilder().append(job, rhs.job).append(taskId, rhs.taskId).append(pid, rhs.pid).append(runningSince, rhs.runningSince).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).append(taskId, rhs.taskId).append(pid, rhs.pid).append(runningSince, rhs.runningSince).append(agent, rhs.agent).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

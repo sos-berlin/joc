@@ -74,7 +74,7 @@ public class StatisticsSchema {
     @JsonProperty("jobChains")
     private JobChains jobChains;
     /**
-     * TODO here we need in addition: setback, waitingForRessource, running, blacklist
+     * TODO here we need in addition: setback, waitingForResource, running, blacklist
      * (Required)
      * 
      */
@@ -212,7 +212,7 @@ public class StatisticsSchema {
     }
 
     /**
-     * TODO here we need in addition: setback, waitingForRessource, running, blacklist
+     * TODO here we need in addition: setback, waitingForResource, running, blacklist
      * (Required)
      * 
      * @return
@@ -224,7 +224,7 @@ public class StatisticsSchema {
     }
 
     /**
-     * TODO here we need in addition: setback, waitingForRessource, running, blacklist
+     * TODO here we need in addition: setback, waitingForResource, running, blacklist
      * (Required)
      * 
      * @param orders

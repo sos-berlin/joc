@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.order;
+package com.sos.joc.model.jobscheduler;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -17,64 +17,64 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * pending order
+ * jobscheduler cluster
  * <p>
- * order object which is pending
+ * 
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "nextStartTime",
-    "processingState"
+    "deliveryDate",
+    "cluster"
 })
-public class PendingOrderSchema {
+public class ClusterSchema {
 
     /**
-     * timestamp
+     * delivery date
      * <p>
-     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * (Required)
      * 
      */
-    @JsonProperty("nextStartTime")
-    private Date nextStartTime;
+    @JsonProperty("deliveryDate")
+    private Date deliveryDate;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("processingState")
-    private ProcessingState__ processingState;
+    @JsonProperty("cluster")
+    private Cluster cluster;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * timestamp
+     * delivery date
      * <p>
-     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * (Required)
      * 
      * @return
-     *     The nextStartTime
+     *     The deliveryDate
      */
-    @JsonProperty("nextStartTime")
-    public Date getNextStartTime() {
-        return nextStartTime;
+    @JsonProperty("deliveryDate")
+    public Date getDeliveryDate() {
+        return deliveryDate;
     }
 
     /**
-     * timestamp
+     * delivery date
      * <p>
-     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * (Required)
      * 
-     * @param nextStartTime
-     *     The nextStartTime
+     * @param deliveryDate
+     *     The deliveryDate
      */
-    @JsonProperty("nextStartTime")
-    public void setNextStartTime(Date nextStartTime) {
-        this.nextStartTime = nextStartTime;
+    @JsonProperty("deliveryDate")
+    public void setDeliveryDate(Date deliveryDate) {
+        this.deliveryDate = deliveryDate;
     }
 
     /**
@@ -82,23 +82,23 @@ public class PendingOrderSchema {
      * (Required)
      * 
      * @return
-     *     The processingState
+     *     The cluster
      */
-    @JsonProperty("processingState")
-    public ProcessingState__ getProcessingState() {
-        return processingState;
+    @JsonProperty("cluster")
+    public Cluster getCluster() {
+        return cluster;
     }
 
     /**
      * 
      * (Required)
      * 
-     * @param processingState
-     *     The processingState
+     * @param cluster
+     *     The cluster
      */
-    @JsonProperty("processingState")
-    public void setProcessingState(ProcessingState__ processingState) {
-        this.processingState = processingState;
+    @JsonProperty("cluster")
+    public void setCluster(Cluster cluster) {
+        this.cluster = cluster;
     }
 
     @Override
@@ -118,7 +118,7 @@ public class PendingOrderSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(nextStartTime).append(processingState).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(cluster).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -126,11 +126,11 @@ public class PendingOrderSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof PendingOrderSchema) == false) {
+        if ((other instanceof ClusterSchema) == false) {
             return false;
         }
-        PendingOrderSchema rhs = ((PendingOrderSchema) other);
-        return new EqualsBuilder().append(nextStartTime, rhs.nextStartTime).append(processingState, rhs.processingState).append(additionalProperties, rhs.additionalProperties).isEquals();
+        ClusterSchema rhs = ((ClusterSchema) other);
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(cluster, rhs.cluster).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

@@ -16,7 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * TODO here we need in addition: setback, waitingForRessource, running, blacklist
+ * TODO here we need in addition: setback, waitingForResource, running, blacklist
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -27,7 +27,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "pending",
     "suspended",
     "setback",
-    "waitingForRessource",
+    "waitingForResource",
     "running",
     "blacklist"
 })
@@ -73,8 +73,8 @@ public class Orders {
      * (Required)
      * 
      */
-    @JsonProperty("waitingForRessource")
-    private Integer waitingForRessource = 0;
+    @JsonProperty("waitingForResource")
+    private Integer waitingForResource = 0;
     /**
      * 
      * (Required)
@@ -217,23 +217,23 @@ public class Orders {
      * (Required)
      * 
      * @return
-     *     The waitingForRessource
+     *     The waitingForResource
      */
-    @JsonProperty("waitingForRessource")
-    public Integer getWaitingForRessource() {
-        return waitingForRessource;
+    @JsonProperty("waitingForResource")
+    public Integer getWaitingForResource() {
+        return waitingForResource;
     }
 
     /**
      * 
      * (Required)
      * 
-     * @param waitingForRessource
-     *     The waitingForRessource
+     * @param waitingForResource
+     *     The waitingForResource
      */
-    @JsonProperty("waitingForRessource")
-    public void setWaitingForRessource(Integer waitingForRessource) {
-        this.waitingForRessource = waitingForRessource;
+    @JsonProperty("waitingForResource")
+    public void setWaitingForResource(Integer waitingForResource) {
+        this.waitingForResource = waitingForResource;
     }
 
     /**
@@ -301,7 +301,7 @@ public class Orders {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(any).append(clustered).append(pending).append(suspended).append(setback).append(waitingForRessource).append(running).append(blacklist).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(any).append(clustered).append(pending).append(suspended).append(setback).append(waitingForResource).append(running).append(blacklist).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -313,7 +313,7 @@ public class Orders {
             return false;
         }
         Orders rhs = ((Orders) other);
-        return new EqualsBuilder().append(any, rhs.any).append(clustered, rhs.clustered).append(pending, rhs.pending).append(suspended, rhs.suspended).append(setback, rhs.setback).append(waitingForRessource, rhs.waitingForRessource).append(running, rhs.running).append(blacklist, rhs.blacklist).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(any, rhs.any).append(clustered, rhs.clustered).append(pending, rhs.pending).append(suspended, rhs.suspended).append(setback, rhs.setback).append(waitingForResource, rhs.waitingForResource).append(running, rhs.running).append(blacklist, rhs.blacklist).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.job;
+package com.sos.joc.model.schedule;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +19,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * jobConfigurationFilter
+ * scheduleConfigurationFilter
  * <p>
  * 
  * 
@@ -28,10 +28,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "job",
+    "schedule",
     "mime"
 })
-public class JobConfigurationFilterSchema {
+public class ScheduleConfigurationFilterSchema {
 
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
@@ -42,10 +42,10 @@ public class JobConfigurationFilterSchema {
      * (Required)
      * 
      */
-    @JsonProperty("job")
-    private Pattern job;
+    @JsonProperty("schedule")
+    private Pattern schedule;
     @JsonProperty("mime")
-    private JobConfigurationFilterSchema.Mime mime = JobConfigurationFilterSchema.Mime.fromValue("xml");
+    private ScheduleConfigurationFilterSchema.Mime mime = ScheduleConfigurationFilterSchema.Mime.fromValue("xml");
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -76,11 +76,11 @@ public class JobConfigurationFilterSchema {
      * (Required)
      * 
      * @return
-     *     The job
+     *     The schedule
      */
-    @JsonProperty("job")
-    public Pattern getJob() {
-        return job;
+    @JsonProperty("schedule")
+    public Pattern getSchedule() {
+        return schedule;
     }
 
     /**
@@ -89,12 +89,12 @@ public class JobConfigurationFilterSchema {
      * absolute path based on live folder of a JobScheduler object.
      * (Required)
      * 
-     * @param job
-     *     The job
+     * @param schedule
+     *     The schedule
      */
-    @JsonProperty("job")
-    public void setJob(Pattern job) {
-        this.job = job;
+    @JsonProperty("schedule")
+    public void setSchedule(Pattern schedule) {
+        this.schedule = schedule;
     }
 
     /**
@@ -103,7 +103,7 @@ public class JobConfigurationFilterSchema {
      *     The mime
      */
     @JsonProperty("mime")
-    public JobConfigurationFilterSchema.Mime getMime() {
+    public ScheduleConfigurationFilterSchema.Mime getMime() {
         return mime;
     }
 
@@ -113,7 +113,7 @@ public class JobConfigurationFilterSchema {
      *     The mime
      */
     @JsonProperty("mime")
-    public void setMime(JobConfigurationFilterSchema.Mime mime) {
+    public void setMime(ScheduleConfigurationFilterSchema.Mime mime) {
         this.mime = mime;
     }
 
@@ -134,7 +134,7 @@ public class JobConfigurationFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(job).append(mime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(schedule).append(mime).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -142,11 +142,11 @@ public class JobConfigurationFilterSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof JobConfigurationFilterSchema) == false) {
+        if ((other instanceof ScheduleConfigurationFilterSchema) == false) {
             return false;
         }
-        JobConfigurationFilterSchema rhs = ((JobConfigurationFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(job, rhs.job).append(mime, rhs.mime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        ScheduleConfigurationFilterSchema rhs = ((ScheduleConfigurationFilterSchema) other);
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(schedule, rhs.schedule).append(mime, rhs.mime).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
@@ -155,10 +155,10 @@ public class JobConfigurationFilterSchema {
         HTML("html"),
         XML("xml");
         private final String value;
-        private final static Map<String, JobConfigurationFilterSchema.Mime> CONSTANTS = new HashMap<String, JobConfigurationFilterSchema.Mime>();
+        private final static Map<String, ScheduleConfigurationFilterSchema.Mime> CONSTANTS = new HashMap<String, ScheduleConfigurationFilterSchema.Mime>();
 
         static {
-            for (JobConfigurationFilterSchema.Mime c: values()) {
+            for (ScheduleConfigurationFilterSchema.Mime c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -174,8 +174,8 @@ public class JobConfigurationFilterSchema {
         }
 
         @JsonCreator
-        public static JobConfigurationFilterSchema.Mime fromValue(String value) {
-            JobConfigurationFilterSchema.Mime constant = CONSTANTS.get(value);
+        public static ScheduleConfigurationFilterSchema.Mime fromValue(String value) {
+            ScheduleConfigurationFilterSchema.Mime constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

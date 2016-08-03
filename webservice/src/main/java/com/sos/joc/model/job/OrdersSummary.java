@@ -26,7 +26,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "running",
     "suspended",
     "setback",
-    "waitingForRessource"
+    "waitingForResource"
 })
 public class OrdersSummary {
 
@@ -68,8 +68,8 @@ public class OrdersSummary {
      * 
      * 
      */
-    @JsonProperty("waitingForRessource")
-    private Integer waitingForRessource;
+    @JsonProperty("waitingForResource")
+    private Integer waitingForResource;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -183,11 +183,11 @@ public class OrdersSummary {
      * 
      * 
      * @return
-     *     The waitingForRessource
+     *     The waitingForResource
      */
-    @JsonProperty("waitingForRessource")
-    public Integer getWaitingForRessource() {
-        return waitingForRessource;
+    @JsonProperty("waitingForResource")
+    public Integer getWaitingForResource() {
+        return waitingForResource;
     }
 
     /**
@@ -195,12 +195,12 @@ public class OrdersSummary {
      * <p>
      * 
      * 
-     * @param waitingForRessource
-     *     The waitingForRessource
+     * @param waitingForResource
+     *     The waitingForResource
      */
-    @JsonProperty("waitingForRessource")
-    public void setWaitingForRessource(Integer waitingForRessource) {
-        this.waitingForRessource = waitingForRessource;
+    @JsonProperty("waitingForResource")
+    public void setWaitingForResource(Integer waitingForResource) {
+        this.waitingForResource = waitingForResource;
     }
 
     @Override
@@ -220,7 +220,7 @@ public class OrdersSummary {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(pending).append(running).append(suspended).append(setback).append(waitingForRessource).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(pending).append(running).append(suspended).append(setback).append(waitingForResource).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -232,7 +232,7 @@ public class OrdersSummary {
             return false;
         }
         OrdersSummary rhs = ((OrdersSummary) other);
-        return new EqualsBuilder().append(pending, rhs.pending).append(running, rhs.running).append(suspended, rhs.suspended).append(setback, rhs.setback).append(waitingForRessource, rhs.waitingForRessource).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(pending, rhs.pending).append(running, rhs.running).append(suspended, rhs.suspended).append(setback, rhs.setback).append(waitingForResource, rhs.waitingForResource).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

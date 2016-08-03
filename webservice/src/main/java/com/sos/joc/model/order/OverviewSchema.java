@@ -28,7 +28,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "running",
     "suspended",
     "setback",
-    "waitingForRessource",
+    "waitingForResource",
     "blacklist",
     "successful",
     "failed"
@@ -78,8 +78,8 @@ public class OverviewSchema {
      * (Required)
      * 
      */
-    @JsonProperty("waitingForRessource")
-    private Integer waitingForRessource;
+    @JsonProperty("waitingForResource")
+    private Integer waitingForResource;
     /**
      * non negative integer
      * <p>
@@ -229,11 +229,11 @@ public class OverviewSchema {
      * (Required)
      * 
      * @return
-     *     The waitingForRessource
+     *     The waitingForResource
      */
-    @JsonProperty("waitingForRessource")
-    public Integer getWaitingForRessource() {
-        return waitingForRessource;
+    @JsonProperty("waitingForResource")
+    public Integer getWaitingForResource() {
+        return waitingForResource;
     }
 
     /**
@@ -242,12 +242,12 @@ public class OverviewSchema {
      * 
      * (Required)
      * 
-     * @param waitingForRessource
-     *     The waitingForRessource
+     * @param waitingForResource
+     *     The waitingForResource
      */
-    @JsonProperty("waitingForRessource")
-    public void setWaitingForRessource(Integer waitingForRessource) {
-        this.waitingForRessource = waitingForRessource;
+    @JsonProperty("waitingForResource")
+    public void setWaitingForResource(Integer waitingForResource) {
+        this.waitingForResource = waitingForResource;
     }
 
     /**
@@ -351,7 +351,7 @@ public class OverviewSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(pending).append(running).append(suspended).append(setback).append(waitingForRessource).append(blacklist).append(successful).append(failed).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(pending).append(running).append(suspended).append(setback).append(waitingForResource).append(blacklist).append(successful).append(failed).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -363,7 +363,7 @@ public class OverviewSchema {
             return false;
         }
         OverviewSchema rhs = ((OverviewSchema) other);
-        return new EqualsBuilder().append(pending, rhs.pending).append(running, rhs.running).append(suspended, rhs.suspended).append(setback, rhs.setback).append(waitingForRessource, rhs.waitingForRessource).append(blacklist, rhs.blacklist).append(successful, rhs.successful).append(failed, rhs.failed).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(pending, rhs.pending).append(running, rhs.running).append(suspended, rhs.suspended).append(setback, rhs.setback).append(waitingForResource, rhs.waitingForResource).append(blacklist, rhs.blacklist).append(successful, rhs.successful).append(failed, rhs.failed).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

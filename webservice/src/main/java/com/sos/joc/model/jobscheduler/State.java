@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class State {
 
     /**
-     *  0=running, 1=paused/waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
+     *  0=running, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
      * (Required)
      * 
      */
@@ -49,7 +49,7 @@ public class State {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     *  0=running, 1=paused/waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
+     *  0=running, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
      * (Required)
      * 
      * @return
@@ -61,7 +61,7 @@ public class State {
     }
 
     /**
-     *  0=running, 1=paused/waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
+     *  0=running, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
      * (Required)
      * 
      * @param severity
@@ -133,7 +133,8 @@ public class State {
 
         _0("0"),
         _1("1"),
-        _2("2");
+        _2("2"),
+        _3("3");
         private final String value;
         private final static Map<String, State.Severity> CONSTANTS = new HashMap<String, State.Severity>();
 

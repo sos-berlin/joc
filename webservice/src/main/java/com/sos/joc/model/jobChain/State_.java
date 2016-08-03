@@ -24,30 +24,36 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class State_ {
 
+    /**
+     *  5=skipped, 4=active, 2=stopped
+     * 
+     */
     @JsonProperty("severity")
-    private Integer severity;
+    private State_.Severity severity;
     @JsonProperty("_text")
     private State_.Text text;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
+     *  5=skipped, 4=active, 2=stopped
      * 
      * @return
      *     The severity
      */
     @JsonProperty("severity")
-    public Integer getSeverity() {
+    public State_.Severity getSeverity() {
         return severity;
     }
 
     /**
+     *  5=skipped, 4=active, 2=stopped
      * 
      * @param severity
      *     The severity
      */
     @JsonProperty("severity")
-    public void setSeverity(Integer severity) {
+    public void setSeverity(State_.Severity severity) {
         this.severity = severity;
     }
 
@@ -101,6 +107,43 @@ public class State_ {
         }
         State_ rhs = ((State_) other);
         return new EqualsBuilder().append(severity, rhs.severity).append(text, rhs.text).append(additionalProperties, rhs.additionalProperties).isEquals();
+    }
+
+    @Generated("org.jsonschema2pojo")
+    public enum Severity {
+
+        _5("5"),
+        _4("4"),
+        _2("2");
+        private final String value;
+        private final static Map<String, State_.Severity> CONSTANTS = new HashMap<String, State_.Severity>();
+
+        static {
+            for (State_.Severity c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private Severity(String value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static State_.Severity fromValue(String value) {
+            State_.Severity constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
     }
 
     @Generated("org.jsonschema2pojo")
