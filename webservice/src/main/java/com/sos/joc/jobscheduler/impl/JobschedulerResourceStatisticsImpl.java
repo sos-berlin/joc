@@ -4,18 +4,17 @@ import java.util.Date;
 import javax.ws.rs.Path;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobschedulerUser;
+import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceStatistics;
-import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceP.JobschedulerPResponse;
 import com.sos.joc.model.jobscheduler.JobChains;
 import com.sos.joc.model.jobscheduler.Jobs;
 import com.sos.joc.model.jobscheduler.Orders;
 import com.sos.joc.model.jobscheduler.StatisticsSchema;
 import com.sos.joc.model.jobscheduler.Tasks;
 import com.sos.joc.response.JocCockpitResponse;
-import com.sos.scheduler.db.SchedulerInstancesDBItem;
 import com.sos.xml.SOSXmlCommand;
 
 @Path("jobscheduler")
@@ -23,7 +22,7 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
 
     private JobschedulerStatisticsResponse getStatistics(String schedulerId, String accessToken) {
         JobschedulerStatisticsResponse jobschedulerStatisticsResponse;
-        jobschedulerUser = new JobschedulerUser(accessToken);
+        jobschedulerUser = new JobSchedulerUser(accessToken);
 
         if (jobschedulerUser.isTimedOut()) {
             return JobschedulerStatisticsResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
@@ -42,7 +41,7 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
 
         try {
 
-            SchedulerInstancesDBItem schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
+            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
           
             if (schedulerInstancesDBItem == null) {
                 return JobschedulerStatisticsResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",schedulerId)));

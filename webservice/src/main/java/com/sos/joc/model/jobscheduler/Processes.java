@@ -4,7 +4,6 @@ package com.sos.joc.model.jobscheduler;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -35,7 +34,7 @@ public class Processes {
      * 
      */
     @JsonProperty("job")
-    private Pattern job;
+    private String job;
     /**
      * non negative integer
      * <p>
@@ -69,7 +68,7 @@ public class Processes {
      * 
      */
     @JsonProperty("agent")
-    private Pattern agent;
+    private String agent;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -83,7 +82,7 @@ public class Processes {
      *     The job
      */
     @JsonProperty("job")
-    public Pattern getJob() {
+    public String getJob() {
         return job;
     }
 
@@ -97,7 +96,7 @@ public class Processes {
      *     The job
      */
     @JsonProperty("job")
-    public void setJob(Pattern job) {
+    public void setJob(String job) {
         this.job = job;
     }
 
@@ -193,7 +192,7 @@ public class Processes {
      *     The agent
      */
     @JsonProperty("agent")
-    public Pattern getAgent() {
+    public String getAgent() {
         return agent;
     }
 
@@ -205,7 +204,7 @@ public class Processes {
      *     The agent
      */
     @JsonProperty("agent")
-    public void setAgent(Pattern agent) {
+    public void setAgent(String agent) {
         this.agent = agent;
     }
 

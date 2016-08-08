@@ -5,15 +5,14 @@ import java.util.Date;
 import javax.ws.rs.Path;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobschedulerUser;
+import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCluster;
-import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceStatistics.JobschedulerStatisticsResponse;
 import com.sos.joc.model.jobscheduler.Cluster;
 import com.sos.joc.model.jobscheduler.ClusterSchema;
 import com.sos.joc.response.JocCockpitResponse;
-import com.sos.scheduler.db.SchedulerInstancesDBItem;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl  extends JOCResourceImpl implements IJobSchedulerResourceCluster {
@@ -22,7 +21,7 @@ public class JobSchedulerResourceClusterImpl  extends JOCResourceImpl implements
     public JobschedulerClusterResponse postJobschedulerCluster(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
 
         JobschedulerClusterResponse jobschedulerClusterResponse;
-        jobschedulerUser = new JobschedulerUser(accessToken);
+        jobschedulerUser = new JobSchedulerUser(accessToken);
 
         if (jobschedulerUser.isTimedOut()) {
             return JobschedulerClusterResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
@@ -45,7 +44,7 @@ public class JobSchedulerResourceClusterImpl  extends JOCResourceImpl implements
 
         try {
 
-            SchedulerInstancesDBItem schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
+            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
 
             if (schedulerInstancesDBItem == null) {
                 return JobschedulerClusterResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerDefaultBody.getJobschedulerId())));

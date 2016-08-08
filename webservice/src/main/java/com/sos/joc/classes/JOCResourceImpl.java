@@ -8,7 +8,7 @@ public class JOCResourceImpl {
     protected static final String NO = "no";
     protected static final String YES = "yes";
     
-    protected JobschedulerUser jobschedulerUser;
+    protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
     protected JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody;
 
@@ -16,7 +16,7 @@ public class JOCResourceImpl {
        return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
     }
 
-    public JobschedulerUser getJobschedulerUser() {
+    public JobSchedulerUser getJobschedulerUser() {
         return jobschedulerUser;
     }
 

@@ -49,7 +49,7 @@ public class AgentVSchema {
      * 
      */
     @JsonProperty("url")
-    private Pattern url;
+    private String url;
     /**
      * jobscheduler state
      * <p>
@@ -114,7 +114,7 @@ public class AgentVSchema {
      *     The url
      */
     @JsonProperty("url")
-    public Pattern getUrl() {
+    public String getUrl() {
         return url;
     }
 
@@ -126,7 +126,7 @@ public class AgentVSchema {
      *     The url
      */
     @JsonProperty("url")
-    public void setUrl(Pattern url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 

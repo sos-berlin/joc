@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.ws.rs.core.Response;
 
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.classes.JobschedulerUser;
+import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.model.common.Error420Schema;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.common.OkSchema;
@@ -33,7 +33,7 @@ public class JocCockpitResponse extends com.sos.joc.support.ResponseWrapper {
         return getError420Schema(message, null);
     }
 
-    public static SOSShiroCurrentUserAnswer getError401Schema(JobschedulerUser sosJobschedulerUser) {
+    public static SOSShiroCurrentUserAnswer getError401Schema(JobSchedulerUser sosJobschedulerUser) {
         SOSShiroCurrentUserAnswer entity = new SOSShiroCurrentUserAnswer();
         entity.setAccessToken(sosJobschedulerUser.getSosShiroCurrentUser().getAccessToken());
         entity.setHasRole(false);
@@ -84,13 +84,13 @@ public class JocCockpitResponse extends com.sos.joc.support.ResponseWrapper {
         return new JocCockpitResponse(responseBuilder.build());
     }
 
-    public static JocCockpitResponse responseStatus403(JobschedulerUser sosJobschedulerUser) {
+    public static JocCockpitResponse responseStatus403(JobSchedulerUser sosJobschedulerUser) {
         Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", "application/json");
         responseBuilder.entity(getError401Schema(sosJobschedulerUser));
         return new JocCockpitResponse(responseBuilder.build());
     }
 
-    public static JocCockpitResponse responseStatus440(JobschedulerUser sosJobschedulerUser) {
+    public static JocCockpitResponse responseStatus440(JobSchedulerUser sosJobschedulerUser) {
         Response.ResponseBuilder responseBuilder = Response.status(440).header("Content-Type", "application/json");
         responseBuilder.entity(getError401Schema(sosJobschedulerUser));
         return new JocCockpitResponse(responseBuilder.build());

@@ -50,15 +50,15 @@
 			<artifactId>jersey-media-moxy</artifactId>
 		</dependency>
 
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-grizzly2-http</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-grizzly2-http</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet-core</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -71,13 +71,20 @@
 			<artifactId>sos-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-        <dependency>
-            <groupId>com.sos-berlin.jid</groupId>
-            <artifactId>scheduler-instances</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
+
+		<dependency>
+			<groupId>com.sos-berlin.jitl</groupId>
+			<artifactId>jitl-jobs</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.sos-berlin.jid</groupId>
+			<artifactId>scheduler-instances</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<version>${project.version}</version>
 			<groupId>com.sos-berlin.commons</groupId>
@@ -101,13 +108,13 @@
 			<version>2.0.0</version>
 		</dependency>
 
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-         </dependency>
-         
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc6</artifactId>
+		</dependency>
 
-         
+
+
 	</dependencies>
 
 	<build>
@@ -138,61 +145,50 @@
 				</configuration>
 			</plugin>
 
-			  <!--<plugin>
-				<groupId>org.jsonschema2pojo</groupId>
-				<artifactId>jsonschema2pojo-maven-plugin</artifactId>
-				<version>0.4.23</version>
+			<!--<plugin> <groupId>org.jsonschema2pojo</groupId> <artifactId>jsonschema2pojo-maven-plugin</artifactId> 
+				<version>0.4.23</version> <configuration> <sourceDirectory>${basedir}/src/main/resources/temp</sourceDirectory> 
+				<targetPackage>com.sos.joc.common.post</targetPackage> </configuration> <executions> 
+				<execution> <goals> <goal>generate</goal> </goals> </execution> </executions> 
+				</plugin> -->
+
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.4</version>
 				<configuration>
-					<sourceDirectory>${basedir}/src/main/resources/temp</sourceDirectory>
-					<targetPackage>com.sos.joc.common.post</targetPackage>
+					<createDependencyReducedPom>true</createDependencyReducedPom>
+					<filters>
+						<filter>
+							<artifact>*:*</artifact>
+							<excludes>
+								<exclude>META-INF/*.SF</exclude>
+								<exclude>META-INF/*.DSA</exclude>
+								<exclude>META-INF/*.RSA</exclude>
+							</excludes>
+						</filter>
+					</filters>
 				</configuration>
 				<executions>
 					<execution>
+						<phase>package</phase>
 						<goals>
-							<goal>generate</goal>
+							<goal>shade</goal>
 						</goals>
+						<configuration>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
+
+							</transformers>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			           
-			            -->
-			           
 
-           <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.4</version>
-                <configuration>
-                    <createDependencyReducedPom>true</createDependencyReducedPom>
-                    <filters>
-        <filter>
-            <artifact>*:*</artifact>
-            <excludes>
-                <exclude>META-INF/*.SF</exclude>
-                <exclude>META-INF/*.DSA</exclude>
-                <exclude>META-INF/*.RSA</exclude>
-            </excludes>
-        </filter>
-    </filters>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                               
-                              <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"/>
-                              
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            
 		</plugins>
 	</build>
 

@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
-import com.sos.joc.response.JobschedulerResponse;
+import com.sos.joc.response.JobSchedulerResponse;
  
 @Path("Ijobscheduler")
 public interface IJobSchedulerResourceSupervisor {
@@ -19,11 +19,9 @@ public interface IJobSchedulerResourceSupervisor {
     @Path("supervisor")
     @Consumes(MediaType.APPLICATION_JSON )
     @Produces({ MediaType.APPLICATION_JSON })
-    public JobschedulerResponse postJobschedulerSupervisor(
+    public JobSchedulerResponse postJobschedulerSupervisor(
             @HeaderParam("access_token") String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception;
-    
-     
-   
+ 
    
 
 }

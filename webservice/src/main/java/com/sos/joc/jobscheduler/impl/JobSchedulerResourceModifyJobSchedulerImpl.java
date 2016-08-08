@@ -3,12 +3,12 @@ package com.sos.joc.jobscheduler.impl;
 import javax.ws.rs.Path;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobschedulerUser;
+import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
 import com.sos.joc.response.JocCockpitResponse;
-import com.sos.scheduler.db.SchedulerInstancesDBItem;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdModifySpooler;
 import com.sos.scheduler.model.objects.Spooler;
@@ -44,7 +44,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
     private JocCockpitResponse executeModifyJobSchedulerCommand(String cmd) {
         try {
-            SchedulerInstancesDBItem schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(jobSchedulerIdentifier);
+            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(jobSchedulerIdentifier);
             
             if (schedulerInstancesDBItem == null) {
                 return JocCockpitResponse.responseStatus420(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerIdentifier.getSchedulerId()));
@@ -69,7 +69,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
     private void init(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) {
         this.jobSchedulerTerminateBody = jobSchedulerTerminateBody;
-        this.jobschedulerUser = new JobschedulerUser(accessToken);
+        this.jobschedulerUser = new JobSchedulerUser(accessToken);
 
         jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerTerminateBody.getJobschedulerId());
         jobSchedulerIdentifier.setHost(jobSchedulerTerminateBody.getHost());

@@ -1,20 +1,19 @@
 package com.sos.joc.classes;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.auth.classes.SOSShiroProperties;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
-import com.sos.scheduler.db.SchedulerInstancesDBItem;
-import com.sos.scheduler.db.SchedulerInstancesDBLayer;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayerReporting;
 
 
-public class JobschedulerUser {
+public class JobSchedulerUser {
 
     private String accessToken;
     private boolean wasAuthenticated;
     private SOSShiroCurrentUser sosShiroCurrentUser;
 
-    public JobschedulerUser(String accessToken) {
+    public JobSchedulerUser(String accessToken) {
         super();
         this.wasAuthenticated=false;
         this.accessToken = accessToken;
@@ -49,11 +48,10 @@ public class JobschedulerUser {
         return accessToken;
     }
 
-    public SchedulerInstancesDBItem getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier){
+    public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws Exception{
         if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier) == null) {
-            SOSShiroProperties sosShiroProperties = new SOSShiroProperties();
-            SchedulerInstancesDBLayer schedulerInstancesDBLayer = new SchedulerInstancesDBLayer(sosShiroCurrentUser.getSosHibernateDBLayer().getConnection());
-            getSosShiroCurrentUser().addSchedulerInstanceDBItem (jobSchedulerIdentifier,schedulerInstancesDBLayer.getInstance(jobSchedulerIdentifier.getSchedulerId(),jobSchedulerIdentifier.getHost(),jobSchedulerIdentifier.getPort()));
+            DBLayerReporting dbLayer = new DBLayerReporting(sosShiroCurrentUser.getSOSHibernateConnection());
+            getSosShiroCurrentUser().addSchedulerInstanceDBItem (jobSchedulerIdentifier,dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
         }
         return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier);
     }

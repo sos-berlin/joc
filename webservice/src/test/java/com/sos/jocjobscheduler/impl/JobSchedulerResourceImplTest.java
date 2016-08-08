@@ -8,7 +8,7 @@ import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
-import com.sos.joc.response.JobschedulerResponse;
+import com.sos.joc.response.JobSchedulerResponse;
 
 public class JobSchedulerResourceImplTest {
     private static final String LDAP_PASSWORD = "sos01";
@@ -22,7 +22,7 @@ public class JobSchedulerResourceImplTest {
         JobSchedulerDefaultBody jobSchedulerDefaultBody = new JobSchedulerDefaultBody();
         jobSchedulerDefaultBody.setJobschedulerId("scheduler_current");
         JobSchedulerResourceImpl jobschedulerResourceImpl = new JobSchedulerResourceImpl();
-        JobschedulerResponse jobschedulerResponse = jobschedulerResourceImpl.postJobscheduler(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
+        JobSchedulerResponse jobschedulerResponse = jobschedulerResourceImpl.postJobscheduler(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
         Jobscheduler200VSchema jobscheduler200VSchema = (Jobscheduler200VSchema) jobschedulerResponse.getEntity();
         assertEquals("postjobschedulerTest", 4000, jobscheduler200VSchema.getJobscheduler().getPort().intValue());
      }

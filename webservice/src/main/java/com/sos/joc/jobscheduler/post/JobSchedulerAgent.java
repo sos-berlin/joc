@@ -2,6 +2,7 @@ package com.sos.joc.jobscheduler.post;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,22 +11,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "jobschedulerId" })
-public class JobSchedulerDefaultBody {
+@JsonPropertyOrder({
+    "agent"
+})
 
-    @JsonProperty("jobschedulerId")
-    private String jobschedulerId;
+public class JobSchedulerAgent {
+
+    @JsonProperty("agent")
+    private String agent;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("jobschedulerId")
-    public String getJobschedulerId() {
-        return jobschedulerId;
+    @JsonProperty("agent")
+    public String getAgent() {
+        return agent;
     }
 
-    @JsonProperty("jobschedulerId")
-    public void setJobschedulerId(String jobschedulerId) {
-        this.jobschedulerId = jobschedulerId;
+    @JsonProperty("agent")
+    public void setAgent(String agent) {
+        this.agent = agent;
     }
 
     @JsonAnyGetter

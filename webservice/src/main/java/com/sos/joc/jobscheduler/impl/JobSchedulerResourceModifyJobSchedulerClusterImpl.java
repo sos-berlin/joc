@@ -3,12 +3,12 @@ package com.sos.joc.jobscheduler.impl;
 import javax.ws.rs.Path;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobschedulerUser;
+import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerClusterBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
 import com.sos.joc.response.JocCockpitResponse;
-import com.sos.scheduler.db.SchedulerInstancesDBItem;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdTerminate;
 import com.sos.scheduler.model.objects.Spooler;
@@ -49,7 +49,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
 
     private JocCockpitResponse executeModifyJobSchedulerClusterCommand(String restart,JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) {
         try {
-            SchedulerInstancesDBItem schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(jobSchedulerIdentifier);
+            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(jobSchedulerIdentifier);
 
             if (schedulerInstancesDBItem == null) {
                 return JocCockpitResponse.responseStatus420(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerIdentifier.getSchedulerId()));
@@ -74,7 +74,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
 
     private void init(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerModifyJobSchedulerClusterBody) {
         this.jobSchedulerModifyJobSchedulerClusterBody = jobSchedulerModifyJobSchedulerClusterBody;
-        this.jobschedulerUser = new JobschedulerUser(accessToken);
+        this.jobschedulerUser = new JobSchedulerUser(accessToken);
 
         jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerModifyJobSchedulerClusterBody.getJobschedulerId());
     }

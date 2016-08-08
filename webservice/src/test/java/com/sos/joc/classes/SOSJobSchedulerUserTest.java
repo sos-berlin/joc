@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.scheduler.db.SchedulerInstancesDBItem;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
 public class SOSJobSchedulerUserTest {
  
@@ -18,13 +18,13 @@ public class SOSJobSchedulerUserTest {
 
     @Test
 
-    public void getJobSchedulerInstance() {
+    public void getJobSchedulerInstance() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
 
-        JobschedulerUser sosJobschedulerUser = new JobschedulerUser(sosShiroCurrentUserAnswer.getAccessToken());
+        JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(sosShiroCurrentUserAnswer.getAccessToken());
 
-        SchedulerInstancesDBItem schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier("scheduler_current"));
+        DBItemInventoryInstance schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier("scheduler_current"));
         assertEquals("getJobSchedulerInstance", "http://localhost:4000", schedulerInstancesDBItem.getUrl());
 
     }

@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -78,7 +77,7 @@ public class AgentPSchema {
      * 
      */
     @JsonProperty("url")
-    private Pattern url;
+    private String url;
     /**
      * jobscheduler platform
      * <p>
@@ -112,7 +111,7 @@ public class AgentPSchema {
      * 
      */
     @JsonProperty("clusters")
-    private List<Pattern> clusters = new ArrayList<Pattern>();
+    private List<String> clusters = new ArrayList<String>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -228,7 +227,7 @@ public class AgentPSchema {
      *     The url
      */
     @JsonProperty("url")
-    public Pattern getUrl() {
+    public String getUrl() {
         return url;
     }
 
@@ -240,7 +239,7 @@ public class AgentPSchema {
      *     The url
      */
     @JsonProperty("url")
-    public void setUrl(Pattern url) {
+    public void setUrl(String url) {
         this.url = url;
     }
 
@@ -336,7 +335,7 @@ public class AgentPSchema {
      *     The clusters
      */
     @JsonProperty("clusters")
-    public List<Pattern> getClusters() {
+    public List<String> getClusters() {
         return clusters;
     }
 
@@ -348,7 +347,7 @@ public class AgentPSchema {
      *     The clusters
      */
     @JsonProperty("clusters")
-    public void setClusters(List<Pattern> clusters) {
+    public void setClusters(List<String> clusters) {
         this.clusters = clusters;
     }
 
