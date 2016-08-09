@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.ws.rs.Path;
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgent;
@@ -45,10 +46,10 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
 
         try {
 
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerAgentsBody.getJobschedulerId()));
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerAgentsBody.getJobschedulerId()));
           
-            if (schedulerInstancesDBItem == null) {
-                return JobschedulerAgentsPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerAgentsBody.getJobschedulerId())));
+            if (dbItemInventoryInstance == null) {
+                return JobschedulerAgentsPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerAgentsBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
             }
             
             AgentsPSchema entity = new AgentsPSchema();
@@ -68,14 +69,14 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 state.setText(Text.PAUSED);
                 agent.setState(state);
                 agent.setSurveyDate(new Date());
-                agent.setHost(schedulerInstancesDBItem.getHostname());
+                agent.setHost(dbItemInventoryInstance.getHostname());
                 Os os = new Os();
                 os.setArchitecture(Architecture._32);
                 os.setDistribution("myDistribution");
                 os.setName("myName");
                 agent.setOs(os);
-                agent.setPort(schedulerInstancesDBItem.getPort());
-                agent.setStartedAt(schedulerInstancesDBItem.getStartTime());
+                agent.setPort(dbItemInventoryInstance.getPort());
+                agent.setStartedAt(dbItemInventoryInstance.getStartTime());
                 ArrayList<String> listOfClusters = new ArrayList<String>();
                 listOfClusters.add("cluster1");
                 listOfClusters.add("cluster2");

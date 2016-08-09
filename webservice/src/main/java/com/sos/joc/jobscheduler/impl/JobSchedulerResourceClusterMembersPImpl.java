@@ -5,20 +5,16 @@ import java.util.Date;
 import javax.ws.rs.Path;
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
-import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembers;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembersP;
 import com.sos.joc.model.jobscheduler.ClusterMemberTypeSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler;
-import com.sos.joc.model.jobscheduler.Jobscheduler_;
 import com.sos.joc.model.jobscheduler.MastersPSchema;
 import com.sos.joc.model.jobscheduler.Os;
 import com.sos.joc.model.jobscheduler.Os.Architecture;
-import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.model.jobscheduler.State.Severity;
-import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.model.jobscheduler.Supervisor;
 import com.sos.joc.response.JocCockpitResponse;
 
@@ -52,10 +48,10 @@ public class JobSchedulerResourceClusterMembersPImpl  extends JOCResourceImpl im
 
         try {
 
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
 
-            if (schedulerInstancesDBItem == null) {
-                return JobschedulerClusterMembersPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerDefaultBody.getJobschedulerId())));
+            if (dbItemInventoryInstance == null) {
+                return JobschedulerClusterMembersPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerDefaultBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
             }
 
  

@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.ws.rs.Path;
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentClustersBody;
@@ -46,10 +47,10 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
 
         try {
 
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerAgentClustersBody.getJobschedulerId()));
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerAgentClustersBody.getJobschedulerId()));
           
-            if (schedulerInstancesDBItem == null) {
-                return JobschedulerAgentClustersResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerAgentClustersBody.getJobschedulerId())));
+            if (dbItemInventoryInstance == null) {
+                return JobschedulerAgentClustersResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerAgentClustersBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
             }
             
             AgentClustersVSchema entity = new AgentClustersVSchema();

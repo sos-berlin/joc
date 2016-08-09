@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
@@ -48,16 +49,16 @@ public class JobSchedulerResourceP extends JOCResourceImpl{
         }
 
         try {
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
 
-            if (schedulerInstancesDBItem == null) {
-                return JobSchedulerPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerDefaultBody.getJobschedulerId())));
+            if (dbItemInventoryInstance == null) {
+                return JobSchedulerPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerIdentifier.getSchedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
             }
 
             
-            DBItemInventoryInstance schedulerSupervisorInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerInstancesDBItem.getSupervisorId()));
+            DBItemInventoryInstance schedulerSupervisorInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(dbItemInventoryInstance.getSupervisorId()));
             if (schedulerSupervisorInstancesDBItem == null) {
-                return JobSchedulerPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",schedulerInstancesDBItem.getSupervisorId())));
+                return JobSchedulerPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",dbItemInventoryInstance.getSupervisorId())));
             }
 
             
@@ -67,14 +68,14 @@ public class JobSchedulerResourceP extends JOCResourceImpl{
             //TODO JOC Cockpit Webservice
 
             Jobscheduler jobscheduler = new Jobscheduler();
-            jobscheduler.setHost(schedulerInstancesDBItem.getHostname());
+            jobscheduler.setHost(dbItemInventoryInstance.getHostname());
             jobscheduler.setJobschedulerId(jobSchedulerDefaultBody.getJobschedulerId());
-            jobscheduler.setPort(schedulerInstancesDBItem.getPort());
-            jobscheduler.setStartedAt(schedulerInstancesDBItem.getStartTime());
+            jobscheduler.setPort(dbItemInventoryInstance.getPort());
+            jobscheduler.setStartedAt(dbItemInventoryInstance.getStartTime());
             
             ClusterMemberTypeSchema clusterMemberTypeSchema = new ClusterMemberTypeSchema();
             clusterMemberTypeSchema.setPrecedence(-1);
-            clusterMemberTypeSchema.setPrecedence(schedulerInstancesDBItem.getClusterMemberPrecedence());
+            clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getClusterMemberPrecedence());
             //clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.fromValue(schedulerInstancesDBItem.getClusterMemberType()));
             clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.ACTIVE);
             jobscheduler.setClusterType(clusterMemberTypeSchema);
@@ -92,10 +93,10 @@ public class JobSchedulerResourceP extends JOCResourceImpl{
             supervisor.setJobschedulerId(schedulerSupervisorInstancesDBItem.getSchedulerId());
             jobscheduler.setSupervisor(supervisor);
             
-            jobscheduler.setTimeZone(schedulerInstancesDBItem.getTimeZone()); 
-            jobscheduler.setVersion(schedulerInstancesDBItem.getJobSchedulerVersion());
+            jobscheduler.setTimeZone(dbItemInventoryInstance.getTimeZone()); 
+            jobscheduler.setVersion(dbItemInventoryInstance.getJobSchedulerVersion());
  
-            jobscheduler.setSurveyDate(schedulerInstancesDBItem.getModified());
+            jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
             
             entity.setJobscheduler(jobscheduler);
             JobSchedulerPResponse jobschedulerResponse = JobSchedulerPResponse.responseStatus200(entity);

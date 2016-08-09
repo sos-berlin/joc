@@ -44,19 +44,19 @@ public class JobSchedulerResource extends JOCResourceImpl{
         }
 
         try {
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
 
-            if (schedulerInstancesDBItem == null) {
+            if (dbItemInventoryInstance == null) {
                 return JobSchedulerResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerDefaultBody.getJobschedulerId())));
             }
 
             Jobscheduler200VSchema entity = new Jobscheduler200VSchema();
             entity.setDeliveryDate(new Date());
             Jobscheduler_ jobscheduler = new Jobscheduler_();
-            jobscheduler.setHost(schedulerInstancesDBItem.getHostname());
+            jobscheduler.setHost(dbItemInventoryInstance.getHostname());
             jobscheduler.setJobschedulerId(jobSchedulerDefaultBody.getJobschedulerId());
-            jobscheduler.setPort(schedulerInstancesDBItem.getPort());
-            jobscheduler.setStartedAt(schedulerInstancesDBItem.getStartTime());
+            jobscheduler.setPort(dbItemInventoryInstance.getPort());
+            jobscheduler.setStartedAt(dbItemInventoryInstance.getStartTime());
             
             //TODO JOC Cockpit Webservice
             
@@ -64,7 +64,7 @@ public class JobSchedulerResource extends JOCResourceImpl{
             state.setSeverity(State.Severity._0);
             state.setText(State.Text.PAUSED);
             jobscheduler.setState(state);
-            jobscheduler.setSurveyDate(schedulerInstancesDBItem.getModified());
+            jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
             entity.setJobscheduler(jobscheduler);
             JobSchedulerResponse jobschedulerResponse = JobSchedulerResponse.responseStatus200(entity);
             return jobschedulerResponse;

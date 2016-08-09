@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
@@ -44,10 +45,10 @@ public class JobSchedulerResourceClusterImpl  extends JOCResourceImpl implements
 
         try {
 
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
 
-            if (schedulerInstancesDBItem == null) {
-                return JobschedulerClusterResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerDefaultBody.getJobschedulerId())));
+            if (dbItemInventoryInstance == null) {
+                return JobschedulerClusterResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerDefaultBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
             }
 
  

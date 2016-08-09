@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
@@ -44,10 +45,10 @@ public class JobSchedulerResourceDbImpl  extends JOCResourceImpl implements IJob
 
         try {
 
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
 
-            if (schedulerInstancesDBItem == null) {
-                return JobschedulerDbResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerDefaultBody.getJobschedulerId())));
+            if (dbItemInventoryInstance == null) {
+                return JobschedulerDbResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerDefaultBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
             }
  
             //TODO JOC Cockpit Webservice
@@ -55,8 +56,8 @@ public class JobSchedulerResourceDbImpl  extends JOCResourceImpl implements IJob
             DbSchema entity = new DbSchema();
             Database database = new Database();
             database.setDbms(Dbms.DB_2);
-            database.setSurveyDate(schedulerInstancesDBItem.getModified());
-            database.setVersion(schedulerInstancesDBItem.getJobSchedulerVersion());
+            database.setSurveyDate(dbItemInventoryInstance.getModified());
+            database.setVersion(dbItemInventoryInstance.getJobSchedulerVersion());
             State__ state = new State__();
             state.setSeverity(Severity._0);
             state.setText(State__.Text.RUNNING);

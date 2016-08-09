@@ -4,7 +4,9 @@ import javax.ws.rs.Path;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
@@ -12,7 +14,6 @@ import com.sos.joc.response.JocCockpitResponse;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdModifySpooler;
 import com.sos.scheduler.model.objects.Spooler;
-import com.sos.xml.SOSXmlCommand;
 
 @Path("jobscheduler")
 
@@ -44,14 +45,14 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
     private JocCockpitResponse executeModifyJobSchedulerCommand(String cmd) {
         try {
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(jobSchedulerIdentifier);
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(jobSchedulerIdentifier);
             
-            if (schedulerInstancesDBItem == null) {
-                return JocCockpitResponse.responseStatus420(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerIdentifier.getSchedulerId()));
+            if (dbItemInventoryInstance == null) {
+                return JocCockpitResponse.responseStatus420(String.format("schedulerId %s not found in table %s",jobSchedulerIdentifier.getSchedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES));
             }
 
             
-            SOSXmlCommand sosXmlCommand = new SOSXmlCommand(schedulerInstancesDBItem.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
             schedulerObjectFactory.initMarshaller(Spooler.class);
@@ -60,8 +61,8 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
             jsCmdModifySpooler.setTimeoutIfNotEmpty(jobSchedulerTerminateBody.getTimeoutAsString());
 
             String xml = schedulerObjectFactory.toXMLString(jsCmdModifySpooler);
-            sosXmlCommand.excutePost(xml);
-            return JocCockpitResponse.responseStatus200(sosXmlCommand.getSurveyDate());
+            jocXmlCommand.excutePost(xml);
+            return JocCockpitResponse.responseStatus200(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
             return JocCockpitResponse.responseStatus420(e.getMessage());
         }

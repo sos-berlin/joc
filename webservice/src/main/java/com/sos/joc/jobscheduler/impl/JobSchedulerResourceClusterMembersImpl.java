@@ -5,7 +5,9 @@ import java.util.Date;
 import javax.ws.rs.Path;
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembers;
@@ -15,10 +17,9 @@ import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Severity;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.response.JocCockpitResponse;
-import com.sos.xml.SOSXmlCommand;
 
 @Path("jobscheduler")
-public class JobSchedulerResourceClusterMembersImpl  extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
+public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
 
     @Override
     public JobschedulerClusterMembersResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
@@ -33,60 +34,52 @@ public class JobSchedulerResourceClusterMembersImpl  extends JOCResourceImpl imp
         if (!jobschedulerUser.isAuthenticated()) {
             return JobschedulerClusterMembersResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
         }
-        
-        if (!getPermissons().getJobschedulerMaster().getView().isStatus()){
+
+        if (!getPermissons().getJobschedulerMaster().getView().isStatus()) {
             return JobschedulerClusterMembersResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
         }
 
         if (jobSchedulerDefaultBody.getJobschedulerId() == null) {
             return JobschedulerClusterMembersResponse.responseStatus420(JocCockpitResponse.getError420Schema("schedulerId is null"));
         }
-        if (!getPermissons().getJobschedulerMasterCluster().getView().isClusterStatus()){
+        if (!getPermissons().getJobschedulerMasterCluster().getView().isClusterStatus()) {
             return JobschedulerClusterMembersResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
         }
 
         try {
 
-            DBItemInventoryInstance schedulerInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
+            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
 
-            if (schedulerInstancesDBItem == null) {
-                return JobschedulerClusterMembersResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerDefaultBody.getJobschedulerId())));
+            if (dbItemInventoryInstance == null) {
+                return JobschedulerClusterMembersResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerDefaultBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
             }
 
- 
-            SOSXmlCommand sosXmlCommand = new SOSXmlCommand(schedulerInstancesDBItem.getUrl());
-            sosXmlCommand.excutePost("<show_state subsystems=\"folder\" what=\"folders no_subfolders cluster\" path=\"/does/not/exist\"/>");
-            sosXmlCommand.executeXPath("//spooler/answer/state/cluster/cluster_member");
-          
-            MastersVSchema entity = new MastersVSchema();
-             
-            //TODO JOC Cockpit Webservice
-           
-            entity.setDeliveryDate(new Date());
-            ArrayList<Jobscheduler_> masters = new ArrayList<Jobscheduler_>();
-            Jobscheduler_ jobscheduler = new Jobscheduler_();
-            jobscheduler.setHost("myHost");
-            jobscheduler.setJobschedulerId(jobSchedulerDefaultBody.getJobschedulerId());
-            jobscheduler.setPort(-1);
-            jobscheduler.setStartedAt(new Date());
-            State state = new State();
-            state.setSeverity(Severity._0);
-            state.setText(Text.DEAD);
-            jobscheduler.setState(state);
-            jobscheduler.setSurveyDate(new Date());
-            masters.add(jobscheduler);
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            jocXmlCommand.excutePost("<show_state subsystems=\"folder\" what=\"folders no_subfolders cluster\" path=\"/does/not/exist\"/>");
+            jocXmlCommand.createNodeList("//spooler/answer/state/cluster/cluster_member");
 
-            Jobscheduler_ jobscheduler2 = new Jobscheduler_();
-            jobscheduler2.setHost("mySecondHost");
-            jobscheduler2.setJobschedulerId(jobSchedulerDefaultBody.getJobschedulerId());
-            jobscheduler2.setPort(-1);
-            jobscheduler2.setStartedAt(new Date());
-            State state2 = new State();
-            state2.setSeverity(Severity._0);
-            state2.setText(Text.RUNNING);
-            jobscheduler2.setState(state2);
-            jobscheduler2.setSurveyDate(new Date());
-            masters.add(jobscheduler2);
+            int count = jocXmlCommand.getNodeList().getLength();
+
+            MastersVSchema entity = new MastersVSchema();
+            ArrayList<Jobscheduler_> masters = new ArrayList<Jobscheduler_>();
+
+            for (int i = 0; i < count; i++) {
+                jocXmlCommand.getElementFromList(i);
+
+                entity.setDeliveryDate(new Date());
+                Jobscheduler_ jobscheduler = new Jobscheduler_();
+                jobscheduler.setHost(jocXmlCommand.getAttribut("host"));
+                jobscheduler.setJobschedulerId(jocXmlCommand.getAttribut("cluster_member_id"));
+                jobscheduler.setPort(jocXmlCommand.getAttributAsIntegerOr0("tcp_port"));
+                jobscheduler.setStartedAt(jocXmlCommand.getAttributAsDate("running_since"));
+                State state = new State();
+                state.setSeverity(Severity._0);
+                state.setText(Text.DEAD);
+                jobscheduler.setState(state);
+                jobscheduler.setSurveyDate(jocXmlCommand.getSurveyDate());
+                masters.add(jobscheduler);
+
+            }
 
             entity.setMasters(masters);
 
@@ -98,8 +91,5 @@ public class JobSchedulerResourceClusterMembersImpl  extends JOCResourceImpl imp
         }
 
     }
- 
-
-    
 
 }
