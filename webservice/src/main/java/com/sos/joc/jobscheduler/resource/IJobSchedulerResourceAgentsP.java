@@ -14,7 +14,6 @@ import com.sos.joc.jobscheduler.post.JobSchedulerAgentsBody;
 import com.sos.joc.model.common.Error420Schema;
 import com.sos.joc.model.jobscheduler.AgentsPSchema;
  
-@Path("Ijobscheduler")
 public interface IJobSchedulerResourceAgentsP {
  
 

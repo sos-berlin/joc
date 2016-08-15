@@ -9,11 +9,10 @@ import javax.ws.rs.Produces;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerBody;
 import com.sos.joc.response.JocCockpitResponse;
 
-@Path("Ijobscheduler")
 public interface IJobSchedulerResourceModifyJobScheduler {
     
     @POST
-    @Path("terminate")
+    @Path("jobscheduler/terminate")
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JocCockpitResponse postJobschedulerTerminate(
@@ -21,7 +20,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
 
     
     @POST
-    @Path("terminate_and_restart")
+    @Path("jobscheduler/terminate_and_restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JocCockpitResponse postJobschedulerRestartTerminate(

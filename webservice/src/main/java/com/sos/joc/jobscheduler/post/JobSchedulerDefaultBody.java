@@ -39,3 +39,8 @@ public class JobSchedulerDefaultBody {
     }
 
 }
+/*
+{
+"jobschedulerId":"scheduler_joc_cockpit"
+}
+*/

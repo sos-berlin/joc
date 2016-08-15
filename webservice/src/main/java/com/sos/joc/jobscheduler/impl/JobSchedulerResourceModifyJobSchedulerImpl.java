@@ -19,7 +19,8 @@ import com.sos.scheduler.model.objects.Spooler;
 
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobScheduler {
  
-   
+    protected JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody;
+
     private JocCockpitResponse check(boolean right) {
         
         if (jobschedulerUser.isTimedOut()) {

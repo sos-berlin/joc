@@ -15,7 +15,7 @@ public class JobSchedulerResourceClusterMembersImplTest {
     private static final String LDAP_USER = "SOS01";
      
     @Test
-    public void postjobschedulerClusterTest() throws Exception   {
+    public void postjobschedulerClusterMembersTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();

@@ -11,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.response.JobSchedulerResponse;
  
-@Path("Ijobscheduler")
 public interface IJobSchedulerResourceSupervisor {
   
 

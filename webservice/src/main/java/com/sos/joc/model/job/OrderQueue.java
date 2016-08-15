@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -62,7 +61,7 @@ public class OrderQueue {
      * 
      */
     @JsonProperty("path")
-    private Pattern path;
+    private String path;
     @JsonProperty("orderId")
     private String orderId;
     /**
@@ -72,7 +71,7 @@ public class OrderQueue {
      * 
      */
     @JsonProperty("jobChain")
-    private Pattern jobChain;
+    private String jobChain;
     /**
      * non negative integer
      * <p>
@@ -110,7 +109,7 @@ public class OrderQueue {
      * 
      */
     @JsonProperty("job")
-    private Pattern job;
+    private String job;
     @JsonProperty("stateText")
     private String stateText;
     /**
@@ -182,7 +181,7 @@ public class OrderQueue {
      * 
      */
     @JsonProperty("lock")
-    private Pattern lock;
+    private String lock;
     /**
      * path
      * <p>
@@ -190,7 +189,7 @@ public class OrderQueue {
      * 
      */
     @JsonProperty("processClass")
-    private Pattern processClass;
+    private String processClass;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -203,7 +202,7 @@ public class OrderQueue {
      *     The path
      */
     @JsonProperty("path")
-    public Pattern getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -216,7 +215,7 @@ public class OrderQueue {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Pattern path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -249,7 +248,7 @@ public class OrderQueue {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public Pattern getJobChain() {
+    public String getJobChain() {
         return jobChain;
     }
 
@@ -262,7 +261,7 @@ public class OrderQueue {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public void setJobChain(Pattern jobChain) {
+    public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
 
@@ -391,7 +390,7 @@ public class OrderQueue {
      *     The job
      */
     @JsonProperty("job")
-    public Pattern getJob() {
+    public String getJob() {
         return job;
     }
 
@@ -404,7 +403,7 @@ public class OrderQueue {
      *     The job
      */
     @JsonProperty("job")
-    public void setJob(Pattern job) {
+    public void setJob(String job) {
         this.job = job;
     }
 
@@ -657,7 +656,7 @@ public class OrderQueue {
      *     The lock
      */
     @JsonProperty("lock")
-    public Pattern getLock() {
+    public String getLock() {
         return lock;
     }
 
@@ -670,7 +669,7 @@ public class OrderQueue {
      *     The lock
      */
     @JsonProperty("lock")
-    public void setLock(Pattern lock) {
+    public void setLock(String lock) {
         this.lock = lock;
     }
 
@@ -683,7 +682,7 @@ public class OrderQueue {
      *     The processClass
      */
     @JsonProperty("processClass")
-    public Pattern getProcessClass() {
+    public String getProcessClass() {
         return processClass;
     }
 
@@ -696,7 +695,7 @@ public class OrderQueue {
      *     The processClass
      */
     @JsonProperty("processClass")
-    public void setProcessClass(Pattern processClass) {
+    public void setProcessClass(String processClass) {
         this.processClass = processClass;
     }
 

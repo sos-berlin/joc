@@ -4,8 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-import javax.xml.xpath.XPathConstants;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -23,14 +21,14 @@ public class JOCXmlCommand extends SOSXmlCommand {
     }
 
     public Date getSurveyDate() {
-        if ("".equals(surveyDate)) {
+        if (surveyDate == null || "".equals(surveyDate)) {
             try {
                 executeXPath("/spooler/answer");
                 SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT);
                 surveyDate = formatter.parse(getAttribut("time"));
             } catch (Exception e) {
                 try {
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss.SSS'Z'");
+                    SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT2);
                     surveyDate = formatter.parse(getAttribut("time"));
                 } catch (Exception ee) {
                 }

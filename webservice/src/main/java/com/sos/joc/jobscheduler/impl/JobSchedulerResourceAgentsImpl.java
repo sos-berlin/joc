@@ -58,7 +58,9 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
             
             
             ArrayList<AgentVSchema> listOfAgents = new ArrayList<AgentVSchema>();
-          
+
+            //TODO Hier muss die DB gelesen und mit dem Filter gefiltert werden
+
             for (JobSchedulerAgent agentFilter : jobSchedulerAgentsBody.getAgents()) {
                 AgentVSchema agent = new AgentVSchema();
                 agent.setRunningTasks(-1);

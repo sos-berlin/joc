@@ -20,7 +20,7 @@ import com.sos.joc.model.jobscheduler.State.Severity;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.response.JocCockpitResponse;
 
-@Path("jobscheduler/agents/p")
+@Path("jobscheduler")
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
 
     @Override
@@ -58,7 +58,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             
             entity.setDeliveryDate(new Date());
             
-            
+            //TODO Hier muss die DB gelesen und mit dem Filter gefiltert werden
             ArrayList<AgentPSchema> listOfAgents = new ArrayList<AgentPSchema>();
           
             for (JobSchedulerAgent agentFilter : jobSchedulerAgentsBody.getAgents()) {
@@ -70,6 +70,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 agent.setState(state);
                 agent.setSurveyDate(new Date());
                 agent.setHost(dbItemInventoryInstance.getHostname());
+                agent.setUrl(agentFilter.getAgent());
                 Os os = new Os();
                 os.setArchitecture(Architecture._32);
                 os.setDistribution("myDistribution");

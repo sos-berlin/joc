@@ -86,4 +86,11 @@ public class JobSchedulerAgentClustersBody {
 
     }
 
-}
+
+    /*
+    {
+  "jobschedulerId":"scheduler_joc_cockpit",
+  "agents":[{"agent":" http://galadriel:4445"
+  }]
+  }
+  */}

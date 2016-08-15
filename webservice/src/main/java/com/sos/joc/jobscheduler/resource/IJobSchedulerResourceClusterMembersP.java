@@ -14,7 +14,6 @@ import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.model.common.Error420Schema;
 import com.sos.joc.model.jobscheduler.MastersPSchema;
 
-@Path("Ijobscheduler")
 public interface IJobSchedulerResourceClusterMembersP {
 
     @POST

@@ -15,7 +15,7 @@ public class JobSchedulerResourceSupervisorPImpl  implements IJobSchedulerResour
  
 
     @Override
-    public JobSchedulerPResponse postJobschedulerSupervisor(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
+    public JobSchedulerPResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
         JobSchedulerResourceP jobSchedulerPResource = new JobSchedulerResourceP(accessToken, jobSchedulerDefaultBody);
 
         DBItemInventoryInstance dbItemInventoryInstance = jobSchedulerPResource.getJobschedulerUser().getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));

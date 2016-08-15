@@ -10,11 +10,10 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentClustersBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
-import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters.JobschedulerAgentClustersResponse;
 import com.sos.joc.model.jobscheduler.Agent;
 import com.sos.joc.model.jobscheduler.AgentClusterPSchema;
 import com.sos.joc.model.jobscheduler.AgentClustersPSchema;
-import com.sos.joc.model.jobscheduler.NumOfAgents_;
+import com.sos.joc.model.jobscheduler.NumOfAgents;
 import com.sos.joc.model.jobscheduler.Os;
 import com.sos.joc.model.jobscheduler.Os.Architecture;
 import com.sos.joc.model.jobscheduler.State;
@@ -85,7 +84,10 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             agent1.setState(state1);
             agent1.setSurveyDate(new Date());
             agent1.setUrl("myUrl");
-            agent1.setVersion("myVersion");            
+            agent1.setVersion("myVersion");     
+            agentClusterPSchema.setAgents(listOfAgents);
+
+  
             listOfAgents.add(agent1);
             
             Agent agent2 = new Agent();
@@ -107,9 +109,10 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             listOfAgents.add(agent2);
             
             agentClusterPSchema.setAgents(listOfAgents);
-            NumOfAgents_ numOfAgents = new NumOfAgents_();
+            NumOfAgents numOfAgents = new NumOfAgents();
             numOfAgents.setAny(-1);
             numOfAgents.setRunning(-1);
+            agentClusterPSchema.setNumOfAgents(numOfAgents);
   
             State_ state = new State_();
             state.setSeverity(State_.Severity._2);

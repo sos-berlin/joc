@@ -8,6 +8,7 @@ import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCluster;
@@ -51,6 +52,8 @@ public class JobSchedulerResourceClusterImpl  extends JOCResourceImpl implements
                 return JobschedulerClusterResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerDefaultBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
             }
 
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            jocXmlCommand.excutePost("<show_state subsystems=\"folder\" what=\"folders no_subfolders cluster\" path=\"/does/not/exist\"/>");
  
             ClusterSchema entity = new ClusterSchema();
             
@@ -58,7 +61,7 @@ public class JobSchedulerResourceClusterImpl  extends JOCResourceImpl implements
             cluster.setJobschedulerId(jobSchedulerDefaultBody.getJobschedulerId());
 
             //TODO JOC Cockpit Webservice
-            cluster.setSurveyDate(new Date());
+            cluster.setSurveyDate(jocXmlCommand.getSurveyDate());
             cluster.setType(Cluster.Type.ACTIVE);
  
             entity.setDeliveryDate(new Date());

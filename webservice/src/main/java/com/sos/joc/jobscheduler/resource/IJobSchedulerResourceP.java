@@ -10,7 +10,6 @@ import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.response.JobSchedulerPResponse;
 
  
-@Path("Ijobscheduler")
 public interface IJobSchedulerResourceP {
 
     @POST

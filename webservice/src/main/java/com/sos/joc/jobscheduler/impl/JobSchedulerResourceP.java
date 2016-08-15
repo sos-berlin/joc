@@ -18,15 +18,15 @@ import com.sos.joc.response.JocCockpitResponse;
 
 public class JobSchedulerResourceP extends JOCResourceImpl{
     
+    private String accessToken;
+    private JobSchedulerDefaultBody jobSchedulerDefaultBody;
+
     public JobSchedulerResourceP(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) {
         super();
         this.accessToken = accessToken;
         this.jobSchedulerDefaultBody = jobSchedulerDefaultBody;
         jobschedulerUser = new JobSchedulerUser(accessToken);
     }
-
-    private String accessToken;
-    private JobSchedulerDefaultBody jobSchedulerDefaultBody;
     
     public JobSchedulerPResponse postJobschedulerP (){
 

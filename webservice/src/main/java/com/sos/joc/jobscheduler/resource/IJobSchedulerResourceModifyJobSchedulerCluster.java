@@ -9,7 +9,6 @@ import javax.ws.rs.Produces;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerClusterBody;
 import com.sos.joc.response.JocCockpitResponse;
 
-@Path("Ijobscheduler")
 public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     
     @POST
