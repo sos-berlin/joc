@@ -40,6 +40,18 @@ public class JocCockpitResponse extends com.sos.joc.support.ResponseWrapper {
         entity.setIsPermitted(false);
         entity.setIsAuthenticated(false);
         entity.setUser(sosJobschedulerUser.getSosShiroCurrentUser().getUsername());
+        entity.setMessage("Authentication failure");
+        return entity;
+    }
+
+    public static SOSShiroCurrentUserAnswer getError401Schema(JobSchedulerUser sosJobschedulerUser,String message) {
+        SOSShiroCurrentUserAnswer entity = new SOSShiroCurrentUserAnswer();
+        entity.setAccessToken(sosJobschedulerUser.getSosShiroCurrentUser().getAccessToken());
+        entity.setHasRole(false);
+        entity.setIsPermitted(false);
+        entity.setIsAuthenticated(false);
+        entity.setUser(sosJobschedulerUser.getSosShiroCurrentUser().getUsername());
+        entity.setMessage(message);
         return entity;
     }
 
@@ -50,6 +62,18 @@ public class JocCockpitResponse extends com.sos.joc.support.ResponseWrapper {
         entity.setIsPermitted(false);
         entity.setIsAuthenticated(false);
         entity.setUser("");
+        entity.setMessage("Authentication failure");
+        return entity;
+    }
+
+    public static SOSShiroCurrentUserAnswer getError401Schema(String accessToken, String message) {
+        SOSShiroCurrentUserAnswer entity = new SOSShiroCurrentUserAnswer();
+        entity.setAccessToken(accessToken);
+        entity.setHasRole(false);
+        entity.setIsPermitted(false);
+        entity.setIsAuthenticated(false);
+        entity.setUser("");
+        entity.setMessage(message);
         return entity;
     }
 
@@ -90,9 +114,11 @@ public class JocCockpitResponse extends com.sos.joc.support.ResponseWrapper {
         return new JocCockpitResponse(responseBuilder.build());
     }
 
-    public static JocCockpitResponse responseStatus440(JobSchedulerUser sosJobschedulerUser) {
+    public static JocCockpitResponse responseStatus440(JobSchedulerUser sosJobschedulerUser, String message) {
         Response.ResponseBuilder responseBuilder = Response.status(440).header("Content-Type", "application/json");
-        responseBuilder.entity(getError401Schema(sosJobschedulerUser));
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = getError401Schema(sosJobschedulerUser);
+        sosShiroCurrentUserAnswer.setMessage(message);
+        responseBuilder.entity(sosShiroCurrentUserAnswer);
         return new JocCockpitResponse(responseBuilder.build());
     }
 }

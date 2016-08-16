@@ -2,6 +2,8 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
+import org.apache.log4j.Logger;
+
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -18,17 +20,22 @@ import com.sos.scheduler.model.objects.Spooler;
 @Path("jobscheduler")
 
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobScheduler {
- 
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
+
     protected JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody;
 
     private JocCockpitResponse check(boolean right) {
-        
-        if (jobschedulerUser.isTimedOut()) {
-            return JocCockpitResponse.responseStatus440(jobschedulerUser);
-        }
 
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JocCockpitResponse.responseStatus401(jobschedulerUser.getAccessToken());
+        try {
+            if (!jobschedulerUser.isAuthenticated()) {
+                return JocCockpitResponse.responseStatus401(jobschedulerUser.getAccessToken());
+            }
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+            LOGGER.error(e.getMessage());
+            return JocCockpitResponse.responseStatus440(jobschedulerUser,e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return JocCockpitResponse.responseStatus420(e.getMessage());
         }
 
         if (jobSchedulerTerminateBody.getJobschedulerId() == null) {
@@ -39,7 +46,6 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
             return JocCockpitResponse.responseStatus403(jobschedulerUser);
         }
 
-        
         return null;
 
     }
@@ -47,12 +53,12 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     private JocCockpitResponse executeModifyJobSchedulerCommand(String cmd) {
         try {
             DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(jobSchedulerIdentifier);
-            
+
             if (dbItemInventoryInstance == null) {
-                return JocCockpitResponse.responseStatus420(String.format("schedulerId %s not found in table %s",jobSchedulerIdentifier.getSchedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES));
+                return JocCockpitResponse.responseStatus420(String.format("schedulerId %s not found in table %s", jobSchedulerIdentifier.getSchedulerId(),
+                        DBLayer.TABLE_INVENTORY_INSTANCES));
             }
 
-            
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
@@ -141,7 +147,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
         return executeModifyJobSchedulerCommand("pause");
     }
-    
+
     @Override
     public JocCockpitResponse postJobschedulerContinue(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
         init(accessToken, jobSchedulerTerminateBody);

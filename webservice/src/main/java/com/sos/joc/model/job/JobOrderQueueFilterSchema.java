@@ -3,7 +3,6 @@ package com.sos.joc.model.job;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -43,7 +42,7 @@ public class JobOrderQueueFilterSchema {
      * 
      */
     @JsonProperty("job")
-    private Pattern job;
+    private String job;
     /**
      * path
      * <p>
@@ -51,7 +50,7 @@ public class JobOrderQueueFilterSchema {
      * 
      */
     @JsonProperty("jobChain")
-    private Pattern jobChain;
+    private String jobChain;
     @JsonProperty("orderId")
     private String orderId;
     @JsonProperty("node")
@@ -89,7 +88,7 @@ public class JobOrderQueueFilterSchema {
      *     The job
      */
     @JsonProperty("job")
-    public Pattern getJob() {
+    public String getJob() {
         return job;
     }
 
@@ -103,7 +102,7 @@ public class JobOrderQueueFilterSchema {
      *     The job
      */
     @JsonProperty("job")
-    public void setJob(Pattern job) {
+    public void setJob(String job) {
         this.job = job;
     }
 
@@ -116,7 +115,7 @@ public class JobOrderQueueFilterSchema {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public Pattern getJobChain() {
+    public String getJobChain() {
         return jobChain;
     }
 
@@ -129,7 +128,7 @@ public class JobOrderQueueFilterSchema {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public void setJobChain(Pattern jobChain) {
+    public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
 

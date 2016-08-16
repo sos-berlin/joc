@@ -3,6 +3,7 @@ package com.sos.joc.jobscheduler.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
+import org.apache.log4j.Logger;
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -10,12 +11,12 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentClustersBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
+import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters.JobschedulerAgentClustersResponse;
 import com.sos.joc.model.jobscheduler.Agent;
 import com.sos.joc.model.jobscheduler.AgentClusterPSchema;
 import com.sos.joc.model.jobscheduler.AgentClustersPSchema;
 import com.sos.joc.model.jobscheduler.NumOfAgents;
 import com.sos.joc.model.jobscheduler.Os;
-import com.sos.joc.model.jobscheduler.Os.Architecture;
 import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.model.jobscheduler.State_;
@@ -23,19 +24,25 @@ import com.sos.joc.response.JocCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
 
     @Override
     public JobschedulerAgentClustersPResponse postJobschedulerAgentClusters(String accessToken, JobSchedulerAgentClustersBody jobSchedulerAgentClustersBody) throws Exception {
         JobschedulerAgentClustersPResponse jobschedulerAgentClustersResponse;
         jobschedulerUser = new JobSchedulerUser(accessToken);
 
-        if (jobschedulerUser.isTimedOut()) {
-            return JobschedulerAgentClustersPResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
+        try {
+            if (!jobschedulerUser.isAuthenticated()) {
+                return JobschedulerAgentClustersPResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
+            }
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerAgentClustersPResponse.responseStatus440(JocCockpitResponse.getError401Schema(jobschedulerUser,e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerAgentClustersPResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
         }
 
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JobschedulerAgentClustersPResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
 
         if (!getPermissons().getJobschedulerUniversalAgent().getView().isStatus()) {
             return JobschedulerAgentClustersPResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
@@ -72,7 +79,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             Agent agent1 = new Agent();
             agent1.setHost("myHost");
             Os os = new Os();
-            os.setArchitecture(Architecture._64);
+            os.setArchitecture("64");
             os.setDistribution("myDistribution");
             os.setName("myName");
             agent1.setOs(os);
@@ -93,7 +100,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             Agent agent2 = new Agent();
             agent2.setHost("myHost");
             Os os2 = new Os();
-            os2.setArchitecture(Architecture._32);
+            os2.setArchitecture("32");
             os2.setDistribution("myDistribution");
             os2.setName("myName");
             agent2.setOs(os);

@@ -3,7 +3,6 @@ package com.sos.joc.model.order;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -31,7 +30,7 @@ public class Order_ {
      * 
      */
     @JsonProperty("jobChain")
-    private Pattern jobChain;
+    private String jobChain;
     /**
      * if orderId undefined or empty then all orders of specified job chain are requested
      * 
@@ -51,7 +50,7 @@ public class Order_ {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public Pattern getJobChain() {
+    public String getJobChain() {
         return jobChain;
     }
 
@@ -65,7 +64,7 @@ public class Order_ {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public void setJobChain(Pattern jobChain) {
+    public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
 

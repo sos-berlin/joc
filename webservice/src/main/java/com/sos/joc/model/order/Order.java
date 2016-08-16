@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -16,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.sos.joc.model.common.NameValuePairsSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -62,7 +62,7 @@ public class Order {
      * 
      */
     @JsonProperty("path")
-    private Pattern path;
+    private String path;
     /**
      * 
      * (Required)
@@ -78,7 +78,7 @@ public class Order {
      * 
      */
     @JsonProperty("jobChain")
-    private Pattern jobChain;
+    private String jobChain;
     /**
      * non negative integer
      * <p>
@@ -87,8 +87,14 @@ public class Order {
      */
     @JsonProperty("priority")
     private Integer priority;
+    /**
+     * params or environment variables
+     * <p>
+     * 
+     * 
+     */
     @JsonProperty("params")
-    private List<Object> params = new ArrayList<Object>();
+    private List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
     /**
      * the type of the order
      * 
@@ -166,7 +172,7 @@ public class Order {
      *     The path
      */
     @JsonProperty("path")
-    public Pattern getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -180,7 +186,7 @@ public class Order {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Pattern path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -218,7 +224,7 @@ public class Order {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public Pattern getJobChain() {
+    public String getJobChain() {
         return jobChain;
     }
 
@@ -232,7 +238,7 @@ public class Order {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public void setJobChain(Pattern jobChain) {
+    public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
 
@@ -263,22 +269,28 @@ public class Order {
     }
 
     /**
+     * params or environment variables
+     * <p>
+     * 
      * 
      * @return
      *     The params
      */
     @JsonProperty("params")
-    public List<Object> getParams() {
+    public List<NameValuePairsSchema> getParams() {
         return params;
     }
 
     /**
+     * params or environment variables
+     * <p>
+     * 
      * 
      * @param params
      *     The params
      */
     @JsonProperty("params")
-    public void setParams(List<Object> params) {
+    public void setParams(List<NameValuePairsSchema> params) {
         this.params = params;
     }
 

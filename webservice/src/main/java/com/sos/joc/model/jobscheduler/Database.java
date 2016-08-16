@@ -23,8 +23,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "dbms",
     "surveyDate",
     "version",
-    "state",
-    "error"
+    "state"
 })
 public class Database {
 
@@ -53,8 +52,6 @@ public class Database {
      */
     @JsonProperty("state")
     private State__ state;
-    @JsonProperty("error")
-    private String error;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -154,26 +151,6 @@ public class Database {
         this.state = state;
     }
 
-    /**
-     * 
-     * @return
-     *     The error
-     */
-    @JsonProperty("error")
-    public String getError() {
-        return error;
-    }
-
-    /**
-     * 
-     * @param error
-     *     The error
-     */
-    @JsonProperty("error")
-    public void setError(String error) {
-        this.error = error;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -191,7 +168,7 @@ public class Database {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(dbms).append(surveyDate).append(version).append(state).append(error).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(dbms).append(surveyDate).append(version).append(state).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -203,7 +180,7 @@ public class Database {
             return false;
         }
         Database rhs = ((Database) other);
-        return new EqualsBuilder().append(dbms, rhs.dbms).append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(state, rhs.state).append(error, rhs.error).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(dbms, rhs.dbms).append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(state, rhs.state).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")

@@ -31,7 +31,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "jobschedulerId",
     "agentClusters",
     "regex",
-    "state"
+    "state",
+    "compact"
 })
 public class AgentClusterFilterSchema {
 
@@ -49,6 +50,14 @@ public class AgentClusterFilterSchema {
     private String regex;
     @JsonProperty("state")
     private AgentClusterFilterSchema.State state;
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     */
+    @JsonProperty("compact")
+    private Boolean compact = false;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -138,6 +147,32 @@ public class AgentClusterFilterSchema {
         this.state = state;
     }
 
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     * @return
+     *     The compact
+     */
+    @JsonProperty("compact")
+    public Boolean getCompact() {
+        return compact;
+    }
+
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     * @param compact
+     *     The compact
+     */
+    @JsonProperty("compact")
+    public void setCompact(Boolean compact) {
+        this.compact = compact;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -155,7 +190,7 @@ public class AgentClusterFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(agentClusters).append(regex).append(state).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(agentClusters).append(regex).append(state).append(compact).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -167,7 +202,7 @@ public class AgentClusterFilterSchema {
             return false;
         }
         AgentClusterFilterSchema rhs = ((AgentClusterFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(agentClusters, rhs.agentClusters).append(regex, rhs.regex).append(state, rhs.state).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(agentClusters, rhs.agentClusters).append(regex, rhs.regex).append(state, rhs.state).append(compact, rhs.compact).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")

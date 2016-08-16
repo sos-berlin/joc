@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -64,9 +63,9 @@ public class OrdersFilterSchema {
     @JsonProperty("type")
     private List<Type> type = new ArrayList<Type>();
     @JsonProperty("dateFrom")
-    private Pattern dateFrom;
+    private String dateFrom;
     @JsonProperty("dateTo")
-    private Pattern dateTo;
+    private String dateTo;
     /**
      * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
      * 
@@ -214,7 +213,7 @@ public class OrdersFilterSchema {
      *     The dateFrom
      */
     @JsonProperty("dateFrom")
-    public Pattern getDateFrom() {
+    public String getDateFrom() {
         return dateFrom;
     }
 
@@ -224,7 +223,7 @@ public class OrdersFilterSchema {
      *     The dateFrom
      */
     @JsonProperty("dateFrom")
-    public void setDateFrom(Pattern dateFrom) {
+    public void setDateFrom(String dateFrom) {
         this.dateFrom = dateFrom;
     }
 
@@ -234,7 +233,7 @@ public class OrdersFilterSchema {
      *     The dateTo
      */
     @JsonProperty("dateTo")
-    public Pattern getDateTo() {
+    public String getDateTo() {
         return dateTo;
     }
 
@@ -244,7 +243,7 @@ public class OrdersFilterSchema {
      *     The dateTo
      */
     @JsonProperty("dateTo")
-    public void setDateTo(Pattern dateTo) {
+    public void setDateTo(String dateTo) {
         this.dateTo = dateTo;
     }
 

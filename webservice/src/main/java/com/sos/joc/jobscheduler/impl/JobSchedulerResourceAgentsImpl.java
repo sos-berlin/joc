@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
@@ -20,19 +21,26 @@ import com.sos.joc.response.JocCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements IJobSchedulerResourceAgents {
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResourceAgentsImpl.class);
 
     @Override
     public JobschedulerAgentsResponse postJobschedulerAgents(String accessToken, JobSchedulerAgentsBody jobSchedulerAgentsBody) throws Exception {
         JobschedulerAgentsResponse jobschedulerAgentsResponse;
         jobschedulerUser = new JobSchedulerUser(accessToken);
 
-        if (jobschedulerUser.isTimedOut()) {
-            return JobschedulerAgentsResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
+        try {
+            if (!jobschedulerUser.isAuthenticated()) {
+                return JobschedulerAgentsResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
+            }
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerAgentsResponse.responseStatus440(JocCockpitResponse.getError401Schema(jobschedulerUser,e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerAgentsResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
         }
 
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JobschedulerAgentsResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
+
         
         if (!getPermissons().getJobschedulerUniversalAgent().getView().isStatus()){
             return JobschedulerAgentsResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));

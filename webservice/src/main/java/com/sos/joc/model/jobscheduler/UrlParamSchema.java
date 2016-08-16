@@ -3,7 +3,6 @@ package com.sos.joc.model.jobscheduler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -33,7 +32,7 @@ public class UrlParamSchema {
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     @JsonProperty("clusterMember")
-    private Pattern clusterMember;
+    private String clusterMember;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -63,7 +62,7 @@ public class UrlParamSchema {
      *     The clusterMember
      */
     @JsonProperty("clusterMember")
-    public Pattern getClusterMember() {
+    public String getClusterMember() {
         return clusterMember;
     }
 
@@ -73,7 +72,7 @@ public class UrlParamSchema {
      *     The clusterMember
      */
     @JsonProperty("clusterMember")
-    public void setClusterMember(Pattern clusterMember) {
+    public void setClusterMember(String clusterMember) {
         this.clusterMember = clusterMember;
     }
 

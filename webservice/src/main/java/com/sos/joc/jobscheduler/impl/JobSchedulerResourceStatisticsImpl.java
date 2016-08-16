@@ -3,6 +3,8 @@ package com.sos.joc.jobscheduler.impl;
 import java.util.Date;
 import javax.ws.rs.Path;
 
+import org.apache.log4j.Logger;
+
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -20,18 +22,25 @@ import com.sos.joc.response.JocCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implements IJobSchedulerResourceStatistics {
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
 
     private JobschedulerStatisticsResponse getStatistics(String schedulerId, String accessToken) {
         JobschedulerStatisticsResponse jobschedulerStatisticsResponse;
         jobschedulerUser = new JobSchedulerUser(accessToken);
-
-        if (jobschedulerUser.isTimedOut()) {
-            return JobschedulerStatisticsResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
+        
+        try {
+            if (!jobschedulerUser.isAuthenticated()) {
+                return JobschedulerStatisticsResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
+            }
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerStatisticsResponse.responseStatus440(JocCockpitResponse.getError401Schema(jobschedulerUser,e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerStatisticsResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
         }
 
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JobschedulerStatisticsResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
+
         if (!getPermissons().getJobschedulerMaster().getView().isStatus()){
             return JobschedulerStatisticsResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
         }

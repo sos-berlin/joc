@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -15,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
+import com.sos.joc.model.common.NameValuePairsSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -67,7 +67,7 @@ public class Job_ {
      * 
      */
     @JsonProperty("path")
-    private Pattern path;
+    private String path;
     @JsonProperty("name")
     private String name;
     /**
@@ -129,8 +129,14 @@ public class Job_ {
     private Integer numOfQueuedTasks;
     @JsonProperty("taskQueue")
     private List<TaskQueue> taskQueue = new ArrayList<TaskQueue>();
+    /**
+     * params or environment variables
+     * <p>
+     * 
+     * 
+     */
     @JsonProperty("params")
-    private List<Object> params = new ArrayList<Object>();
+    private List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
     /**
      * configuration status
      * <p>
@@ -199,7 +205,7 @@ public class Job_ {
      *     The path
      */
     @JsonProperty("path")
-    public Pattern getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -212,7 +218,7 @@ public class Job_ {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Pattern path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -505,22 +511,28 @@ public class Job_ {
     }
 
     /**
+     * params or environment variables
+     * <p>
+     * 
      * 
      * @return
      *     The params
      */
     @JsonProperty("params")
-    public List<Object> getParams() {
+    public List<NameValuePairsSchema> getParams() {
         return params;
     }
 
     /**
+     * params or environment variables
+     * <p>
+     * 
      * 
      * @param params
      *     The params
      */
     @JsonProperty("params")
-    public void setParams(List<Object> params) {
+    public void setParams(List<NameValuePairsSchema> params) {
         this.params = params;
     }
 

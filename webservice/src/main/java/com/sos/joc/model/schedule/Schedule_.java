@@ -3,7 +3,6 @@ package com.sos.joc.model.schedule;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -42,7 +41,7 @@ public class Schedule_ {
      * 
      */
     @JsonProperty("path")
-    private Pattern path;
+    private String path;
     /**
      * 
      * (Required)
@@ -64,7 +63,7 @@ public class Schedule_ {
      * 
      */
     @JsonProperty("substitutedBy")
-    private Pattern substitutedBy;
+    private String substitutedBy;
     /**
      * configuration status
      * <p>
@@ -86,7 +85,7 @@ public class Schedule_ {
      *     The path
      */
     @JsonProperty("path")
-    public Pattern getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -100,7 +99,7 @@ public class Schedule_ {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Pattern path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -161,7 +160,7 @@ public class Schedule_ {
      *     The substitutedBy
      */
     @JsonProperty("substitutedBy")
-    public Pattern getSubstitutedBy() {
+    public String getSubstitutedBy() {
         return substitutedBy;
     }
 
@@ -174,7 +173,7 @@ public class Schedule_ {
      *     The substitutedBy
      */
     @JsonProperty("substitutedBy")
-    public void setSubstitutedBy(Pattern substitutedBy) {
+    public void setSubstitutedBy(String substitutedBy) {
         this.substitutedBy = substitutedBy;
     }
 

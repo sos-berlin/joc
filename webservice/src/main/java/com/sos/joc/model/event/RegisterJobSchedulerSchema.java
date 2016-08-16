@@ -3,7 +3,6 @@ package com.sos.joc.model.event;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -62,7 +61,7 @@ public class RegisterJobSchedulerSchema {
      * 
      */
     @JsonProperty("agent")
-    private Pattern agent;
+    private String agent;
     @JsonIgnore
     private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
@@ -151,7 +150,7 @@ public class RegisterJobSchedulerSchema {
      *     The agent
      */
     @JsonProperty("agent")
-    public Pattern getAgent() {
+    public String getAgent() {
         return agent;
     }
 
@@ -162,7 +161,7 @@ public class RegisterJobSchedulerSchema {
      *     The agent
      */
     @JsonProperty("agent")
-    public void setAgent(Pattern agent) {
+    public void setAgent(String agent) {
         this.agent = agent;
     }
 

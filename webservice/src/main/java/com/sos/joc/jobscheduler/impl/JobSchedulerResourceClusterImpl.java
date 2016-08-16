@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import org.apache.log4j.Logger;
+
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -18,6 +20,7 @@ import com.sos.joc.response.JocCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl  extends JOCResourceImpl implements IJobSchedulerResourceCluster {
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
 
     @Override
     public JobschedulerClusterResponse postJobschedulerCluster(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
@@ -25,14 +28,19 @@ public class JobSchedulerResourceClusterImpl  extends JOCResourceImpl implements
         JobschedulerClusterResponse jobschedulerClusterResponse;
         jobschedulerUser = new JobSchedulerUser(accessToken);
 
-        if (jobschedulerUser.isTimedOut()) {
-            return JobschedulerClusterResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
+        try {
+            if (!jobschedulerUser.isAuthenticated()) {
+                return JobschedulerClusterResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
+            }
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerClusterResponse.responseStatus440(JocCockpitResponse.getError401Schema(jobschedulerUser,e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerClusterResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
         }
 
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JobschedulerClusterResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
-        
+
         if (!getPermissons().getJobschedulerMasterCluster().getView().isClusterStatus()){
             return JobschedulerClusterResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
         }

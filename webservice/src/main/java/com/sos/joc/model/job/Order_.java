@@ -3,7 +3,6 @@ package com.sos.joc.model.job;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -31,7 +30,7 @@ public class Order_ {
      * 
      */
     @JsonProperty("path")
-    private Pattern path;
+    private String path;
     @JsonProperty("title")
     private String title;
     @JsonIgnore
@@ -47,7 +46,7 @@ public class Order_ {
      *     The path
      */
     @JsonProperty("path")
-    public Pattern getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -61,7 +60,7 @@ public class Order_ {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Pattern path) {
+    public void setPath(String path) {
         this.path = path;
     }
 

@@ -2,11 +2,14 @@ package com.sos.joc.jobscheduler.impl;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
+import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters.JobschedulerAgentClustersResponse;
 import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler_;
 import com.sos.joc.model.jobscheduler.State;
@@ -14,26 +17,32 @@ import com.sos.joc.response.JobSchedulerResponse;
 import com.sos.joc.response.JocCockpitResponse;
 
 public class JobSchedulerResource extends JOCResourceImpl{
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
+    private String accessToken;
     
     public JobSchedulerResource(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) {
         super();
-        this.accessToken = accessToken;
         this.jobSchedulerDefaultBody = jobSchedulerDefaultBody;
         jobschedulerUser = new JobSchedulerUser(accessToken);
+        this.accessToken = accessToken;
     }
 
-    private String accessToken;
     JobSchedulerDefaultBody jobSchedulerDefaultBody;
     
-    public JobSchedulerResponse postJobscheduler (){
+    public JobSchedulerResponse postJobscheduler (){    
 
-        if (jobschedulerUser.isTimedOut()) {
-            return JobSchedulerResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
+        try {
+            if (!jobschedulerUser.isAuthenticated()) {
+                return JobSchedulerResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
+            }
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+            LOGGER.error(e.getMessage());
+            return JobSchedulerResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken,e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return JobSchedulerResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
         }
 
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JobSchedulerResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
 
         if (!getPermissons().getJobschedulerMaster().getView().isStatus()) {
             return JobSchedulerResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));

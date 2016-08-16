@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -44,7 +43,7 @@ public class StartJobSchema {
      * 
      */
     @JsonProperty("job")
-    private Pattern job;
+    private String job;
     /**
      * Field to comment manually job starts which can be logged.
      * 
@@ -88,7 +87,7 @@ public class StartJobSchema {
      *     The job
      */
     @JsonProperty("job")
-    public Pattern getJob() {
+    public String getJob() {
         return job;
     }
 
@@ -102,7 +101,7 @@ public class StartJobSchema {
      *     The job
      */
     @JsonProperty("job")
-    public void setJob(Pattern job) {
+    public void setJob(String job) {
         this.job = job;
     }
 

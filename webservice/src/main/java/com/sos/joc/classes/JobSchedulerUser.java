@@ -6,16 +6,13 @@ import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayerReporting;
 
-
 public class JobSchedulerUser {
 
     private String accessToken;
-    private boolean wasAuthenticated;
     private SOSShiroCurrentUser sosShiroCurrentUser;
 
     public JobSchedulerUser(String accessToken) {
         super();
-        this.wasAuthenticated=false;
         this.accessToken = accessToken;
     }
 
@@ -27,38 +24,31 @@ public class JobSchedulerUser {
     }
 
     public boolean isAuthenticated() {
-        if (sosShiroCurrentUser == null  && SOSServicePermissionShiro.currentUsersList != null) {
+        if (sosShiroCurrentUser == null && SOSServicePermissionShiro.currentUsersList != null) {
             sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(accessToken);
         }
         resetTimeOut();
-        wasAuthenticated = wasAuthenticated || (sosShiroCurrentUser != null);
 
         return (sosShiroCurrentUser != null);
     }
 
-    public boolean isTimedOut() {
-        if (sosShiroCurrentUser == null && SOSServicePermissionShiro.currentUsersList != null) {
-            sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(accessToken);
-        }
-
-        return (wasAuthenticated && (sosShiroCurrentUser == null));
-    }
  
+
     public String getAccessToken() {
         return accessToken;
     }
 
-    public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws Exception{
+    public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws Exception {
         if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier) == null) {
             DBLayerReporting dbLayer = new DBLayerReporting(sosShiroCurrentUser.getSosHibernateConnection());
-            getSosShiroCurrentUser().addSchedulerInstanceDBItem (jobSchedulerIdentifier,dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
+            getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerIdentifier, dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
         }
         return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier);
     }
-    
-    private void resetTimeOut(){
-        if (sosShiroCurrentUser != null){
-           sosShiroCurrentUser.getCurrentSubject().getSession().touch();
+
+    private void resetTimeOut() {
+        if (sosShiroCurrentUser != null) {
+            sosShiroCurrentUser.getCurrentSubject().getSession().touch();
         }
     }
 }

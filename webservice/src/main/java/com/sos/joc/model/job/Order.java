@@ -4,7 +4,6 @@ package com.sos.joc.model.job;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -40,7 +39,7 @@ public class Order {
      * 
      */
     @JsonProperty("path")
-    private Pattern path;
+    private String path;
     /**
      * 
      * (Required)
@@ -56,7 +55,7 @@ public class Order {
      * 
      */
     @JsonProperty("jobChain")
-    private Pattern jobChain;
+    private String jobChain;
     /**
      * name of the current node
      * (Required)
@@ -85,7 +84,7 @@ public class Order {
      *     The path
      */
     @JsonProperty("path")
-    public Pattern getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -99,7 +98,7 @@ public class Order {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Pattern path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -137,7 +136,7 @@ public class Order {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public Pattern getJobChain() {
+    public String getJobChain() {
         return jobChain;
     }
 
@@ -151,7 +150,7 @@ public class Order {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public void setJobChain(Pattern jobChain) {
+    public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
 

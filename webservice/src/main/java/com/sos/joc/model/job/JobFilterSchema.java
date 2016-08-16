@@ -3,7 +3,6 @@ package com.sos.joc.model.job;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -41,7 +40,7 @@ public class JobFilterSchema {
      * 
      */
     @JsonProperty("job")
-    private Pattern job;
+    private String job;
     /**
      * compact parameter
      * <p>
@@ -83,7 +82,7 @@ public class JobFilterSchema {
      *     The job
      */
     @JsonProperty("job")
-    public Pattern getJob() {
+    public String getJob() {
         return job;
     }
 
@@ -97,7 +96,7 @@ public class JobFilterSchema {
      *     The job
      */
     @JsonProperty("job")
-    public void setJob(Pattern job) {
+    public void setJob(String job) {
         this.job = job;
     }
 

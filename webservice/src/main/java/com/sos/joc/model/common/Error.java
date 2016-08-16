@@ -4,7 +4,6 @@ package com.sos.joc.model.common;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -43,7 +42,7 @@ public class Error {
      * 
      */
     @JsonProperty("path")
-    private Pattern path;
+    private String path;
     /**
      * 
      * (Required)
@@ -99,7 +98,7 @@ public class Error {
      *     The path
      */
     @JsonProperty("path")
-    public Pattern getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -113,7 +112,7 @@ public class Error {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Pattern path) {
+    public void setPath(String path) {
         this.path = path;
     }
 

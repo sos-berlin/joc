@@ -1,4 +1,4 @@
-package com.sos.jocjobscheduler.impl;
+package com.sos.joc.jobscheduler.impl;
  
 import static org.junit.Assert.*;
  
@@ -11,8 +11,8 @@ import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters.Jobs
 import com.sos.joc.model.jobscheduler.AgentClustersVSchema;
 
 public class JobSchedulerResourceAgentClustersImplTest {
-    private static final String LDAP_PASSWORD = "sos01";
-    private static final String LDAP_USER = "SOS01";
+    private static final String LDAP_PASSWORD = "root";
+    private static final String LDAP_USER = "secret";
      
     @Test
     public void postjobschedulerAgentClustersTest() throws Exception   {

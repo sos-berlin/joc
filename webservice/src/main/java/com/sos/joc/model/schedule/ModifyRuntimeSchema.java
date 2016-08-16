@@ -3,7 +3,6 @@ package com.sos.joc.model.schedule;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -39,7 +38,7 @@ public class ModifyRuntimeSchema {
      * 
      */
     @JsonProperty("schedule")
-    private Pattern schedule;
+    private String schedule;
     /**
      * Field to comment manually job modifications which can be logged.
      * 
@@ -66,7 +65,7 @@ public class ModifyRuntimeSchema {
      *     The schedule
      */
     @JsonProperty("schedule")
-    public Pattern getSchedule() {
+    public String getSchedule() {
         return schedule;
     }
 
@@ -80,7 +79,7 @@ public class ModifyRuntimeSchema {
      *     The schedule
      */
     @JsonProperty("schedule")
-    public void setSchedule(Pattern schedule) {
+    public void setSchedule(String schedule) {
         this.schedule = schedule;
     }
 

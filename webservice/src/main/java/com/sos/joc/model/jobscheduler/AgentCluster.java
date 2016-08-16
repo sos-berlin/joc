@@ -3,7 +3,6 @@ package com.sos.joc.model.jobscheduler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -29,7 +28,7 @@ public class AgentCluster {
      * 
      */
     @JsonProperty("agentCluster")
-    private Pattern agentCluster;
+    private String agentCluster;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -42,7 +41,7 @@ public class AgentCluster {
      *     The agentCluster
      */
     @JsonProperty("agentCluster")
-    public Pattern getAgentCluster() {
+    public String getAgentCluster() {
         return agentCluster;
     }
 
@@ -55,7 +54,7 @@ public class AgentCluster {
      *     The agentCluster
      */
     @JsonProperty("agentCluster")
-    public void setAgentCluster(Pattern agentCluster) {
+    public void setAgentCluster(String agentCluster) {
         this.agentCluster = agentCluster;
     }
 

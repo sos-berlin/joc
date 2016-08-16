@@ -1,4 +1,4 @@
-package com.sos.jocjobscheduler.impl;
+package com.sos.joc.jobscheduler.impl;
  
 import static org.junit.Assert.*;
  
@@ -12,8 +12,8 @@ import com.sos.joc.model.jobscheduler.DbSchema;
 import com.sos.joc.model.jobscheduler.Database.Dbms;
 
 public class JobSchedulerResourceDbImplTest {
-    private static final String LDAP_PASSWORD = "sos01";
-    private static final String LDAP_USER = "SOS01";
+    private static final String LDAP_PASSWORD = "root";
+    private static final String LDAP_USER = "secret";
      
     @Test
     public void postjobschedulerDbTest() throws Exception   {

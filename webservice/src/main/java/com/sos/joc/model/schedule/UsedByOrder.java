@@ -3,7 +3,6 @@ package com.sos.joc.model.schedule;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -30,7 +29,7 @@ public class UsedByOrder {
      * 
      */
     @JsonProperty("jobChain")
-    private Pattern jobChain;
+    private String jobChain;
     @JsonProperty("orderId")
     private String orderId;
     @JsonIgnore
@@ -45,7 +44,7 @@ public class UsedByOrder {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public Pattern getJobChain() {
+    public String getJobChain() {
         return jobChain;
     }
 
@@ -58,7 +57,7 @@ public class UsedByOrder {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public void setJobChain(Pattern jobChain) {
+    public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
 

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -44,9 +43,9 @@ public class JobChainFilterSchema {
      * 
      */
     @JsonProperty("jobChain")
-    private Pattern jobChain;
+    private String jobChain;
     @JsonProperty("orders")
-    private List<Pattern> orders = new ArrayList<Pattern>();
+    private List<String> orders = new ArrayList<String>();
     /**
      * compact parameter
      * <p>
@@ -88,7 +87,7 @@ public class JobChainFilterSchema {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public Pattern getJobChain() {
+    public String getJobChain() {
         return jobChain;
     }
 
@@ -102,7 +101,7 @@ public class JobChainFilterSchema {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public void setJobChain(Pattern jobChain) {
+    public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
 
@@ -112,7 +111,7 @@ public class JobChainFilterSchema {
      *     The orders
      */
     @JsonProperty("orders")
-    public List<Pattern> getOrders() {
+    public List<String> getOrders() {
         return orders;
     }
 
@@ -122,7 +121,7 @@ public class JobChainFilterSchema {
      *     The orders
      */
     @JsonProperty("orders")
-    public void setOrders(List<Pattern> orders) {
+    public void setOrders(List<String> orders) {
         this.orders = orders;
     }
 

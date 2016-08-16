@@ -4,7 +4,6 @@ package com.sos.joc.model.order;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -53,7 +52,7 @@ public class Step {
      * 
      */
     @JsonProperty("job")
-    private Pattern job;
+    private String job;
     /**
      * non negative integer
      * <p>
@@ -137,7 +136,7 @@ public class Step {
      *     The job
      */
     @JsonProperty("job")
-    public Pattern getJob() {
+    public String getJob() {
         return job;
     }
 
@@ -151,7 +150,7 @@ public class Step {
      *     The job
      */
     @JsonProperty("job")
-    public void setJob(Pattern job) {
+    public void setJob(String job) {
         this.job = job;
     }
 

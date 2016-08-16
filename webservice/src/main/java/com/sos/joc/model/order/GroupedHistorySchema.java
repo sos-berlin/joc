@@ -3,7 +3,6 @@ package com.sos.joc.model.order;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -41,7 +40,7 @@ public class GroupedHistorySchema {
      * 
      */
     @JsonProperty("path")
-    private Pattern path;
+    private String path;
     /**
      * 
      * (Required)
@@ -57,7 +56,7 @@ public class GroupedHistorySchema {
      * 
      */
     @JsonProperty("jobChain")
-    private Pattern jobChain;
+    private String jobChain;
     /**
      * non negative integer
      * <p>
@@ -89,7 +88,7 @@ public class GroupedHistorySchema {
      *     The path
      */
     @JsonProperty("path")
-    public Pattern getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -103,7 +102,7 @@ public class GroupedHistorySchema {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Pattern path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -141,7 +140,7 @@ public class GroupedHistorySchema {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public Pattern getJobChain() {
+    public String getJobChain() {
         return jobChain;
     }
 
@@ -155,7 +154,7 @@ public class GroupedHistorySchema {
      *     The jobChain
      */
     @JsonProperty("jobChain")
-    public void setJobChain(Pattern jobChain) {
+    public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
 

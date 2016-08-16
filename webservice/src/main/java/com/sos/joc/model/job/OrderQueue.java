@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
+import com.sos.joc.model.common.NameValuePairsSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -80,8 +81,14 @@ public class OrderQueue {
      */
     @JsonProperty("priority")
     private Integer priority;
+    /**
+     * params or environment variables
+     * <p>
+     * 
+     * 
+     */
     @JsonProperty("params")
-    private List<Object> params = new ArrayList<Object>();
+    private List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
     /**
      * the type of the order
      * 
@@ -292,22 +299,28 @@ public class OrderQueue {
     }
 
     /**
+     * params or environment variables
+     * <p>
+     * 
      * 
      * @return
      *     The params
      */
     @JsonProperty("params")
-    public List<Object> getParams() {
+    public List<NameValuePairsSchema> getParams() {
         return params;
     }
 
     /**
+     * params or environment variables
+     * <p>
+     * 
      * 
      * @param params
      *     The params
      */
     @JsonProperty("params")
-    public void setParams(List<Object> params) {
+    public void setParams(List<NameValuePairsSchema> params) {
         this.params = params;
     }
 

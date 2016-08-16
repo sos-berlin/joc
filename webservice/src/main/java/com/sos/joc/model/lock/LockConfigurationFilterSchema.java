@@ -3,7 +3,6 @@ package com.sos.joc.model.lock;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -43,7 +42,7 @@ public class LockConfigurationFilterSchema {
      * 
      */
     @JsonProperty("lock")
-    private Pattern lock;
+    private String lock;
     @JsonProperty("mime")
     private LockConfigurationFilterSchema.Mime mime = LockConfigurationFilterSchema.Mime.fromValue("xml");
     @JsonIgnore
@@ -79,7 +78,7 @@ public class LockConfigurationFilterSchema {
      *     The lock
      */
     @JsonProperty("lock")
-    public Pattern getLock() {
+    public String getLock() {
         return lock;
     }
 
@@ -93,7 +92,7 @@ public class LockConfigurationFilterSchema {
      *     The lock
      */
     @JsonProperty("lock")
-    public void setLock(Pattern lock) {
+    public void setLock(String lock) {
         this.lock = lock;
     }
 

@@ -3,6 +3,9 @@ package com.sos.joc.jobscheduler.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
+
+import org.apache.log4j.Logger;
+
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -14,12 +17,12 @@ import com.sos.joc.model.jobscheduler.ClusterMemberTypeSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler;
 import com.sos.joc.model.jobscheduler.MastersPSchema;
 import com.sos.joc.model.jobscheduler.Os;
-import com.sos.joc.model.jobscheduler.Os.Architecture;
 import com.sos.joc.model.jobscheduler.Supervisor;
 import com.sos.joc.response.JocCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersPImpl  extends JOCResourceImpl implements IJobSchedulerResourceClusterMembersP {
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
 
     @Override
     public JobschedulerClusterMembersPResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
@@ -27,14 +30,19 @@ public class JobSchedulerResourceClusterMembersPImpl  extends JOCResourceImpl im
         JobschedulerClusterMembersPResponse jobschedulerClusterResponse;
         jobschedulerUser = new JobSchedulerUser(accessToken);
 
-        if (jobschedulerUser.isTimedOut()) {
-            return JobschedulerClusterMembersPResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
+        try {
+            if (!jobschedulerUser.isAuthenticated()) {
+                return JobschedulerClusterMembersPResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
+            }
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerClusterMembersPResponse.responseStatus440(JocCockpitResponse.getError401Schema(jobschedulerUser,e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerClusterMembersPResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
         }
 
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JobschedulerClusterMembersPResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
-        
+
         if (!getPermissons().getJobschedulerMasterCluster().getView().isClusterStatus()){
             return JobschedulerClusterMembersPResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
         }
@@ -73,7 +81,7 @@ public class JobSchedulerResourceClusterMembersPImpl  extends JOCResourceImpl im
             jobscheduler.setClusterType(clusterMemberTypeSchema);
             
             Os os = new Os();
-            os.setArchitecture(Architecture._64);
+            os.setArchitecture("64");
             os.setDistribution("myDistribution");
             os.setName("myName");
             jobscheduler.setOs(os);
@@ -102,7 +110,7 @@ public class JobSchedulerResourceClusterMembersPImpl  extends JOCResourceImpl im
             jobscheduler.setClusterType(clusterMemberTypeSchema2);
             
             Os os2 = new Os();
-            os2.setArchitecture(Architecture._32);
+            os2.setArchitecture("32");
             os2.setDistribution("myDistribution2");
             os2.setName("myName2");
             jobscheduler.setOs(os2);

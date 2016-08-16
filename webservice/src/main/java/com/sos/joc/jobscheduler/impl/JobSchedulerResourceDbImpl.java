@@ -4,6 +4,8 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import org.apache.log4j.Logger;
+
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -21,21 +23,27 @@ import com.sos.joc.response.JocCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceDbImpl  extends JOCResourceImpl implements IJobSchedulerResourceDb {
+    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
 
     @Override
     public JobschedulerDbResponse postJobschedulerDb(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
 
         JobschedulerDbResponse jobschedulerDbResponse;
         jobschedulerUser = new JobSchedulerUser(accessToken);
-
-        if (jobschedulerUser.isTimedOut()) {
-            return JobschedulerDbResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken));
-        }
-
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JobschedulerDbResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
         
+        try {
+            if (!jobschedulerUser.isAuthenticated()) {
+                return JobschedulerDbResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
+            }
+        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerDbResponse.responseStatus440(JocCockpitResponse.getError401Schema(jobschedulerUser,e.getMessage()));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            return JobschedulerDbResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
+        }
+
+
         if (jobSchedulerDefaultBody.getJobschedulerId() == null) {
             return JobschedulerDbResponse.responseStatus420(JocCockpitResponse.getError420Schema("schedulerId is null"));
         }
