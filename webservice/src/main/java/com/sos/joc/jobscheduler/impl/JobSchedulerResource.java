@@ -4,22 +4,19 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
-import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters.JobschedulerAgentClustersResponse;
 import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler_;
 import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.response.JobSchedulerResponse;
-import com.sos.joc.response.JocCockpitResponse;
+import com.sos.joc.response.JOCDefaultResponse;
+import com.sos.joc.response.JOCCockpitResponse;
 
-public class JobSchedulerResource extends JOCResourceImpl{
+public class JobSchedulerResource extends JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
     private String accessToken;
-    
+
     public JobSchedulerResource(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) {
         super();
         this.jobSchedulerDefaultBody = jobSchedulerDefaultBody;
@@ -28,35 +25,13 @@ public class JobSchedulerResource extends JOCResourceImpl{
     }
 
     JobSchedulerDefaultBody jobSchedulerDefaultBody;
-    
-    public JobSchedulerResponse postJobscheduler (){    
 
+    public JOCDefaultResponse postJobscheduler() {
+        LOGGER.debug("init Jobscheduler");
         try {
-            if (!jobschedulerUser.isAuthenticated()) {
-                return JobSchedulerResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-            }
-        } catch (org.apache.shiro.session.ExpiredSessionException e) {
-            LOGGER.error(e.getMessage());
-            return JobSchedulerResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken,e.getMessage()));
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return JobSchedulerResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
-        }
-
-
-        if (!getPermissons().getJobschedulerMaster().getView().isStatus()) {
-            return JobSchedulerResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
-
-        if (jobSchedulerDefaultBody.getJobschedulerId() == null) {
-            return JobSchedulerResponse.responseStatus420(JocCockpitResponse.getError420Schema("schedulerId is null"));
-        }
-
-        try {
-            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
-
-            if (dbItemInventoryInstance == null) {
-                return JobSchedulerResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",jobSchedulerDefaultBody.getJobschedulerId())));
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerDefaultBody.getJobschedulerId());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
             }
 
             Jobscheduler200VSchema entity = new Jobscheduler200VSchema();
@@ -66,20 +41,19 @@ public class JobSchedulerResource extends JOCResourceImpl{
             jobscheduler.setJobschedulerId(jobSchedulerDefaultBody.getJobschedulerId());
             jobscheduler.setPort(dbItemInventoryInstance.getPort());
             jobscheduler.setStartedAt(dbItemInventoryInstance.getStartTime());
-            
-            //TODO JOC Cockpit Webservice
-            
+
+            // TODO JOC Cockpit Webservice
+
             State state = new State();
             state.setSeverity(State.Severity._0);
             state.setText(State.Text.PAUSED);
             jobscheduler.setState(state);
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
             entity.setJobscheduler(jobscheduler);
-            JobSchedulerResponse jobschedulerResponse = JobSchedulerResponse.responseStatus200(entity);
-            return jobschedulerResponse;
+            return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (Exception e) {
-            return JobSchedulerResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
         }
     }
 

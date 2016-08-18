@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerClusterBody;
-import com.sos.joc.response.JocCockpitResponse;
+import com.sos.joc.response.JOCCockpitResponse;
 
 public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     
@@ -15,7 +15,7 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Path("cluster/terminate")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerTerminate(
+    public JOCCockpitResponse postJobschedulerTerminate(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception;
 
     
@@ -23,7 +23,7 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Path("cluster/terminate_and_restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerRestartTerminate(
+    public JOCCockpitResponse postJobschedulerRestartTerminate(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception;
 
     
@@ -32,7 +32,7 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Path("cluster/terminate_failsafe")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerTerminateFailSafe(
+    public JOCCockpitResponse postJobschedulerTerminateFailSafe(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception;
  
         

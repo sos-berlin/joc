@@ -10,12 +10,12 @@ import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentsImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgent;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentsBody;
-import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgents.JobschedulerAgentsResponse;
 import com.sos.joc.model.jobscheduler.AgentsVSchema;
+import com.sos.joc.response.JOCDefaultResponse;
 
 public class JobSchedulerResourceAgentsImplTest {
-    private static final String LDAP_PASSWORD = "root";
-    private static final String LDAP_USER = "secret";
+    private static final String LDAP_PASSWORD = "secret";
+    private static final String LDAP_USER = "root";
      
     @Test
     public void postjobschedulerAgentsTest() throws Exception   {
@@ -30,7 +30,7 @@ public class JobSchedulerResourceAgentsImplTest {
         jobSchedulerAgentsBody.setAgents(agents);
         jobSchedulerAgentsBody.setJobschedulerId("scheduler_current");
         JobSchedulerResourceAgentsImpl jobschedulerResourceAgentsImpl = new JobSchedulerResourceAgentsImpl();
-        JobschedulerAgentsResponse jobschedulerAgentsResponse = jobschedulerResourceAgentsImpl.postJobschedulerAgents(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerAgentsBody);
+        JOCDefaultResponse jobschedulerAgentsResponse = jobschedulerResourceAgentsImpl.postJobschedulerAgents(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerAgentsBody);
         AgentsVSchema agentsVSchema = (AgentsVSchema) jobschedulerAgentsResponse.getEntity();
         assertEquals("postjobschedulerClusterTest", "http://galadriel:4445", agentsVSchema.getAgents().get(0).getUrl());
      }

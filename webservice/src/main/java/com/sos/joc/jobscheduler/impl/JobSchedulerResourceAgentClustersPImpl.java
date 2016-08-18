@@ -4,14 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
-import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.jitl.reporting.db.DBLayer;
+
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentClustersBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
-import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters.JobschedulerAgentClustersResponse;
 import com.sos.joc.model.jobscheduler.Agent;
 import com.sos.joc.model.jobscheduler.AgentClusterPSchema;
 import com.sos.joc.model.jobscheduler.AgentClustersPSchema;
@@ -20,44 +16,20 @@ import com.sos.joc.model.jobscheduler.Os;
 import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.model.jobscheduler.State_;
-import com.sos.joc.response.JocCockpitResponse;
+import com.sos.joc.response.JOCDefaultResponse;
+import com.sos.joc.response.JOCCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
 
     @Override
-    public JobschedulerAgentClustersPResponse postJobschedulerAgentClusters(String accessToken, JobSchedulerAgentClustersBody jobSchedulerAgentClustersBody) throws Exception {
-        JobschedulerAgentClustersPResponse jobschedulerAgentClustersResponse;
-        jobschedulerUser = new JobSchedulerUser(accessToken);
-
+    public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, JobSchedulerAgentClustersBody jobSchedulerAgentClustersBody) {
+        LOGGER.debug("init JobschedulerAgentClustersP");
         try {
-            if (!jobschedulerUser.isAuthenticated()) {
-                return JobschedulerAgentClustersPResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-            }
-        } catch (org.apache.shiro.session.ExpiredSessionException e) {
-            LOGGER.error(e.getMessage());
-            return JobschedulerAgentClustersPResponse.responseStatus440(JocCockpitResponse.getError401Schema(jobschedulerUser,e.getMessage()));
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return JobschedulerAgentClustersPResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
-        }
-
-
-        if (!getPermissons().getJobschedulerUniversalAgent().getView().isStatus()) {
-            return JobschedulerAgentClustersPResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
-
-        if (jobSchedulerAgentClustersBody.getJobschedulerId() == null) {
-            return JobschedulerAgentClustersPResponse.responseStatus420(JocCockpitResponse.getError420Schema("schedulerId is null"));
-        }
-
-        try {
-
-            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerAgentClustersBody.getJobschedulerId()));
-
-            if (dbItemInventoryInstance == null) {
-                return JobschedulerAgentClustersPResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerAgentClustersBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentClustersBody.getJobschedulerId());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
             }
 
             AgentClustersPSchema entity = new AgentClustersPSchema();
@@ -65,7 +37,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             // TODO JOC Cockpit Webservice
 
             entity.setDeliveryDate(new Date());
-            
+
             ArrayList<AgentClusterPSchema> listOfAgentClusters = new ArrayList<AgentClusterPSchema>();
 
             AgentClusterPSchema agentClusterPSchema = new AgentClusterPSchema();
@@ -91,12 +63,11 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             agent1.setState(state1);
             agent1.setSurveyDate(new Date());
             agent1.setUrl("myUrl");
-            agent1.setVersion("myVersion");     
+            agent1.setVersion("myVersion");
             agentClusterPSchema.setAgents(listOfAgents);
 
-  
             listOfAgents.add(agent1);
-            
+
             Agent agent2 = new Agent();
             agent2.setHost("myHost");
             Os os2 = new Os();
@@ -112,15 +83,15 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             agent2.setState(state1);
             agent2.setSurveyDate(new Date());
             agent2.setUrl("myUrl");
-            agent2.setVersion("myVersion");            
+            agent2.setVersion("myVersion");
             listOfAgents.add(agent2);
-            
+
             agentClusterPSchema.setAgents(listOfAgents);
             NumOfAgents numOfAgents = new NumOfAgents();
             numOfAgents.setAny(-1);
             numOfAgents.setRunning(-1);
             agentClusterPSchema.setNumOfAgents(numOfAgents);
-  
+
             State_ state = new State_();
             state.setSeverity(State_.Severity._2);
             state.setText(State_.Text.ALL_AGENTS_ARE_UNREACHABLE);
@@ -131,12 +102,10 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
 
             // TODO get a list of agents and set the data.
 
-            jobschedulerAgentClustersResponse = JobschedulerAgentClustersPResponse.responseStatus200(entity);
-
-            return jobschedulerAgentClustersResponse;
+            return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
 
-            return JobschedulerAgentClustersPResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
         }
 
     }

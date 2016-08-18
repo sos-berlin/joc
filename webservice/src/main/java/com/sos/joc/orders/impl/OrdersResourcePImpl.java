@@ -8,63 +8,29 @@ import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.order.Order;
 import com.sos.joc.model.order.OrdersPSchema;
 import com.sos.joc.orders.post.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceP;
-import com.sos.joc.orders.resource.IOrdersResource.OrdersResponse;
-import com.sos.joc.response.JocCockpitResponse;
+import com.sos.joc.response.JOCCockpitResponse;
+import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
 public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResourceP {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourcePImpl.class);
 
     @Override
-    public OrdersResponseP postOrdersP(String accessToken, OrdersBody ordersBody) throws Exception {
-
-        OrdersResponseP ordersResponse;
-        jobschedulerUser = new JobSchedulerUser(accessToken);
-
-        try {
-            if (!jobschedulerUser.isAuthenticated()) {
-                return OrdersResponseP.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-            }
-        } catch (org.apache.shiro.session.ExpiredSessionException e) {
-            LOGGER.error(e.getMessage());
-            return OrdersResponseP.responseStatus440(JocCockpitResponse.getError401Schema(accessToken,e.getMessage()));
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return OrdersResponseP.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
-        }
-
-        if (!getPermissons().getOrder().getView().isStatus()) {
-            return OrdersResponseP.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
-
-        if (ordersBody.getJobschedulerId() == null) {
-            return OrdersResponseP.responseStatus420(JocCockpitResponse.getError420Schema("schedulerId is null"));
-        }
+    public JOCDefaultResponse postOrdersP(String accessToken, OrdersBody ordersBody) throws Exception {
+        LOGGER.debug("init OrdersP");
+        init(accessToken,ordersBody.getJobschedulerId());       
 
         try {
-
-            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(ordersBody.getJobschedulerId()));
-
-            if (dbItemInventoryInstance == null) {
-                return OrdersResponseP.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s", ordersBody.getJobschedulerId(),
-                        DBLayer.TABLE_INVENTORY_INSTANCES)));
-            }
 
             OrdersPSchema entity = new OrdersPSchema();
 
             // TODO JOC Cockpit Webservice
-            String actProcessingState = "getValueFromScheduler";
-
             entity.setDeliveryDate(new Date());
             entity.setSurveyDate(new Date());
             List<Order> listOrder = new ArrayList<Order>();
@@ -118,10 +84,9 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                 entity.setOrders(listOrder);
 
             }
-            ordersResponse = OrdersResponseP.responseStatus200(entity);
-            return ordersResponse;
+            return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            return OrdersResponseP.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
 
         }
     }

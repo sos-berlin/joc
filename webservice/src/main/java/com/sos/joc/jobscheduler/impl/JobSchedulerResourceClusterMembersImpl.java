@@ -6,12 +6,8 @@ import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembers;
 import com.sos.joc.model.jobscheduler.Jobscheduler_;
@@ -19,48 +15,20 @@ import com.sos.joc.model.jobscheduler.MastersVSchema;
 import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Severity;
 import com.sos.joc.model.jobscheduler.State.Text;
-import com.sos.joc.response.JocCockpitResponse;
+import com.sos.joc.response.JOCDefaultResponse;
+import com.sos.joc.response.JOCCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
 
     @Override
-    public JobschedulerClusterMembersResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception {
-
-        JobschedulerClusterMembersResponse jobschedulerClusterResponse;
-        jobschedulerUser = new JobSchedulerUser(accessToken);
-
+    public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) {
+        LOGGER.debug("init JobschedulerClusterMembers");
         try {
-            if (!jobschedulerUser.isAuthenticated()) {
-                return JobschedulerClusterMembersResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-            }
-        } catch (org.apache.shiro.session.ExpiredSessionException e) {
-            LOGGER.error(e.getMessage());
-            return JobschedulerClusterMembersResponse.responseStatus440(JocCockpitResponse.getError401Schema(jobschedulerUser,e.getMessage()));
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return JobschedulerClusterMembersResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
-        }
-
-
-        if (!getPermissons().getJobschedulerMaster().getView().isStatus()) {
-            return JobschedulerClusterMembersResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
-
-        if (jobSchedulerDefaultBody.getJobschedulerId() == null) {
-            return JobschedulerClusterMembersResponse.responseStatus420(JocCockpitResponse.getError420Schema("schedulerId is null"));
-        }
-        if (!getPermissons().getJobschedulerMasterCluster().getView().isClusterStatus()) {
-            return JobschedulerClusterMembersResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
-
-        try {
-
-            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));
-
-            if (dbItemInventoryInstance == null) {
-                return JobschedulerClusterMembersResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerDefaultBody.getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerDefaultBody.getJobschedulerId());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
@@ -84,7 +52,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                 State state = new State();
                 state.setSeverity(Severity._0);
                 state.setText(Text.RUNNING);
-                if ("yes".equals(jocXmlCommand.getAttribut("dead"))){
+                if ("yes".equals(jocXmlCommand.getAttribut("dead"))) {
                     state.setSeverity(Severity._1);
                     state.setText(Text.DEAD);
                 }
@@ -96,11 +64,9 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
 
             entity.setMasters(masters);
 
-            jobschedulerClusterResponse = JobschedulerClusterMembersResponse.responseStatus200(entity);
-
-            return jobschedulerClusterResponse;
+            return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            return JobschedulerClusterMembersResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
         }
 
     }

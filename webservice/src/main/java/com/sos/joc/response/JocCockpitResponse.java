@@ -9,9 +9,9 @@ import com.sos.joc.model.common.Error420Schema;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.common.OkSchema;
 
-public class JocCockpitResponse extends com.sos.joc.support.ResponseWrapper {
+public class JOCCockpitResponse extends com.sos.joc.support.ResponseWrapper {
 
-    private JocCockpitResponse(Response delegate) {
+    private JOCCockpitResponse(Response delegate) {
         super(delegate);
     }
 
@@ -77,7 +77,7 @@ public class JocCockpitResponse extends com.sos.joc.support.ResponseWrapper {
         return entity;
     }
 
-    public static JocCockpitResponse responseStatus200(Date surveyDate) {
+    public static JOCCockpitResponse responseStatus200(Date surveyDate) {
         Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", "application/json");
         OkSchema entity = new OkSchema();
 
@@ -88,37 +88,37 @@ public class JocCockpitResponse extends com.sos.joc.support.ResponseWrapper {
         entity.setDeliveryDate(new Date());
         entity.setOk(true);
         responseBuilder.entity(entity);
-        return new JocCockpitResponse(responseBuilder.build());
+        return new JOCCockpitResponse(responseBuilder.build());
 
     }
 
-    public static JocCockpitResponse responseStatus420(String message, Date surveyDate) {
+    public static JOCCockpitResponse responseStatus420(String message, Date surveyDate) {
         Response.ResponseBuilder responseBuilder = Response.status(420).header("Content-Type", "application/json");
         responseBuilder.entity(getError420Schema(message, surveyDate));
-        return new JocCockpitResponse(responseBuilder.build());
+        return new JOCCockpitResponse(responseBuilder.build());
     }
 
-    public static JocCockpitResponse responseStatus420(String message) {
-        return JocCockpitResponse.responseStatus420(message, null);
+    public static JOCCockpitResponse responseStatus420(String message) {
+        return JOCCockpitResponse.responseStatus420(message, null);
     }
 
-    public static JocCockpitResponse responseStatus401(String accessToken) {
+    public static JOCCockpitResponse responseStatus401(String accessToken) {
         Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", "application/json");
         responseBuilder.entity(getError401Schema(accessToken));
-        return new JocCockpitResponse(responseBuilder.build());
+        return new JOCCockpitResponse(responseBuilder.build());
     }
 
-    public static JocCockpitResponse responseStatus403(JobSchedulerUser sosJobschedulerUser) {
+    public static JOCCockpitResponse responseStatus403(JobSchedulerUser sosJobschedulerUser) {
         Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", "application/json");
         responseBuilder.entity(getError401Schema(sosJobschedulerUser));
-        return new JocCockpitResponse(responseBuilder.build());
+        return new JOCCockpitResponse(responseBuilder.build());
     }
 
-    public static JocCockpitResponse responseStatus440(JobSchedulerUser sosJobschedulerUser, String message) {
+    public static JOCCockpitResponse responseStatus440(JobSchedulerUser sosJobschedulerUser, String message) {
         Response.ResponseBuilder responseBuilder = Response.status(440).header("Content-Type", "application/json");
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = getError401Schema(sosJobschedulerUser);
         sosShiroCurrentUserAnswer.setMessage(message);
         responseBuilder.entity(sosShiroCurrentUserAnswer);
-        return new JocCockpitResponse(responseBuilder.build());
+        return new JOCCockpitResponse(responseBuilder.build());
     }
 }

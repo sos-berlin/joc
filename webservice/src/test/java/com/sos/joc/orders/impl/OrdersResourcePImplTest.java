@@ -7,7 +7,7 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.order.OrdersPSchema;
 import com.sos.joc.orders.post.OrdersBody;
-import com.sos.joc.orders.resource.IOrdersResourceP.OrdersResponseP;
+import com.sos.joc.response.JOCDefaultResponse;
 
 public class OrdersResourcePImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -21,7 +21,7 @@ public class OrdersResourcePImplTest {
         OrdersBody ordersBody = new OrdersBody();
         ordersBody.setJobschedulerId("scheduler_current");
         OrdersResourcePImpl ordersPImpl = new OrdersResourcePImpl();
-        OrdersResponseP ordersResponseP = ordersPImpl.postOrdersP(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
+        JOCDefaultResponse ordersResponseP = ordersPImpl.postOrdersP(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
         
         OrdersPSchema ordersPSchema = (OrdersPSchema) ordersResponseP.getEntity();
         assertEquals("postjobschedulerClusterTest","myPath1", ordersPSchema.getOrders().get(0).getPath());

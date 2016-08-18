@@ -10,8 +10,8 @@ import com.sos.joc.jobscheduler.impl.JobSchedulerResourceModifyJobSchedulerImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerBody;
 
 public class JobSchedulerResourceTerminateImplTest {
-    private static final String LDAP_PASSWORD = "root";
-    private static final String LDAP_USER = "secret";
+    private static final String LDAP_PASSWORD = "secret";
+    private static final String LDAP_USER = "root";
      
     @Test
     public void postjobschedulerTerminateTest() throws Exception   {

@@ -7,12 +7,12 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceClusterMembersPImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
-import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembersP.JobschedulerClusterMembersPResponse;
 import com.sos.joc.model.jobscheduler.MastersPSchema;
+import com.sos.joc.response.JOCDefaultResponse;
 
 public class JobSchedulerResourceClusterMembersPImplTest {
-    private static final String LDAP_PASSWORD = "root";
-    private static final String LDAP_USER = "secret";
+    private static final String LDAP_PASSWORD = "secret";
+    private static final String LDAP_USER = "root";
      
     @Test
     public void postjobschedulerClusterMembersPTest() throws Exception   {
@@ -22,7 +22,7 @@ public class JobSchedulerResourceClusterMembersPImplTest {
         JobSchedulerDefaultBody jobSchedulerDefaultBody = new JobSchedulerDefaultBody();
         jobSchedulerDefaultBody.setJobschedulerId("scheduler_joc_cockpit");
         JobSchedulerResourceClusterMembersPImpl jobschedulerResourceClusterMembersPImpl = new JobSchedulerResourceClusterMembersPImpl();
-        JobschedulerClusterMembersPResponse jobschedulerClusterMembersPResponse = jobschedulerResourceClusterMembersPImpl.postJobschedulerClusterMembers(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
+        JOCDefaultResponse jobschedulerClusterMembersPResponse = jobschedulerResourceClusterMembersPImpl.postJobschedulerClusterMembers(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
         MastersPSchema mastersPSchema = (MastersPSchema) jobschedulerClusterMembersPResponse.getEntity();
         assertEquals("postjobschedulerClusterTest", "scheduler_joc_cockpit", mastersPSchema.getMasters().get(0).getJobschedulerId());
      }

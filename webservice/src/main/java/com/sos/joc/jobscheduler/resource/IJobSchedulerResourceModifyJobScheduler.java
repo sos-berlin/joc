@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerBody;
-import com.sos.joc.response.JocCockpitResponse;
+import com.sos.joc.response.JOCCockpitResponse;
 
 public interface IJobSchedulerResourceModifyJobScheduler {
     
@@ -15,7 +15,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Path("jobscheduler/terminate")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerTerminate(
+    public JOCCockpitResponse postJobschedulerTerminate(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception;
 
     
@@ -23,7 +23,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Path("jobscheduler/terminate_and_restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerRestartTerminate(
+    public JOCCockpitResponse postJobschedulerRestartTerminate(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception;
 
     
@@ -32,14 +32,14 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Path("abort")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerAbort(
+    public JOCCockpitResponse postJobschedulerAbort(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception;
 
     @POST
     @Path("abort_and_restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerRestartAbort(
+    public JOCCockpitResponse postJobschedulerRestartAbort(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception;
 
            
@@ -47,7 +47,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Path("pause")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerPause(
+    public JOCCockpitResponse postJobschedulerPause(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception;
 
            
@@ -55,7 +55,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Path("continue")
     @Consumes("application/json")
     @Produces({ "application/json" })
-    public JocCockpitResponse postJobschedulerContinue(
+    public JOCCockpitResponse postJobschedulerContinue(
             @HeaderParam("access_token") String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception;
 
            

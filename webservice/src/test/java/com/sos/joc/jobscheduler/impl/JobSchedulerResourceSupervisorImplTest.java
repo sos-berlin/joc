@@ -8,11 +8,11 @@ import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceSupervisorImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
-import com.sos.joc.response.JobSchedulerResponse;
+import com.sos.joc.response.JOCDefaultResponse;
 
 public class JobSchedulerResourceSupervisorImplTest {
-    private static final String LDAP_PASSWORD = "root";
-    private static final String LDAP_USER = "secret";
+    private static final String LDAP_PASSWORD = "secret";
+    private static final String LDAP_USER = "root";
      
     @Test
     public void postjobschedulerSupervisorTest() throws Exception   {
@@ -22,7 +22,7 @@ public class JobSchedulerResourceSupervisorImplTest {
         JobSchedulerDefaultBody jobSchedulerDefaultBody = new JobSchedulerDefaultBody();
         jobSchedulerDefaultBody.setJobschedulerId("scheduler_current");
         JobSchedulerResourceSupervisorImpl jobschedulerResourceSupervisorImpl = new JobSchedulerResourceSupervisorImpl();
-        JobSchedulerResponse jobschedulerResponse = jobschedulerResourceSupervisorImpl.postJobschedulerSupervisor(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
+        JOCDefaultResponse jobschedulerResponse = jobschedulerResourceSupervisorImpl.postJobschedulerSupervisor(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
         Jobscheduler200VSchema jobschedulerSupervisorSchema = (Jobscheduler200VSchema) jobschedulerResponse.getEntity();
         assertEquals("postjobschedulerJobSchedulerResourceClusterImplTest.javaTest", "supervisor_scheduler_id", jobschedulerSupervisorSchema.getJobscheduler().getJobschedulerId());
      }

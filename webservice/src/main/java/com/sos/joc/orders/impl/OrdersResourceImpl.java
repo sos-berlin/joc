@@ -1,19 +1,25 @@
 package com.sos.joc.orders.impl;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.JsonValue;
 import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.jitl.restclient.JobSchedulerRestClient;
 import com.sos.joc.classes.JOCProcessingState;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobSchedulerUser;
+import com.sos.joc.classes.UsedTask;
+import com.sos.joc.classes.UsedTasks;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.OrderQueue;
@@ -21,197 +27,169 @@ import com.sos.joc.model.order.OrdersVSchema;
 import com.sos.joc.model.job.ProcessingState;
 import com.sos.joc.orders.post.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResource;
-import com.sos.joc.response.JobSchedulerResponse;
-import com.sos.joc.response.JocCockpitResponse;
+import com.sos.joc.response.JOCCockpitResponse;
+import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceImpl.class);
-
+ 
     @Override
-    public OrdersResponse postOrders(String accessToken, OrdersBody ordersBody) throws Exception {
-
-        OrdersResponse ordersResponse;
-        jobschedulerUser = new JobSchedulerUser(accessToken);
-
+    public JOCDefaultResponse postOrders(String accessToken, OrdersBody ordersBody) throws Exception {
+        LOGGER.debug("init Orders");
+        init(accessToken,ordersBody.getJobschedulerId());
+ 
         try {
-            if (!jobschedulerUser.isAuthenticated()) {
-                return OrdersResponse.responseStatus401(JocCockpitResponse.getError401Schema(jobschedulerUser));
-            }
-        } catch (org.apache.shiro.session.ExpiredSessionException e) {
-            LOGGER.error(e.getMessage());
-            return OrdersResponse.responseStatus440(JocCockpitResponse.getError401Schema(accessToken,e.getMessage()));
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return OrdersResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
-        }
-
-
-  
-        if (!getPermissons().getOrder().getView().isStatus()) {
-             return OrdersResponse.responseStatus403(JocCockpitResponse.getError401Schema(jobschedulerUser));
-        }
-
-        if (ordersBody.getJobschedulerId() == null) {
-            return OrdersResponse.responseStatus420(JocCockpitResponse.getError420Schema("schedulerId is null"));
-        }
-
-        try {
-
-            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(ordersBody.getJobschedulerId()));
-
-            if (dbItemInventoryInstance == null) {
-                return OrdersResponse.responseStatus420(JocCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s", ordersBody.getJobschedulerId(),
-                        DBLayer.TABLE_INVENTORY_INSTANCES)));
-            }
-            
-
+ 
             OrdersVSchema entity = new OrdersVSchema();
-
-            // TODO JOC Cockpit Webservice
-            String actProcessingState = ProcessingState.Text.PENDING.toString();
+            List<OrderQueue> listOrderQueue = new ArrayList<OrderQueue>();
 
             entity.setDeliveryDate(new Date());
-            List<OrderQueue> listOrderQueue = new ArrayList<OrderQueue>();
-            OrderQueue orderQueue1 = new OrderQueue();
-            OrderQueue orderQueue2 = new OrderQueue();
-
-            orderQueue1.setSurveyDate(new Date());
-            orderQueue1.setPath("myPath1");
-            orderQueue1.setOrderId("myOrderId1");
-            orderQueue1.setJobChain("myJobChain1");
-            orderQueue1.setState("myState1");
-            orderQueue1.setJob("myJob1");
             
-            JOCProcessingState processingState = new JOCProcessingState();
-            processingState.setDescription("myDescription1");
-            processingState.setSeverity(ProcessingState.Severity._0);
-            processingState.setText(ProcessingState.Text.JOB_NOT_IN_PERIOD);
-            orderQueue1.setProcessingState(processingState.getProcessingState());
+            String actProcessingState = "";
+            
+           //TODO Use correct authenticfication
+            JobSchedulerRestClient.headers.put("Authorization", "Basic U09TMDE6c29zMDE=");
+            JobSchedulerRestClient.headers.put("Content-Type", "application/json");
 
-            ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
-            configurationStatusSchema.setMessage("myMessage");
-            configurationStatusSchema.setSeverity(ConfigurationStatusSchema.Severity._2);
-            configurationStatusSchema.setText(ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
+            String response = JobSchedulerRestClient.executeRestServiceCommand("get", "http://localhost:4404/jobscheduler/master/api/order/?return=OrdersComplemented");
 
-            orderQueue1.setType(OrderQueue.Type.FILE_ORDER);
-            orderQueue1.setConfigurationStatus(configurationStatusSchema);
-            orderQueue1.setInProcessSince(new Date());
+            JsonReader rdr = Json.createReader(new StringReader(response));
+            JsonObject obj = rdr.readObject();
+            
+      
+            JsonArray resultUsedTasks = obj.getJsonArray("usedTasks");
+            UsedTasks usedTasks = new UsedTasks();
+            usedTasks.addEntries(resultUsedTasks);
 
-            if (!ordersBody.getCompact()) {
-                orderQueue1.setPriority(-1);
-                orderQueue1.setStateText("myStateText1");
-                // orderQueue1.setEndState("");
-                List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
-                NameValuePairsSchema param1 = new NameValuePairsSchema();
-                NameValuePairsSchema param2 = new NameValuePairsSchema();
-                param1.setName("param1");
-                param1.setValue("value1");
-                param2.setName("param2");
-                param2.setValue("value2");
-                parameters.add(param1);
-                parameters.add(param1);
-                orderQueue1.setParams(parameters);
+            JsonArray resultsUsedNodes = obj.getJsonArray("usedNodes");
+            for (JsonObject result : resultsUsedNodes.getValuesAs(JsonObject.class)) {
+                
+            }
+            
+            JsonArray resultsUsedJobs = obj.getJsonArray("usedJobs");
+            for (JsonObject result : resultsUsedJobs.getValuesAs(JsonObject.class)) {
+                
+            }
+            
+
+            JsonArray resultOrders = obj.getJsonArray("orders");
+            for (JsonObject order : resultOrders.getValuesAs(JsonObject.class)) {
+                
+                OrderQueue orderQueue = new OrderQueue();
+                JOCProcessingState processingState = new JOCProcessingState();
+
+                orderQueue.setSurveyDate(new Date());
+                orderQueue.setPath(order.getString("path", ""));
+                String[] s = order.getString("path", "").split(",");
+                orderQueue.setOrderId(s[1]);
+                orderQueue.setJobChain(s[0]);
+                orderQueue.setState(order.getString("nodeId", ""));
+                
+                orderQueue.setStartedAt(new Date());
+                
+                try {
+                    actProcessingState = order.getJsonString("processingState").getString();
+                    processingState.setText(actProcessingState);
+                } catch (Exception e) {
+                    actProcessingState = order.getJsonObject("processingState").getString("TYPE");
+                    String taskId = order.getJsonObject("processingState").getString("taskId","");
+                    processingState.setText(actProcessingState);
+                    if (processingState.isSetTaskId(actProcessingState)) {
+                        orderQueue.setInProcessSince(getDateFromString(order.getJsonObject("processingState").getString("since")));
+                    }
+                    if (processingState.isSetProcessClass(actProcessingState)) {
+                        orderQueue.setProcessClass(order.getJsonObject("processingState").getString("processClassPath"));
+                    }
+                    if (processingState.isSetTaskId(actProcessingState)) {
+                        orderQueue.setTaskId(Integer.parseInt(taskId));
+                    }
+                    if (usedTasks.get(taskId) != null){
+                        orderQueue.setJob(usedTasks.get(taskId).getJobPath());
+                    }
+                    if (order.getJsonObject("processingState").getJsonString("processClassPath")  != null){
+                       orderQueue.setProcessClass(order.getJsonObject("processingState").getString("processClassPath"));
+                    }
+
+                }
+                
+                processingState.setDescription("myDescription1");
+                processingState.setSeverity(ProcessingState.Severity._0);
+
+                if (processingState.isSetHistoryId(actProcessingState)) {
+                    orderQueue.setHistoryId(-1);
+                }
+
+                orderQueue.setProcessingState(processingState.getProcessingState());
+
+                ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
+                configurationStatusSchema.setMessage("myMessage");
+                configurationStatusSchema.setSeverity(ConfigurationStatusSchema.Severity._2);
+                configurationStatusSchema.setText(ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
+                orderQueue.setConfigurationStatus(configurationStatusSchema);
+                
+                try { 
+                    orderQueue.setType(OrderQueue.Type.fromValue(order.getString("sourceType", "")));
+                
+                }catch (Exception e){
+                    
+                }
+                
+                
+                if (!ordersBody.getCompact()) {
+                    orderQueue.setPriority(-1);
+                    orderQueue.setStateText("myStateText1");
+                    //orderQueue1.setEndState("");
+                    List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
+                    NameValuePairsSchema param1 = new NameValuePairsSchema();
+                    NameValuePairsSchema param2 = new NameValuePairsSchema();
+                    param1.setName("param1");
+                    param1.setValue("value1");
+                    param2.setName("param2");
+                    param2.setValue("value2");
+                    parameters.add(param1);
+                    parameters.add(param1);
+                    orderQueue.setParams(parameters);
+                }
+
+                if (processingState.isSetLock(actProcessingState)) {
+                    orderQueue.setLock("myLock1");
+                }
+
+                if (processingState.isSetNextStartTime(actProcessingState)) {
+                    orderQueue.setNextStartTime(getDateFromString(order.getString("nextStepAt", "")));
+                }
+
+                if (processingState.isSetProcessedBy(actProcessingState)) {
+                    orderQueue.setProcessedBy("myProcessedBy1");
+                }
+
+                if (processingState.isSetSetBack(actProcessingState)) {
+                    orderQueue.setSetback(new Date());
+                }
+
+                listOrderQueue.add(orderQueue);                
+                
+                
+                 JsonArray obstacles = order.getJsonArray("obstacles");
+                if (obstacles != null) {
+                    for (JsonValue obstacle : obstacles) {
+                        System.out.println(obstacle.toString());
+                    }
+                }
             }
 
-            if (processingState.isSetLock(actProcessingState)) {
-                orderQueue1.setLock("myLock1");
-            }
+  
+            // TODO JOC Cockpit Webservice
 
-            if (processingState.isSetNextStartTime(actProcessingState)) {
-                orderQueue1.setNextStartTime(new Date());
-            }
-
-            if (processingState.isSetHistoryId(actProcessingState)) {
-                orderQueue1.setHistoryId(-1);
-                orderQueue1.setStartedAt(new Date());
-            }
-
-            if (processingState.isSetProcessClass(actProcessingState)) {
-                orderQueue1.setProcessClass("myProcessClass1");
-            }
-
-            if (processingState.isSetTaskId(actProcessingState)) {
-                orderQueue1.setTaskId(-1);
-            }
-
-            if (processingState.isSetProcessedBy(actProcessingState)) {
-                orderQueue1.setProcessedBy("myProcessedBy1");
-            }
-
-            if (processingState.isSetSetBack(actProcessingState)) {
-                orderQueue1.setSetback(new Date());
-            }
-
-            listOrderQueue.add(orderQueue1);
-
-            orderQueue2.setSurveyDate(new Date());
-            orderQueue2.setPath("myPath1");
-            orderQueue2.setOrderId("myOrderId1");
-            orderQueue2.setJobChain("myJobChain1");
-            orderQueue2.setState("myState1");
-            orderQueue2.setJob("myJob1");
-            orderQueue2.setProcessingState(processingState.getProcessingState());
-
-            orderQueue2.setType(OrderQueue.Type.FILE_ORDER);
-            orderQueue2.setConfigurationStatus(configurationStatusSchema);
-            orderQueue2.setInProcessSince(new Date());
-
-            if (!ordersBody.getCompact()) {
-                orderQueue2.setPriority(-1);
-                orderQueue2.setStateText("myStateText1");
-                // orderQueue2.setEndState("");
-                List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
-                NameValuePairsSchema param1 = new NameValuePairsSchema();
-                NameValuePairsSchema param2 = new NameValuePairsSchema();
-                param1.setName("param1");
-                param1.setValue("value1");
-                param2.setName("param2");
-                param2.setValue("value2");
-                parameters.add(param1);
-                parameters.add(param1);
-                orderQueue2.setParams(parameters);
-            }
-           
-            if (processingState.isSetLock(actProcessingState)) {
-                orderQueue2.setLock("myLock2");
-            }
-
-            if (processingState.isSetNextStartTime(actProcessingState)) {
-                orderQueue2.setNextStartTime(new Date());
-            }
-
-            if (processingState.isSetHistoryId(actProcessingState)) {
-                orderQueue2.setHistoryId(-1);
-                orderQueue2.setStartedAt(new Date());
-            }
-
-            if (processingState.isSetProcessClass(actProcessingState)) {
-                orderQueue2.setProcessClass("myProcessClass2");
-            }
-
-            if (processingState.isSetTaskId(actProcessingState)) {
-                orderQueue2.setTaskId(-1);
-            }
-
-            if (processingState.isSetProcessedBy(actProcessingState)) {
-                orderQueue2.setProcessedBy("myProcessedBy2");
-            }
-
-            if (processingState.isSetSetBack(actProcessingState)) {
-                orderQueue2.setSetback(new Date());
-            }
-
-            listOrderQueue.add(orderQueue2);
+        
 
             entity.setOrders(listOrderQueue);
 
-            ordersResponse = OrdersResponse.responseStatus200(entity);
-
-            return ordersResponse;
+            return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-
-            return OrdersResponse.responseStatus420(JocCockpitResponse.getError420Schema(e.getMessage()));
+            System.out.println(e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getCause() + ":" + e.getMessage()));
         }
 
     }

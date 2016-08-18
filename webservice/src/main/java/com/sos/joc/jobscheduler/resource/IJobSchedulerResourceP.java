@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
-import com.sos.joc.response.JobSchedulerPResponse;
+import com.sos.joc.response.JOCDefaultResponse;
 
  
 public interface IJobSchedulerResourceP {
@@ -15,7 +15,7 @@ public interface IJobSchedulerResourceP {
     @POST
     @Path("p")
     @Produces({ "application/json" })
-    public JobSchedulerPResponse postJobschedulerP(            
+    public JOCDefaultResponse postJobschedulerP(            
             @HeaderParam("access_token") String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception;
 
  
