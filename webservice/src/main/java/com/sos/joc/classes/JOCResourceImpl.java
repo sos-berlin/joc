@@ -1,5 +1,6 @@
 package com.sos.joc.classes;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -20,11 +21,20 @@ public class JOCResourceImpl {
     protected static final String NO = "no";
     protected static final String YES = "yes";
 
+    private String accessToken;
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
 
-    protected SOSPermissionJocCockpit getPermissons() {
+    protected SOSPermissionJocCockpit getPermissons(String accessToken) {
+        if (jobschedulerUser == null){
+            this.accessToken = accessToken;
+            jobschedulerUser = new JobSchedulerUser(accessToken);
+         }
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
+    }
+
+    public String getAccessToken() {
+        return accessToken;
     }
 
     public JobSchedulerUser getJobschedulerUser() {
@@ -47,10 +57,16 @@ public class JOCResourceImpl {
         return date;
     }
 
-    public JOCDefaultResponse init(String accessToken, String schedulerId) throws Exception {
+    public Date getDateFromTimestamp(Long timeStamp){
+        Long time = new Long(timeStamp);
+        Timestamp stamp = new Timestamp(time);
+        Date date = new Date(stamp.getTime());
+        return date;
+    }
+    
+    public JOCDefaultResponse init(String schedulerId, boolean permission) throws Exception {
         JOCDefaultResponse jocDefaultResponse = null;
-        jobschedulerUser = new JobSchedulerUser(accessToken);
-
+ 
         try {
             if (!jobschedulerUser.isAuthenticated()) {
                 return JOCDefaultResponse.responseStatus401(JOCCockpitResponse.getError401Schema(jobschedulerUser));
@@ -63,7 +79,7 @@ public class JOCResourceImpl {
             return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
         }
 
-        if (!getPermissons().getJobschedulerUniversalAgent().getView().isStatus()) {
+        if (!permission) {
             return JOCDefaultResponse.responseStatus403(JOCCockpitResponse.getError401Schema(jobschedulerUser));
         }
 

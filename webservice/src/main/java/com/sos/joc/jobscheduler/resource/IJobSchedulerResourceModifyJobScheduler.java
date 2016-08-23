@@ -12,7 +12,7 @@ import com.sos.joc.response.JOCCockpitResponse;
 public interface IJobSchedulerResourceModifyJobScheduler {
     
     @POST
-    @Path("jobscheduler/terminate")
+    @Path("terminate")
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCCockpitResponse postJobschedulerTerminate(
@@ -20,7 +20,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
 
     
     @POST
-    @Path("jobscheduler/terminate_and_restart")
+    @Path("terminate_and_restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCCockpitResponse postJobschedulerRestartTerminate(

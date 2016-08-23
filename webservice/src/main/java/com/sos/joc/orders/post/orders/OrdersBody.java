@@ -1,4 +1,4 @@
-package com.sos.joc.orders.post;
+package com.sos.joc.orders.post.orders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ public class OrdersBody {
     private String dateFrom;
     private String dateTo;
     private String timeZone;
+    private List<Folder> folders = new ArrayList<Folder>();
 
     public String getJobschedulerId() {
         return jobschedulerId;
@@ -85,6 +86,14 @@ public class OrdersBody {
 
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
+    }
+
+    public List<Folder> getFolders() {
+        return folders;
+    }
+
+    public void setFolders(List<Folder> folders) {
+        this.folders = folders;
     }
 
 }

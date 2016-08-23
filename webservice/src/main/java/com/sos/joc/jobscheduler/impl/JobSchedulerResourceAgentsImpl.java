@@ -25,7 +25,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
     public JOCDefaultResponse postJobschedulerAgents(String accessToken, JobSchedulerAgentsBody jobSchedulerAgentsBody) {
         LOGGER.debug("init JobschedulerAgents");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentsBody.getJobschedulerId());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerAgentsBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

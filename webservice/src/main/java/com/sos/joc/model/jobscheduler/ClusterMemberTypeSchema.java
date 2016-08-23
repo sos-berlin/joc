@@ -150,6 +150,12 @@ public class ClusterMemberTypeSchema {
             return this.value;
         }
 
+        @JsonValue
+        final String value() {
+            return this.value;
+        }
+ 
+        
         @JsonCreator
         public static ClusterMemberTypeSchema.Type fromValue(String value) {
             ClusterMemberTypeSchema.Type constant = CONSTANTS.get(value);

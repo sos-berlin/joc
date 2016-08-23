@@ -25,7 +25,7 @@ public class JobSchedulerResourceDbImplTest {
         JobSchedulerResourceDbImpl jobschedulerResourceDbImpl = new JobSchedulerResourceDbImpl();
         JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceDbImpl.postJobschedulerDb(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
         DbSchema dbSchema = (DbSchema) jobschedulerClusterResponse.getEntity();
-        assertEquals("postjobschedulerClusterTest", Dbms.DB_2, dbSchema.getDatabase().getDbms());
+        assertEquals("postjobschedulerClusterTest", Dbms.DB2, dbSchema.getDatabase().getDbms());
      }
 
 }

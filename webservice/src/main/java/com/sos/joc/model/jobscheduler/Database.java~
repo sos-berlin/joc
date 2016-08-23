@@ -20,12 +20,20 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
+    "dbms",
     "surveyDate",
-    "jobschedulerId",
-    "type"
+    "version",
+    "state"
 })
-public class Cluster {
+public class Database {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("dbms")
+    private Database.Dbms dbms;
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
@@ -35,22 +43,41 @@ public class Cluster {
      */
     @JsonProperty("surveyDate")
     private Date surveyDate;
+    @JsonProperty("version")
+    private String version;
     /**
-     * JobScheduler id of all cluster member
+     * 
      * (Required)
      * 
      */
-    @JsonProperty("jobschedulerId")
-    private String jobschedulerId;
-    /**
-     * type could be 'active' (distributed orders), 'passive' (backup) or 'standalone' (without cluster)
-     * (Required)
-     * 
-     */
-    @JsonProperty("type")
-    private Cluster.Type type;
+    @JsonProperty("state")
+    private State__ state;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @return
+     *     The dbms
+     */
+    @JsonProperty("dbms")
+    public Database.Dbms getDbms() {
+        return dbms;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @param dbms
+     *     The dbms
+     */
+    @JsonProperty("dbms")
+    public void setDbms(Database.Dbms dbms) {
+        this.dbms = dbms;
+    }
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -81,51 +108,47 @@ public class Cluster {
     }
 
     /**
-     * JobScheduler id of all cluster member
+     * 
+     * @return
+     *     The version
+     */
+    @JsonProperty("version")
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * 
+     * @param version
+     *     The version
+     */
+    @JsonProperty("version")
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+     * 
      * (Required)
      * 
      * @return
-     *     The jobschedulerId
+     *     The state
      */
-    @JsonProperty("jobschedulerId")
-    public String getJobschedulerId() {
-        return jobschedulerId;
+    @JsonProperty("state")
+    public State__ getState() {
+        return state;
     }
 
     /**
-     * JobScheduler id of all cluster member
+     * 
      * (Required)
      * 
-     * @param jobschedulerId
-     *     The jobschedulerId
+     * @param state
+     *     The state
      */
-    @JsonProperty("jobschedulerId")
-    public void setJobschedulerId(String jobschedulerId) {
-        this.jobschedulerId = jobschedulerId;
-    }
-
-    /**
-     * type could be 'active' (distributed orders), 'passive' (backup) or 'standalone' (without cluster)
-     * (Required)
-     * 
-     * @return
-     *     The type
-     */
-    @JsonProperty("type")
-    public Cluster.Type getType() {
-        return type;
-    }
-
-    /**
-     * type could be 'active' (distributed orders), 'passive' (backup) or 'standalone' (without cluster)
-     * (Required)
-     * 
-     * @param type
-     *     The type
-     */
-    @JsonProperty("type")
-    public void setType(Cluster.Type type) {
-        this.type = type;
+    @JsonProperty("state")
+    public void setState(State__ state) {
+        this.state = state;
     }
 
     @Override
@@ -145,7 +168,7 @@ public class Cluster {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(type).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(dbms).append(surveyDate).append(version).append(state).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -153,29 +176,32 @@ public class Cluster {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Cluster) == false) {
+        if ((other instanceof Database) == false) {
             return false;
         }
-        Cluster rhs = ((Cluster) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(type, rhs.type).append(additionalProperties, rhs.additionalProperties).isEquals();
+        Database rhs = ((Database) other);
+        return new EqualsBuilder().append(dbms, rhs.dbms).append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(state, rhs.state).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
-    public enum Type {
+    public enum Dbms {
 
-        ACTIVE("active"),
-        PASSIVE("passive"),
-        STANDALONE("standalone");
+        MY_SQL("MySQL"),
+        ORACLE("Oracle"),
+        POSTGRES("Postgres"),
+        SYBASE("Sybase"),
+        DB_2("DB2"),
+        MS_SQL_SERVER("MS SQL Server");
         private final String value;
-        private final static Map<String, Cluster.Type> CONSTANTS = new HashMap<String, Cluster.Type>();
+        private final static Map<String, Database.Dbms> CONSTANTS = new HashMap<String, Database.Dbms>();
 
         static {
-            for (Cluster.Type c: values()) {
+            for (Database.Dbms c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
 
-        private Type(String value) {
+        private Dbms(String value) {
             this.value = value;
         }
 
@@ -184,16 +210,10 @@ public class Cluster {
         public String toString() {
             return this.value;
         }
-        
 
-        @JsonValue
-        final String value() {
-            return this.value;
-        }
-        
         @JsonCreator
-        public static Cluster.Type fromValue(String value) {
-            Cluster.Type constant = CONSTANTS.get(value);
+        public static Database.Dbms fromValue(String value) {
+            Database.Dbms constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

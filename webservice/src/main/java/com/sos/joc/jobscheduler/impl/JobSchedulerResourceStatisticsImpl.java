@@ -25,7 +25,7 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
 
         LOGGER.debug("init Statistics");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulerId);
+            JOCDefaultResponse jocDefaultResponse = init(schedulerId,getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

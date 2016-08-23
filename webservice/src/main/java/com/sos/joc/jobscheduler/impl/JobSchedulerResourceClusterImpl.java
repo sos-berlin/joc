@@ -23,7 +23,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
     public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) {
         LOGGER.debug("init JobschedulerCluster");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerDefaultBody.getJobschedulerId());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerDefaultBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

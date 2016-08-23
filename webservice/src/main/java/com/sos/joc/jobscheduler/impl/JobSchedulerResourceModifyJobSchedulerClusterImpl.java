@@ -48,9 +48,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             return JOCCockpitResponse.responseStatus403(jobschedulerUser);
         }
 
-        if (!
-
-        getPermissons().getJobschedulerMasterCluster().getView().isClusterStatus()) {
+        if (!getPermissons(this.getAccessToken()).getJobschedulerMasterCluster().getView().isClusterStatus()) {
             return JOCCockpitResponse.responseStatus403(jobschedulerUser);
         }
 
@@ -94,7 +92,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCCockpitResponse postJobschedulerTerminate(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
         init(accessToken, jobSchedulerClusterTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMasterCluster().isTerminate());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminate());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;
@@ -106,7 +104,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCCockpitResponse postJobschedulerRestartTerminate(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
         init(accessToken, jobSchedulerClusterTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMasterCluster().isRestart());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isRestart());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;
@@ -118,7 +116,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCCockpitResponse postJobschedulerTerminateFailSafe(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
         init(accessToken, jobSchedulerClusterTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMasterCluster().isTerminateFailSafe());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminateFailSafe());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;

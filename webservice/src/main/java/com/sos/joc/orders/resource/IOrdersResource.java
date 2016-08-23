@@ -4,7 +4,8 @@ package com.sos.joc.orders.resource;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
-import com.sos.joc.orders.post.OrdersBody;
+
+import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.response.JOCDefaultResponse;
 
  

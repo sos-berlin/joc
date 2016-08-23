@@ -18,14 +18,13 @@ import org.apache.log4j.Logger;
 import com.sos.jitl.restclient.JobSchedulerRestClient;
 import com.sos.joc.classes.JOCProcessingState;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.UsedTask;
 import com.sos.joc.classes.UsedTasks;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.OrderQueue;
 import com.sos.joc.model.order.OrdersVSchema;
 import com.sos.joc.model.job.ProcessingState;
-import com.sos.joc.orders.post.OrdersBody;
+import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResource;
 import com.sos.joc.response.JOCCockpitResponse;
 import com.sos.joc.response.JOCDefaultResponse;
@@ -34,10 +33,9 @@ import com.sos.joc.response.JOCDefaultResponse;
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceImpl.class);
  
-    @Override
-    public JOCDefaultResponse postOrders(String accessToken, OrdersBody ordersBody) throws Exception {
+     public JOCDefaultResponse postOrders1(String accessToken, OrdersBody ordersBody) throws Exception {
         LOGGER.debug("init Orders");
-        init(accessToken,ordersBody.getJobschedulerId());
+        init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
  
         try {
  
@@ -79,7 +77,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 OrderQueue orderQueue = new OrderQueue();
                 JOCProcessingState processingState = new JOCProcessingState();
 
-                orderQueue.setSurveyDate(new Date());
+                orderQueue.setSurveyDate(getDateFromTimestamp(obj.getJsonNumber( "eventId").longValue()));
                 orderQueue.setPath(order.getString("path", ""));
                 String[] s = order.getString("path", "").split(",");
                 orderQueue.setOrderId(s[1]);
@@ -192,6 +190,12 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getCause() + ":" + e.getMessage()));
         }
 
+    }
+
+    @Override
+    public JOCDefaultResponse postOrders(String accessToken, OrdersBody orderBody) throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

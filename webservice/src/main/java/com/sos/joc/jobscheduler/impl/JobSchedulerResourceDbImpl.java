@@ -26,7 +26,7 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
 
         LOGGER.debug("init JobschedulerClusterMembers");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerDefaultBody.getJobschedulerId());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerDefaultBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

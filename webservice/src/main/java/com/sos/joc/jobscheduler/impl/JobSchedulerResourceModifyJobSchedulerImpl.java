@@ -89,7 +89,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCCockpitResponse postJobschedulerTerminate(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
 
         init(accessToken, jobSchedulerTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMaster().isTerminate());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMaster().isTerminate());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;
@@ -102,7 +102,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCCockpitResponse postJobschedulerRestartTerminate(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
 
         init(accessToken, jobSchedulerTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMaster().getRestart().isTerminate());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isTerminate());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;
@@ -115,7 +115,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCCockpitResponse postJobschedulerAbort(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
 
         init(accessToken, jobSchedulerTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMaster().isAbort());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMaster().isAbort());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;
@@ -127,7 +127,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCCockpitResponse postJobschedulerRestartAbort(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
         init(accessToken, jobSchedulerTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMaster().getRestart().isAbort());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isAbort());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;
@@ -139,7 +139,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCCockpitResponse postJobschedulerPause(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
         init(accessToken, jobSchedulerTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMaster().isPause());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMaster().isPause());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;
@@ -151,7 +151,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCCockpitResponse postJobschedulerContinue(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
         init(accessToken, jobSchedulerTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons().getJobschedulerMaster().isContinue());
+        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMaster().isContinue());
 
         if (jocCockpitResponse != null) {
             return jocCockpitResponse;

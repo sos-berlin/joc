@@ -3,16 +3,13 @@ package com.sos.joc.orders.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.ws.rs.Path;
-
 import org.apache.log4j.Logger;
-
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.order.Order;
 import com.sos.joc.model.order.OrdersPSchema;
-import com.sos.joc.orders.post.OrdersBody;
+import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceP;
 import com.sos.joc.response.JOCCockpitResponse;
 import com.sos.joc.response.JOCDefaultResponse;
@@ -23,14 +20,16 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
 
     @Override
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersBody ordersBody) throws Exception {
+ 
+        
         LOGGER.debug("init OrdersP");
-        init(accessToken,ordersBody.getJobschedulerId());       
+        init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());       
 
         try {
 
             OrdersPSchema entity = new OrdersPSchema();
 
-            // TODO JOC Cockpit Webservice
+            // TODO JOC Cockpit Webservice: Reading from database
             entity.setDeliveryDate(new Date());
             entity.setSurveyDate(new Date());
             List<Order> listOrder = new ArrayList<Order>();
@@ -90,4 +89,6 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
 
         }
     }
+    
+    
 }

@@ -10,15 +10,15 @@ import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.response.JOCDefaultResponse;
 
  
-public interface IOrdersResourceP {
+public interface IOrdersResourceHistory {
 
     @POST
-    @Path("p")
+    @Path("history")
     @Produces({ "application/json" })
-    public JOCDefaultResponse postOrdersP(            
+    public JOCDefaultResponse postOrdersHistory(            
             @HeaderParam("access_token") String accessToken, OrdersBody orderBody) throws Exception;
 
-   
+
  
     
 }

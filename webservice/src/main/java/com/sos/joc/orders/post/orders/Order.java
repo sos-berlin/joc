@@ -1,4 +1,4 @@
-package com.sos.joc.orders.post;
+package com.sos.joc.orders.post.orders;
 
 public class Order {
 

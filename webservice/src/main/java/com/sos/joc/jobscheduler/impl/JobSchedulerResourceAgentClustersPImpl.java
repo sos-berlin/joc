@@ -27,7 +27,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
     public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, JobSchedulerAgentClustersBody jobSchedulerAgentClustersBody) {
         LOGGER.debug("init JobschedulerAgentClustersP");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentClustersBody.getJobschedulerId());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerAgentClustersBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

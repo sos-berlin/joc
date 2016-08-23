@@ -74,16 +74,7 @@
 			</exclusions>
 		</dependency>
 
-		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-grizzly2-http</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		
 
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
@@ -114,31 +105,8 @@
 			</exclusions>
 		</dependency>
 
-		<dependency>
-			<groupId>com.sos-berlin.jitl</groupId>
-			<artifactId>jitl-jobs</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-
-		<dependency>
-			<groupId>com.sos-berlin.jid</groupId>
-			<artifactId>scheduler-instances</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
+	 
+ 
 		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-xml</artifactId>
@@ -190,7 +158,6 @@
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
-			<scope>test</scope>
 		</dependency>
 		
 	</dependencies>
@@ -202,21 +169,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<inherited>true</inherited>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.2.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>java</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<mainClass>com.sos.joc.Main</mainClass>
-				</configuration>
-			</plugin>
+			
 
 			<!--plugin>
 				<groupId>org.apache.maven.plugins</groupId>

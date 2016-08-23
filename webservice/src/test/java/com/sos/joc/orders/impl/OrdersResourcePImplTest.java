@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.order.OrdersPSchema;
-import com.sos.joc.orders.post.OrdersBody;
+import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.response.JOCDefaultResponse;
 
 public class OrdersResourcePImplTest {

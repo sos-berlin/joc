@@ -5,25 +5,25 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.order.OrdersVSchema;
+import com.sos.joc.model.order.SnapshotSchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.response.JOCDefaultResponse;
 
-public class OrdersResourceImplTest {
+public class OrdersResourceOverviewSnapshotImplTest {
     private static final String LDAP_PASSWORD = "secret";
     private static final String LDAP_USER = "root";
      
     @Test
-    public void postOrdersTest() throws Exception   {
+    public void postOrdersOverviewSnapshot() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrdersBody ordersBody = new OrdersBody();
         ordersBody.setJobschedulerId("scheduler_current");
-        OrdersResourceImpl ordersImpl = new OrdersResourceImpl();
-        JOCDefaultResponse ordersResponse = ordersImpl.postOrders(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
-        OrdersVSchema ordersVSchema = (OrdersVSchema) ordersResponse.getEntity();
-        assertEquals("postjobschedulerClusterTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
+        OrdersResourceOverviewSnapshotImpl ordersResourceOverviewSnapshotImpl = new OrdersResourceOverviewSnapshotImpl();
+        JOCDefaultResponse ordersResponse = ordersResourceOverviewSnapshotImpl.postOrdersOverviewSnapshot(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
+        SnapshotSchema snapshotSchema = (SnapshotSchema) ordersResponse.getEntity();
+        assertEquals("postOrdersOverviewSnapshot",-1, snapshotSchema.getOrders().getRunning().intValue());
      }
 
 }

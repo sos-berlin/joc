@@ -1,11 +1,11 @@
-package com.sos.joc.orders.post;
+package com.sos.joc.orders.post.orders;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public enum ProcessingState {
 
-    PENDING("pending"), RUNNING("running"), WAITING_FOR_RESOURCE("waitingForResource"), SUSPENDED("suspended"), SETBACK("setback"), BLACKLIST("blacklist");
+    pending("pending"), running("running"), waitingForResource("waitingForResource"), suspended("suspended"), setback("setback"), blacklist("blacklist");
     private final String value;
     private final static Map<String, ProcessingState> CONSTANTS = new HashMap<String, ProcessingState>();
 

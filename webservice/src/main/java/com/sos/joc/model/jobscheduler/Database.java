@@ -186,12 +186,12 @@ public class Database {
     @Generated("org.jsonschema2pojo")
     public enum Dbms {
 
-        MY_SQL("MySQL"),
-        ORACLE("Oracle"),
-        POSTGRES("Postgres"),
-        SYBASE("Sybase"),
-        DB_2("DB2"),
-        MS_SQL_SERVER("MS SQL Server");
+        MySQL("MySQL"),
+        Oracle("Oracle"),
+        Postgres("Postgres"),
+        Sybase("Sybase"),
+        DB2("DB2"),
+        MS_SQL_Server("MS SQL Server");
         private final String value;
         private final static Map<String, Database.Dbms> CONSTANTS = new HashMap<String, Database.Dbms>();
 
