@@ -63,6 +63,10 @@
 					<groupId>javax.servlet</groupId>
 					<artifactId>servlet-api</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>javax.ws.rs</groupId>
+					<artifactId>jsr311-api</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -225,7 +229,7 @@
 								engine-base,engine-common,engine-cppjava-runtime,hostware,
 								scalactic_2.11,scala-library,scala-reflect,scala-xml_2.11,
 								spray-http_2.11,spray-httpx_2.11,spray-json_2.11,spray-util_2.11,
-								webdavclient4j-core,ganymed-ssh2,sos-trilead-ssh2,jsch,jzlib,
+								webdavclient4j-core,ganymed-ssh2,sos-trilead-ssh2,jsch,jzlib,jsr311-api,
 								org.eclipse.swt.${swtSuffix},org.eclipse.jface,org.eclipse.osgi,osgi-resource-locator,junit,hamcrest-core,snakeyaml
 							</excludeArtifactIds>
 							<excludeScope>provided</excludeScope>
