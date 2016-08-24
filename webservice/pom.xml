@@ -28,7 +28,49 @@
 	</dependencyManagement>
 
 	<dependencies>
+	
+		<!--  SOS DEPENDENCIES -->
+		<dependency>
+			<groupId>com.sos-berlin.commons</groupId>
+			<artifactId>sos-util</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+ 
+		<dependency>
+			<groupId>com.sos-berlin.commons</groupId>
+			<artifactId>sos-xml</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.sos-berlin.jobscheduler</groupId>
+			<artifactId>sos-security</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.ws.rs</groupId>
+					<artifactId>jsr311-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
+		<!-- 3RD PARTY DEPENDENCIES -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -64,6 +106,17 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
 			<exclusions>
@@ -73,8 +126,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		
 
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
@@ -86,51 +137,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		 
-		<dependency>
-			<groupId>com.sos-berlin.commons</groupId>
-			<artifactId>sos-util</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-	 
- 
-		<dependency>
-			<groupId>com.sos-berlin.commons</groupId>
-			<artifactId>sos-xml</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.sos-berlin.jobscheduler</groupId>
-			<artifactId>sos-security</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
 
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -145,21 +151,17 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		 
 	</dependencies>
 
 	<build>
@@ -170,7 +172,6 @@
 				<inherited>true</inherited>
 			</plugin>
 			
-
 			<!--plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -206,7 +207,7 @@
 				</executions>
 			</plugin-->
 
-			<!--plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -221,10 +222,21 @@
 							<overWriteReleases>false</overWriteReleases>
 							<overWriteSnapshots>false</overWriteSnapshots>
 							<overWriteIfNewer>true</overWriteIfNewer>
+							<excludeArtifactIds>
+								daily-schedule,credentialstore,dashboard-globals,events,graphviz-adapter,jade-history,
+								joe-globals,scheduler-history,scheduler-instances,sos-configuration,sos-connection,sos-dialog,
+								sos-mail,sos-settings,sos-textprocessor,virtual-file-system,
+								engine-base,engine-common,engine-cppjava-runtime,hostware,
+								scalactic_2.11,scala-library,scala-reflect,scala-xml_2.11,
+								spray-http_2.11,spray-httpx_2.11,spray-json_2.11,spray-util_2.11,
+								webdavclient4j-core,ganymed-ssh2,sos-trilead-ssh2,jsch,jzlib,jsr311-api,
+								org.eclipse.swt.${swtSuffix},org.eclipse.jface,org.eclipse.osgi,osgi-resource-locator,junit,hamcrest-core,snakeyaml
+							</excludeArtifactIds>
+							<excludeScope>provided</excludeScope>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin-->
+			</plugin>
 
 		</plugins>
 	</build>
