@@ -124,8 +124,8 @@ public class State {
     @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        ACTIVE("active"),
-        INACTIVE("inactive");
+        active("active"),
+        inactive("inactive");
         private final String value;
         private final static Map<String, State.Text> CONSTANTS = new HashMap<String, State.Text>();
 

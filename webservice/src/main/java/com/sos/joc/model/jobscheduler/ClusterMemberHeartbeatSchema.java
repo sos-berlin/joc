@@ -201,9 +201,9 @@ public class ClusterMemberHeartbeatSchema {
     @Generated("org.jsonschema2pojo")
     public enum Quality {
 
-        GOOD("good"),
-        LATE("late"),
-        STILL_CHECKING("still_checking");
+        good("good"),
+        late("late"),
+        still_checking("still_checking");
         private final String value;
         private final static Map<String, ClusterMemberHeartbeatSchema.Quality> CONSTANTS = new HashMap<String, ClusterMemberHeartbeatSchema.Quality>();
 

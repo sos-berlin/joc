@@ -151,8 +151,8 @@ public class LockConfigurationFilterSchema {
     @Generated("org.jsonschema2pojo")
     public enum Mime {
 
-        HTML("html"),
-        XML("xml");
+        html("html"),
+        xml("xml");
         private final String value;
         private final static Map<String, LockConfigurationFilterSchema.Mime> CONSTANTS = new HashMap<String, LockConfigurationFilterSchema.Mime>();
 

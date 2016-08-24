@@ -305,9 +305,9 @@ public class AgentClusterPSchema {
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        SINGLE_AGENT("single_agent"),
-        FIX_PRIORITY("fix_priority"),
-        ROUND_ROBIN("round_robin");
+        single_agent("single_agent"),
+        fix_priority("fix_priority"),
+        round_robin("round_robin");
         private final String value;
         private final static Map<String, AgentClusterPSchema.Type> CONSTANTS = new HashMap<String, AgentClusterPSchema.Type>();
 

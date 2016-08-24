@@ -124,20 +124,20 @@ public class State {
     @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        INITIALIZED("initialized"),
-        NOT_INITIALIZED("not_initialized"),
-        LOADED("loaded"),
-        PENDING("pending"),
-        RUNNING("running"),
-        WAITING_FOR_PROCESS("waiting_for_process"),
-        WAITING_FOR_LOCK("waiting_for_lock"),
-        WAITING_FOR_AGENT("waiting_for_agent"),
-        WAITING_FOR_TASK("waiting_for_task"),
-        NOT_IN_PERIOD("not_in_period"),
-        STOPPING("stopping"),
-        STOPPED("stopped"),
-        REMOVED("removed"),
-        DISABLED("disabled");
+        initialized("initialized"),
+        not_initialized("not_initialized"),
+        loaded("loaded"),
+        pending("pending"),
+        running("running"),
+        waiting_for_process("waiting_for_process"),
+        waiting_for_lock("waiting_for_lock"),
+        waiting_for_agent("waiting_for_agent"),
+        waiting_for_task("waiting_for_task"),
+        not_in_period("not_in_period"),
+        stopping("stopping"),
+        stopped("stopped"),
+        removed("removed"),
+        disabled("disabled");
         private final String value;
         private final static Map<String, State.Text> CONSTANTS = new HashMap<String, State.Text>();
 

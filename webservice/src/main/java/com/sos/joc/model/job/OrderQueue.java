@@ -42,6 +42,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "job",
     "stateText",
     "configurationStatus",
+    "endState",
     "processingState",
     "nextStartTime",
     "historyId",
@@ -127,6 +128,12 @@ public class OrderQueue {
      */
     @JsonProperty("configurationStatus")
     private ConfigurationStatusSchema configurationStatus;
+    /**
+     * the name of the end node
+     * 
+     */
+    @JsonProperty("endState")
+    private String endState;
     @JsonProperty("processingState")
     private ProcessingState processingState;
     /**
@@ -467,6 +474,28 @@ public class OrderQueue {
     }
 
     /**
+     * the name of the end node
+     * 
+     * @return
+     *     The endState
+     */
+    @JsonProperty("endState")
+    public String getEndState() {
+        return endState;
+    }
+
+    /**
+     * the name of the end node
+     * 
+     * @param endState
+     *     The endState
+     */
+    @JsonProperty("endState")
+    public void setEndState(String endState) {
+        this.endState = endState;
+    }
+
+    /**
      * 
      * @return
      *     The processingState
@@ -729,7 +758,7 @@ public class OrderQueue {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(priority).append(params).append(type).append(surveyDate).append(state).append(job).append(stateText).append(configurationStatus).append(processingState).append(nextStartTime).append(historyId).append(startedAt).append(processedBy).append(taskId).append(inProcessSince).append(setback).append(lock).append(processClass).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(priority).append(params).append(type).append(surveyDate).append(state).append(job).append(stateText).append(configurationStatus).append(endState).append(processingState).append(nextStartTime).append(historyId).append(startedAt).append(processedBy).append(taskId).append(inProcessSince).append(setback).append(lock).append(processClass).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -741,15 +770,15 @@ public class OrderQueue {
             return false;
         }
         OrderQueue rhs = ((OrderQueue) other);
-        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(priority, rhs.priority).append(params, rhs.params).append(type, rhs.type).append(surveyDate, rhs.surveyDate).append(state, rhs.state).append(job, rhs.job).append(stateText, rhs.stateText).append(configurationStatus, rhs.configurationStatus).append(processingState, rhs.processingState).append(nextStartTime, rhs.nextStartTime).append(historyId, rhs.historyId).append(startedAt, rhs.startedAt).append(processedBy, rhs.processedBy).append(taskId, rhs.taskId).append(inProcessSince, rhs.inProcessSince).append(setback, rhs.setback).append(lock, rhs.lock).append(processClass, rhs.processClass).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(priority, rhs.priority).append(params, rhs.params).append(type, rhs.type).append(surveyDate, rhs.surveyDate).append(state, rhs.state).append(job, rhs.job).append(stateText, rhs.stateText).append(configurationStatus, rhs.configurationStatus).append(endState, rhs.endState).append(processingState, rhs.processingState).append(nextStartTime, rhs.nextStartTime).append(historyId, rhs.historyId).append(startedAt, rhs.startedAt).append(processedBy, rhs.processedBy).append(taskId, rhs.taskId).append(inProcessSince, rhs.inProcessSince).append(setback, rhs.setback).append(lock, rhs.lock).append(processClass, rhs.processClass).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        PERMANENT("permanent"),
-        AD_HOC("ad_hoc"),
-        FILE_ORDER("file_order");
+        permanent("permanent"),
+        ad_hoc("ad_hoc"),
+        file_order("file_order");
         private final String value;
         private final static Map<String, OrderQueue.Type> CONSTANTS = new HashMap<String, OrderQueue.Type>();
 

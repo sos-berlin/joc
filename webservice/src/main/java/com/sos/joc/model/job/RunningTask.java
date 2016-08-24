@@ -312,16 +312,16 @@ public class RunningTask {
     @Generated("org.jsonschema2pojo")
     public enum Cause {
 
-        NONE("none"),
-        MIN_TASKS("min_tasks"),
-        PERIOD_ONCE("period_once"),
-        PERIOD_SINGLE("period_single"),
-        PERIOD_REPEAT("period_repeat"),
-        QUEUE("queue"),
-        QUEUE_AT("queue_at"),
-        DIRECTORY("directory"),
-        DELAY_AFTER_ERROR("delay_after_error"),
-        ORDER("order");
+        none("none"),
+        min_tasks("min_tasks"),
+        period_once("period_once"),
+        period_single("period_single"),
+        period_repeat("period_repeat"),
+        queue("queue"),
+        queue_at("queue_at"),
+        directory("directory"),
+        delay_after_error("delay_after_error"),
+        order("order");
         private final String value;
         private final static Map<String, RunningTask.Cause> CONSTANTS = new HashMap<String, RunningTask.Cause>();
 

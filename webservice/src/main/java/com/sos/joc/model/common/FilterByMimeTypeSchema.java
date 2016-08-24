@@ -113,8 +113,8 @@ public class FilterByMimeTypeSchema {
     @Generated("org.jsonschema2pojo")
     public enum Mime {
 
-        PLAIN("plain"),
-        HTML("html");
+        plain("plain"),
+        html("html");
         private final String value;
         private final static Map<String, FilterByMimeTypeSchema.Mime> CONSTANTS = new HashMap<String, FilterByMimeTypeSchema.Mime>();
 

@@ -165,9 +165,9 @@ public class ClusterMembersSchema {
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        ACTIVE("active"),
-        PASSIVE("passive"),
-        STANDALONE("standalone");
+        active("active"),
+        passive("passive"),
+        standalone("standalone");
         private final String value;
         private final static Map<String, ClusterMembersSchema.Type> CONSTANTS = new HashMap<String, ClusterMembersSchema.Type>();
 

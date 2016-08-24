@@ -8,12 +8,10 @@ import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -49,7 +47,7 @@ public class AgentClusterFilterSchema {
     @JsonProperty("regex")
     private String regex;
     @JsonProperty("state")
-    private AgentClusterFilterSchema.State state;
+    private Integer state;
     /**
      * compact parameter
      * <p>
@@ -133,7 +131,7 @@ public class AgentClusterFilterSchema {
      *     The state
      */
     @JsonProperty("state")
-    public AgentClusterFilterSchema.State getState() {
+    public Integer getState() {
         return state;
     }
 
@@ -143,7 +141,7 @@ public class AgentClusterFilterSchema {
      *     The state
      */
     @JsonProperty("state")
-    public void setState(AgentClusterFilterSchema.State state) {
+    public void setState(Integer state) {
         this.state = state;
     }
 
@@ -203,43 +201,6 @@ public class AgentClusterFilterSchema {
         }
         AgentClusterFilterSchema rhs = ((AgentClusterFilterSchema) other);
         return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(agentClusters, rhs.agentClusters).append(regex, rhs.regex).append(state, rhs.state).append(compact, rhs.compact).append(additionalProperties, rhs.additionalProperties).isEquals();
-    }
-
-    @Generated("org.jsonschema2pojo")
-    public enum State {
-
-        _0("0"),
-        _1("1"),
-        _2("2");
-        private final String value;
-        private final static Map<String, AgentClusterFilterSchema.State> CONSTANTS = new HashMap<String, AgentClusterFilterSchema.State>();
-
-        static {
-            for (AgentClusterFilterSchema.State c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private State(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static AgentClusterFilterSchema.State fromValue(String value) {
-            AgentClusterFilterSchema.State constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
     }
 
 }

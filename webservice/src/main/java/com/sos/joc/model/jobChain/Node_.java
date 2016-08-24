@@ -261,8 +261,8 @@ public class Node_ {
     public enum OnError {
 
         __EMPTY__(""),
-        SUSPEND("suspend"),
-        SETBACK("setback");
+        suspend("suspend"),
+        setback("setback");
         private final String value;
         private final static Map<String, Node_.OnError> CONSTANTS = new HashMap<String, Node_.OnError>();
 

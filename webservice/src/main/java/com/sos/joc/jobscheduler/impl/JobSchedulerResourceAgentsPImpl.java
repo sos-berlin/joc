@@ -13,7 +13,6 @@ import com.sos.joc.model.jobscheduler.AgentPSchema;
 import com.sos.joc.model.jobscheduler.AgentsPSchema;
 import com.sos.joc.model.jobscheduler.Os;
 import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.model.jobscheduler.State.Severity;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.response.JOCDefaultResponse;
 
@@ -44,8 +43,8 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 AgentPSchema agent = new AgentPSchema();
                 agent.setStartedAt(new Date());
                 State state = new State();
-                state.setSeverity(Severity._0);
-                state.setText(Text.PAUSED);
+                state.setSeverity(0);
+                state.setText(Text.paused);
                 agent.setState(state);
                 agent.setSurveyDate(new Date());
                 agent.setHost(dbItemInventoryInstance.getHostname());

@@ -29,7 +29,7 @@ public class State__ {
      * 
      */
     @JsonProperty("severity")
-    private State__.Severity severity;
+    private Integer severity;
     @JsonProperty("_text")
     private State__.Text text;
     @JsonIgnore
@@ -42,7 +42,7 @@ public class State__ {
      *     The severity
      */
     @JsonProperty("severity")
-    public State__.Severity getSeverity() {
+    public Integer getSeverity() {
         return severity;
     }
 
@@ -53,7 +53,7 @@ public class State__ {
      *     The severity
      */
     @JsonProperty("severity")
-    public void setSeverity(State__.Severity severity) {
+    public void setSeverity(Integer severity) {
         this.severity = severity;
     }
 
@@ -110,51 +110,13 @@ public class State__ {
     }
 
     @Generated("org.jsonschema2pojo")
-    public enum Severity {
-
-        _0("0"),
-        _4("4"),
-        _3("3"),
-        _2("2");
-        private final String value;
-        private final static Map<String, State__.Severity> CONSTANTS = new HashMap<String, State__.Severity>();
-
-        static {
-            for (State__.Severity c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Severity(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static State__.Severity fromValue(String value) {
-            State__.Severity constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
-    @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        NOT_INITIALIZED("not_initialized"),
-        INITIALIZED("initialized"),
-        ACTIVE("active"),
-        UNDER_CONSTRUCTION("under_construction"),
-        STOPPED("stopped");
+        not_initialized("not_initialized"),
+        initialized("initialized"),
+        active("active"),
+        under_construction("under_construction"),
+        stopped("stopped");
         private final String value;
         private final static Map<String, State__.Text> CONSTANTS = new HashMap<String, State__.Text>();
 

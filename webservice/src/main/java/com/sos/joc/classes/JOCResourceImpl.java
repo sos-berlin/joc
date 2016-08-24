@@ -85,10 +85,12 @@ public class JOCResourceImpl {
         if (schedulerId == null) {
             jocDefaultResponse = JOCDefaultResponse.responseStatusJSError("schedulerId is null");
         }
-        dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
-
-        if (dbItemInventoryInstance == null) {
-            jocDefaultResponse = JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES));
+        if (!"".equals(schedulerId)){
+            dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
+    
+            if (dbItemInventoryInstance == null) {
+                jocDefaultResponse = JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES));
+            }
         }
 
         return jocDefaultResponse;

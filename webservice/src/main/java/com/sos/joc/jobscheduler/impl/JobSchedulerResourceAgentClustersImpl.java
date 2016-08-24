@@ -15,7 +15,6 @@ import com.sos.joc.model.jobscheduler.AgentVSchema;
 import com.sos.joc.model.jobscheduler.NumOfAgents_;
 import com.sos.joc.model.jobscheduler.Processes;
 import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.model.jobscheduler.State.Severity;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.model.jobscheduler.State_;
 import com.sos.joc.response.JOCDefaultResponse;
@@ -47,16 +46,16 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             agent1.setRunningTasks(-1);
             agent1.setStartedAt(new Date());
             State state1 = new State();
-            state1.setSeverity(Severity._0);
-            state1.setText(Text.TERMINATING);
+            state1.setSeverity(0);
+            state1.setText(Text.terminating);
             agent1.setState(state1);
             listOfAgents.add(agent1);
             AgentVSchema agent2 = new AgentVSchema();
             agent2.setRunningTasks(-1);
             agent2.setStartedAt(new Date());
             State state2 = new State();
-            state2.setSeverity(Severity._2);
-            state2.setText(Text.DEAD);
+            state2.setSeverity(2);
+            state2.setText(Text.dead);
             agent2.setState(state2);
             listOfAgents.add(agent2);
 
@@ -78,8 +77,8 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             agentClusterVSchema.setProcesses(processes);
 
             State_ state = new State_();
-            state.setSeverity(State_.Severity._2);
-            state.setText(State_.Text.ALL_AGENTS_ARE_UNREACHABLE);
+            state.setSeverity(2);
+            state.setText(State_.Text.all_agents_are_running);
             agentClusterVSchema.setState(state);
 
             agentClusterVSchema.setSurveyDate(new Date());

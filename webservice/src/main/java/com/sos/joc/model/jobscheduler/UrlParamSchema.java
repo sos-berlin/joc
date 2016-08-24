@@ -25,14 +25,23 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "clusterMember"
+    "host",
+    "port"
 })
 public class UrlParamSchema {
 
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
-    @JsonProperty("clusterMember")
-    private String clusterMember;
+    @JsonProperty("host")
+    private String host;
+    /**
+     * port
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("port")
+    private Integer port;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -59,21 +68,47 @@ public class UrlParamSchema {
     /**
      * 
      * @return
-     *     The clusterMember
+     *     The host
      */
-    @JsonProperty("clusterMember")
-    public String getClusterMember() {
-        return clusterMember;
+    @JsonProperty("host")
+    public String getHost() {
+        return host;
     }
 
     /**
      * 
-     * @param clusterMember
-     *     The clusterMember
+     * @param host
+     *     The host
      */
-    @JsonProperty("clusterMember")
-    public void setClusterMember(String clusterMember) {
-        this.clusterMember = clusterMember;
+    @JsonProperty("host")
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    /**
+     * port
+     * <p>
+     * 
+     * 
+     * @return
+     *     The port
+     */
+    @JsonProperty("port")
+    public Integer getPort() {
+        return port;
+    }
+
+    /**
+     * port
+     * <p>
+     * 
+     * 
+     * @param port
+     *     The port
+     */
+    @JsonProperty("port")
+    public void setPort(Integer port) {
+        this.port = port;
     }
 
     @Override
@@ -93,7 +128,7 @@ public class UrlParamSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(clusterMember).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(host).append(port).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -105,7 +140,7 @@ public class UrlParamSchema {
             return false;
         }
         UrlParamSchema rhs = ((UrlParamSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(clusterMember, rhs.clusterMember).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

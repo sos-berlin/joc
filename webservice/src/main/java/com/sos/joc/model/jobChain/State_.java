@@ -29,7 +29,7 @@ public class State_ {
      * 
      */
     @JsonProperty("severity")
-    private State_.Severity severity;
+    private Integer severity;
     @JsonProperty("_text")
     private State_.Text text;
     @JsonIgnore
@@ -42,7 +42,7 @@ public class State_ {
      *     The severity
      */
     @JsonProperty("severity")
-    public State_.Severity getSeverity() {
+    public Integer getSeverity() {
         return severity;
     }
 
@@ -53,7 +53,7 @@ public class State_ {
      *     The severity
      */
     @JsonProperty("severity")
-    public void setSeverity(State_.Severity severity) {
+    public void setSeverity(Integer severity) {
         this.severity = severity;
     }
 
@@ -110,48 +110,11 @@ public class State_ {
     }
 
     @Generated("org.jsonschema2pojo")
-    public enum Severity {
-
-        _5("5"),
-        _4("4"),
-        _2("2");
-        private final String value;
-        private final static Map<String, State_.Severity> CONSTANTS = new HashMap<String, State_.Severity>();
-
-        static {
-            for (State_.Severity c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Severity(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static State_.Severity fromValue(String value) {
-            State_.Severity constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
-    @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        ACTIVE("active"),
-        SKIPPED("skipped"),
-        STOPPED("stopped");
+        active("active"),
+        skipped("skipped"),
+        stopped("stopped");
         private final String value;
         private final static Map<String, State_.Text> CONSTANTS = new HashMap<String, State_.Text>();
 

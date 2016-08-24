@@ -151,8 +151,8 @@ public class JobConfigurationFilterSchema {
     @Generated("org.jsonschema2pojo")
     public enum Mime {
 
-        HTML("html"),
-        XML("xml");
+        html("html"),
+        xml("xml");
         private final String value;
         private final static Map<String, JobConfigurationFilterSchema.Mime> CONSTANTS = new HashMap<String, JobConfigurationFilterSchema.Mime>();
 

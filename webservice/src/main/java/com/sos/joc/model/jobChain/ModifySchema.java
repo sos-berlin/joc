@@ -31,6 +31,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class ModifySchema {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     @JsonProperty("jobChains")
@@ -39,6 +44,8 @@ public class ModifySchema {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
+     * 
+     * (Required)
      * 
      * @return
      *     The jobschedulerId
@@ -49,6 +56,8 @@ public class ModifySchema {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param jobschedulerId
      *     The jobschedulerId

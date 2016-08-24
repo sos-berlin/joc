@@ -44,7 +44,7 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
 
             ClusterMemberTypeSchema clusterMemberTypeSchema = new ClusterMemberTypeSchema();
             clusterMemberTypeSchema.setPrecedence(-1);
-            clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.ACTIVE);
+            clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.active);
             jobscheduler.setClusterType(clusterMemberTypeSchema);
 
             Os os = new Os();
@@ -72,7 +72,7 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
 
             ClusterMemberTypeSchema clusterMemberTypeSchema2 = new ClusterMemberTypeSchema();
             clusterMemberTypeSchema2.setPrecedence(-1);
-            clusterMemberTypeSchema2.setType(ClusterMemberTypeSchema.Type.ACTIVE);
+            clusterMemberTypeSchema2.setType(ClusterMemberTypeSchema.Type.active);
             jobscheduler.setClusterType(clusterMemberTypeSchema2);
 
             Os os2 = new Os();

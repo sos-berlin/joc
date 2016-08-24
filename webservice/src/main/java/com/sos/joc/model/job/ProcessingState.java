@@ -19,58 +19,41 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "description",
     "severity",
     "_text"
 })
 public class ProcessingState {
 
-    @JsonProperty("description")
-    private Object description;
+    /**
+     *  1=pending; 0=running; 2=waiting_for_agent,job_chain_stopped,node_stopped,job_stopped; 5=setback,suspended; 3=job_not_in_period,node_delay,waiting_for_lock,waiting_for_process,waiting_for_task
+     * 
+     */
     @JsonProperty("severity")
-    private ProcessingState.Severity severity;
+    private Integer severity;
     @JsonProperty("_text")
     private ProcessingState.Text text;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * @return
-     *     The description
-     */
-    @JsonProperty("description")
-    public Object getDescription() {
-        return description;
-    }
-
-    /**
-     * 
-     * @param description
-     *     The description
-     */
-    @JsonProperty("description")
-    public void setDescription(Object description) {
-        this.description = description;
-    }
-
-    /**
+     *  1=pending; 0=running; 2=waiting_for_agent,job_chain_stopped,node_stopped,job_stopped; 5=setback,suspended; 3=job_not_in_period,node_delay,waiting_for_lock,waiting_for_process,waiting_for_task
      * 
      * @return
      *     The severity
      */
     @JsonProperty("severity")
-    public ProcessingState.Severity getSeverity() {
+    public Integer getSeverity() {
         return severity;
     }
 
     /**
+     *  1=pending; 0=running; 2=waiting_for_agent,job_chain_stopped,node_stopped,job_stopped; 5=setback,suspended; 3=job_not_in_period,node_delay,waiting_for_lock,waiting_for_process,waiting_for_task
      * 
      * @param severity
      *     The severity
      */
     @JsonProperty("severity")
-    public void setSeverity(ProcessingState.Severity severity) {
+    public void setSeverity(Integer severity) {
         this.severity = severity;
     }
 
@@ -111,7 +94,7 @@ public class ProcessingState {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(description).append(severity).append(text).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(severity).append(text).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -123,67 +106,26 @@ public class ProcessingState {
             return false;
         }
         ProcessingState rhs = ((ProcessingState) other);
-        return new EqualsBuilder().append(description, rhs.description).append(severity, rhs.severity).append(text, rhs.text).append(additionalProperties, rhs.additionalProperties).isEquals();
-    }
-
-    @Generated("org.jsonschema2pojo")
-    public enum Severity {
-
-        _0("0"),
-        _1("1"),
-        _2("2"),
-        _3("3"),
-        _4("4"),
-        _5("5"),
-        _6("6");
-        private final String value;
-        private final static Map<String, ProcessingState.Severity> CONSTANTS = new HashMap<String, ProcessingState.Severity>();
-
-        static {
-            for (ProcessingState.Severity c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Severity(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static ProcessingState.Severity fromValue(String value) {
-            ProcessingState.Severity constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
+        return new EqualsBuilder().append(severity, rhs.severity).append(text, rhs.text).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        PENDING("pending"),
-        RUNNING("running"),
-        SUSPENDED("suspended"),
-        SETBACK("setback"),
-        BACKLIST("backlist"),
-        JOB_NOT_IN_PERIOD("job_not_in_period"),
-        NODE_DELAY("node_delay"),
-        WAITING_FOR_LOCK("waiting_for_lock"),
-        WAITING_FOR_PROCESS("waiting_for_process"),
-        WAITING_FOR_AGENT("waiting_for_agent"),
-        JOB_CHAIN_STOPPED("job_chain_stopped"),
-        NODE_STOPPED("node_stopped"),
-        JOB_STOPPED("job_stopped"),
-        WAITING_FOR_TASK("waiting_for_task");
+        pending("pending"),
+        running("running"),
+        suspended("suspended"),
+        setback("setback"),
+        backlist("backlist"),
+        job_not_in_period("job_not_in_period"),
+        node_delay("node_delay"),
+        waiting_for_lock("waiting_for_lock"),
+        waiting_for_process("waiting_for_process"),
+        waiting_for_agent("waiting_for_agent"),
+        job_chain_stopped("job_chain_stopped"),
+        node_stopped("node_stopped"),
+        job_stopped("job_stopped"),
+        waiting_for_task("waiting_for_task");
         private final String value;
         private final static Map<String, ProcessingState.Text> CONSTANTS = new HashMap<String, ProcessingState.Text>();
 

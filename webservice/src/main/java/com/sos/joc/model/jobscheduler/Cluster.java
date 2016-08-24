@@ -163,9 +163,9 @@ public class Cluster {
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        ACTIVE("active"),
-        PASSIVE("passive"),
-        STANDALONE("standalone");
+        active("active"),
+        passive("passive"),
+        standalone("standalone");
         private final String value;
         private final static Map<String, Cluster.Type> CONSTANTS = new HashMap<String, Cluster.Type>();
 
@@ -184,13 +184,7 @@ public class Cluster {
         public String toString() {
             return this.value;
         }
-        
 
-        @JsonValue
-        final String value() {
-            return this.value;
-        }
-        
         @JsonCreator
         public static Cluster.Type fromValue(String value) {
             Cluster.Type constant = CONSTANTS.get(value);

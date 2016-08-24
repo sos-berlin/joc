@@ -21,7 +21,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * modify order command
  * <p>
- * 
+ * NOTE: orderId is required too except for add order
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -34,16 +34,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "comment",
     "at",
     "resume",
+    "title",
+    "priority",
     "params",
     "runTime"
 })
 public class ModifyOrderSchema {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("orderId")
     private String orderId;
     /**
@@ -81,8 +78,22 @@ public class ModifyOrderSchema {
      */
     @JsonProperty("at")
     private String at = "now";
+    /**
+     * only useful when changing order state of suspended orders
+     * 
+     */
     @JsonProperty("resume")
     private Boolean resume = false;
+    @JsonProperty("title")
+    private String title;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("priority")
+    private Integer priority;
     /**
      * params or environment variables
      * <p>
@@ -102,8 +113,6 @@ public class ModifyOrderSchema {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
      *     The orderId
      */
@@ -113,8 +122,6 @@ public class ModifyOrderSchema {
     }
 
     /**
-     * 
-     * (Required)
      * 
      * @param orderId
      *     The orderId
@@ -245,6 +252,7 @@ public class ModifyOrderSchema {
     }
 
     /**
+     * only useful when changing order state of suspended orders
      * 
      * @return
      *     The resume
@@ -255,6 +263,7 @@ public class ModifyOrderSchema {
     }
 
     /**
+     * only useful when changing order state of suspended orders
      * 
      * @param resume
      *     The resume
@@ -262,6 +271,52 @@ public class ModifyOrderSchema {
     @JsonProperty("resume")
     public void setResume(Boolean resume) {
         this.resume = resume;
+    }
+
+    /**
+     * 
+     * @return
+     *     The title
+     */
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * 
+     * @param title
+     *     The title
+     */
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The priority
+     */
+    @JsonProperty("priority")
+    public Integer getPriority() {
+        return priority;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param priority
+     *     The priority
+     */
+    @JsonProperty("priority")
+    public void setPriority(Integer priority) {
+        this.priority = priority;
     }
 
     /**
@@ -329,7 +384,7 @@ public class ModifyOrderSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(orderId).append(jobChain).append(state).append(endState).append(comment).append(at).append(resume).append(params).append(runTime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(orderId).append(jobChain).append(state).append(endState).append(comment).append(at).append(resume).append(title).append(priority).append(params).append(runTime).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -341,7 +396,7 @@ public class ModifyOrderSchema {
             return false;
         }
         ModifyOrderSchema rhs = ((ModifyOrderSchema) other);
-        return new EqualsBuilder().append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(endState, rhs.endState).append(comment, rhs.comment).append(at, rhs.at).append(resume, rhs.resume).append(params, rhs.params).append(runTime, rhs.runTime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(endState, rhs.endState).append(comment, rhs.comment).append(at, rhs.at).append(resume, rhs.resume).append(title, rhs.title).append(priority, rhs.priority).append(params, rhs.params).append(runTime, rhs.runTime).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

@@ -13,7 +13,6 @@ import com.sos.joc.model.jobscheduler.Database;
 import com.sos.joc.model.jobscheduler.Database.Dbms;
 import com.sos.joc.model.jobscheduler.DbSchema;
 import com.sos.joc.model.jobscheduler.State__;
-import com.sos.joc.model.jobscheduler.State__.Severity;
 import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("jobscheduler")
@@ -38,8 +37,8 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
             database.setSurveyDate(dbItemInventoryInstance.getModified());
             database.setVersion(dbItemInventoryInstance.getJobSchedulerVersion());
             State__ state = new State__();
-            state.setSeverity(Severity._0);
-            state.setText(State__.Text.RUNNING);
+            state.setSeverity(0);
+            state.setText(State__.Text.running);
             database.setState(state);
             entity.setDatabase(database);
             entity.setDeliveryDate(new Date());

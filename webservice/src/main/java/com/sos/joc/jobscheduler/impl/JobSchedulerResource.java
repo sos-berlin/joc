@@ -44,8 +44,8 @@ public class JobSchedulerResource extends JOCResourceImpl {
             // TODO JOC Cockpit Webservice
 
             State state = new State();
-            state.setSeverity(State.Severity._0);
-            state.setText(State.Text.PAUSED);
+            state.setSeverity(0);
+            state.setText(State.Text.paused);
             jobscheduler.setState(state);
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
             entity.setJobscheduler(jobscheduler);

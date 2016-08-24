@@ -38,7 +38,7 @@ public class ConfigurationStatusSchema {
      * 
      */
     @JsonProperty("severity")
-    private ConfigurationStatusSchema.Severity severity;
+    private Integer severity;
     /**
      * 
      * (Required)
@@ -63,7 +63,7 @@ public class ConfigurationStatusSchema {
      *     The severity
      */
     @JsonProperty("severity")
-    public ConfigurationStatusSchema.Severity getSeverity() {
+    public Integer getSeverity() {
         return severity;
     }
 
@@ -75,7 +75,7 @@ public class ConfigurationStatusSchema {
      *     The severity
      */
     @JsonProperty("severity")
-    public void setSeverity(ConfigurationStatusSchema.Severity severity) {
+    public void setSeverity(Integer severity) {
         this.severity = severity;
     }
 
@@ -158,51 +158,14 @@ public class ConfigurationStatusSchema {
     }
 
     @Generated("org.jsonschema2pojo")
-    public enum Severity {
-
-        _4("4"),
-        _5("5"),
-        _2("2");
-        private final String value;
-        private final static Map<String, ConfigurationStatusSchema.Severity> CONSTANTS = new HashMap<String, ConfigurationStatusSchema.Severity>();
-
-        static {
-            for (ConfigurationStatusSchema.Severity c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Severity(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static ConfigurationStatusSchema.Severity fromValue(String value) {
-            ConfigurationStatusSchema.Severity constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
-    @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        ERROR_IN_CONFIGURATION_FILE("error_in_configuration_file"),
-        CHANGED_FILE_NOT_LOADED("changed_file_not_loaded"),
-        REMOVING_DELAYED("removing_delayed"),
-        RESOURCE_IS_MISSING("resource_is_missing"),
-        REPLACEMENT_IS_STANDING_BY("replacement_is_standing_by"),
-        OK("ok");
+        error_in_configuration_file("error_in_configuration_file"),
+        changed_file_not_loaded("changed_file_not_loaded"),
+        removing_delayed("removing_delayed"),
+        resource_is_missing("resource_is_missing"),
+        replacement_is_standing_by("replacement_is_standing_by"),
+        ok("ok");
         private final String value;
         private final static Map<String, ConfigurationStatusSchema.Text> CONSTANTS = new HashMap<String, ConfigurationStatusSchema.Text>();
 

@@ -248,14 +248,14 @@ public class Configuration {
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        JOB("job"),
-        JOB_CHAIN("jobChain"),
-        ORDER("order"),
-        PROCESS_CLASS("processClass"),
-        LOCK("lock"),
-        SCHEDULE("schedule"),
-        PARAMS("params"),
-        OTHER("other");
+        job("job"),
+        jobChain("jobChain"),
+        order("order"),
+        processClass("processClass"),
+        lock("lock"),
+        schedule("schedule"),
+        params("params"),
+        other("other");
         private final String value;
         private final static Map<String, Configuration.Type> CONSTANTS = new HashMap<String, Configuration.Type>();
 

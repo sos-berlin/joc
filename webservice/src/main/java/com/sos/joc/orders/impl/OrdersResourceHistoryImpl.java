@@ -50,8 +50,8 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             history.setPath("myPath");
             history.setStartTime(new Date());
             State state = new State();
-            state.setSeverity(State.Severity._0);
-            state.setText(State.Text.INCOMPLETE);
+            state.setSeverity(0);
+            state.setText(State.Text.incomplete);
             history.setState(state);
             listHistory.add(history);
             

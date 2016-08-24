@@ -13,7 +13,6 @@ import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembers;
 import com.sos.joc.model.jobscheduler.Jobscheduler_;
 import com.sos.joc.model.jobscheduler.MastersVSchema;
 import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.model.jobscheduler.State.Severity;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.response.JOCDefaultResponse;
 
@@ -49,11 +48,11 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                 jobscheduler.setPort(jocXmlCommand.getAttributAsIntegerOr0("tcp_port"));
                 jobscheduler.setStartedAt(jocXmlCommand.getAttributAsDate("running_since"));
                 State state = new State();
-                state.setSeverity(Severity._0);
-                state.setText(Text.RUNNING);
+                state.setSeverity(0);
+                state.setText(Text.running);
                 if ("yes".equals(jocXmlCommand.getAttribut("dead"))) {
-                    state.setSeverity(Severity._1);
-                    state.setText(Text.DEAD);
+                    state.setSeverity(1);
+                    state.setText(Text.dead);
                 }
                 jobscheduler.setState(state);
                 jobscheduler.setSurveyDate(jocXmlCommand.getSurveyDate());

@@ -22,7 +22,6 @@ import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.OrderQueue;
 import com.sos.joc.model.order.OrdersVSchema;
-import com.sos.joc.model.job.ProcessingState;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResource;
 import com.sos.joc.response.JOCDefaultResponse;
@@ -114,9 +113,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
                 }
                 
-                processingState.setDescription("myDescription1");
-                processingState.setSeverity(ProcessingState.Severity._0);
-
+                
                 if (processingState.isSetHistoryId(actProcessingState)) {
                     orderQueue.setHistoryId(-1);
                 }
@@ -125,8 +122,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
                 ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
                 configurationStatusSchema.setMessage("myMessage");
-                configurationStatusSchema.setSeverity(ConfigurationStatusSchema.Severity._2);
-                configurationStatusSchema.setText(ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
+                configurationStatusSchema.setSeverity(2);
+                configurationStatusSchema.setText(ConfigurationStatusSchema.Text.changed_file_not_loaded);
                 orderQueue.setConfigurationStatus(configurationStatusSchema);
                 
                 try { 

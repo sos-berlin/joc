@@ -29,6 +29,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class TimeoutParamSchema {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
@@ -44,6 +49,8 @@ public class TimeoutParamSchema {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The jobschedulerId
      */
@@ -53,6 +60,8 @@ public class TimeoutParamSchema {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param jobschedulerId
      *     The jobschedulerId

@@ -178,8 +178,8 @@ public class Category {
     public enum Mode {
 
         __EMPTY__(""),
-        IMPLICIT("implicit"),
-        EXPLICIT("explicit");
+        implicit("implicit"),
+        explicit("explicit");
         private final String value;
         private final static Map<String, Category.Mode> CONSTANTS = new HashMap<String, Category.Mode>();
 

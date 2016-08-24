@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Generated("org.jsonschema2pojo")
 public enum State____ {
 
-    ACTIVE("active"),
-    STOPPED("stopped");
+    active("active"),
+    stopped("stopped");
     private final String value;
     private final static Map<String, State____> CONSTANTS = new HashMap<String, State____>();
 

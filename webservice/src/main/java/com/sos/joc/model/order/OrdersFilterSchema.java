@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.common.FoldersSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -34,7 +35,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "type",
     "dateFrom",
     "dateTo",
-    "timeZone"
+    "timeZone",
+    "folders"
 })
 public class OrdersFilterSchema {
 
@@ -72,6 +74,14 @@ public class OrdersFilterSchema {
      */
     @JsonProperty("timeZone")
     private String timeZone;
+    /**
+     * folders
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("folders")
+    private List<FoldersSchema> folders = new ArrayList<FoldersSchema>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -269,6 +279,32 @@ public class OrdersFilterSchema {
         this.timeZone = timeZone;
     }
 
+    /**
+     * folders
+     * <p>
+     * 
+     * 
+     * @return
+     *     The folders
+     */
+    @JsonProperty("folders")
+    public List<FoldersSchema> getFolders() {
+        return folders;
+    }
+
+    /**
+     * folders
+     * <p>
+     * 
+     * 
+     * @param folders
+     *     The folders
+     */
+    @JsonProperty("folders")
+    public void setFolders(List<FoldersSchema> folders) {
+        this.folders = folders;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -286,7 +322,7 @@ public class OrdersFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(orders).append(compact).append(regex).append(processingState).append(type).append(dateFrom).append(dateTo).append(timeZone).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(orders).append(compact).append(regex).append(processingState).append(type).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -298,7 +334,7 @@ public class OrdersFilterSchema {
             return false;
         }
         OrdersFilterSchema rhs = ((OrdersFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(orders, rhs.orders).append(compact, rhs.compact).append(regex, rhs.regex).append(processingState, rhs.processingState).append(type, rhs.type).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(orders, rhs.orders).append(compact, rhs.compact).append(regex, rhs.regex).append(processingState, rhs.processingState).append(type, rhs.type).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

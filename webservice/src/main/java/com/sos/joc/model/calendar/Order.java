@@ -250,12 +250,12 @@ public class Order {
     @Generated("org.jsonschema2pojo")
     public enum State {
 
-        PENDING("pending"),
-        RUNNING("running"),
-        SUSPENDED("suspended"),
-        SETBACK("setback"),
-        WAITING_FOR_RESOURCE("waitingForResource"),
-        BLACKLIST("blacklist");
+        pending("pending"),
+        running("running"),
+        suspended("suspended"),
+        setback("setback"),
+        waitingForResource("waitingForResource"),
+        blacklist("blacklist");
         private final String value;
         private final static Map<String, Order.State> CONSTANTS = new HashMap<String, Order.State>();
 

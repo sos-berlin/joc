@@ -268,11 +268,11 @@ public class SupervisorSchema {
     @Generated("org.jsonschema2pojo")
     public enum State {
 
-        UNKNOWN("unknown"),
-        RUNNING("running"),
-        PAUSED("paused"),
-        WAITING_FOR_ACTIVATION("waiting_for_activation"),
-        WAITING_FOR_DATABASE("waiting_for_database");
+        unknown("unknown"),
+        running("running"),
+        paused("paused"),
+        waiting_for_activation("waiting_for_activation"),
+        waiting_for_database("waiting_for_database");
         private final String value;
         private final static Map<String, SupervisorSchema.State> CONSTANTS = new HashMap<String, SupervisorSchema.State>();
 

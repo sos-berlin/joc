@@ -414,14 +414,14 @@ public class TaskSchema {
     @Generated("org.jsonschema2pojo")
     public enum Cause {
 
-        PERIOD_ONCE("period_once"),
-        PERIOD_SINGLE("period_single"),
-        PERIOD_REPEAT("period_repeat"),
-        QUEUE("queue"),
-        QUEUE_AT("queue_at"),
-        DIRECTORY("directory"),
-        DELAY_AFTER_ERROR("delay_after_error"),
-        ORDER("order");
+        period_once("period_once"),
+        period_single("period_single"),
+        period_repeat("period_repeat"),
+        queue("queue"),
+        queue_at("queue_at"),
+        directory("directory"),
+        delay_after_error("delay_after_error"),
+        order("order");
         private final String value;
         private final static Map<String, TaskSchema.Cause> CONSTANTS = new HashMap<String, TaskSchema.Cause>();
 
@@ -456,18 +456,18 @@ public class TaskSchema {
     @Generated("org.jsonschema2pojo")
     public enum State {
 
-        NONE("none"),
-        LOADING("loading"),
-        STARTING("starting"),
-        RUNNING("running"),
-        RUNNING_PROCESS("running_process"),
-        RUNNING_REMOTE_PROCESS("running_remote_process"),
-        WAITING_FOR_PROCESS("waiting_for_process"),
-        WAITING_FOR_LOCKS("waiting_for_locks"),
-        WAITING_FOR_ORDER("waiting_for_order"),
-        SUSPENDED("suspended"),
-        ENDING("ending"),
-        CLOSED("closed");
+        none("none"),
+        loading("loading"),
+        starting("starting"),
+        running("running"),
+        running_process("running_process"),
+        running_remote_process("running_remote_process"),
+        waiting_for_process("waiting_for_process"),
+        waiting_for_locks("waiting_for_locks"),
+        waiting_for_order("waiting_for_order"),
+        suspended("suspended"),
+        ending("ending"),
+        closed("closed");
         private final String value;
         private final static Map<String, TaskSchema.State> CONSTANTS = new HashMap<String, TaskSchema.State>();
 

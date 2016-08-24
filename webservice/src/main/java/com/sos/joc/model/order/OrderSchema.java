@@ -277,9 +277,9 @@ public class OrderSchema {
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        PERMANENT("permanent"),
-        AD_HOC("ad_hoc"),
-        FILE_ORDER("file_order");
+        permanent("permanent"),
+        ad_hoc("ad_hoc"),
+        file_order("file_order");
         private final String value;
         private final static Map<String, OrderSchema.Type> CONSTANTS = new HashMap<String, OrderSchema.Type>();
 

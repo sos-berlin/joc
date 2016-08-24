@@ -37,7 +37,7 @@ public class State {
      * 
      */
     @JsonProperty("severity")
-    private State.Severity severity;
+    private Integer severity;
     /**
      * 
      * (Required)
@@ -56,7 +56,7 @@ public class State {
      *     The severity
      */
     @JsonProperty("severity")
-    public State.Severity getSeverity() {
+    public Integer getSeverity() {
         return severity;
     }
 
@@ -68,7 +68,7 @@ public class State {
      *     The severity
      */
     @JsonProperty("severity")
-    public void setSeverity(State.Severity severity) {
+    public void setSeverity(Integer severity) {
         this.severity = severity;
     }
 
@@ -129,53 +129,15 @@ public class State {
     }
 
     @Generated("org.jsonschema2pojo")
-    public enum Severity {
-
-        _0("0"),
-        _1("1"),
-        _2("2"),
-        _3("3");
-        private final String value;
-        private final static Map<String, State.Severity> CONSTANTS = new HashMap<String, State.Severity>();
-
-        static {
-            for (State.Severity c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Severity(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static State.Severity fromValue(String value) {
-            State.Severity constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
-    @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        RUNNING("running"),
-        PAUSED("paused"),
-        WAITING_FOR_ACTIVATION("waiting_for_activation"),
-        TERMINATING("terminating"),
-        WAITING_FOR_DATABASE("waiting_for_database"),
-        DEAD("dead"),
-        UNREACHABLE("unreachable");
+        running("running"),
+        paused("paused"),
+        waiting_for_activation("waiting_for_activation"),
+        terminating("terminating"),
+        waiting_for_database("waiting_for_database"),
+        dead("dead"),
+        unreachable("unreachable");
         private final String value;
         private final static Map<String, State.Text> CONSTANTS = new HashMap<String, State.Text>();
 

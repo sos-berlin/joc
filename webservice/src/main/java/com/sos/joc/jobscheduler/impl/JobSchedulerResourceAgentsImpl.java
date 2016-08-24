@@ -12,7 +12,6 @@ import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgents;
 import com.sos.joc.model.jobscheduler.AgentVSchema;
 import com.sos.joc.model.jobscheduler.AgentsVSchema;
 import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.model.jobscheduler.State.Severity;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.response.JOCDefaultResponse;
 
@@ -44,8 +43,8 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                 agent.setRunningTasks(-1);
                 agent.setStartedAt(new Date());
                 State state = new State();
-                state.setSeverity(Severity._0);
-                state.setText(Text.PAUSED);
+                state.setSeverity(0);
+                state.setText(Text.paused);
                 agent.setState(state);
                 agent.setUrl(agentFilter.getAgent());
                 agent.setSurveyDate(new Date());

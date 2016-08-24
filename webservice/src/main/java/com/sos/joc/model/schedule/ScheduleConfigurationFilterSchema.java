@@ -151,8 +151,8 @@ public class ScheduleConfigurationFilterSchema {
     @Generated("org.jsonschema2pojo")
     public enum Mime {
 
-        HTML("html"),
-        XML("xml");
+        html("html"),
+        xml("xml");
         private final String value;
         private final static Map<String, ScheduleConfigurationFilterSchema.Mime> CONSTANTS = new HashMap<String, ScheduleConfigurationFilterSchema.Mime>();
 
