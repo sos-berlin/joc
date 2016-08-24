@@ -93,5 +93,15 @@ public class JOCResourceImpl {
 
         return jocDefaultResponse;
     }
+    
+    public JOCDefaultResponse init(String accessToken, String schedulerId, boolean permission) throws Exception {
+        this.accessToken = accessToken;
+        if (jobschedulerUser == null) {
+            jobschedulerUser = new JobSchedulerUser(accessToken);
+        }
+        return init(schedulerId,permission);
+        
+    }
+
 
 }

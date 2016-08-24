@@ -27,7 +27,7 @@ public class Order {
      * SECONDS
      *
      */
-    private String at = "now";
+    private String at = "";
     /**
      * only useful when changing order state of suspended orders
      *

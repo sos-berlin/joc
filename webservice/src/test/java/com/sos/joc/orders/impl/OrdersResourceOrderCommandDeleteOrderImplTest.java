@@ -12,12 +12,12 @@ import com.sos.joc.orders.post.commands.start.Order;
 import com.sos.joc.orders.post.commands.start.OrdersModifyOrderBody;
 import com.sos.joc.response.JOCDefaultResponse;
 
-public class OrdersResourceOrderCommandsImplTest {
+public class OrdersResourceOrderCommandDeleteOrderImplTest {
     private static final String LDAP_PASSWORD = "secret";
     private static final String LDAP_USER = "root";
      
     @Test
-    public void postOrdersCommand() throws Exception   {
+    public void postOrdersCommandDeleteOrder() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
@@ -26,18 +26,18 @@ public class OrdersResourceOrderCommandsImplTest {
         Order order = new Order();
         order.setOrderId("junit_test");
         order.setJobChain("/test/job_chain1");
-       // orders.add(order);
+        orders.add(order);
      
         Order order2 = new Order();
-        order2.setOrderId("test");
+        order2.setOrderId("junit_test2");
         order2.setState("100");
         order2.setJobChain("/test/job_chain1");
         orders.add(order2);
 
         ordersBody.setOrders(orders);
         ordersBody.setJobschedulerId("scheduler_current");
-        OrdersResourceCommandModifyOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandModifyOrderImpl();
-        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersSetState(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
+        OrdersResourceCommandDeleteOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandDeleteOrderImpl();
+        JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersDelete(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
         OkSchema okSchema = (OkSchema) ordersResponse.getEntity();
         assertEquals("postOrdersHistory",true, okSchema.getOk());
      }
