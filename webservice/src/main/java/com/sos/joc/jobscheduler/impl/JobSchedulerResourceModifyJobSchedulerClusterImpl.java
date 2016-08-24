@@ -5,14 +5,12 @@ import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerClusterBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
-import com.sos.joc.response.JOCCockpitResponse;
+import com.sos.joc.response.JOCDefaultResponse;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdTerminate;
 import com.sos.scheduler.model.objects.Spooler;
@@ -22,49 +20,24 @@ import com.sos.scheduler.model.objects.Spooler;
 public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobSchedulerCluster {
 
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
-    private JobSchedulerIdentifier jobSchedulerIdentifier;
     private JobSchedulerModifyJobSchedulerClusterBody jobSchedulerModifyJobSchedulerClusterBody;
 
-    private JOCCockpitResponse check(boolean right) {
-
+    private JOCDefaultResponse check(boolean right) {
         try {
-            if (!jobschedulerUser.isAuthenticated()) {
-                return JOCCockpitResponse.responseStatus401(jobschedulerUser.getAccessToken());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerModifyJobSchedulerClusterBody.getJobschedulerId(),right);
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
             }
-        } catch (org.apache.shiro.session.ExpiredSessionException e) {
-            LOGGER.error(e.getMessage());
-            return JOCCockpitResponse.responseStatus440(jobschedulerUser,e.getMessage());
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return JOCCockpitResponse.responseStatus420(e.getMessage());
-        }
-
-
-        if (jobSchedulerModifyJobSchedulerClusterBody.getJobschedulerId() == null) {
-            return JOCCockpitResponse.responseStatus420("schedulerId is null");
-        }
-
-        if (!right) {
-            return JOCCockpitResponse.responseStatus403(jobschedulerUser);
-        }
-
-        if (!getPermissons(this.getAccessToken()).getJobschedulerMasterCluster().getView().isClusterStatus()) {
-            return JOCCockpitResponse.responseStatus403(jobschedulerUser);
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
         return null;
 
     }
 
-    private JOCCockpitResponse executeModifyJobSchedulerClusterCommand(String restart, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) {
+    private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String restart, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) {
         try {
-            DBItemInventoryInstance dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(jobSchedulerIdentifier);
-
-            if (dbItemInventoryInstance == null) {
-                return JOCCockpitResponse.responseStatus420(String.format("schedulerId %s not found in table %s", jobSchedulerIdentifier.getSchedulerId(),
-                        DBLayer.TABLE_INVENTORY_INSTANCES));
-            }
-
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
@@ -76,9 +49,9 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             jsCmdTerminate.setTimeoutIfNotEmpty(jobSchedulerClusterTerminateBody.getTimeoutAsString());
 
             jocXmlCommand.excutePost(schedulerObjectFactory.toXMLString(jsCmdTerminate));
-            return JOCCockpitResponse.responseStatus200(jocXmlCommand.getSurveyDate());
+            return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            return JOCCockpitResponse.responseStatus420(e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
     }
 
@@ -90,36 +63,36 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
-    public JOCCockpitResponse postJobschedulerTerminate(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
         init(accessToken, jobSchedulerClusterTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminate());
+        JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminate());
 
-        if (jocCockpitResponse != null) {
-            return jocCockpitResponse;
+        if (JOCDefaultResponse != null) {
+            return JOCDefaultResponse;
         }
 
         return executeModifyJobSchedulerClusterCommand(NO, jobSchedulerClusterTerminateBody);
     }
 
     @Override
-    public JOCCockpitResponse postJobschedulerRestartTerminate(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
         init(accessToken, jobSchedulerClusterTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isRestart());
+        JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isRestart());
 
-        if (jocCockpitResponse != null) {
-            return jocCockpitResponse;
+        if (JOCDefaultResponse != null) {
+            return JOCDefaultResponse;
         }
 
         return executeModifyJobSchedulerClusterCommand(YES, jobSchedulerClusterTerminateBody);
     }
 
     @Override
-    public JOCCockpitResponse postJobschedulerTerminateFailSafe(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
         init(accessToken, jobSchedulerClusterTerminateBody);
-        JOCCockpitResponse jocCockpitResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminateFailSafe());
+        JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminateFailSafe());
 
-        if (jocCockpitResponse != null) {
-            return jocCockpitResponse;
+        if (JOCDefaultResponse != null) {
+            return JOCDefaultResponse;
         }
 
         return executeModifyJobSchedulerClusterCommand(NO, jobSchedulerClusterTerminateBody);

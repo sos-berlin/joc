@@ -15,7 +15,6 @@ import com.sos.joc.model.jobscheduler.DbSchema;
 import com.sos.joc.model.jobscheduler.State__;
 import com.sos.joc.model.jobscheduler.State__.Severity;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobSchedulerResourceDb {
@@ -35,7 +34,7 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
 
             DbSchema entity = new DbSchema();
             Database database = new Database();
-            database.setDbms(Dbms.DB_2);
+            database.setDbms(Dbms.DB2);
             database.setSurveyDate(dbItemInventoryInstance.getModified());
             database.setVersion(dbItemInventoryInstance.getJobSchedulerVersion());
             State__ state = new State__();
@@ -47,7 +46,7 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
     }

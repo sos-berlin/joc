@@ -11,7 +11,6 @@ import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler_;
 import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 public class JobSchedulerResource extends JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
@@ -53,7 +52,7 @@ public class JobSchedulerResource extends JOCResourceImpl {
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
     }
 

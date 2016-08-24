@@ -15,7 +15,6 @@ import com.sos.joc.model.jobscheduler.Orders;
 import com.sos.joc.model.jobscheduler.StatisticsSchema;
 import com.sos.joc.model.jobscheduler.Tasks;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implements IJobSchedulerResourceStatistics {
@@ -87,8 +86,7 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
     }

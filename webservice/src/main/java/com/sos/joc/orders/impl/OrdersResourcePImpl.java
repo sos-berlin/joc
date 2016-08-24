@@ -11,7 +11,6 @@ import com.sos.joc.model.order.Order;
 import com.sos.joc.model.order.OrdersPSchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceP;
-import com.sos.joc.response.JOCCockpitResponse;
 import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
@@ -23,8 +22,12 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
  
         
         LOGGER.debug("init OrdersP");
-        init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());       
+        JOCDefaultResponse jocDefaultResponse = init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());       
 
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }        
+        
         try {
 
             OrdersPSchema entity = new OrdersPSchema();
@@ -85,7 +88,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
 
         }
     }

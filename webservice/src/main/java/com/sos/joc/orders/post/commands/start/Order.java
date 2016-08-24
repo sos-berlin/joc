@@ -3,17 +3,45 @@ package com.sos.joc.orders.post.commands.start;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * NOTE: orderId is required too except for add order
+ *
+ */
 public class Order {
 
     private String orderId;
+    /**
+     * absolute path based on live folder of a JobScheduler object. (Required)
+     *
+     */
     private String jobChain;
     private String state;
     private String endState;
+    /**
+     * Field to comment this action which can be logged.
+     *
+     */
     private String comment;
+    /**
+     * ISO format yyyy-mm-dd HH:MM[:SS] or now or now + HH:MM[:SS] or now +
+     * SECONDS
+     *
+     */
     private String at = "now";
+    /**
+     * only useful when changing order state of suspended orders
+     *
+     */
     private Boolean resume = false;
     private List<Param> params = new ArrayList<Param>();
+    /**
+     * A run_time xml is expected which is specified in the
+     * <xsd:complexType name='run_time'> element of
+     * http://www.sos-berlin.com/schema/scheduler.xsd
+     *
+     */
     private String runTime;
+
     public String getOrderId() {
         return orderId;
     }

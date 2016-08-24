@@ -15,7 +15,6 @@ import com.sos.joc.model.jobscheduler.Jobscheduler200PSchema;
 import com.sos.joc.model.jobscheduler.Os;
 import com.sos.joc.model.jobscheduler.Supervisor;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 public class JobSchedulerResourceP extends JOCResourceImpl {
 
@@ -42,8 +41,8 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             DBItemInventoryInstance schedulerSupervisorInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(dbItemInventoryInstance
                     .getSupervisorId()));
             if (schedulerSupervisorInstancesDBItem == null) {
-                return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",
-                        dbItemInventoryInstance.getSupervisorId())));
+                return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",
+                        dbItemInventoryInstance.getSupervisorId()));
             }
 
             Jobscheduler200PSchema entity = new Jobscheduler200PSchema();
@@ -86,7 +85,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
     }
 

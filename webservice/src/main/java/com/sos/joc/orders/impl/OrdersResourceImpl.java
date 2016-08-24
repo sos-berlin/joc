@@ -3,7 +3,6 @@ package com.sos.joc.orders.impl;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.json.Json;
@@ -26,16 +25,20 @@ import com.sos.joc.model.order.OrdersVSchema;
 import com.sos.joc.model.job.ProcessingState;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResource;
-import com.sos.joc.response.JOCCockpitResponse;
 import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceImpl.class);
  
-     public JOCDefaultResponse postOrders1(String accessToken, OrdersBody ordersBody) throws Exception {
+    @Override
+    public JOCDefaultResponse postOrders(String accessToken, OrdersBody ordersBody) throws Exception {
         LOGGER.debug("init Orders");
-        init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
+
  
         try {
  
@@ -187,15 +190,10 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
             System.out.println(e.getCause() + ":" + e.getMessage());
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getCause() + ":" + e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
 
     }
 
-    @Override
-    public JOCDefaultResponse postOrders(String accessToken, OrdersBody orderBody) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
 }

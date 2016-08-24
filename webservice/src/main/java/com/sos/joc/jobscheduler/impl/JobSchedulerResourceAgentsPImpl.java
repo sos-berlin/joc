@@ -16,7 +16,6 @@ import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Severity;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
@@ -26,7 +25,8 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, JobSchedulerAgentsBody jobSchedulerAgentsBody) {
         LOGGER.debug("init JobschedulerAgentsP");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerAgentsBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerAgentsBody.getJobschedulerId(), getPermissons(accessToken).getJobschedulerUniversalAgent().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -70,8 +70,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
     }

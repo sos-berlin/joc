@@ -11,7 +11,6 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 public class JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JOCResourceImpl.class);
@@ -20,16 +19,15 @@ public class JOCResourceImpl {
     protected DBItemInventoryInstance dbItemInventoryInstance;
     protected static final String NO = "no";
     protected static final String YES = "yes";
-
     private String accessToken;
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
 
     protected SOSPermissionJocCockpit getPermissons(String accessToken) {
-        if (jobschedulerUser == null){
+        if (jobschedulerUser == null) {
             this.accessToken = accessToken;
             jobschedulerUser = new JobSchedulerUser(accessToken);
-         }
+        }
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
     }
 
@@ -57,41 +55,40 @@ public class JOCResourceImpl {
         return date;
     }
 
-    public Date getDateFromTimestamp(Long timeStamp){
+    public Date getDateFromTimestamp(Long timeStamp) {
         Long time = new Long(timeStamp);
         Timestamp stamp = new Timestamp(time);
         Date date = new Date(stamp.getTime());
         return date;
     }
-    
+
     public JOCDefaultResponse init(String schedulerId, boolean permission) throws Exception {
         JOCDefaultResponse jocDefaultResponse = null;
- 
+
         try {
+            
             if (!jobschedulerUser.isAuthenticated()) {
-                return JOCDefaultResponse.responseStatus401(JOCCockpitResponse.getError401Schema(jobschedulerUser));
+                jocDefaultResponse = JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser,""));
             }
         } catch (org.apache.shiro.session.ExpiredSessionException e) {
             LOGGER.error(e.getMessage());
-            return JOCDefaultResponse.responseStatus440(JOCCockpitResponse.getError401Schema(jobschedulerUser, e.getMessage()));
+            jocDefaultResponse = JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, e.getMessage()));
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            jocDefaultResponse = JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
         if (!permission) {
-            return JOCDefaultResponse.responseStatus403(JOCCockpitResponse.getError401Schema(jobschedulerUser));
+            jocDefaultResponse = JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser,""));
         }
 
         if (schedulerId == null) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema("schedulerId is null"));
+            jocDefaultResponse = JOCDefaultResponse.responseStatusJSError("schedulerId is null");
         }
-
         dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
 
         if (dbItemInventoryInstance == null) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s", schedulerId,
-                    DBLayer.TABLE_INVENTORY_INSTANCES)));
+            jocDefaultResponse = JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES));
         }
 
         return jocDefaultResponse;

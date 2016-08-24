@@ -8,7 +8,6 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSupervisor;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSupervisorImpl  implements IJobSchedulerResourceSupervisor {
@@ -20,7 +19,7 @@ public class JobSchedulerResourceSupervisorImpl  implements IJobSchedulerResourc
 
         DBItemInventoryInstance dbItemInventoryInstance = jobSchedulerResource.getJobschedulerUser().getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerDefaultBody.getJobschedulerId()));  
         if (dbItemInventoryInstance == null) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(String.format("schedulerId %s not found in table %s",jobSchedulerDefaultBody. getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES)));
+            return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s",jobSchedulerDefaultBody. getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES));
         }
      
         jobSchedulerDefaultBody.setJobschedulerId(dbItemInventoryInstance.getSupervisorId());

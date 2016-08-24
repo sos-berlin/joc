@@ -13,7 +13,6 @@ import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCluster;
 import com.sos.joc.model.jobscheduler.Cluster;
 import com.sos.joc.model.jobscheduler.ClusterSchema;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceCluster {
@@ -45,7 +44,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
     }

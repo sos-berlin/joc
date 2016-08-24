@@ -3,7 +3,7 @@ package com.sos.joc.orders.post.commands.start;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrdersStartBody {
+public class OrdersModifyOrderBody {
 
     private String jobschedulerId;
     private List<Order> orders = new ArrayList<Order>();

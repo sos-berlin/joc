@@ -7,19 +7,12 @@ import java.util.List;
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.model.job.ProcessingState.Severity;
 import com.sos.joc.model.order.History;
 import com.sos.joc.model.order.HistorySchema;
-import com.sos.joc.model.order.Orders_;
 import com.sos.joc.model.order.State;
-import com.sos.joc.model.order.State.Text;
-import com.sos.joc.model.order.SummarySchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceHistory;
-import com.sos.joc.response.JOCCockpitResponse;
 import com.sos.joc.response.JOCDefaultResponse;
-
-import oracle.net.aso.h;
 
 @Path("orders")
 public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrdersResourceHistory {
@@ -28,7 +21,11 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
     @Override
     public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersBody ordersBody) throws Exception {
         LOGGER.debug("init Orders");
-        init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
+
  
         try {
             
@@ -64,8 +61,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
    
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            System.out.println(e.getCause() + ":" + e.getMessage());
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getCause() + ":" + e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
 
     }

@@ -15,7 +15,6 @@ import com.sos.joc.model.jobscheduler.MastersPSchema;
 import com.sos.joc.model.jobscheduler.Os;
 import com.sos.joc.model.jobscheduler.Supervisor;
 import com.sos.joc.response.JOCDefaultResponse;
-import com.sos.joc.response.JOCCockpitResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembersP {
@@ -97,7 +96,7 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
     }

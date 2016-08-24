@@ -18,7 +18,6 @@ import com.sos.joc.model.order.Orders;
 import com.sos.joc.model.order.SnapshotSchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
-import com.sos.joc.response.JOCCockpitResponse;
 import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
@@ -28,8 +27,12 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
     @Override
     public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, OrdersBody ordersBody) throws Exception {
         LOGGER.debug("init Orders");
-        init( ordersBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init( ordersBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
 
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
+        
         try {
 
             // Reading orders from the JobScheduler Webservice
@@ -63,7 +66,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
             System.out.println(e.getCause() + ":" + e.getMessage());
-            return JOCDefaultResponse.responseStatus420(JOCCockpitResponse.getError420Schema(e.getCause() + ":" + e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
 
     }
