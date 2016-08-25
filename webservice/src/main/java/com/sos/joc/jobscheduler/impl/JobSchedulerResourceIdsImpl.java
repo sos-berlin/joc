@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.db.inventory.InventoryDBLayer;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceIds;
 import com.sos.joc.model.jobscheduler.JobschedulerIdsSchema;
 import com.sos.joc.response.JOCDefaultResponse;
@@ -38,7 +38,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             entity.setDeliveryDate(new Date());
             String first = "";
 
-            InventoryDBLayer dbLayer = new InventoryDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection());
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection());
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getInventoryInstances();
             for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
                 jobschedulerIs.add(inventoryInstance.getSchedulerId());

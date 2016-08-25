@@ -56,7 +56,7 @@ public class JOCResourceImpl {
     }
 
     public Date getDateFromTimestamp(Long timeStamp) {
-        Long time = new Long(timeStamp);
+        Long time = new Long(timeStamp/1000);
         Timestamp stamp = new Timestamp(time);
         Date date = new Date(stamp.getTime());
         return date;

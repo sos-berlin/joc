@@ -48,8 +48,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             
             String actProcessingState = "";
             
-           //TODO Use correct authenticfication
-            JobSchedulerRestClient.headers.put("Authorization", "Basic U09TMDE6c29zMDE=");
+           //TODO Use correct url
             JobSchedulerRestClient.headers.put("Content-Type", "application/json");
 
             String response = JobSchedulerRestClient.executeRestServiceCommand("get", "http://localhost:4404/jobscheduler/master/api/order/?return=OrdersComplemented");

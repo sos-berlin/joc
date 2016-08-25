@@ -4,7 +4,6 @@ import java.io.StringReader;
 import java.util.Date;
 
 import javax.json.Json;
-import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.ws.rs.Path;
@@ -13,7 +12,6 @@ import org.apache.log4j.Logger;
 
 import com.sos.jitl.restclient.JobSchedulerRestClient;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.UsedTasks;
 import com.sos.joc.model.order.Orders;
 import com.sos.joc.model.order.SnapshotSchema;
 import com.sos.joc.orders.post.orders.OrdersBody;

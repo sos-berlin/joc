@@ -4,7 +4,7 @@ import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.joc.db.inventory.InventoryDBLayer;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 
 public class JobSchedulerUser {
 
@@ -40,7 +40,7 @@ public class JobSchedulerUser {
 
     public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws Exception {
         if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier) == null) {
-            InventoryDBLayer dbLayer = new InventoryDBLayer(sosShiroCurrentUser.getSosHibernateConnection());
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(sosShiroCurrentUser.getSosHibernateConnection());
             getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerIdentifier, dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
         }
         return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier);

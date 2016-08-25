@@ -10,7 +10,7 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.joc.db.inventory.InventoryDBLayer;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 
 public class InventoryDBLayerTest {
     private static final String LDAP_PASSWORD = "sos01";
@@ -25,7 +25,7 @@ public class InventoryDBLayerTest {
         SOSShiroCurrentUser sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
 
          
-        InventoryDBLayer dbLayer = new InventoryDBLayer(SOSServicePermissionShiro.sosHibernateConnection);
+        InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(SOSServicePermissionShiro.sosHibernateConnection);
         sosShiroCurrentUser.addSchedulerInstanceDBItem (jobSchedulerIdentifier,dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
         DBItemInventoryInstance schedulerInstancesDBItem = sosShiroCurrentUser.getSchedulerInstanceDBItem(jobSchedulerIdentifier);
         

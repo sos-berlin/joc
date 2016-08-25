@@ -31,6 +31,7 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
 
             StatisticsSchema entity = new StatisticsSchema();
             entity.setDeliveryDate(new Date());
+
             Jobs jobschedulerJobs = new Jobs();
             Tasks jobschedulerTasks = new Tasks();
             Orders jobschedulerOrders = new Orders();
