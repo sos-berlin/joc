@@ -1,0 +1,45 @@
+{
+  "title": "jobChainsFilter",
+  "id": "schemas/jobChain/jobChainsFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobChains": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "jobChain": {
+            "$ref": "../common/path-schema.json"
+          }
+        }
+      }
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "folders": {
+      "$ref": "../common/folders-schema.json"
+    },
+    "state": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "active",
+          "stopped"
+        ],
+        "javaEnumNames": [
+          "active",
+          "stopped"
+        ]
+      }
+    }
+  }
+}

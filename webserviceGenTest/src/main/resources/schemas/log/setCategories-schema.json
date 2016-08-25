@@ -1,0 +1,21 @@
+{
+  "title": "set log categories",
+  "id": "schemas/log/setCategories",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "category",
+      "active"
+    ],
+    "properties": {
+      "category": {
+        "type": "string"
+      },
+      "active": {
+        "type": "boolean"
+      }
+    }
+  }
+}

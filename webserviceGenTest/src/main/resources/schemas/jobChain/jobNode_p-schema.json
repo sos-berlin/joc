@@ -1,0 +1,43 @@
+{
+  "title": "JobNode (permanent part)",
+  "id": "schemas/jobchain/jobNode_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "job chain node object with assigned a job",
+  "required": [
+    "name",
+    "nextNode",
+    "errorNode",
+    "job"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "nextNode": {
+      "type": "string"
+    },
+    "errorNode": {
+      "type": "string"
+    },
+    "job": {
+      "$ref": "../job/job_p-schema.json"
+    },
+    "onError": {
+      "type": "string",
+      "enum": [
+        "",
+        "suspend",
+        "setback"
+      ],
+      "javaEnumNames": [
+        "",
+        "suspend",
+        "setback"
+      ]
+    },
+    "delay": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

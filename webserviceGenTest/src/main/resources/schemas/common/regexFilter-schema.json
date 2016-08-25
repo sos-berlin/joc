@@ -1,0 +1,7 @@
+{
+  "title": "filter with regex",
+  "id": "schemas/common/regexFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "regular expression to filter JobScheduler objects by matching the path",
+  "type": "string"
+}

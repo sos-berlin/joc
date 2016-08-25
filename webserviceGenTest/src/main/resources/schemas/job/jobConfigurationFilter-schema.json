@@ -1,0 +1,29 @@
+{
+  "title": "jobConfigurationFilter",
+  "id": "schemas/job/jobConfigurationFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "job"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "mime": {
+      "type": "string",
+      "enum": [
+        "html",
+        "xml"
+      ],
+      "javaEnumNames": [
+        "html",
+        "xml"
+      ],
+      "default": "xml"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "title": "JobScheduler filter",
+  "id": "schemas/common/jobSchedulerFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    }
+  }
+}

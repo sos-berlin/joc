@@ -1,0 +1,17 @@
+{
+  "title": "job chain with delivery date (permanent part)",
+  "id": "schemas/jobChain/jobChain200_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "required": [
+    "deliveryDate",
+    "jobChain"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "jobChain": {
+      "$ref": "jobChain_p-schema.json"
+    }
+  }
+}

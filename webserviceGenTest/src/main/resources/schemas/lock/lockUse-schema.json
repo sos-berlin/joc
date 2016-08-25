@@ -1,0 +1,21 @@
+{
+  "title": "lockUse",
+  "id": "schemas/lock/lockUse",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "path",
+    "exclusive"
+  ],
+  "properties": {
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "available": {
+      "type": "boolean"
+    },
+    "exclusive": {
+      "type": "boolean"
+    }
+  }
+}

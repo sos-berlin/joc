@@ -1,0 +1,26 @@
+{
+  "title": "jobschedulerIds",
+  "id": "schemas/jobscheduler/jobschedulerIds",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "jobschedulerIds",
+    "selected"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "jobschedulerIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "selected": {
+      "description": "The Id from the 'jobschedulerIds' collection which is specified in the selected field will be used for all further calls",
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "title": "jobscheduler supervisor",
+  "id": "schemas/jobscheduler/supervisor",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "version",
+    "host",
+    "port",
+    "platform",
+    "state"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "port": {
+      "$ref": "../common/port-schema.json"
+    },
+    "os": {
+      "$ref": "os-schema.json"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "unknown",
+        "running",
+        "paused",
+        "waiting_for_activation",
+        "waiting_for_database"
+      ],
+      "javaEnumNames": [
+        "unknown",
+        "running",
+        "paused",
+        "waiting_for_activation",
+        "waiting_for_database"
+      ]
+    }
+  }
+}

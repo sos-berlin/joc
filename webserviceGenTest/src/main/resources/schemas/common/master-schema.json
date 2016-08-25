@@ -1,0 +1,14 @@
+{
+  "title": "Master JobScheduler",
+  "id": "schemas/common/master",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    }
+  }
+}

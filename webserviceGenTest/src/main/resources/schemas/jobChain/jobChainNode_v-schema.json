@@ -1,0 +1,79 @@
+{
+  "title": "jobChainNode (volatile part)",
+  "id": "schemas/jobchain/jobChainNode_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "oneOf": [
+    {
+      "description": "job chain node object with assigned a job and parameter compact=true",
+      "required": [
+        "name",
+        "state",
+        "job",
+        "numOfOrders"
+      ]
+    },
+    {
+      "description": "job chain node object with assigned a job and parameter compact=false",
+      "required": [
+        "name",
+        "state",
+        "job",
+        "numOfOrders",
+        "orders"
+      ]
+    },
+    {
+      "description": "job chain node object with assigned a job chain",
+      "required": [
+        "name",
+        "state",
+        "jobChain",
+        "numOfOrders"
+      ]
+    }
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "severity": {
+          "description": "5=skipped, 4=active, 2=stopped",
+          "type": "integer"
+        },
+        "_text": {
+          "type": "string",
+          "enum": [
+            "active",
+            "skipped",
+            "stopped"
+          ],
+          "javaEnumNames": [
+            "active",
+            "skipped",
+            "stopped"
+          ]
+        }
+      }
+    },
+    "job": {
+      "$ref": "../job/job_v-schema.json"
+    },
+    "jobChain": {
+      "description": "job chain object",
+      "$ref": "nestedJobChain_v-schema.json"
+    },
+    "numOfOrders": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "orders": {
+      "type": "array",
+      "items": {
+        "$ref": "../order/order_v-schema.json"
+      }
+    }
+  }
+}

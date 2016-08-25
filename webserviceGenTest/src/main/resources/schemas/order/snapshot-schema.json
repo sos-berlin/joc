@@ -1,0 +1,50 @@
+{
+  "title": "orders overview snapshot",
+  "id": "schemas/orders/snapshot",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "surveyDate",
+    "orders"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "orders": {
+      "type": "object",
+      "required": [
+        "pending",
+        "running",
+        "suspended",
+        "setback",
+        "waitingForResource",
+        "blacklist"
+      ],
+      "properties": {
+        "pending": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        },
+        "running": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        },
+        "suspended": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        },
+        "setback": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        },
+        "waitingForResource": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        },
+        "blacklist": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        }
+      }
+    }
+  }
+}

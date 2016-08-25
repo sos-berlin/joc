@@ -1,0 +1,17 @@
+{
+  "title": "mimeTypeParameter",
+  "id": "schemas/common/filterByMimeType-schema",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "mime": {
+      "type": "string",
+      "enum": ["plain","html"],
+      "javaEnumNames": ["plain","html"],
+      "default": "plain"
+    }
+  }
+}

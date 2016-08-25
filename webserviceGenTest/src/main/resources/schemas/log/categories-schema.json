@@ -1,0 +1,24 @@
+{
+  "title": "log categories object with category collection",
+  "id": "schemas/log/categories",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "currentCategories",
+    "categories"
+  ],
+  "properties": {
+    "currentCategories": {
+      "type": "string"
+    },
+    "resetAt": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+         "$ref": "category-schema.json"
+      }
+    }
+  }
+}

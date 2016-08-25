@@ -1,0 +1,41 @@
+{
+  "title": "errors",
+  "id": "schemas/common/errors",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "errors"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "surveyDate",
+          "path",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "surveyDate": {
+            "$ref": "../common/surveyDate_v-schema.json"
+          },
+          "path": {
+            "$ref": "../common/path-schema.json"
+          },
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

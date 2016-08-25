@@ -1,0 +1,22 @@
+{
+  "title": "task log meta infos",
+  "id": "schemas/history/task200",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "surveyDate",
+    "task"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "task": {
+      "$ref": "task-schema.json"
+    }
+  }
+}

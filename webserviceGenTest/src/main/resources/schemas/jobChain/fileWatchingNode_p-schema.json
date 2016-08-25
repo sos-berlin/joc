@@ -1,0 +1,33 @@
+{
+  "title": "fileOrderSource (permanent part)",
+  "id": "schemas/jobchain/fileWatchingNode_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "directory",
+    "regex"
+  ],
+  "properties": {
+    "directory": {
+      "type": "string"
+    },
+    "nextNode": {
+      "type": "string"
+    },
+    "regex": {
+      "type": "string"
+    },
+    "repeat": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "delayAfterError": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "alertWhenDirectoryMissing": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

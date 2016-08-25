@@ -1,0 +1,32 @@
+{
+  "title": "fileOrderSource (volatile part)",
+  "id": "schemas/jobchain/fileWatchingNode_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "directory",
+    "regex"
+  ],
+  "properties": {
+    "directory": {
+      "type": "string"
+    },
+    "regex": {
+      "type": "string"
+    },
+    "files": {
+      "type": "object",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "$ref": "../common/path-schema.json"
+          },
+          "modified": {
+            "$ref": "../common/timestamp-schema.json"
+          }
+        }
+      }
+    }
+  }
+}

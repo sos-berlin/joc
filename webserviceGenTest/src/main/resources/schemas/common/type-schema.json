@@ -1,0 +1,26 @@
+{
+  "title": "JobScheduler object type",
+  "id": "schemas/common/type",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "string",
+  "enum": [
+    "job",
+    "jobChain",
+    "order",
+    "processClass",
+    "lock",
+    "schedule",
+    "params",
+    "other"
+  ],
+  "javaEnumNames": [
+    "job",
+    "jobChain",
+    "order",
+    "processClass",
+    "lock",
+    "schedule",
+    "params",
+    "other"
+  ]
+}

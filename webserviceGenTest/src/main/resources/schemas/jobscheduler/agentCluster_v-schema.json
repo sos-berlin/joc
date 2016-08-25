@@ -1,0 +1,94 @@
+{
+  "title": "agent cluster (volatile part)",
+  "id": "schemas/jobscheduler/agentCluster_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "oneOf": [
+    {
+      "description": "if parameter compact=false or undefined",
+      "required": [
+        "surveyDate",
+        "path",
+        "state",
+        "numOfAgents",
+        "numOfProcesses",
+        "agents"
+      ]
+    },
+    {
+      "description": "response without agents collection if parameter compact=true",
+      "required": [
+        "surveyDate",
+        "path",
+        "state",
+        "numOfAgents",
+        "numOfProcesses"
+      ]
+    }
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "path": {
+      "description": "Agent cluster name: path of the process class which represents the agent cluster",
+      "$ref": "../common/path-schema.json"
+    },
+    "state": {
+      "$ref": "agentClusterState-schema.json"
+    },
+    "numOfAgents": {
+      "type": "object",
+      "required": [
+        "any",
+        "running"
+      ],
+      "properties": {
+        "any": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        },
+        "running": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        }
+      }
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "$ref": "agent_v-schema.json"
+      }
+    },
+    "numOfProcesses": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "processes": {
+      "required": [
+        "job",
+        "taskId",
+        "pid",
+        "runningSince",
+        "agent"
+      ],
+      "type": "object",
+      "properties": {
+        "job": {
+          "$ref": "../common/path-schema.json"
+        },
+        "taskId": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        },
+        "pid": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        },
+        "runningSince": {
+          "$ref": "../common/timestamp-schema.json"
+        },
+        "agent": {
+          "description": "url",
+          "type": "string",
+          "pattern": "https?://.+"
+        }
+      }
+    }
+  }
+}

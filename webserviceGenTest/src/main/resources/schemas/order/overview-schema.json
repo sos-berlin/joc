@@ -1,0 +1,50 @@
+{
+  "title": "orders overview",
+  "id": "schemas/orders/overview",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "pending",
+    "running",
+    "suspended",
+    "setback",
+    "waitingForResource",
+    "blacklist",
+    "successful",
+    "failed"
+  ],
+  "properties": {
+    "pending": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    },
+    "running": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    },
+    "suspended": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    },
+    "setback": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    },
+    "waitingForResource": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    },
+    "blacklist": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    },
+    "successful": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    },
+    "failed": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    }
+  }
+}

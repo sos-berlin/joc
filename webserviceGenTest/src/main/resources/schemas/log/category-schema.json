@@ -1,0 +1,35 @@
+{
+  "title": "log category object",
+  "id": "schemas/log/category",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "name",
+    "active"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "",
+        "implicit",
+        "explicit"
+      ],
+      "javaEnumNames": [
+        "",
+        "implicit",
+        "explicit"
+      ],
+      "default": ""
+    }
+  }
+}

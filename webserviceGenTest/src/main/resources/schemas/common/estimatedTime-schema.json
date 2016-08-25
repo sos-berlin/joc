@@ -1,0 +1,20 @@
+{
+  "title": "estimated time",
+  "id": "schemas/common/estimatedTime",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "time",
+    "estimated"
+  ],
+  "properties": {
+    "time": {
+      "description": "hh:mm:ss",
+      "type": "string",
+      "format": "time"
+    },
+    "estimated": {
+      "type": "boolean"
+    }
+  }
+}

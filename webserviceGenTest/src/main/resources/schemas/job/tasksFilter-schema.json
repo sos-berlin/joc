@@ -1,0 +1,72 @@
+{
+  "title": "tasksFilter",
+  "id": "schemas/job/tasksFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "job": {
+            "$ref": "../common/path-schema.json"
+          }
+        }
+      }
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "isOrderJob": {
+      "type": "boolean"
+    },
+    "state": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "initialized",
+          "not_initialized",
+          "loaded",
+          "pending",
+          "running",
+          "waiting_for_process",
+          "waiting_for_lock",
+          "waiting_for_agent",
+          "waiting_for_task",
+          "not_in_period",
+          "stopping",
+          "stopped",
+          "removed",
+          "disabled"
+        ],
+        "javaEnumNames": [
+          "initialized",
+          "not_initialized",
+          "loaded",
+          "pending",
+          "running",
+          "waiting_for_process",
+          "waiting_for_lock",
+          "waiting_for_agent",
+          "waiting_for_task",
+          "not_in_period",
+          "stopping",
+          "stopped",
+          "removed",
+          "disabled"
+        ]
+      }
+    }
+  }
+}

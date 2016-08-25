@@ -1,0 +1,14 @@
+{
+  "title": "job order queue with delivery date (volatile part)",
+  "id": "schemas/job/jobOrderQueue200_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "job": {
+      "$ref": "jobOrderQueue_v-schema.json"
+    }
+  }
+}

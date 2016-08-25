@@ -1,0 +1,34 @@
+{
+  "title": "JobScheduler objects filter",
+  "id": "schemas/common/jobSchedulerObjectFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "objects": {
+      "description": "collection of JobScheduler object with path and type",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": {
+            "$ref": "../common/path-schema.json"
+          },
+          "type": {
+            "$ref": "../common/type-schema.json"
+          }
+        }
+      }
+    },
+    "regex": {
+      "description": "regular expression to filter JobScheduler objects by matching the path",
+      "type": "string"
+    }
+  }
+}

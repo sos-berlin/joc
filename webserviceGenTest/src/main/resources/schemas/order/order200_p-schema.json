@@ -1,0 +1,19 @@
+{
+  "title": "order with delivray date (permanent part)",
+  "id": "schemas/order/order200_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "order"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "description": "current time of the JOC server/REST service",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "order": {
+      "$ref": "order_p-schema.json"
+    }
+  }
+}

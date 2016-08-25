@@ -1,0 +1,18 @@
+{
+  "title": "runtime with delivery date",
+  "id": "schemas/common/runtime",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "runTime"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "runTime": {
+      "$ref": "../common/runtime-schema.json"
+    }
+  }
+}

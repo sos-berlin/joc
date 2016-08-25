@@ -1,0 +1,17 @@
+{
+  "title": "clusterMember",
+  "id": "schemas/jobscheduler/urlParam",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "port": {
+      "$ref": "../common/port-schema.json"
+    }
+  }
+}

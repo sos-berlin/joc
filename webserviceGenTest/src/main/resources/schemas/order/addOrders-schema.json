@@ -1,0 +1,20 @@
+{
+  "title": "add order commands",
+  "id": "schemas/order/modifyOrders",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "orders"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "orders": {
+      "type": "array",
+      "items": {
+        "$ref": "addOrder-schema.json"
+      }
+    }
+  }
+}

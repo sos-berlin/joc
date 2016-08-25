@@ -1,0 +1,111 @@
+{
+  "title": "task",
+  "id": "schemas/job/task",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "id",
+    "state"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "pid": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "none",
+        "loading",
+        "starting",
+        "running",
+        "running_process",
+        "running_remote_process",
+        "waiting_for_process",
+        "waiting_for_locks",
+        "waiting_for_order",
+        "suspended",
+        "ending",
+        "closed"
+      ],
+      "javaEnumNames": [
+        "none",
+        "loading",
+        "starting",
+        "running",
+        "running_process",
+        "running_remote_process",
+        "waiting_for_process",
+        "waiting_for_locks",
+        "waiting_for_order",
+        "suspended",
+        "ending",
+        "closed"
+      ]
+    },
+    "startAt": {
+      "description": "The time at which the task should be started",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "runningSince": {
+      "description": "The time when the task was loaded or started",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "enqueued": {
+      "description": "The time when the task entered the task queue.",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "idleSince": {
+      "description": "The time at which the task state changed to waiting_for_order.",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "inProcessSince": {
+      "description": "The time when at which the current active job step started.",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "steps": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "cause": {
+      "type": "string",
+      "enum": [
+        "period_once",
+        "period_single",
+        "period_repeat",
+        "queue",
+        "queue_at",
+        "directory",
+        "delay_after_error",
+        "order"
+      ],
+      "javaEnumNames": [
+        "period_once",
+        "period_single",
+        "period_repeat",
+        "queue",
+        "queue_at",
+        "directory",
+        "delay_after_error",
+        "order"
+      ]
+    },
+    "order": {
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "../common/path-schema.json"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

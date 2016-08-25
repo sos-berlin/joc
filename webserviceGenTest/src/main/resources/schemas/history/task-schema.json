@@ -1,0 +1,44 @@
+{
+  "title": "task log infos",
+  "id": "schemas/history/task",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "oneOf": [
+    {
+      "required": [
+        "taskId",
+        "steps",
+        "startedAt",
+        "endedAt"
+      ]
+    },
+    {
+      "required": [
+        "taskId",
+        "steps",
+        "startedAt",
+        "estimatedEnd"
+      ]
+    }
+  ],
+  "properties": {
+    "taskId": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "steps": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "startedAt": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "endedAt": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "estimatedEnd": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "error": {
+      "$ref": "../common/error-schema.json"
+    }
+  }
+}

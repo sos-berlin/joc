@@ -1,0 +1,46 @@
+{
+  "title": "jobscheduler (volatile part)",
+  "id": "schemas/jobscheduler/jobscheduler_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "oneOf": [
+    {
+      "description": "if state.text=unreachable",
+      "required": [
+        "host",
+        "port",
+        "state"
+      ]
+    },
+    {
+      "required": [
+        "surveyDate",
+        "jobschedulerId",
+        "host",
+        "port",
+        "state",
+        "startedAt"
+      ]
+    }
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "port": {
+      "$ref": "../common/port-schema.json"
+    },
+    "state": {
+      "$ref": "state-schema.json"
+    },
+    "startedAt": {
+      "$ref": "../common/timestamp-schema.json"
+    }
+  }
+}

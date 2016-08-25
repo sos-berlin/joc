@@ -1,0 +1,67 @@
+{
+    "title": "jobChainsFilter",
+    "id": "schemas/jobChain/jobChainsFilter",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "anyOf": [{
+        "type": "object",
+        "required": [
+            "access_token"
+        ],
+        "properties": {
+            "description": "Request requires authentication!",
+            "access_token": {
+                "type": "string"
+            }
+        }
+    }, {
+        "type": "object",
+        "required": [
+            "host",
+            "port"
+        ],
+        "properties": {
+            "host": {
+                "type": "string"
+            },
+            "port": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 65535
+            }
+        }
+    }, {
+        "properties": {
+            "job_chains": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "job_chain": {
+                            "description": "absolute path based on live folder of a JobScheduler object.",
+                            "type": "string",
+                            "format": "regex",
+                            "pattern": "/([^/]+/)*[^/]+"
+                        }
+                    }
+                }
+            },
+            "compact": {
+                "description": "controls if the object view is compact or detailed",
+                "type": "boolean",
+                "default": false
+            },
+            "regex": {
+                "description": "regular expression to filter JobScheduler objects by matching the path",
+                "type": "string"
+            },
+            "state": {
+                "type": "string",
+                "enum": [
+                    "active",
+                    "stopped"
+                ]
+            }
+        }
+    }]
+}

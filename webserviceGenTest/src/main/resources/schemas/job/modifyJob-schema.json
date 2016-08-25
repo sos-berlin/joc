@@ -1,0 +1,23 @@
+{
+  "title": "job modify",
+  "id": "schemas/job/modifyJob",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "the command is part of the web servive url",
+  "type": "object",
+  "required": [
+    "job"
+  ],
+  "properties": {
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "comment": {
+      "description": "Field to comment manually job modifications which can be logged.",
+      "type": "string"
+    },
+    "runTime": {
+      "description": "A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd",
+      "type": "string"
+    }
+  }
+}

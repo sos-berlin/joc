@@ -1,0 +1,51 @@
+{
+  "title": "modify order command",
+  "id": "schemas/order/modifyOrder",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "description": "NOTE: orderId is required too except for add order",
+  "required": [
+    "jobChain"
+  ],
+  "properties": {
+    "orderId": {
+      "type": "string"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "state": {
+      "description": "the name of the node",
+      "type": "string"
+    },
+    "endState": {
+      "description": "the name of the end node",
+      "type": "string"
+    },
+    "comment": {
+      "description": "Field to comment this action which can be logged.",
+      "type": "string"
+    },
+    "at": {
+      "$ref": "../common/timestampWithNow-schema.json"
+    },
+    "resume": {
+      "description": "only useful when changing order state of suspended orders",
+      "type": "boolean",
+      "default": false
+    },
+    "title": {
+      "type": "string"
+    },
+    "priority": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    },
+    "runTime": {
+      "description": "A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd",
+      "type": "string"
+    }
+  }
+}

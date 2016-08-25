@@ -1,0 +1,14 @@
+{
+  "title": "schedule with delivery date (volatile part)",
+  "id": "schemas/schedule/schedule200_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "schedule": {
+      "$ref": "schedule_v-schema.json"
+    }
+  }
+}

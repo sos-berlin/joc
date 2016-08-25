@@ -1,0 +1,130 @@
+{
+  "title": "job order queue (volatile part)",
+  "id": "schemas/job/jobOrderQueue_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "nextPeriodBegin": {
+      "description": "only relevant for order jobs if state.text=not_in_period",
+      "type": "string",
+      "format": "time"
+    },
+    "orderQueue": {
+      "description": "Only for /job/orderQueue",
+      "type": "array",
+      "items": {
+        "$ref": "../order/order_v-schema.json"
+      }
+    },
+    "allTasks": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "allSteps": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "state": {
+      "type": "object",
+      "required": [
+        "severity",
+        "_text"
+      ],
+      "properties": {
+        "severity": {
+          "description": "0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/removed, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled",
+          "type": "integer"
+        },
+        "_text": {
+          "type": "string",
+          "enum": [
+            "initialized",
+            "not_initialized",
+            "loaded",
+            "pending",
+            "running",
+            "waiting_for_process",
+            "waiting_for_lock",
+            "waiting_for_agent",
+            "waiting_for_task",
+            "not_in_period",
+            "stopping",
+            "stopped",
+            "removed",
+            "disabled"
+          ],
+          "javaEnumNames": [
+            "initialized",
+            "not_initialized",
+            "loaded",
+            "pending",
+            "running",
+            "waiting_for_process",
+            "waiting_for_lock",
+            "waiting_for_agent",
+            "waiting_for_task",
+            "not_in_period",
+            "stopping",
+            "stopped",
+            "removed",
+            "disabled"
+          ]
+        }
+      }
+    },
+    "stateText": { "type": "string" },
+    "locks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "exclusive",
+          "available"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "../common/path-schema.json"
+          },
+          "available": { "type": "boolean" },
+          "exclusive": { "type": "boolean" }
+        }
+      }
+    },
+    "temporary": {
+      "type": "boolean",
+      "default": false
+    },
+    "numOfRunningTasks": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "runningTasks": {
+      "type": "array",
+      "items": {
+        "$ref": "runningTask-schema.json"
+      }
+    },
+    "numOfQueuedTasks": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "taskQueue": {
+      "type": "array",
+      "items": {
+        "$ref": "queuedTask-schema.json"
+      }
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    },
+    "configurationStatus": {
+      "$ref": "../common/configurationStatus-schema.json"
+    }
+  }
+}

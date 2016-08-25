@@ -1,0 +1,126 @@
+{
+  "title": "jobscheduler statistics",
+  "id": "schemas/jobscheduler/statistics",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "surveyDate",
+    "jobs",
+    "tasks",
+    "jobChains",
+    "orders"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "jobs": {
+      "type": "object",
+      "required": [ "any", "running", "stopped", "needProcess" ],
+      "properties": {
+        "any": {
+          "type": "integer",
+          "default": 0
+        },
+        "running": {
+          "type": "integer",
+          "default": 0
+        },
+        "stopped": {
+          "type": "integer",
+          "default": 0
+        },
+        "needProcess": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "tasks": {
+      "type": "object",
+      "required": [
+        "any",
+        "running"
+      ],
+      "properties": {
+        "any": {
+          "type": "integer",
+          "default": 0
+        },
+        "running": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "jobChains": {
+      "type": "object",
+      "required": [
+        "any",
+        "stopped"
+      ],
+      "properties": {
+        "any": {
+          "type": "integer",
+          "default": 0
+        },
+        "stopped": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "orders": {
+      "type": "object",
+      "description": "TODO here we need in addition: setback, waitingForResource, running, blacklist",
+      "required": [
+        "any",
+        "clustered",
+        "pending",
+        "suspended",
+        "setback",
+        "waitingForResource",
+        "running",
+        "blacklist"
+      ],
+      "properties": {
+        "any": {
+          "type": "integer",
+          "default": 0
+        },
+        "clustered": {
+          "type": "integer",
+          "default": 0
+        },
+        "pending": {
+          "type": "integer",
+          "default": 0
+        },
+        "suspended": {
+          "type": "integer",
+          "default": 0
+        },
+        "setback": {
+          "type": "integer",
+          "default": 0
+        },
+        "waitingForResource": {
+          "type": "integer",
+          "default": 0
+        },
+        "running": {
+          "type": "integer",
+          "default": 0
+        },
+        "blacklist": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    }
+  }
+}

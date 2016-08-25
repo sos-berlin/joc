@@ -1,0 +1,17 @@
+{
+  "title": "dateFrom and dateTo filter",
+  "id": "schemas/common/dateFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "dates in ISO 8601 format",
+  "type": "object",
+  "properties": {
+    "dateFrom": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "dateTo": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

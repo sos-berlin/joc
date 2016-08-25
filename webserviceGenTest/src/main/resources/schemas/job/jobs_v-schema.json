@@ -1,0 +1,21 @@
+{
+  "title": "jobs (volatile part)",
+  "id": "schemas/job/jobs_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "jobs"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "$ref": "job_v-schema.json"
+      }
+    }
+  }
+}

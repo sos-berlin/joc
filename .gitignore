@@ -18,8 +18,9 @@
 # DOUBLE-CHECK GENERATED FILES
 *.class
 *.jar
-webservice2
 webservice/src/main/raml
 raml.zip
 raml/
 webservice/target/
+webserviceGenTest/target/java-gen/
+webserviceGenTest/target/
