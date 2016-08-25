@@ -12,17 +12,18 @@ import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.order.Order;
 import com.sos.joc.model.order.Order200PSchema;
 import com.sos.joc.order.post.OrderBody;
+import com.sos.joc.order.resource.IOrderHistoryIdResource;
 import com.sos.joc.order.resource.IOrderPResource;
 import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("order")
-public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
-    private static final Logger LOGGER = Logger.getLogger(OrderPResourceImpl.class);
+public class OrderHistoryIdResourceImpl extends JOCResourceImpl implements IOrderHistoryIdResource {
+    private static final Logger LOGGER = Logger.getLogger(OrderHistoryIdResourceImpl.class);
  
     @Override
-    public JOCDefaultResponse postOrderP(String accessToken, OrderBody orderBody) throws Exception {
-        LOGGER.debug("init OrderP");
-        JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
+    public JOCDefaultResponse postOrderHistoryId(String accessToken, String historyId) throws Exception {
+        LOGGER.debug("init OrderHistory");
+      /*  JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -75,7 +76,8 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
-
+*/
+        return null;
     }
 
 

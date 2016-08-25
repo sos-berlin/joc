@@ -26,7 +26,7 @@ public class JOCResourceImplTest {
    public void getDateFromTimestampTest(){
        JOCResourceImpl jocResourceImpl  = new JOCResourceImpl();
        Date date = jocResourceImpl.getDateFromTimestamp(new Long("1471854067629000"));
-       assertEquals("getDateFromStringTest", 1, date.getHours());
+       assertEquals("getDateFromStringTest", 8, date.getHours());
    }
 
    

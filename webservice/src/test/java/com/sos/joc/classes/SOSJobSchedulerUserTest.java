@@ -25,7 +25,7 @@ public class SOSJobSchedulerUserTest {
         JobSchedulerUser sosJobschedulerUser = new JobSchedulerUser(sosShiroCurrentUserAnswer.getAccessToken());
 
         DBItemInventoryInstance schedulerInstancesDBItem = sosJobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier("scheduler_current"));
-        assertEquals("getJobSchedulerInstance", "http://localhost:4000", schedulerInstancesDBItem.getUrl());
+        assertEquals("getJobSchedulerInstance", "http://localhost:4444", schedulerInstancesDBItem.getUrl());
 
     }
 }

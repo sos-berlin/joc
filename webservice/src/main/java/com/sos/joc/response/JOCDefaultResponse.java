@@ -38,7 +38,7 @@ public class JOCDefaultResponse extends com.sos.joc.support.ResponseWrapper {
     }
 
     public static JOCDefaultResponse responseStatusJSError(String message) {
-        Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", MediaType.APPLICATION_JSON);
+        Response.ResponseBuilder responseBuilder = Response.status(420).header("Content-Type", MediaType.APPLICATION_JSON);
         Error420Schema entity = new Error420Schema();
         entity.setDeliveryDate(new Date());
          

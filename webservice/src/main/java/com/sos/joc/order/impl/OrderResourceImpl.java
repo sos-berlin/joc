@@ -98,7 +98,6 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            System.out.println(e.getCause() + ":" + e.getMessage());
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
 

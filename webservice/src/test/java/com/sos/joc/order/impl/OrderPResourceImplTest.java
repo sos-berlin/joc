@@ -25,7 +25,7 @@ public class OrderPResourceImplTest {
         OrderPResourceImpl orderPImpl = new OrderPResourceImpl();
         JOCDefaultResponse ordersResponse = orderPImpl.postOrderP(sosShiroCurrentUserAnswer.getAccessToken(), orderBody);
         Order200PSchema order200PSchema = (Order200PSchema) ordersResponse.getEntity();
-        assertEquals("postjobschedulerClusterTest","Title from db", order200PSchema.getOrder().getTitle());
+        assertEquals("postjobschedulerClusterTest","Titel from db", order200PSchema.getOrder().getTitle());
      }
 
 }
