@@ -173,38 +173,37 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>com.sos.joc.Main</mainClass>
-                </configuration>
-            </plugin>
 
-            <!--plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-shade-plugin</artifactId> 
-                <version>1.4</version> <configuration> <createDependencyReducedPom>true</createDependencyReducedPom> 
-                <filters> <filter> <artifact>*:*</artifact> <excludes> <exclude>META-INF/*.SF</exclude> 
-                <exclude>META-INF/*.DSA</exclude> <exclude>META-INF/*.RSA</exclude> </excludes> 
-                </filter> </filters> </configuration> <executions> <execution> <phase>package</phase> 
-                <goals> <goal>shade</goal> </goals> <configuration> <transformers> <transformer 
-                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" 
-                /> <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" 
-                /> </transformers> </configuration> </execution> </executions> </plugin -->
-
-            <!--plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> 
-                <executions> <execution> <id>copy-dependencies</id> <phase>package</phase> 
-                <goals> <goal>copy-dependencies</goal> </goals> <configuration> <outputDirectory>${project.build.directory}/lib/ext</outputDirectory> 
-                <overWriteReleases>false</overWriteReleases> <overWriteSnapshots>false</overWriteSnapshots> 
-                <overWriteIfNewer>true</overWriteIfNewer> </configuration> </execution> </executions> 
-                </plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/lib/ext</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<excludeArtifactIds>
+								credentialstore,daily-schedule,dashboard-globals,events,graphviz-adapter,jade-history,
+								joe-globals,scheduler-history,scheduler-instances,sos-configuration,sos-connection,sos-dialog,
+								sos-mail,sos-settings,sos-textprocessor,virtual-file-system,
+								engine-base,engine-common,engine-cppjava-runtime,hostware,
+								scalactic_2.11,scala-library,scala-reflect,scala-xml_2.11,
+								spray-http_2.11,spray-httpx_2.11,spray-json_2.11,spray-util_2.11,
+								webdavclient4j-core,ganymed-ssh2,sos-trilead-ssh2,jsch,jzlib,jsr311-api,
+								org.eclipse.swt.${swtSuffix},org.eclipse.jface,org.eclipse.osgi,osgi-resource-locator,junit,hamcrest-core,snakeyaml
+							</excludeArtifactIds>
+							<excludeScope>provided</excludeScope>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
         </plugins>
     </build>
