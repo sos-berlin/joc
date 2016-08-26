@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.order.OrdersVSchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class OrdersResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -23,7 +23,7 @@ public class OrdersResourceImplTest {
         OrdersResourceImpl ordersImpl = new OrdersResourceImpl();
         JOCDefaultResponse ordersResponse = ordersImpl.postOrders(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
         OrdersVSchema ordersVSchema = (OrdersVSchema) ordersResponse.getEntity();
-        assertEquals("postjobschedulerClusterTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
+        assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
      }
 
 }

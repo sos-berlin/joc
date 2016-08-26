@@ -15,16 +15,16 @@ import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
 import com.sos.jitl.restclient.JobSchedulerRestClient;
-import com.sos.joc.classes.JOCProcessingState;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.UsedTasks;
+import com.sos.joc.classes.orders.JOCProcessingState;
+import com.sos.joc.classes.orders.UsedTasks;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.OrderQueue;
 import com.sos.joc.model.order.OrdersVSchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResource;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {

@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
@@ -14,7 +15,6 @@ import com.sos.joc.model.jobscheduler.Jobscheduler_;
 import com.sos.joc.model.jobscheduler.MastersVSchema;
 import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Text;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
@@ -43,14 +43,14 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
 
                 entity.setDeliveryDate(new Date());
                 Jobscheduler_ jobscheduler = new Jobscheduler_();
-                jobscheduler.setHost(jocXmlCommand.getAttribut("host"));
-                jobscheduler.setJobschedulerId(jocXmlCommand.getAttribut("cluster_member_id"));
-                jobscheduler.setPort(jocXmlCommand.getAttributAsIntegerOr0("tcp_port"));
-                jobscheduler.setStartedAt(jocXmlCommand.getAttributAsDate("running_since"));
+                jobscheduler.setHost(jocXmlCommand.getAttribute("host"));
+                jobscheduler.setJobschedulerId(jocXmlCommand.getAttribute("cluster_member_id"));
+                jobscheduler.setPort(jocXmlCommand.getAttributeAsIntegerOr0("tcp_port"));
+                jobscheduler.setStartedAt(jocXmlCommand.getAttributeAsDate("running_since"));
                 State state = new State();
                 state.setSeverity(0);
                 state.setText(Text.running);
-                if ("yes".equals(jocXmlCommand.getAttribut("dead"))) {
+                if ("yes".equals(jocXmlCommand.getAttribute("dead"))) {
                     state.setSeverity(1);
                     state.setText(Text.dead);
                 }

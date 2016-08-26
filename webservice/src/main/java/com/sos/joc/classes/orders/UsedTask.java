@@ -1,4 +1,4 @@
-package com.sos.joc.classes;
+package com.sos.joc.classes.orders;
 
 public class UsedTask {
     Integer taskId;

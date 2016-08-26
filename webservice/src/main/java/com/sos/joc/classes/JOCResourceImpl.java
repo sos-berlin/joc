@@ -10,7 +10,6 @@ import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JOCResourceImpl.class);

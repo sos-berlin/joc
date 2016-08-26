@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Runtime200Schema;
 import com.sos.joc.order.post.OrderRunTimeBody;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class OrderRuntimeResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -25,7 +25,7 @@ public class OrderRuntimeResourceImplTest {
         OrderRunTimeResourceImpl orderRunTimeImpl = new OrderRunTimeResourceImpl();
         JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(sosShiroCurrentUserAnswer.getAccessToken(), orderRunTimeBody);
         Runtime200Schema orderRunTimeSchema = (Runtime200Schema) ordersResponse.getEntity();
-        assertEquals("postjobschedulerClusterTest","myRuntime", orderRunTimeSchema.getRunTime().getRunTime());
+        assertEquals("postOrderPTest","myRuntime", orderRunTimeSchema.getRunTime().getRunTime());
      }
 
 }

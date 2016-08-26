@@ -1,4 +1,4 @@
-package com.sos.joc.classes;
+package com.sos.joc.classes.orders;
 
 import org.apache.log4j.Logger;
 

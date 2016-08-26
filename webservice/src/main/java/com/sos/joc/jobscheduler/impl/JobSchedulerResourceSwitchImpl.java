@@ -6,12 +6,12 @@ import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSwitch;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl  implements IJobSchedulerResourceSwitch {

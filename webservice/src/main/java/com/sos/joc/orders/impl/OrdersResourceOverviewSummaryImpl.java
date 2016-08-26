@@ -3,12 +3,13 @@ package com.sos.joc.orders.impl;
 import java.util.Date;
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
+
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.order.Orders_;
 import com.sos.joc.model.order.SummarySchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSummary;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
 public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implements IOrdersResourceOverviewSummary {

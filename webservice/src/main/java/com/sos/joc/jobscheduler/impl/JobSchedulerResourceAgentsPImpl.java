@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgent;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentsBody;
@@ -14,7 +15,6 @@ import com.sos.joc.model.jobscheduler.AgentsPSchema;
 import com.sos.joc.model.jobscheduler.Os;
 import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Text;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {

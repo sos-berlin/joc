@@ -1,4 +1,4 @@
-package com.sos.joc.db;
+package com.sos.joc.db.inventory.instances;
 
 import static org.junit.Assert.*;
 

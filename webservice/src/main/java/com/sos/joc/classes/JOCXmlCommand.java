@@ -25,11 +25,11 @@ public class JOCXmlCommand extends SOSXmlCommand {
             try {
                 executeXPath("/spooler/answer");
                 SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT);
-                surveyDate = formatter.parse(getAttribut("time"));
+                surveyDate = formatter.parse(getAttribute("time"));
             } catch (Exception e) {
                 try {
                     SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT2);
-                    surveyDate = formatter.parse(getAttribut("time"));
+                    surveyDate = formatter.parse(getAttribute("time"));
                 } catch (Exception ee) {
                 }
             }

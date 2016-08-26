@@ -6,8 +6,8 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.orders.post.orders.OrdersBody;
-import com.sos.joc.response.JOCDefaultResponse;
 
  
 public interface IOrdersResourceOverviewSnapshot {

@@ -4,13 +4,13 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler_;
 import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class JobSchedulerResource extends JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);

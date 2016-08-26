@@ -2,9 +2,9 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResource;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceImpl implements IJobSchedulerResource {

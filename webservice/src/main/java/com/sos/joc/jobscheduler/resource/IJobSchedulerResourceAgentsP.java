@@ -8,8 +8,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentsBody;
-import com.sos.joc.response.JOCDefaultResponse;
  
 public interface IJobSchedulerResourceAgentsP {
  

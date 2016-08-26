@@ -4,7 +4,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBLayer;
 
@@ -12,21 +11,23 @@ import com.sos.jitl.reporting.db.DBLayer;
 public class InventoryOrdersDBLayer extends DBLayer {
 
     private static final Logger LOGGER = Logger.getLogger(InventoryOrdersDBLayer.class);
+    private String jobSchedulerId;
 
-    public InventoryOrdersDBLayer(SOSHibernateConnection conn) {
+    public InventoryOrdersDBLayer(SOSHibernateConnection conn, String jobSchedulerID) {
         super(conn);
+        this.jobSchedulerId = jobSchedulerID;
     }
     
-    public DBItemInventoryOrder getInventoryOrderByOrderId(String jobChain, String orderId) throws Exception {
+    public DBItemInventoryOrder getInventoryOrderByOrderId(String jobChainName, String orderId) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("from ");
-            sql.append(DBITEM_INVENTORY_ORDERS);
-            sql.append(" where (orderId) = :orderId");
-            sql.append("  and  (job_chain_name) = :jobChain");
+            StringBuilder sql = new StringBuilder("select order from ");
+            sql.append(DBITEM_INVENTORY_ORDERS +" as order, " + DBITEM_INVENTORY_INSTANCES + " as instance");
+            sql.append(" where order.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "'");
+            sql.append(" and  (name) = :name");
             Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("orderId", orderId);
-            query.setParameter("jobChain", jobChain);
+            query.setParameter("name", jobChainName + "," + orderId);
 
+            
             List<DBItemInventoryOrder> result = query.list();
             if (!result.isEmpty()) {
                 return result.get(0);
@@ -39,8 +40,9 @@ public class InventoryOrdersDBLayer extends DBLayer {
    
     public List<DBItemInventoryOrder> getInventoryOrders() throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("from ");
-            sql.append(DBITEM_INVENTORY_ORDERS);
+            StringBuilder sql = new StringBuilder("select order from ");
+            sql.append(DBITEM_INVENTORY_ORDERS +" as order, " + DBITEM_INVENTORY_INSTANCES + " as instance");
+            sql.append(" where order.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "'");
             Query query = getConnection().createQuery(sql.toString());
 
             return query.list();

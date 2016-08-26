@@ -6,13 +6,14 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
+
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.order.History;
 import com.sos.joc.model.order.HistorySchema;
 import com.sos.joc.model.order.State;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceHistory;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
 public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrdersResourceHistory {

@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.OkSchema;
 import com.sos.joc.orders.post.commands.start.Order;
 import com.sos.joc.orders.post.commands.start.OrdersModifyOrderBody;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class OrdersResourceOrderCommandsImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -39,7 +39,7 @@ public class OrdersResourceOrderCommandsImplTest {
         OrdersResourceCommandModifyOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandModifyOrderImpl();
         JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersSetState(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
         OkSchema okSchema = (OkSchema) ordersResponse.getEntity();
-        assertEquals("postOrdersHistory",true, okSchema.getOk());
+        assertEquals("postOrdersCommand",true, okSchema.getOk());
      }
 
 }

@@ -4,12 +4,12 @@ import java.util.Date;
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.common.Runtime200Schema;
 import com.sos.joc.model.common.RuntimeSchema;
 import com.sos.joc.order.post.OrderRunTimeBody;
 import com.sos.joc.order.resource.IOrderRunTimeResource;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("order")
 public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderRunTimeResource {

@@ -5,12 +5,12 @@ import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerClusterBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
-import com.sos.joc.response.JOCDefaultResponse;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdTerminate;
 import com.sos.scheduler.model.objects.Spooler;

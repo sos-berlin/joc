@@ -6,6 +6,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.model.common.NameValuePairsSchema;
@@ -13,7 +14,6 @@ import com.sos.joc.model.order.Order;
 import com.sos.joc.model.order.Order200PSchema;
 import com.sos.joc.order.post.OrderBody;
 import com.sos.joc.order.resource.IOrderPResource;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("order")
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
@@ -32,7 +32,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             Order200PSchema entity = new Order200PSchema();
             
 
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection());
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection(), orderBody.getJobschedulerId());
             DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderBody.getJobChain(),orderBody.getOrderId());
      
             entity.setDeliveryDate(new Date());

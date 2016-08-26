@@ -11,12 +11,12 @@ import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
 import com.sos.jitl.restclient.JobSchedulerRestClient;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.order.Orders;
 import com.sos.joc.model.order.SnapshotSchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("orders")
 public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implements IOrdersResourceOverviewSnapshot {

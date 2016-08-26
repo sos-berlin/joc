@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentsPImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgent;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentsBody;
 import com.sos.joc.model.jobscheduler.AgentsPSchema;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class JobSchedulerResourceAgentsPImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -32,7 +32,7 @@ public class JobSchedulerResourceAgentsPImplTest {
         JobSchedulerResourceAgentsPImpl jobschedulerResourceAgentsPImpl = new JobSchedulerResourceAgentsPImpl();
         JOCDefaultResponse jobschedulerAgentsPResponse = jobschedulerResourceAgentsPImpl.postJobschedulerAgentsP(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerAgentsBody);
         AgentsPSchema agentsPSchema = (AgentsPSchema) jobschedulerAgentsPResponse.getEntity();
-        assertEquals("postjobschedulerClusterTest", "http://galadriel:4445", agentsPSchema.getAgents().get(0).getUrl());
+        assertEquals("postjobschedulerAgentsPTest", "http://galadriel:4445", agentsPSchema.getAgents().get(0).getUrl());
      }
 
 }

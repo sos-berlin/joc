@@ -9,12 +9,12 @@ import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceIds;
 import com.sos.joc.model.jobscheduler.JobschedulerIdsSchema;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJobSchedulerResourceIds {

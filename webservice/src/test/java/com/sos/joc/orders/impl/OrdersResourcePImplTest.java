@@ -5,9 +5,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.order.OrdersPSchema;
 import com.sos.joc.orders.post.orders.OrdersBody;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class OrdersResourcePImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -24,7 +24,7 @@ public class OrdersResourcePImplTest {
         JOCDefaultResponse ordersResponseP = ordersPImpl.postOrdersP(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
         
         OrdersPSchema ordersPSchema = (OrdersPSchema) ordersResponseP.getEntity();
-        assertEquals("postjobschedulerClusterTest","myPath1", ordersPSchema.getOrders().get(0).getPath());
+        assertEquals("postjobschedulerClusterTest","RAPID/APAC Solution/QA/QA_TRACE_GENEALOGY/CHN_EVENT_QA_TRACE_GENEALOGY_STAR_CHECK_EVENT,ORD_EVENT_QA_TRACE_GENEALOGY_STAR_CHECK_EVENT", ordersPSchema.getOrders().get(0).getPath());
      }
 
 }

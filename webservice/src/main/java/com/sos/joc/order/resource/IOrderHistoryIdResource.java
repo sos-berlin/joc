@@ -7,8 +7,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.order.post.OrderBody;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public interface IOrderHistoryIdResource {
 

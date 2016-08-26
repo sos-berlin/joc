@@ -1,11 +1,10 @@
-package com.sos.joc.response;
+package com.sos.joc.classes;
 
 import java.util.Date;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.model.common.Error420Schema;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.common.OkSchema;

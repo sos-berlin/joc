@@ -13,7 +13,8 @@ import javax.json.JsonValue;
 import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;
- 
+
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.ConfigurationStatusSchema.Text;
@@ -24,7 +25,6 @@ import com.sos.joc.model.job.ProcessingState;
 import com.sos.joc.model.order.Order200VSchema;
 import com.sos.joc.order.post.OrderBody;
 import com.sos.joc.order.resource.IOrderResource;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("order")
 public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource {

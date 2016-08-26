@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerAgentClustersBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters;
@@ -17,7 +18,6 @@ import com.sos.joc.model.jobscheduler.Processes;
 import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Text;
 import com.sos.joc.model.jobscheduler.State_;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClusters {

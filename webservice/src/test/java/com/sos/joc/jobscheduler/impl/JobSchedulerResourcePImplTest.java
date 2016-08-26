@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourcePImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.model.jobscheduler.Jobscheduler200PSchema;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class JobSchedulerResourcePImplTest {
     private static final String LDAP_PASSWORD = "secret";

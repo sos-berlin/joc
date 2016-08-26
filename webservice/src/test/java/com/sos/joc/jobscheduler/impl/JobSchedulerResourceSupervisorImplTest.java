@@ -5,10 +5,10 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceSupervisorImpl;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
-import com.sos.joc.response.JOCDefaultResponse;
 
 public class JobSchedulerResourceSupervisorImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -24,7 +24,7 @@ public class JobSchedulerResourceSupervisorImplTest {
         JobSchedulerResourceSupervisorImpl jobschedulerResourceSupervisorImpl = new JobSchedulerResourceSupervisorImpl();
         JOCDefaultResponse jobschedulerResponse = jobschedulerResourceSupervisorImpl.postJobschedulerSupervisor(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
         Jobscheduler200VSchema jobschedulerSupervisorSchema = (Jobscheduler200VSchema) jobschedulerResponse.getEntity();
-        assertEquals("postjobschedulerJobSchedulerResourceClusterImplTest.javaTest", "supervisor_scheduler_id", jobschedulerSupervisorSchema.getJobscheduler().getJobschedulerId());
+        assertEquals("postjobschedulerSupervisorTest.javaTest", "supervisor_scheduler_id", jobschedulerSupervisorSchema.getJobscheduler().getJobschedulerId());
      }
 
 }

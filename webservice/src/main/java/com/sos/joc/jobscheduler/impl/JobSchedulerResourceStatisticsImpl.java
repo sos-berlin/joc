@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;
 
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
@@ -14,17 +15,17 @@ import com.sos.joc.model.jobscheduler.Jobs;
 import com.sos.joc.model.jobscheduler.Orders;
 import com.sos.joc.model.jobscheduler.StatisticsSchema;
 import com.sos.joc.model.jobscheduler.Tasks;
-import com.sos.joc.response.JOCDefaultResponse;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implements IJobSchedulerResourceStatistics {
     private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
 
-    private JOCDefaultResponse getStatistics(String schedulerId, String accessToken) {
+    @Override
+    public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerDefaultBody jobSchedulerStatisticsBody) throws Exception {
 
         LOGGER.debug("init Statistics");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(schedulerId,getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerStatisticsBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -46,27 +47,27 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
             }
 
             jocXmlCommand.executeXPath("//subsystem[@name='job']//file_based.statistics");
-            jobschedulerJobs.setAny(jocXmlCommand.getAttributAsIntegerOr0("count"));
+            jobschedulerJobs.setAny(jocXmlCommand.getAttributeAsIntegerOr0("count"));
             jocXmlCommand.executeXPath("//subsystem[@name='job']//job.statistic[@need_process='true']");
-            jobschedulerJobs.setNeedProcess(jocXmlCommand.getAttributAsIntegerOr0("count"));
+            jobschedulerJobs.setNeedProcess(jocXmlCommand.getAttributeAsIntegerOr0("count"));
 
             jocXmlCommand.executeXPath("//subsystem[@name='job']//job.statistic[@job_state='running']");
-            jobschedulerJobs.setRunning(jocXmlCommand.getAttributAsIntegerOr0("count"));
+            jobschedulerJobs.setRunning(jocXmlCommand.getAttributeAsIntegerOr0("count"));
 
             jocXmlCommand.executeXPath("//subsystem[@name='job']//job.statistic[@job_state='stopped']");
-            jobschedulerJobs.setStopped(jocXmlCommand.getAttributAsIntegerOr0("count"));
+            jobschedulerJobs.setStopped(jocXmlCommand.getAttributeAsIntegerOr0("count"));
 
             jocXmlCommand.executeXPath("//subsystem[@name='task']//task.statistic[@task_state='exist']");
-            jobschedulerTasks.setAny(jocXmlCommand.getAttributAsIntegerOr0("count"));
+            jobschedulerTasks.setAny(jocXmlCommand.getAttributeAsIntegerOr0("count"));
 
             jocXmlCommand.executeXPath("//subsystem[@name='task']//task.statistic[@task_state='running']");
-            jobschedulerTasks.setRunning(jocXmlCommand.getAttributAsIntegerOr0("count"));
+            jobschedulerTasks.setRunning(jocXmlCommand.getAttributeAsIntegerOr0("count"));
 
             jocXmlCommand.executeXPath("//subsystem[@name='order']//order.statistic[@order_state='any']");
-            jobschedulerOrders.setAny(jocXmlCommand.getAttributAsIntegerOr0("count"));
+            jobschedulerOrders.setAny(jocXmlCommand.getAttributeAsIntegerOr0("count"));
 
             jocXmlCommand.executeXPath("//subsystem[@name='order']//order.statistic[@order_state='clustered']");
-            jobschedulerOrders.setClustered(jocXmlCommand.getAttributAsIntegerOr0("count"));
+            jobschedulerOrders.setClustered(jocXmlCommand.getAttributeAsIntegerOr0("count"));
 
             // TODO JOC Cockpit Webservice
 
@@ -92,14 +93,5 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
 
     }
 
-    @Override
-    public JOCDefaultResponse getJobschedulerStatistics(String schedulerId, String accessToken) throws Exception {
-        return getStatistics(schedulerId, accessToken);
-    }
-
-    @Override
-    public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerDefaultBody jobSchedulerStatisticsBody) throws Exception {
-        return getStatistics(jobSchedulerStatisticsBody.getJobschedulerId(), accessToken);
-    }
-
+ 
 }
