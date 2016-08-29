@@ -181,43 +181,20 @@
     </dependencies>
 
     <build>
+		<resources>
+			<resource>
+				<directory>/src/main/resources</directory>
+				<excludes>
+					<exclude>shiro.ini</exclude>
+				</excludes>
+			</resource>
+		</resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
             </plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib/ext</outputDirectory>
-							<overWriteReleases>false</overWriteReleases>
-							<overWriteSnapshots>false</overWriteSnapshots>
-							<overWriteIfNewer>true</overWriteIfNewer>
-							<excludeArtifactIds>
-								credentialstore,daily-schedule,dashboard-globals,events,graphviz-adapter,jade-history,
-								joe-globals,scheduler-history,scheduler-instances,sos-configuration,sos-connection,sos-dialog,
-								sos-mail,sos-settings,sos-textprocessor,virtual-file-system,
-								engine-base,engine-common,engine-cppjava-runtime,hostware,
-								scalactic_2.11,scala-library,scala-reflect,scala-xml_2.11,
-								spray-http_2.11,spray-httpx_2.11,spray-json_2.11,spray-util_2.11,
-								webdavclient4j-core,ganymed-ssh2,sos-trilead-ssh2,jsch,jzlib,jsr311-api,
-								org.eclipse.swt.${swtSuffix},org.eclipse.jface,org.eclipse.osgi,osgi-resource-locator,junit,hamcrest-core,snakeyaml
-							</excludeArtifactIds>
-							<excludeScope>provided</excludeScope>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 
         </plugins>
     </build>
