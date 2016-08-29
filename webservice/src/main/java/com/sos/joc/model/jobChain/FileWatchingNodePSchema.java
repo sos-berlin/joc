@@ -54,7 +54,7 @@ public class FileWatchingNodePSchema {
     @JsonProperty("delayAfterError")
     private Integer delayAfterError;
     @JsonProperty("alertWhenDirectoryMissing")
-    private Boolean alertWhenDirectoryMissing = true;
+    private Boolean alertWhenDirectoryMissing;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 

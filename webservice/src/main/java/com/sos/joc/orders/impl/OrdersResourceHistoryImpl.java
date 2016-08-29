@@ -36,7 +36,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             ordersBody.getTimeZone();
             ordersBody.getRegex();
             ordersBody.getOrders();   //list of wanted orders.
- 
+  
             // TODO JOC Cockpit Webservice (Data coming from db Inventory History Tables)
    
             HistorySchema entity = new HistorySchema();

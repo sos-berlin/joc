@@ -32,6 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "errorNode",
     "job",
     "jobChain",
+    "level",
     "onError",
     "delay"
 })
@@ -59,6 +60,12 @@ public class Node {
      */
     @JsonProperty("jobChain")
     private JobChain_ jobChain;
+    /**
+     * Only relevant for job chain with splits and syncs. For example to imagine splits/sync in the job chain list view with different indents
+     * 
+     */
+    @JsonProperty("level")
+    private Integer level;
     @JsonProperty("onError")
     private Node.OnError onError;
     /**
@@ -185,6 +192,28 @@ public class Node {
     }
 
     /**
+     * Only relevant for job chain with splits and syncs. For example to imagine splits/sync in the job chain list view with different indents
+     * 
+     * @return
+     *     The level
+     */
+    @JsonProperty("level")
+    public Integer getLevel() {
+        return level;
+    }
+
+    /**
+     * Only relevant for job chain with splits and syncs. For example to imagine splits/sync in the job chain list view with different indents
+     * 
+     * @param level
+     *     The level
+     */
+    @JsonProperty("level")
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    /**
      * 
      * @return
      *     The onError
@@ -247,7 +276,7 @@ public class Node {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(nextNode).append(errorNode).append(job).append(jobChain).append(onError).append(delay).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(name).append(nextNode).append(errorNode).append(job).append(jobChain).append(level).append(onError).append(delay).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -259,7 +288,7 @@ public class Node {
             return false;
         }
         Node rhs = ((Node) other);
-        return new EqualsBuilder().append(name, rhs.name).append(nextNode, rhs.nextNode).append(errorNode, rhs.errorNode).append(job, rhs.job).append(jobChain, rhs.jobChain).append(onError, rhs.onError).append(delay, rhs.delay).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(nextNode, rhs.nextNode).append(errorNode, rhs.errorNode).append(job, rhs.job).append(jobChain, rhs.jobChain).append(level, rhs.level).append(onError, rhs.onError).append(delay, rhs.delay).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")

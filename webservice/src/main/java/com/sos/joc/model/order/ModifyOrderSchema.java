@@ -34,6 +34,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "comment",
     "at",
     "resume",
+    "removeSetback",
     "title",
     "priority",
     "params",
@@ -77,13 +78,19 @@ public class ModifyOrderSchema {
      * 
      */
     @JsonProperty("at")
-    private String at = "now";
+    private String at;
     /**
      * only useful when changing order state of suspended orders
      * 
      */
     @JsonProperty("resume")
-    private Boolean resume = false;
+    private Boolean resume;
+    /**
+     * only useful when order has a setback
+     * 
+     */
+    @JsonProperty("removeSetback")
+    private Boolean removeSetback;
     @JsonProperty("title")
     private String title;
     /**
@@ -274,6 +281,28 @@ public class ModifyOrderSchema {
     }
 
     /**
+     * only useful when order has a setback
+     * 
+     * @return
+     *     The removeSetback
+     */
+    @JsonProperty("removeSetback")
+    public Boolean getRemoveSetback() {
+        return removeSetback;
+    }
+
+    /**
+     * only useful when order has a setback
+     * 
+     * @param removeSetback
+     *     The removeSetback
+     */
+    @JsonProperty("removeSetback")
+    public void setRemoveSetback(Boolean removeSetback) {
+        this.removeSetback = removeSetback;
+    }
+
+    /**
      * 
      * @return
      *     The title
@@ -384,7 +413,7 @@ public class ModifyOrderSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(orderId).append(jobChain).append(state).append(endState).append(comment).append(at).append(resume).append(title).append(priority).append(params).append(runTime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(orderId).append(jobChain).append(state).append(endState).append(comment).append(at).append(resume).append(removeSetback).append(title).append(priority).append(params).append(runTime).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -396,7 +425,7 @@ public class ModifyOrderSchema {
             return false;
         }
         ModifyOrderSchema rhs = ((ModifyOrderSchema) other);
-        return new EqualsBuilder().append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(endState, rhs.endState).append(comment, rhs.comment).append(at, rhs.at).append(resume, rhs.resume).append(title, rhs.title).append(priority, rhs.priority).append(params, rhs.params).append(runTime, rhs.runTime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(endState, rhs.endState).append(comment, rhs.comment).append(at, rhs.at).append(resume, rhs.resume).append(removeSetback, rhs.removeSetback).append(title, rhs.title).append(priority, rhs.priority).append(params, rhs.params).append(runTime, rhs.runTime).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

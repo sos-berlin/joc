@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.jobChain;
+package com.sos.joc.model.job;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * delete (temporary) orders command
+ * task filter
  * <p>
  * 
  * 
@@ -25,23 +25,41 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "jobChains"
+    "taskId",
+    "timeout"
 })
-public class DeleteOrdersSchema {
+public class TaskFilterSchema {
 
-    @JsonProperty("jobschedulerId")
-    private String jobschedulerId;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("jobChains")
-    private JobChains jobChains;
+    @JsonProperty("jobschedulerId")
+    private String jobschedulerId;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("taskId")
+    private Integer taskId;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("timeout")
+    private Integer timeout;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
+     * 
+     * (Required)
      * 
      * @return
      *     The jobschedulerId
@@ -53,6 +71,8 @@ public class DeleteOrdersSchema {
 
     /**
      * 
+     * (Required)
+     * 
      * @param jobschedulerId
      *     The jobschedulerId
      */
@@ -62,27 +82,57 @@ public class DeleteOrdersSchema {
     }
 
     /**
+     * non negative integer
+     * <p>
      * 
      * (Required)
      * 
      * @return
-     *     The jobChains
+     *     The taskId
      */
-    @JsonProperty("jobChains")
-    public JobChains getJobChains() {
-        return jobChains;
+    @JsonProperty("taskId")
+    public Integer getTaskId() {
+        return taskId;
     }
 
     /**
+     * non negative integer
+     * <p>
      * 
      * (Required)
      * 
-     * @param jobChains
-     *     The jobChains
+     * @param taskId
+     *     The taskId
      */
-    @JsonProperty("jobChains")
-    public void setJobChains(JobChains jobChains) {
-        this.jobChains = jobChains;
+    @JsonProperty("taskId")
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The timeout
+     */
+    @JsonProperty("timeout")
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param timeout
+     *     The timeout
+     */
+    @JsonProperty("timeout")
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
     }
 
     @Override
@@ -102,7 +152,7 @@ public class DeleteOrdersSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobChains).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(taskId).append(timeout).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -110,11 +160,11 @@ public class DeleteOrdersSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof DeleteOrdersSchema) == false) {
+        if ((other instanceof TaskFilterSchema) == false) {
             return false;
         }
-        DeleteOrdersSchema rhs = ((DeleteOrdersSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChains, rhs.jobChains).append(additionalProperties, rhs.additionalProperties).isEquals();
+        TaskFilterSchema rhs = ((TaskFilterSchema) other);
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(taskId, rhs.taskId).append(timeout, rhs.timeout).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

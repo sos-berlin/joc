@@ -57,7 +57,7 @@ public class StartJobSchema {
      * 
      */
     @JsonProperty("at")
-    private String at = "now";
+    private String at;
     /**
      * params or environment variables
      * <p>

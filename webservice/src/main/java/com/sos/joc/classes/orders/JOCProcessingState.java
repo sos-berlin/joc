@@ -74,7 +74,7 @@ public class JOCProcessingState {
 
     public boolean isSetProcessedBy(String actProcessingState) {
         return ProcessingState.Text.running.equals(getText(actProcessingState)) || 
-                ProcessingState.Text.backlist.equals(getText(actProcessingState));
+                ProcessingState.Text.blacklist.equals(getText(actProcessingState));
     }
 
     public boolean isSetSetBack(String actProcessingState) {

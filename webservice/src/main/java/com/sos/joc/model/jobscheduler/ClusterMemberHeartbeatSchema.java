@@ -54,7 +54,7 @@ public class ClusterMemberHeartbeatSchema {
     @JsonProperty("lastDetectedAge")
     private Integer lastDetectedAge;
     @JsonProperty("dead")
-    private Boolean dead = false;
+    private Boolean dead;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 

@@ -1,4 +1,4 @@
-package com.sos.joc.orders.post.commands.start;
+package com.sos.joc.orders.post.commands.modify;
 
 import java.util.ArrayList;
 import java.util.List;

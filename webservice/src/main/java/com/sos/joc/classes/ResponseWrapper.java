@@ -1,5 +1,5 @@
 
-package com.sos.joc.support;
+package com.sos.joc.classes;
 
 import java.lang.annotation.Annotation;
 import java.net.URI;

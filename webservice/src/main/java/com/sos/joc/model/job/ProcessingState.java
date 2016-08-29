@@ -116,7 +116,7 @@ public class ProcessingState {
         running("running"),
         suspended("suspended"),
         setback("setback"),
-        backlist("backlist"),
+        blacklist("blacklist"),
         job_not_in_period("job_not_in_period"),
         node_delay("node_delay"),
         waiting_for_lock("waiting_for_lock"),

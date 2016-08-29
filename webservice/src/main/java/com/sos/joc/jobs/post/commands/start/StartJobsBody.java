@@ -1,12 +1,12 @@
-package com.sos.joc.orders.post.commands.start;
+package com.sos.joc.jobs.post.commands.start;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrdersModifyOrderBody {
+public class StartJobsBody {
 
     private String jobschedulerId;
-    private List<Order> orders = new ArrayList<Order>();
+    private List<Job> jobs = new ArrayList<Job>();
 
     public String getJobschedulerId() {
         return jobschedulerId;
@@ -16,12 +16,12 @@ public class OrdersModifyOrderBody {
         this.jobschedulerId = jobschedulerId;
     }
 
-    public List<Order> getOrders() {
-        return orders;
+    public List<Job> getJobs() {
+        return jobs;
     }
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
     }
 
 }

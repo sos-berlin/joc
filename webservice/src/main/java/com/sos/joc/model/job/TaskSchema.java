@@ -56,7 +56,7 @@ public class TaskSchema {
      * 
      */
     @JsonProperty("state")
-    private TaskSchema.State state;
+    private State___ state;
     /**
      * timestamp
      * <p>
@@ -167,7 +167,7 @@ public class TaskSchema {
      *     The state
      */
     @JsonProperty("state")
-    public TaskSchema.State getState() {
+    public State___ getState() {
         return state;
     }
 
@@ -179,7 +179,7 @@ public class TaskSchema {
      *     The state
      */
     @JsonProperty("state")
-    public void setState(TaskSchema.State state) {
+    public void setState(State___ state) {
         this.state = state;
     }
 
@@ -444,52 +444,6 @@ public class TaskSchema {
         @JsonCreator
         public static TaskSchema.Cause fromValue(String value) {
             TaskSchema.Cause constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
-    @Generated("org.jsonschema2pojo")
-    public enum State {
-
-        none("none"),
-        loading("loading"),
-        starting("starting"),
-        running("running"),
-        running_process("running_process"),
-        running_remote_process("running_remote_process"),
-        waiting_for_process("waiting_for_process"),
-        waiting_for_locks("waiting_for_locks"),
-        waiting_for_order("waiting_for_order"),
-        suspended("suspended"),
-        ending("ending"),
-        closed("closed");
-        private final String value;
-        private final static Map<String, TaskSchema.State> CONSTANTS = new HashMap<String, TaskSchema.State>();
-
-        static {
-            for (TaskSchema.State c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private State(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static TaskSchema.State fromValue(String value) {
-            TaskSchema.State constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

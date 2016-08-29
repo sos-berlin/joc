@@ -8,10 +8,10 @@ import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.orders.post.commands.start.Order;
-import com.sos.joc.orders.post.commands.start.OrdersModifyOrderBody;
-import com.sos.joc.orders.post.commands.start.Param;
-import com.sos.joc.orders.resource.IOrdersResourceOrderCommandModifyOrder;
+import com.sos.joc.orders.post.commands.modify.ModifyOrdersBody;
+import com.sos.joc.orders.post.commands.modify.Order;
+import com.sos.joc.orders.post.commands.modify.Param;
+import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdAddOrder;
 import com.sos.scheduler.model.commands.JSCmdModifyOrder;
@@ -20,7 +20,7 @@ import com.sos.scheduler.model.objects.JSObjRunTime;
 import com.sos.scheduler.model.objects.Spooler;
 
 @Path("orders")
-public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceOrderCommandModifyOrder {
+public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandModifyOrderImpl.class);
 
     private String[] getParams(List<Param> list) {
@@ -40,48 +40,48 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
-            SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
-            objFactory.initMarshaller(Spooler.class);
-            JSCmdModifyOrder objOrder = objFactory.createModifyOrder();
-            objOrder.setJobChainIfNotEmpty(order.getJobChain());
-            objOrder.setOrderIfNotEmpty(order.getOrderId());
+            SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
+            schedulerObjectFactory.initMarshaller(Spooler.class);
+            JSCmdModifyOrder jsCmdModifyOrder = schedulerObjectFactory.createModifyOrder();
+            jsCmdModifyOrder.setJobChainIfNotEmpty(order.getJobChain());
+            jsCmdModifyOrder.setOrderIfNotEmpty(order.getOrderId());
 
             if ("start".equals(command)) {
                 if (order.getAt() == null || "".equals(order.getAt())) {
                     order.setAt("now");
                 }
             } else {
-                objOrder.setAtIfNotEmpty(order.getAt());
+                jsCmdModifyOrder.setAtIfNotEmpty(order.getAt());
             }
 
-            objOrder.setEndStateIfNotEmpty(order.getEndState());
-            objOrder.setPriorityIfNotEmpty("");
+            jsCmdModifyOrder.setEndStateIfNotEmpty(order.getEndState());
+            jsCmdModifyOrder.setPriorityIfNotEmpty("");
             if ("set_state".equals(command)) {
-                objOrder.setStateIfNotEmpty(order.getState());
+                jsCmdModifyOrder.setStateIfNotEmpty(order.getState());
             }
-            objOrder.setSetbackIfNotEmpty("");
+            jsCmdModifyOrder.setSetbackIfNotEmpty("");
             if ("suspend".equals(command)) {
-                objOrder.setSuspendedIfNotEmpty("yes");
+                jsCmdModifyOrder.setSuspendedIfNotEmpty("yes");
             }
             if ("resume".equals(command)) {
-                objOrder.setSuspendedIfNotEmpty("no");
+                jsCmdModifyOrder.setSuspendedIfNotEmpty("no");
             }
             if ("reset".equals(command)) {
-                objOrder.setAction("reset");
+                jsCmdModifyOrder.setAction("reset");
             }
-            objOrder.setTitleIfNotEmpty("");
+            jsCmdModifyOrder.setTitleIfNotEmpty("");
             String[] jobParams = getParams(order.getParams());
             if (jobParams != null) {
-                objOrder.setParams(jobParams);
+                jsCmdModifyOrder.setParams(jobParams);
             }
             if ("set_run_time".equals(command)) {
                 if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
-                    JSObjRunTime objRuntime = new JSObjRunTime(objFactory, order.getRunTime());
-                    objOrder.setRunTime(objRuntime);
+                    JSObjRunTime objRuntime = new JSObjRunTime(schedulerObjectFactory, order.getRunTime());
+                    jsCmdModifyOrder.setRunTime(objRuntime);
                 }
             }
 
-            String xml = objFactory.toXMLString(objOrder);
+            String xml = schedulerObjectFactory.toXMLString(jsCmdModifyOrder);
             jocXmlCommand.excutePost(xml);
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
@@ -91,7 +91,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersStart(String accessToken, OrdersModifyOrderBody ordersModifyOrderBody) {
+    public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders: Start");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
@@ -112,7 +112,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersSuspend(String accessToken, OrdersModifyOrderBody ordersModifyOrderBody) throws Exception {
+    public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrdersBody ordersModifyOrderBody) throws Exception {
         LOGGER.debug("init Orders:Suspend");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
@@ -133,7 +133,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersResume(String accessToken, OrdersModifyOrderBody ordersModifyOrderBody) {
+    public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders:Resume");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
@@ -154,11 +154,11 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersReset(String accessToken, OrdersModifyOrderBody ordersModifyOrderBody) {
+    public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders: Reset");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
-            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), true);
+            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isReset());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -175,12 +175,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersSetState(String accessToken, OrdersModifyOrderBody ordersModifyOrderBody) {
+    public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders: Set State");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), true);
+            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isSetState());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -197,11 +197,11 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersSetRunTime(String accessToken, OrdersModifyOrderBody ordersModifyOrderBody) {
+    public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders: Set Runtime");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
-            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), true);
+            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isSetRunTime());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

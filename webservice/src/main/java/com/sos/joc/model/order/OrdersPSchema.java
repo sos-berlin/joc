@@ -28,7 +28,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "surveyDate",
     "orders"
 })
 public class OrdersPSchema {
@@ -42,15 +41,6 @@ public class OrdersPSchema {
      */
     @JsonProperty("deliveryDate")
     private Date deliveryDate;
-    /**
-     * survey date of the inventory data; last time the inventory job has checked the live folder
-     * <p>
-     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
-     * 
-     */
-    @JsonProperty("surveyDate")
-    private Date surveyDate;
     /**
      * 
      * (Required)
@@ -87,34 +77,6 @@ public class OrdersPSchema {
     @JsonProperty("deliveryDate")
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
-    }
-
-    /**
-     * survey date of the inventory data; last time the inventory job has checked the live folder
-     * <p>
-     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
-     * 
-     * @return
-     *     The surveyDate
-     */
-    @JsonProperty("surveyDate")
-    public Date getSurveyDate() {
-        return surveyDate;
-    }
-
-    /**
-     * survey date of the inventory data; last time the inventory job has checked the live folder
-     * <p>
-     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
-     * 
-     * @param surveyDate
-     *     The surveyDate
-     */
-    @JsonProperty("surveyDate")
-    public void setSurveyDate(Date surveyDate) {
-        this.surveyDate = surveyDate;
     }
 
     /**
@@ -158,7 +120,7 @@ public class OrdersPSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(surveyDate).append(orders).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(orders).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -170,7 +132,7 @@ public class OrdersPSchema {
             return false;
         }
         OrdersPSchema rhs = ((OrdersPSchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(surveyDate, rhs.surveyDate).append(orders, rhs.orders).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(orders, rhs.orders).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

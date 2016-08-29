@@ -63,7 +63,7 @@ public class TasksFilterSchema {
     @JsonProperty("isOrderJob")
     private Boolean isOrderJob;
     @JsonProperty("state")
-    private List<State___> state = new ArrayList<State___>();
+    private List<State____> state = new ArrayList<State____>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -189,7 +189,7 @@ public class TasksFilterSchema {
      *     The state
      */
     @JsonProperty("state")
-    public List<State___> getState() {
+    public List<State____> getState() {
         return state;
     }
 
@@ -199,7 +199,7 @@ public class TasksFilterSchema {
      *     The state
      */
     @JsonProperty("state")
-    public void setState(List<State___> state) {
+    public void setState(List<State____> state) {
         this.state = state;
     }
 

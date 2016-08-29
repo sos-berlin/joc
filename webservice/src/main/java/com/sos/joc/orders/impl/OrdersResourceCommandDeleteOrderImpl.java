@@ -9,15 +9,15 @@ import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.orders.post.commands.start.Order;
-import com.sos.joc.orders.post.commands.start.OrdersModifyOrderBody;
-import com.sos.joc.orders.resource.IOrdersResourceOrderCommandDeleteOrder;
+import com.sos.joc.orders.post.commands.modify.ModifyOrdersBody;
+import com.sos.joc.orders.post.commands.modify.Order;
+import com.sos.joc.orders.resource.IOrdersResourceCommandDeleteOrder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdRemoveOrder;
 import com.sos.scheduler.model.objects.Spooler;
 
 @Path("orders")
-public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implements IOrdersResourceOrderCommandDeleteOrder {
+public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandDeleteOrder {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandDeleteOrderImpl.class);
  
     private JOCDefaultResponse executeDeleteOrderCommand(Order order) {
@@ -40,7 +40,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersDelete(String accessToken, OrdersModifyOrderBody ordersModifyOrderBody) {
+    public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders:Delete");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 

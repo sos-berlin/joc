@@ -30,6 +30,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "surveyDate",
     "path",
+    "name",
     "maxNonExclusive",
     "holders",
     "queue",
@@ -55,6 +56,13 @@ public class LockVSchema {
      */
     @JsonProperty("path")
     private String path;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("name")
+    private String name;
     /**
      * non negative integer
      * <p>
@@ -139,6 +147,30 @@ public class LockVSchema {
     @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @return
+     *     The name
+     */
+    @JsonProperty("name")
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @param name
+     *     The name
+     */
+    @JsonProperty("name")
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -252,7 +284,7 @@ public class LockVSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(maxNonExclusive).append(holders).append(queue).append(configurationStatus).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(maxNonExclusive).append(holders).append(queue).append(configurationStatus).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -264,7 +296,7 @@ public class LockVSchema {
             return false;
         }
         LockVSchema rhs = ((LockVSchema) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(maxNonExclusive, rhs.maxNonExclusive).append(holders, rhs.holders).append(queue, rhs.queue).append(configurationStatus, rhs.configurationStatus).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(maxNonExclusive, rhs.maxNonExclusive).append(holders, rhs.holders).append(queue, rhs.queue).append(configurationStatus, rhs.configurationStatus).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

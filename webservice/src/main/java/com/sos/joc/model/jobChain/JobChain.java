@@ -72,7 +72,7 @@ public class JobChain {
     @JsonProperty("maxOrders")
     private Integer maxOrders;
     @JsonProperty("distributed")
-    private Boolean distributed = false;
+    private Boolean distributed;
     @JsonProperty("processClass")
     private String processClass;
     @JsonProperty("fileWatchingProcessClass")

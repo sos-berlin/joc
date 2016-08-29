@@ -105,7 +105,7 @@ public class Job__ {
     @JsonProperty("locks")
     private List<Lock__> locks = new ArrayList<Lock__>();
     @JsonProperty("temporary")
-    private Boolean temporary = false;
+    private Boolean temporary;
     /**
      * non negative integer
      * <p>

@@ -38,7 +38,7 @@ public class FileSinkNodeSchema {
     @JsonProperty("name")
     private String name;
     @JsonProperty("remove")
-    private Boolean remove = false;
+    private Boolean remove;
     /**
      * a directory path is expected
      * 

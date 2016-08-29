@@ -8,17 +8,17 @@ import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.orders.post.commands.start.Order;
-import com.sos.joc.orders.post.commands.start.OrdersModifyOrderBody;
-import com.sos.joc.orders.post.commands.start.Param;
-import com.sos.joc.orders.resource.IOrdersResourceOrderCommandAddOrder;
+import com.sos.joc.orders.post.commands.modify.ModifyOrdersBody;
+import com.sos.joc.orders.post.commands.modify.Order;
+import com.sos.joc.orders.post.commands.modify.Param;
+import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdAddOrder;
 import com.sos.scheduler.model.objects.JSObjRunTime;
 import com.sos.scheduler.model.objects.Spooler;
 
 @Path("orders")
-public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceOrderCommandAddOrder {
+public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandAddOrderImpl.class);
 
     private String[] getParams(List<Param> list) {
@@ -66,11 +66,11 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     }
 
     @Override
-    public JOCDefaultResponse postOrdersAdd(String accessToken, OrdersModifyOrderBody ordersModifyOrderBody) throws Exception {
+    public JOCDefaultResponse postOrdersAdd(String accessToken, ModifyOrdersBody ordersModifyOrderBody) throws Exception {
         LOGGER.debug("init Orders: Add");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
-            jocDefaultResponse = init(ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isStart());
+            jocDefaultResponse = init(ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getJobChain().isAddOrder());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

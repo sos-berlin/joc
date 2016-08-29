@@ -9,7 +9,7 @@ import com.sos.joc.model.common.Error420Schema;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.common.OkSchema;
 
-public class JOCDefaultResponse extends com.sos.joc.support.ResponseWrapper {
+public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
     private JOCDefaultResponse(Response delegate) {
         super(delegate);

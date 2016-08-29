@@ -27,6 +27,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "surveyDate",
     "path",
+    "name",
     "maxNonExclusive"
 })
 public class LockPSchema {
@@ -49,6 +50,13 @@ public class LockPSchema {
      */
     @JsonProperty("path")
     private String path;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("name")
+    private String name;
     /**
      * non negative integer
      * <p>
@@ -117,6 +125,30 @@ public class LockPSchema {
     }
 
     /**
+     * 
+     * (Required)
+     * 
+     * @return
+     *     The name
+     */
+    @JsonProperty("name")
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @param name
+     *     The name
+     */
+    @JsonProperty("name")
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
      * non negative integer
      * <p>
      * 
@@ -159,7 +191,7 @@ public class LockPSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(maxNonExclusive).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(maxNonExclusive).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -171,7 +203,7 @@ public class LockPSchema {
             return false;
         }
         LockPSchema rhs = ((LockPSchema) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(maxNonExclusive, rhs.maxNonExclusive).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(maxNonExclusive, rhs.maxNonExclusive).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }
