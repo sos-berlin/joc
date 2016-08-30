@@ -4,7 +4,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBLayer;
 

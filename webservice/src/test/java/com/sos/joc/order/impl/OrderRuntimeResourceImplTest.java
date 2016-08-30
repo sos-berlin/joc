@@ -14,7 +14,7 @@ public class OrderRuntimeResourceImplTest {
     private static final String LDAP_USER = "root";
      
     @Test
-    public void postOrderPTest() throws Exception   {
+    public void postOrderRunTimeTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
@@ -25,7 +25,7 @@ public class OrderRuntimeResourceImplTest {
         OrderRunTimeResourceImpl orderRunTimeImpl = new OrderRunTimeResourceImpl();
         JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(sosShiroCurrentUserAnswer.getAccessToken(), orderRunTimeBody);
         Runtime200Schema orderRunTimeSchema = (Runtime200Schema) ordersResponse.getEntity();
-        assertEquals("postOrderPTest","myRuntime", orderRunTimeSchema.getRunTime().getRunTime());
+        assertEquals("postOrderRunTimeTest","myRuntime", orderRunTimeSchema.getRunTime().getRunTime());
      }
 
 }

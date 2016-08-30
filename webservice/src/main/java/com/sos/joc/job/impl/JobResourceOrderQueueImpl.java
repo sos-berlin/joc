@@ -1,53 +1,49 @@
-package com.sos.joc.jobs.impl;
+package com.sos.joc.job.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.ws.rs.Path;
-
 import org.apache.log4j.Logger;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobs.post.JobsBody;
-import com.sos.joc.jobs.resource.IJobsResource;
+import com.sos.joc.job.post.JobOrderQueueBody;
+import com.sos.joc.job.resource.IJobResourceOrderQueue;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
-import com.sos.joc.model.common.ConfigurationStatusSchema.Text;
 import com.sos.joc.model.common.NameValuePairsSchema;
+import com.sos.joc.model.common.ConfigurationStatusSchema.Text;
+import com.sos.joc.model.job.Job200VSchema;
 import com.sos.joc.model.job.Job_;
-import com.sos.joc.model.job.JobsVSchema;
 import com.sos.joc.model.job.Lock_;
 import com.sos.joc.model.job.Order;
 import com.sos.joc.model.job.OrderQueue;
+import com.sos.joc.model.job.OrdersSummary;
 import com.sos.joc.model.job.ProcessingState;
 import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.TaskQueue;
-import com.sos.joc.model.job.RunningTask.Cause;
 import com.sos.joc.model.job.OrderQueue.Type;
-import com.sos.joc.model.job.OrdersSummary;
+import com.sos.joc.model.job.RunningTask.Cause;
 
-@Path("jobs")
-public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
-    private static final Logger LOGGER = Logger.getLogger(JobsResourceImpl.class);
+@Path("job")
+public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobResourceOrderQueue {
+    private static final Logger LOGGER = Logger.getLogger(JobResourceOrderQueueImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobs(String accessToken, JobsBody jobsBody) throws Exception {
-        LOGGER.debug("init Jobs");
-        JOCDefaultResponse jocDefaultResponse = init(jobsBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+    public JOCDefaultResponse postJobOrderQueue(String accessToken, JobOrderQueueBody jobOrderQueueBody) throws Exception {
+
+        LOGGER.debug("init JobsP");
+        JOCDefaultResponse jocDefaultResponse = init(jobOrderQueueBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
 
         try {
- 
-            JobsVSchema entity = new JobsVSchema();
-            List<Job_> listJobs = new ArrayList<Job_>();
+
+            Job200VSchema entity = new Job200VSchema();
 
             entity.setDeliveryDate(new Date());
-
-            // TODO Use correct url
-
             Job_ job = new Job_();
 
             job.setName("myName");
@@ -88,16 +84,11 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             listOfLocks.add(lock2);
             job.setLocks(listOfLocks);
 
-            
-            
-             if (jobsBody.getCompact()) {
+            if (jobOrderQueueBody.getCompact()) {
                 job.setAllSteps(-1);
                 job.setAllTasks(-1);
 
-                job.setDelayUntil(new Date());
-
                 job.setNextPeriodBegin("myNextPeriodBegin");
-                job.setNextStartTime(new Date());
 
                 List<OrderQueue> listOrderQueue = new ArrayList<OrderQueue>();
 
@@ -182,14 +173,14 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
                 job.setTemporary(false);
             }
-            
-            listJobs.add(job);
-            entity.setJobs(listJobs);
+
+            entity.setJob(job);
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
-        }
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
 
+        }
     }
+
 }

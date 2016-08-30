@@ -12,7 +12,7 @@ public class OrderLogHtmlResourceImplTest {
     private static final String LDAP_USER = "root";
      
     @Test
-    public void postOrderHistoryTest() throws Exception   {
+    public void postOrderLogHtmlTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
@@ -20,7 +20,7 @@ public class OrderLogHtmlResourceImplTest {
         OrderLogHtmlResourceImpl orderLogHtmlImpl = new OrderLogHtmlResourceImpl();
         JOCDefaultResponse ordersResponse = orderLogHtmlImpl.getOrderLogHtml(sosShiroCurrentUserAnswer.getAccessToken(), "scheduler_current");
         String logContentSchema = (String) ordersResponse.getEntity();
-        assertEquals("postOrderHistoryTest","<html><body>myLog</body></html>", logContentSchema);
+        assertEquals("postOrderLogHtmlTest","<html><body>myLog</body></html>", logContentSchema);
      }
 
 }

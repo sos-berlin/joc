@@ -1,4 +1,4 @@
-package com.sos.joc.order.impl;
+package com.sos.joc.job.impl;
 
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
@@ -6,17 +6,17 @@ import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.runtime.RunTimeEntity;
-import com.sos.joc.order.post.OrderRunTimeBody;
-import com.sos.joc.order.resource.IOrderRunTimeResource;
-
+import com.sos.joc.job.post.JobRunTimeBody;
+import com.sos.joc.job.resource.IJobRunTimeResource;
+ 
 @Path("order")
-public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderRunTimeResource {
-    private static final Logger LOGGER = Logger.getLogger(OrderRunTimeResourceImpl.class);
+public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTimeResource {
+    private static final Logger LOGGER = Logger.getLogger(JobRunTimeResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrderRunTime(String accessToken, OrderRunTimeBody orderRunTimeBody) throws Exception {
+    public JOCDefaultResponse postJobRunTime(String accessToken, JobRunTimeBody jobRunTimeBody) throws Exception {
         LOGGER.debug("init OrderRunTime");
-        JOCDefaultResponse jocDefaultResponse = init(orderRunTimeBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(jobRunTimeBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -32,5 +32,5 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
         }
 
     }
-
+  
 }

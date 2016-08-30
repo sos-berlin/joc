@@ -1,53 +1,42 @@
-package com.sos.joc.jobs.impl;
+package com.sos.joc.job.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import javax.ws.rs.Path;
-
 import org.apache.log4j.Logger;
-
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobs.post.JobsBody;
-import com.sos.joc.jobs.resource.IJobsResource;
+import com.sos.joc.job.post.JobBody;
+import com.sos.joc.job.resource.IJobResource;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.ConfigurationStatusSchema.Text;
 import com.sos.joc.model.common.NameValuePairsSchema;
+import com.sos.joc.model.job.Job200VSchema;
 import com.sos.joc.model.job.Job_;
-import com.sos.joc.model.job.JobsVSchema;
 import com.sos.joc.model.job.Lock_;
 import com.sos.joc.model.job.Order;
-import com.sos.joc.model.job.OrderQueue;
-import com.sos.joc.model.job.ProcessingState;
 import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.TaskQueue;
 import com.sos.joc.model.job.RunningTask.Cause;
-import com.sos.joc.model.job.OrderQueue.Type;
 import com.sos.joc.model.job.OrdersSummary;
 
-@Path("jobs")
-public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
-    private static final Logger LOGGER = Logger.getLogger(JobsResourceImpl.class);
+@Path("job")
+public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
+    private static final Logger LOGGER = Logger.getLogger(JobResourceImpl.class);
 
-    @Override
-    public JOCDefaultResponse postJobs(String accessToken, JobsBody jobsBody) throws Exception {
-        LOGGER.debug("init Jobs");
-        JOCDefaultResponse jocDefaultResponse = init(jobsBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+    public JOCDefaultResponse postJob(String accessToken, JobBody jobBody) throws Exception {
+        LOGGER.debug("init Job");
+        JOCDefaultResponse jocDefaultResponse = init(jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
 
         try {
- 
-            JobsVSchema entity = new JobsVSchema();
-            List<Job_> listJobs = new ArrayList<Job_>();
+
+            Job200VSchema entity = new Job200VSchema();
 
             entity.setDeliveryDate(new Date());
-
-            // TODO Use correct url
-
             Job_ job = new Job_();
 
             job.setName("myName");
@@ -88,9 +77,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             listOfLocks.add(lock2);
             job.setLocks(listOfLocks);
 
-            
-            
-             if (jobsBody.getCompact()) {
+            if (jobBody.getCompact()) {
                 job.setAllSteps(-1);
                 job.setAllTasks(-1);
 
@@ -98,26 +85,6 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
                 job.setNextPeriodBegin("myNextPeriodBegin");
                 job.setNextStartTime(new Date());
-
-                List<OrderQueue> listOrderQueue = new ArrayList<OrderQueue>();
-
-                OrderQueue orderQueue = new OrderQueue();
-
-                entity.setDeliveryDate(new Date());
-                ConfigurationStatusSchema configurationStatus = new ConfigurationStatusSchema();
-                configurationStatus.setMessage("myMessage");
-                configurationStatus.setSeverity(0);
-                configurationStatus.setText(Text.changed_file_not_loaded);
-                orderQueue.setConfigurationStatus(configurationStatus);
-
-                orderQueue.setEndState("myEndState");
-                orderQueue.setHistoryId(-1);
-                orderQueue.setInProcessSince(new Date());
-                orderQueue.setJob("myJob");
-                orderQueue.setJobChain("myJobChain");
-                orderQueue.setLock("myLock");
-                orderQueue.setNextStartTime(new Date());
-                orderQueue.setOrderId("myOrderId");
 
                 List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
                 NameValuePairsSchema param1 = new NameValuePairsSchema();
@@ -128,28 +95,6 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 param2.setValue("value2");
                 parameters.add(param1);
                 parameters.add(param1);
-                orderQueue.setParams(parameters);
-
-                orderQueue.setPath("myPath");
-                orderQueue.setPriority(-1);
-                orderQueue.setProcessClass("myProcessClass");
-                orderQueue.setProcessedBy("myProcessedBy");
-
-                ProcessingState processingState = new ProcessingState();
-                processingState.setSeverity(1);
-                processingState.setText(ProcessingState.Text.running);
-
-                orderQueue.setProcessingState(processingState);
-
-                orderQueue.setSetback(new Date());
-                orderQueue.setStartedAt(new Date());
-                orderQueue.setState("myState");
-                orderQueue.setStateText("myStateText");
-                orderQueue.setSurveyDate(new Date());
-                orderQueue.setTaskId(-1);
-                orderQueue.setType(Type.file_order);
-                listOrderQueue.add(orderQueue);
-                job.setOrderQueue(listOrderQueue);
 
                 job.setParams(parameters);
 
@@ -182,9 +127,8 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
                 job.setTemporary(false);
             }
-            
-            listJobs.add(job);
-            entity.setJobs(listJobs);
+
+            entity.setJob(job);
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {

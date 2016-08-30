@@ -10,6 +10,7 @@ import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.job.post.JobBody;
 
 public class JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JOCResourceImpl.class);
@@ -55,7 +56,7 @@ public class JOCResourceImpl {
     }
 
     public Date getDateFromTimestamp(Long timeStamp) {
-        Long time = new Long(timeStamp/1000);
+        Long time = new Long(timeStamp / 1000);
         Timestamp stamp = new Timestamp(time);
         Date date = new Date(stamp.getTime());
         return date;
@@ -65,44 +66,44 @@ public class JOCResourceImpl {
         JOCDefaultResponse jocDefaultResponse = null;
 
         try {
-            
+
             if (!jobschedulerUser.isAuthenticated()) {
-                jocDefaultResponse = JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser,""));
+                return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
             }
         } catch (org.apache.shiro.session.ExpiredSessionException e) {
             LOGGER.error(e.getMessage());
-            jocDefaultResponse = JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, e.getMessage()));
+            return JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, e.getMessage()));
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
-            jocDefaultResponse = JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
         if (!permission) {
-            jocDefaultResponse = JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser,""));
+            return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
         }
 
         if (schedulerId == null) {
-            jocDefaultResponse = JOCDefaultResponse.responseStatusJSError("schedulerId is null");
+            return JOCDefaultResponse.responseStatusJSError("schedulerId is null");
         }
-        if (!"".equals(schedulerId)){
+        if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
-    
+
             if (dbItemInventoryInstance == null) {
-                jocDefaultResponse = JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES));
+                return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId,
+                        DBLayer.TABLE_INVENTORY_INSTANCES));
             }
         }
 
         return jocDefaultResponse;
     }
-    
+
     public JOCDefaultResponse init(String accessToken, String schedulerId, boolean permission) throws Exception {
         this.accessToken = accessToken;
         if (jobschedulerUser == null) {
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
-        return init(schedulerId,permission);
-        
-    }
+        return init(schedulerId, permission);
 
+    }
 
 }

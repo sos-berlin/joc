@@ -11,7 +11,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.OkSchema;
 import com.sos.joc.orders.post.commands.modify.ModifyOrdersBody;
 import com.sos.joc.orders.post.commands.modify.Order;
- 
+
+
 public class OrdersResourceOrderCommandDeleteOrderImplTest {
     private static final String LDAP_PASSWORD = "secret";
     private static final String LDAP_USER = "root";
