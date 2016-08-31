@@ -9,7 +9,7 @@ import com.sos.joc.classes.runtime.RunTimeEntity;
 import com.sos.joc.job.post.JobRunTimeBody;
 import com.sos.joc.job.resource.IJobRunTimeResource;
  
-@Path("order")
+@Path("job")
 public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTimeResource {
     private static final Logger LOGGER = Logger.getLogger(JobRunTimeResourceImpl.class);
 
