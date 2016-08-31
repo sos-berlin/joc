@@ -13,9 +13,7 @@ import com.sos.joc.orders.post.commands.modify.Order;
 import com.sos.joc.orders.post.commands.modify.Param;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
-import com.sos.scheduler.model.commands.JSCmdAddOrder;
 import com.sos.scheduler.model.commands.JSCmdModifyOrder;
-import com.sos.scheduler.model.commands.JSCmdRemoveOrder;
 import com.sos.scheduler.model.objects.JSObjRunTime;
 import com.sos.scheduler.model.objects.Spooler;
 

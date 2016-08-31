@@ -36,7 +36,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "nodes",
     "fileOrderSources",
     "numOfOrders",
-    "configurationStatus"
+    "configurationStatus",
+    "ordersSummary"
 })
 public class JobChain__ {
 
@@ -88,6 +89,8 @@ public class JobChain__ {
      */
     @JsonProperty("configurationStatus")
     private ConfigurationStatusSchema configurationStatus;
+    @JsonProperty("ordersSummary")
+    private OrdersSummary ordersSummary;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -301,6 +304,26 @@ public class JobChain__ {
         this.configurationStatus = configurationStatus;
     }
 
+    /**
+     * 
+     * @return
+     *     The ordersSummary
+     */
+    @JsonProperty("ordersSummary")
+    public OrdersSummary getOrdersSummary() {
+        return ordersSummary;
+    }
+
+    /**
+     * 
+     * @param ordersSummary
+     *     The ordersSummary
+     */
+    @JsonProperty("ordersSummary")
+    public void setOrdersSummary(OrdersSummary ordersSummary) {
+        this.ordersSummary = ordersSummary;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -318,7 +341,7 @@ public class JobChain__ {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(state).append(numOfNodes).append(nodes).append(fileOrderSources).append(numOfOrders).append(configurationStatus).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(state).append(numOfNodes).append(nodes).append(fileOrderSources).append(numOfOrders).append(configurationStatus).append(ordersSummary).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -330,7 +353,7 @@ public class JobChain__ {
             return false;
         }
         JobChain__ rhs = ((JobChain__) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(state, rhs.state).append(numOfNodes, rhs.numOfNodes).append(nodes, rhs.nodes).append(fileOrderSources, rhs.fileOrderSources).append(numOfOrders, rhs.numOfOrders).append(configurationStatus, rhs.configurationStatus).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(state, rhs.state).append(numOfNodes, rhs.numOfNodes).append(nodes, rhs.nodes).append(fileOrderSources, rhs.fileOrderSources).append(numOfOrders, rhs.numOfOrders).append(configurationStatus, rhs.configurationStatus).append(ordersSummary, rhs.ordersSummary).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

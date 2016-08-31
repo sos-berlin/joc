@@ -6,11 +6,9 @@ import java.util.List;
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.order.Order;

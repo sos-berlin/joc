@@ -19,23 +19,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "path",
     "historyId",
-    "orderId",
-    "jobChain",
     "steps"
 })
 public class History_ {
 
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     */
-    @JsonProperty("path")
-    private String path;
     /**
      * non negative integer
      * <p>
@@ -50,54 +38,10 @@ public class History_ {
      * (Required)
      * 
      */
-    @JsonProperty("orderId")
-    private String orderId;
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     */
-    @JsonProperty("jobChain")
-    private String jobChain;
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("steps")
     private List<Step> steps = new ArrayList<Step>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     * @return
-     *     The path
-     */
-    @JsonProperty("path")
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     * @param path
-     *     The path
-     */
-    @JsonProperty("path")
-    public void setPath(String path) {
-        this.path = path;
-    }
 
     /**
      * non negative integer
@@ -125,58 +69,6 @@ public class History_ {
     @JsonProperty("historyId")
     public void setHistoryId(Integer historyId) {
         this.historyId = historyId;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The orderId
-     */
-    @JsonProperty("orderId")
-    public String getOrderId() {
-        return orderId;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param orderId
-     *     The orderId
-     */
-    @JsonProperty("orderId")
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     * @return
-     *     The jobChain
-     */
-    @JsonProperty("jobChain")
-    public String getJobChain() {
-        return jobChain;
-    }
-
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     * @param jobChain
-     *     The jobChain
-     */
-    @JsonProperty("jobChain")
-    public void setJobChain(String jobChain) {
-        this.jobChain = jobChain;
     }
 
     /**
@@ -220,7 +112,7 @@ public class History_ {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(historyId).append(orderId).append(jobChain).append(steps).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(historyId).append(steps).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -232,7 +124,7 @@ public class History_ {
             return false;
         }
         History_ rhs = ((History_) other);
-        return new EqualsBuilder().append(path, rhs.path).append(historyId, rhs.historyId).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(steps, rhs.steps).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(historyId, rhs.historyId).append(steps, rhs.steps).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

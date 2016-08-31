@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.history;
+package com.sos.joc.model.job;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,66 +14,48 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/**
- * log content
- * <p>
- * A parameter can specify if the content is plain or html. Either 'plain' or'html' is required
- * 
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "plain",
-    "html"
+    "job"
 })
-public class TaskLogSchema {
+public class Job_____ {
 
-    @JsonProperty("plain")
-    private String plain;
-    @JsonProperty("html")
-    private String html;
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     */
+    @JsonProperty("job")
+    private String job;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
      * 
      * @return
-     *     The plain
+     *     The job
      */
-    @JsonProperty("plain")
-    public String getPlain() {
-        return plain;
+    @JsonProperty("job")
+    public String getJob() {
+        return job;
     }
 
     /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
      * 
-     * @param plain
-     *     The plain
+     * @param job
+     *     The job
      */
-    @JsonProperty("plain")
-    public void setPlain(String plain) {
-        this.plain = plain;
-    }
-
-    /**
-     * 
-     * @return
-     *     The html
-     */
-    @JsonProperty("html")
-    public String getHtml() {
-        return html;
-    }
-
-    /**
-     * 
-     * @param html
-     *     The html
-     */
-    @JsonProperty("html")
-    public void setHtml(String html) {
-        this.html = html;
+    @JsonProperty("job")
+    public void setJob(String job) {
+        this.job = job;
     }
 
     @Override
@@ -93,7 +75,7 @@ public class TaskLogSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(plain).append(html).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(job).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -101,11 +83,11 @@ public class TaskLogSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof TaskLogSchema) == false) {
+        if ((other instanceof Job_____) == false) {
             return false;
         }
-        TaskLogSchema rhs = ((TaskLogSchema) other);
-        return new EqualsBuilder().append(plain, rhs.plain).append(html, rhs.html).append(additionalProperties, rhs.additionalProperties).isEquals();
+        Job_____ rhs = ((Job_____) other);
+        return new EqualsBuilder().append(job, rhs.job).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

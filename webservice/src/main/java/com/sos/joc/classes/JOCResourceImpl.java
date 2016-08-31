@@ -17,8 +17,7 @@ public class JOCResourceImpl {
     protected static final String JOBSCHEDULER_DATE_FORMAT = "yyyy-mm-dd hh:mm:ss.SSS'Z'";
     protected static final String JOBSCHEDULER_DATE_FORMAT2 = "yyyy-mm-dd'T'hh:mm:ss.SSS'Z'";
     protected DBItemInventoryInstance dbItemInventoryInstance;
-    protected static final String NO = "no";
-    protected static final String YES = "yes";
+
     private String accessToken;
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;

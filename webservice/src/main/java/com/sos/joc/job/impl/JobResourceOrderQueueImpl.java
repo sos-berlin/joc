@@ -49,9 +49,9 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
             job.setName("myName");
             job.setPath("myPath");
 
-            com.sos.joc.model.job.State state = new com.sos.joc.model.job.State();
+            com.sos.joc.model.job.State_ state = new com.sos.joc.model.job.State_();
             state.setSeverity(0);
-            state.setText(com.sos.joc.model.job.State.Text.pending);
+            state.setText(com.sos.joc.model.job.State_.Text.pending);
             job.setState(state);
             job.setStateText("myStateText");
             job.setSurveyDate(new Date());

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.jobs.post.commands.start.Job;
 import com.sos.joc.jobs.post.commands.start.Param;
 import com.sos.joc.jobs.post.commands.start.StartJobsBody;
@@ -40,7 +41,7 @@ public class JobsResourceCommandStartJobsImpl extends JOCResourceImpl implements
             objFactory.initMarshaller(Spooler.class);
             JSCmdStartJob objStartJob = new JSCmdStartJob(objFactory);
             objStartJob.setJobIfNotEmpty(job.getJob());
-            objStartJob.setForceIfNotEmpty(YES);
+            objStartJob.setForceIfNotEmpty(WebserviceConstants.YES);
             objStartJob.setAtIfNotEmpty(job.getAt());
             objStartJob.setNameIfNotEmpty(job.getJob());
             String[] jobParams = getParams(job.getParams());

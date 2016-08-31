@@ -33,10 +33,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             entity.setDeliveryDate(new Date());
             History_ history = new History_();
             history.setHistoryId(-1);
-            history.setJobChain("myJobChain");
-            history.setOrderId("myOrderId");
-            history.setPath("myPath");
-            
+           
             ArrayList<Step> listOfSteps = new ArrayList<Step>();
             Step step1 = new Step();
             step1.setEndTime(new Date());
@@ -48,7 +45,8 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             step1.setNode("myNode1");
             step1.setStartTime(new Date());
             step1.setStep(1);
-            step1.setSuccessful(false);
+            step1.setClusterMember(-1);
+            step1.setExitCode(-1);
             step1.setTaskId(-1);
             listOfSteps.add(step1);
 
@@ -56,15 +54,15 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             step2.setEndTime(new Date());
             ErrorSchema errorSchema2 = new ErrorSchema();
             errorSchema2.setCode("myCode2");
-            errorSchema2.setMessage("myMessage2");            
+            errorSchema2.setMessage("myMessage2");
             step2.setError(errorSchema2);
             step2.setJob("myJob2");
             step2.setNode("myNode2");
             step2.setStartTime(new Date());
-            step2.setStep(2);
-            step2.setSuccessful(false);
-            step2.setTaskId(-1);
-            listOfSteps.add(step2);
+            step2.setStep(1);
+            step2.setClusterMember(-1);
+            step2.setExitCode(-1);
+            step2.setTaskId(-1);            listOfSteps.add(step2);
 
             history.setSteps(listOfSteps);
             entity.setHistory(history);

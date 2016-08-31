@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.history;
+package com.sos.joc.model.job;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -17,7 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * task log meta infos
+ * task history
  * <p>
  * 
  * 
@@ -26,45 +26,35 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "surveyDate",
     "task"
 })
-public class Task200Schema {
+public class HistoryItem200Schema {
 
     /**
-     * timestamp
+     * delivery date
      * <p>
-     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * (Required)
      * 
      */
     @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
-     * survey date of the inventory data; last time the inventory job has checked the live folder
-     * <p>
-     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
-     * 
-     */
-    @JsonProperty("surveyDate")
-    private Date surveyDate;
-    /**
-     * task log infos
+     * task in history collection
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("task")
-    private JobSchema task;
+    private History task;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * timestamp
+     * delivery date
      * <p>
-     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * (Required)
      * 
      * @return
@@ -76,9 +66,9 @@ public class Task200Schema {
     }
 
     /**
-     * timestamp
+     * delivery date
      * <p>
-     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * (Required)
      * 
      * @param deliveryDate
@@ -90,35 +80,7 @@ public class Task200Schema {
     }
 
     /**
-     * survey date of the inventory data; last time the inventory job has checked the live folder
-     * <p>
-     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
-     * 
-     * @return
-     *     The surveyDate
-     */
-    @JsonProperty("surveyDate")
-    public Date getSurveyDate() {
-        return surveyDate;
-    }
-
-    /**
-     * survey date of the inventory data; last time the inventory job has checked the live folder
-     * <p>
-     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
-     * 
-     * @param surveyDate
-     *     The surveyDate
-     */
-    @JsonProperty("surveyDate")
-    public void setSurveyDate(Date surveyDate) {
-        this.surveyDate = surveyDate;
-    }
-
-    /**
-     * task log infos
+     * task in history collection
      * <p>
      * 
      * (Required)
@@ -127,12 +89,12 @@ public class Task200Schema {
      *     The task
      */
     @JsonProperty("task")
-    public JobSchema getTask() {
+    public History getTask() {
         return task;
     }
 
     /**
-     * task log infos
+     * task in history collection
      * <p>
      * 
      * (Required)
@@ -141,7 +103,7 @@ public class Task200Schema {
      *     The task
      */
     @JsonProperty("task")
-    public void setTask(JobSchema task) {
+    public void setTask(History task) {
         this.task = task;
     }
 
@@ -162,7 +124,7 @@ public class Task200Schema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(surveyDate).append(task).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(task).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -170,11 +132,11 @@ public class Task200Schema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Task200Schema) == false) {
+        if ((other instanceof HistoryItem200Schema) == false) {
             return false;
         }
-        Task200Schema rhs = ((Task200Schema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(surveyDate, rhs.surveyDate).append(task, rhs.task).append(additionalProperties, rhs.additionalProperties).isEquals();
+        HistoryItem200Schema rhs = ((HistoryItem200Schema) other);
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(task, rhs.task).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

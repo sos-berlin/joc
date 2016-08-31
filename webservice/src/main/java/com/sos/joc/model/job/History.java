@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.order;
+package com.sos.joc.model.job;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * item of step history collection of one order run
+ * task in history collection
  * <p>
  * 
  * 
@@ -26,44 +26,26 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "node",
     "job",
-    "step",
     "startTime",
     "endTime",
+    "state",
     "taskId",
     "clusterMember",
+    "steps",
     "exitCode",
     "error",
     "agent"
 })
-public class Step {
+public class History {
 
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("node")
-    private String node;
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     */
     @JsonProperty("job")
     private String job;
-    /**
-     * non negative integer
-     * <p>
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("step")
-    private Integer step;
     /**
      * timestamp
      * <p>
@@ -82,6 +64,13 @@ public class Step {
     @JsonProperty("endTime")
     private Date endTime;
     /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("state")
+    private State state;
+    /**
      * non negative integer
      * <p>
      * 
@@ -98,6 +87,14 @@ public class Step {
      */
     @JsonProperty("clusterMember")
     private Integer clusterMember;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("steps")
+    private Integer steps;
     /**
      * non negative integer
      * <p>
@@ -128,32 +125,6 @@ public class Step {
      * (Required)
      * 
      * @return
-     *     The node
-     */
-    @JsonProperty("node")
-    public String getNode() {
-        return node;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param node
-     *     The node
-     */
-    @JsonProperty("node")
-    public void setNode(String node) {
-        this.node = node;
-    }
-
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     * @return
      *     The job
      */
     @JsonProperty("job")
@@ -162,9 +133,7 @@ public class Step {
     }
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
+     * 
      * (Required)
      * 
      * @param job
@@ -173,34 +142,6 @@ public class Step {
     @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
-    }
-
-    /**
-     * non negative integer
-     * <p>
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The step
-     */
-    @JsonProperty("step")
-    public Integer getStep() {
-        return step;
-    }
-
-    /**
-     * non negative integer
-     * <p>
-     * 
-     * (Required)
-     * 
-     * @param step
-     *     The step
-     */
-    @JsonProperty("step")
-    public void setStep(Integer step) {
-        this.step = step;
     }
 
     /**
@@ -258,6 +199,30 @@ public class Step {
     }
 
     /**
+     * 
+     * (Required)
+     * 
+     * @return
+     *     The state
+     */
+    @JsonProperty("state")
+    public State getState() {
+        return state;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @param state
+     *     The state
+     */
+    @JsonProperty("state")
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    /**
      * non negative integer
      * <p>
      * 
@@ -309,6 +274,32 @@ public class Step {
     @JsonProperty("clusterMember")
     public void setClusterMember(Integer clusterMember) {
         this.clusterMember = clusterMember;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The steps
+     */
+    @JsonProperty("steps")
+    public Integer getSteps() {
+        return steps;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param steps
+     *     The steps
+     */
+    @JsonProperty("steps")
+    public void setSteps(Integer steps) {
+        this.steps = steps;
     }
 
     /**
@@ -402,7 +393,7 @@ public class Step {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(node).append(job).append(step).append(startTime).append(endTime).append(taskId).append(clusterMember).append(exitCode).append(error).append(agent).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(job).append(startTime).append(endTime).append(state).append(taskId).append(clusterMember).append(steps).append(exitCode).append(error).append(agent).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -410,11 +401,11 @@ public class Step {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Step) == false) {
+        if ((other instanceof History) == false) {
             return false;
         }
-        Step rhs = ((Step) other);
-        return new EqualsBuilder().append(node, rhs.node).append(job, rhs.job).append(step, rhs.step).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(taskId, rhs.taskId).append(clusterMember, rhs.clusterMember).append(exitCode, rhs.exitCode).append(error, rhs.error).append(agent, rhs.agent).append(additionalProperties, rhs.additionalProperties).isEquals();
+        History rhs = ((History) other);
+        return new EqualsBuilder().append(job, rhs.job).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(state, rhs.state).append(taskId, rhs.taskId).append(clusterMember, rhs.clusterMember).append(steps, rhs.steps).append(exitCode, rhs.exitCode).append(error, rhs.error).append(agent, rhs.agent).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

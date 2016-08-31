@@ -1,11 +1,9 @@
 package com.sos.joc.jobs.impl;
 
 import java.util.Date;
-import java.util.List;
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
-import com.sos.auth.rest.SOSWebserviceAuthenticationRecord;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;

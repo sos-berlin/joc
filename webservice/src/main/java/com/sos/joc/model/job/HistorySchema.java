@@ -1,7 +1,10 @@
 
 package com.sos.joc.model.job;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -16,88 +19,88 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * task filter
+ * history collection of tasks
  * <p>
- * 
+ * one item per started task
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "jobschedulerId",
-    "taskId"
+    "deliveryDate",
+    "history"
 })
-public class TaskFilterSchema {
+public class HistorySchema {
 
     /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("jobschedulerId")
-    private String jobschedulerId;
-    /**
-     * non negative integer
+     * delivery date
      * <p>
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
+     * 
+     */
+    @JsonProperty("deliveryDate")
+    private Date deliveryDate;
+    /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("taskId")
-    private Integer taskId;
+    @JsonProperty("history")
+    private List<History> history = new ArrayList<History>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
+     * delivery date
+     * <p>
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
+     * 
+     * @return
+     *     The deliveryDate
+     */
+    @JsonProperty("deliveryDate")
+    public Date getDeliveryDate() {
+        return deliveryDate;
+    }
+
+    /**
+     * delivery date
+     * <p>
+     * Current date of the JOC server/REST service. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
+     * 
+     * @param deliveryDate
+     *     The deliveryDate
+     */
+    @JsonProperty("deliveryDate")
+    public void setDeliveryDate(Date deliveryDate) {
+        this.deliveryDate = deliveryDate;
+    }
+
+    /**
      * 
      * (Required)
      * 
      * @return
-     *     The jobschedulerId
+     *     The history
      */
-    @JsonProperty("jobschedulerId")
-    public String getJobschedulerId() {
-        return jobschedulerId;
+    @JsonProperty("history")
+    public List<History> getHistory() {
+        return history;
     }
 
     /**
      * 
      * (Required)
      * 
-     * @param jobschedulerId
-     *     The jobschedulerId
+     * @param history
+     *     The history
      */
-    @JsonProperty("jobschedulerId")
-    public void setJobschedulerId(String jobschedulerId) {
-        this.jobschedulerId = jobschedulerId;
-    }
-
-    /**
-     * non negative integer
-     * <p>
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The taskId
-     */
-    @JsonProperty("taskId")
-    public Integer getTaskId() {
-        return taskId;
-    }
-
-    /**
-     * non negative integer
-     * <p>
-     * 
-     * (Required)
-     * 
-     * @param taskId
-     *     The taskId
-     */
-    @JsonProperty("taskId")
-    public void setTaskId(Integer taskId) {
-        this.taskId = taskId;
+    @JsonProperty("history")
+    public void setHistory(List<History> history) {
+        this.history = history;
     }
 
     @Override
@@ -117,7 +120,7 @@ public class TaskFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(taskId).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(history).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -125,11 +128,11 @@ public class TaskFilterSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof TaskFilterSchema) == false) {
+        if ((other instanceof HistorySchema) == false) {
             return false;
         }
-        TaskFilterSchema rhs = ((TaskFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(taskId, rhs.taskId).append(additionalProperties, rhs.additionalProperties).isEquals();
+        HistorySchema rhs = ((HistorySchema) other);
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(history, rhs.history).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

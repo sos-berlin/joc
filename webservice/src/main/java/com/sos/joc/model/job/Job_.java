@@ -102,7 +102,7 @@ public class Job_ {
      * 
      */
     @JsonProperty("state")
-    private State state;
+    private State_ state;
     @JsonProperty("stateText")
     private String stateText;
     @JsonProperty("locks")
@@ -344,7 +344,7 @@ public class Job_ {
      *     The state
      */
     @JsonProperty("state")
-    public State getState() {
+    public State_ getState() {
         return state;
     }
 
@@ -354,7 +354,7 @@ public class Job_ {
      *     The state
      */
     @JsonProperty("state")
-    public void setState(State state) {
+    public void setState(State_ state) {
         this.state = state;
     }
 

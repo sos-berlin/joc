@@ -25,25 +25,18 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class State {
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/removed, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
-     * (Required)
+     *  0=successful, 1=incomplete, 2=failed with a green/yellow/red representation
      * 
      */
     @JsonProperty("severity")
     private Integer severity;
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("_text")
     private State.Text text;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/removed, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
-     * (Required)
+     *  0=successful, 1=incomplete, 2=failed with a green/yellow/red representation
      * 
      * @return
      *     The severity
@@ -54,8 +47,7 @@ public class State {
     }
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/removed, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
-     * (Required)
+     *  0=successful, 1=incomplete, 2=failed with a green/yellow/red representation
      * 
      * @param severity
      *     The severity
@@ -67,8 +59,6 @@ public class State {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
      *     The text
      */
@@ -78,8 +68,6 @@ public class State {
     }
 
     /**
-     * 
-     * (Required)
      * 
      * @param text
      *     The _text
@@ -124,20 +112,9 @@ public class State {
     @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        initialized("initialized"),
-        not_initialized("not_initialized"),
-        loaded("loaded"),
-        pending("pending"),
-        running("running"),
-        waiting_for_process("waiting_for_process"),
-        waiting_for_lock("waiting_for_lock"),
-        waiting_for_agent("waiting_for_agent"),
-        waiting_for_task("waiting_for_task"),
-        not_in_period("not_in_period"),
-        stopping("stopping"),
-        stopped("stopped"),
-        removed("removed"),
-        disabled("disabled");
+        successful("successful"),
+        incomplete("incomplete"),
+        failed("failed");
         private final String value;
         private final static Map<String, State.Text> CONSTANTS = new HashMap<String, State.Text>();
 

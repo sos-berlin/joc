@@ -1,7 +1,9 @@
 
 package com.sos.joc.model.job;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -16,7 +18,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * job modify
+ * task modify
  * <p>
  * the command is part of the web servive url
  * 
@@ -24,27 +26,24 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "job",
-    "comment",
+    "jobschedulerId",
+    "jobs",
+    "taskIds",
     "timeout"
 })
 public class ModifyTasksSchema {
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
+     * 
      * (Required)
      * 
      */
-    @JsonProperty("job")
-    private String job;
-    /**
-     * Field to comment manually job modifications which can be logged.
-     * 
-     */
-    @JsonProperty("comment")
-    private String comment;
+    @JsonProperty("jobschedulerId")
+    private String jobschedulerId;
+    @JsonProperty("jobs")
+    private List<Job____> jobs = new ArrayList<Job____>();
+    @JsonProperty("taskIds")
+    private List<TaskId> taskIds = new ArrayList<TaskId>();
     /**
      * non negative integer
      * <p>
@@ -57,53 +56,67 @@ public class ModifyTasksSchema {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
+     * 
      * (Required)
      * 
      * @return
-     *     The job
+     *     The jobschedulerId
      */
-    @JsonProperty("job")
-    public String getJob() {
-        return job;
+    @JsonProperty("jobschedulerId")
+    public String getJobschedulerId() {
+        return jobschedulerId;
     }
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
+     * 
      * (Required)
      * 
-     * @param job
-     *     The job
+     * @param jobschedulerId
+     *     The jobschedulerId
      */
-    @JsonProperty("job")
-    public void setJob(String job) {
-        this.job = job;
+    @JsonProperty("jobschedulerId")
+    public void setJobschedulerId(String jobschedulerId) {
+        this.jobschedulerId = jobschedulerId;
     }
 
     /**
-     * Field to comment manually job modifications which can be logged.
      * 
      * @return
-     *     The comment
+     *     The jobs
      */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
+    @JsonProperty("jobs")
+    public List<Job____> getJobs() {
+        return jobs;
     }
 
     /**
-     * Field to comment manually job modifications which can be logged.
      * 
-     * @param comment
-     *     The comment
+     * @param jobs
+     *     The jobs
      */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
+    @JsonProperty("jobs")
+    public void setJobs(List<Job____> jobs) {
+        this.jobs = jobs;
+    }
+
+    /**
+     * 
+     * @return
+     *     The taskIds
+     */
+    @JsonProperty("taskIds")
+    public List<TaskId> getTaskIds() {
+        return taskIds;
+    }
+
+    /**
+     * 
+     * @param taskIds
+     *     The taskIds
+     */
+    @JsonProperty("taskIds")
+    public void setTaskIds(List<TaskId> taskIds) {
+        this.taskIds = taskIds;
     }
 
     /**
@@ -149,7 +162,7 @@ public class ModifyTasksSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(comment).append(timeout).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(taskIds).append(timeout).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -161,7 +174,7 @@ public class ModifyTasksSchema {
             return false;
         }
         ModifyTasksSchema rhs = ((ModifyTasksSchema) other);
-        return new EqualsBuilder().append(job, rhs.job).append(comment, rhs.comment).append(timeout, rhs.timeout).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(taskIds, rhs.taskIds).append(timeout, rhs.timeout).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

@@ -86,7 +86,7 @@ public class JobsFilterSchema {
     @JsonProperty("folders")
     private List<FoldersSchema> folders = new ArrayList<FoldersSchema>();
     @JsonProperty("state")
-    private List<State__> state = new ArrayList<State__>();
+    private List<State___> state = new ArrayList<State___>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -300,7 +300,7 @@ public class JobsFilterSchema {
      *     The state
      */
     @JsonProperty("state")
-    public List<State__> getState() {
+    public List<State___> getState() {
         return state;
     }
 
@@ -310,7 +310,7 @@ public class JobsFilterSchema {
      *     The state
      */
     @JsonProperty("state")
-    public void setState(List<State__> state) {
+    public void setState(List<State___> state) {
         this.state = state;
     }
 

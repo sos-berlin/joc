@@ -9,6 +9,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerClusterBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -43,8 +44,8 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
             schedulerObjectFactory.initMarshaller(Spooler.class);
             JSCmdTerminate jsCmdTerminate = new JSCmdTerminate(schedulerObjectFactory);
-            jsCmdTerminate.setAllSchedulersIfNotEmpty(YES);
-            jsCmdTerminate.setContinueExclusiveOperationIfNotEmpty(NO);
+            jsCmdTerminate.setAllSchedulersIfNotEmpty(WebserviceConstants.YES);
+            jsCmdTerminate.setContinueExclusiveOperationIfNotEmpty(WebserviceConstants.NO);
             jsCmdTerminate.setRestartIfNotEmpty(restart);
             jsCmdTerminate.setTimeoutIfNotEmpty(jobSchedulerClusterTerminateBody.getTimeoutAsString());
 
@@ -71,7 +72,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             return JOCDefaultResponse;
         }
 
-        return executeModifyJobSchedulerClusterCommand(NO, jobSchedulerClusterTerminateBody);
+        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, jobSchedulerClusterTerminateBody);
     }
 
     @Override
@@ -83,7 +84,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             return JOCDefaultResponse;
         }
 
-        return executeModifyJobSchedulerClusterCommand(YES, jobSchedulerClusterTerminateBody);
+        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.YES, jobSchedulerClusterTerminateBody);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             return JOCDefaultResponse;
         }
 
-        return executeModifyJobSchedulerClusterCommand(NO, jobSchedulerClusterTerminateBody);
+        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, jobSchedulerClusterTerminateBody);
     }
 
 }

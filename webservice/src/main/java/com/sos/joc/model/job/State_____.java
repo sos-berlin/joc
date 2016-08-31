@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @Generated("org.jsonschema2pojo")
-public enum State___ {
+public enum State_____ {
 
     initialized("initialized"),
     not_initialized("not_initialized"),
@@ -25,15 +25,15 @@ public enum State___ {
     removed("removed"),
     disabled("disabled");
     private final String value;
-    private final static Map<String, State___> CONSTANTS = new HashMap<String, State___>();
+    private final static Map<String, State_____> CONSTANTS = new HashMap<String, State_____>();
 
     static {
-        for (State___ c: values()) {
+        for (State_____ c: values()) {
             CONSTANTS.put(c.value, c);
         }
     }
 
-    private State___(String value) {
+    private State_____(String value) {
         this.value = value;
     }
 
@@ -44,8 +44,8 @@ public enum State___ {
     }
 
     @JsonCreator
-    public static State___ fromValue(String value) {
-        State___ constant = CONSTANTS.get(value);
+    public static State_____ fromValue(String value) {
+        State_____ constant = CONSTANTS.get(value);
         if (constant == null) {
             throw new IllegalArgumentException(value);
         } else {

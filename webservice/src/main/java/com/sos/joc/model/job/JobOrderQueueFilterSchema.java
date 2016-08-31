@@ -28,10 +28,16 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "job",
     "jobChain",
     "orderId",
-    "node"
+    "node",
+    "compact"
 })
 public class JobOrderQueueFilterSchema {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
@@ -55,10 +61,20 @@ public class JobOrderQueueFilterSchema {
     private String orderId;
     @JsonProperty("node")
     private String node;
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     */
+    @JsonProperty("compact")
+    private Boolean compact = false;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
+     * 
+     * (Required)
      * 
      * @return
      *     The jobschedulerId
@@ -69,6 +85,8 @@ public class JobOrderQueueFilterSchema {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param jobschedulerId
      *     The jobschedulerId
@@ -172,6 +190,32 @@ public class JobOrderQueueFilterSchema {
         this.node = node;
     }
 
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     * @return
+     *     The compact
+     */
+    @JsonProperty("compact")
+    public Boolean getCompact() {
+        return compact;
+    }
+
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     * @param compact
+     *     The compact
+     */
+    @JsonProperty("compact")
+    public void setCompact(Boolean compact) {
+        this.compact = compact;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -189,7 +233,7 @@ public class JobOrderQueueFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(job).append(jobChain).append(orderId).append(node).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(job).append(jobChain).append(orderId).append(node).append(compact).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -201,7 +245,7 @@ public class JobOrderQueueFilterSchema {
             return false;
         }
         JobOrderQueueFilterSchema rhs = ((JobOrderQueueFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(node, rhs.node).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(node, rhs.node).append(compact, rhs.compact).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

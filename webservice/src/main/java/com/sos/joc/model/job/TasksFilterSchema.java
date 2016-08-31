@@ -43,7 +43,7 @@ public class TasksFilterSchema {
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     @JsonProperty("jobs")
-    private List<Job____> jobs = new ArrayList<Job____>();
+    private List<Job_____> jobs = new ArrayList<Job_____>();
     /**
      * compact parameter
      * <p>
@@ -63,7 +63,7 @@ public class TasksFilterSchema {
     @JsonProperty("isOrderJob")
     private Boolean isOrderJob;
     @JsonProperty("state")
-    private List<State____> state = new ArrayList<State____>();
+    private List<State_____> state = new ArrayList<State_____>();
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -97,7 +97,7 @@ public class TasksFilterSchema {
      *     The jobs
      */
     @JsonProperty("jobs")
-    public List<Job____> getJobs() {
+    public List<Job_____> getJobs() {
         return jobs;
     }
 
@@ -107,7 +107,7 @@ public class TasksFilterSchema {
      *     The jobs
      */
     @JsonProperty("jobs")
-    public void setJobs(List<Job____> jobs) {
+    public void setJobs(List<Job_____> jobs) {
         this.jobs = jobs;
     }
 
@@ -189,7 +189,7 @@ public class TasksFilterSchema {
      *     The state
      */
     @JsonProperty("state")
-    public List<State____> getState() {
+    public List<State_____> getState() {
         return state;
     }
 
@@ -199,7 +199,7 @@ public class TasksFilterSchema {
      *     The state
      */
     @JsonProperty("state")
-    public void setState(List<State____> state) {
+    public void setState(List<State_____> state) {
         this.state = state;
     }
 

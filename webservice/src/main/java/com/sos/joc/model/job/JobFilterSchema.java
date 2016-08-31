@@ -30,6 +30,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class JobFilterSchema {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
@@ -54,6 +59,8 @@ public class JobFilterSchema {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The jobschedulerId
      */
@@ -63,6 +70,8 @@ public class JobFilterSchema {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param jobschedulerId
      *     The jobschedulerId

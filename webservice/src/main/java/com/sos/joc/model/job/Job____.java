@@ -17,7 +17,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "job"
+    "job",
+    "comment"
 })
 public class Job____ {
 
@@ -29,6 +30,12 @@ public class Job____ {
      */
     @JsonProperty("job")
     private String job;
+    /**
+     * Field to comment manually job modifications which can be logged.
+     * 
+     */
+    @JsonProperty("comment")
+    private String comment;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -58,6 +65,28 @@ public class Job____ {
         this.job = job;
     }
 
+    /**
+     * Field to comment manually job modifications which can be logged.
+     * 
+     * @return
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Field to comment manually job modifications which can be logged.
+     * 
+     * @param comment
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -75,7 +104,7 @@ public class Job____ {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(job).append(comment).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -87,7 +116,7 @@ public class Job____ {
             return false;
         }
         Job____ rhs = ((Job____) other);
-        return new EqualsBuilder().append(job, rhs.job).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).append(comment, rhs.comment).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

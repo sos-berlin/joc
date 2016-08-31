@@ -1,15 +1,8 @@
 package com.sos.joc.order.impl;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonValue;
 import javax.ws.rs.Path;
 
 import org.apache.log4j.Logger;

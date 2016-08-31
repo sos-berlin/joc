@@ -14,33 +14,17 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/**
- * task filter
- * <p>
- * 
- * 
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "jobschedulerId",
     "taskId"
 })
-public class TaskFilterSchema {
+public class TaskId {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("jobschedulerId")
-    private String jobschedulerId;
     /**
      * non negative integer
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("taskId")
@@ -49,34 +33,9 @@ public class TaskFilterSchema {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The jobschedulerId
-     */
-    @JsonProperty("jobschedulerId")
-    public String getJobschedulerId() {
-        return jobschedulerId;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param jobschedulerId
-     *     The jobschedulerId
-     */
-    @JsonProperty("jobschedulerId")
-    public void setJobschedulerId(String jobschedulerId) {
-        this.jobschedulerId = jobschedulerId;
-    }
-
-    /**
      * non negative integer
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The taskId
@@ -90,7 +49,6 @@ public class TaskFilterSchema {
      * non negative integer
      * <p>
      * 
-     * (Required)
      * 
      * @param taskId
      *     The taskId
@@ -117,7 +75,7 @@ public class TaskFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(taskId).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(taskId).append(additionalProperties).toHashCode();
     }
 
     @Override
@@ -125,11 +83,11 @@ public class TaskFilterSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof TaskFilterSchema) == false) {
+        if ((other instanceof TaskId) == false) {
             return false;
         }
-        TaskFilterSchema rhs = ((TaskFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(taskId, rhs.taskId).append(additionalProperties, rhs.additionalProperties).isEquals();
+        TaskId rhs = ((TaskId) other);
+        return new EqualsBuilder().append(taskId, rhs.taskId).append(additionalProperties, rhs.additionalProperties).isEquals();
     }
 
 }

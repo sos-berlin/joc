@@ -56,7 +56,7 @@ public class TaskSchema {
      * 
      */
     @JsonProperty("state")
-    private State___ state;
+    private State____ state;
     /**
      * timestamp
      * <p>
@@ -167,7 +167,7 @@ public class TaskSchema {
      *     The state
      */
     @JsonProperty("state")
-    public State___ getState() {
+    public State____ getState() {
         return state;
     }
 
@@ -179,7 +179,7 @@ public class TaskSchema {
      *     The state
      */
     @JsonProperty("state")
-    public void setState(State___ state) {
+    public void setState(State____ state) {
         this.state = state;
     }
 
