@@ -1,8 +1,0 @@
-{
-  "title": "process class object",
-  "id": "schemas/processClass/processClass",
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
-  "description": "TODO",
-  "properties": {}
-}

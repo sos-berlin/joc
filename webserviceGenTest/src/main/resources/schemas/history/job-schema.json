@@ -1,9 +1,0 @@
-{
-  "title": "job task logs info",
-  "id": "schemas/history/job",
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "array",
-  "items": {
-    "$ref": "task-schema.json"
-  }
-}

@@ -1,7 +1,0 @@
-{
-  "title": "jobscheduler time",
-  "id": "schemas/jobscheduler/time",
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "string",
-  "format": "date-time"
-}

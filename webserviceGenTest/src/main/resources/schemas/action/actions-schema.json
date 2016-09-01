@@ -1,9 +1,0 @@
-{
-  "title": "actions",
-  "id": "schemas/action/actions",
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "array",
-  "items": {
-    "$ref": "action-schema.json"
-  }
-}
