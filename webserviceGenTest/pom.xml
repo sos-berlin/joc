@@ -143,7 +143,10 @@
 				<configuration>
 					<sourceDirectory>${basedir}/src/main/resources/schemas</sourceDirectory>
 					<targetPackage>com.sos.joc.model</targetPackage>
-					<removeOldOutput>true</removeOldOutput>
+					<removeOldOutput>true</removeOldOutput> 
+					<annotationStyle>none</annotationStyle>
+					<includeAdditionalProperties>false</includeAdditionalProperties>
+					
 					<excludes>
 						<exclude>**/*.xsd</exclude>
 					</excludes>

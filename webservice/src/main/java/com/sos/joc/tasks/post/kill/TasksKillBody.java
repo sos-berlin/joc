@@ -7,7 +7,6 @@ public class TasksKillBody {
 
     private String jobschedulerId;
     private List<JobKill> jobs = new ArrayList<JobKill>();
-    private List<TaskId> taskIds = new ArrayList<TaskId>();
     private Integer timeout;
 
     public String getJobschedulerId() {
@@ -24,14 +23,6 @@ public class TasksKillBody {
 
     public void setJobs(List<JobKill> jobs) {
         this.jobs = jobs;
-    }
-
-    public List<TaskId> getTaskIds() {
-        return taskIds;
-    }
-
-    public void setTaskIds(List<TaskId> taskIds) {
-        this.taskIds = taskIds;
     }
 
     public Integer getTimeout() {

@@ -19,8 +19,8 @@ import com.sos.scheduler.model.objects.Spooler;
 @Path("tasks")
 public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksResourceKill {
     private static final Logger LOGGER = Logger.getLogger(TasksResourceKillImpl.class);
-    private TasksKillBody tasksKillBody=null;
-    
+    private TasksKillBody tasksKillBody = null;
+
     private JOCDefaultResponse executeKillCommand(JobKill job, TaskId taskId, String command) {
         try {
 
@@ -30,20 +30,14 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             schedulerObjectFactory.initMarshaller(Spooler.class);
             JSCmdKillTask jsCmdKillTask = schedulerObjectFactory.createKillTask();
             jsCmdKillTask.setImmediately(WebserviceConstants.YES);
+            jsCmdKillTask.setIdIfNotEmpty(taskId.getTaskId());
+            jsCmdKillTask.setJobIfNotEmpty(job.getJob());
 
-            if (taskId != null) {
-                jsCmdKillTask.setIdIfNotEmpty(taskId.getTaskId());
-            }
-            
-            if (job != null) {
-                jsCmdKillTask.setJobIfNotEmpty(job.getJob());
-            }
-            
-            if ("terminate".equals(command)){
+            if ("terminate".equals(command)) {
                 jsCmdKillTask.setTimeoutIfNotEmpty(WebserviceConstants.NEVER);
             }
 
-            if ("terminate_within".equals(command)){
+            if ("terminate_within".equals(command)) {
                 jsCmdKillTask.setTimeout(tasksKillBody.getTimeout());
             }
 
@@ -66,12 +60,13 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
             for (JobKill job : tasksKillBody.getJobs()) {
-                jocDefaultResponse = executeKillCommand(job, null, "terminate");
+                for (TaskId task : job.getTaskIds()) {
+                    jocDefaultResponse = executeKillCommand(job, task, "terminate");
+                }
             }
-            for (TaskId task : tasksKillBody.getTaskIds()) {
-                jocDefaultResponse = executeKillCommand(null, task, "terminate");
-            }
+
         } catch (Exception e) {
             return jocDefaultResponse;
         }
@@ -84,17 +79,16 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     public JOCDefaultResponse postTasksTerminateWithin(String accessToken, TasksKillBody tasksKillBody) throws Exception {
         LOGGER.debug("init Tasks: teminate_within");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-        this.tasksKillBody =  tasksKillBody;
+        this.tasksKillBody = tasksKillBody;
         try {
             jocDefaultResponse = init(tasksKillBody.getJobschedulerId(), getPermissons(accessToken).getJob().isKill());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             for (JobKill job : tasksKillBody.getJobs()) {
-                jocDefaultResponse = executeKillCommand(job, null, "terminate_within");
-            }
-            for (TaskId task : tasksKillBody.getTaskIds()) {
-                jocDefaultResponse = executeKillCommand(null, task, "terminate_within");
+                for (TaskId task : job.getTaskIds()) {
+                    jocDefaultResponse = executeKillCommand(job, task, "terminate_within");
+                }
             }
         } catch (Exception e) {
             return jocDefaultResponse;
@@ -110,15 +104,14 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(tasksKillBody.getJobschedulerId(), getPermissons(accessToken).getJob().isSetRunTime());
+            jocDefaultResponse = init(tasksKillBody.getJobschedulerId(), getPermissons(accessToken).getJob().isKill());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             for (JobKill job : tasksKillBody.getJobs()) {
-                jocDefaultResponse = executeKillCommand(job, null, "kill");
-            }
-            for (TaskId task : tasksKillBody.getTaskIds()) {
-                jocDefaultResponse = executeKillCommand(null, task, "kill");
+                for (TaskId task : job.getTaskIds()) {
+                    jocDefaultResponse = executeKillCommand(job, task, "kill");
+                }
             }
         } catch (Exception e) {
             return jocDefaultResponse;
