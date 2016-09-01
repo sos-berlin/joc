@@ -30,6 +30,7 @@ import com.sos.joc.model.job.OrdersSummary;
 import com.sos.joc.model.job.ProcessingState;
 import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.RunningTask.Cause;
+import com.sos.joc.model.job.State_;
 import com.sos.joc.model.job.TaskQueue;
 
 @Path("jobs")
@@ -48,12 +49,12 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
  
             JobsVSchema entity = new JobsVSchema();
             List<Job_> listJobs = new ArrayList<Job_>();
-
             // TODO Use correct url
+            //FOLDERS
+            //COMPACT
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand("http://localhost:4444");
             String postCommand = "<commands><show_state subsystems=\"job process_class lock\" what=\"job_orders task_queue\" path=\"/test\"/><show_state subsystems=\"job process_class lock\" what=\"job_orders task_queue\" path=\"/sos\"/></commands>";
             jocXmlCommand.excutePost(postCommand);
-                    );
             entity.setDeliveryDate(new Date());
 
             Date surveyDate = jocXmlCommand.getSurveyDate();
@@ -120,7 +121,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                         job.setName(attributes.getNamedItem("name").getNodeValue());
                         job.setPath(attributes.getNamedItem("path").getNodeValue());
                         String stateText = attributes.getNamedItem("state").getNodeValue();
-                        com.sos.joc.model.job.State state = new com.sos.joc.model.job.State();
+                        State_ state = new State_();
                         switch(stateText) {
                             case "running":
                                 state.setSeverity(0);
@@ -147,7 +148,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                                 state.setSeverity(4);
                                 break;
                         }
-                        state.setText(com.sos.joc.model.job.State.Text.valueOf(stateText));
+                        state.setText(com.sos.joc.model.job.State_.Text.valueOf(stateText));
                         job.setState(state);
                         job.setStateText(stateText);
 
