@@ -24,3 +24,4 @@ raml/
 webservice/target/
 webserviceGenTest/target/java-gen/
 webserviceGenTest/target/
+webserviceGenTest/src/main/resources/schemas/
