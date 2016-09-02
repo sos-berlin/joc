@@ -2,15 +2,7 @@
 package com.sos.joc.model.order;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,18 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "orderId",
-    "jobChain",
-    "startTime",
-    "endTime",
-    "node",
-    "state",
-    "historyId"
-})
 public class History {
 
     /**
@@ -43,14 +24,12 @@ public class History {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("orderId")
     private String orderId;
     /**
      * path
@@ -59,7 +38,6 @@ public class History {
      * (Required)
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
     /**
      * timestamp
@@ -68,7 +46,6 @@ public class History {
      * (Required)
      * 
      */
-    @JsonProperty("startTime")
     private Date startTime;
     /**
      * timestamp
@@ -76,21 +53,18 @@ public class History {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("endTime")
     private Date endTime;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("node")
     private String node;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("state")
     private State state;
     /**
      * non negative integer
@@ -99,10 +73,7 @@ public class History {
      * (Required)
      * 
      */
-    @JsonProperty("historyId")
     private Integer historyId;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -113,7 +84,6 @@ public class History {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -127,7 +97,6 @@ public class History {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -139,7 +108,6 @@ public class History {
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -151,7 +119,6 @@ public class History {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -165,7 +132,6 @@ public class History {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -179,7 +145,6 @@ public class History {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -193,7 +158,6 @@ public class History {
      * @return
      *     The startTime
      */
-    @JsonProperty("startTime")
     public Date getStartTime() {
         return startTime;
     }
@@ -207,7 +171,6 @@ public class History {
      * @param startTime
      *     The startTime
      */
-    @JsonProperty("startTime")
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
@@ -220,7 +183,6 @@ public class History {
      * @return
      *     The endTime
      */
-    @JsonProperty("endTime")
     public Date getEndTime() {
         return endTime;
     }
@@ -233,7 +195,6 @@ public class History {
      * @param endTime
      *     The endTime
      */
-    @JsonProperty("endTime")
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
@@ -245,7 +206,6 @@ public class History {
      * @return
      *     The node
      */
-    @JsonProperty("node")
     public String getNode() {
         return node;
     }
@@ -257,7 +217,6 @@ public class History {
      * @param node
      *     The node
      */
-    @JsonProperty("node")
     public void setNode(String node) {
         this.node = node;
     }
@@ -269,7 +228,6 @@ public class History {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public State getState() {
         return state;
     }
@@ -281,7 +239,6 @@ public class History {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(State state) {
         this.state = state;
     }
@@ -295,7 +252,6 @@ public class History {
      * @return
      *     The historyId
      */
-    @JsonProperty("historyId")
     public Integer getHistoryId() {
         return historyId;
     }
@@ -309,7 +265,6 @@ public class History {
      * @param historyId
      *     The historyId
      */
-    @JsonProperty("historyId")
     public void setHistoryId(Integer historyId) {
         this.historyId = historyId;
     }
@@ -319,19 +274,9 @@ public class History {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(startTime).append(endTime).append(node).append(state).append(historyId).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(startTime).append(endTime).append(node).append(state).append(historyId).toHashCode();
     }
 
     @Override
@@ -343,7 +288,7 @@ public class History {
             return false;
         }
         History rhs = ((History) other);
-        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(node, rhs.node).append(state, rhs.state).append(historyId, rhs.historyId).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(node, rhs.node).append(state, rhs.state).append(historyId, rhs.historyId).isEquals();
     }
 
 }

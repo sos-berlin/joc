@@ -2,27 +2,12 @@
 package com.sos.joc.model.common;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "path",
-    "code",
-    "message"
-})
 public class Error {
 
     /**
@@ -32,7 +17,6 @@ public class Error {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -41,24 +25,19 @@ public class Error {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("code")
     private String code;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("message")
     private String message;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -69,7 +48,6 @@ public class Error {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -83,7 +61,6 @@ public class Error {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -97,7 +74,6 @@ public class Error {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -111,7 +87,6 @@ public class Error {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -123,7 +98,6 @@ public class Error {
      * @return
      *     The code
      */
-    @JsonProperty("code")
     public String getCode() {
         return code;
     }
@@ -135,7 +109,6 @@ public class Error {
      * @param code
      *     The code
      */
-    @JsonProperty("code")
     public void setCode(String code) {
         this.code = code;
     }
@@ -147,7 +120,6 @@ public class Error {
      * @return
      *     The message
      */
-    @JsonProperty("message")
     public String getMessage() {
         return message;
     }
@@ -159,7 +131,6 @@ public class Error {
      * @param message
      *     The message
      */
-    @JsonProperty("message")
     public void setMessage(String message) {
         this.message = message;
     }
@@ -169,19 +140,9 @@ public class Error {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(code).append(message).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(code).append(message).toHashCode();
     }
 
     @Override
@@ -193,7 +154,7 @@ public class Error {
             return false;
         }
         Error rhs = ((Error) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(code, rhs.code).append(message, rhs.message).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(code, rhs.code).append(message, rhs.message).isEquals();
     }
 
 }

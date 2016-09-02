@@ -2,28 +2,12 @@
 package com.sos.joc.model.jobscheduler;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "job",
-    "taskId",
-    "pid",
-    "runningSince",
-    "agent"
-})
 public class Processes {
 
     /**
@@ -33,7 +17,6 @@ public class Processes {
      * (Required)
      * 
      */
-    @JsonProperty("job")
     private String job;
     /**
      * non negative integer
@@ -42,7 +25,6 @@ public class Processes {
      * (Required)
      * 
      */
-    @JsonProperty("taskId")
     private Integer taskId;
     /**
      * non negative integer
@@ -51,7 +33,6 @@ public class Processes {
      * (Required)
      * 
      */
-    @JsonProperty("pid")
     private Integer pid;
     /**
      * timestamp
@@ -60,17 +41,13 @@ public class Processes {
      * (Required)
      * 
      */
-    @JsonProperty("runningSince")
     private Date runningSince;
     /**
      * url
      * (Required)
      * 
      */
-    @JsonProperty("agent")
     private String agent;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -81,7 +58,6 @@ public class Processes {
      * @return
      *     The job
      */
-    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -95,7 +71,6 @@ public class Processes {
      * @param job
      *     The job
      */
-    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }
@@ -109,7 +84,6 @@ public class Processes {
      * @return
      *     The taskId
      */
-    @JsonProperty("taskId")
     public Integer getTaskId() {
         return taskId;
     }
@@ -123,7 +97,6 @@ public class Processes {
      * @param taskId
      *     The taskId
      */
-    @JsonProperty("taskId")
     public void setTaskId(Integer taskId) {
         this.taskId = taskId;
     }
@@ -137,7 +110,6 @@ public class Processes {
      * @return
      *     The pid
      */
-    @JsonProperty("pid")
     public Integer getPid() {
         return pid;
     }
@@ -151,7 +123,6 @@ public class Processes {
      * @param pid
      *     The pid
      */
-    @JsonProperty("pid")
     public void setPid(Integer pid) {
         this.pid = pid;
     }
@@ -165,7 +136,6 @@ public class Processes {
      * @return
      *     The runningSince
      */
-    @JsonProperty("runningSince")
     public Date getRunningSince() {
         return runningSince;
     }
@@ -179,7 +149,6 @@ public class Processes {
      * @param runningSince
      *     The runningSince
      */
-    @JsonProperty("runningSince")
     public void setRunningSince(Date runningSince) {
         this.runningSince = runningSince;
     }
@@ -191,7 +160,6 @@ public class Processes {
      * @return
      *     The agent
      */
-    @JsonProperty("agent")
     public String getAgent() {
         return agent;
     }
@@ -203,7 +171,6 @@ public class Processes {
      * @param agent
      *     The agent
      */
-    @JsonProperty("agent")
     public void setAgent(String agent) {
         this.agent = agent;
     }
@@ -213,19 +180,9 @@ public class Processes {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(taskId).append(pid).append(runningSince).append(agent).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(job).append(taskId).append(pid).append(runningSince).append(agent).toHashCode();
     }
 
     @Override
@@ -237,7 +194,7 @@ public class Processes {
             return false;
         }
         Processes rhs = ((Processes) other);
-        return new EqualsBuilder().append(job, rhs.job).append(taskId, rhs.taskId).append(pid, rhs.pid).append(runningSince, rhs.runningSince).append(agent, rhs.agent).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).append(taskId, rhs.taskId).append(pid, rhs.pid).append(runningSince, rhs.runningSince).append(agent, rhs.agent).isEquals();
     }
 
 }

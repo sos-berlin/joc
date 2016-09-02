@@ -4,36 +4,19 @@ package com.sos.joc.model.job;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "severity",
-    "_text"
-})
 public class ProcessingState {
 
     /**
      *  1=pending; 0=running; 2=waiting_for_agent,job_chain_stopped,node_stopped,job_stopped; 5=setback,suspended; 3=job_not_in_period,node_delay,waiting_for_lock,waiting_for_process,waiting_for_task
      * 
      */
-    @JsonProperty("severity")
     private Integer severity;
-    @JsonProperty("_text")
     private ProcessingState.Text text;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      *  1=pending; 0=running; 2=waiting_for_agent,job_chain_stopped,node_stopped,job_stopped; 5=setback,suspended; 3=job_not_in_period,node_delay,waiting_for_lock,waiting_for_process,waiting_for_task
@@ -41,7 +24,6 @@ public class ProcessingState {
      * @return
      *     The severity
      */
-    @JsonProperty("severity")
     public Integer getSeverity() {
         return severity;
     }
@@ -52,7 +34,6 @@ public class ProcessingState {
      * @param severity
      *     The severity
      */
-    @JsonProperty("severity")
     public void setSeverity(Integer severity) {
         this.severity = severity;
     }
@@ -62,7 +43,6 @@ public class ProcessingState {
      * @return
      *     The text
      */
-    @JsonProperty("_text")
     public ProcessingState.Text getText() {
         return text;
     }
@@ -72,7 +52,6 @@ public class ProcessingState {
      * @param text
      *     The _text
      */
-    @JsonProperty("_text")
     public void setText(ProcessingState.Text text) {
         this.text = text;
     }
@@ -82,19 +61,9 @@ public class ProcessingState {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(severity).append(text).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(severity).append(text).toHashCode();
     }
 
     @Override
@@ -106,26 +75,26 @@ public class ProcessingState {
             return false;
         }
         ProcessingState rhs = ((ProcessingState) other);
-        return new EqualsBuilder().append(severity, rhs.severity).append(text, rhs.text).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(severity, rhs.severity).append(text, rhs.text).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        pending("pending"),
-        running("running"),
-        suspended("suspended"),
-        setback("setback"),
-        blacklist("blacklist"),
-        job_not_in_period("job_not_in_period"),
-        node_delay("node_delay"),
-        waiting_for_lock("waiting_for_lock"),
-        waiting_for_process("waiting_for_process"),
-        waiting_for_agent("waiting_for_agent"),
-        job_chain_stopped("job_chain_stopped"),
-        node_stopped("node_stopped"),
-        job_stopped("job_stopped"),
-        waiting_for_task("waiting_for_task");
+        PENDING("PENDING"),
+        RUNNING("RUNNING"),
+        SUSPENDED("SUSPENDED"),
+        SETBACK("SETBACK"),
+        BLACKLIST("BLACKLIST"),
+        JOB_NOT_IN_PERIOD("JOB_NOT_IN_PERIOD"),
+        NODE_DELAY("NODE_DELAY"),
+        WAITING_FOR_LOCK("WAITING_FOR_LOCK"),
+        WAITING_FOR_PROCESS("WAITING_FOR_PROCESS"),
+        WAITING_FOR_AGENT("WAITING_FOR_AGENT"),
+        JOB_CHAIN_STOPPED("JOB_CHAIN_STOPPED"),
+        NODE_STOPPED("NODE_STOPPED"),
+        JOB_STOPPED("JOB_STOPPED"),
+        WAITING_FOR_TASK("WAITING_FOR_TASK");
         private final String value;
         private final static Map<String, ProcessingState.Text> CONSTANTS = new HashMap<String, ProcessingState.Text>();
 
@@ -139,13 +108,11 @@ public class ProcessingState {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static ProcessingState.Text fromValue(String value) {
             ProcessingState.Text constant = CONSTANTS.get(value);
             if (constant == null) {

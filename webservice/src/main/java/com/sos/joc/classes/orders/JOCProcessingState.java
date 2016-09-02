@@ -18,7 +18,6 @@ public class JOCProcessingState {
         processingState = new ProcessingState();
     }
 
-
     public void setSeverity(int severity) {
         processingState.setSeverity(severity);
     }
@@ -31,54 +30,52 @@ public class JOCProcessingState {
         try {
             ProcessingState.Text text = ProcessingState.Text.fromValue(s);
             setText(text);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             LOGGER.error("illegal argument:" + s);
         }
-     }
-    
+    }
+
     public ProcessingState.Text getText(String s) {
         try {
             return ProcessingState.Text.fromValue(s);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             LOGGER.error("illegal argument:" + s);
         }
 
-        return null;     }
+        return null;
+    }
 
     public boolean isSetLock(String actProcessingState) {
-        return ProcessingState.Text.waiting_for_lock.equals(getText(actProcessingState));
+        return ProcessingState.Text.WAITING_FOR_LOCK.equals(getText(actProcessingState));
     }
 
     public boolean isSetNextStartTime(String actProcessingState) {
-        return (ProcessingState.Text.pending.equals(getText(actProcessingState)) || 
-                ProcessingState.Text.job_not_in_period.equals(getText(actProcessingState)) || 
-                ProcessingState.Text.node_delay.equals(getText(actProcessingState)));
+        return (ProcessingState.Text.PENDING.equals(getText(actProcessingState)) || ProcessingState.Text.JOB_NOT_IN_PERIOD.equals(getText(actProcessingState))
+                || ProcessingState.Text.NODE_DELAY.equals(getText(actProcessingState)));
     }
 
     public boolean isSetStartedAt(String actProcessingState) {
-        return !ProcessingState.Text.pending.equals(getText(actProcessingState));
+        return !ProcessingState.Text.PENDING.equals(getText(actProcessingState));
     }
 
     public boolean isSetHistoryId(String actProcessingState) {
-        return !ProcessingState.Text.pending.equals(getText(actProcessingState));
+        return !ProcessingState.Text.PENDING.equals(getText(actProcessingState));
     }
 
     public boolean isSetProcessClass(String actProcessingState) {
-        return ProcessingState.Text.waiting_for_process.equals(getText(actProcessingState)) || 
-               ProcessingState.Text.waiting_for_agent.equals(getText(actProcessingState));
+        return ProcessingState.Text.WAITING_FOR_PROCESS.equals(getText(actProcessingState)) || ProcessingState.Text.WAITING_FOR_AGENT.equals(getText(actProcessingState));
     }
 
     public boolean isSetTaskId(String actProcessingState) {
-        return ProcessingState.Text.running.equals(getText(actProcessingState));
+        return ProcessingState.Text.RUNNING.equals(getText(actProcessingState));
     }
 
     public boolean isSetProcessedBy(String actProcessingState) {
-        return ProcessingState.Text.running.equals(getText(actProcessingState)) || 
-                ProcessingState.Text.blacklist.equals(getText(actProcessingState));
+        return ProcessingState.Text.RUNNING.equals(getText(actProcessingState)) || ProcessingState.Text.BLACKLIST.equals(getText(actProcessingState));
     }
 
     public boolean isSetSetBack(String actProcessingState) {
-        return ProcessingState.Text.setback.equals(getText(actProcessingState));
+        return ProcessingState.Text.SETBACK.equals(getText(actProcessingState));
     }
 
 }

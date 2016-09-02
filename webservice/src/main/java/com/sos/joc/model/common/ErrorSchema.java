@@ -1,15 +1,7 @@
 
 package com.sos.joc.model.common;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,12 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "code",
-    "message"
-})
 public class ErrorSchema {
 
     /**
@@ -34,17 +21,13 @@ public class ErrorSchema {
      * (Required)
      * 
      */
-    @JsonProperty("code")
     private String code;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("message")
     private String message;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * 
@@ -53,7 +36,6 @@ public class ErrorSchema {
      * @return
      *     The code
      */
-    @JsonProperty("code")
     public String getCode() {
         return code;
     }
@@ -65,7 +47,6 @@ public class ErrorSchema {
      * @param code
      *     The code
      */
-    @JsonProperty("code")
     public void setCode(String code) {
         this.code = code;
     }
@@ -77,7 +58,6 @@ public class ErrorSchema {
      * @return
      *     The message
      */
-    @JsonProperty("message")
     public String getMessage() {
         return message;
     }
@@ -89,7 +69,6 @@ public class ErrorSchema {
      * @param message
      *     The message
      */
-    @JsonProperty("message")
     public void setMessage(String message) {
         this.message = message;
     }
@@ -99,19 +78,9 @@ public class ErrorSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(code).append(message).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(code).append(message).toHashCode();
     }
 
     @Override
@@ -123,7 +92,7 @@ public class ErrorSchema {
             return false;
         }
         ErrorSchema rhs = ((ErrorSchema) other);
-        return new EqualsBuilder().append(code, rhs.code).append(message, rhs.message).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(code, rhs.code).append(message, rhs.message).isEquals();
     }
 
 }

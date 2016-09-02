@@ -7,14 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -26,18 +18,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "path",
-    "name",
-    "maxProcesses",
-    "_type",
-    "state",
-    "numOfAgents",
-    "agents"
-})
 public class AgentClusterPSchema {
 
     /**
@@ -46,7 +27,6 @@ public class AgentClusterPSchema {
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -54,9 +34,7 @@ public class AgentClusterPSchema {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("path")
     private String path;
-    @JsonProperty("name")
     private String name;
     /**
      * non negative integer
@@ -64,9 +42,7 @@ public class AgentClusterPSchema {
      * 
      * 
      */
-    @JsonProperty("maxProcesses")
     private Integer maxProcesses;
-    @JsonProperty("_type")
     private AgentClusterPSchema.Type type;
     /**
      * agent cluster state
@@ -74,17 +50,12 @@ public class AgentClusterPSchema {
      * 
      * 
      */
-    @JsonProperty("state")
     private State_ state;
     /**
      * 
      */
-    @JsonProperty("numOfAgents")
     private NumOfAgents numOfAgents;
-    @JsonProperty("agents")
     private List<Agent> agents = new ArrayList<Agent>();
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -94,7 +65,6 @@ public class AgentClusterPSchema {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -107,7 +77,6 @@ public class AgentClusterPSchema {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -120,7 +89,6 @@ public class AgentClusterPSchema {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -133,7 +101,6 @@ public class AgentClusterPSchema {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -143,7 +110,6 @@ public class AgentClusterPSchema {
      * @return
      *     The name
      */
-    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -153,7 +119,6 @@ public class AgentClusterPSchema {
      * @param name
      *     The name
      */
-    @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
     }
@@ -166,7 +131,6 @@ public class AgentClusterPSchema {
      * @return
      *     The maxProcesses
      */
-    @JsonProperty("maxProcesses")
     public Integer getMaxProcesses() {
         return maxProcesses;
     }
@@ -179,7 +143,6 @@ public class AgentClusterPSchema {
      * @param maxProcesses
      *     The maxProcesses
      */
-    @JsonProperty("maxProcesses")
     public void setMaxProcesses(Integer maxProcesses) {
         this.maxProcesses = maxProcesses;
     }
@@ -189,7 +152,6 @@ public class AgentClusterPSchema {
      * @return
      *     The type
      */
-    @JsonProperty("_type")
     public AgentClusterPSchema.Type getType() {
         return type;
     }
@@ -199,7 +161,6 @@ public class AgentClusterPSchema {
      * @param type
      *     The _type
      */
-    @JsonProperty("_type")
     public void setType(AgentClusterPSchema.Type type) {
         this.type = type;
     }
@@ -212,7 +173,6 @@ public class AgentClusterPSchema {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public State_ getState() {
         return state;
     }
@@ -225,7 +185,6 @@ public class AgentClusterPSchema {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(State_ state) {
         this.state = state;
     }
@@ -235,7 +194,6 @@ public class AgentClusterPSchema {
      * @return
      *     The numOfAgents
      */
-    @JsonProperty("numOfAgents")
     public NumOfAgents getNumOfAgents() {
         return numOfAgents;
     }
@@ -245,7 +203,6 @@ public class AgentClusterPSchema {
      * @param numOfAgents
      *     The numOfAgents
      */
-    @JsonProperty("numOfAgents")
     public void setNumOfAgents(NumOfAgents numOfAgents) {
         this.numOfAgents = numOfAgents;
     }
@@ -255,7 +212,6 @@ public class AgentClusterPSchema {
      * @return
      *     The agents
      */
-    @JsonProperty("agents")
     public List<Agent> getAgents() {
         return agents;
     }
@@ -265,7 +221,6 @@ public class AgentClusterPSchema {
      * @param agents
      *     The agents
      */
-    @JsonProperty("agents")
     public void setAgents(List<Agent> agents) {
         this.agents = agents;
     }
@@ -275,19 +230,9 @@ public class AgentClusterPSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(maxProcesses).append(type).append(state).append(numOfAgents).append(agents).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(maxProcesses).append(type).append(state).append(numOfAgents).append(agents).toHashCode();
     }
 
     @Override
@@ -299,15 +244,15 @@ public class AgentClusterPSchema {
             return false;
         }
         AgentClusterPSchema rhs = ((AgentClusterPSchema) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(maxProcesses, rhs.maxProcesses).append(type, rhs.type).append(state, rhs.state).append(numOfAgents, rhs.numOfAgents).append(agents, rhs.agents).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(maxProcesses, rhs.maxProcesses).append(type, rhs.type).append(state, rhs.state).append(numOfAgents, rhs.numOfAgents).append(agents, rhs.agents).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        single_agent("single_agent"),
-        fix_priority("fix_priority"),
-        round_robin("round_robin");
+        SINGLE_AGENT("SINGLE_AGENT"),
+        FIX_PRIORITY("FIX_PRIORITY"),
+        ROUND_ROBIN("ROUND_ROBIN");
         private final String value;
         private final static Map<String, AgentClusterPSchema.Type> CONSTANTS = new HashMap<String, AgentClusterPSchema.Type>();
 
@@ -321,13 +266,11 @@ public class AgentClusterPSchema {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static AgentClusterPSchema.Type fromValue(String value) {
             AgentClusterPSchema.Type constant = CONSTANTS.get(value);
             if (constant == null) {

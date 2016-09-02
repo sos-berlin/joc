@@ -1,34 +1,19 @@
 
 package com.sos.joc.model.jobscheduler;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "agent"
-})
 public class Agent_ {
 
     /**
      * Url of an Agent
      * 
      */
-    @JsonProperty("agent")
     private String agent;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * Url of an Agent
@@ -36,7 +21,6 @@ public class Agent_ {
      * @return
      *     The agent
      */
-    @JsonProperty("agent")
     public String getAgent() {
         return agent;
     }
@@ -47,7 +31,6 @@ public class Agent_ {
      * @param agent
      *     The agent
      */
-    @JsonProperty("agent")
     public void setAgent(String agent) {
         this.agent = agent;
     }
@@ -57,19 +40,9 @@ public class Agent_ {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(agent).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(agent).toHashCode();
     }
 
     @Override
@@ -81,7 +54,7 @@ public class Agent_ {
             return false;
         }
         Agent_ rhs = ((Agent_) other);
-        return new EqualsBuilder().append(agent, rhs.agent).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(agent, rhs.agent).isEquals();
     }
 
 }

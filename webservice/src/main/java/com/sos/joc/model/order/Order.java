@@ -7,14 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -27,22 +19,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "path",
-    "orderId",
-    "jobChain",
-    "priority",
-    "params",
-    "_type",
-    "title",
-    "initialState",
-    "endState",
-    "estimatedDuration",
-    "configurationDate"
-})
 public class Order {
 
     /**
@@ -52,7 +29,6 @@ public class Order {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -61,14 +37,12 @@ public class Order {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("orderId")
     private String orderId;
     /**
      * path
@@ -77,7 +51,6 @@ public class Order {
      * (Required)
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
     /**
      * non negative integer
@@ -85,7 +58,6 @@ public class Order {
      * 
      * 
      */
-    @JsonProperty("priority")
     private Integer priority;
     /**
      * params or environment variables
@@ -93,27 +65,22 @@ public class Order {
      * 
      * 
      */
-    @JsonProperty("params")
     private List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
     /**
      * the type of the order
      * 
      */
-    @JsonProperty("_type")
     private Order.Type type;
-    @JsonProperty("title")
     private String title;
     /**
      * the name of the start node
      * 
      */
-    @JsonProperty("initialState")
     private String initialState;
     /**
      * the name of the end node
      * 
      */
-    @JsonProperty("endState")
     private String endState;
     /**
      * non negative integer
@@ -121,7 +88,6 @@ public class Order {
      * 
      * 
      */
-    @JsonProperty("estimatedDuration")
     private Integer estimatedDuration;
     /**
      * timestamp
@@ -129,10 +95,7 @@ public class Order {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("configurationDate")
     private Date configurationDate;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -143,7 +106,6 @@ public class Order {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -157,7 +119,6 @@ public class Order {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -171,7 +132,6 @@ public class Order {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -185,7 +145,6 @@ public class Order {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -197,7 +156,6 @@ public class Order {
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -209,7 +167,6 @@ public class Order {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -223,7 +180,6 @@ public class Order {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -237,7 +193,6 @@ public class Order {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -250,7 +205,6 @@ public class Order {
      * @return
      *     The priority
      */
-    @JsonProperty("priority")
     public Integer getPriority() {
         return priority;
     }
@@ -263,7 +217,6 @@ public class Order {
      * @param priority
      *     The priority
      */
-    @JsonProperty("priority")
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
@@ -276,7 +229,6 @@ public class Order {
      * @return
      *     The params
      */
-    @JsonProperty("params")
     public List<NameValuePairsSchema> getParams() {
         return params;
     }
@@ -289,7 +241,6 @@ public class Order {
      * @param params
      *     The params
      */
-    @JsonProperty("params")
     public void setParams(List<NameValuePairsSchema> params) {
         this.params = params;
     }
@@ -300,7 +251,6 @@ public class Order {
      * @return
      *     The type
      */
-    @JsonProperty("_type")
     public Order.Type getType() {
         return type;
     }
@@ -311,7 +261,6 @@ public class Order {
      * @param type
      *     The _type
      */
-    @JsonProperty("_type")
     public void setType(Order.Type type) {
         this.type = type;
     }
@@ -321,7 +270,6 @@ public class Order {
      * @return
      *     The title
      */
-    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -331,7 +279,6 @@ public class Order {
      * @param title
      *     The title
      */
-    @JsonProperty("title")
     public void setTitle(String title) {
         this.title = title;
     }
@@ -342,7 +289,6 @@ public class Order {
      * @return
      *     The initialState
      */
-    @JsonProperty("initialState")
     public String getInitialState() {
         return initialState;
     }
@@ -353,7 +299,6 @@ public class Order {
      * @param initialState
      *     The initialState
      */
-    @JsonProperty("initialState")
     public void setInitialState(String initialState) {
         this.initialState = initialState;
     }
@@ -364,7 +309,6 @@ public class Order {
      * @return
      *     The endState
      */
-    @JsonProperty("endState")
     public String getEndState() {
         return endState;
     }
@@ -375,7 +319,6 @@ public class Order {
      * @param endState
      *     The endState
      */
-    @JsonProperty("endState")
     public void setEndState(String endState) {
         this.endState = endState;
     }
@@ -388,7 +331,6 @@ public class Order {
      * @return
      *     The estimatedDuration
      */
-    @JsonProperty("estimatedDuration")
     public Integer getEstimatedDuration() {
         return estimatedDuration;
     }
@@ -401,7 +343,6 @@ public class Order {
      * @param estimatedDuration
      *     The estimatedDuration
      */
-    @JsonProperty("estimatedDuration")
     public void setEstimatedDuration(Integer estimatedDuration) {
         this.estimatedDuration = estimatedDuration;
     }
@@ -414,7 +355,6 @@ public class Order {
      * @return
      *     The configurationDate
      */
-    @JsonProperty("configurationDate")
     public Date getConfigurationDate() {
         return configurationDate;
     }
@@ -427,7 +367,6 @@ public class Order {
      * @param configurationDate
      *     The configurationDate
      */
-    @JsonProperty("configurationDate")
     public void setConfigurationDate(Date configurationDate) {
         this.configurationDate = configurationDate;
     }
@@ -437,19 +376,9 @@ public class Order {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(orderId).append(jobChain).append(priority).append(params).append(type).append(title).append(initialState).append(endState).append(estimatedDuration).append(configurationDate).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(orderId).append(jobChain).append(priority).append(params).append(type).append(title).append(initialState).append(endState).append(estimatedDuration).append(configurationDate).toHashCode();
     }
 
     @Override
@@ -461,15 +390,15 @@ public class Order {
             return false;
         }
         Order rhs = ((Order) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(priority, rhs.priority).append(params, rhs.params).append(type, rhs.type).append(title, rhs.title).append(initialState, rhs.initialState).append(endState, rhs.endState).append(estimatedDuration, rhs.estimatedDuration).append(configurationDate, rhs.configurationDate).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(priority, rhs.priority).append(params, rhs.params).append(type, rhs.type).append(title, rhs.title).append(initialState, rhs.initialState).append(endState, rhs.endState).append(estimatedDuration, rhs.estimatedDuration).append(configurationDate, rhs.configurationDate).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        permanent("permanent"),
-        ad_hoc("ad_hoc"),
-        file_order("file_order");
+        PERMANENT("PERMANENT"),
+        AD_HOC("AD_HOC"),
+        FILE_ORDER("FILE_ORDER");
         private final String value;
         private final static Map<String, Order.Type> CONSTANTS = new HashMap<String, Order.Type>();
 
@@ -483,13 +412,11 @@ public class Order {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static Order.Type fromValue(String value) {
             Order.Type constant = CONSTANTS.get(value);
             if (constant == null) {

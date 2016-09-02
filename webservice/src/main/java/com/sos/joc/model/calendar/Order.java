@@ -4,14 +4,6 @@ package com.sos.joc.model.calendar;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -23,16 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "orderId",
-    "state",
-    "holiday",
-    "startTime",
-    "endTime"
-})
 public class Order {
 
     /**
@@ -42,17 +25,13 @@ public class Order {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * order id
      * 
      */
-    @JsonProperty("orderId")
     private String orderId;
-    @JsonProperty("state")
     private Order.State state;
-    @JsonProperty("holiday")
     private Boolean holiday = false;
     /**
      * estimated time
@@ -60,7 +39,6 @@ public class Order {
      * 
      * 
      */
-    @JsonProperty("startTime")
     private StartTime startTime;
     /**
      * estimated time
@@ -68,10 +46,7 @@ public class Order {
      * 
      * 
      */
-    @JsonProperty("endTime")
     private StartTime endTime;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -82,7 +57,6 @@ public class Order {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -96,7 +70,6 @@ public class Order {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -107,7 +80,6 @@ public class Order {
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -118,7 +90,6 @@ public class Order {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -128,7 +99,6 @@ public class Order {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public Order.State getState() {
         return state;
     }
@@ -138,7 +108,6 @@ public class Order {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(Order.State state) {
         this.state = state;
     }
@@ -148,7 +117,6 @@ public class Order {
      * @return
      *     The holiday
      */
-    @JsonProperty("holiday")
     public Boolean getHoliday() {
         return holiday;
     }
@@ -158,7 +126,6 @@ public class Order {
      * @param holiday
      *     The holiday
      */
-    @JsonProperty("holiday")
     public void setHoliday(Boolean holiday) {
         this.holiday = holiday;
     }
@@ -171,7 +138,6 @@ public class Order {
      * @return
      *     The startTime
      */
-    @JsonProperty("startTime")
     public StartTime getStartTime() {
         return startTime;
     }
@@ -184,7 +150,6 @@ public class Order {
      * @param startTime
      *     The startTime
      */
-    @JsonProperty("startTime")
     public void setStartTime(StartTime startTime) {
         this.startTime = startTime;
     }
@@ -197,7 +162,6 @@ public class Order {
      * @return
      *     The endTime
      */
-    @JsonProperty("endTime")
     public StartTime getEndTime() {
         return endTime;
     }
@@ -210,7 +174,6 @@ public class Order {
      * @param endTime
      *     The endTime
      */
-    @JsonProperty("endTime")
     public void setEndTime(StartTime endTime) {
         this.endTime = endTime;
     }
@@ -220,19 +183,9 @@ public class Order {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(orderId).append(state).append(holiday).append(startTime).append(endTime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(orderId).append(state).append(holiday).append(startTime).append(endTime).toHashCode();
     }
 
     @Override
@@ -244,18 +197,18 @@ public class Order {
             return false;
         }
         Order rhs = ((Order) other);
-        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(state, rhs.state).append(holiday, rhs.holiday).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(state, rhs.state).append(holiday, rhs.holiday).append(startTime, rhs.startTime).append(endTime, rhs.endTime).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum State {
 
-        pending("pending"),
-        running("running"),
-        suspended("suspended"),
-        setback("setback"),
-        waitingForResource("waitingForResource"),
-        blacklist("blacklist");
+        PENDING("PENDING"),
+        RUNNING("RUNNING"),
+        SUSPENDED("SUSPENDED"),
+        SETBACK("SETBACK"),
+        WAITINGFORRESOURCE("WAITINGFORRESOURCE"),
+        BLACKLIST("BLACKLIST");
         private final String value;
         private final static Map<String, Order.State> CONSTANTS = new HashMap<String, Order.State>();
 
@@ -269,13 +222,11 @@ public class Order {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static Order.State fromValue(String value) {
             Order.State constant = CONSTANTS.get(value);
             if (constant == null) {

@@ -2,15 +2,7 @@
 package com.sos.joc.model.job;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.ErrorSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -23,20 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "job",
-    "startTime",
-    "endTime",
-    "state",
-    "taskId",
-    "clusterMember",
-    "steps",
-    "exitCode",
-    "error",
-    "agent"
-})
 public class History {
 
     /**
@@ -44,7 +23,6 @@ public class History {
      * (Required)
      * 
      */
-    @JsonProperty("job")
     private String job;
     /**
      * timestamp
@@ -53,7 +31,6 @@ public class History {
      * (Required)
      * 
      */
-    @JsonProperty("startTime")
     private Date startTime;
     /**
      * timestamp
@@ -61,14 +38,12 @@ public class History {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("endTime")
     private Date endTime;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("state")
     private State state;
     /**
      * non negative integer
@@ -77,7 +52,6 @@ public class History {
      * (Required)
      * 
      */
-    @JsonProperty("taskId")
     private Integer taskId;
     /**
      * non negative integer
@@ -85,7 +59,6 @@ public class History {
      * 
      * 
      */
-    @JsonProperty("clusterMember")
     private Integer clusterMember;
     /**
      * non negative integer
@@ -93,7 +66,6 @@ public class History {
      * 
      * 
      */
-    @JsonProperty("steps")
     private Integer steps;
     /**
      * non negative integer
@@ -101,7 +73,6 @@ public class History {
      * 
      * 
      */
-    @JsonProperty("exitCode")
     private Integer exitCode;
     /**
      * error
@@ -109,16 +80,12 @@ public class History {
      * 
      * 
      */
-    @JsonProperty("error")
     private ErrorSchema error;
     /**
      * agent url
      * 
      */
-    @JsonProperty("agent")
     private String agent;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -127,7 +94,6 @@ public class History {
      * @return
      *     The job
      */
-    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -139,7 +105,6 @@ public class History {
      * @param job
      *     The job
      */
-    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }
@@ -153,7 +118,6 @@ public class History {
      * @return
      *     The startTime
      */
-    @JsonProperty("startTime")
     public Date getStartTime() {
         return startTime;
     }
@@ -167,7 +131,6 @@ public class History {
      * @param startTime
      *     The startTime
      */
-    @JsonProperty("startTime")
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
@@ -180,7 +143,6 @@ public class History {
      * @return
      *     The endTime
      */
-    @JsonProperty("endTime")
     public Date getEndTime() {
         return endTime;
     }
@@ -193,7 +155,6 @@ public class History {
      * @param endTime
      *     The endTime
      */
-    @JsonProperty("endTime")
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
@@ -205,7 +166,6 @@ public class History {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public State getState() {
         return state;
     }
@@ -217,7 +177,6 @@ public class History {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(State state) {
         this.state = state;
     }
@@ -231,7 +190,6 @@ public class History {
      * @return
      *     The taskId
      */
-    @JsonProperty("taskId")
     public Integer getTaskId() {
         return taskId;
     }
@@ -245,7 +203,6 @@ public class History {
      * @param taskId
      *     The taskId
      */
-    @JsonProperty("taskId")
     public void setTaskId(Integer taskId) {
         this.taskId = taskId;
     }
@@ -258,7 +215,6 @@ public class History {
      * @return
      *     The clusterMember
      */
-    @JsonProperty("clusterMember")
     public Integer getClusterMember() {
         return clusterMember;
     }
@@ -271,7 +227,6 @@ public class History {
      * @param clusterMember
      *     The clusterMember
      */
-    @JsonProperty("clusterMember")
     public void setClusterMember(Integer clusterMember) {
         this.clusterMember = clusterMember;
     }
@@ -284,7 +239,6 @@ public class History {
      * @return
      *     The steps
      */
-    @JsonProperty("steps")
     public Integer getSteps() {
         return steps;
     }
@@ -297,7 +251,6 @@ public class History {
      * @param steps
      *     The steps
      */
-    @JsonProperty("steps")
     public void setSteps(Integer steps) {
         this.steps = steps;
     }
@@ -310,7 +263,6 @@ public class History {
      * @return
      *     The exitCode
      */
-    @JsonProperty("exitCode")
     public Integer getExitCode() {
         return exitCode;
     }
@@ -323,7 +275,6 @@ public class History {
      * @param exitCode
      *     The exitCode
      */
-    @JsonProperty("exitCode")
     public void setExitCode(Integer exitCode) {
         this.exitCode = exitCode;
     }
@@ -336,7 +287,6 @@ public class History {
      * @return
      *     The error
      */
-    @JsonProperty("error")
     public ErrorSchema getError() {
         return error;
     }
@@ -349,7 +299,6 @@ public class History {
      * @param error
      *     The error
      */
-    @JsonProperty("error")
     public void setError(ErrorSchema error) {
         this.error = error;
     }
@@ -360,7 +309,6 @@ public class History {
      * @return
      *     The agent
      */
-    @JsonProperty("agent")
     public String getAgent() {
         return agent;
     }
@@ -371,7 +319,6 @@ public class History {
      * @param agent
      *     The agent
      */
-    @JsonProperty("agent")
     public void setAgent(String agent) {
         this.agent = agent;
     }
@@ -381,19 +328,9 @@ public class History {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(startTime).append(endTime).append(state).append(taskId).append(clusterMember).append(steps).append(exitCode).append(error).append(agent).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(job).append(startTime).append(endTime).append(state).append(taskId).append(clusterMember).append(steps).append(exitCode).append(error).append(agent).toHashCode();
     }
 
     @Override
@@ -405,7 +342,7 @@ public class History {
             return false;
         }
         History rhs = ((History) other);
-        return new EqualsBuilder().append(job, rhs.job).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(state, rhs.state).append(taskId, rhs.taskId).append(clusterMember, rhs.clusterMember).append(steps, rhs.steps).append(exitCode, rhs.exitCode).append(error, rhs.error).append(agent, rhs.agent).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(state, rhs.state).append(taskId, rhs.taskId).append(clusterMember, rhs.clusterMember).append(steps, rhs.steps).append(exitCode, rhs.exitCode).append(error, rhs.error).append(agent, rhs.agent).isEquals();
     }
 
 }

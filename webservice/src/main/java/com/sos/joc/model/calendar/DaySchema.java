@@ -2,16 +2,8 @@
 package com.sos.joc.model.calendar;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -23,13 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "date",
-    "orders",
-    "jobs"
-})
 public class DaySchema {
 
     /**
@@ -37,24 +23,19 @@ public class DaySchema {
      * (Required)
      * 
      */
-    @JsonProperty("date")
     private String date;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("orders")
     private List<Order> orders = new ArrayList<Order>();
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("jobs")
     private List<Order> jobs = new ArrayList<Order>();
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * YYYY-MM-DD
@@ -63,7 +44,6 @@ public class DaySchema {
      * @return
      *     The date
      */
-    @JsonProperty("date")
     public String getDate() {
         return date;
     }
@@ -75,7 +55,6 @@ public class DaySchema {
      * @param date
      *     The date
      */
-    @JsonProperty("date")
     public void setDate(String date) {
         this.date = date;
     }
@@ -87,7 +66,6 @@ public class DaySchema {
      * @return
      *     The orders
      */
-    @JsonProperty("orders")
     public List<Order> getOrders() {
         return orders;
     }
@@ -99,7 +77,6 @@ public class DaySchema {
      * @param orders
      *     The orders
      */
-    @JsonProperty("orders")
     public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
@@ -111,7 +88,6 @@ public class DaySchema {
      * @return
      *     The jobs
      */
-    @JsonProperty("jobs")
     public List<Order> getJobs() {
         return jobs;
     }
@@ -123,7 +99,6 @@ public class DaySchema {
      * @param jobs
      *     The jobs
      */
-    @JsonProperty("jobs")
     public void setJobs(List<Order> jobs) {
         this.jobs = jobs;
     }
@@ -133,19 +108,9 @@ public class DaySchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(date).append(orders).append(jobs).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(date).append(orders).append(jobs).toHashCode();
     }
 
     @Override
@@ -157,7 +122,7 @@ public class DaySchema {
             return false;
         }
         DaySchema rhs = ((DaySchema) other);
-        return new EqualsBuilder().append(date, rhs.date).append(orders, rhs.orders).append(jobs, rhs.jobs).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(date, rhs.date).append(orders, rhs.orders).append(jobs, rhs.jobs).isEquals();
     }
 
 }

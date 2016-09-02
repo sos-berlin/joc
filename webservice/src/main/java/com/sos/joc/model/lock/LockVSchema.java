@@ -3,16 +3,8 @@ package com.sos.joc.model.lock;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -25,17 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * The lock is free iff no holders specified
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "path",
-    "name",
-    "maxNonExclusive",
-    "holders",
-    "queue",
-    "configurationStatus"
-})
 public class LockVSchema {
 
     /**
@@ -45,7 +27,6 @@ public class LockVSchema {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -54,14 +35,12 @@ public class LockVSchema {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("name")
     private String name;
     /**
      * non negative integer
@@ -69,18 +48,15 @@ public class LockVSchema {
      * 
      * 
      */
-    @JsonProperty("maxNonExclusive")
     private Integer maxNonExclusive;
     /**
      * 
      */
-    @JsonProperty("holders")
     private Holders holders;
     /**
      * Collection of jobs which have to wait until the lock is free
      * 
      */
-    @JsonProperty("queue")
     private List<Queue> queue = new ArrayList<Queue>();
     /**
      * configuration status
@@ -88,10 +64,7 @@ public class LockVSchema {
      * 
      * 
      */
-    @JsonProperty("configurationStatus")
     private ConfigurationStatusSchema configurationStatus;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -102,7 +75,6 @@ public class LockVSchema {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -116,7 +88,6 @@ public class LockVSchema {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -130,7 +101,6 @@ public class LockVSchema {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -144,7 +114,6 @@ public class LockVSchema {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -156,7 +125,6 @@ public class LockVSchema {
      * @return
      *     The name
      */
-    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -168,7 +136,6 @@ public class LockVSchema {
      * @param name
      *     The name
      */
-    @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
     }
@@ -181,7 +148,6 @@ public class LockVSchema {
      * @return
      *     The maxNonExclusive
      */
-    @JsonProperty("maxNonExclusive")
     public Integer getMaxNonExclusive() {
         return maxNonExclusive;
     }
@@ -194,7 +160,6 @@ public class LockVSchema {
      * @param maxNonExclusive
      *     The maxNonExclusive
      */
-    @JsonProperty("maxNonExclusive")
     public void setMaxNonExclusive(Integer maxNonExclusive) {
         this.maxNonExclusive = maxNonExclusive;
     }
@@ -204,7 +169,6 @@ public class LockVSchema {
      * @return
      *     The holders
      */
-    @JsonProperty("holders")
     public Holders getHolders() {
         return holders;
     }
@@ -214,7 +178,6 @@ public class LockVSchema {
      * @param holders
      *     The holders
      */
-    @JsonProperty("holders")
     public void setHolders(Holders holders) {
         this.holders = holders;
     }
@@ -225,7 +188,6 @@ public class LockVSchema {
      * @return
      *     The queue
      */
-    @JsonProperty("queue")
     public List<Queue> getQueue() {
         return queue;
     }
@@ -236,7 +198,6 @@ public class LockVSchema {
      * @param queue
      *     The queue
      */
-    @JsonProperty("queue")
     public void setQueue(List<Queue> queue) {
         this.queue = queue;
     }
@@ -249,7 +210,6 @@ public class LockVSchema {
      * @return
      *     The configurationStatus
      */
-    @JsonProperty("configurationStatus")
     public ConfigurationStatusSchema getConfigurationStatus() {
         return configurationStatus;
     }
@@ -262,7 +222,6 @@ public class LockVSchema {
      * @param configurationStatus
      *     The configurationStatus
      */
-    @JsonProperty("configurationStatus")
     public void setConfigurationStatus(ConfigurationStatusSchema configurationStatus) {
         this.configurationStatus = configurationStatus;
     }
@@ -272,19 +231,9 @@ public class LockVSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(maxNonExclusive).append(holders).append(queue).append(configurationStatus).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(maxNonExclusive).append(holders).append(queue).append(configurationStatus).toHashCode();
     }
 
     @Override
@@ -296,7 +245,7 @@ public class LockVSchema {
             return false;
         }
         LockVSchema rhs = ((LockVSchema) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(maxNonExclusive, rhs.maxNonExclusive).append(holders, rhs.holders).append(queue, rhs.queue).append(configurationStatus, rhs.configurationStatus).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(maxNonExclusive, rhs.maxNonExclusive).append(holders, rhs.holders).append(queue, rhs.queue).append(configurationStatus, rhs.configurationStatus).isEquals();
     }
 
 }

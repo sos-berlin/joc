@@ -1,15 +1,7 @@
 
 package com.sos.joc.model.job;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,16 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "jobschedulerId",
-    "job",
-    "jobChain",
-    "orderId",
-    "node",
-    "compact"
-})
 public class JobOrderQueueFilterSchema {
 
     /**
@@ -38,7 +21,6 @@ public class JobOrderQueueFilterSchema {
      * (Required)
      * 
      */
-    @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
      * path
@@ -47,7 +29,6 @@ public class JobOrderQueueFilterSchema {
      * (Required)
      * 
      */
-    @JsonProperty("job")
     private String job;
     /**
      * path
@@ -55,11 +36,8 @@ public class JobOrderQueueFilterSchema {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
-    @JsonProperty("orderId")
     private String orderId;
-    @JsonProperty("node")
     private String node;
     /**
      * compact parameter
@@ -67,10 +45,7 @@ public class JobOrderQueueFilterSchema {
      * controls if the object view is compact or detailed
      * 
      */
-    @JsonProperty("compact")
     private Boolean compact = false;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -79,7 +54,6 @@ public class JobOrderQueueFilterSchema {
      * @return
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public String getJobschedulerId() {
         return jobschedulerId;
     }
@@ -91,7 +65,6 @@ public class JobOrderQueueFilterSchema {
      * @param jobschedulerId
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public void setJobschedulerId(String jobschedulerId) {
         this.jobschedulerId = jobschedulerId;
     }
@@ -105,7 +78,6 @@ public class JobOrderQueueFilterSchema {
      * @return
      *     The job
      */
-    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -119,7 +91,6 @@ public class JobOrderQueueFilterSchema {
      * @param job
      *     The job
      */
-    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }
@@ -132,7 +103,6 @@ public class JobOrderQueueFilterSchema {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -145,7 +115,6 @@ public class JobOrderQueueFilterSchema {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -155,7 +124,6 @@ public class JobOrderQueueFilterSchema {
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -165,7 +133,6 @@ public class JobOrderQueueFilterSchema {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -175,7 +142,6 @@ public class JobOrderQueueFilterSchema {
      * @return
      *     The node
      */
-    @JsonProperty("node")
     public String getNode() {
         return node;
     }
@@ -185,7 +151,6 @@ public class JobOrderQueueFilterSchema {
      * @param node
      *     The node
      */
-    @JsonProperty("node")
     public void setNode(String node) {
         this.node = node;
     }
@@ -198,7 +163,6 @@ public class JobOrderQueueFilterSchema {
      * @return
      *     The compact
      */
-    @JsonProperty("compact")
     public Boolean getCompact() {
         return compact;
     }
@@ -211,7 +175,6 @@ public class JobOrderQueueFilterSchema {
      * @param compact
      *     The compact
      */
-    @JsonProperty("compact")
     public void setCompact(Boolean compact) {
         this.compact = compact;
     }
@@ -221,19 +184,9 @@ public class JobOrderQueueFilterSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(job).append(jobChain).append(orderId).append(node).append(compact).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(job).append(jobChain).append(orderId).append(node).append(compact).toHashCode();
     }
 
     @Override
@@ -245,7 +198,7 @@ public class JobOrderQueueFilterSchema {
             return false;
         }
         JobOrderQueueFilterSchema rhs = ((JobOrderQueueFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(node, rhs.node).append(compact, rhs.compact).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(node, rhs.node).append(compact, rhs.compact).isEquals();
     }
 
 }

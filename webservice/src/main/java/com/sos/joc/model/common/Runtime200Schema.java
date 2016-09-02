@@ -2,15 +2,7 @@
 package com.sos.joc.model.common;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,12 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "deliveryDate",
-    "runTime"
-})
 public class Runtime200Schema {
 
     /**
@@ -37,7 +24,6 @@ public class Runtime200Schema {
      * (Required)
      * 
      */
-    @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
      * runtime
@@ -46,10 +32,7 @@ public class Runtime200Schema {
      * (Required)
      * 
      */
-    @JsonProperty("runTime")
     private RuntimeSchema runTime;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * delivery date
@@ -60,7 +43,6 @@ public class Runtime200Schema {
      * @return
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public Date getDeliveryDate() {
         return deliveryDate;
     }
@@ -74,7 +56,6 @@ public class Runtime200Schema {
      * @param deliveryDate
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
@@ -88,7 +69,6 @@ public class Runtime200Schema {
      * @return
      *     The runTime
      */
-    @JsonProperty("runTime")
     public RuntimeSchema getRunTime() {
         return runTime;
     }
@@ -102,7 +82,6 @@ public class Runtime200Schema {
      * @param runTime
      *     The runTime
      */
-    @JsonProperty("runTime")
     public void setRunTime(RuntimeSchema runTime) {
         this.runTime = runTime;
     }
@@ -112,19 +91,9 @@ public class Runtime200Schema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(runTime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(runTime).toHashCode();
     }
 
     @Override
@@ -136,7 +105,7 @@ public class Runtime200Schema {
             return false;
         }
         Runtime200Schema rhs = ((Runtime200Schema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(runTime, rhs.runTime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(runTime, rhs.runTime).isEquals();
     }
 
 }

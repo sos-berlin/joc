@@ -1,26 +1,12 @@
 
 package com.sos.joc.model.job;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "available",
-    "exclusive"
-})
 public class Lock__ {
 
     /**
@@ -30,24 +16,19 @@ public class Lock__ {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("available")
     private Boolean available;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("exclusive")
     private Boolean exclusive;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -58,7 +39,6 @@ public class Lock__ {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -72,7 +52,6 @@ public class Lock__ {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -84,7 +63,6 @@ public class Lock__ {
      * @return
      *     The available
      */
-    @JsonProperty("available")
     public Boolean getAvailable() {
         return available;
     }
@@ -96,7 +74,6 @@ public class Lock__ {
      * @param available
      *     The available
      */
-    @JsonProperty("available")
     public void setAvailable(Boolean available) {
         this.available = available;
     }
@@ -108,7 +85,6 @@ public class Lock__ {
      * @return
      *     The exclusive
      */
-    @JsonProperty("exclusive")
     public Boolean getExclusive() {
         return exclusive;
     }
@@ -120,7 +96,6 @@ public class Lock__ {
      * @param exclusive
      *     The exclusive
      */
-    @JsonProperty("exclusive")
     public void setExclusive(Boolean exclusive) {
         this.exclusive = exclusive;
     }
@@ -130,19 +105,9 @@ public class Lock__ {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(available).append(exclusive).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(available).append(exclusive).toHashCode();
     }
 
     @Override
@@ -154,7 +119,7 @@ public class Lock__ {
             return false;
         }
         Lock__ rhs = ((Lock__) other);
-        return new EqualsBuilder().append(path, rhs.path).append(available, rhs.available).append(exclusive, rhs.exclusive).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(available, rhs.available).append(exclusive, rhs.exclusive).isEquals();
     }
 
 }

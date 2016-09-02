@@ -3,16 +3,8 @@ package com.sos.joc.model.job;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -25,24 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "path",
-    "isOrderJob",
-    "name",
-    "title",
-    "estimatedDuration",
-    "processClass",
-    "maxTasks",
-    "params",
-    "locks",
-    "usedInJobChains",
-    "jobChains",
-    "hasDescription",
-    "configurationDate"
-})
 public class Job {
 
     /**
@@ -51,7 +26,6 @@ public class Job {
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -59,13 +33,9 @@ public class Job {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("path")
     private String path;
-    @JsonProperty("isOrderJob")
     private Boolean isOrderJob;
-    @JsonProperty("name")
     private String name;
-    @JsonProperty("title")
     private String title;
     /**
      * non negative integer
@@ -73,7 +43,6 @@ public class Job {
      * 
      * 
      */
-    @JsonProperty("estimatedDuration")
     private Integer estimatedDuration;
     /**
      * path
@@ -81,7 +50,6 @@ public class Job {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("processClass")
     private String processClass;
     /**
      * non negative integer
@@ -89,7 +57,6 @@ public class Job {
      * 
      * 
      */
-    @JsonProperty("maxTasks")
     private Integer maxTasks;
     /**
      * params or environment variables
@@ -97,9 +64,7 @@ public class Job {
      * 
      * 
      */
-    @JsonProperty("params")
     private List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
-    @JsonProperty("locks")
     private List<Lock> locks = new ArrayList<Lock>();
     /**
      * non negative integer
@@ -107,15 +72,12 @@ public class Job {
      * 
      * 
      */
-    @JsonProperty("usedInJobChains")
     private Integer usedInJobChains;
     /**
      * Only relevant for order jobs when called /jobs/p/... or job/p/...
      * 
      */
-    @JsonProperty("jobChains")
     private List<String> jobChains = new ArrayList<String>();
-    @JsonProperty("hasDescription")
     private Boolean hasDescription = false;
     /**
      * timestamp
@@ -123,10 +85,7 @@ public class Job {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("configurationDate")
     private Date configurationDate;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -136,7 +95,6 @@ public class Job {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -149,7 +107,6 @@ public class Job {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -162,7 +119,6 @@ public class Job {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -175,7 +131,6 @@ public class Job {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -185,7 +140,6 @@ public class Job {
      * @return
      *     The isOrderJob
      */
-    @JsonProperty("isOrderJob")
     public Boolean getIsOrderJob() {
         return isOrderJob;
     }
@@ -195,7 +149,6 @@ public class Job {
      * @param isOrderJob
      *     The isOrderJob
      */
-    @JsonProperty("isOrderJob")
     public void setIsOrderJob(Boolean isOrderJob) {
         this.isOrderJob = isOrderJob;
     }
@@ -205,7 +158,6 @@ public class Job {
      * @return
      *     The name
      */
-    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -215,7 +167,6 @@ public class Job {
      * @param name
      *     The name
      */
-    @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
     }
@@ -225,7 +176,6 @@ public class Job {
      * @return
      *     The title
      */
-    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -235,7 +185,6 @@ public class Job {
      * @param title
      *     The title
      */
-    @JsonProperty("title")
     public void setTitle(String title) {
         this.title = title;
     }
@@ -248,7 +197,6 @@ public class Job {
      * @return
      *     The estimatedDuration
      */
-    @JsonProperty("estimatedDuration")
     public Integer getEstimatedDuration() {
         return estimatedDuration;
     }
@@ -261,7 +209,6 @@ public class Job {
      * @param estimatedDuration
      *     The estimatedDuration
      */
-    @JsonProperty("estimatedDuration")
     public void setEstimatedDuration(Integer estimatedDuration) {
         this.estimatedDuration = estimatedDuration;
     }
@@ -274,7 +221,6 @@ public class Job {
      * @return
      *     The processClass
      */
-    @JsonProperty("processClass")
     public String getProcessClass() {
         return processClass;
     }
@@ -287,7 +233,6 @@ public class Job {
      * @param processClass
      *     The processClass
      */
-    @JsonProperty("processClass")
     public void setProcessClass(String processClass) {
         this.processClass = processClass;
     }
@@ -300,7 +245,6 @@ public class Job {
      * @return
      *     The maxTasks
      */
-    @JsonProperty("maxTasks")
     public Integer getMaxTasks() {
         return maxTasks;
     }
@@ -313,7 +257,6 @@ public class Job {
      * @param maxTasks
      *     The maxTasks
      */
-    @JsonProperty("maxTasks")
     public void setMaxTasks(Integer maxTasks) {
         this.maxTasks = maxTasks;
     }
@@ -326,7 +269,6 @@ public class Job {
      * @return
      *     The params
      */
-    @JsonProperty("params")
     public List<NameValuePairsSchema> getParams() {
         return params;
     }
@@ -339,7 +281,6 @@ public class Job {
      * @param params
      *     The params
      */
-    @JsonProperty("params")
     public void setParams(List<NameValuePairsSchema> params) {
         this.params = params;
     }
@@ -349,7 +290,6 @@ public class Job {
      * @return
      *     The locks
      */
-    @JsonProperty("locks")
     public List<Lock> getLocks() {
         return locks;
     }
@@ -359,7 +299,6 @@ public class Job {
      * @param locks
      *     The locks
      */
-    @JsonProperty("locks")
     public void setLocks(List<Lock> locks) {
         this.locks = locks;
     }
@@ -372,7 +311,6 @@ public class Job {
      * @return
      *     The usedInJobChains
      */
-    @JsonProperty("usedInJobChains")
     public Integer getUsedInJobChains() {
         return usedInJobChains;
     }
@@ -385,7 +323,6 @@ public class Job {
      * @param usedInJobChains
      *     The usedInJobChains
      */
-    @JsonProperty("usedInJobChains")
     public void setUsedInJobChains(Integer usedInJobChains) {
         this.usedInJobChains = usedInJobChains;
     }
@@ -396,7 +333,6 @@ public class Job {
      * @return
      *     The jobChains
      */
-    @JsonProperty("jobChains")
     public List<String> getJobChains() {
         return jobChains;
     }
@@ -407,7 +343,6 @@ public class Job {
      * @param jobChains
      *     The jobChains
      */
-    @JsonProperty("jobChains")
     public void setJobChains(List<String> jobChains) {
         this.jobChains = jobChains;
     }
@@ -417,7 +352,6 @@ public class Job {
      * @return
      *     The hasDescription
      */
-    @JsonProperty("hasDescription")
     public Boolean getHasDescription() {
         return hasDescription;
     }
@@ -427,7 +361,6 @@ public class Job {
      * @param hasDescription
      *     The hasDescription
      */
-    @JsonProperty("hasDescription")
     public void setHasDescription(Boolean hasDescription) {
         this.hasDescription = hasDescription;
     }
@@ -440,7 +373,6 @@ public class Job {
      * @return
      *     The configurationDate
      */
-    @JsonProperty("configurationDate")
     public Date getConfigurationDate() {
         return configurationDate;
     }
@@ -453,7 +385,6 @@ public class Job {
      * @param configurationDate
      *     The configurationDate
      */
-    @JsonProperty("configurationDate")
     public void setConfigurationDate(Date configurationDate) {
         this.configurationDate = configurationDate;
     }
@@ -463,19 +394,9 @@ public class Job {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(isOrderJob).append(name).append(title).append(estimatedDuration).append(processClass).append(maxTasks).append(params).append(locks).append(usedInJobChains).append(jobChains).append(hasDescription).append(configurationDate).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(isOrderJob).append(name).append(title).append(estimatedDuration).append(processClass).append(maxTasks).append(params).append(locks).append(usedInJobChains).append(jobChains).append(hasDescription).append(configurationDate).toHashCode();
     }
 
     @Override
@@ -487,7 +408,7 @@ public class Job {
             return false;
         }
         Job rhs = ((Job) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(isOrderJob, rhs.isOrderJob).append(name, rhs.name).append(title, rhs.title).append(estimatedDuration, rhs.estimatedDuration).append(processClass, rhs.processClass).append(maxTasks, rhs.maxTasks).append(params, rhs.params).append(locks, rhs.locks).append(usedInJobChains, rhs.usedInJobChains).append(jobChains, rhs.jobChains).append(hasDescription, rhs.hasDescription).append(configurationDate, rhs.configurationDate).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(isOrderJob, rhs.isOrderJob).append(name, rhs.name).append(title, rhs.title).append(estimatedDuration, rhs.estimatedDuration).append(processClass, rhs.processClass).append(maxTasks, rhs.maxTasks).append(params, rhs.params).append(locks, rhs.locks).append(usedInJobChains, rhs.usedInJobChains).append(jobChains, rhs.jobChains).append(hasDescription, rhs.hasDescription).append(configurationDate, rhs.configurationDate).isEquals();
     }
 
 }

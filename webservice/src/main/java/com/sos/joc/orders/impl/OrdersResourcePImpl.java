@@ -50,7 +50,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                     order.setEndState("myEndState");
                     order.setInitialState("myInitialState");
                     order.setTitle("myTitle");
-                    order.setType(Order.Type.permanent);
+                    order.setType(Order.Type.PERMANENT);
                     order.setPriority(-1);
 
                     List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();

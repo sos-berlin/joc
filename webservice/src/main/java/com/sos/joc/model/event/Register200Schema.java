@@ -3,16 +3,8 @@ package com.sos.joc.model.event;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -24,12 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "deliveryDate",
-    "events"
-})
 public class Register200Schema {
 
     /**
@@ -39,7 +26,6 @@ public class Register200Schema {
      * (Required)
      * 
      */
-    @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
      * register, unregister or collect event
@@ -48,10 +34,7 @@ public class Register200Schema {
      * (Required)
      * 
      */
-    @JsonProperty("events")
     private List<java.lang.Object> events = new ArrayList<java.lang.Object>();
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * timestamp
@@ -62,7 +45,6 @@ public class Register200Schema {
      * @return
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public Date getDeliveryDate() {
         return deliveryDate;
     }
@@ -76,7 +58,6 @@ public class Register200Schema {
      * @param deliveryDate
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
@@ -90,7 +71,6 @@ public class Register200Schema {
      * @return
      *     The events
      */
-    @JsonProperty("events")
     public List<java.lang.Object> getEvents() {
         return events;
     }
@@ -104,7 +84,6 @@ public class Register200Schema {
      * @param events
      *     The events
      */
-    @JsonProperty("events")
     public void setEvents(List<java.lang.Object> events) {
         this.events = events;
     }
@@ -114,19 +93,9 @@ public class Register200Schema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(events).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(events).toHashCode();
     }
 
     @Override
@@ -138,7 +107,7 @@ public class Register200Schema {
             return false;
         }
         Register200Schema rhs = ((Register200Schema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(events, rhs.events).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(events, rhs.events).isEquals();
     }
 
 }

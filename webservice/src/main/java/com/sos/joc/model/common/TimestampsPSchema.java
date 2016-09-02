@@ -2,15 +2,7 @@
 package com.sos.joc.model.common;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,12 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * timestamps of permanent requests
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "deliveryDate",
-    "surveyDate"
-})
 public class TimestampsPSchema {
 
     /**
@@ -37,7 +24,6 @@ public class TimestampsPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -46,10 +32,7 @@ public class TimestampsPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * timestamp
@@ -60,7 +43,6 @@ public class TimestampsPSchema {
      * @return
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public Date getDeliveryDate() {
         return deliveryDate;
     }
@@ -74,7 +56,6 @@ public class TimestampsPSchema {
      * @param deliveryDate
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
@@ -88,7 +69,6 @@ public class TimestampsPSchema {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -102,7 +82,6 @@ public class TimestampsPSchema {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -112,19 +91,9 @@ public class TimestampsPSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(surveyDate).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(surveyDate).toHashCode();
     }
 
     @Override
@@ -136,7 +105,7 @@ public class TimestampsPSchema {
             return false;
         }
         TimestampsPSchema rhs = ((TimestampsPSchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(surveyDate, rhs.surveyDate).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(surveyDate, rhs.surveyDate).isEquals();
     }
 
 }

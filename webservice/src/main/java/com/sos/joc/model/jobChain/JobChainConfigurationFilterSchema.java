@@ -4,14 +4,6 @@ package com.sos.joc.model.jobChain;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -23,16 +15,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "jobschedulerId",
-    "jobChain",
-    "mime"
-})
 public class JobChainConfigurationFilterSchema {
 
-    @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
      * path
@@ -41,23 +26,18 @@ public class JobChainConfigurationFilterSchema {
      * (Required)
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
     /**
      * The configuration can have a HTML representation where the XML gets a highlighting via CSS classes.
      * 
      */
-    @JsonProperty("mime")
-    private JobChainConfigurationFilterSchema.Mime mime = JobChainConfigurationFilterSchema.Mime.fromValue("xml");
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private JobChainConfigurationFilterSchema.Mime mime = JobChainConfigurationFilterSchema.Mime.fromValue("XML");
 
     /**
      * 
      * @return
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public String getJobschedulerId() {
         return jobschedulerId;
     }
@@ -67,7 +47,6 @@ public class JobChainConfigurationFilterSchema {
      * @param jobschedulerId
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public void setJobschedulerId(String jobschedulerId) {
         this.jobschedulerId = jobschedulerId;
     }
@@ -81,7 +60,6 @@ public class JobChainConfigurationFilterSchema {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -95,7 +73,6 @@ public class JobChainConfigurationFilterSchema {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -106,7 +83,6 @@ public class JobChainConfigurationFilterSchema {
      * @return
      *     The mime
      */
-    @JsonProperty("mime")
     public JobChainConfigurationFilterSchema.Mime getMime() {
         return mime;
     }
@@ -117,7 +93,6 @@ public class JobChainConfigurationFilterSchema {
      * @param mime
      *     The mime
      */
-    @JsonProperty("mime")
     public void setMime(JobChainConfigurationFilterSchema.Mime mime) {
         this.mime = mime;
     }
@@ -127,19 +102,9 @@ public class JobChainConfigurationFilterSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobChain).append(mime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobChain).append(mime).toHashCode();
     }
 
     @Override
@@ -151,14 +116,14 @@ public class JobChainConfigurationFilterSchema {
             return false;
         }
         JobChainConfigurationFilterSchema rhs = ((JobChainConfigurationFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChain, rhs.jobChain).append(mime, rhs.mime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChain, rhs.jobChain).append(mime, rhs.mime).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Mime {
 
-        xml("xml"),
-        html("html");
+        XML("XML"),
+        HTML("HTML");
         private final String value;
         private final static Map<String, JobChainConfigurationFilterSchema.Mime> CONSTANTS = new HashMap<String, JobChainConfigurationFilterSchema.Mime>();
 
@@ -172,13 +137,11 @@ public class JobChainConfigurationFilterSchema {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static JobChainConfigurationFilterSchema.Mime fromValue(String value) {
             JobChainConfigurationFilterSchema.Mime constant = CONSTANTS.get(value);
             if (constant == null) {

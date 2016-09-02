@@ -1,15 +1,7 @@
 
 package com.sos.joc.model.order;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,15 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "orderId",
-    "jobChain",
-    "numOfSuccessful",
-    "numOfFailed"
-})
 public class GroupedHistorySchema {
 
     /**
@@ -39,14 +23,12 @@ public class GroupedHistorySchema {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("orderId")
     private String orderId;
     /**
      * path
@@ -55,7 +37,6 @@ public class GroupedHistorySchema {
      * (Required)
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
     /**
      * non negative integer
@@ -64,7 +45,6 @@ public class GroupedHistorySchema {
      * (Required)
      * 
      */
-    @JsonProperty("numOfSuccessful")
     private Integer numOfSuccessful;
     /**
      * non negative integer
@@ -73,10 +53,7 @@ public class GroupedHistorySchema {
      * (Required)
      * 
      */
-    @JsonProperty("numOfFailed")
     private Integer numOfFailed;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -87,7 +64,6 @@ public class GroupedHistorySchema {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -101,7 +77,6 @@ public class GroupedHistorySchema {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -113,7 +88,6 @@ public class GroupedHistorySchema {
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -125,7 +99,6 @@ public class GroupedHistorySchema {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -139,7 +112,6 @@ public class GroupedHistorySchema {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -153,7 +125,6 @@ public class GroupedHistorySchema {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -167,7 +138,6 @@ public class GroupedHistorySchema {
      * @return
      *     The numOfSuccessful
      */
-    @JsonProperty("numOfSuccessful")
     public Integer getNumOfSuccessful() {
         return numOfSuccessful;
     }
@@ -181,7 +151,6 @@ public class GroupedHistorySchema {
      * @param numOfSuccessful
      *     The numOfSuccessful
      */
-    @JsonProperty("numOfSuccessful")
     public void setNumOfSuccessful(Integer numOfSuccessful) {
         this.numOfSuccessful = numOfSuccessful;
     }
@@ -195,7 +164,6 @@ public class GroupedHistorySchema {
      * @return
      *     The numOfFailed
      */
-    @JsonProperty("numOfFailed")
     public Integer getNumOfFailed() {
         return numOfFailed;
     }
@@ -209,7 +177,6 @@ public class GroupedHistorySchema {
      * @param numOfFailed
      *     The numOfFailed
      */
-    @JsonProperty("numOfFailed")
     public void setNumOfFailed(Integer numOfFailed) {
         this.numOfFailed = numOfFailed;
     }
@@ -219,19 +186,9 @@ public class GroupedHistorySchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(numOfSuccessful).append(numOfFailed).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(numOfSuccessful).append(numOfFailed).toHashCode();
     }
 
     @Override
@@ -243,7 +200,7 @@ public class GroupedHistorySchema {
             return false;
         }
         GroupedHistorySchema rhs = ((GroupedHistorySchema) other);
-        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(numOfSuccessful, rhs.numOfSuccessful).append(numOfFailed, rhs.numOfFailed).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(numOfSuccessful, rhs.numOfSuccessful).append(numOfFailed, rhs.numOfFailed).isEquals();
     }
 
 }

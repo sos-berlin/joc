@@ -122,7 +122,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
                 configurationStatusSchema.setMessage("myMessage");
                 configurationStatusSchema.setSeverity(2);
-                configurationStatusSchema.setText(ConfigurationStatusSchema.Text.changed_file_not_loaded);
+                configurationStatusSchema.setText(ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
                 orderQueue.setConfigurationStatus(configurationStatusSchema);
                 
                 try { 

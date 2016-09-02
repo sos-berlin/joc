@@ -5,14 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -24,18 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * task object of an order job which is running
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "taskId",
-    "pid",
-    "startedAt",
-    "enqueued",
-    "idleSince",
-    "steps",
-    "cause",
-    "order"
-})
 public class RunningTask {
 
     /**
@@ -43,9 +24,7 @@ public class RunningTask {
      * (Required)
      * 
      */
-    @JsonProperty("taskId")
     private Integer taskId;
-    @JsonProperty("pid")
     private Integer pid;
     /**
      * timestamp
@@ -54,7 +33,6 @@ public class RunningTask {
      * (Required)
      * 
      */
-    @JsonProperty("startedAt")
     private Date startedAt;
     /**
      * timestamp
@@ -62,7 +40,6 @@ public class RunningTask {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("enqueued")
     private Date enqueued;
     /**
      * timestamp
@@ -70,24 +47,18 @@ public class RunningTask {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("idleSince")
     private Date idleSince;
-    @JsonProperty("steps")
     private Integer steps;
     /**
      * For order jobs only cause=order possible
      * 
      */
-    @JsonProperty("cause")
     private RunningTask.Cause cause;
     /**
      * Only relevant for order jobs; cause=order resp.
      * 
      */
-    @JsonProperty("order")
     private Order order;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -96,7 +67,6 @@ public class RunningTask {
      * @return
      *     The taskId
      */
-    @JsonProperty("taskId")
     public Integer getTaskId() {
         return taskId;
     }
@@ -108,7 +78,6 @@ public class RunningTask {
      * @param taskId
      *     The taskId
      */
-    @JsonProperty("taskId")
     public void setTaskId(Integer taskId) {
         this.taskId = taskId;
     }
@@ -118,7 +87,6 @@ public class RunningTask {
      * @return
      *     The pid
      */
-    @JsonProperty("pid")
     public Integer getPid() {
         return pid;
     }
@@ -128,7 +96,6 @@ public class RunningTask {
      * @param pid
      *     The pid
      */
-    @JsonProperty("pid")
     public void setPid(Integer pid) {
         this.pid = pid;
     }
@@ -142,7 +109,6 @@ public class RunningTask {
      * @return
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public Date getStartedAt() {
         return startedAt;
     }
@@ -156,7 +122,6 @@ public class RunningTask {
      * @param startedAt
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
@@ -169,7 +134,6 @@ public class RunningTask {
      * @return
      *     The enqueued
      */
-    @JsonProperty("enqueued")
     public Date getEnqueued() {
         return enqueued;
     }
@@ -182,7 +146,6 @@ public class RunningTask {
      * @param enqueued
      *     The enqueued
      */
-    @JsonProperty("enqueued")
     public void setEnqueued(Date enqueued) {
         this.enqueued = enqueued;
     }
@@ -195,7 +158,6 @@ public class RunningTask {
      * @return
      *     The idleSince
      */
-    @JsonProperty("idleSince")
     public Date getIdleSince() {
         return idleSince;
     }
@@ -208,7 +170,6 @@ public class RunningTask {
      * @param idleSince
      *     The idleSince
      */
-    @JsonProperty("idleSince")
     public void setIdleSince(Date idleSince) {
         this.idleSince = idleSince;
     }
@@ -218,7 +179,6 @@ public class RunningTask {
      * @return
      *     The steps
      */
-    @JsonProperty("steps")
     public Integer getSteps() {
         return steps;
     }
@@ -228,7 +188,6 @@ public class RunningTask {
      * @param steps
      *     The steps
      */
-    @JsonProperty("steps")
     public void setSteps(Integer steps) {
         this.steps = steps;
     }
@@ -239,7 +198,6 @@ public class RunningTask {
      * @return
      *     The cause
      */
-    @JsonProperty("cause")
     public RunningTask.Cause getCause() {
         return cause;
     }
@@ -248,9 +206,8 @@ public class RunningTask {
      * For order jobs only cause=order possible
      * 
      * @param cause
-     *     The cause
+     *     The _cause
      */
-    @JsonProperty("cause")
     public void setCause(RunningTask.Cause cause) {
         this.cause = cause;
     }
@@ -261,7 +218,6 @@ public class RunningTask {
      * @return
      *     The order
      */
-    @JsonProperty("order")
     public Order getOrder() {
         return order;
     }
@@ -272,7 +228,6 @@ public class RunningTask {
      * @param order
      *     The order
      */
-    @JsonProperty("order")
     public void setOrder(Order order) {
         this.order = order;
     }
@@ -282,19 +237,9 @@ public class RunningTask {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(taskId).append(pid).append(startedAt).append(enqueued).append(idleSince).append(steps).append(cause).append(order).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(taskId).append(pid).append(startedAt).append(enqueued).append(idleSince).append(steps).append(cause).append(order).toHashCode();
     }
 
     @Override
@@ -306,22 +251,22 @@ public class RunningTask {
             return false;
         }
         RunningTask rhs = ((RunningTask) other);
-        return new EqualsBuilder().append(taskId, rhs.taskId).append(pid, rhs.pid).append(startedAt, rhs.startedAt).append(enqueued, rhs.enqueued).append(idleSince, rhs.idleSince).append(steps, rhs.steps).append(cause, rhs.cause).append(order, rhs.order).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(taskId, rhs.taskId).append(pid, rhs.pid).append(startedAt, rhs.startedAt).append(enqueued, rhs.enqueued).append(idleSince, rhs.idleSince).append(steps, rhs.steps).append(cause, rhs.cause).append(order, rhs.order).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Cause {
 
-        none("none"),
-        min_tasks("min_tasks"),
-        period_once("period_once"),
-        period_single("period_single"),
-        period_repeat("period_repeat"),
-        queue("queue"),
-        queue_at("queue_at"),
-        directory("directory"),
-        delay_after_error("delay_after_error"),
-        order("order");
+        NONE("NONE"),
+        MIN_TASKS("MIN_TASKS"),
+        PERIOD_ONCE("PERIOD_ONCE"),
+        PERIOD_SINGLE("PERIOD_SINGLE"),
+        PERIOD_REPEAT("PERIOD_REPEAT"),
+        QUEUE("QUEUE"),
+        QUEUE_AT("QUEUE_AT"),
+        DIRECTORY("DIRECTORY"),
+        DELAY_AFTER_ERROR("DELAY_AFTER_ERROR"),
+        ORDER("ORDER");
         private final String value;
         private final static Map<String, RunningTask.Cause> CONSTANTS = new HashMap<String, RunningTask.Cause>();
 
@@ -335,13 +280,11 @@ public class RunningTask {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static RunningTask.Cause fromValue(String value) {
             RunningTask.Cause constant = CONSTANTS.get(value);
             if (constant == null) {

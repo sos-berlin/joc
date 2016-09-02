@@ -43,7 +43,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             agentClusterPSchema.setMaxProcesses(-1);
             agentClusterPSchema.setName("myName");
             agentClusterPSchema.setPath("myPath");
-            agentClusterPSchema.setType(AgentClusterPSchema.Type.round_robin);
+            agentClusterPSchema.setType(AgentClusterPSchema.Type.ROUND_ROBIN);
             agentClusterPSchema.setSurveyDate(new Date());
 
             ArrayList<Agent> listOfAgents = new ArrayList<Agent>();
@@ -58,7 +58,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             agent1.setStartedAt(new Date());
             State state1 = new State();
             state1.setSeverity(1);
-            state1.setText(Text.terminating);
+            state1.setText(Text.TERMINATING);
             agent1.setState(state1);
             agent1.setSurveyDate(new Date());
             agent1.setUrl("myUrl");
@@ -78,7 +78,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             agent2.setStartedAt(new Date());
             State state2 = new State();
             state2.setSeverity(3);
-            state2.setText(Text.terminating);
+            state2.setText(Text.TERMINATING);
             agent2.setState(state1);
             agent2.setSurveyDate(new Date());
             agent2.setUrl("myUrl");
@@ -93,7 +93,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
 
             State_ state = new State_();
             state.setSeverity(2);
-            state.setText(State_.Text.all_agents_are_unreachable);
+            state.setText(State_.Text.ALL_AGENTS_ARE_UNREACHABLE);
             agentClusterPSchema.setState(state);
 
             listOfAgentClusters.add(agentClusterPSchema);

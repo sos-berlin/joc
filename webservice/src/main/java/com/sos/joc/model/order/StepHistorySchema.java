@@ -2,15 +2,7 @@
 package com.sos.joc.model.order;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,12 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "deliveryDate",
-    "history"
-})
 public class StepHistorySchema {
 
     /**
@@ -37,17 +24,13 @@ public class StepHistorySchema {
      * (Required)
      * 
      */
-    @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("history")
     private History_ history;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * delivery date
@@ -58,7 +41,6 @@ public class StepHistorySchema {
      * @return
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public Date getDeliveryDate() {
         return deliveryDate;
     }
@@ -72,7 +54,6 @@ public class StepHistorySchema {
      * @param deliveryDate
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
@@ -84,7 +65,6 @@ public class StepHistorySchema {
      * @return
      *     The history
      */
-    @JsonProperty("history")
     public History_ getHistory() {
         return history;
     }
@@ -96,7 +76,6 @@ public class StepHistorySchema {
      * @param history
      *     The history
      */
-    @JsonProperty("history")
     public void setHistory(History_ history) {
         this.history = history;
     }
@@ -106,19 +85,9 @@ public class StepHistorySchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(history).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(history).toHashCode();
     }
 
     @Override
@@ -130,7 +99,7 @@ public class StepHistorySchema {
             return false;
         }
         StepHistorySchema rhs = ((StepHistorySchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(history, rhs.history).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(history, rhs.history).isEquals();
     }
 
 }

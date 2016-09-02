@@ -1,24 +1,12 @@
 
 package com.sos.joc.model.job;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "job"
-})
 public class Job___ {
 
     /**
@@ -27,10 +15,7 @@ public class Job___ {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("job")
     private String job;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -40,7 +25,6 @@ public class Job___ {
      * @return
      *     The job
      */
-    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -53,7 +37,6 @@ public class Job___ {
      * @param job
      *     The job
      */
-    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }
@@ -63,19 +46,9 @@ public class Job___ {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(job).toHashCode();
     }
 
     @Override
@@ -87,7 +60,7 @@ public class Job___ {
             return false;
         }
         Job___ rhs = ((Job___) other);
-        return new EqualsBuilder().append(job, rhs.job).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).isEquals();
     }
 
 }

@@ -1,25 +1,12 @@
 
 package com.sos.joc.model.event;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "type"
-})
 public class Object {
 
     /**
@@ -29,7 +16,6 @@ public class Object {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * JobScheduler object type
@@ -38,10 +24,7 @@ public class Object {
      * (Required)
      * 
      */
-    @JsonProperty("type")
     private com.sos.joc.model.common.Configuration.Type type;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * path
@@ -52,7 +35,6 @@ public class Object {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -66,7 +48,6 @@ public class Object {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -80,7 +61,6 @@ public class Object {
      * @return
      *     The type
      */
-    @JsonProperty("type")
     public com.sos.joc.model.common.Configuration.Type getType() {
         return type;
     }
@@ -94,7 +74,6 @@ public class Object {
      * @param type
      *     The type
      */
-    @JsonProperty("type")
     public void setType(com.sos.joc.model.common.Configuration.Type type) {
         this.type = type;
     }
@@ -104,19 +83,9 @@ public class Object {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(type).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(type).toHashCode();
     }
 
     @Override
@@ -128,7 +97,7 @@ public class Object {
             return false;
         }
         Object rhs = ((Object) other);
-        return new EqualsBuilder().append(path, rhs.path).append(type, rhs.type).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(type, rhs.type).isEquals();
     }
 
 }

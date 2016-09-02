@@ -2,16 +2,8 @@
 package com.sos.joc.model.order;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -24,25 +16,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * NOTE: orderId is required too except for add order
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "orderId",
-    "jobChain",
-    "state",
-    "endState",
-    "comment",
-    "at",
-    "resume",
-    "removeSetback",
-    "title",
-    "priority",
-    "params",
-    "runTime"
-})
 public class ModifyOrderSchema {
 
-    @JsonProperty("orderId")
     private String orderId;
     /**
      * path
@@ -51,25 +27,21 @@ public class ModifyOrderSchema {
      * (Required)
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
     /**
      * the name of the node
      * 
      */
-    @JsonProperty("state")
     private String state;
     /**
      * the name of the end node
      * 
      */
-    @JsonProperty("endState")
     private String endState;
     /**
      * Field to comment this action which can be logged.
      * 
      */
-    @JsonProperty("comment")
     private String comment;
     /**
      * timestamp with now
@@ -77,21 +49,17 @@ public class ModifyOrderSchema {
      * ISO format yyyy-mm-dd HH:MM[:SS] or now or now + HH:MM[:SS] or now + SECONDS
      * 
      */
-    @JsonProperty("at")
     private String at;
     /**
      * only useful when changing order state of suspended orders
      * 
      */
-    @JsonProperty("resume")
     private Boolean resume;
     /**
      * only useful when order has a setback
      * 
      */
-    @JsonProperty("removeSetback")
     private Boolean removeSetback;
-    @JsonProperty("title")
     private String title;
     /**
      * non negative integer
@@ -99,7 +67,6 @@ public class ModifyOrderSchema {
      * 
      * 
      */
-    @JsonProperty("priority")
     private Integer priority;
     /**
      * params or environment variables
@@ -107,23 +74,18 @@ public class ModifyOrderSchema {
      * 
      * 
      */
-    @JsonProperty("params")
     private List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
     /**
      * A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd
      * 
      */
-    @JsonProperty("runTime")
     private String runTime;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -133,7 +95,6 @@ public class ModifyOrderSchema {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -147,7 +108,6 @@ public class ModifyOrderSchema {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -161,7 +121,6 @@ public class ModifyOrderSchema {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -172,7 +131,6 @@ public class ModifyOrderSchema {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public String getState() {
         return state;
     }
@@ -183,7 +141,6 @@ public class ModifyOrderSchema {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(String state) {
         this.state = state;
     }
@@ -194,7 +151,6 @@ public class ModifyOrderSchema {
      * @return
      *     The endState
      */
-    @JsonProperty("endState")
     public String getEndState() {
         return endState;
     }
@@ -205,7 +161,6 @@ public class ModifyOrderSchema {
      * @param endState
      *     The endState
      */
-    @JsonProperty("endState")
     public void setEndState(String endState) {
         this.endState = endState;
     }
@@ -216,7 +171,6 @@ public class ModifyOrderSchema {
      * @return
      *     The comment
      */
-    @JsonProperty("comment")
     public String getComment() {
         return comment;
     }
@@ -227,7 +181,6 @@ public class ModifyOrderSchema {
      * @param comment
      *     The comment
      */
-    @JsonProperty("comment")
     public void setComment(String comment) {
         this.comment = comment;
     }
@@ -240,7 +193,6 @@ public class ModifyOrderSchema {
      * @return
      *     The at
      */
-    @JsonProperty("at")
     public String getAt() {
         return at;
     }
@@ -253,7 +205,6 @@ public class ModifyOrderSchema {
      * @param at
      *     The at
      */
-    @JsonProperty("at")
     public void setAt(String at) {
         this.at = at;
     }
@@ -264,7 +215,6 @@ public class ModifyOrderSchema {
      * @return
      *     The resume
      */
-    @JsonProperty("resume")
     public Boolean getResume() {
         return resume;
     }
@@ -275,7 +225,6 @@ public class ModifyOrderSchema {
      * @param resume
      *     The resume
      */
-    @JsonProperty("resume")
     public void setResume(Boolean resume) {
         this.resume = resume;
     }
@@ -286,7 +235,6 @@ public class ModifyOrderSchema {
      * @return
      *     The removeSetback
      */
-    @JsonProperty("removeSetback")
     public Boolean getRemoveSetback() {
         return removeSetback;
     }
@@ -297,7 +245,6 @@ public class ModifyOrderSchema {
      * @param removeSetback
      *     The removeSetback
      */
-    @JsonProperty("removeSetback")
     public void setRemoveSetback(Boolean removeSetback) {
         this.removeSetback = removeSetback;
     }
@@ -307,7 +254,6 @@ public class ModifyOrderSchema {
      * @return
      *     The title
      */
-    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -317,7 +263,6 @@ public class ModifyOrderSchema {
      * @param title
      *     The title
      */
-    @JsonProperty("title")
     public void setTitle(String title) {
         this.title = title;
     }
@@ -330,7 +275,6 @@ public class ModifyOrderSchema {
      * @return
      *     The priority
      */
-    @JsonProperty("priority")
     public Integer getPriority() {
         return priority;
     }
@@ -343,7 +287,6 @@ public class ModifyOrderSchema {
      * @param priority
      *     The priority
      */
-    @JsonProperty("priority")
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
@@ -356,7 +299,6 @@ public class ModifyOrderSchema {
      * @return
      *     The params
      */
-    @JsonProperty("params")
     public List<NameValuePairsSchema> getParams() {
         return params;
     }
@@ -369,7 +311,6 @@ public class ModifyOrderSchema {
      * @param params
      *     The params
      */
-    @JsonProperty("params")
     public void setParams(List<NameValuePairsSchema> params) {
         this.params = params;
     }
@@ -380,7 +321,6 @@ public class ModifyOrderSchema {
      * @return
      *     The runTime
      */
-    @JsonProperty("runTime")
     public String getRunTime() {
         return runTime;
     }
@@ -391,7 +331,6 @@ public class ModifyOrderSchema {
      * @param runTime
      *     The runTime
      */
-    @JsonProperty("runTime")
     public void setRunTime(String runTime) {
         this.runTime = runTime;
     }
@@ -401,19 +340,9 @@ public class ModifyOrderSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(orderId).append(jobChain).append(state).append(endState).append(comment).append(at).append(resume).append(removeSetback).append(title).append(priority).append(params).append(runTime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(orderId).append(jobChain).append(state).append(endState).append(comment).append(at).append(resume).append(removeSetback).append(title).append(priority).append(params).append(runTime).toHashCode();
     }
 
     @Override
@@ -425,7 +354,7 @@ public class ModifyOrderSchema {
             return false;
         }
         ModifyOrderSchema rhs = ((ModifyOrderSchema) other);
-        return new EqualsBuilder().append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(endState, rhs.endState).append(comment, rhs.comment).append(at, rhs.at).append(resume, rhs.resume).append(removeSetback, rhs.removeSetback).append(title, rhs.title).append(priority, rhs.priority).append(params, rhs.params).append(runTime, rhs.runTime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(endState, rhs.endState).append(comment, rhs.comment).append(at, rhs.at).append(resume, rhs.resume).append(removeSetback, rhs.removeSetback).append(title, rhs.title).append(priority, rhs.priority).append(params, rhs.params).append(runTime, rhs.runTime).isEquals();
     }
 
 }

@@ -4,36 +4,19 @@ package com.sos.joc.model.job;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "severity",
-    "_text"
-})
 public class State____ {
 
     /**
      * TODO mapping severity and _text
      * 
      */
-    @JsonProperty("severity")
     private Integer severity;
-    @JsonProperty("_text")
     private State____.Text text;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * TODO mapping severity and _text
@@ -41,7 +24,6 @@ public class State____ {
      * @return
      *     The severity
      */
-    @JsonProperty("severity")
     public Integer getSeverity() {
         return severity;
     }
@@ -52,7 +34,6 @@ public class State____ {
      * @param severity
      *     The severity
      */
-    @JsonProperty("severity")
     public void setSeverity(Integer severity) {
         this.severity = severity;
     }
@@ -62,7 +43,6 @@ public class State____ {
      * @return
      *     The text
      */
-    @JsonProperty("_text")
     public State____.Text getText() {
         return text;
     }
@@ -72,7 +52,6 @@ public class State____ {
      * @param text
      *     The _text
      */
-    @JsonProperty("_text")
     public void setText(State____.Text text) {
         this.text = text;
     }
@@ -82,19 +61,9 @@ public class State____ {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(severity).append(text).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(severity).append(text).toHashCode();
     }
 
     @Override
@@ -106,23 +75,23 @@ public class State____ {
             return false;
         }
         State____ rhs = ((State____) other);
-        return new EqualsBuilder().append(severity, rhs.severity).append(text, rhs.text).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(severity, rhs.severity).append(text, rhs.text).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Text {
 
-        none("none"),
-        loading("loading"),
-        starting("starting"),
-        running("running"),
-        running_process("running_process"),
-        running_remote_process("running_remote_process"),
-        waiting_for_process("waiting_for_process"),
-        waiting_for_locks("waiting_for_locks"),
-        waiting_for_order("waiting_for_order"),
-        ending("ending"),
-        closed("closed");
+        NONE("NONE"),
+        LOADING("LOADING"),
+        STARTING("STARTING"),
+        RUNNING("RUNNING"),
+        RUNNING_PROCESS("RUNNING_PROCESS"),
+        RUNNING_REMOTE_PROCESS("RUNNING_REMOTE_PROCESS"),
+        WAITING_FOR_PROCESS("WAITING_FOR_PROCESS"),
+        WAITING_FOR_LOCKS("WAITING_FOR_LOCKS"),
+        WAITING_FOR_ORDER("WAITING_FOR_ORDER"),
+        ENDING("ENDING"),
+        CLOSED("CLOSED");
         private final String value;
         private final static Map<String, State____.Text> CONSTANTS = new HashMap<String, State____.Text>();
 
@@ -136,13 +105,11 @@ public class State____ {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static State____.Text fromValue(String value) {
             State____.Text constant = CONSTANTS.get(value);
             if (constant == null) {

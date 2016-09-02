@@ -1,25 +1,12 @@
 
 package com.sos.joc.model.job;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "title"
-})
 public class Order_ {
 
     /**
@@ -29,12 +16,8 @@ public class Order_ {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
-    @JsonProperty("title")
     private String title;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -45,7 +28,6 @@ public class Order_ {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -59,7 +41,6 @@ public class Order_ {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -69,7 +50,6 @@ public class Order_ {
      * @return
      *     The title
      */
-    @JsonProperty("title")
     public String getTitle() {
         return title;
     }
@@ -79,7 +59,6 @@ public class Order_ {
      * @param title
      *     The title
      */
-    @JsonProperty("title")
     public void setTitle(String title) {
         this.title = title;
     }
@@ -89,19 +68,9 @@ public class Order_ {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(title).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(title).toHashCode();
     }
 
     @Override
@@ -113,7 +82,7 @@ public class Order_ {
             return false;
         }
         Order_ rhs = ((Order_) other);
-        return new EqualsBuilder().append(path, rhs.path).append(title, rhs.title).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(title, rhs.title).isEquals();
     }
 
 }

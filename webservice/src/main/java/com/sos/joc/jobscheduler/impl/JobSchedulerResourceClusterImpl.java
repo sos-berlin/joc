@@ -37,7 +37,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
 
             // TODO JOC Cockpit Webservice
             cluster.setSurveyDate(jocXmlCommand.getSurveyDate());
-            cluster.setType(Cluster.Type.active);
+            cluster.setType("myType");
 
             entity.setDeliveryDate(new Date());
             entity.setCluster(cluster);

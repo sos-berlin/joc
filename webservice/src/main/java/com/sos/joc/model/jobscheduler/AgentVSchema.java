@@ -2,15 +2,7 @@
 package com.sos.joc.model.jobscheduler;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,15 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "url",
-    "state",
-    "startedAt",
-    "runningTasks"
-})
 public class AgentVSchema {
 
     /**
@@ -40,14 +24,12 @@ public class AgentVSchema {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * url can be different against host/port if agent behind a proxy
      * (Required)
      * 
      */
-    @JsonProperty("url")
     private String url;
     /**
      * jobscheduler state
@@ -56,7 +38,6 @@ public class AgentVSchema {
      * (Required)
      * 
      */
-    @JsonProperty("state")
     private State state;
     /**
      * timestamp
@@ -64,7 +45,6 @@ public class AgentVSchema {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("startedAt")
     private Date startedAt;
     /**
      * non negative integer
@@ -72,10 +52,7 @@ public class AgentVSchema {
      * 
      * 
      */
-    @JsonProperty("runningTasks")
     private Integer runningTasks;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -86,7 +63,6 @@ public class AgentVSchema {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -100,7 +76,6 @@ public class AgentVSchema {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -112,7 +87,6 @@ public class AgentVSchema {
      * @return
      *     The url
      */
-    @JsonProperty("url")
     public String getUrl() {
         return url;
     }
@@ -124,7 +98,6 @@ public class AgentVSchema {
      * @param url
      *     The url
      */
-    @JsonProperty("url")
     public void setUrl(String url) {
         this.url = url;
     }
@@ -138,7 +111,6 @@ public class AgentVSchema {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public State getState() {
         return state;
     }
@@ -152,7 +124,6 @@ public class AgentVSchema {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(State state) {
         this.state = state;
     }
@@ -165,7 +136,6 @@ public class AgentVSchema {
      * @return
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public Date getStartedAt() {
         return startedAt;
     }
@@ -178,7 +148,6 @@ public class AgentVSchema {
      * @param startedAt
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
@@ -191,7 +160,6 @@ public class AgentVSchema {
      * @return
      *     The runningTasks
      */
-    @JsonProperty("runningTasks")
     public Integer getRunningTasks() {
         return runningTasks;
     }
@@ -204,7 +172,6 @@ public class AgentVSchema {
      * @param runningTasks
      *     The runningTasks
      */
-    @JsonProperty("runningTasks")
     public void setRunningTasks(Integer runningTasks) {
         this.runningTasks = runningTasks;
     }
@@ -214,19 +181,9 @@ public class AgentVSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(url).append(state).append(startedAt).append(runningTasks).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(url).append(state).append(startedAt).append(runningTasks).toHashCode();
     }
 
     @Override
@@ -238,7 +195,7 @@ public class AgentVSchema {
             return false;
         }
         AgentVSchema rhs = ((AgentVSchema) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(url, rhs.url).append(state, rhs.state).append(startedAt, rhs.startedAt).append(runningTasks, rhs.runningTasks).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(url, rhs.url).append(state, rhs.state).append(startedAt, rhs.startedAt).append(runningTasks, rhs.runningTasks).isEquals();
     }
 
 }

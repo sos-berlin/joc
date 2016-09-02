@@ -1,25 +1,12 @@
 
 package com.sos.joc.model.common;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "folder",
-    "recursive"
-})
 public class FoldersSchema {
 
     /**
@@ -29,12 +16,8 @@ public class FoldersSchema {
      * (Required)
      * 
      */
-    @JsonProperty("folder")
     private String folder;
-    @JsonProperty("recursive")
     private Boolean recursive = true;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * path
@@ -45,7 +28,6 @@ public class FoldersSchema {
      * @return
      *     The folder
      */
-    @JsonProperty("folder")
     public String getFolder() {
         return folder;
     }
@@ -59,7 +41,6 @@ public class FoldersSchema {
      * @param folder
      *     The folder
      */
-    @JsonProperty("folder")
     public void setFolder(String folder) {
         this.folder = folder;
     }
@@ -69,7 +50,6 @@ public class FoldersSchema {
      * @return
      *     The recursive
      */
-    @JsonProperty("recursive")
     public Boolean getRecursive() {
         return recursive;
     }
@@ -79,7 +59,6 @@ public class FoldersSchema {
      * @param recursive
      *     The recursive
      */
-    @JsonProperty("recursive")
     public void setRecursive(Boolean recursive) {
         this.recursive = recursive;
     }
@@ -89,19 +68,9 @@ public class FoldersSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(folder).append(recursive).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(folder).append(recursive).toHashCode();
     }
 
     @Override
@@ -113,7 +82,7 @@ public class FoldersSchema {
             return false;
         }
         FoldersSchema rhs = ((FoldersSchema) other);
-        return new EqualsBuilder().append(folder, rhs.folder).append(recursive, rhs.recursive).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(folder, rhs.folder).append(recursive, rhs.recursive).isEquals();
     }
 
 }

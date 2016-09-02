@@ -1,15 +1,7 @@
 
 package com.sos.joc.model.event;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.MasterSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -22,14 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "jobscheduler",
-    "master",
-    "supervisor",
-    "agent"
-})
 public class RegisterJobSchedulerSchema {
 
     /**
@@ -38,7 +23,6 @@ public class RegisterJobSchedulerSchema {
      * 
      * 
      */
-    @JsonProperty("jobscheduler")
     private MasterSchema jobscheduler;
     /**
      * Master JobScheduler
@@ -46,7 +30,6 @@ public class RegisterJobSchedulerSchema {
      * 
      * 
      */
-    @JsonProperty("master")
     private MasterSchema master;
     /**
      * Master JobScheduler
@@ -54,16 +37,12 @@ public class RegisterJobSchedulerSchema {
      * 
      * 
      */
-    @JsonProperty("supervisor")
     private MasterSchema supervisor;
     /**
      * agent's url
      * 
      */
-    @JsonProperty("agent")
     private String agent;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * Master JobScheduler
@@ -73,7 +52,6 @@ public class RegisterJobSchedulerSchema {
      * @return
      *     The jobscheduler
      */
-    @JsonProperty("jobscheduler")
     public MasterSchema getJobscheduler() {
         return jobscheduler;
     }
@@ -86,7 +64,6 @@ public class RegisterJobSchedulerSchema {
      * @param jobscheduler
      *     The jobscheduler
      */
-    @JsonProperty("jobscheduler")
     public void setJobscheduler(MasterSchema jobscheduler) {
         this.jobscheduler = jobscheduler;
     }
@@ -99,7 +76,6 @@ public class RegisterJobSchedulerSchema {
      * @return
      *     The master
      */
-    @JsonProperty("master")
     public MasterSchema getMaster() {
         return master;
     }
@@ -112,7 +88,6 @@ public class RegisterJobSchedulerSchema {
      * @param master
      *     The master
      */
-    @JsonProperty("master")
     public void setMaster(MasterSchema master) {
         this.master = master;
     }
@@ -125,7 +100,6 @@ public class RegisterJobSchedulerSchema {
      * @return
      *     The supervisor
      */
-    @JsonProperty("supervisor")
     public MasterSchema getSupervisor() {
         return supervisor;
     }
@@ -138,7 +112,6 @@ public class RegisterJobSchedulerSchema {
      * @param supervisor
      *     The supervisor
      */
-    @JsonProperty("supervisor")
     public void setSupervisor(MasterSchema supervisor) {
         this.supervisor = supervisor;
     }
@@ -149,7 +122,6 @@ public class RegisterJobSchedulerSchema {
      * @return
      *     The agent
      */
-    @JsonProperty("agent")
     public String getAgent() {
         return agent;
     }
@@ -160,7 +132,6 @@ public class RegisterJobSchedulerSchema {
      * @param agent
      *     The agent
      */
-    @JsonProperty("agent")
     public void setAgent(String agent) {
         this.agent = agent;
     }
@@ -170,19 +141,9 @@ public class RegisterJobSchedulerSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobscheduler).append(master).append(supervisor).append(agent).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobscheduler).append(master).append(supervisor).append(agent).toHashCode();
     }
 
     @Override
@@ -194,7 +155,7 @@ public class RegisterJobSchedulerSchema {
             return false;
         }
         RegisterJobSchedulerSchema rhs = ((RegisterJobSchedulerSchema) other);
-        return new EqualsBuilder().append(jobscheduler, rhs.jobscheduler).append(master, rhs.master).append(supervisor, rhs.supervisor).append(agent, rhs.agent).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobscheduler, rhs.jobscheduler).append(master, rhs.master).append(supervisor, rhs.supervisor).append(agent, rhs.agent).isEquals();
     }
 
 }

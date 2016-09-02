@@ -51,7 +51,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
 
             com.sos.joc.model.job.State_ state = new com.sos.joc.model.job.State_();
             state.setSeverity(0);
-            state.setText(com.sos.joc.model.job.State_.Text.pending);
+            state.setText(com.sos.joc.model.job.State_.Text.PENDING);
             job.setState(state);
             job.setStateText("myStateText");
             job.setSurveyDate(new Date());
@@ -69,7 +69,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
             ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
             configurationStatusSchema.setMessage("myMessage");
             configurationStatusSchema.setSeverity(-1);
-            configurationStatusSchema.setText(Text.changed_file_not_loaded);
+            configurationStatusSchema.setText(Text.CHANGED_FILE_NOT_LOADED);
             job.setConfigurationStatus(configurationStatusSchema);
             List<Lock_> listOfLocks = new ArrayList<Lock_>();
             Lock_ lock = new Lock_();
@@ -98,7 +98,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
                 ConfigurationStatusSchema configurationStatus = new ConfigurationStatusSchema();
                 configurationStatus.setMessage("myMessage");
                 configurationStatus.setSeverity(0);
-                configurationStatus.setText(Text.changed_file_not_loaded);
+                configurationStatus.setText(Text.CHANGED_FILE_NOT_LOADED);
                 orderQueue.setConfigurationStatus(configurationStatus);
 
                 orderQueue.setEndState("myEndState");
@@ -128,7 +128,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
 
                 ProcessingState processingState = new ProcessingState();
                 processingState.setSeverity(1);
-                processingState.setText(ProcessingState.Text.running);
+                processingState.setText(ProcessingState.Text.RUNNING);
 
                 orderQueue.setProcessingState(processingState);
 
@@ -138,7 +138,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
                 orderQueue.setStateText("myStateText");
                 orderQueue.setSurveyDate(new Date());
                 orderQueue.setTaskId(-1);
-                orderQueue.setType(Type.file_order);
+                orderQueue.setType(Type.FILE_ORDER);
                 listOrderQueue.add(orderQueue);
                 job.setOrderQueue(listOrderQueue);
 
@@ -146,7 +146,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
 
                 List<RunningTask> listOfRunningTask = new ArrayList<RunningTask>();
                 RunningTask runningTask = new RunningTask();
-                runningTask.setCause(Cause.none);
+                runningTask.setCause(Cause.NONE);
                 runningTask.setEnqueued(new Date());
                 runningTask.setIdleSince(new Date());
 

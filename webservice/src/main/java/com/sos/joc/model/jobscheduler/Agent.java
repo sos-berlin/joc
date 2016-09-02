@@ -2,15 +2,7 @@
 package com.sos.joc.model.jobscheduler;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,18 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "version",
-    "host",
-    "port",
-    "url",
-    "os",
-    "state",
-    "startedAt"
-})
 public class Agent {
 
     /**
@@ -43,21 +24,18 @@ public class Agent {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("version")
     private String version;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("host")
     private String host;
     /**
      * port
@@ -66,14 +44,12 @@ public class Agent {
      * (Required)
      * 
      */
-    @JsonProperty("port")
     private Integer port;
     /**
      * url can be different against host/port if agent behind a proxy
      * (Required)
      * 
      */
-    @JsonProperty("url")
     private String url;
     /**
      * jobscheduler platform
@@ -82,7 +58,6 @@ public class Agent {
      * (Required)
      * 
      */
-    @JsonProperty("os")
     private Os os;
     /**
      * jobscheduler state
@@ -91,7 +66,6 @@ public class Agent {
      * (Required)
      * 
      */
-    @JsonProperty("state")
     private State state;
     /**
      * timestamp
@@ -100,10 +74,7 @@ public class Agent {
      * (Required)
      * 
      */
-    @JsonProperty("startedAt")
     private Date startedAt;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -114,7 +85,6 @@ public class Agent {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -128,7 +98,6 @@ public class Agent {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -140,7 +109,6 @@ public class Agent {
      * @return
      *     The version
      */
-    @JsonProperty("version")
     public String getVersion() {
         return version;
     }
@@ -152,7 +120,6 @@ public class Agent {
      * @param version
      *     The version
      */
-    @JsonProperty("version")
     public void setVersion(String version) {
         this.version = version;
     }
@@ -164,7 +131,6 @@ public class Agent {
      * @return
      *     The host
      */
-    @JsonProperty("host")
     public String getHost() {
         return host;
     }
@@ -176,7 +142,6 @@ public class Agent {
      * @param host
      *     The host
      */
-    @JsonProperty("host")
     public void setHost(String host) {
         this.host = host;
     }
@@ -190,7 +155,6 @@ public class Agent {
      * @return
      *     The port
      */
-    @JsonProperty("port")
     public Integer getPort() {
         return port;
     }
@@ -204,7 +168,6 @@ public class Agent {
      * @param port
      *     The port
      */
-    @JsonProperty("port")
     public void setPort(Integer port) {
         this.port = port;
     }
@@ -216,7 +179,6 @@ public class Agent {
      * @return
      *     The url
      */
-    @JsonProperty("url")
     public String getUrl() {
         return url;
     }
@@ -228,7 +190,6 @@ public class Agent {
      * @param url
      *     The url
      */
-    @JsonProperty("url")
     public void setUrl(String url) {
         this.url = url;
     }
@@ -242,7 +203,6 @@ public class Agent {
      * @return
      *     The os
      */
-    @JsonProperty("os")
     public Os getOs() {
         return os;
     }
@@ -256,7 +216,6 @@ public class Agent {
      * @param os
      *     The os
      */
-    @JsonProperty("os")
     public void setOs(Os os) {
         this.os = os;
     }
@@ -270,7 +229,6 @@ public class Agent {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public State getState() {
         return state;
     }
@@ -284,7 +242,6 @@ public class Agent {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(State state) {
         this.state = state;
     }
@@ -298,7 +255,6 @@ public class Agent {
      * @return
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public Date getStartedAt() {
         return startedAt;
     }
@@ -312,7 +268,6 @@ public class Agent {
      * @param startedAt
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
@@ -322,19 +277,9 @@ public class Agent {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(version).append(host).append(port).append(url).append(os).append(state).append(startedAt).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(version).append(host).append(port).append(url).append(os).append(state).append(startedAt).toHashCode();
     }
 
     @Override
@@ -346,7 +291,7 @@ public class Agent {
             return false;
         }
         Agent rhs = ((Agent) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(host, rhs.host).append(port, rhs.port).append(url, rhs.url).append(os, rhs.os).append(state, rhs.state).append(startedAt, rhs.startedAt).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(host, rhs.host).append(port, rhs.port).append(url, rhs.url).append(os, rhs.os).append(state, rhs.state).append(startedAt, rhs.startedAt).isEquals();
     }
 
 }

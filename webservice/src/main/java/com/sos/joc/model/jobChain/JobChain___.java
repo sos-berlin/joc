@@ -3,16 +3,8 @@ package com.sos.joc.model.jobChain;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -25,19 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "path",
-    "name",
-    "state",
-    "numOfNodes",
-    "nodes",
-    "fileOrderSources",
-    "numOfOrders",
-    "configurationStatus"
-})
 public class JobChain___ {
 
     /**
@@ -46,7 +26,6 @@ public class JobChain___ {
      * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -54,11 +33,8 @@ public class JobChain___ {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("path")
     private String path;
-    @JsonProperty("name")
     private String name;
-    @JsonProperty("state")
     private State__ state;
     /**
      * non negative integer
@@ -66,11 +42,8 @@ public class JobChain___ {
      * 
      * 
      */
-    @JsonProperty("numOfNodes")
     private Integer numOfNodes;
-    @JsonProperty("nodes")
     private List<Node___> nodes = new ArrayList<Node___>();
-    @JsonProperty("fileOrderSources")
     private List<FileWatchingNodeVSchema> fileOrderSources = new ArrayList<FileWatchingNodeVSchema>();
     /**
      * non negative integer
@@ -78,7 +51,6 @@ public class JobChain___ {
      * 
      * 
      */
-    @JsonProperty("numOfOrders")
     private Integer numOfOrders;
     /**
      * configuration status
@@ -86,10 +58,7 @@ public class JobChain___ {
      * 
      * 
      */
-    @JsonProperty("configurationStatus")
     private ConfigurationStatusSchema configurationStatus;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -99,7 +68,6 @@ public class JobChain___ {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -112,7 +80,6 @@ public class JobChain___ {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -125,7 +92,6 @@ public class JobChain___ {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -138,7 +104,6 @@ public class JobChain___ {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -148,7 +113,6 @@ public class JobChain___ {
      * @return
      *     The name
      */
-    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -158,7 +122,6 @@ public class JobChain___ {
      * @param name
      *     The name
      */
-    @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
     }
@@ -168,7 +131,6 @@ public class JobChain___ {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public State__ getState() {
         return state;
     }
@@ -178,7 +140,6 @@ public class JobChain___ {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(State__ state) {
         this.state = state;
     }
@@ -191,7 +152,6 @@ public class JobChain___ {
      * @return
      *     The numOfNodes
      */
-    @JsonProperty("numOfNodes")
     public Integer getNumOfNodes() {
         return numOfNodes;
     }
@@ -204,7 +164,6 @@ public class JobChain___ {
      * @param numOfNodes
      *     The numOfNodes
      */
-    @JsonProperty("numOfNodes")
     public void setNumOfNodes(Integer numOfNodes) {
         this.numOfNodes = numOfNodes;
     }
@@ -214,7 +173,6 @@ public class JobChain___ {
      * @return
      *     The nodes
      */
-    @JsonProperty("nodes")
     public List<Node___> getNodes() {
         return nodes;
     }
@@ -224,7 +182,6 @@ public class JobChain___ {
      * @param nodes
      *     The nodes
      */
-    @JsonProperty("nodes")
     public void setNodes(List<Node___> nodes) {
         this.nodes = nodes;
     }
@@ -234,7 +191,6 @@ public class JobChain___ {
      * @return
      *     The fileOrderSources
      */
-    @JsonProperty("fileOrderSources")
     public List<FileWatchingNodeVSchema> getFileOrderSources() {
         return fileOrderSources;
     }
@@ -244,7 +200,6 @@ public class JobChain___ {
      * @param fileOrderSources
      *     The fileOrderSources
      */
-    @JsonProperty("fileOrderSources")
     public void setFileOrderSources(List<FileWatchingNodeVSchema> fileOrderSources) {
         this.fileOrderSources = fileOrderSources;
     }
@@ -257,7 +212,6 @@ public class JobChain___ {
      * @return
      *     The numOfOrders
      */
-    @JsonProperty("numOfOrders")
     public Integer getNumOfOrders() {
         return numOfOrders;
     }
@@ -270,7 +224,6 @@ public class JobChain___ {
      * @param numOfOrders
      *     The numOfOrders
      */
-    @JsonProperty("numOfOrders")
     public void setNumOfOrders(Integer numOfOrders) {
         this.numOfOrders = numOfOrders;
     }
@@ -283,7 +236,6 @@ public class JobChain___ {
      * @return
      *     The configurationStatus
      */
-    @JsonProperty("configurationStatus")
     public ConfigurationStatusSchema getConfigurationStatus() {
         return configurationStatus;
     }
@@ -296,7 +248,6 @@ public class JobChain___ {
      * @param configurationStatus
      *     The configurationStatus
      */
-    @JsonProperty("configurationStatus")
     public void setConfigurationStatus(ConfigurationStatusSchema configurationStatus) {
         this.configurationStatus = configurationStatus;
     }
@@ -306,19 +257,9 @@ public class JobChain___ {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(state).append(numOfNodes).append(nodes).append(fileOrderSources).append(numOfOrders).append(configurationStatus).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(state).append(numOfNodes).append(nodes).append(fileOrderSources).append(numOfOrders).append(configurationStatus).toHashCode();
     }
 
     @Override
@@ -330,7 +271,7 @@ public class JobChain___ {
             return false;
         }
         JobChain___ rhs = ((JobChain___) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(state, rhs.state).append(numOfNodes, rhs.numOfNodes).append(nodes, rhs.nodes).append(fileOrderSources, rhs.fileOrderSources).append(numOfOrders, rhs.numOfOrders).append(configurationStatus, rhs.configurationStatus).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(state, rhs.state).append(numOfNodes, rhs.numOfNodes).append(nodes, rhs.nodes).append(fileOrderSources, rhs.fileOrderSources).append(numOfOrders, rhs.numOfOrders).append(configurationStatus, rhs.configurationStatus).isEquals();
     }
 
 }

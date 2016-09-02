@@ -1,26 +1,12 @@
 
 package com.sos.joc.model.job;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "comment",
-    "runTime"
-})
 public class ModifyRuntimeSchema {
 
     /**
@@ -30,23 +16,18 @@ public class ModifyRuntimeSchema {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * Field to comment manually job modifications which can be logged.
      * 
      */
-    @JsonProperty("comment")
     private String comment;
     /**
      * A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd
      * (Required)
      * 
      */
-    @JsonProperty("runTime")
     private String runTime;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -57,7 +38,6 @@ public class ModifyRuntimeSchema {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -71,7 +51,6 @@ public class ModifyRuntimeSchema {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -82,7 +61,6 @@ public class ModifyRuntimeSchema {
      * @return
      *     The comment
      */
-    @JsonProperty("comment")
     public String getComment() {
         return comment;
     }
@@ -93,7 +71,6 @@ public class ModifyRuntimeSchema {
      * @param comment
      *     The comment
      */
-    @JsonProperty("comment")
     public void setComment(String comment) {
         this.comment = comment;
     }
@@ -105,7 +82,6 @@ public class ModifyRuntimeSchema {
      * @return
      *     The runTime
      */
-    @JsonProperty("runTime")
     public String getRunTime() {
         return runTime;
     }
@@ -117,7 +93,6 @@ public class ModifyRuntimeSchema {
      * @param runTime
      *     The runTime
      */
-    @JsonProperty("runTime")
     public void setRunTime(String runTime) {
         this.runTime = runTime;
     }
@@ -127,19 +102,9 @@ public class ModifyRuntimeSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(comment).append(runTime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(comment).append(runTime).toHashCode();
     }
 
     @Override
@@ -151,7 +116,7 @@ public class ModifyRuntimeSchema {
             return false;
         }
         ModifyRuntimeSchema rhs = ((ModifyRuntimeSchema) other);
-        return new EqualsBuilder().append(path, rhs.path).append(comment, rhs.comment).append(runTime, rhs.runTime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(comment, rhs.comment).append(runTime, rhs.runTime).isEquals();
     }
 
 }

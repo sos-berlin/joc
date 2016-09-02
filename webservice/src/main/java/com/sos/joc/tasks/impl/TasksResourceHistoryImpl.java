@@ -50,7 +50,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             history1.setStartTime(new Date());
             com.sos.joc.model.job.State state = new com.sos.joc.model.job.State();
             state.setSeverity(-1);
-            state.setText(Text.successful);
+            state.setText(Text.SUCCESSFUL);
             history1.setState(state);
             
             history1.setSteps(-1);

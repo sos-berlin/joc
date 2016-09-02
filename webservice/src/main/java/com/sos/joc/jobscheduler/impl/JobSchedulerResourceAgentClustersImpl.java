@@ -47,7 +47,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             agent1.setStartedAt(new Date());
             State state1 = new State();
             state1.setSeverity(0);
-            state1.setText(Text.terminating);
+            state1.setText(Text.TERMINATING);
             agent1.setState(state1);
             listOfAgents.add(agent1);
             AgentVSchema agent2 = new AgentVSchema();
@@ -55,7 +55,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             agent2.setStartedAt(new Date());
             State state2 = new State();
             state2.setSeverity(2);
-            state2.setText(Text.dead);
+            state2.setText(Text.DEAD);
             agent2.setState(state2);
             listOfAgents.add(agent2);
 
@@ -78,7 +78,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
 
             State_ state = new State_();
             state.setSeverity(2);
-            state.setText(State_.Text.all_agents_are_running);
+            state.setText(State_.Text.ALL_AGENTS_ARE_RUNNING);
             agentClusterVSchema.setState(state);
 
             agentClusterVSchema.setSurveyDate(new Date());

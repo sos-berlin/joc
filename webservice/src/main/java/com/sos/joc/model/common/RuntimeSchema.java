@@ -2,15 +2,7 @@
 package com.sos.joc.model.common;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,12 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "runTime"
-})
 public class RuntimeSchema {
 
     /**
@@ -36,12 +23,8 @@ public class RuntimeSchema {
      * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
-    @JsonProperty("runTime")
     private String runTime;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -51,7 +34,6 @@ public class RuntimeSchema {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -64,7 +46,6 @@ public class RuntimeSchema {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -74,7 +55,6 @@ public class RuntimeSchema {
      * @return
      *     The runTime
      */
-    @JsonProperty("runTime")
     public String getRunTime() {
         return runTime;
     }
@@ -84,7 +64,6 @@ public class RuntimeSchema {
      * @param runTime
      *     The runTime
      */
-    @JsonProperty("runTime")
     public void setRunTime(String runTime) {
         this.runTime = runTime;
     }
@@ -94,19 +73,9 @@ public class RuntimeSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(runTime).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(runTime).toHashCode();
     }
 
     @Override
@@ -118,7 +87,7 @@ public class RuntimeSchema {
             return false;
         }
         RuntimeSchema rhs = ((RuntimeSchema) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(runTime, rhs.runTime).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(runTime, rhs.runTime).isEquals();
     }
 
 }

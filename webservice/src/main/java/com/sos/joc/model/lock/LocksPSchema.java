@@ -3,16 +3,8 @@ package com.sos.joc.model.lock;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -24,12 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "deliveryDate",
-    "locks"
-})
 public class LocksPSchema {
 
     /**
@@ -39,17 +26,13 @@ public class LocksPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("locks")
     private List<LockPSchema> locks = new ArrayList<LockPSchema>();
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * delivery date
@@ -60,7 +43,6 @@ public class LocksPSchema {
      * @return
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public Date getDeliveryDate() {
         return deliveryDate;
     }
@@ -74,7 +56,6 @@ public class LocksPSchema {
      * @param deliveryDate
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
@@ -86,7 +67,6 @@ public class LocksPSchema {
      * @return
      *     The locks
      */
-    @JsonProperty("locks")
     public List<LockPSchema> getLocks() {
         return locks;
     }
@@ -98,7 +78,6 @@ public class LocksPSchema {
      * @param locks
      *     The locks
      */
-    @JsonProperty("locks")
     public void setLocks(List<LockPSchema> locks) {
         this.locks = locks;
     }
@@ -108,19 +87,9 @@ public class LocksPSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(locks).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(locks).toHashCode();
     }
 
     @Override
@@ -132,7 +101,7 @@ public class LocksPSchema {
             return false;
         }
         LocksPSchema rhs = ((LocksPSchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(locks, rhs.locks).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(locks, rhs.locks).isEquals();
     }
 
 }

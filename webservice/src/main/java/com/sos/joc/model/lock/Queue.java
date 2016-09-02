@@ -1,25 +1,12 @@
 
 package com.sos.joc.model.lock;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "exclusive",
-    "job"
-})
 public class Queue {
 
     /**
@@ -27,7 +14,6 @@ public class Queue {
      * (Required)
      * 
      */
-    @JsonProperty("exclusive")
     private Boolean exclusive;
     /**
      * path
@@ -36,10 +22,7 @@ public class Queue {
      * (Required)
      * 
      */
-    @JsonProperty("job")
     private String job;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * Is true iff the job want to use the lock exclusive
@@ -48,7 +31,6 @@ public class Queue {
      * @return
      *     The exclusive
      */
-    @JsonProperty("exclusive")
     public Boolean getExclusive() {
         return exclusive;
     }
@@ -60,7 +42,6 @@ public class Queue {
      * @param exclusive
      *     The exclusive
      */
-    @JsonProperty("exclusive")
     public void setExclusive(Boolean exclusive) {
         this.exclusive = exclusive;
     }
@@ -74,7 +55,6 @@ public class Queue {
      * @return
      *     The job
      */
-    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -88,7 +68,6 @@ public class Queue {
      * @param job
      *     The job
      */
-    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }
@@ -98,19 +77,9 @@ public class Queue {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(exclusive).append(job).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(exclusive).append(job).toHashCode();
     }
 
     @Override
@@ -122,7 +91,7 @@ public class Queue {
             return false;
         }
         Queue rhs = ((Queue) other);
-        return new EqualsBuilder().append(exclusive, rhs.exclusive).append(job, rhs.job).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(exclusive, rhs.exclusive).append(job, rhs.job).isEquals();
     }
 
 }

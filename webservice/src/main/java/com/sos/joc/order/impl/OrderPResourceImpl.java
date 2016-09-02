@@ -61,7 +61,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
 
             order.setPriority(-1);
             order.setTitle(dbItemInventoryOrder.getTitle());
-            order.setType(Order.Type.permanent);
+            order.setType(Order.Type.PERMANENT);
 
             entity.setOrder(order);
 

@@ -1,15 +1,7 @@
 
 package com.sos.joc.model.job;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,12 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "jobschedulerId",
-    "taskId"
-})
 public class TaskFilterSchema {
 
     /**
@@ -34,7 +21,6 @@ public class TaskFilterSchema {
      * (Required)
      * 
      */
-    @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
      * non negative integer
@@ -43,10 +29,7 @@ public class TaskFilterSchema {
      * (Required)
      * 
      */
-    @JsonProperty("taskId")
     private Integer taskId;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -55,7 +38,6 @@ public class TaskFilterSchema {
      * @return
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public String getJobschedulerId() {
         return jobschedulerId;
     }
@@ -67,7 +49,6 @@ public class TaskFilterSchema {
      * @param jobschedulerId
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public void setJobschedulerId(String jobschedulerId) {
         this.jobschedulerId = jobschedulerId;
     }
@@ -81,7 +62,6 @@ public class TaskFilterSchema {
      * @return
      *     The taskId
      */
-    @JsonProperty("taskId")
     public Integer getTaskId() {
         return taskId;
     }
@@ -95,7 +75,6 @@ public class TaskFilterSchema {
      * @param taskId
      *     The taskId
      */
-    @JsonProperty("taskId")
     public void setTaskId(Integer taskId) {
         this.taskId = taskId;
     }
@@ -105,19 +84,9 @@ public class TaskFilterSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(taskId).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(taskId).toHashCode();
     }
 
     @Override
@@ -129,7 +98,7 @@ public class TaskFilterSchema {
             return false;
         }
         TaskFilterSchema rhs = ((TaskFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(taskId, rhs.taskId).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(taskId, rhs.taskId).isEquals();
     }
 
 }

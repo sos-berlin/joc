@@ -1,15 +1,7 @@
 
 package com.sos.joc.model.calendar;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,12 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "time",
-    "estimated"
-})
 public class StartTime {
 
     /**
@@ -34,17 +21,13 @@ public class StartTime {
      * (Required)
      * 
      */
-    @JsonProperty("time")
     private String time;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("estimated")
     private Boolean estimated;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * hh:mm:ss
@@ -53,7 +36,6 @@ public class StartTime {
      * @return
      *     The time
      */
-    @JsonProperty("time")
     public String getTime() {
         return time;
     }
@@ -65,7 +47,6 @@ public class StartTime {
      * @param time
      *     The time
      */
-    @JsonProperty("time")
     public void setTime(String time) {
         this.time = time;
     }
@@ -77,7 +58,6 @@ public class StartTime {
      * @return
      *     The estimated
      */
-    @JsonProperty("estimated")
     public Boolean getEstimated() {
         return estimated;
     }
@@ -89,7 +69,6 @@ public class StartTime {
      * @param estimated
      *     The estimated
      */
-    @JsonProperty("estimated")
     public void setEstimated(Boolean estimated) {
         this.estimated = estimated;
     }
@@ -99,19 +78,9 @@ public class StartTime {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(time).append(estimated).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(time).append(estimated).toHashCode();
     }
 
     @Override
@@ -123,7 +92,7 @@ public class StartTime {
             return false;
         }
         StartTime rhs = ((StartTime) other);
-        return new EqualsBuilder().append(time, rhs.time).append(estimated, rhs.estimated).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(time, rhs.time).append(estimated, rhs.estimated).isEquals();
     }
 
 }

@@ -45,7 +45,7 @@ public class JobSchedulerResource extends JOCResourceImpl {
 
             State state = new State();
             state.setSeverity(0);
-            state.setText(State.Text.paused);
+            state.setText(State.Text.PAUSED);
             jobscheduler.setState(state);
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
             entity.setJobscheduler(jobscheduler);

@@ -7,14 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -28,32 +20,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "orderId",
-    "jobChain",
-    "priority",
-    "params",
-    "_type",
-    "surveyDate",
-    "state",
-    "job",
-    "stateText",
-    "configurationStatus",
-    "endState",
-    "processingState",
-    "nextStartTime",
-    "historyId",
-    "startedAt",
-    "processedBy",
-    "taskId",
-    "inProcessSince",
-    "setback",
-    "lock",
-    "processClass"
-})
 public class OrderQueue {
 
     /**
@@ -62,9 +29,7 @@ public class OrderQueue {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("path")
     private String path;
-    @JsonProperty("orderId")
     private String orderId;
     /**
      * path
@@ -72,7 +37,6 @@ public class OrderQueue {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
     /**
      * non negative integer
@@ -80,7 +44,6 @@ public class OrderQueue {
      * 
      * 
      */
-    @JsonProperty("priority")
     private Integer priority;
     /**
      * params or environment variables
@@ -88,13 +51,11 @@ public class OrderQueue {
      * 
      * 
      */
-    @JsonProperty("params")
     private List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
     /**
      * the type of the order
      * 
      */
-    @JsonProperty("_type")
     private OrderQueue.Type type;
     /**
      * survey date of the JobScheduler Master/Agent
@@ -102,13 +63,11 @@ public class OrderQueue {
      * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * the name of the node
      * 
      */
-    @JsonProperty("state")
     private String state;
     /**
      * path
@@ -116,9 +75,7 @@ public class OrderQueue {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("job")
     private String job;
-    @JsonProperty("stateText")
     private String stateText;
     /**
      * configuration status
@@ -126,15 +83,12 @@ public class OrderQueue {
      * 
      * 
      */
-    @JsonProperty("configurationStatus")
     private ConfigurationStatusSchema configurationStatus;
     /**
      * the name of the end node
      * 
      */
-    @JsonProperty("endState")
     private String endState;
-    @JsonProperty("processingState")
     private ProcessingState processingState;
     /**
      * timestamp
@@ -142,7 +96,6 @@ public class OrderQueue {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("nextStartTime")
     private Date nextStartTime;
     /**
      * non negative integer
@@ -150,7 +103,6 @@ public class OrderQueue {
      * 
      * 
      */
-    @JsonProperty("historyId")
     private Integer historyId;
     /**
      * timestamp
@@ -158,19 +110,16 @@ public class OrderQueue {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("startedAt")
     private Date startedAt;
     /**
      * ONLY for running or blacklist order, contains Host/port of an active cluster member or URL of a JobScheduler Agent
      * 
      */
-    @JsonProperty("processedBy")
     private String processedBy;
     /**
      * ONLY for running order
      * 
      */
-    @JsonProperty("taskId")
     private Integer taskId;
     /**
      * timestamp
@@ -178,7 +127,6 @@ public class OrderQueue {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("inProcessSince")
     private Date inProcessSince;
     /**
      * timestamp
@@ -186,7 +134,6 @@ public class OrderQueue {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("setback")
     private Date setback;
     /**
      * path
@@ -194,7 +141,6 @@ public class OrderQueue {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("lock")
     private String lock;
     /**
      * path
@@ -202,10 +148,7 @@ public class OrderQueue {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
-    @JsonProperty("processClass")
     private String processClass;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -215,7 +158,6 @@ public class OrderQueue {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -228,7 +170,6 @@ public class OrderQueue {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -238,7 +179,6 @@ public class OrderQueue {
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -248,7 +188,6 @@ public class OrderQueue {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -261,7 +200,6 @@ public class OrderQueue {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -274,7 +212,6 @@ public class OrderQueue {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -287,7 +224,6 @@ public class OrderQueue {
      * @return
      *     The priority
      */
-    @JsonProperty("priority")
     public Integer getPriority() {
         return priority;
     }
@@ -300,7 +236,6 @@ public class OrderQueue {
      * @param priority
      *     The priority
      */
-    @JsonProperty("priority")
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
@@ -313,7 +248,6 @@ public class OrderQueue {
      * @return
      *     The params
      */
-    @JsonProperty("params")
     public List<NameValuePairsSchema> getParams() {
         return params;
     }
@@ -326,7 +260,6 @@ public class OrderQueue {
      * @param params
      *     The params
      */
-    @JsonProperty("params")
     public void setParams(List<NameValuePairsSchema> params) {
         this.params = params;
     }
@@ -337,7 +270,6 @@ public class OrderQueue {
      * @return
      *     The type
      */
-    @JsonProperty("_type")
     public OrderQueue.Type getType() {
         return type;
     }
@@ -348,7 +280,6 @@ public class OrderQueue {
      * @param type
      *     The _type
      */
-    @JsonProperty("_type")
     public void setType(OrderQueue.Type type) {
         this.type = type;
     }
@@ -361,7 +292,6 @@ public class OrderQueue {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -374,7 +304,6 @@ public class OrderQueue {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -385,7 +314,6 @@ public class OrderQueue {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public String getState() {
         return state;
     }
@@ -396,7 +324,6 @@ public class OrderQueue {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(String state) {
         this.state = state;
     }
@@ -409,7 +336,6 @@ public class OrderQueue {
      * @return
      *     The job
      */
-    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -422,7 +348,6 @@ public class OrderQueue {
      * @param job
      *     The job
      */
-    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }
@@ -432,7 +357,6 @@ public class OrderQueue {
      * @return
      *     The stateText
      */
-    @JsonProperty("stateText")
     public String getStateText() {
         return stateText;
     }
@@ -442,7 +366,6 @@ public class OrderQueue {
      * @param stateText
      *     The stateText
      */
-    @JsonProperty("stateText")
     public void setStateText(String stateText) {
         this.stateText = stateText;
     }
@@ -455,7 +378,6 @@ public class OrderQueue {
      * @return
      *     The configurationStatus
      */
-    @JsonProperty("configurationStatus")
     public ConfigurationStatusSchema getConfigurationStatus() {
         return configurationStatus;
     }
@@ -468,7 +390,6 @@ public class OrderQueue {
      * @param configurationStatus
      *     The configurationStatus
      */
-    @JsonProperty("configurationStatus")
     public void setConfigurationStatus(ConfigurationStatusSchema configurationStatus) {
         this.configurationStatus = configurationStatus;
     }
@@ -479,7 +400,6 @@ public class OrderQueue {
      * @return
      *     The endState
      */
-    @JsonProperty("endState")
     public String getEndState() {
         return endState;
     }
@@ -490,7 +410,6 @@ public class OrderQueue {
      * @param endState
      *     The endState
      */
-    @JsonProperty("endState")
     public void setEndState(String endState) {
         this.endState = endState;
     }
@@ -500,7 +419,6 @@ public class OrderQueue {
      * @return
      *     The processingState
      */
-    @JsonProperty("processingState")
     public ProcessingState getProcessingState() {
         return processingState;
     }
@@ -510,7 +428,6 @@ public class OrderQueue {
      * @param processingState
      *     The processingState
      */
-    @JsonProperty("processingState")
     public void setProcessingState(ProcessingState processingState) {
         this.processingState = processingState;
     }
@@ -523,7 +440,6 @@ public class OrderQueue {
      * @return
      *     The nextStartTime
      */
-    @JsonProperty("nextStartTime")
     public Date getNextStartTime() {
         return nextStartTime;
     }
@@ -536,7 +452,6 @@ public class OrderQueue {
      * @param nextStartTime
      *     The nextStartTime
      */
-    @JsonProperty("nextStartTime")
     public void setNextStartTime(Date nextStartTime) {
         this.nextStartTime = nextStartTime;
     }
@@ -549,7 +464,6 @@ public class OrderQueue {
      * @return
      *     The historyId
      */
-    @JsonProperty("historyId")
     public Integer getHistoryId() {
         return historyId;
     }
@@ -562,7 +476,6 @@ public class OrderQueue {
      * @param historyId
      *     The historyId
      */
-    @JsonProperty("historyId")
     public void setHistoryId(Integer historyId) {
         this.historyId = historyId;
     }
@@ -575,7 +488,6 @@ public class OrderQueue {
      * @return
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public Date getStartedAt() {
         return startedAt;
     }
@@ -588,7 +500,6 @@ public class OrderQueue {
      * @param startedAt
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
@@ -599,7 +510,6 @@ public class OrderQueue {
      * @return
      *     The processedBy
      */
-    @JsonProperty("processedBy")
     public String getProcessedBy() {
         return processedBy;
     }
@@ -610,7 +520,6 @@ public class OrderQueue {
      * @param processedBy
      *     The processedBy
      */
-    @JsonProperty("processedBy")
     public void setProcessedBy(String processedBy) {
         this.processedBy = processedBy;
     }
@@ -621,7 +530,6 @@ public class OrderQueue {
      * @return
      *     The taskId
      */
-    @JsonProperty("taskId")
     public Integer getTaskId() {
         return taskId;
     }
@@ -632,7 +540,6 @@ public class OrderQueue {
      * @param taskId
      *     The taskId
      */
-    @JsonProperty("taskId")
     public void setTaskId(Integer taskId) {
         this.taskId = taskId;
     }
@@ -645,7 +552,6 @@ public class OrderQueue {
      * @return
      *     The inProcessSince
      */
-    @JsonProperty("inProcessSince")
     public Date getInProcessSince() {
         return inProcessSince;
     }
@@ -658,7 +564,6 @@ public class OrderQueue {
      * @param inProcessSince
      *     The inProcessSince
      */
-    @JsonProperty("inProcessSince")
     public void setInProcessSince(Date inProcessSince) {
         this.inProcessSince = inProcessSince;
     }
@@ -671,7 +576,6 @@ public class OrderQueue {
      * @return
      *     The setback
      */
-    @JsonProperty("setback")
     public Date getSetback() {
         return setback;
     }
@@ -684,7 +588,6 @@ public class OrderQueue {
      * @param setback
      *     The setback
      */
-    @JsonProperty("setback")
     public void setSetback(Date setback) {
         this.setback = setback;
     }
@@ -697,7 +600,6 @@ public class OrderQueue {
      * @return
      *     The lock
      */
-    @JsonProperty("lock")
     public String getLock() {
         return lock;
     }
@@ -710,7 +612,6 @@ public class OrderQueue {
      * @param lock
      *     The lock
      */
-    @JsonProperty("lock")
     public void setLock(String lock) {
         this.lock = lock;
     }
@@ -723,7 +624,6 @@ public class OrderQueue {
      * @return
      *     The processClass
      */
-    @JsonProperty("processClass")
     public String getProcessClass() {
         return processClass;
     }
@@ -736,7 +636,6 @@ public class OrderQueue {
      * @param processClass
      *     The processClass
      */
-    @JsonProperty("processClass")
     public void setProcessClass(String processClass) {
         this.processClass = processClass;
     }
@@ -746,19 +645,9 @@ public class OrderQueue {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(priority).append(params).append(type).append(surveyDate).append(state).append(job).append(stateText).append(configurationStatus).append(endState).append(processingState).append(nextStartTime).append(historyId).append(startedAt).append(processedBy).append(taskId).append(inProcessSince).append(setback).append(lock).append(processClass).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(priority).append(params).append(type).append(surveyDate).append(state).append(job).append(stateText).append(configurationStatus).append(endState).append(processingState).append(nextStartTime).append(historyId).append(startedAt).append(processedBy).append(taskId).append(inProcessSince).append(setback).append(lock).append(processClass).toHashCode();
     }
 
     @Override
@@ -770,15 +659,15 @@ public class OrderQueue {
             return false;
         }
         OrderQueue rhs = ((OrderQueue) other);
-        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(priority, rhs.priority).append(params, rhs.params).append(type, rhs.type).append(surveyDate, rhs.surveyDate).append(state, rhs.state).append(job, rhs.job).append(stateText, rhs.stateText).append(configurationStatus, rhs.configurationStatus).append(endState, rhs.endState).append(processingState, rhs.processingState).append(nextStartTime, rhs.nextStartTime).append(historyId, rhs.historyId).append(startedAt, rhs.startedAt).append(processedBy, rhs.processedBy).append(taskId, rhs.taskId).append(inProcessSince, rhs.inProcessSince).append(setback, rhs.setback).append(lock, rhs.lock).append(processClass, rhs.processClass).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(priority, rhs.priority).append(params, rhs.params).append(type, rhs.type).append(surveyDate, rhs.surveyDate).append(state, rhs.state).append(job, rhs.job).append(stateText, rhs.stateText).append(configurationStatus, rhs.configurationStatus).append(endState, rhs.endState).append(processingState, rhs.processingState).append(nextStartTime, rhs.nextStartTime).append(historyId, rhs.historyId).append(startedAt, rhs.startedAt).append(processedBy, rhs.processedBy).append(taskId, rhs.taskId).append(inProcessSince, rhs.inProcessSince).append(setback, rhs.setback).append(lock, rhs.lock).append(processClass, rhs.processClass).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        permanent("permanent"),
-        ad_hoc("ad_hoc"),
-        file_order("file_order");
+        PERMANENT("PERMANENT"),
+        AD_HOC("AD_HOC"),
+        FILE_ORDER("FILE_ORDER");
         private final String value;
         private final static Map<String, OrderQueue.Type> CONSTANTS = new HashMap<String, OrderQueue.Type>();
 
@@ -792,13 +681,11 @@ public class OrderQueue {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static OrderQueue.Type fromValue(String value) {
             OrderQueue.Type constant = CONSTANTS.get(value);
             if (constant == null) {

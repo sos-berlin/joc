@@ -44,7 +44,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                 agent.setStartedAt(new Date());
                 State state = new State();
                 state.setSeverity(0);
-                state.setText(Text.paused);
+                state.setText(Text.PAUSED);
                 agent.setState(state);
                 agent.setUrl(agentFilter.getAgent());
                 agent.setSurveyDate(new Date());

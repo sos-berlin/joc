@@ -41,7 +41,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             ConfigurationStatusSchema configurationStatus = new ConfigurationStatusSchema();
             configurationStatus.setMessage("myMessage");
             configurationStatus.setSeverity(0);
-            configurationStatus.setText(Text.changed_file_not_loaded);
+            configurationStatus.setText(Text.CHANGED_FILE_NOT_LOADED);
             orderQueue.setConfigurationStatus(configurationStatus);
             
             orderQueue.setEndState("myEndState");
@@ -71,7 +71,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             
             ProcessingState processingState = new ProcessingState();
             processingState.setSeverity(1);
-            processingState.setText(ProcessingState.Text.running);
+            processingState.setText(ProcessingState.Text.RUNNING);
             
             orderQueue.setProcessingState(processingState);
            
@@ -81,7 +81,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             orderQueue.setStateText("myStateText");
             orderQueue.setSurveyDate(new Date());
             orderQueue.setTaskId(-1);
-            orderQueue.setType(Type.file_order);
+            orderQueue.setType(Type.FILE_ORDER);
              
 
             entity.setOrder(orderQueue);

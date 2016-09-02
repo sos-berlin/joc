@@ -1,17 +1,7 @@
 
 package com.sos.joc.model.jobChain;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.sos.joc.model.job.Job;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -24,16 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * job chain node object with assigned a job
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "name",
-    "nextNode",
-    "errorNode",
-    "job",
-    "onError",
-    "delay"
-})
 public class Node_ {
 
     /**
@@ -41,21 +22,18 @@ public class Node_ {
      * (Required)
      * 
      */
-    @JsonProperty("name")
     private String name;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("nextNode")
     private String nextNode;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("errorNode")
     private String errorNode;
     /**
      * job object (permanent part)
@@ -64,20 +42,19 @@ public class Node_ {
      * (Required)
      * 
      */
-    @JsonProperty("job")
     private Job job;
-    @JsonProperty("onError")
-    private Node_.OnError onError;
+    /**
+     * possible values are 'suspend', 'setback' or it isn't set
+     * 
+     */
+    private String onError;
     /**
      * non negative integer
      * <p>
      * 
      * 
      */
-    @JsonProperty("delay")
     private Integer delay;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -86,7 +63,6 @@ public class Node_ {
      * @return
      *     The name
      */
-    @JsonProperty("name")
     public String getName() {
         return name;
     }
@@ -98,7 +74,6 @@ public class Node_ {
      * @param name
      *     The name
      */
-    @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
     }
@@ -110,7 +85,6 @@ public class Node_ {
      * @return
      *     The nextNode
      */
-    @JsonProperty("nextNode")
     public String getNextNode() {
         return nextNode;
     }
@@ -122,7 +96,6 @@ public class Node_ {
      * @param nextNode
      *     The nextNode
      */
-    @JsonProperty("nextNode")
     public void setNextNode(String nextNode) {
         this.nextNode = nextNode;
     }
@@ -134,7 +107,6 @@ public class Node_ {
      * @return
      *     The errorNode
      */
-    @JsonProperty("errorNode")
     public String getErrorNode() {
         return errorNode;
     }
@@ -146,7 +118,6 @@ public class Node_ {
      * @param errorNode
      *     The errorNode
      */
-    @JsonProperty("errorNode")
     public void setErrorNode(String errorNode) {
         this.errorNode = errorNode;
     }
@@ -160,7 +131,6 @@ public class Node_ {
      * @return
      *     The job
      */
-    @JsonProperty("job")
     public Job getJob() {
         return job;
     }
@@ -174,28 +144,27 @@ public class Node_ {
      * @param job
      *     The job
      */
-    @JsonProperty("job")
     public void setJob(Job job) {
         this.job = job;
     }
 
     /**
+     * possible values are 'suspend', 'setback' or it isn't set
      * 
      * @return
      *     The onError
      */
-    @JsonProperty("onError")
-    public Node_.OnError getOnError() {
+    public String getOnError() {
         return onError;
     }
 
     /**
+     * possible values are 'suspend', 'setback' or it isn't set
      * 
      * @param onError
      *     The onError
      */
-    @JsonProperty("onError")
-    public void setOnError(Node_.OnError onError) {
+    public void setOnError(String onError) {
         this.onError = onError;
     }
 
@@ -207,7 +176,6 @@ public class Node_ {
      * @return
      *     The delay
      */
-    @JsonProperty("delay")
     public Integer getDelay() {
         return delay;
     }
@@ -220,7 +188,6 @@ public class Node_ {
      * @param delay
      *     The delay
      */
-    @JsonProperty("delay")
     public void setDelay(Integer delay) {
         this.delay = delay;
     }
@@ -230,19 +197,9 @@ public class Node_ {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(nextNode).append(errorNode).append(job).append(onError).append(delay).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(name).append(nextNode).append(errorNode).append(job).append(onError).append(delay).toHashCode();
     }
 
     @Override
@@ -254,44 +211,7 @@ public class Node_ {
             return false;
         }
         Node_ rhs = ((Node_) other);
-        return new EqualsBuilder().append(name, rhs.name).append(nextNode, rhs.nextNode).append(errorNode, rhs.errorNode).append(job, rhs.job).append(onError, rhs.onError).append(delay, rhs.delay).append(additionalProperties, rhs.additionalProperties).isEquals();
-    }
-
-    @Generated("org.jsonschema2pojo")
-    public enum OnError {
-
-        __EMPTY__(""),
-        suspend("suspend"),
-        setback("setback");
-        private final String value;
-        private final static Map<String, Node_.OnError> CONSTANTS = new HashMap<String, Node_.OnError>();
-
-        static {
-            for (Node_.OnError c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private OnError(String value) {
-            this.value = value;
-        }
-
-        @JsonValue
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static Node_.OnError fromValue(String value) {
-            Node_.OnError constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
+        return new EqualsBuilder().append(name, rhs.name).append(nextNode, rhs.nextNode).append(errorNode, rhs.errorNode).append(job, rhs.job).append(onError, rhs.onError).append(delay, rhs.delay).isEquals();
     }
 
 }

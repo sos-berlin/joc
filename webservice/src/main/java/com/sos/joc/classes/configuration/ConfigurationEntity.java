@@ -21,7 +21,7 @@ public class ConfigurationEntity {
         configuration.setContent(content);
         configuration.setPath("myPath");
         configuration.setSurveyDate(new Date());
-        configuration.setType(Configuration.Type.order);
+        configuration.setType(Configuration.Type.ORDER);
         entity.setConfiguration(configuration);
         return entity;
     }

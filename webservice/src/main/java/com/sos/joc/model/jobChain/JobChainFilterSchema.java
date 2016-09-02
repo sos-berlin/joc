@@ -2,16 +2,8 @@
 package com.sos.joc.model.jobChain;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -23,17 +15,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "jobschedulerId",
-    "jobChain",
-    "orders",
-    "compact"
-})
 public class JobChainFilterSchema {
 
-    @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
      * path
@@ -42,9 +26,7 @@ public class JobChainFilterSchema {
      * (Required)
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
-    @JsonProperty("orders")
     private List<String> orders = new ArrayList<String>();
     /**
      * compact parameter
@@ -52,17 +34,13 @@ public class JobChainFilterSchema {
      * controls if the object view is compact or detailed
      * 
      */
-    @JsonProperty("compact")
     private Boolean compact = false;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
      * @return
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public String getJobschedulerId() {
         return jobschedulerId;
     }
@@ -72,7 +50,6 @@ public class JobChainFilterSchema {
      * @param jobschedulerId
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public void setJobschedulerId(String jobschedulerId) {
         this.jobschedulerId = jobschedulerId;
     }
@@ -86,7 +63,6 @@ public class JobChainFilterSchema {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -100,7 +76,6 @@ public class JobChainFilterSchema {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -110,7 +85,6 @@ public class JobChainFilterSchema {
      * @return
      *     The orders
      */
-    @JsonProperty("orders")
     public List<String> getOrders() {
         return orders;
     }
@@ -120,7 +94,6 @@ public class JobChainFilterSchema {
      * @param orders
      *     The orders
      */
-    @JsonProperty("orders")
     public void setOrders(List<String> orders) {
         this.orders = orders;
     }
@@ -133,7 +106,6 @@ public class JobChainFilterSchema {
      * @return
      *     The compact
      */
-    @JsonProperty("compact")
     public Boolean getCompact() {
         return compact;
     }
@@ -146,7 +118,6 @@ public class JobChainFilterSchema {
      * @param compact
      *     The compact
      */
-    @JsonProperty("compact")
     public void setCompact(Boolean compact) {
         this.compact = compact;
     }
@@ -156,19 +127,9 @@ public class JobChainFilterSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobChain).append(orders).append(compact).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobChain).append(orders).append(compact).toHashCode();
     }
 
     @Override
@@ -180,7 +141,7 @@ public class JobChainFilterSchema {
             return false;
         }
         JobChainFilterSchema rhs = ((JobChainFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChain, rhs.jobChain).append(orders, rhs.orders).append(compact, rhs.compact).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChain, rhs.jobChain).append(orders, rhs.orders).append(compact, rhs.compact).isEquals();
     }
 
 }

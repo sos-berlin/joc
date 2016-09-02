@@ -5,27 +5,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "path",
-    "type",
-    "configurationDate",
-    "content"
-})
 public class Configuration {
 
     /**
@@ -35,7 +19,6 @@ public class Configuration {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -44,7 +27,6 @@ public class Configuration {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * JobScheduler object type
@@ -52,7 +34,6 @@ public class Configuration {
      * 
      * 
      */
-    @JsonProperty("type")
     private Configuration.Type type;
     /**
      * timestamp
@@ -61,7 +42,6 @@ public class Configuration {
      * (Required)
      * 
      */
-    @JsonProperty("configurationDate")
     private Date configurationDate;
     /**
      * configuration content
@@ -70,10 +50,7 @@ public class Configuration {
      * (Required)
      * 
      */
-    @JsonProperty("content")
     private Content content;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -84,7 +61,6 @@ public class Configuration {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -98,7 +74,6 @@ public class Configuration {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -112,7 +87,6 @@ public class Configuration {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -126,7 +100,6 @@ public class Configuration {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -139,7 +112,6 @@ public class Configuration {
      * @return
      *     The type
      */
-    @JsonProperty("type")
     public Configuration.Type getType() {
         return type;
     }
@@ -152,7 +124,6 @@ public class Configuration {
      * @param type
      *     The type
      */
-    @JsonProperty("type")
     public void setType(Configuration.Type type) {
         this.type = type;
     }
@@ -166,7 +137,6 @@ public class Configuration {
      * @return
      *     The configurationDate
      */
-    @JsonProperty("configurationDate")
     public Date getConfigurationDate() {
         return configurationDate;
     }
@@ -180,7 +150,6 @@ public class Configuration {
      * @param configurationDate
      *     The configurationDate
      */
-    @JsonProperty("configurationDate")
     public void setConfigurationDate(Date configurationDate) {
         this.configurationDate = configurationDate;
     }
@@ -194,7 +163,6 @@ public class Configuration {
      * @return
      *     The content
      */
-    @JsonProperty("content")
     public Content getContent() {
         return content;
     }
@@ -208,7 +176,6 @@ public class Configuration {
      * @param content
      *     The content
      */
-    @JsonProperty("content")
     public void setContent(Content content) {
         this.content = content;
     }
@@ -218,19 +185,9 @@ public class Configuration {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(type).append(configurationDate).append(content).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(type).append(configurationDate).append(content).toHashCode();
     }
 
     @Override
@@ -242,20 +199,20 @@ public class Configuration {
             return false;
         }
         Configuration rhs = ((Configuration) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(type, rhs.type).append(configurationDate, rhs.configurationDate).append(content, rhs.content).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(type, rhs.type).append(configurationDate, rhs.configurationDate).append(content, rhs.content).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        job("job"),
-        jobChain("jobChain"),
-        order("order"),
-        processClass("processClass"),
-        lock("lock"),
-        schedule("schedule"),
-        params("params"),
-        other("other");
+        JOB("JOB"),
+        JOBCHAIN("JOBCHAIN"),
+        ORDER("ORDER"),
+        PROCESSCLASS("PROCESSCLASS"),
+        LOCK("LOCK"),
+        SCHEDULE("SCHEDULE"),
+        PARAMS("PARAMS"),
+        OTHER("OTHER");
         private final String value;
         private final static Map<String, Configuration.Type> CONSTANTS = new HashMap<String, Configuration.Type>();
 
@@ -269,13 +226,11 @@ public class Configuration {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static Configuration.Type fromValue(String value) {
             Configuration.Type constant = CONSTANTS.get(value);
             if (constant == null) {

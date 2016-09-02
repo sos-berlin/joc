@@ -44,7 +44,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 agent.setStartedAt(new Date());
                 State state = new State();
                 state.setSeverity(0);
-                state.setText(Text.paused);
+                state.setText(Text.PAUSED);
                 agent.setState(state);
                 agent.setSurveyDate(new Date());
                 agent.setHost(dbItemInventoryInstance.getHostname());

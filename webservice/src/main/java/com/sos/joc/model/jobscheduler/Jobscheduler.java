@@ -2,15 +2,7 @@
 package com.sos.joc.model.jobscheduler;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,20 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "jobschedulerId",
-    "version",
-    "host",
-    "port",
-    "os",
-    "timeZone",
-    "clusterType",
-    "startedAt",
-    "supervisor"
-})
 public class Jobscheduler {
 
     /**
@@ -45,28 +24,24 @@ public class Jobscheduler {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("version")
     private String version;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("host")
     private String host;
     /**
      * port
@@ -75,7 +50,6 @@ public class Jobscheduler {
      * (Required)
      * 
      */
-    @JsonProperty("port")
     private Integer port;
     /**
      * jobscheduler platform
@@ -84,14 +58,12 @@ public class Jobscheduler {
      * (Required)
      * 
      */
-    @JsonProperty("os")
     private Os os;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("timeZone")
     private String timeZone;
     /**
      * jobscheduler cluster member type
@@ -100,7 +72,6 @@ public class Jobscheduler {
      * (Required)
      * 
      */
-    @JsonProperty("clusterType")
     private ClusterMemberTypeSchema clusterType;
     /**
      * timestamp
@@ -109,16 +80,12 @@ public class Jobscheduler {
      * (Required)
      * 
      */
-    @JsonProperty("startedAt")
     private Date startedAt;
     /**
      * undefined iff JobScheduler doesn't have a supervisor
      * 
      */
-    @JsonProperty("supervisor")
     private Supervisor supervisor;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -129,7 +96,6 @@ public class Jobscheduler {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -143,7 +109,6 @@ public class Jobscheduler {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -155,7 +120,6 @@ public class Jobscheduler {
      * @return
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public String getJobschedulerId() {
         return jobschedulerId;
     }
@@ -167,7 +131,6 @@ public class Jobscheduler {
      * @param jobschedulerId
      *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
     public void setJobschedulerId(String jobschedulerId) {
         this.jobschedulerId = jobschedulerId;
     }
@@ -179,7 +142,6 @@ public class Jobscheduler {
      * @return
      *     The version
      */
-    @JsonProperty("version")
     public String getVersion() {
         return version;
     }
@@ -191,7 +153,6 @@ public class Jobscheduler {
      * @param version
      *     The version
      */
-    @JsonProperty("version")
     public void setVersion(String version) {
         this.version = version;
     }
@@ -203,7 +164,6 @@ public class Jobscheduler {
      * @return
      *     The host
      */
-    @JsonProperty("host")
     public String getHost() {
         return host;
     }
@@ -215,7 +175,6 @@ public class Jobscheduler {
      * @param host
      *     The host
      */
-    @JsonProperty("host")
     public void setHost(String host) {
         this.host = host;
     }
@@ -229,7 +188,6 @@ public class Jobscheduler {
      * @return
      *     The port
      */
-    @JsonProperty("port")
     public Integer getPort() {
         return port;
     }
@@ -243,7 +201,6 @@ public class Jobscheduler {
      * @param port
      *     The port
      */
-    @JsonProperty("port")
     public void setPort(Integer port) {
         this.port = port;
     }
@@ -257,7 +214,6 @@ public class Jobscheduler {
      * @return
      *     The os
      */
-    @JsonProperty("os")
     public Os getOs() {
         return os;
     }
@@ -271,7 +227,6 @@ public class Jobscheduler {
      * @param os
      *     The os
      */
-    @JsonProperty("os")
     public void setOs(Os os) {
         this.os = os;
     }
@@ -283,7 +238,6 @@ public class Jobscheduler {
      * @return
      *     The timeZone
      */
-    @JsonProperty("timeZone")
     public String getTimeZone() {
         return timeZone;
     }
@@ -295,7 +249,6 @@ public class Jobscheduler {
      * @param timeZone
      *     The timeZone
      */
-    @JsonProperty("timeZone")
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
     }
@@ -309,7 +262,6 @@ public class Jobscheduler {
      * @return
      *     The clusterType
      */
-    @JsonProperty("clusterType")
     public ClusterMemberTypeSchema getClusterType() {
         return clusterType;
     }
@@ -323,7 +275,6 @@ public class Jobscheduler {
      * @param clusterType
      *     The clusterType
      */
-    @JsonProperty("clusterType")
     public void setClusterType(ClusterMemberTypeSchema clusterType) {
         this.clusterType = clusterType;
     }
@@ -337,7 +288,6 @@ public class Jobscheduler {
      * @return
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public Date getStartedAt() {
         return startedAt;
     }
@@ -351,7 +301,6 @@ public class Jobscheduler {
      * @param startedAt
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
@@ -362,7 +311,6 @@ public class Jobscheduler {
      * @return
      *     The supervisor
      */
-    @JsonProperty("supervisor")
     public Supervisor getSupervisor() {
         return supervisor;
     }
@@ -373,7 +321,6 @@ public class Jobscheduler {
      * @param supervisor
      *     The supervisor
      */
-    @JsonProperty("supervisor")
     public void setSupervisor(Supervisor supervisor) {
         this.supervisor = supervisor;
     }
@@ -383,19 +330,9 @@ public class Jobscheduler {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(version).append(host).append(port).append(os).append(timeZone).append(clusterType).append(startedAt).append(supervisor).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(version).append(host).append(port).append(os).append(timeZone).append(clusterType).append(startedAt).append(supervisor).toHashCode();
     }
 
     @Override
@@ -407,7 +344,7 @@ public class Jobscheduler {
             return false;
         }
         Jobscheduler rhs = ((Jobscheduler) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(version, rhs.version).append(host, rhs.host).append(port, rhs.port).append(os, rhs.os).append(timeZone, rhs.timeZone).append(clusterType, rhs.clusterType).append(startedAt, rhs.startedAt).append(supervisor, rhs.supervisor).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(version, rhs.version).append(host, rhs.host).append(port, rhs.port).append(os, rhs.os).append(timeZone, rhs.timeZone).append(clusterType, rhs.clusterType).append(startedAt, rhs.startedAt).append(supervisor, rhs.supervisor).isEquals();
     }
 
 }

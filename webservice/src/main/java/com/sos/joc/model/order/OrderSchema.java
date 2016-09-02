@@ -6,14 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -26,16 +18,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * compact=true then ONLY path, id, jobChain and _type are responded
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "path",
-    "orderId",
-    "jobChain",
-    "priority",
-    "params",
-    "_type"
-})
 public class OrderSchema {
 
     /**
@@ -45,14 +28,12 @@ public class OrderSchema {
      * (Required)
      * 
      */
-    @JsonProperty("path")
     private String path;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("orderId")
     private String orderId;
     /**
      * path
@@ -61,7 +42,6 @@ public class OrderSchema {
      * (Required)
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
     /**
      * non negative integer
@@ -69,7 +49,6 @@ public class OrderSchema {
      * 
      * 
      */
-    @JsonProperty("priority")
     private Integer priority;
     /**
      * params or environment variables
@@ -77,16 +56,12 @@ public class OrderSchema {
      * 
      * 
      */
-    @JsonProperty("params")
     private List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
     /**
      * the type of the order
      * 
      */
-    @JsonProperty("_type")
     private OrderSchema.Type type;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -97,7 +72,6 @@ public class OrderSchema {
      * @return
      *     The path
      */
-    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -111,7 +85,6 @@ public class OrderSchema {
      * @param path
      *     The path
      */
-    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -123,7 +96,6 @@ public class OrderSchema {
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -135,7 +107,6 @@ public class OrderSchema {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -149,7 +120,6 @@ public class OrderSchema {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -163,7 +133,6 @@ public class OrderSchema {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -176,7 +145,6 @@ public class OrderSchema {
      * @return
      *     The priority
      */
-    @JsonProperty("priority")
     public Integer getPriority() {
         return priority;
     }
@@ -189,7 +157,6 @@ public class OrderSchema {
      * @param priority
      *     The priority
      */
-    @JsonProperty("priority")
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
@@ -202,7 +169,6 @@ public class OrderSchema {
      * @return
      *     The params
      */
-    @JsonProperty("params")
     public List<NameValuePairsSchema> getParams() {
         return params;
     }
@@ -215,7 +181,6 @@ public class OrderSchema {
      * @param params
      *     The params
      */
-    @JsonProperty("params")
     public void setParams(List<NameValuePairsSchema> params) {
         this.params = params;
     }
@@ -226,7 +191,6 @@ public class OrderSchema {
      * @return
      *     The type
      */
-    @JsonProperty("_type")
     public OrderSchema.Type getType() {
         return type;
     }
@@ -237,7 +201,6 @@ public class OrderSchema {
      * @param type
      *     The _type
      */
-    @JsonProperty("_type")
     public void setType(OrderSchema.Type type) {
         this.type = type;
     }
@@ -247,19 +210,9 @@ public class OrderSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(priority).append(params).append(type).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(priority).append(params).append(type).toHashCode();
     }
 
     @Override
@@ -271,15 +224,15 @@ public class OrderSchema {
             return false;
         }
         OrderSchema rhs = ((OrderSchema) other);
-        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(priority, rhs.priority).append(params, rhs.params).append(type, rhs.type).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(priority, rhs.priority).append(params, rhs.params).append(type, rhs.type).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Type {
 
-        permanent("permanent"),
-        ad_hoc("ad_hoc"),
-        file_order("file_order");
+        PERMANENT("PERMANENT"),
+        AD_HOC("AD_HOC"),
+        FILE_ORDER("FILE_ORDER");
         private final String value;
         private final static Map<String, OrderSchema.Type> CONSTANTS = new HashMap<String, OrderSchema.Type>();
 
@@ -293,13 +246,11 @@ public class OrderSchema {
             this.value = value;
         }
 
-        @JsonValue
         @Override
         public String toString() {
             return this.value;
         }
 
-        @JsonCreator
         public static OrderSchema.Type fromValue(String value) {
             OrderSchema.Type constant = CONSTANTS.get(value);
             if (constant == null) {

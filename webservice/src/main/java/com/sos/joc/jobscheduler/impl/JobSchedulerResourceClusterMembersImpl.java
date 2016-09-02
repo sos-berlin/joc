@@ -49,10 +49,10 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                 jobscheduler.setStartedAt(jocXmlCommand.getAttributeAsDate("running_since"));
                 State state = new State();
                 state.setSeverity(0);
-                state.setText(Text.running);
+                state.setText(Text.RUNNING);
                 if ("yes".equals(jocXmlCommand.getAttribute("dead"))) {
                     state.setSeverity(1);
-                    state.setText(Text.dead);
+                    state.setText(Text.DEAD);
                 }
                 jobscheduler.setState(state);
                 jobscheduler.setSurveyDate(jocXmlCommand.getSurveyDate());

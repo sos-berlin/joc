@@ -52,7 +52,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             history.setStartTime(new Date());
             State state = new State();
             state.setSeverity(0);
-            state.setText(State.Text.incomplete);
+            state.setText(State.Text.INCOMPLETE);
             history.setState(state);
             listHistory.add(history);
             

@@ -60,7 +60,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             clusterMemberTypeSchema.setPrecedence(-1);
             clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getClusterMemberPrecedence());
             // clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.fromValue(schedulerInstancesDBItem.getClusterMemberType()));
-            clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.active);
+            clusterMemberTypeSchema.setType("myType");
             jobscheduler.setClusterType(clusterMemberTypeSchema);
 
             Os os = new Os();

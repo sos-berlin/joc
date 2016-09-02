@@ -2,15 +2,7 @@
 package com.sos.joc.model.common;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -22,13 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "deliveryDate",
-    "surveyDate",
-    "error"
-})
 public class Error420Schema {
 
     /**
@@ -38,13 +24,11 @@ public class Error420Schema {
      * (Required)
      * 
      */
-    @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
      * is also required for permanent or volatile requests
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * error
@@ -53,10 +37,7 @@ public class Error420Schema {
      * (Required)
      * 
      */
-    @JsonProperty("error")
     private ErrorSchema error;
-    @JsonIgnore
-    private Map<String, java.lang.Object> additionalProperties = new HashMap<String, java.lang.Object>();
 
     /**
      * delivery date
@@ -67,7 +48,6 @@ public class Error420Schema {
      * @return
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public Date getDeliveryDate() {
         return deliveryDate;
     }
@@ -81,7 +61,6 @@ public class Error420Schema {
      * @param deliveryDate
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
@@ -92,7 +71,6 @@ public class Error420Schema {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -103,7 +81,6 @@ public class Error420Schema {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -117,7 +94,6 @@ public class Error420Schema {
      * @return
      *     The error
      */
-    @JsonProperty("error")
     public ErrorSchema getError() {
         return error;
     }
@@ -131,7 +107,6 @@ public class Error420Schema {
      * @param error
      *     The error
      */
-    @JsonProperty("error")
     public void setError(ErrorSchema error) {
         this.error = error;
     }
@@ -141,19 +116,9 @@ public class Error420Schema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, java.lang.Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, java.lang.Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(surveyDate).append(error).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(surveyDate).append(error).toHashCode();
     }
 
     @Override
@@ -165,7 +130,7 @@ public class Error420Schema {
             return false;
         }
         Error420Schema rhs = ((Error420Schema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(surveyDate, rhs.surveyDate).append(error, rhs.error).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(surveyDate, rhs.surveyDate).append(error, rhs.error).isEquals();
     }
 
 }

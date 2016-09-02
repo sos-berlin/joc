@@ -3,16 +3,8 @@ package com.sos.joc.model.jobscheduler;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -24,19 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "surveyDate",
-    "version",
-    "host",
-    "port",
-    "url",
-    "os",
-    "state",
-    "startedAt",
-    "clusters"
-})
 public class AgentPSchema {
 
     /**
@@ -46,21 +26,18 @@ public class AgentPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("version")
     private String version;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("host")
     private String host;
     /**
      * port
@@ -69,14 +46,12 @@ public class AgentPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("port")
     private Integer port;
     /**
      * url can be different against host/port if agent behind a proxy
      * (Required)
      * 
      */
-    @JsonProperty("url")
     private String url;
     /**
      * jobscheduler platform
@@ -85,7 +60,6 @@ public class AgentPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("os")
     private Os os;
     /**
      * jobscheduler state
@@ -94,7 +68,6 @@ public class AgentPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("state")
     private State state;
     /**
      * timestamp
@@ -103,17 +76,13 @@ public class AgentPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("startedAt")
     private Date startedAt;
     /**
      * Collection of process class' paths
      * (Required)
      * 
      */
-    @JsonProperty("clusters")
     private List<String> clusters = new ArrayList<String>();
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -124,7 +93,6 @@ public class AgentPSchema {
      * @return
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -138,7 +106,6 @@ public class AgentPSchema {
      * @param surveyDate
      *     The surveyDate
      */
-    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -150,7 +117,6 @@ public class AgentPSchema {
      * @return
      *     The version
      */
-    @JsonProperty("version")
     public String getVersion() {
         return version;
     }
@@ -162,7 +128,6 @@ public class AgentPSchema {
      * @param version
      *     The version
      */
-    @JsonProperty("version")
     public void setVersion(String version) {
         this.version = version;
     }
@@ -174,7 +139,6 @@ public class AgentPSchema {
      * @return
      *     The host
      */
-    @JsonProperty("host")
     public String getHost() {
         return host;
     }
@@ -186,7 +150,6 @@ public class AgentPSchema {
      * @param host
      *     The host
      */
-    @JsonProperty("host")
     public void setHost(String host) {
         this.host = host;
     }
@@ -200,7 +163,6 @@ public class AgentPSchema {
      * @return
      *     The port
      */
-    @JsonProperty("port")
     public Integer getPort() {
         return port;
     }
@@ -214,7 +176,6 @@ public class AgentPSchema {
      * @param port
      *     The port
      */
-    @JsonProperty("port")
     public void setPort(Integer port) {
         this.port = port;
     }
@@ -226,7 +187,6 @@ public class AgentPSchema {
      * @return
      *     The url
      */
-    @JsonProperty("url")
     public String getUrl() {
         return url;
     }
@@ -238,7 +198,6 @@ public class AgentPSchema {
      * @param url
      *     The url
      */
-    @JsonProperty("url")
     public void setUrl(String url) {
         this.url = url;
     }
@@ -252,7 +211,6 @@ public class AgentPSchema {
      * @return
      *     The os
      */
-    @JsonProperty("os")
     public Os getOs() {
         return os;
     }
@@ -266,7 +224,6 @@ public class AgentPSchema {
      * @param os
      *     The os
      */
-    @JsonProperty("os")
     public void setOs(Os os) {
         this.os = os;
     }
@@ -280,7 +237,6 @@ public class AgentPSchema {
      * @return
      *     The state
      */
-    @JsonProperty("state")
     public State getState() {
         return state;
     }
@@ -294,7 +250,6 @@ public class AgentPSchema {
      * @param state
      *     The state
      */
-    @JsonProperty("state")
     public void setState(State state) {
         this.state = state;
     }
@@ -308,7 +263,6 @@ public class AgentPSchema {
      * @return
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public Date getStartedAt() {
         return startedAt;
     }
@@ -322,7 +276,6 @@ public class AgentPSchema {
      * @param startedAt
      *     The startedAt
      */
-    @JsonProperty("startedAt")
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
@@ -334,7 +287,6 @@ public class AgentPSchema {
      * @return
      *     The clusters
      */
-    @JsonProperty("clusters")
     public List<String> getClusters() {
         return clusters;
     }
@@ -346,7 +298,6 @@ public class AgentPSchema {
      * @param clusters
      *     The clusters
      */
-    @JsonProperty("clusters")
     public void setClusters(List<String> clusters) {
         this.clusters = clusters;
     }
@@ -356,19 +307,9 @@ public class AgentPSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(version).append(host).append(port).append(url).append(os).append(state).append(startedAt).append(clusters).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(version).append(host).append(port).append(url).append(os).append(state).append(startedAt).append(clusters).toHashCode();
     }
 
     @Override
@@ -380,7 +321,7 @@ public class AgentPSchema {
             return false;
         }
         AgentPSchema rhs = ((AgentPSchema) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(host, rhs.host).append(port, rhs.port).append(url, rhs.url).append(os, rhs.os).append(state, rhs.state).append(startedAt, rhs.startedAt).append(clusters, rhs.clusters).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(host, rhs.host).append(port, rhs.port).append(url, rhs.url).append(os, rhs.os).append(state, rhs.state).append(startedAt, rhs.startedAt).append(clusters, rhs.clusters).isEquals();
     }
 
 }

@@ -44,7 +44,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 
             com.sos.joc.model.job.State_ state = new com.sos.joc.model.job.State_();
             state.setSeverity(0);
-            state.setText(com.sos.joc.model.job.State_.Text.loaded);
+            state.setText(com.sos.joc.model.job.State_.Text.LOADED);
             job.setState(state);
             job.setStateText("myStateText");
             job.setSurveyDate(new Date());
@@ -62,7 +62,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
             ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
             configurationStatusSchema.setMessage("myMessage");
             configurationStatusSchema.setSeverity(-1);
-            configurationStatusSchema.setText(Text.changed_file_not_loaded);
+            configurationStatusSchema.setText(Text.CHANGED_FILE_NOT_LOADED);
             job.setConfigurationStatus(configurationStatusSchema);
             List<Lock_> listOfLocks = new ArrayList<Lock_>();
             Lock_ lock = new Lock_();
@@ -100,7 +100,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
 
                 List<RunningTask> listOfRunningTask = new ArrayList<RunningTask>();
                 RunningTask runningTask = new RunningTask();
-                runningTask.setCause(Cause.none);
+                runningTask.setCause(Cause.NONE);
                 runningTask.setEnqueued(new Date());
                 runningTask.setIdleSince(new Date());
 

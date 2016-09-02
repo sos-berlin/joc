@@ -3,16 +3,8 @@ package com.sos.joc.model.jobChain;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -24,12 +16,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "deliveryDate",
-    "jobChains"
-})
 public class JobChainsPSchema {
 
     /**
@@ -39,17 +26,13 @@ public class JobChainsPSchema {
      * (Required)
      * 
      */
-    @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("jobChains")
     private List<JobChain> jobChains = new ArrayList<JobChain>();
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * delivery date
@@ -60,7 +43,6 @@ public class JobChainsPSchema {
      * @return
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public Date getDeliveryDate() {
         return deliveryDate;
     }
@@ -74,7 +56,6 @@ public class JobChainsPSchema {
      * @param deliveryDate
      *     The deliveryDate
      */
-    @JsonProperty("deliveryDate")
     public void setDeliveryDate(Date deliveryDate) {
         this.deliveryDate = deliveryDate;
     }
@@ -86,7 +67,6 @@ public class JobChainsPSchema {
      * @return
      *     The jobChains
      */
-    @JsonProperty("jobChains")
     public List<JobChain> getJobChains() {
         return jobChains;
     }
@@ -98,7 +78,6 @@ public class JobChainsPSchema {
      * @param jobChains
      *     The jobChains
      */
-    @JsonProperty("jobChains")
     public void setJobChains(List<JobChain> jobChains) {
         this.jobChains = jobChains;
     }
@@ -108,19 +87,9 @@ public class JobChainsPSchema {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(jobChains).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(jobChains).toHashCode();
     }
 
     @Override
@@ -132,7 +101,7 @@ public class JobChainsPSchema {
             return false;
         }
         JobChainsPSchema rhs = ((JobChainsPSchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(jobChains, rhs.jobChains).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(jobChains, rhs.jobChains).isEquals();
     }
 
 }

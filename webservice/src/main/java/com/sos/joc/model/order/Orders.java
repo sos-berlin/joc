@@ -1,29 +1,12 @@
 
 package com.sos.joc.model.order;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "pending",
-    "running",
-    "suspended",
-    "setback",
-    "waitingForResource",
-    "blacklist"
-})
 public class Orders {
 
     /**
@@ -33,7 +16,6 @@ public class Orders {
      * (Required)
      * 
      */
-    @JsonProperty("pending")
     private Integer pending;
     /**
      * non negative integer
@@ -42,7 +24,6 @@ public class Orders {
      * (Required)
      * 
      */
-    @JsonProperty("running")
     private Integer running;
     /**
      * non negative integer
@@ -51,7 +32,6 @@ public class Orders {
      * (Required)
      * 
      */
-    @JsonProperty("suspended")
     private Integer suspended;
     /**
      * non negative integer
@@ -60,7 +40,6 @@ public class Orders {
      * (Required)
      * 
      */
-    @JsonProperty("setback")
     private Integer setback;
     /**
      * non negative integer
@@ -69,7 +48,6 @@ public class Orders {
      * (Required)
      * 
      */
-    @JsonProperty("waitingForResource")
     private Integer waitingForResource;
     /**
      * non negative integer
@@ -78,10 +56,7 @@ public class Orders {
      * (Required)
      * 
      */
-    @JsonProperty("blacklist")
     private Integer blacklist;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * non negative integer
@@ -92,7 +67,6 @@ public class Orders {
      * @return
      *     The pending
      */
-    @JsonProperty("pending")
     public Integer getPending() {
         return pending;
     }
@@ -106,7 +80,6 @@ public class Orders {
      * @param pending
      *     The pending
      */
-    @JsonProperty("pending")
     public void setPending(Integer pending) {
         this.pending = pending;
     }
@@ -120,7 +93,6 @@ public class Orders {
      * @return
      *     The running
      */
-    @JsonProperty("running")
     public Integer getRunning() {
         return running;
     }
@@ -134,7 +106,6 @@ public class Orders {
      * @param running
      *     The running
      */
-    @JsonProperty("running")
     public void setRunning(Integer running) {
         this.running = running;
     }
@@ -148,7 +119,6 @@ public class Orders {
      * @return
      *     The suspended
      */
-    @JsonProperty("suspended")
     public Integer getSuspended() {
         return suspended;
     }
@@ -162,7 +132,6 @@ public class Orders {
      * @param suspended
      *     The suspended
      */
-    @JsonProperty("suspended")
     public void setSuspended(Integer suspended) {
         this.suspended = suspended;
     }
@@ -176,7 +145,6 @@ public class Orders {
      * @return
      *     The setback
      */
-    @JsonProperty("setback")
     public Integer getSetback() {
         return setback;
     }
@@ -190,7 +158,6 @@ public class Orders {
      * @param setback
      *     The setback
      */
-    @JsonProperty("setback")
     public void setSetback(Integer setback) {
         this.setback = setback;
     }
@@ -204,7 +171,6 @@ public class Orders {
      * @return
      *     The waitingForResource
      */
-    @JsonProperty("waitingForResource")
     public Integer getWaitingForResource() {
         return waitingForResource;
     }
@@ -218,7 +184,6 @@ public class Orders {
      * @param waitingForResource
      *     The waitingForResource
      */
-    @JsonProperty("waitingForResource")
     public void setWaitingForResource(Integer waitingForResource) {
         this.waitingForResource = waitingForResource;
     }
@@ -232,7 +197,6 @@ public class Orders {
      * @return
      *     The blacklist
      */
-    @JsonProperty("blacklist")
     public Integer getBlacklist() {
         return blacklist;
     }
@@ -246,7 +210,6 @@ public class Orders {
      * @param blacklist
      *     The blacklist
      */
-    @JsonProperty("blacklist")
     public void setBlacklist(Integer blacklist) {
         this.blacklist = blacklist;
     }
@@ -256,19 +219,9 @@ public class Orders {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(pending).append(running).append(suspended).append(setback).append(waitingForResource).append(blacklist).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(pending).append(running).append(suspended).append(setback).append(waitingForResource).append(blacklist).toHashCode();
     }
 
     @Override
@@ -280,7 +233,7 @@ public class Orders {
             return false;
         }
         Orders rhs = ((Orders) other);
-        return new EqualsBuilder().append(pending, rhs.pending).append(running, rhs.running).append(suspended, rhs.suspended).append(setback, rhs.setback).append(waitingForResource, rhs.waitingForResource).append(blacklist, rhs.blacklist).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(pending, rhs.pending).append(running, rhs.running).append(suspended, rhs.suspended).append(setback, rhs.setback).append(waitingForResource, rhs.waitingForResource).append(blacklist, rhs.blacklist).isEquals();
     }
 
 }

@@ -1,25 +1,12 @@
 
 package com.sos.joc.model.order;
 
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
-@JsonPropertyOrder({
-    "jobChain",
-    "orderId"
-})
 public class Order_ {
 
     /**
@@ -29,16 +16,12 @@ public class Order_ {
      * (Required)
      * 
      */
-    @JsonProperty("jobChain")
     private String jobChain;
     /**
      * if orderId undefined or empty then all orders of specified job chain are requested
      * 
      */
-    @JsonProperty("orderId")
     private String orderId;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * path
@@ -49,7 +32,6 @@ public class Order_ {
      * @return
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -63,7 +45,6 @@ public class Order_ {
      * @param jobChain
      *     The jobChain
      */
-    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -74,7 +55,6 @@ public class Order_ {
      * @return
      *     The orderId
      */
-    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -85,7 +65,6 @@ public class Order_ {
      * @param orderId
      *     The orderId
      */
-    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -95,19 +74,9 @@ public class Order_ {
         return ToStringBuilder.reflectionToString(this);
     }
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobChain).append(orderId).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(jobChain).append(orderId).toHashCode();
     }
 
     @Override
@@ -119,7 +88,7 @@ public class Order_ {
             return false;
         }
         Order_ rhs = ((Order_) other);
-        return new EqualsBuilder().append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).isEquals();
     }
 
 }

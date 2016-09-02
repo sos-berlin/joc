@@ -166,7 +166,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                         ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
                         configurationStatusSchema.setMessage("myMessage");
                         configurationStatusSchema.setSeverity(-1);
-                        configurationStatusSchema.setText(Text.changed_file_not_loaded);
+                        configurationStatusSchema.setText(Text.CHANGED_FILE_NOT_LOADED);
                         // TODO: job.setConfigurationStatus(configurationStatusSchema);
                         job.setConfigurationStatus(configurationStatusSchema);
                         
@@ -192,7 +192,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                             ConfigurationStatusSchema configurationStatus = new ConfigurationStatusSchema();
                             configurationStatus.setMessage("myMessage");
                             configurationStatus.setSeverity(0);
-                            configurationStatus.setText(Text.changed_file_not_loaded);
+                            configurationStatus.setText(Text.CHANGED_FILE_NOT_LOADED);
                             orderQueue.setConfigurationStatus(configurationStatus);
                             orderQueue.setEndState("myEndState");
                             orderQueue.setHistoryId(-1);
@@ -221,7 +221,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
                             ProcessingState processingState = new ProcessingState();
                             processingState.setSeverity(1);
-                            processingState.setText(ProcessingState.Text.running);
+                            processingState.setText(ProcessingState.Text.RUNNING);
 
                             orderQueue.setProcessingState(processingState);
 
@@ -231,7 +231,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                             orderQueue.setStateText("myStateText");
                             orderQueue.setSurveyDate(new Date());
                             orderQueue.setTaskId(-1);
-                            orderQueue.setType(Type.file_order);
+                            orderQueue.setType(Type.FILE_ORDER);
                             listOrderQueue.add(orderQueue);
                             // TODO: job.setOrderQueue(listOrderQueue);
                             job.setOrderQueue(listOrderQueue);
@@ -240,7 +240,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
                             List<RunningTask> listOfRunningTask = new ArrayList<RunningTask>();
                             RunningTask runningTask = new RunningTask();
-                            runningTask.setCause(Cause.none);
+                            runningTask.setCause(Cause.NONE);
                             runningTask.setEnqueued(new Date());
                             runningTask.setIdleSince(new Date());
                             Order order = new Order();
