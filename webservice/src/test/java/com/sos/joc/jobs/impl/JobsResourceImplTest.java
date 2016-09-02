@@ -19,11 +19,11 @@ public class JobsResourceImplTest {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsBody jobsBody = new JobsBody();
-        jobsBody.setJobschedulerId("scheduler_current");
+        jobsBody.setJobschedulerId("scheduler_4444");
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsBody);
         JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
-        assertEquals("postJobsTest","myName", jobsVSchema.getJobs().get(0).getName());
+        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
      }
 
 }
