@@ -16,7 +16,7 @@ import org.w3c.dom.NodeList;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.jobs.post.Folder;
+import com.sos.joc.classes.jobs.JobsUtils;
 import com.sos.joc.jobs.post.JobsBody;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
@@ -39,37 +39,6 @@ import com.sos.joc.model.job.TaskQueue;
 public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
     private static final Logger LOGGER = Logger.getLogger(JobsResourceImpl.class);
     
-    private String createPostCommand(JobsBody body) {
-        StringBuilder postCommand = new StringBuilder();
-        postCommand.append("<commands>");
-        if (!body.getFolders().isEmpty()) {
-            for (Folder folder : body.getFolders()) {
-                postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders task_queue");
-                String path = folder.getFolder();
-                Boolean recursive = folder.getRecursive();
-                if(!recursive) {
-                    postCommand.append(" no_subfolders");
-                }
-                postCommand.append("\" ");
-                postCommand.append("path=\"").append(path).append("\"/>");
-            }
-        } else {
-            postCommand.append("<show_state subsystems=\"job\" what=\"job_orders task_queue\" path=\"/\"/>");
-        }
-        postCommand.append("</commands>");
-        return postCommand.toString();
-    }
-
-    private Boolean getBoolValue(String value) {
-        if("yes".equalsIgnoreCase(value)){
-            return true;
-        } else if("no".equalsIgnoreCase(value)){
-            return false;
-        } else {
-            return null;
-        }
-    }
-    
     @Override
     public JOCDefaultResponse postJobs(String accessToken, JobsBody jobsBody) throws Exception {
         LOGGER.debug("init Jobs");
@@ -78,31 +47,26 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             return jocDefaultResponse;
         }
 
-        jobsBody.getCompact();
-        jobsBody.getDateFrom();
-        jobsBody.getDateTo();
-        /* jobsBody.getFolders(); ERLEDIGT*/ 
-        jobsBody.getIsOrderJob();
-        jobsBody.getJobs();
-        jobsBody.getRegex();
-        jobsBody.getTimeZone();
-        jobsBody.getState();
+        /* jobsBody.getCompact(); ERLEDIGT */
+        /* jobsBody.getFolders(); ERLEDIGT */ 
+        /* jobsBody.getIsOrderJob(); ERLEDIGT */
+        /* jobsBody.getJobs(); ERLEDIGT */
+//        jobsBody.getDateFrom();
+//        jobsBody.getDateTo();
+//        jobsBody.getRegex();
+//        jobsBody.getTimeZone();
+//        jobsBody.getState();
         try {
  
             JobsVSchema entity = new JobsVSchema();
             List<Job_> listJobs = new ArrayList<Job_>();
-            // TODO Use correct url
             //FOLDERS ERLEDIGT
-            //COMPACT
+            //COMPACT ERLEDIGT
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            String postCommand = createPostCommand(jobsBody);
+            String postCommand = JobsUtils.createPostCommand(jobsBody);
             jocXmlCommand.excutePost(postCommand);
             entity.setDeliveryDate(new Date());
             Date surveyDate = jocXmlCommand.getSurveyDate();
-            
-            SimpleDateFormat sdf = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT);
-            SimpleDateFormat sdf2 = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT2);
-
             
             if(jobsBody.getIsOrderJob() == null) {
                 // all jobs
@@ -132,10 +96,10 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                         Lock_ lock = new Lock_(); 
                         Element lockElement = (Element) lockNode;
                         if (lockElement.getAttribute("exclusive") != null) {
-                            lock.setExclusive(getBoolValue(lockElement.getAttribute("exclusive")));
+                            lock.setExclusive(JobsUtils.getBoolValue(lockElement.getAttribute("exclusive")));
                         }
                         if (lockElement.getAttribute("is_available") != null) {
-                            lock.setAvailable(getBoolValue(lockElement.getAttribute("is_available")));
+                            lock.setAvailable(JobsUtils.getBoolValue(lockElement.getAttribute("is_available")));
                         }
                         if (lockElement.getAttribute("lock") != null) {
                             lock.setPath(lockElement.getAttribute("lock"));
@@ -143,164 +107,132 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                         listOfLocks.add(lock);
                     }
                     job.setLocks(listOfLocks);
+                } else {
+                    job.setLocks(null);
                 }
                 NamedNodeMap attributes = jobNode.getAttributes();
                 job.setName(attributes.getNamedItem("name").getNodeValue());
                 job.setPath(attributes.getNamedItem("path").getNodeValue());
                 String stateText = attributes.getNamedItem("state").getNodeValue();
                 State_ state = new State_();
-                switch(stateText) {
-                    case "running":
-                        state.setSeverity(0);
-                        break;
-                    case "pending":
-                        state.setSeverity(1);
-                        break;
-                    case "not_initialized":
-                    case "waiting_for_agent":
-                    case "stopping":
-                    case "stopped":
-                    case "removed":
-                        state.setSeverity(2);
-                        break;
-                    case "initialized": 
-                    case "loaded": 
-                    case "waiting_for_process": 
-                    case "waiting_for_lock": 
-                    case "waiting_for_task": 
-                    case "not_in_period": 
-                        state.setSeverity(3);
-                        break;
-                    case "disabled": 
-                        state.setSeverity(4);
-                        break;
+                Integer severity = JobsUtils.getSeverityFromStateText(stateText);
+                if (severity != null) {
+                    state.setSeverity(JobsUtils.getSeverityFromStateText(stateText));
                 }
-                state.setText(com.sos.joc.model.job.State_.Text.valueOf(stateText));
+                // UpperCase only to prevent error in actual body, re-adjust when model changes
+                state.setText(com.sos.joc.model.job.State_.Text.valueOf(stateText.toUpperCase()));
                 job.setState(state);
                 job.setStateText(stateText);
 
-                OrdersSummary ordersSummary = new OrdersSummary();
-                ordersSummary.setPending(-1);
-                ordersSummary.setRunning(-1);
-                ordersSummary.setSetback(-1);
-                ordersSummary.setSuspended(-1);
-                ordersSummary.setWaitingForResource(-1);
-                // TODO: job.setOrdersSummary(ordersSummary);
-                job.setOrdersSummary(ordersSummary);
-                // TODO: job.setNumOfRunningTasks(-1);
-                job.setNumOfRunningTasks(-1);
-                
-                ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
-                configurationStatusSchema.setMessage("myMessage");
-                configurationStatusSchema.setSeverity(-1);
-                configurationStatusSchema.setText(Text.CHANGED_FILE_NOT_LOADED);
-                // TODO: job.setConfigurationStatus(configurationStatusSchema);
-                job.setConfigurationStatus(configurationStatusSchema);
+                // BIG TODO
+//                OrdersSummary ordersSummary = new OrdersSummary();
+//                ordersSummary.setPending(-1);
+//                ordersSummary.setRunning(-1);
+//                ordersSummary.setSetback(-1);
+//                ordersSummary.setSuspended(-1);
+//                ordersSummary.setWaitingForResource(-1);
+//                job.setOrdersSummary(ordersSummary);
+
+                if (jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks[@count]") != null &&
+                        !"".equalsIgnoreCase(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks[@count]"))) {
+                    job.setNumOfRunningTasks(Integer.parseInt(
+                            jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks[@count]")));
+                }
+                // TODO ConfigurationStatusSchema
+//                ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
+//                configurationStatusSchema.setMessage("myMessage");
+//                configurationStatusSchema.setSeverity(-1);
+//                configurationStatusSchema.setText(Text.CHANGED_FILE_NOT_LOADED);
+//                job.setConfigurationStatus(configurationStatusSchema);
                 
                 if (!jobsBody.getCompact()) {
                     job.setAllSteps(Integer.valueOf(attributes.getNamedItem("all_steps").getNodeValue()));
                     job.setAllTasks(Integer.valueOf(attributes.getNamedItem("all_tasks").getNodeValue()));
+                    
                     // TODO: job.setDelayUntil(new Date());
-                    job.setDelayUntil(new Date());
-                    // TODO: job.setNextPeriodBegin("myNextPeriodBegin");
-                    job.setNextPeriodBegin("myNextPeriodBegin");
+//                    job.setDelayUntil(new Date());
+                    
+                    // TODO: Joacim
+//                    job.setNextPeriodBegin("myNextPeriodBegin");
+                    
                     if(attributes.getNamedItem("next_start_time") != null) {
-                        String nextStartTime = attributes.getNamedItem("next_start_time").getNodeValue();
-                        if (!nextStartTime.contains("T")) {
-                            job.setNextStartTime(sdf.parse(nextStartTime));
-                        } else {
-                            job.setNextStartTime(sdf2.parse(nextStartTime));
-                            
-                        }
+                        job.setNextStartTime(getDateFromString(attributes.getNamedItem("next_start_time").getNodeValue()));
                     }
-                    List<OrderQueue> listOrderQueue = new ArrayList<OrderQueue>();
-                    OrderQueue orderQueue = new OrderQueue();
-                    entity.setDeliveryDate(new Date());
-                    ConfigurationStatusSchema configurationStatus = new ConfigurationStatusSchema();
-                    configurationStatus.setMessage("myMessage");
-                    configurationStatus.setSeverity(0);
-                    configurationStatus.setText(Text.CHANGED_FILE_NOT_LOADED);
-                    orderQueue.setConfigurationStatus(configurationStatus);
-                    orderQueue.setEndState("myEndState");
-                    orderQueue.setHistoryId(-1);
-                    orderQueue.setInProcessSince(new Date());
-                    orderQueue.setJob("myJob");
-                    orderQueue.setJobChain("myJobChain");
-                    orderQueue.setLock("myLock");
-                    orderQueue.setNextStartTime(new Date());
-                    orderQueue.setOrderId("myOrderId");
 
-                    List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
-                    NameValuePairsSchema param1 = new NameValuePairsSchema();
-                    NameValuePairsSchema param2 = new NameValuePairsSchema();
-                    param1.setName("param1");
-                    param1.setValue("value1");
-                    param2.setName("param2");
-                    param2.setValue("value2");
-                    parameters.add(param1);
-                    parameters.add(param1);
-                    orderQueue.setParams(parameters);
+                    NodeList paramsNodes = jocXmlCommand.getSosxml().selectNodeList((Element)jobNode, "params/param");
+                    List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
+                    if (paramsNodes != null && paramsNodes.getLength() > 0) {
+                        for(int paramsCount = 0; paramsCount < paramsNodes.getLength(); paramsCount++) {
+                            NameValuePairsSchema param = new NameValuePairsSchema();
+                            Element paramElement = (Element)paramsNodes.item(paramsCount);
+                            param.setName(paramElement.getAttribute("name"));
+                            param.setValue(paramElement.getAttribute("value"));
+                            params.add(param);
+                        }
+                        job.setParams(params);
+                    } else {
+                        job.setParams(null);
+                    }
 
-                    orderQueue.setPath("myPath");
-                    orderQueue.setPriority(-1);
-                    orderQueue.setProcessClass("myProcessClass");
-                    orderQueue.setProcessedBy("myProcessedBy");
-
-                    ProcessingState processingState = new ProcessingState();
-                    processingState.setSeverity(1);
-                    processingState.setText(ProcessingState.Text.RUNNING);
-
-                    orderQueue.setProcessingState(processingState);
-
-                    orderQueue.setSetback(new Date());
-                    orderQueue.setStartedAt(new Date());
-                    orderQueue.setState("myState");
-                    orderQueue.setStateText("myStateText");
-                    orderQueue.setSurveyDate(new Date());
-                    orderQueue.setTaskId(-1);
-                    orderQueue.setType(Type.FILE_ORDER);
-                    listOrderQueue.add(orderQueue);
-                    // TODO: job.setOrderQueue(listOrderQueue);
-                    job.setOrderQueue(listOrderQueue);
-                    // TODO: job.setParams(parameters);
-                    job.setParams(parameters);
-
-                    List<RunningTask> listOfRunningTask = new ArrayList<RunningTask>();
-                    RunningTask runningTask = new RunningTask();
-                    runningTask.setCause(Cause.NONE);
-                    runningTask.setEnqueued(new Date());
-                    runningTask.setIdleSince(new Date());
-                    Order order = new Order();
-                    order.setInProcessSince(new Date());
-                    order.setJobChain("myJobChain");
-                    order.setOrderId("myOrderId");
-                    order.setPath("myPath");
-                    order.setState("myState");
-                    runningTask.setOrder(order);
-                    runningTask.setPid(-1);
-                    runningTask.setStartedAt(new Date());
-                    runningTask.setSteps(-1);
-                    runningTask.setTaskId(-1);
-                    listOfRunningTask.add(runningTask);
-                    // TODO: job.setRunningTasks(listOfRunningTask);
-                    job.setRunningTasks(listOfRunningTask);
-
-                    List<TaskQueue> listOfTasks = new ArrayList<TaskQueue>();
-                    TaskQueue taskQueue = new TaskQueue();
-                    taskQueue.setTaskId(-1);
-                    job.setTaskQueue(listOfTasks);
+                    NodeList queuedTasksNodes = jocXmlCommand.getSosxml().selectNodeList((Element)jobNode, "queued_tasks/queued_task");
+                    List<TaskQueue> queuedTasks = new ArrayList<TaskQueue>();
+                    if (queuedTasksNodes != null && queuedTasksNodes.getLength() > 0) {
+                        for(int queuedTasksCount = 0; queuedTasksCount < paramsNodes.getLength(); queuedTasksCount++) {
+                            TaskQueue taskQueue = new TaskQueue();
+                            Element taskQueueElement = (Element)queuedTasksNodes.item(queuedTasksCount);
+                            taskQueue.setTaskId(Integer.parseInt(taskQueueElement.getAttribute("id")));
+                            taskQueue.setEnqueued(getDateFromString(taskQueueElement.getAttribute("enqueued")));
+                        }
+                        job.setTaskQueue(queuedTasks);
+                    } else {
+                        job.setTaskQueue(null);
+                    }
+                    
+                    if (job.getNumOfRunningTasks() > 0) {
+                        NodeList runningTasksNodes = jocXmlCommand.getSosxml().selectNodeList((Element)jobNode, "tasks/task");
+                        List<RunningTask> runningTasks = new ArrayList<RunningTask>();
+                        for (int runningTasksCount = 0; runningTasksCount < runningTasksNodes.getLength(); runningTasksCount++) {
+                            RunningTask task = new RunningTask();
+                            Element taskElement = (Element)runningTasksNodes.item(runningTasksCount);
+                            task.setCause(RunningTask.Cause.valueOf(taskElement.getAttribute("cause")));
+                            task.setEnqueued(getDateFromString(taskElement.getAttribute("enqueued")));
+                            task.setIdleSince(getDateFromString(taskElement.getAttribute("idle_since")));
+                            if(taskElement.getAttribute("pid") != null && !taskElement.getAttribute("pid").isEmpty()){
+                                task.setPid(Integer.parseInt(taskElement.getAttribute("pid")));
+                            }
+                            task.setStartedAt(getDateFromString(taskElement.getAttribute("start_at")));
+                            if(taskElement.getAttribute("steps") != null && !taskElement.getAttribute("steps").isEmpty()) {
+                            task.setSteps(Integer.parseInt(taskElement.getAttribute("steps")));
+                            }
+                            if(taskElement.getAttribute("id") != null && !taskElement.getAttribute("id").isEmpty()){
+                                task.setTaskId(Integer.parseInt(taskElement.getAttribute("id")));
+                            }
+                            Element orderElement = (Element)jocXmlCommand.getSosxml().selectSingleNode(taskElement, "order");
+                            if(orderElement != null) {
+                                Order order = new Order();
+                                order.setInProcessSince(getDateFromString(orderElement.getAttribute("in_process_since")));
+                                order.setJobChain(orderElement.getAttribute("job_chain"));
+                                order.setOrderId(orderElement.getAttribute("id"));
+                                order.setPath(orderElement.getAttribute("path"));
+                                order.setState(orderElement.getAttribute("state"));
+                                task.setOrder(order);
+                            }
+                            runningTasks.add(task);
+                        }
+                        job.setRunningTasks(runningTasks);
+                    } else {
+                        job.setRunningTasks(null);
+                    }
 
                     job.setTemporary(false);
                 }
-
                 listJobs.add(job);
             }
             entity.setJobs(listJobs);
-
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
-
     }
+
 }
