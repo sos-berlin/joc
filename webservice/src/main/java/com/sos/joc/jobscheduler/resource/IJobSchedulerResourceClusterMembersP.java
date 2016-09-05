@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
+import com.sos.joc.model.common.JobSchedulerFilterSchema;
 
 public interface IJobSchedulerResourceClusterMembersP {
 
@@ -18,7 +18,7 @@ public interface IJobSchedulerResourceClusterMembersP {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobschedulerClusterMembers(@HeaderParam("access_token") String accessToken,
-            JobSchedulerDefaultBody jobSchedulerDefaultBody) throws Exception;
+            JobSchedulerFilterSchema jobSchedulerFilterSchema) throws Exception;
 
  
 

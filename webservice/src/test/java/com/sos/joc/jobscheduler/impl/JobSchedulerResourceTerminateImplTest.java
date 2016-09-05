@@ -1,13 +1,12 @@
 package com.sos.joc.jobscheduler.impl;
 
-import static org.junit.Assert.*;
- 
+  
 
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceModifyJobSchedulerImpl;
-import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerBody;
+import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
 
 public class JobSchedulerResourceTerminateImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -18,11 +17,11 @@ public class JobSchedulerResourceTerminateImplTest {
            
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody = new JobSchedulerModifyJobSchedulerBody();
-        jobSchedulerTerminateBody.setJobschedulerId("scheduler_current");
-        jobSchedulerTerminateBody.setTimeout(30);
+        UrlTimeoutParamSchema urlTimeoutParamSchema = new UrlTimeoutParamSchema();
+        urlTimeoutParamSchema.setJobschedulerId("scheduler_current");
+        urlTimeoutParamSchema.setTimeout(30);
         JobSchedulerResourceModifyJobSchedulerImpl jobschedulerResourceTerminateImpl = new JobSchedulerResourceModifyJobSchedulerImpl();
-        jobschedulerResourceTerminateImpl.postJobschedulerTerminate(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerTerminateBody);
+        jobschedulerResourceTerminateImpl.postJobschedulerTerminate(sosShiroCurrentUserAnswer.getAccessToken(), urlTimeoutParamSchema);
     }
     
     @Test
@@ -30,11 +29,11 @@ public class JobSchedulerResourceTerminateImplTest {
            
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody = new JobSchedulerModifyJobSchedulerBody();
-        jobSchedulerTerminateBody.setJobschedulerId("scheduler_current");
-        jobSchedulerTerminateBody.setTimeout(30);
+        UrlTimeoutParamSchema urlTimeoutParamSchema = new UrlTimeoutParamSchema();
+        urlTimeoutParamSchema.setJobschedulerId("scheduler_current");
+        urlTimeoutParamSchema.setTimeout(30);
         JobSchedulerResourceModifyJobSchedulerImpl jobschedulerResourceTerminateImpl = new JobSchedulerResourceModifyJobSchedulerImpl();
-        jobschedulerResourceTerminateImpl.postJobschedulerRestartTerminate(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerTerminateBody);
+        jobschedulerResourceTerminateImpl.postJobschedulerRestartTerminate(sosShiroCurrentUserAnswer.getAccessToken(), urlTimeoutParamSchema);
     }
 
 }

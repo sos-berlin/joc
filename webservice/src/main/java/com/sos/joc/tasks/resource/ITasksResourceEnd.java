@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.tasks.post.kill.TasksKillBody;
+import com.sos.joc.model.job.ModifyTasksSchema;
  
 public interface ITasksResourceEnd {
 
@@ -17,6 +17,6 @@ public interface ITasksResourceEnd {
     @Path("end")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTasksEnd(@HeaderParam("access_token") String accessToken, TasksKillBody tasksKillBody) throws Exception;
+    public JOCDefaultResponse postTasksEnd(@HeaderParam("access_token") String accessToken, ModifyTasksSchema modifyTasksSchema) throws Exception;
 
 }

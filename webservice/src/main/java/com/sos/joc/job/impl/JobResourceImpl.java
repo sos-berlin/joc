@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
-import com.sos.joc.classes.JOCDefaultResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.job.post.JobBody;
 import com.sos.joc.job.resource.IJobResource;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.ConfigurationStatusSchema.Text;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.Job200VSchema;
+import com.sos.joc.model.job.JobFilterSchema;
 import com.sos.joc.model.job.Job_;
 import com.sos.joc.model.job.Lock_;
 import com.sos.joc.model.job.Order;
@@ -23,11 +23,11 @@ import com.sos.joc.model.job.OrdersSummary;
 
 @Path("job")
 public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
-    private static final Logger LOGGER = Logger.getLogger(JobResourceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceImpl.class);
 
-    public JOCDefaultResponse postJob(String accessToken, JobBody jobBody) throws Exception {
+    public JOCDefaultResponse postJob(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
         LOGGER.debug("init Job");
-        JOCDefaultResponse jocDefaultResponse = init(jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -77,7 +77,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
             listOfLocks.add(lock2);
             job.setLocks(listOfLocks);
 
-            if (jobBody.getCompact()) {
+            if (jobFilterSchema.getCompact()) {
                 job.setAllSteps(-1);
                 job.setAllTasks(-1);
 

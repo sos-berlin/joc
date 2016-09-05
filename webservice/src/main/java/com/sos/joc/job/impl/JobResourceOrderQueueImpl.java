@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.job.post.JobOrderQueueBody;
 import com.sos.joc.job.resource.IJobResourceOrderQueue;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.common.ConfigurationStatusSchema.Text;
 import com.sos.joc.model.job.Job200VSchema;
+import com.sos.joc.model.job.JobOrderQueueFilterSchema;
 import com.sos.joc.model.job.Job_;
 import com.sos.joc.model.job.Lock_;
 import com.sos.joc.model.job.Order;
@@ -27,13 +27,13 @@ import com.sos.joc.model.job.RunningTask.Cause;
 
 @Path("job")
 public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobResourceOrderQueue {
-    private static final Logger LOGGER = Logger.getLogger(JobResourceOrderQueueImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceOrderQueueImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobOrderQueue(String accessToken, JobOrderQueueBody jobOrderQueueBody) throws Exception {
+    public JOCDefaultResponse postJobOrderQueue(String accessToken, JobOrderQueueFilterSchema jobOrderQueueFilterSchema) throws Exception {
 
         LOGGER.debug("init JobsP");
-        JOCDefaultResponse jocDefaultResponse = init(jobOrderQueueBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(jobOrderQueueFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
 
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -84,7 +84,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
             listOfLocks.add(lock2);
             job.setLocks(listOfLocks);
 
-            if (jobOrderQueueBody.getCompact()) {
+            if (jobOrderQueueFilterSchema.getCompact()) {
                 job.setAllSteps(-1);
                 job.setAllTasks(-1);
 

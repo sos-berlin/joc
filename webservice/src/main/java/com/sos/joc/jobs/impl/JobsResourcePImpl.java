@@ -4,29 +4,29 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
-import com.sos.joc.jobs.post.JobsBody;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.Job;
+import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsPSchema;
 import com.sos.joc.model.job.Lock;
 
 @Path("jobs")
 public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP {
-    private static final Logger LOGGER = Logger.getLogger(JobsResourcePImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobsP(String accessToken, JobsBody jobsBody) throws Exception {
+    public JOCDefaultResponse postJobsP(String accessToken, JobsFilterSchema jobsFilterSchema) throws Exception {
  
         
         LOGGER.debug("init JobsP");
-        JOCDefaultResponse jocDefaultResponse = init(jobsBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());       
+        JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());       
 
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -40,7 +40,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             entity.setDeliveryDate(new Date());
             List<Job> listJobs = new ArrayList<Job>();
             
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection(),jobsBody.getJobschedulerId());
+            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection(),jobsFilterSchema.getJobschedulerId());
             List<DBItemInventoryJob> listOfJobs = dbLayer.getInventoryJobs();
             for (DBItemInventoryJob inventoryJob : listOfJobs) {
                 Job job = new Job();

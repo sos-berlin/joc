@@ -2,7 +2,8 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -10,8 +11,8 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerClusterBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
+import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdTerminate;
 import com.sos.scheduler.model.objects.Spooler;
@@ -20,8 +21,8 @@ import com.sos.scheduler.model.objects.Spooler;
 
 public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobSchedulerCluster {
 
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
-    private JobSchedulerModifyJobSchedulerClusterBody jobSchedulerModifyJobSchedulerClusterBody;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
+    private UrlTimeoutParamSchema jobSchedulerModifyJobSchedulerClusterBody;
 
     private JOCDefaultResponse check(boolean right) {
         try {
@@ -37,7 +38,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
 
     }
 
-    private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String restart, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) {
+    private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String restart, UrlTimeoutParamSchema urlTimeoutParamSchema) {
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
@@ -47,7 +48,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             jsCmdTerminate.setAllSchedulersIfNotEmpty(WebserviceConstants.YES);
             jsCmdTerminate.setContinueExclusiveOperationIfNotEmpty(WebserviceConstants.NO);
             jsCmdTerminate.setRestartIfNotEmpty(restart);
-            jsCmdTerminate.setTimeoutIfNotEmpty(jobSchedulerClusterTerminateBody.getTimeoutAsString());
+            jsCmdTerminate.setTimeoutIfNotEmpty(urlTimeoutParamSchema.getTimeout());
 
             jocXmlCommand.excutePost(schedulerObjectFactory.toXMLString(jsCmdTerminate));
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
@@ -56,47 +57,47 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
         }
     }
 
-    private void init(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerModifyJobSchedulerClusterBody) {
-        this.jobSchedulerModifyJobSchedulerClusterBody = jobSchedulerModifyJobSchedulerClusterBody;
+    private void init(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) {
+        this.jobSchedulerModifyJobSchedulerClusterBody = urlTimeoutParamSchema;
         this.jobschedulerUser = new JobSchedulerUser(accessToken);
 
-        jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerModifyJobSchedulerClusterBody.getJobschedulerId());
+        jobSchedulerIdentifier = new JobSchedulerIdentifier(urlTimeoutParamSchema.getJobschedulerId());
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
-        init(accessToken, jobSchedulerClusterTerminateBody);
+    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+        init(accessToken, urlTimeoutParamSchema);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminate());
 
         if (JOCDefaultResponse != null) {
             return JOCDefaultResponse;
         }
 
-        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, jobSchedulerClusterTerminateBody);
+        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, urlTimeoutParamSchema);
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
-        init(accessToken, jobSchedulerClusterTerminateBody);
+    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+        init(accessToken, urlTimeoutParamSchema);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isRestart());
 
         if (JOCDefaultResponse != null) {
             return JOCDefaultResponse;
         }
 
-        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.YES, jobSchedulerClusterTerminateBody);
+        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.YES, urlTimeoutParamSchema);
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, JobSchedulerModifyJobSchedulerClusterBody jobSchedulerClusterTerminateBody) throws Exception {
-        init(accessToken, jobSchedulerClusterTerminateBody);
+    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+        init(accessToken, urlTimeoutParamSchema);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminateFailSafe());
 
         if (JOCDefaultResponse != null) {
             return JOCDefaultResponse;
         }
 
-        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, jobSchedulerClusterTerminateBody);
+        return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, urlTimeoutParamSchema);
     }
 
 }

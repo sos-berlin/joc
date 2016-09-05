@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.jobs.post.Folder;
-import com.sos.joc.jobs.post.JobsBody;
+import com.sos.joc.model.common.FoldersSchema;
+import com.sos.joc.model.job.JobsFilterSchema;
 
 
 public class JobsUtils {
@@ -32,12 +32,12 @@ public class JobsUtils {
         return date;
     }
     
-    public static String createPostCommand(final JobsBody body) {
+    public static String createPostCommand(final JobsFilterSchema body) {
         StringBuilder postCommand = new StringBuilder();
         boolean compact = body.getCompact();
         postCommand.append("<commands>");
         if (!body.getFolders().isEmpty()) {
-            for (Folder folder : body.getFolders()) {
+            for (FoldersSchema folder : body.getFolders()) {
                 postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders task_queue");
                 if(!compact){
                     postCommand.append(" job_params");

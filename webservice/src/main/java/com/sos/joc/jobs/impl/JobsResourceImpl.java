@@ -1,13 +1,13 @@
 package com.sos.joc.jobs.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -17,45 +17,38 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.jobs.JobsUtils;
-import com.sos.joc.jobs.post.JobsBody;
 import com.sos.joc.jobs.resource.IJobsResource;
-import com.sos.joc.model.common.ConfigurationStatusSchema;
-import com.sos.joc.model.common.ConfigurationStatusSchema.Text;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.Job_;
+import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsVSchema;
 import com.sos.joc.model.job.Lock_;
 import com.sos.joc.model.job.Order;
-import com.sos.joc.model.job.OrderQueue;
-import com.sos.joc.model.job.OrderQueue.Type;
-import com.sos.joc.model.job.OrdersSummary;
-import com.sos.joc.model.job.ProcessingState;
 import com.sos.joc.model.job.RunningTask;
-import com.sos.joc.model.job.RunningTask.Cause;
 import com.sos.joc.model.job.State_;
 import com.sos.joc.model.job.TaskQueue;
 
 @Path("jobs")
 public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
-    private static final Logger LOGGER = Logger.getLogger(JobsResourceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceImpl.class);
     
     @Override
-    public JOCDefaultResponse postJobs(String accessToken, JobsBody jobsBody) throws Exception {
+    public JOCDefaultResponse postJobs(String accessToken, JobsFilterSchema jobsFilterSchema) throws Exception {
         LOGGER.debug("init Jobs");
-        JOCDefaultResponse jocDefaultResponse = init(jobsBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
 
-        /* jobsBody.getCompact(); ERLEDIGT */
-        /* jobsBody.getFolders(); ERLEDIGT */ 
-        /* jobsBody.getIsOrderJob(); ERLEDIGT */
-        /* jobsBody.getJobs(); ERLEDIGT */
-//        jobsBody.getDateFrom();
-//        jobsBody.getDateTo();
-//        jobsBody.getRegex();
-//        jobsBody.getTimeZone();
-//        jobsBody.getState();
+        /* jobsFilterSchema.getCompact(); ERLEDIGT */
+        /* jobsFilterSchema.getFolders(); ERLEDIGT */ 
+        /* jobsFilterSchema.getIsOrderJob(); ERLEDIGT */
+        /* jobsFilterSchema.getJobs(); ERLEDIGT */
+//        jobsFilterSchema.getDateFrom();
+//        jobsFilterSchema.getDateTo();
+//        jobsFilterSchema.getRegex();
+//        jobsFilterSchema.getTimeZone();
+//        jobsFilterSchema.getState();
         try {
  
             JobsVSchema entity = new JobsVSchema();
@@ -63,15 +56,15 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             //FOLDERS ERLEDIGT
             //COMPACT ERLEDIGT
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            String postCommand = JobsUtils.createPostCommand(jobsBody);
+            String postCommand = JobsUtils.createPostCommand(jobsFilterSchema);
             jocXmlCommand.excutePost(postCommand);
             entity.setDeliveryDate(new Date());
             Date surveyDate = jocXmlCommand.getSurveyDate();
             
-            if(jobsBody.getIsOrderJob() == null) {
+            if(jobsFilterSchema.getIsOrderJob() == null) {
                 // all jobs
                 jocXmlCommand.createNodeList("//jobs/job");
-            } else if(jobsBody.getIsOrderJob()) {
+            } else if(jobsFilterSchema.getIsOrderJob()) {
                 // only order jobs
                 jocXmlCommand.createNodeList("//jobs/job[@order='yes']");
             } else {
@@ -87,6 +80,8 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 if (jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "queued_tasks[@length]") != null) {
                     job.setNumOfQueuedTasks(Integer.valueOf(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode,
                             "queued_tasks/@length")));
+                } else {
+                    job.setNumOfQueuedTasks(0);
                 }
                 NodeList lockNodes = jocXmlCommand.getSosxml().selectNodeList(jobNode, "lock.requestor/lock.use");
                 if (lockNodes != null && lockNodes.getLength() > 0) {
@@ -137,6 +132,8 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                         !"".equalsIgnoreCase(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks[@count]"))) {
                     job.setNumOfRunningTasks(Integer.parseInt(
                             jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks[@count]")));
+                } else {
+                    job.setNumOfRunningTasks(0);
                 }
                 // TODO ConfigurationStatusSchema
 //                ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
@@ -145,7 +142,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 //                configurationStatusSchema.setText(Text.CHANGED_FILE_NOT_LOADED);
 //                job.setConfigurationStatus(configurationStatusSchema);
                 
-                if (!jobsBody.getCompact()) {
+                if (!jobsFilterSchema.getCompact()) {
                     job.setAllSteps(Integer.valueOf(attributes.getNamedItem("all_steps").getNodeValue()));
                     job.setAllTasks(Integer.valueOf(attributes.getNamedItem("all_tasks").getNodeValue()));
                     

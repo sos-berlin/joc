@@ -9,7 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.jobscheduler.post.JobSchedulerAgentsBody;
+import com.sos.joc.model.jobscheduler.AgentFilterSchema;
  
 public interface IJobSchedulerResourceAgents {
  
@@ -19,7 +19,7 @@ public interface IJobSchedulerResourceAgents {
     @Consumes(MediaType.APPLICATION_JSON )
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobschedulerAgents(
-            @HeaderParam("access_token") String accessToken, JobSchedulerAgentsBody jobSchedulerAgentsBody) throws Exception;
+            @HeaderParam("access_token") String accessToken, AgentFilterSchema agentFilterSchema) throws Exception;
     
     
  

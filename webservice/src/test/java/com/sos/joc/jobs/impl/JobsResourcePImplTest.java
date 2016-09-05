@@ -6,9 +6,8 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.jobs.post.JobsBody;
+import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsPSchema;
-import com.sos.joc.model.job.JobsVSchema;
 
 public class JobsResourcePImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -19,10 +18,10 @@ public class JobsResourcePImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobsBody jobsBody = new JobsBody();
-        jobsBody.setJobschedulerId("scheduler_current");
+        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        jobsFilterSchema.setJobschedulerId("scheduler_current");
         JobsResourcePImpl jobsPImpl = new JobsResourcePImpl();
-        JOCDefaultResponse jobsPResponse = jobsPImpl.postJobsP(sosShiroCurrentUserAnswer.getAccessToken(), jobsBody);
+        JOCDefaultResponse jobsPResponse = jobsPImpl.postJobsP(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
         JobsPSchema jobsPSchema = (JobsPSchema) jobsPResponse.getEntity();
         assertEquals("postJobsPTest","Sync_ChainA_ChainB", jobsPSchema.getJobs().get(0).getName());
      }

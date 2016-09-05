@@ -9,8 +9,8 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentsImpl;
-import com.sos.joc.jobscheduler.post.JobSchedulerAgent;
-import com.sos.joc.jobscheduler.post.JobSchedulerAgentsBody;
+import com.sos.joc.model.jobscheduler.AgentFilterSchema;
+import com.sos.joc.model.jobscheduler.Agent_;
 import com.sos.joc.model.jobscheduler.AgentsVSchema;
 
 public class JobSchedulerResourceAgentsImplTest {
@@ -22,15 +22,15 @@ public class JobSchedulerResourceAgentsImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobSchedulerAgentsBody jobSchedulerAgentsBody = new JobSchedulerAgentsBody();
-        ArrayList <JobSchedulerAgent>agents = new ArrayList<JobSchedulerAgent>();
-        JobSchedulerAgent jobSchedulerAgent = new JobSchedulerAgent();
+        AgentFilterSchema agentFilterSchema = new AgentFilterSchema();
+        ArrayList <Agent_>agents = new ArrayList<Agent_>();
+        Agent_ jobSchedulerAgent = new Agent_();
         jobSchedulerAgent.setAgent("http://galadriel:4445");
         agents.add(jobSchedulerAgent);
-        jobSchedulerAgentsBody.setAgents(agents);
-        jobSchedulerAgentsBody.setJobschedulerId("scheduler_current");
+        agentFilterSchema.setAgents(agents);
+        agentFilterSchema.setJobschedulerId("scheduler_current");
         JobSchedulerResourceAgentsImpl jobschedulerResourceAgentsImpl = new JobSchedulerResourceAgentsImpl();
-        JOCDefaultResponse jobschedulerAgentsResponse = jobschedulerResourceAgentsImpl.postJobschedulerAgents(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerAgentsBody);
+        JOCDefaultResponse jobschedulerAgentsResponse = jobschedulerResourceAgentsImpl.postJobschedulerAgents(sosShiroCurrentUserAnswer.getAccessToken(), agentFilterSchema);
         AgentsVSchema agentsVSchema = (AgentsVSchema) jobschedulerAgentsResponse.getEntity();
         assertEquals("postjobschedulerAgentsTest", "http://galadriel:4445", agentsVSchema.getAgents().get(0).getUrl());
      }

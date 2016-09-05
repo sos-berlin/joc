@@ -7,7 +7,7 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentClustersImpl;
-import com.sos.joc.jobscheduler.post.JobSchedulerAgentClustersBody;
+import com.sos.joc.model.jobscheduler.AgentClusterFilterSchema;
 import com.sos.joc.model.jobscheduler.AgentClustersVSchema;
 
 public class JobSchedulerResourceAgentClustersImplTest {
@@ -19,10 +19,10 @@ public class JobSchedulerResourceAgentClustersImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobSchedulerAgentClustersBody jobSchedulerAgentClustersBody = new JobSchedulerAgentClustersBody();
-        jobSchedulerAgentClustersBody.setJobschedulerId("scheduler_current");
+        AgentClusterFilterSchema agentClusterFilterSchema = new AgentClusterFilterSchema();
+        agentClusterFilterSchema.setJobschedulerId("scheduler_current");
         JobSchedulerResourceAgentClustersImpl jobschedulerResourceAgentClustersImpl = new JobSchedulerResourceAgentClustersImpl();
-        JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceAgentClustersImpl.postJobschedulerAgentClusters(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerAgentClustersBody);
+        JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceAgentClustersImpl.postJobschedulerAgentClusters(sosShiroCurrentUserAnswer.getAccessToken(), agentClusterFilterSchema);
         AgentClustersVSchema agentClustersVSchema = (AgentClustersVSchema) jobschedulerClusterResponse.getEntity();
         assertEquals("postjobschedulerClusterTest", -1, agentClustersVSchema.getAgentClusters().get(0).getNumOfAgents().getAny().intValue());
      }
