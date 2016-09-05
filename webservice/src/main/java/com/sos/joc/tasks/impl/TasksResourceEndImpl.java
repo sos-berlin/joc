@@ -2,13 +2,14 @@ package com.sos.joc.tasks.impl;
 
 import java.util.Date;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.tasks.post.kill.JobKill;
-import com.sos.joc.tasks.post.kill.TasksKillBody;
+import com.sos.joc.model.job.Job____;
+import com.sos.joc.model.job.ModifyTasksSchema;
 import com.sos.joc.tasks.resource.ITasksResourceEnd;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdModifyJob;
@@ -16,9 +17,9 @@ import com.sos.scheduler.model.objects.Spooler;
 
 @Path("tasks")
 public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResourceEnd {
-    private static final Logger LOGGER = Logger.getLogger(TasksResourceEndImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceEndImpl.class);
      
-    private JOCDefaultResponse executeModifyJobCommand(JobKill job, String command) {
+    private JOCDefaultResponse executeModifyJobCommand(Job____ job, String command) {
         try {
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
@@ -41,16 +42,16 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
 
   
     @Override
-    public JOCDefaultResponse postTasksEnd(String accessToken, TasksKillBody tasksKillBody) {
+    public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasksSchema modifyTasksSchema) {
         LOGGER.debug("init Tasks: end");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(tasksKillBody.getJobschedulerId(), getPermissons(accessToken).getJob().isEndAllTasks());
+            jocDefaultResponse = init(modifyTasksSchema.getJobschedulerId(), getPermissons(accessToken).getJob().isEndAllTasks());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (JobKill job : tasksKillBody.getJobs()) {
+            for (Job____ job : modifyTasksSchema.getJobs()) {
                 jocDefaultResponse = executeModifyJobCommand(job,"end");
             }
             

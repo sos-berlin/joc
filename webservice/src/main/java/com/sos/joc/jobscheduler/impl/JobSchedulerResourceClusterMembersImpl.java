@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembers;
+import com.sos.joc.model.common.JobSchedulerFilterSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler_;
 import com.sos.joc.model.jobscheduler.MastersVSchema;
 import com.sos.joc.model.jobscheduler.State;
@@ -18,13 +18,13 @@ import com.sos.joc.model.jobscheduler.State.Text;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) {
+    public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
         LOGGER.debug("init JobschedulerClusterMembers");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerDefaultBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

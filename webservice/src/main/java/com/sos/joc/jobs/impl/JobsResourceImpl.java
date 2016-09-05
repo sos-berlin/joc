@@ -7,22 +7,23 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.jobs.post.Folder;
-import com.sos.joc.jobs.post.JobsBody;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import com.sos.joc.model.common.ConfigurationStatusSchema.Text;
+import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.Job_;
+import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsVSchema;
 import com.sos.joc.model.job.Lock_;
 import com.sos.joc.model.job.Order;
@@ -37,13 +38,13 @@ import com.sos.joc.model.job.TaskQueue;
 
 @Path("jobs")
 public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
-    private static final Logger LOGGER = Logger.getLogger(JobsResourceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceImpl.class);
     
-    private String createPostCommand(JobsBody body) {
+    private String createPostCommand(JobsFilterSchema jobsFilterSchema) {
         StringBuilder postCommand = new StringBuilder();
         postCommand.append("<commands>");
-        if (!body.getFolders().isEmpty()) {
-            for (Folder folder : body.getFolders()) {
+        if (!jobsFilterSchema.getFolders().isEmpty()) {
+            for (FoldersSchema folder : jobsFilterSchema.getFolders()) {
                 postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders task_queue");
                 String path = folder.getFolder();
                 Boolean recursive = folder.getRecursive();
@@ -71,22 +72,22 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
     }
     
     @Override
-    public JOCDefaultResponse postJobs(String accessToken, JobsBody jobsBody) throws Exception {
+    public JOCDefaultResponse postJobs(String accessToken, JobsFilterSchema jobsFilterSchema) throws Exception {
         LOGGER.debug("init Jobs");
-        JOCDefaultResponse jocDefaultResponse = init(jobsBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
 
-        jobsBody.getCompact();
-        jobsBody.getDateFrom();
-        jobsBody.getDateTo();
+        jobsFilterSchema.getCompact();
+        jobsFilterSchema.getDateFrom();
+        jobsFilterSchema.getDateTo();
         /* jobsBody.getFolders(); ERLEDIGT*/ 
-        jobsBody.getIsOrderJob();
-        jobsBody.getJobs();
-        jobsBody.getRegex();
-        jobsBody.getTimeZone();
-        jobsBody.getState();
+        jobsFilterSchema.getIsOrderJob();
+        jobsFilterSchema.getJobs();
+        jobsFilterSchema.getRegex();
+        jobsFilterSchema.getTimeZone();
+        jobsFilterSchema.getState();
         try {
  
             JobsVSchema entity = new JobsVSchema();
@@ -95,7 +96,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             //FOLDERS ERLEDIGT
             //COMPACT
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            String postCommand = createPostCommand(jobsBody);
+            String postCommand = createPostCommand(jobsFilterSchema);
             jocXmlCommand.excutePost(postCommand);
             entity.setDeliveryDate(new Date());
             Date surveyDate = jocXmlCommand.getSurveyDate();
@@ -104,10 +105,10 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             SimpleDateFormat sdf2 = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT2);
 
             
-            if(jobsBody.getIsOrderJob() == null) {
+            if(jobsFilterSchema.getIsOrderJob() == null) {
                 // all jobs
                 jocXmlCommand.createNodeList("//jobs/job");
-            } else if(jobsBody.getIsOrderJob()) {
+            } else if(jobsFilterSchema.getIsOrderJob()) {
                 // only order jobs
                 jocXmlCommand.createNodeList("//jobs/job[@order='yes']");
             } else {
@@ -197,7 +198,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 // TODO: job.setConfigurationStatus(configurationStatusSchema);
                 job.setConfigurationStatus(configurationStatusSchema);
                 
-                if (!jobsBody.getCompact()) {
+                if (!jobsFilterSchema.getCompact()) {
                     job.setAllSteps(Integer.valueOf(attributes.getNamedItem("all_steps").getNodeValue()));
                     job.setAllTasks(Integer.valueOf(attributes.getNamedItem("all_tasks").getNodeValue()));
                     // TODO: job.setDelayUntil(new Date());

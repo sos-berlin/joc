@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.jobs.post.JobsBody;
+import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsVSchema;
 
 public class JobsResourceImplTest {
@@ -18,10 +18,10 @@ public class JobsResourceImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobsBody jobsBody = new JobsBody();
-        jobsBody.setJobschedulerId("scheduler_4444");
+        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        jobsFilterSchema.setJobschedulerId("scheduler_4444");
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
-        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsBody);
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
         JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
         assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
      }

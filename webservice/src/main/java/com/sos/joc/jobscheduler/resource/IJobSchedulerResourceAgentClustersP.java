@@ -9,8 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.jobscheduler.post.JobSchedulerAgentClustersBody;
- 
+import com.sos.joc.model.jobscheduler.AgentClusterFilterSchema;
+  
 public interface IJobSchedulerResourceAgentClustersP {
  
 
@@ -19,7 +19,7 @@ public interface IJobSchedulerResourceAgentClustersP {
     @Consumes(MediaType.APPLICATION_JSON )
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobschedulerAgentClustersP(
-            @HeaderParam("access_token") String accessToken, JobSchedulerAgentClustersBody jobSchedulerAgentClustersBody) throws Exception;
+            @HeaderParam("access_token") String accessToken, AgentClusterFilterSchema jobSchedulerAgentClustersBody) throws Exception;
     
  
   

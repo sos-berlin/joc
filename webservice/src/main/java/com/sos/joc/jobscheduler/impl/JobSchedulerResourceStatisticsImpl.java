@@ -3,13 +3,14 @@ package com.sos.joc.jobscheduler.impl;
 import java.util.Date;
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceStatistics;
+import com.sos.joc.model.common.JobSchedulerFilterSchema;
 import com.sos.joc.model.jobscheduler.JobChains;
 import com.sos.joc.model.jobscheduler.Jobs;
 import com.sos.joc.model.jobscheduler.Orders;
@@ -18,14 +19,14 @@ import com.sos.joc.model.jobscheduler.Tasks;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implements IJobSchedulerResourceStatistics {
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerDefaultBody jobSchedulerStatisticsBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) throws Exception {
 
         LOGGER.debug("init Statistics");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerStatisticsBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

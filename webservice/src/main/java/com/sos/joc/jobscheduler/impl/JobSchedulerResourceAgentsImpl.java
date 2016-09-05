@@ -1,29 +1,30 @@
 package com.sos.joc.jobscheduler.impl;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobscheduler.post.JobSchedulerAgent;
-import com.sos.joc.jobscheduler.post.JobSchedulerAgentsBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgents;
+import com.sos.joc.model.jobscheduler.AgentFilterSchema;
 import com.sos.joc.model.jobscheduler.AgentVSchema;
+import com.sos.joc.model.jobscheduler.Agent_;
 import com.sos.joc.model.jobscheduler.AgentsVSchema;
 import com.sos.joc.model.jobscheduler.State;
 import com.sos.joc.model.jobscheduler.State.Text;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements IJobSchedulerResourceAgents {
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResourceAgentsImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerAgents(String accessToken, JobSchedulerAgentsBody jobSchedulerAgentsBody) {
+    public JOCDefaultResponse postJobschedulerAgents(String accessToken, AgentFilterSchema agentFilterSchema) {
         LOGGER.debug("init JobschedulerAgents");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerAgentsBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(agentFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -38,7 +39,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
 
             // TODO Hier muss die DB gelesen und mit dem Filter gefiltert werden
 
-            for (JobSchedulerAgent agentFilter : jobSchedulerAgentsBody.getAgents()) {
+            for (Agent_ agentFilter : agentFilterSchema.getAgents()) {
                 AgentVSchema agent = new AgentVSchema();
                 agent.setRunningTasks(-1);
                 agent.setStartedAt(new Date());

@@ -6,8 +6,8 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
@@ -18,7 +18,7 @@ import com.sos.joc.model.jobscheduler.JobschedulerIdsSchema;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJobSchedulerResourceIds {
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResourceIdsImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceIdsImpl.class);
 
     @Override
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {

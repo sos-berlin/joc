@@ -2,17 +2,15 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
-import com.sos.joc.jobscheduler.post.JobSchedulerModifyJobSchedulerBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
+import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdModifySpooler;
 import com.sos.scheduler.model.objects.Spooler;
@@ -20,13 +18,13 @@ import com.sos.scheduler.model.objects.Spooler;
 @Path("jobscheduler")
 
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobScheduler {
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
-    protected JobSchedulerModifyJobSchedulerBody jobSchedulerModifyJobSchedulerBody;
+    protected UrlTimeoutParamSchema urlTimeoutParamSchema;
 
     private JOCDefaultResponse check(boolean right) {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerModifyJobSchedulerBody.getJobschedulerId(),right);
+            JOCDefaultResponse jocDefaultResponse = init(urlTimeoutParamSchema.getJobschedulerId(),right);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -47,7 +45,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
             schedulerObjectFactory.initMarshaller(Spooler.class);
             JSCmdModifySpooler jsCmdModifySpooler = new JSCmdModifySpooler(schedulerObjectFactory);
             jsCmdModifySpooler.setCmd(cmd);
-            jsCmdModifySpooler.setTimeoutIfNotEmpty(jobSchedulerModifyJobSchedulerBody.getTimeoutAsString());
+            jsCmdModifySpooler.setTimeoutIfNotEmpty(urlTimeoutParamSchema.getTimeout());
 
             String xml = schedulerObjectFactory.toXMLString(jsCmdModifySpooler);
             jocXmlCommand.excutePost(xml);
@@ -57,8 +55,8 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         }
     }
 
-    private void init(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) {
-        this.jobSchedulerModifyJobSchedulerBody = jobSchedulerTerminateBody;
+    private void init(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) {
+        this.urlTimeoutParamSchema = jobSchedulerTerminateBody;
         this.jobschedulerUser = new JobSchedulerUser(accessToken);
 
         jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerTerminateBody.getJobschedulerId());
@@ -68,9 +66,9 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
 
-        init(accessToken, jobSchedulerTerminateBody);
+        init(accessToken, urlTimeoutParamSchema);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isTerminate());
 
         if (JOCDefaultResponse != null) {
@@ -81,9 +79,9 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
 
-        init(accessToken, jobSchedulerTerminateBody);
+        init(accessToken, urlTimeoutParamSchema);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isTerminate());
 
         if (JOCDefaultResponse != null) {
@@ -94,9 +92,9 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerAbort(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerAbort(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
 
-        init(accessToken, jobSchedulerTerminateBody);
+        init(accessToken, urlTimeoutParamSchema);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isAbort());
 
         if (JOCDefaultResponse != null) {
@@ -107,7 +105,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
         init(accessToken, jobSchedulerTerminateBody);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isAbort());
 
@@ -119,7 +117,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerPause(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerPause(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
         init(accessToken, jobSchedulerTerminateBody);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isPause());
 
@@ -131,7 +129,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerContinue(String accessToken, JobSchedulerModifyJobSchedulerBody jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerContinue(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
         init(accessToken, jobSchedulerTerminateBody);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isContinue());
 

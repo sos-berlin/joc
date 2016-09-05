@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.jobs.post.commands.start.StartJobsBody;
+import com.sos.joc.model.job.StartJobsSchema;
 
 public interface IJobsResourceCommandStartJob {
 
@@ -16,6 +16,6 @@ public interface IJobsResourceCommandStartJob {
     @Path("start")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsStart(@HeaderParam("access_token") String accessToken, StartJobsBody startJobsBody) throws Exception;
+    public JOCDefaultResponse postJobsStart(@HeaderParam("access_token") String accessToken, StartJobsSchema startJobsSchema) throws Exception;
 
 }

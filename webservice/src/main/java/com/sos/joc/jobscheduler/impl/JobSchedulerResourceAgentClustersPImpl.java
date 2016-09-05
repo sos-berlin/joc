@@ -3,13 +3,13 @@ package com.sos.joc.jobscheduler.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobscheduler.post.JobSchedulerAgentClustersBody;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
 import com.sos.joc.model.jobscheduler.Agent;
+import com.sos.joc.model.jobscheduler.AgentClusterFilterSchema;
 import com.sos.joc.model.jobscheduler.AgentClusterPSchema;
 import com.sos.joc.model.jobscheduler.AgentClustersPSchema;
 import com.sos.joc.model.jobscheduler.NumOfAgents;
@@ -20,10 +20,10 @@ import com.sos.joc.model.jobscheduler.State_;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, JobSchedulerAgentClustersBody jobSchedulerAgentClustersBody) {
+    public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilterSchema jobSchedulerAgentClustersBody) {
         LOGGER.debug("init JobschedulerAgentClustersP");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerAgentClustersBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());

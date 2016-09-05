@@ -6,25 +6,26 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.job.History;
 import com.sos.joc.model.job.HistorySchema;
+import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.State.Text;
-import com.sos.joc.tasks.post.TasksHistoryBody;
 import com.sos.joc.tasks.resource.ITasksResourceHistory;
 
 @Path("tasks")
 public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksResourceHistory {
-    private static final Logger LOGGER = Logger.getLogger(TasksResourceHistoryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceHistoryImpl.class);
 
     @Override
-    public JOCDefaultResponse postTasksHistory(String accessToken, TasksHistoryBody tasksHistoryBody) throws Exception {
+    public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilterSchema jobsFilterSchema) throws Exception {
         LOGGER.debug("init Tasks History");
-        JOCDefaultResponse jocDefaultResponse = init( tasksHistoryBody.getJobschedulerId(), getPermissons(accessToken).getHistory().isView());
+        JOCDefaultResponse jocDefaultResponse = init( jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getHistory().isView());
 
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;

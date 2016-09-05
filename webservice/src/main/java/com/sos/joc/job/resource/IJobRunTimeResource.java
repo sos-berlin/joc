@@ -8,13 +8,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.job.post.JobRunTimeBody;
+import com.sos.joc.model.job.JobFilterSchema;
 
 public interface IJobRunTimeResource {
 
     @POST
     @Path("runtime")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobRunTime(@HeaderParam("access_token") String accessToken, JobRunTimeBody jobRunTimeBody) throws Exception;
+    public JOCDefaultResponse postJobRunTime(@HeaderParam("access_token") String accessToken, JobFilterSchema jobFilterSchema) throws Exception;
 
 }

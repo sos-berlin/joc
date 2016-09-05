@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.job.post.JobConfigurationBody;
+import com.sos.joc.model.job.JobConfigurationFilterSchema;
 
 public interface IJobResourceConfiguration {
 
@@ -16,7 +16,7 @@ public interface IJobResourceConfiguration {
     @Path("configuration")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobConfiguration(            
-            @HeaderParam("access_token") String accessToken, JobConfigurationBody jobConfigurationBody) throws Exception;
+            @HeaderParam("access_token") String accessToken, JobConfigurationFilterSchema jobConfigurationFilterSchema) throws Exception;
 
    
  

@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
+import com.sos.joc.model.common.JobSchedulerFilterSchema;
 import com.sos.joc.model.common.OkSchema;
 
 public class JobSchedulerResourceSwitchImplTest {
@@ -18,10 +18,10 @@ public class JobSchedulerResourceSwitchImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobSchedulerDefaultBody jobSchedulerDefaultBody = new JobSchedulerDefaultBody();
-        jobSchedulerDefaultBody.setJobschedulerId("scheduler_current");
+        JobSchedulerFilterSchema jobSchedulerFilterSchema = new JobSchedulerFilterSchema();
+        jobSchedulerFilterSchema.setJobschedulerId("scheduler_current");
         JobSchedulerResourceSwitchImpl jobSchedulerResourceSwitchImpl= new JobSchedulerResourceSwitchImpl();
-        JOCDefaultResponse jobschedulerClusterResponse = jobSchedulerResourceSwitchImpl.postJobschedulerSwitch(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerDefaultBody);
+        JOCDefaultResponse jobschedulerClusterResponse = jobSchedulerResourceSwitchImpl.postJobschedulerSwitch(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerFilterSchema);
         OkSchema okSchema = (OkSchema) jobschedulerClusterResponse.getEntity();
         assertEquals("postjobschedulerSwitchTest", true, okSchema.getOk());
      }

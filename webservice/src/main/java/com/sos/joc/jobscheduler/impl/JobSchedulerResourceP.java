@@ -2,14 +2,14 @@ package com.sos.joc.jobscheduler.impl;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
-
-import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.auth.classes.JobSchedulerIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
-import com.sos.joc.jobscheduler.post.JobSchedulerDefaultBody;
+import com.sos.joc.model.common.JobSchedulerFilterSchema;
 import com.sos.joc.model.jobscheduler.ClusterMemberTypeSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler;
 import com.sos.joc.model.jobscheduler.Jobscheduler200PSchema;
@@ -18,14 +18,14 @@ import com.sos.joc.model.jobscheduler.Supervisor;
 
 public class JobSchedulerResourceP extends JOCResourceImpl {
 
-    private static final Logger LOGGER = Logger.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
     private String accessToken;
-    private JobSchedulerDefaultBody jobSchedulerDefaultBody;
+    private JobSchedulerFilterSchema jobSchedulerFilterSchema;
 
-    public JobSchedulerResourceP(String accessToken, JobSchedulerDefaultBody jobSchedulerDefaultBody) {
+    public JobSchedulerResourceP(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
         super();
         this.accessToken = accessToken;
-        this.jobSchedulerDefaultBody = jobSchedulerDefaultBody;
+        this.jobSchedulerFilterSchema = jobSchedulerFilterSchema;
         jobschedulerUser = new JobSchedulerUser(accessToken);
     }
 
@@ -33,7 +33,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
 
         LOGGER.debug("init JobschedulerClusterMembers");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerDefaultBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -52,7 +52,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
 
             Jobscheduler jobscheduler = new Jobscheduler();
             jobscheduler.setHost(dbItemInventoryInstance.getHostname());
-            jobscheduler.setJobschedulerId(jobSchedulerDefaultBody.getJobschedulerId());
+            jobscheduler.setJobschedulerId(jobSchedulerFilterSchema.getJobschedulerId());
             jobscheduler.setPort(dbItemInventoryInstance.getPort());
             jobscheduler.setStartedAt(dbItemInventoryInstance.getStartTime());
 
