@@ -5,8 +5,9 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
@@ -18,7 +19,7 @@ import com.sos.joc.model.job.JobsVSchema;
 public class JobsResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
     private static final String LDAP_USER = "root";
-    private static final Logger LOGGER = Logger.getLogger(JobsResourceImplTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceImplTest.class);
      
     @Test
     public void postMinConfJobsTest() throws Exception   {

@@ -18,15 +18,10 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.jobs.JobsUtils;
 import com.sos.joc.jobs.resource.IJobsResource;
-import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.Job_;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsVSchema;
-import com.sos.joc.model.job.Lock_;
-import com.sos.joc.model.job.Order;
-import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.State_;
-import com.sos.joc.model.job.TaskQueue;
 
 @Path("jobs")
 public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
@@ -44,12 +39,13 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
         /* jobsFilterSchema.getFolders(); ERLEDIGT */ 
         /* jobsFilterSchema.getIsOrderJob(); ERLEDIGT */
         /* jobsFilterSchema.getJobs(); ERLEDIGT */
-//        jobsFilterSchema.getDateFrom();
-//        jobsFilterSchema.getDateTo();
-//        jobsFilterSchema.getRegex();
-//        jobsFilterSchema.getTimeZone();
-//        jobsFilterSchema.getState();
+//        jobsFilterSchema.getDateFrom(); TODO
+//        jobsFilterSchema.getDateTo(); TODO
+//        jobsFilterSchema.getRegex(); TODO
+//        jobsFilterSchema.getTimeZone(); TODO
+//        jobsFilterSchema.getState(); TODO
         try {
+            LOGGER.debug("init Jobs");
  
             JobsVSchema entity = new JobsVSchema();
             List<Job_> listJobs = new ArrayList<Job_>();
@@ -73,48 +69,31 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             }
             for(int i = 0; i < jocXmlCommand.getNodeList().getLength(); i++) {
                 Node jobNode = jocXmlCommand.getNodeList().item(i);
+                if (!JobsUtils.filterJob(jobsFilterSchema, jobNode)) {
+                    continue;
+                }
                 Job_ job = new Job_();
                 if (surveyDate != null) {
                     job.setSurveyDate(surveyDate);
                 }
+
                 if (jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "queued_tasks[@length]") != null) {
-                    job.setNumOfQueuedTasks(Integer.valueOf(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode,
+                    job.setNumOfQueuedTasks(Integer.valueOf(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, 
                             "queued_tasks/@length")));
                 } else {
                     job.setNumOfQueuedTasks(0);
                 }
+                
                 NodeList lockNodes = jocXmlCommand.getSosxml().selectNodeList(jobNode, "lock.requestor/lock.use");
-                if (lockNodes != null && lockNodes.getLength() > 0) {
-                    List<Lock_> listOfLocks = new ArrayList<Lock_>();
-                    for (int j = 0; j < lockNodes.getLength(); j ++) {
-                        Node lockNode = lockNodes.item(j);
-                        Lock_ lock = new Lock_(); 
-                        Element lockElement = (Element) lockNode;
-                        if (lockElement.getAttribute("exclusive") != null) {
-                            lock.setExclusive(JobsUtils.getBoolValue(lockElement.getAttribute("exclusive")));
-                        }
-                        if (lockElement.getAttribute("is_available") != null) {
-                            lock.setAvailable(JobsUtils.getBoolValue(lockElement.getAttribute("is_available")));
-                        }
-                        if (lockElement.getAttribute("lock") != null) {
-                            lock.setPath(lockElement.getAttribute("lock"));
-                        }
-                        listOfLocks.add(lock);
-                    }
-                    job.setLocks(listOfLocks);
-                } else {
-                    job.setLocks(null);
-                }
+                job.setLocks(JobsUtils.initLocks(lockNodes));
+
                 NamedNodeMap attributes = jobNode.getAttributes();
                 job.setName(attributes.getNamedItem("name").getNodeValue());
                 job.setPath(attributes.getNamedItem("path").getNodeValue());
+
                 String stateText = attributes.getNamedItem("state").getNodeValue();
                 State_ state = new State_();
-                Integer severity = JobsUtils.getSeverityFromStateText(stateText);
-                if (severity != null) {
-                    state.setSeverity(JobsUtils.getSeverityFromStateText(stateText));
-                }
-                // UpperCase only to prevent error in actual body, re-adjust when model changes
+                state.setSeverity(JobsUtils.getSeverityFromStateText(stateText));
                 state.setText(com.sos.joc.model.job.State_.Text.valueOf(stateText.toUpperCase()));
                 job.setState(state);
                 job.setStateText(stateText);
@@ -157,70 +136,15 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                     }
 
                     NodeList paramsNodes = jocXmlCommand.getSosxml().selectNodeList((Element)jobNode, "params/param");
-                    List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
-                    if (paramsNodes != null && paramsNodes.getLength() > 0) {
-                        for(int paramsCount = 0; paramsCount < paramsNodes.getLength(); paramsCount++) {
-                            NameValuePairsSchema param = new NameValuePairsSchema();
-                            Element paramElement = (Element)paramsNodes.item(paramsCount);
-                            param.setName(paramElement.getAttribute("name"));
-                            param.setValue(paramElement.getAttribute("value"));
-                            params.add(param);
-                        }
-                        job.setParams(params);
-                    } else {
-                        job.setParams(null);
-                    }
+                    job.setParams(JobsUtils.initParameters(paramsNodes));
 
                     NodeList queuedTasksNodes = jocXmlCommand.getSosxml().selectNodeList((Element)jobNode, "queued_tasks/queued_task");
-                    List<TaskQueue> queuedTasks = new ArrayList<TaskQueue>();
-                    if (queuedTasksNodes != null && queuedTasksNodes.getLength() > 0) {
-                        for(int queuedTasksCount = 0; queuedTasksCount < paramsNodes.getLength(); queuedTasksCount++) {
-                            TaskQueue taskQueue = new TaskQueue();
-                            Element taskQueueElement = (Element)queuedTasksNodes.item(queuedTasksCount);
-                            taskQueue.setTaskId(Integer.parseInt(taskQueueElement.getAttribute("id")));
-                            taskQueue.setEnqueued(getDateFromString(taskQueueElement.getAttribute("enqueued")));
-                        }
-                        job.setTaskQueue(queuedTasks);
-                    } else {
-                        job.setTaskQueue(null);
-                    }
+                    job.setTaskQueue(JobsUtils.initQueuedTasks(queuedTasksNodes));
                     
-                    if (job.getNumOfRunningTasks() > 0) {
+                    if (job.getNumOfRunningTasks() != null && job.getNumOfRunningTasks() > 0) {
                         NodeList runningTasksNodes = jocXmlCommand.getSosxml().selectNodeList((Element)jobNode, "tasks/task");
-                        List<RunningTask> runningTasks = new ArrayList<RunningTask>();
-                        for (int runningTasksCount = 0; runningTasksCount < runningTasksNodes.getLength(); runningTasksCount++) {
-                            RunningTask task = new RunningTask();
-                            Element taskElement = (Element)runningTasksNodes.item(runningTasksCount);
-                            task.setCause(RunningTask.Cause.valueOf(taskElement.getAttribute("cause")));
-                            task.setEnqueued(getDateFromString(taskElement.getAttribute("enqueued")));
-                            task.setIdleSince(getDateFromString(taskElement.getAttribute("idle_since")));
-                            if(taskElement.getAttribute("pid") != null && !taskElement.getAttribute("pid").isEmpty()){
-                                task.setPid(Integer.parseInt(taskElement.getAttribute("pid")));
-                            }
-                            task.setStartedAt(getDateFromString(taskElement.getAttribute("start_at")));
-                            if(taskElement.getAttribute("steps") != null && !taskElement.getAttribute("steps").isEmpty()) {
-                            task.setSteps(Integer.parseInt(taskElement.getAttribute("steps")));
-                            }
-                            if(taskElement.getAttribute("id") != null && !taskElement.getAttribute("id").isEmpty()){
-                                task.setTaskId(Integer.parseInt(taskElement.getAttribute("id")));
-                            }
-                            Element orderElement = (Element)jocXmlCommand.getSosxml().selectSingleNode(taskElement, "order");
-                            if(orderElement != null) {
-                                Order order = new Order();
-                                order.setInProcessSince(getDateFromString(orderElement.getAttribute("in_process_since")));
-                                order.setJobChain(orderElement.getAttribute("job_chain"));
-                                order.setOrderId(orderElement.getAttribute("id"));
-                                order.setPath(orderElement.getAttribute("path"));
-                                order.setState(orderElement.getAttribute("state"));
-                                task.setOrder(order);
-                            }
-                            runningTasks.add(task);
-                        }
-                        job.setRunningTasks(runningTasks);
-                    } else {
-                        job.setRunningTasks(null);
+                        job.setRunningTasks(JobsUtils.initRunningTasks(runningTasksNodes, jocXmlCommand));
                     }
-
                     job.setTemporary(false);
                 }
                 listJobs.add(job);
