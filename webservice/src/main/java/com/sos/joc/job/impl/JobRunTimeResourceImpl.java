@@ -1,14 +1,41 @@
 package com.sos.joc.job.impl;
 
-import javax.ws.rs.Path;
+import java.io.StringWriter;
+import java.util.Date;
+import java.util.Properties;
 
+import javax.ws.rs.Path;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.xalan.xsltc.compiler.util.NodeType;
+import org.apache.xml.utils.DOMBuilder;
+import org.apache.xpath.CachedXPathAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import com.lowagie.text.Document;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.jobs.JobsUtils;
 import com.sos.joc.classes.runtime.RunTimeEntity;
 import com.sos.joc.job.resource.IJobRunTimeResource;
+import com.sos.joc.model.common.Runtime200Schema;
+import com.sos.joc.model.common.RuntimeSchema;
 import com.sos.joc.model.job.JobFilterSchema;
  
 @Path("job")
@@ -17,17 +44,35 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 
     @Override
     public JOCDefaultResponse postJobRunTime(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
-        LOGGER.debug("init OrderRunTime");
+        LOGGER.debug("init Job RunTime");
         JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-
         try {
+            Runtime200Schema runTimeAnswer = new Runtime200Schema();
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            String postCommand = JobsUtils.createJobRuntimePostCommand(jobFilterSchema);
+            jocXmlCommand.excutePost(postCommand);
+            runTimeAnswer.setDeliveryDate(new Date());
+            Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode("//job/run_time");
 
-            // TODO JOC Cockpit Webservice
-            RunTimeEntity runTimeEntity = new RunTimeEntity();
-            return JOCDefaultResponse.responseStatus200(runTimeEntity.getEntity());
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Source source = new DOMSource(runtimeNode);
+            StringWriter writer = new StringWriter();
+            Result result = new StreamResult(writer);
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
+            transformer.transform(source, result);
+            
+            String runtime = writer.toString();
+            
+            RuntimeSchema runTime = new RuntimeSchema();
+            runTime.setRunTime(runtime);
+            runTimeAnswer.setRunTime(runTime);
+            return JOCDefaultResponse.responseStatus200(runTimeAnswer);
 
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());

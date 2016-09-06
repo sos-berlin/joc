@@ -1,12 +1,18 @@
 package com.sos.joc.job.impl;
 
 import java.util.Date;
+
 import javax.ws.rs.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Node;
+
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.job.Jobs;
+import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.job.Job;
+import com.sos.joc.classes.jobs.JobsUtils;
 import com.sos.joc.job.resource.IJobResource;
 import com.sos.joc.model.job.Job200VSchema;
 import com.sos.joc.model.job.JobFilterSchema;
@@ -21,18 +27,19 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-
         try {
-
             Job200VSchema entity = new Job200VSchema();
-
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            String postCommand = JobsUtils.createJobPostCommand(jobFilterSchema);
+            jocXmlCommand.excutePost(postCommand);
             entity.setDeliveryDate(new Date());
-            entity.setJob(Jobs.getJob(jobFilterSchema.getCompact()));
-
+            Node jobNode = jocXmlCommand.getSosxml().selectSingleNode("//job");
+            entity.setJob(Job.getJob(jobNode, jocXmlCommand, jobFilterSchema.getCompact()));
+            entity.getJob().setSurveyDate(jocXmlCommand.getSurveyDate());
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
-
     }
+
 }

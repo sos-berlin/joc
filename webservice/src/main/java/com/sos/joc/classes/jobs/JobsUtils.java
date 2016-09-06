@@ -15,6 +15,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
+import com.sos.joc.model.job.JobFilterSchema;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.Lock_;
 import com.sos.joc.model.job.Order;
@@ -51,16 +52,16 @@ public class JobsUtils {
         }
     }
     
-    public static String createPostCommand(final JobsFilterSchema body) {
+    public static String createJobsPostCommand(final JobsFilterSchema body) {
         StringBuilder postCommand = new StringBuilder();
         boolean compact = body.getCompact();
         postCommand.append("<commands>");
         if (!body.getFolders().isEmpty()) {
             for (FoldersSchema folder : body.getFolders()) {
-                postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders task_queue");
+                postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders");
                 postCommand.append(" folders");
                 if(!compact){
-                    postCommand.append(" job_params");
+                    postCommand.append(" task_queue job_params");
                 }
                 String path = folder.getFolder();
                 Boolean recursive = folder.getRecursive();
@@ -78,6 +79,32 @@ public class JobsUtils {
             postCommand.append("\" path=\"/\"/>");
         }
         postCommand.append("</commands>");
+        return postCommand.toString();
+    }
+
+    public static String createJobPostCommand(final JobFilterSchema body) {
+        StringBuilder postCommand = new StringBuilder();
+        boolean compact = body.getCompact();
+        postCommand.append("<commands><show_job");
+        if (!body.getJob().isEmpty()) {
+            if(!compact){
+                postCommand.append(" what=\"job_params task_queue\"");
+            }
+            String path = body.getJob();
+            postCommand.append(" job=\"").append(path).append("\"/>");
+        }
+        postCommand.append("</commands>");
+        return postCommand.toString();
+    }
+
+    public static String createJobRuntimePostCommand(final JobFilterSchema body) {
+        StringBuilder postCommand = new StringBuilder();
+        String path = body.getJob();
+        postCommand.append("<commands><show_job what=\"run_time\"")
+            .append(" job=\"")
+            .append(path)
+            .append("\"/>")
+            .append("</commands>");
         return postCommand.toString();
     }
 
@@ -106,7 +133,7 @@ public class JobsUtils {
         return null;
     }
     
-    public static List<Lock_> initLocks(NodeList lockList) {
+    public static List<Lock_> getLocks(NodeList lockList) {
         if (lockList != null && lockList.getLength() > 0) {
             List<Lock_> listOfLocks = new ArrayList<Lock_>();
             for (int j = 0; j < lockList.getLength(); j ++) {
@@ -129,7 +156,7 @@ public class JobsUtils {
         return null;
     }
     
-    public static List<TaskQueue> initQueuedTasks(NodeList queuedTasksList) throws Exception {
+    public static List<TaskQueue> getQueuedTasks(NodeList queuedTasksList) throws Exception {
         List<TaskQueue> queuedTasks = new ArrayList<TaskQueue>();
         if (queuedTasksList != null && queuedTasksList.getLength() > 0) {
             for(int queuedTasksCount = 0; queuedTasksCount < queuedTasksList.getLength(); queuedTasksCount++) {
@@ -144,7 +171,7 @@ public class JobsUtils {
         }
     }
     
-    public static List<NameValuePairsSchema> initParameters(NodeList paramList) {
+    public static List<NameValuePairsSchema> getParameters(NodeList paramList) {
         List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
         if (paramList != null && paramList.getLength() > 0) {
             for(int paramsCount = 0; paramsCount < paramList.getLength(); paramsCount++) {
@@ -160,7 +187,7 @@ public class JobsUtils {
         }
     }
     
-    public static List<RunningTask> initRunningTasks(NodeList runningTaskList, JOCXmlCommand jocXmlCommand) throws Exception {
+    public static List<RunningTask> getRunningTasks(NodeList runningTaskList, JOCXmlCommand jocXmlCommand) throws Exception {
         List<RunningTask> runningTasks = new ArrayList<RunningTask>();
         if (runningTaskList != null && runningTaskList.getLength() > 0) {
             for (int runningTasksCount = 0; runningTasksCount < runningTaskList.getLength(); runningTasksCount++) {
@@ -197,10 +224,10 @@ public class JobsUtils {
         }
     }
     
-    public static boolean filterJob (JobsFilterSchema filter, Element node, SOSXMLXPath sosXml) throws Exception{
+    public static boolean filterJobs(JobsFilterSchema filter, Element node, SOSXMLXPath sosXml) throws Exception{
         boolean isAvailable = false;
         // no property to compare dateFrom and dateTo to
-        // Klären was für ein Datum relevant ist für den Vergleich
+        // clarification needed of which Date is relevant for comparison
         Date dateFrom = getDateFromString(filter.getDateFrom());
         Date dateTo = getDateFromString(filter.getDateTo());
         // ??? What to do with regex 
