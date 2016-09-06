@@ -189,4 +189,14 @@ public class JobsUtils {
         }
     }
     
+    public static boolean filterJob (JobsFilterSchema filter, Node node) {
+        boolean isAvailable = false;
+//      filter.getDateFrom(); TODO
+//      filter.getDateTo(); TODO
+//      filter.getRegex(); TODO
+//      filter.getTimeZone(); TODO
+//      filter.getState(); TODO
+        return isAvailable;
+    }
+
 }

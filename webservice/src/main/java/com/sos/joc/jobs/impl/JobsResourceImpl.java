@@ -35,28 +35,16 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             return jocDefaultResponse;
         }
 
-        /* jobsFilterSchema.getCompact(); ERLEDIGT */
-        /* jobsFilterSchema.getFolders(); ERLEDIGT */ 
-        /* jobsFilterSchema.getIsOrderJob(); ERLEDIGT */
-        /* jobsFilterSchema.getJobs(); ERLEDIGT */
-//        jobsFilterSchema.getDateFrom(); TODO
-//        jobsFilterSchema.getDateTo(); TODO
-//        jobsFilterSchema.getRegex(); TODO
-//        jobsFilterSchema.getTimeZone(); TODO
-//        jobsFilterSchema.getState(); TODO
         try {
             LOGGER.debug("init Jobs");
  
             JobsVSchema entity = new JobsVSchema();
             List<Job_> listJobs = new ArrayList<Job_>();
-            //FOLDERS ERLEDIGT
-            //COMPACT ERLEDIGT
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             String postCommand = JobsUtils.createPostCommand(jobsFilterSchema);
             jocXmlCommand.excutePost(postCommand);
             entity.setDeliveryDate(new Date());
             Date surveyDate = jocXmlCommand.getSurveyDate();
-            
             if(jobsFilterSchema.getIsOrderJob() == null) {
                 // all jobs
                 jocXmlCommand.createNodeList("//jobs/job");
