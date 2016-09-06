@@ -2,20 +2,19 @@ package com.sos.joc.job.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.job.Jobs;
+import com.sos.joc.classes.parameters.Parameters;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.job.resource.IJobResourceP;
-import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.Job;
 import com.sos.joc.model.job.Job200PSchema;
 import com.sos.joc.model.job.JobFilterSchema;
-import com.sos.joc.model.job.Lock;
 
 @Path("job")
 public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
@@ -51,33 +50,13 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             jobChains.add("myJobChain3");
             job.setJobChains(jobChains);
 
-            List<Lock> listOfLocks = new ArrayList<Lock>();
-            Lock lock = new Lock();
-            lock.setExclusive(false);
-            // lock.setAvailable(true);
-            lock.setPath("myPath");
-            listOfLocks.add(lock);
-            Lock lock2 = new Lock();
-            lock2.setExclusive(true);
-            // lock2.setAvailable(false);
-            lock2.setPath("myPath2");
-            listOfLocks.add(lock2);
-            job.setLocks(listOfLocks);
+  
+            job.setLocks(Jobs.getJobLocks());
 
             job.setMaxTasks(-1);
             job.setName(inventoryJob.getBaseName());
-
-            List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
-            NameValuePairsSchema param1 = new NameValuePairsSchema();
-            NameValuePairsSchema param2 = new NameValuePairsSchema();
-            param1.setName("param1");
-            param1.setValue("value1");
-            param2.setName("param2");
-            param2.setValue("value2");
-            parameters.add(param1);
-            parameters.add(param1);
-
-            job.setParams(parameters);
+ 
+            job.setParams(Parameters.getParameters());
             job.setPath(inventoryJob.getName());
 
             job.setProcessClass("myProcessClass");

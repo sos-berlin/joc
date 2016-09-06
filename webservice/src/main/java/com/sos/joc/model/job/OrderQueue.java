@@ -89,6 +89,9 @@ public class OrderQueue {
      * 
      */
     private String endState;
+    /**
+     * 
+     */
     private ProcessingState processingState;
     /**
      * timestamp

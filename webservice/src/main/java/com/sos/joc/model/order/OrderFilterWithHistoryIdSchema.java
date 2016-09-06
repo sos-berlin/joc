@@ -18,6 +18,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 public class OrderFilterWithHistoryIdSchema {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     private String jobschedulerId;
     /**
      * path
@@ -45,6 +50,8 @@ public class OrderFilterWithHistoryIdSchema {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The jobschedulerId
      */
@@ -53,6 +60,8 @@ public class OrderFilterWithHistoryIdSchema {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param jobschedulerId
      *     The jobschedulerId

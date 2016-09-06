@@ -16,6 +16,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 public class OrderFilterWithCompactSchema {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     private String jobschedulerId;
     /**
      * path
@@ -41,6 +46,8 @@ public class OrderFilterWithCompactSchema {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The jobschedulerId
      */
@@ -49,6 +56,8 @@ public class OrderFilterWithCompactSchema {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param jobschedulerId
      *     The jobschedulerId

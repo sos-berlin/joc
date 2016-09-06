@@ -1,20 +1,20 @@
-package com.sos.joc.order.impl;
+package com.sos.joc.task.impl;
 
 import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.order.resource.IOrderLogHtmlResource;
+import com.sos.joc.task.resource.ITaskLogHtmlResource;
 
-@Path("order")
-public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderLogHtmlResource {
-    private static final Logger LOGGER = Logger.getLogger(OrderLogHtmlResourceImpl.class);
+@Path("task")
+public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLogHtmlResource {
+    private static final Logger LOGGER = Logger.getLogger(TaskLogHtmlResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse getOrderLogHtml(String accessToken, String jobschedulerId) throws Exception {
+    public JOCDefaultResponse getTaskLogHtml(String accessToken, String jobschedulerId) throws Exception {
         LOGGER.debug("init OrderHistory");
 
-        JOCDefaultResponse jocDefaultResponse = init(jobschedulerId, getPermissons(accessToken).getOrder().getView().isOrderLog());
+        JOCDefaultResponse jocDefaultResponse = init(jobschedulerId, getPermissons(accessToken).getJob().getView().isTaskLog());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

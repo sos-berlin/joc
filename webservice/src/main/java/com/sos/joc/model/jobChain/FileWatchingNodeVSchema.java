@@ -1,6 +1,8 @@
 
 package com.sos.joc.model.jobChain;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Generated;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -28,7 +30,7 @@ public class FileWatchingNodeVSchema {
      * 
      */
     private String regex;
-    private Files files;
+    private List<File> files = new ArrayList<File>();
 
     /**
      * 
@@ -79,7 +81,7 @@ public class FileWatchingNodeVSchema {
      * @return
      *     The files
      */
-    public Files getFiles() {
+    public List<File> getFiles() {
         return files;
     }
 
@@ -88,7 +90,7 @@ public class FileWatchingNodeVSchema {
      * @param files
      *     The files
      */
-    public void setFiles(Files files) {
+    public void setFiles(List<File> files) {
         this.files = files;
     }
 

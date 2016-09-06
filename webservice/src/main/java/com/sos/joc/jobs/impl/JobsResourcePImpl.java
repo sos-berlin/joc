@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.job.Jobs;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.NameValuePairsSchema;
@@ -54,18 +55,8 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                 jobChains.add("myJobChain3");
                 job.setJobChains(jobChains);
                 
-                List<Lock> listOfLocks = new ArrayList<Lock>();
-                Lock lock = new Lock();
-                lock.setExclusive(false);
-//                lock.setAvailable(true);
-                lock.setPath("myPath");
-                listOfLocks.add(lock);
-                Lock lock2 = new Lock();
-                lock2.setExclusive(true);
-                //lock2.setAvailable(false);
-                lock2.setPath("myPath2");
-                listOfLocks.add(lock2);
-                job.setLocks(listOfLocks);
+ 
+                job.setLocks(Jobs.getJobLocks());
                 
                 job.setMaxTasks(-1);
                 job.setName(inventoryJob.getBaseName());

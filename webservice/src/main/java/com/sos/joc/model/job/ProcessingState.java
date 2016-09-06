@@ -13,13 +13,20 @@ public class ProcessingState {
 
     /**
      *  1=pending; 0=running; 2=waiting_for_agent,job_chain_stopped,node_stopped,job_stopped; 5=setback,suspended; 3=job_not_in_period,node_delay,waiting_for_lock,waiting_for_process,waiting_for_task
+     * (Required)
      * 
      */
     private Integer severity;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     private ProcessingState.Text text;
 
     /**
      *  1=pending; 0=running; 2=waiting_for_agent,job_chain_stopped,node_stopped,job_stopped; 5=setback,suspended; 3=job_not_in_period,node_delay,waiting_for_lock,waiting_for_process,waiting_for_task
+     * (Required)
      * 
      * @return
      *     The severity
@@ -30,6 +37,7 @@ public class ProcessingState {
 
     /**
      *  1=pending; 0=running; 2=waiting_for_agent,job_chain_stopped,node_stopped,job_stopped; 5=setback,suspended; 3=job_not_in_period,node_delay,waiting_for_lock,waiting_for_process,waiting_for_task
+     * (Required)
      * 
      * @param severity
      *     The severity
@@ -40,6 +48,8 @@ public class ProcessingState {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The text
      */
@@ -48,6 +58,8 @@ public class ProcessingState {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param text
      *     The _text
