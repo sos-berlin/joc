@@ -29,9 +29,9 @@ public class JobsUtils {
     private static final SimpleDateFormat SDF2 = new SimpleDateFormat(WebserviceConstants.JOBSCHEDULER_DATE_FORMAT2);
 
     public static Boolean getBoolValue(final String value) {
-        if("yes".equalsIgnoreCase(value)){
+        if(WebserviceConstants.YES.equalsIgnoreCase(value)){
             return true;
-        } else if("no".equalsIgnoreCase(value)){
+        } else if(WebserviceConstants.NO.equalsIgnoreCase(value)){
             return false;
         }
         return null;
@@ -113,14 +113,14 @@ public class JobsUtils {
                 Node lockNode = lockList.item(j);
                 Lock_ lock = new Lock_(); 
                 Element lockElement = (Element) lockNode;
-                if (lockElement.getAttribute("exclusive") != null) {
-                    lock.setExclusive(JobsUtils.getBoolValue(lockElement.getAttribute("exclusive")));
+                if (lockElement.getAttribute(WebserviceConstants.EXCLUSIVE) != null) {
+                    lock.setExclusive(JobsUtils.getBoolValue(lockElement.getAttribute(WebserviceConstants.EXCLUSIVE)));
                 }
-                if (lockElement.getAttribute("is_available") != null) {
-                    lock.setAvailable(JobsUtils.getBoolValue(lockElement.getAttribute("is_available")));
+                if (lockElement.getAttribute(WebserviceConstants.IS_AVAILABLE) != null) {
+                    lock.setAvailable(JobsUtils.getBoolValue(lockElement.getAttribute(WebserviceConstants.IS_AVAILABLE)));
                 }
-                if (lockElement.getAttribute("lock") != null) {
-                    lock.setPath(lockElement.getAttribute("lock"));
+                if (lockElement.getAttribute(WebserviceConstants.LOCK) != null) {
+                    lock.setPath(lockElement.getAttribute(WebserviceConstants.LOCK));
                 }
                 listOfLocks.add(lock);
             }
@@ -135,8 +135,8 @@ public class JobsUtils {
             for(int queuedTasksCount = 0; queuedTasksCount < queuedTasksList.getLength(); queuedTasksCount++) {
                 TaskQueue taskQueue = new TaskQueue();
                 Element taskQueueElement = (Element)queuedTasksList.item(queuedTasksCount);
-                taskQueue.setTaskId(Integer.parseInt(taskQueueElement.getAttribute("id")));
-                taskQueue.setEnqueued(JobsUtils.getDateFromString(taskQueueElement.getAttribute("enqueued")));
+                taskQueue.setTaskId(Integer.parseInt(taskQueueElement.getAttribute(WebserviceConstants.ID)));
+                taskQueue.setEnqueued(JobsUtils.getDateFromString(taskQueueElement.getAttribute(WebserviceConstants.ENQUEUED)));
             }
             return queuedTasks;
         } else {
@@ -150,8 +150,8 @@ public class JobsUtils {
             for(int paramsCount = 0; paramsCount < paramList.getLength(); paramsCount++) {
                 NameValuePairsSchema param = new NameValuePairsSchema();
                 Element paramElement = (Element)paramList.item(paramsCount);
-                param.setName(paramElement.getAttribute("name"));
-                param.setValue(paramElement.getAttribute("value"));
+                param.setName(paramElement.getAttribute(WebserviceConstants.NAME));
+                param.setValue(paramElement.getAttribute(WebserviceConstants.VALUE));
                 params.add(param);
             }
             return params;
@@ -166,27 +166,27 @@ public class JobsUtils {
             for (int runningTasksCount = 0; runningTasksCount < runningTaskList.getLength(); runningTasksCount++) {
                 RunningTask task = new RunningTask();
                 Element taskElement = (Element) runningTaskList.item(runningTasksCount);
-                task.setCause(RunningTask.Cause.valueOf(taskElement.getAttribute("cause")));
-                task.setEnqueued(getDateFromString(taskElement.getAttribute("enqueued")));
-                task.setIdleSince(getDateFromString(taskElement.getAttribute("idle_since")));
-                if (taskElement.getAttribute("pid") != null && !taskElement.getAttribute("pid").isEmpty()) {
-                    task.setPid(Integer.parseInt(taskElement.getAttribute("pid")));
+                task.setCause(RunningTask.Cause.valueOf(taskElement.getAttribute(WebserviceConstants.CAUSE)));
+                task.setEnqueued(getDateFromString(taskElement.getAttribute(WebserviceConstants.ENQUEUED)));
+                task.setIdleSince(getDateFromString(taskElement.getAttribute(WebserviceConstants.IDLE_SINCE)));
+                if (taskElement.getAttribute(WebserviceConstants.PID) != null && !taskElement.getAttribute(WebserviceConstants.PID).isEmpty()) {
+                    task.setPid(Integer.parseInt(taskElement.getAttribute(WebserviceConstants.PID)));
                 }
-                task.setStartedAt(getDateFromString(taskElement.getAttribute("start_at")));
-                if (taskElement.getAttribute("steps") != null && !taskElement.getAttribute("steps").isEmpty()) {
-                    task.setSteps(Integer.parseInt(taskElement.getAttribute("steps")));
+                task.setStartedAt(getDateFromString(taskElement.getAttribute(WebserviceConstants.START_AT)));
+                if (taskElement.getAttribute(WebserviceConstants.STEPS) != null && !taskElement.getAttribute(WebserviceConstants.STEPS).isEmpty()) {
+                    task.setSteps(Integer.parseInt(taskElement.getAttribute(WebserviceConstants.STEPS)));
                 }
-                if (taskElement.getAttribute("id") != null && !taskElement.getAttribute("id").isEmpty()) {
-                    task.setTaskId(Integer.parseInt(taskElement.getAttribute("id")));
+                if (taskElement.getAttribute(WebserviceConstants.ID) != null && !taskElement.getAttribute(WebserviceConstants.ID).isEmpty()) {
+                    task.setTaskId(Integer.parseInt(taskElement.getAttribute(WebserviceConstants.ID)));
                 }
-                Element orderElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(taskElement, "order");
+                Element orderElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(taskElement, WebserviceConstants.ORDER);
                 if (orderElement != null) {
                     Order order = new Order();
-                    order.setInProcessSince(getDateFromString(orderElement.getAttribute("in_process_since")));
-                    order.setJobChain(orderElement.getAttribute("job_chain"));
-                    order.setOrderId(orderElement.getAttribute("id"));
-                    order.setPath(orderElement.getAttribute("path"));
-                    order.setState(orderElement.getAttribute("state"));
+                    order.setInProcessSince(getDateFromString(orderElement.getAttribute(WebserviceConstants.IN_PROCESS_SINCE)));
+                    order.setJobChain(orderElement.getAttribute(WebserviceConstants.JOB_CHAIN));
+                    order.setOrderId(orderElement.getAttribute(WebserviceConstants.ID));
+                    order.setPath(orderElement.getAttribute(WebserviceConstants.PATH));
+                    order.setState(orderElement.getAttribute(WebserviceConstants.STATE));
                     task.setOrder(order);
                 }
                 runningTasks.add(task);
@@ -212,9 +212,9 @@ public class JobsUtils {
         }
 //        Date runningSince = getDateFromString(sosXml.selectSingleNodeValue(node, "tasks/task/@running_since"));
 //        Date startTime = getDateFromString(sosXml.selectSingleNodeValue(node, "tasks/task/order/@start_time"));
-//        Date nextStartTime = getDateFromString(node.getAttribute("next_start_time"));
-        if(node.getAttribute("state") != null && !node.getAttribute("state").isEmpty() 
-                && stateAvailable(node.getAttribute("state"), filter.getState())){
+//        Date nextStartTime = getDateFromString(node.getAttribute(NEXT_START_TIME));
+        if(node.getAttribute(WebserviceConstants.STATE) != null && !node.getAttribute(WebserviceConstants.STATE).isEmpty() 
+                && stateAvailable(node.getAttribute(WebserviceConstants.STATE), filter.getState())){
             isAvailable = true;
         }
 //        if (dateFrom != null && runningSince != null && dateFrom.compareTo(runningSince) <= 0) {
