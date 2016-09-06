@@ -9,6 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import sos.xml.SOSXMLXPath;
+
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.FoldersSchema;
@@ -17,6 +19,7 @@ import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.Lock_;
 import com.sos.joc.model.job.Order;
 import com.sos.joc.model.job.RunningTask;
+import com.sos.joc.model.job.State___;
 import com.sos.joc.model.job.TaskQueue;
 
 
@@ -35,13 +38,17 @@ public class JobsUtils {
     }
     
     public static Date getDateFromString(final String dateString) throws Exception{
-        Date date = null;
-        if (!dateString.contains("T")) {
-            date = SDF.parse(dateString);
+        if (dateString != null) {
+            Date date = null;
+            if (!dateString.contains("T")) {
+                date = SDF.parse(dateString);
+            } else {
+                date = SDF2.parse(dateString);
+            }
+            return date;
         } else {
-            date = SDF2.parse(dateString);
+            return null;
         }
-        return date;
     }
     
     public static String createPostCommand(final JobsFilterSchema body) {
@@ -51,6 +58,7 @@ public class JobsUtils {
         if (!body.getFolders().isEmpty()) {
             for (FoldersSchema folder : body.getFolders()) {
                 postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders task_queue");
+                postCommand.append(" folders");
                 if(!compact){
                     postCommand.append(" job_params");
                 }
@@ -59,8 +67,8 @@ public class JobsUtils {
                 if(!recursive) {
                     postCommand.append(" no_subfolders");
                 }
-                postCommand.append("\" ");
-                postCommand.append("path=\"").append(path).append("\"/>");
+                postCommand.append("\"");
+                postCommand.append(" path=\"").append(path).append("\"/>");
             }
         } else {
             postCommand.append("<show_state subsystems=\"job\" what=\"job_orders task_queue");
@@ -189,14 +197,45 @@ public class JobsUtils {
         }
     }
     
-    public static boolean filterJob (JobsFilterSchema filter, Node node) {
+    public static boolean filterJob (JobsFilterSchema filter, Element node, SOSXMLXPath sosXml) throws Exception{
         boolean isAvailable = false;
-//      filter.getDateFrom(); TODO
-//      filter.getDateTo(); TODO
-//      filter.getRegex(); TODO
-//      filter.getTimeZone(); TODO
-//      filter.getState(); TODO
+        // no property to compare dateFrom and dateTo to
+        // Klären was für ein Datum relevant ist für den Vergleich
+        Date dateFrom = getDateFromString(filter.getDateFrom());
+        Date dateTo = getDateFromString(filter.getDateTo());
+        // ??? What to do with regex 
+        String regex = filter.getRegex();
+        // ??? What to do with timezone
+        String timezone = filter.getTimeZone();
+        if(dateFrom == null && dateTo == null && regex == null && timezone == null) {
+            return true;
+        }
+//        Date runningSince = getDateFromString(sosXml.selectSingleNodeValue(node, "tasks/task/@running_since"));
+//        Date startTime = getDateFromString(sosXml.selectSingleNodeValue(node, "tasks/task/order/@start_time"));
+//        Date nextStartTime = getDateFromString(node.getAttribute("next_start_time"));
+        if(node.getAttribute("state") != null && !node.getAttribute("state").isEmpty() 
+                && stateAvailable(node.getAttribute("state"), filter.getState())){
+            isAvailable = true;
+        }
+//        if (dateFrom != null && runningSince != null && dateFrom.compareTo(runningSince) <= 0) {
+//            isAvailable = true;
+//        } else {
+//            isAvailable = false;
+//        }
+//        if (dateTo != null && runningSince != null && runningSince.compareTo(dateTo) <= 0) {
+//            isAvailable = true;
+//        } else {
+//            isAvailable = false;
+//        }
         return isAvailable;
     }
 
+    private static boolean stateAvailable(String stateText, List<State___> states) {
+        for(State___ state : states) {
+            if(state.toString().equalsIgnoreCase(stateText)){
+                return true;
+            }
+        }
+        return false;
+    }
 }

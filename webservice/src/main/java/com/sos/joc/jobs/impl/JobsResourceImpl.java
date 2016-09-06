@@ -16,6 +16,7 @@ import org.w3c.dom.NodeList;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.jobs.JobsUtils;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.job.Job_;
@@ -57,7 +58,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             }
             for(int i = 0; i < jocXmlCommand.getNodeList().getLength(); i++) {
                 Node jobNode = jocXmlCommand.getNodeList().item(i);
-                if (!JobsUtils.filterJob(jobsFilterSchema, jobNode)) {
+                if (!JobsUtils.filterJob(jobsFilterSchema, (Element)jobNode, jocXmlCommand.getSosxml())) {
                     continue;
                 }
                 Job_ job = new Job_();
@@ -65,7 +66,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                     job.setSurveyDate(surveyDate);
                 }
 
-                if (jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "queued_tasks[@length]") != null) {
+                if (jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "queued_tasks/@length") != null) {
                     job.setNumOfQueuedTasks(Integer.valueOf(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, 
                             "queued_tasks/@length")));
                 } else {
@@ -95,19 +96,15 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 //                ordersSummary.setWaitingForResource(-1);
 //                job.setOrdersSummary(ordersSummary);
 
-                if (jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks[@count]") != null &&
-                        !"".equalsIgnoreCase(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks[@count]"))) {
+                if (jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks/@count") != null &&
+                        !"".equalsIgnoreCase(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks/@count"))) {
                     job.setNumOfRunningTasks(Integer.parseInt(
-                            jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks[@count]")));
+                            jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "tasks/@count")));
                 } else {
                     job.setNumOfRunningTasks(0);
                 }
-                // TODO ConfigurationStatusSchema
-//                ConfigurationStatusSchema configurationStatusSchema = new ConfigurationStatusSchema();
-//                configurationStatusSchema.setMessage("myMessage");
-//                configurationStatusSchema.setSeverity(-1);
-//                configurationStatusSchema.setText(Text.CHANGED_FILE_NOT_LOADED);
-//                job.setConfigurationStatus(configurationStatusSchema);
+
+                job.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus((Element)jobNode));
                 
                 if (!jobsFilterSchema.getCompact()) {
                     job.setAllSteps(Integer.valueOf(attributes.getNamedItem("all_steps").getNodeValue()));

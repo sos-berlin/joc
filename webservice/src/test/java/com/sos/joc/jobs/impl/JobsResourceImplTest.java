@@ -15,18 +15,20 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsVSchema;
+import com.sos.joc.model.job.State___;
 
 public class JobsResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
     private static final String LDAP_USER = "root";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceImplTest.class);
+    private static final String SCHEDULER_ID = "scheduler_4444";
      
     @Test
     public void postMinConfJobsTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
-        jobsFilterSchema.setJobschedulerId("scheduler_4444");
+        jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
         JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
@@ -39,7 +41,7 @@ public class JobsResourceImplTest {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
-        jobsFilterSchema.setJobschedulerId("scheduler_4444");
+        jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
@@ -53,11 +55,11 @@ public class JobsResourceImplTest {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
-        jobsFilterSchema.setJobschedulerId("scheduler_4444");
+        jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
         List<FoldersSchema> folders = new ArrayList<FoldersSchema>();
         FoldersSchema folder = new FoldersSchema();
-        folder.setFolder("/sos/housekeeping/scheduler_cleanup_history");
+        folder.setFolder("/test_JS-1473");
         folder.setRecursive(true);
         folders.add(folder);
         jobsFilterSchema.setFolders(folders);
@@ -73,7 +75,7 @@ public class JobsResourceImplTest {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
-        jobsFilterSchema.setJobschedulerId("scheduler_4444");
+        jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
         List<FoldersSchema> folders = new ArrayList<FoldersSchema>();
         FoldersSchema folder = new FoldersSchema();
@@ -85,6 +87,37 @@ public class JobsResourceImplTest {
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
         JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
 //        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
+        LOGGER.info(jobsResponse.toString());
+     }
+
+    @Test
+    public void postJobsPendingTest() throws Exception   {
+        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
+        List<State___> states = new ArrayList<State___>();
+        states.add(State___.PENDING);
+        jobsFilterSchema.setState(states);
+        JobsResourceImpl jobsImpl = new JobsResourceImpl();
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
+        JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
+        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
+        LOGGER.info(jobsResponse.toString());
+     }
+
+    @Test
+    public void postJobsFromToTest() throws Exception   {
+        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
+        jobsFilterSchema.setDateFrom("2016-09-06 00:00:00.000Z");
+        jobsFilterSchema.setDateTo("2016-09-06 23:59:59.999Z");
+        JobsResourceImpl jobsImpl = new JobsResourceImpl();
+        JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
+        JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
+        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
      }
 
