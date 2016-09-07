@@ -6,6 +6,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.jobs.JobsUtils;
@@ -68,7 +69,7 @@ public class Job {
 //            job.setNextPeriodBegin("myNextPeriodBegin");
             Node namedItem = attributes.getNamedItem(WebserviceConstants.NEXT_START_TIME);
             if(namedItem != null) {
-                job.setNextStartTime(JobsUtils.getDateFromString(namedItem.getNodeValue()));
+                job.setNextStartTime(JobSchedulerDate.getDate(namedItem.getNodeValue()));
             }
 
             NodeList paramsNodes = jocXmlCommand.getSosxml().selectNodeList((Element)jobNode, "params/param");

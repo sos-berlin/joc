@@ -15,10 +15,8 @@ import org.w3c.dom.Node;
 import com.sos.joc.Globals;
 import com.sos.joc.model.job.JobFilterSchema;
 import com.sos.joc.model.order.OrderFilterSchema;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdShowJob;
 import com.sos.scheduler.model.commands.JSCmdShowOrder;
-import com.sos.scheduler.model.objects.Spooler;
 
 
 public class RunTime {

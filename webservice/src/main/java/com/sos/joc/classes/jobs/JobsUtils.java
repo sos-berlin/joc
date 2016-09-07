@@ -13,6 +13,7 @@ import sos.xml.SOSXMLXPath;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
@@ -40,20 +41,20 @@ public class JobsUtils {
         return null;
     }
 
-    public static Date getDateFromString(final String dateString) throws Exception {
-        if (dateString != null) {
-            Date date = null;
-            if (!dateString.contains("T")) {
-                date = SDF.parse(dateString);
-            } else {
-                date = SDF2.parse(dateString);
-            }
-            return date;
-        } else {
-            return null;
-        }
-    }
-    
+//    public static Date getDateFromString(final String dateString) throws Exception {
+//        if (dateString != null) {
+//            Date date = null;
+//            if (!dateString.contains("T")) {
+//                date = SDF.parse(dateString);
+//            } else {
+//                date = SDF2.parse(dateString);
+//            }
+//            return date;
+//        } else {
+//            return null;
+//        }
+//    }
+//    
     public static String createJobsPostCommandWithModelObject(final JobsFilterSchema body) {
         boolean compact = body.getCompact();
         StringBuilder strb = new StringBuilder();
@@ -187,7 +188,7 @@ public class JobsUtils {
                 TaskQueue taskQueue = new TaskQueue();
                 Element taskQueueElement = (Element) queuedTasksList.item(queuedTasksCount);
                 taskQueue.setTaskId(Integer.parseInt(taskQueueElement.getAttribute(WebserviceConstants.ID)));
-                taskQueue.setEnqueued(JobsUtils.getDateFromString(taskQueueElement.getAttribute(WebserviceConstants.ENQUEUED)));
+                taskQueue.setEnqueued(JobSchedulerDate.getDate(taskQueueElement.getAttribute(WebserviceConstants.ENQUEUED)));
             }
             return queuedTasks;
         } else {
@@ -218,12 +219,12 @@ public class JobsUtils {
                 RunningTask task = new RunningTask();
                 Element taskElement = (Element) runningTaskList.item(runningTasksCount);
                 task.setCause(RunningTask.Cause.valueOf(taskElement.getAttribute(WebserviceConstants.CAUSE)));
-                task.setEnqueued(getDateFromString(taskElement.getAttribute(WebserviceConstants.ENQUEUED)));
-                task.setIdleSince(getDateFromString(taskElement.getAttribute(WebserviceConstants.IDLE_SINCE)));
+                task.setEnqueued(JobSchedulerDate.getDate(taskElement.getAttribute(WebserviceConstants.ENQUEUED)));
+                task.setIdleSince(JobSchedulerDate.getDate(taskElement.getAttribute(WebserviceConstants.IDLE_SINCE)));
                 if (taskElement.getAttribute(WebserviceConstants.PID) != null && !taskElement.getAttribute(WebserviceConstants.PID).isEmpty()) {
                     task.setPid(Integer.parseInt(taskElement.getAttribute(WebserviceConstants.PID)));
                 }
-                task.setStartedAt(getDateFromString(taskElement.getAttribute(WebserviceConstants.START_AT)));
+                task.setStartedAt(JobSchedulerDate.getDate(taskElement.getAttribute(WebserviceConstants.START_AT)));
                 if (taskElement.getAttribute(WebserviceConstants.STEPS) != null && !taskElement.getAttribute(WebserviceConstants.STEPS).isEmpty()) {
                     task.setSteps(Integer.parseInt(taskElement.getAttribute(WebserviceConstants.STEPS)));
                 }
@@ -233,7 +234,7 @@ public class JobsUtils {
                 Element orderElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(taskElement, WebserviceConstants.ORDER);
                 if (orderElement != null) {
                     Order order = new Order();
-                    order.setInProcessSince(getDateFromString(orderElement.getAttribute(WebserviceConstants.IN_PROCESS_SINCE)));
+                    order.setInProcessSince(JobSchedulerDate.getDate(orderElement.getAttribute(WebserviceConstants.IN_PROCESS_SINCE)));
                     order.setJobChain(orderElement.getAttribute(WebserviceConstants.JOB_CHAIN));
                     order.setOrderId(orderElement.getAttribute(WebserviceConstants.ID));
                     order.setPath(orderElement.getAttribute(WebserviceConstants.PATH));
@@ -252,8 +253,8 @@ public class JobsUtils {
         boolean isAvailable = false;
         // TODO no property to compare dateFrom and dateTo to
         // clarification needed of which Date is relevant for comparison
-        Date dateFrom = getDateFromString(filter.getDateFrom());
-        Date dateTo = getDateFromString(filter.getDateTo());
+        Date dateFrom = JobSchedulerDate.getDate(filter.getDateFrom());
+        Date dateTo = JobSchedulerDate.getDate(filter.getDateTo());
         // TODO What to do with regex
         String regex = filter.getRegex();
         // TODO What to do with timezone
@@ -261,9 +262,9 @@ public class JobsUtils {
         if (dateFrom == null && dateTo == null && regex == null && timezone == null) {
             return true;
         }
-        // Date runningSince = getDateFromString(sosXml.selectSingleNodeValue(node, "tasks/task/@running_since"));
-        // Date startTime = getDateFromString(sosXml.selectSingleNodeValue(node, "tasks/task/order/@start_time"));
-        // Date nextStartTime = getDateFromString(node.getAttribute(NEXT_START_TIME));
+        // Date runningSince = JobSchedulerDate.getDate(sosXml.selectSingleNodeValue(node, "tasks/task/@running_since"));
+        // Date startTime = JobSchedulerDate.getDate(sosXml.selectSingleNodeValue(node, "tasks/task/order/@start_time"));
+        // Date nextStartTime = JobSchedulerDate.getDate(node.getAttribute(NEXT_START_TIME));
         if (node.getAttribute(WebserviceConstants.STATE) != null && !node.getAttribute(WebserviceConstants.STATE).isEmpty()
                 && stateAvailable(node.getAttribute(WebserviceConstants.STATE), filter.getState())) {
             isAvailable = true;
