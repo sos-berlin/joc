@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -13,9 +14,7 @@ import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
 import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdTerminate;
-import com.sos.scheduler.model.objects.Spooler;
 
 @Path("jobscheduler")
 
@@ -42,15 +41,15 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
-            SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
-            schedulerObjectFactory.initMarshaller(Spooler.class);
-            JSCmdTerminate jsCmdTerminate = new JSCmdTerminate(schedulerObjectFactory);
+            JSCmdTerminate jsCmdTerminate = new JSCmdTerminate(Globals.schedulerObjectFactory);
             jsCmdTerminate.setAllSchedulersIfNotEmpty(WebserviceConstants.YES);
             jsCmdTerminate.setContinueExclusiveOperationIfNotEmpty(WebserviceConstants.NO);
             jsCmdTerminate.setRestartIfNotEmpty(restart);
             jsCmdTerminate.setTimeoutIfNotEmpty(urlTimeoutParamSchema.getTimeout());
 
-            jocXmlCommand.excutePost(schedulerObjectFactory.toXMLString(jsCmdTerminate));
+            String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdTerminate);
+            LOGGER.debug(String.format("Executing command: %s",xml));
+            jocXmlCommand.excutePost(xml);
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());

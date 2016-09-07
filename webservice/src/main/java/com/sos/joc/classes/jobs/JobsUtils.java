@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList;
 
 import sos.xml.SOSXMLXPath;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.FoldersSchema;
@@ -22,6 +23,7 @@ import com.sos.joc.model.job.Order;
 import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.State___;
 import com.sos.joc.model.job.TaskQueue;
+import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 
 public class JobsUtils {
@@ -83,6 +85,8 @@ public class JobsUtils {
     }
 
     public static String createJobPostCommand(final JobFilterSchema body) {
+        
+        long start = System.currentTimeMillis();
         StringBuilder postCommand = new StringBuilder();
         boolean compact = body.getCompact();
         postCommand.append("<commands><show_job");
@@ -94,6 +98,28 @@ public class JobsUtils {
             postCommand.append(" job=\"").append(path).append("\"/>");
         }
         postCommand.append("</commands>");
+        long end = System.currentTimeMillis();
+        System.out.println("benötigte Zeit StringBuilder: "+(end-start)+" ms");
+        
+      
+        
+        
+        
+        //Variante mit JobScheduler Modell
+        start = System.currentTimeMillis();
+        JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
+        if (!body.getJob().isEmpty()) {
+            if(!compact){
+                showJob.setWhat("job_params task_queue");
+            }
+            showJob.setJob(body.getJob());
+        }
+
+        end = System.currentTimeMillis();
+        System.out.println("benötigte Zeit JaxB: "+(end-start)+" ms");
+
+        String xml = Globals.schedulerObjectFactory.toXMLString(showJob);
+        
         return postCommand.toString();
     }
 

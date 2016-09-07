@@ -2,37 +2,24 @@ package com.sos.joc.job.impl;
 
 import java.io.StringWriter;
 import java.util.Date;
-import java.util.Properties;
 
 import javax.ws.rs.Path;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.xalan.xsltc.compiler.util.NodeType;
-import org.apache.xml.utils.DOMBuilder;
-import org.apache.xpath.CachedXPathAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import com.lowagie.text.Document;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.jobs.JobsUtils;
-import com.sos.joc.classes.runtime.RunTimeEntity;
 import com.sos.joc.job.resource.IJobRunTimeResource;
 import com.sos.joc.model.common.Runtime200Schema;
 import com.sos.joc.model.common.RuntimeSchema;
@@ -57,7 +44,6 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
             runTimeAnswer.setDeliveryDate(new Date());
             Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode("//job/run_time");
 
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Source source = new DOMSource(runtimeNode);
             StringWriter writer = new StringWriter();
             Result result = new StreamResult(writer);

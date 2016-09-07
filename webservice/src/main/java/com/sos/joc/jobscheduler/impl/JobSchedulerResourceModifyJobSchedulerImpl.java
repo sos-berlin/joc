@@ -5,15 +5,14 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.auth.classes.JobSchedulerIdentifier;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
 import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdModifySpooler;
-import com.sos.scheduler.model.objects.Spooler;
 
 @Path("jobscheduler")
 
@@ -41,14 +40,14 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
-            SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
-            schedulerObjectFactory.initMarshaller(Spooler.class);
-            JSCmdModifySpooler jsCmdModifySpooler = new JSCmdModifySpooler(schedulerObjectFactory);
+            JSCmdModifySpooler jsCmdModifySpooler = new JSCmdModifySpooler(Globals.schedulerObjectFactory);
             jsCmdModifySpooler.setCmd(cmd);
             jsCmdModifySpooler.setTimeoutIfNotEmpty(urlTimeoutParamSchema.getTimeout());
 
-            String xml = schedulerObjectFactory.toXMLString(jsCmdModifySpooler);
+            String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdModifySpooler);
+            LOGGER.debug(String.format("Executing command: %s",xml));
             jocXmlCommand.excutePost(xml);
+         
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
