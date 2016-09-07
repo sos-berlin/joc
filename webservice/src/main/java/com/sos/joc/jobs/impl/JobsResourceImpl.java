@@ -38,7 +38,9 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             JobsVSchema entity = new JobsVSchema();
             List<Job_> listJobs = new ArrayList<Job_>();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            String postCommand = JobsUtils.createJobsPostCommand(jobsFilterSchema);
+//            String postCommand = JobsUtils.createJobsPostCommand(jobsFilterSchema);
+            String postCommand = JobsUtils.createJobsPostCommandWithModelObject(jobsFilterSchema);
+            LOGGER.info(postCommand);
             jocXmlCommand.excutePost(postCommand);
             
             entity.setDeliveryDate(new Date());

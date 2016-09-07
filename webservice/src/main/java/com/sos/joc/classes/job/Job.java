@@ -17,10 +17,9 @@ public class Job {
 
     public static Job_ getJob(Node jobNode, JOCXmlCommand jocXmlCommand, Boolean compact) throws Exception {
         Job_ job = new Job_();
-
-        if (jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "queued_tasks/@length") != null) {
-            job.setNumOfQueuedTasks(Integer.valueOf(jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, 
-                    "queued_tasks/@length")));
+        String value = jocXmlCommand.getSosxml().selectSingleNodeValue((Element)jobNode, "queued_tasks/@length");
+        if (value != null) {
+            job.setNumOfQueuedTasks(Integer.valueOf(value));
         } else {
             job.setNumOfQueuedTasks(0);
         }
@@ -67,9 +66,9 @@ public class Job {
             
             // TODO: Joacim
 //            job.setNextPeriodBegin("myNextPeriodBegin");
-            
-            if(attributes.getNamedItem(WebserviceConstants.NEXT_START_TIME) != null) {
-                job.setNextStartTime(JobsUtils.getDateFromString(attributes.getNamedItem(WebserviceConstants.NEXT_START_TIME).getNodeValue()));
+            Node namedItem = attributes.getNamedItem(WebserviceConstants.NEXT_START_TIME);
+            if(namedItem != null) {
+                job.setNextStartTime(JobsUtils.getDateFromString(namedItem.getNodeValue()));
             }
 
             NodeList paramsNodes = jocXmlCommand.getSosxml().selectNodeList((Element)jobNode, "params/param");
