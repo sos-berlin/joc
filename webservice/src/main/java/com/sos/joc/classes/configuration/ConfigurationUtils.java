@@ -76,9 +76,6 @@ public class ConfigurationUtils {
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
         SOSXMLTransformer.transform(xml, new StreamSource(inputStream), result);
-//        TransformerFactory tFactory = TransformerFactory.newInstance();
-//        Transformer transformer = tFactory.newTransformer(new StreamSource(inputStream));
-//        transformer.transform(new StreamSource(new StringReader(xml)), result);
         return writer.toString();
     }
     
@@ -94,4 +91,24 @@ public class ConfigurationUtils {
         return JobSchedulerDate.getDate(time);
     }
 
+    public static Configuration getConfiguration(JobConfigurationFilterSchema jobConfigurationFilterSchema, JOCXmlCommand jocXmlCommand, Content content) throws Exception {
+        Configuration configuration = new Configuration();
+        configuration.setPath(jobConfigurationFilterSchema.getJob());
+        configuration.setSurveyDate(ConfigurationUtils.getSurveyDate(jocXmlCommand));
+        configuration.setType(Configuration.Type.JOB);
+        configuration.setConfigurationDate(ConfigurationUtils.getConfigurationDate(jocXmlCommand));
+        configuration.setContent(content);
+        return configuration;
+    }
+
+    public static Content getContent(JobConfigurationFilterSchema jobConfigurationFilterSchema, Class clazz, String configurationXml) throws Exception {
+        Content content = new Content();
+        if(jobConfigurationFilterSchema.getMime().equals(JobConfigurationFilterSchema.Mime.HTML)) {
+            InputStream inputStream = clazz.getResourceAsStream("/show_configuration.xsl");
+            content.setHtml(transformXmlToHtml("<source>" + configurationXml + "</source>", inputStream));
+        } else {
+            content.setXml(configurationXml);
+        }
+        return content;
+    }
 }
