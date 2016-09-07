@@ -7,18 +7,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.jobchains.resource.IJobChainsResource;
+import com.sos.joc.classes.jobchain.JobChains;
+import com.sos.joc.jobchains.resource.IJobChainsResourceP;
 import com.sos.joc.model.jobChain.JobChainsFilterSchema;
-import com.sos.joc.model.jobChain.JobChainsVSchema;
+import com.sos.joc.model.jobChain.JobChainsPSchema;
 
 @Path("job_chains")
-public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChainsResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourceImpl.class);  
+public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChainsResourceP {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourcePImpl.class);  
     
   
      
     @Override
-    public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilterSchema  jobChainsFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilterSchema  jobChainsFilterSchema) throws Exception {
         LOGGER.debug("init Job Chains");
         JOCDefaultResponse jocDefaultResponse = init(jobChainsFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobChain().getView().isStatus());
         if (jocDefaultResponse != null) {
@@ -28,9 +29,10 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
         try {
             // TODO JOC Cockpit Webservice
  
-            JobChainsVSchema entity = new JobChainsVSchema();
+            JobChainsPSchema entity = new JobChainsPSchema();
             entity.setDeliveryDate(new Date());
-    //        entity.setJobChains(JobChains.getJobChains(jobChainsFilterSchema.getCompact())); 
+            entity.setJobChains(JobChains.getPJobChains(true));
+
               
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {

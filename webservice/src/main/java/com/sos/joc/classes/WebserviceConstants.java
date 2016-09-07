@@ -7,7 +7,7 @@ public class WebserviceConstants {
     public static final String NEVER = "never";
     public static final String NO = "no";
     public static final String YES = "yes";
-    public static final String JOBSCHEDULER_DATE_FORMAT =  "yyyy-mm-dd hh:mm:ss.SSS'Z'";
+    public static final String JOBSCHEDULER_DATE_FORMAT = "yyyy-mm-dd hh:mm:ss.SSS'Z'";
     public static final String JOBSCHEDULER_DATE_FORMAT2 = "yyyy-mm-dd'T'hh:mm:ss.SSS'Z'";
     public static final String EXCLUSIVE = "exclusive";
     public static final String IS_AVAILABLE = "is_available";
@@ -28,5 +28,8 @@ public class WebserviceConstants {
     public static final String STATE = "state";
     public static final String NEXT_START_TIME = "next_start_time";
 
-    
+    public static final String ORDER_API_PATH = "/jobscheduler/master/api/order";
+    public static final String ORDER_OVERVIEW = "OrdersComplemented/OrderOverview";
+    public static final String ORDER_DETAILED = "OrdersComplemented/OrderDetailed";
+
 }

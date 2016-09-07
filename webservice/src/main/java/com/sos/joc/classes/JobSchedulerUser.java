@@ -1,9 +1,9 @@
 package com.sos.joc.classes;
 
 import com.sos.auth.classes.JobSchedulerIdentifier;
-import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 
 public class JobSchedulerUser {
@@ -18,14 +18,14 @@ public class JobSchedulerUser {
 
     public SOSShiroCurrentUser getSosShiroCurrentUser() {
         if (sosShiroCurrentUser == null) {
-            sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(accessToken);
+            sosShiroCurrentUser = Globals.currentUsersList.getUser(accessToken);
         }
         return sosShiroCurrentUser;
     }
 
     public boolean isAuthenticated() {
-        if (sosShiroCurrentUser == null && SOSServicePermissionShiro.currentUsersList != null) {
-            sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(accessToken);
+        if (sosShiroCurrentUser == null && Globals.currentUsersList != null) {
+            sosShiroCurrentUser = Globals.currentUsersList.getUser(accessToken);
         }
         resetTimeOut();
 

@@ -6,11 +6,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
+import com.sos.joc.Globals;
 
 public class InventoryJobsDBLayerTest {
     private static final String LDAP_PASSWORD = "sos01";
@@ -20,7 +20,7 @@ public class InventoryJobsDBLayerTest {
     public void getJobSchedulerJobs() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SOSShiroCurrentUser sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
+        SOSShiroCurrentUser sosShiroCurrentUser = Globals.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
 
          
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(sosShiroCurrentUser.getSosHibernateConnection(), "scheduler_current");
@@ -36,7 +36,7 @@ public class InventoryJobsDBLayerTest {
     public void getJobSchedulerJob() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SOSShiroCurrentUser sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
+        SOSShiroCurrentUser sosShiroCurrentUser = Globals.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
 
          
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(sosShiroCurrentUser.getSosHibernateConnection(), "scheduler_current");

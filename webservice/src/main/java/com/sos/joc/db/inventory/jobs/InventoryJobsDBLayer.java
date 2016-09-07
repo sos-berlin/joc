@@ -18,12 +18,13 @@ public class InventoryJobsDBLayer extends DBLayer {
         this.jobSchedulerId = jobSchedulerId;
     }
     
-    public DBItemInventoryJob getInventoryJobByName(String name) throws Exception {
+     public DBItemInventoryJob getInventoryJobByName(String name) throws Exception {
         try {
             StringBuilder sql = new StringBuilder("select job from ");
             sql.append(DBITEM_INVENTORY_JOBS +" as job, " + DBITEM_INVENTORY_INSTANCES + " as instance");
             sql.append(" where job.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "' and");
             sql.append(" (name)  = :name");
+            LOGGER.debug(sql);
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("name", name);
 

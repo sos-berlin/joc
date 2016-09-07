@@ -7,6 +7,7 @@ import java.util.List;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.Orders;
 import com.sos.joc.classes.parameters.Parameters;
+import com.sos.joc.model.job.Job;
 import com.sos.joc.model.job.Job_;
 import com.sos.joc.model.job.Lock;
 import com.sos.joc.model.job.Lock_;
@@ -117,6 +118,30 @@ public class Jobs {
 
             job.setTemporary(false);
         }
+        return job;
+    }
+    
+    public static Job getPJob(boolean compact) {
+        Job job = new Job();
+
+        job.setName("myName");
+        job.setPath("myPath");
+        job.setConfigurationDate(new Date());
+        job.setEstimatedDuration(-1);
+        job.setHasDescription(false);
+        job.setIsOrderJob(true);
+        List <String> listOfJobChains = new ArrayList<String>();
+        listOfJobChains.add("job_chain1");
+        listOfJobChains.add("job_chain2");
+        job.setJobChains(listOfJobChains);
+        
+        job.setLocks(getJobLocks());
+        job.setMaxTasks(-1);
+        job.setName("myName");
+        job.setParams(Parameters.getParameters());
+        job.setPath("myPath");
+        job.setProcessClass("myProcessClass");
+        job.setSurveyDate(new Date());
         return job;
     }
 }

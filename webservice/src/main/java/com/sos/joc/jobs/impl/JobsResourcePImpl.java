@@ -16,7 +16,6 @@ import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.Job;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsPSchema;
-import com.sos.joc.model.job.Lock;
 
 @Path("jobs")
 public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP {

@@ -9,8 +9,8 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.joc.Globals;
 
 public class InventoryOrdersDBLayerTest {
     private static final String LDAP_PASSWORD = "sos01";
@@ -20,7 +20,7 @@ public class InventoryOrdersDBLayerTest {
     public void getOrderschedulerOrders() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SOSShiroCurrentUser sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
+        SOSShiroCurrentUser sosShiroCurrentUser = Globals.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
 
          
         InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosShiroCurrentUser.getSosHibernateConnection(), "scheduler_current");
@@ -36,7 +36,7 @@ public class InventoryOrdersDBLayerTest {
     public void getOrderschedulerOrder() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SOSShiroCurrentUser sosShiroCurrentUser = SOSServicePermissionShiro.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
+        SOSShiroCurrentUser sosShiroCurrentUser = Globals.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
 
          
         InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosShiroCurrentUser.getSosHibernateConnection(), "scheduler_current");
