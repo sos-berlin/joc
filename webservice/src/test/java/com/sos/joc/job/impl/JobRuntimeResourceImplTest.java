@@ -30,7 +30,8 @@ public class JobRuntimeResourceImplTest {
         JobRunTimeResourceImpl jobRunTimeImpl = new JobRunTimeResourceImpl();
         JOCDefaultResponse jobResponse = jobRunTimeImpl.postJobRunTime(sosShiroCurrentUserAnswer.getAccessToken(), jobFilterSchema);
         Runtime200Schema jobRunTimeSchema = (Runtime200Schema) jobResponse.getEntity();
-        assertEquals("postJobRuntimeTest","<run_time>", jobRunTimeSchema.getRunTime().getRunTime());
+        LOGGER.info(jobRunTimeSchema.getRunTime().getRunTime());
+        assertTrue("", jobRunTimeSchema.getRunTime().getRunTime().startsWith("<run_time>"));
      }
 
 }

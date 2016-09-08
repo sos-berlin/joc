@@ -13,6 +13,7 @@ import sos.xml.SOSXMLXPath;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.common.NameValuePairsSchema;
@@ -24,7 +25,7 @@ import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.State___;
 import com.sos.joc.model.job.TaskQueue;
 import com.sos.scheduler.model.commands.JSCmdShowJob;
-
+import com.sos.scheduler.model.commands.JSCmdShowState;
 
 public class JobsUtils {
 
@@ -32,42 +33,78 @@ public class JobsUtils {
     private static final SimpleDateFormat SDF2 = new SimpleDateFormat(WebserviceConstants.JOBSCHEDULER_DATE_FORMAT2);
 
     public static Boolean getBoolValue(final String value) {
-        if(WebserviceConstants.YES.equalsIgnoreCase(value)){
+        if (WebserviceConstants.YES.equalsIgnoreCase(value)) {
             return true;
-        } else if(WebserviceConstants.NO.equalsIgnoreCase(value)){
+        } else if (WebserviceConstants.NO.equalsIgnoreCase(value)) {
             return false;
         }
         return null;
     }
-    
-    public static Date getDateFromString(final String dateString) throws Exception{
-        if (dateString != null) {
-            Date date = null;
-            if (!dateString.contains("T")) {
-                date = SDF.parse(dateString);
-            } else {
-                date = SDF2.parse(dateString);
-            }
-            return date;
-        } else {
-            return null;
-        }
-    }
-    
-    public static String createJobsPostCommand(final JobsFilterSchema body) {
-        StringBuilder postCommand = new StringBuilder();
+
+//    public static Date getDateFromString(final String dateString) throws Exception {
+//        if (dateString != null) {
+//            Date date = null;
+//            if (!dateString.contains("T")) {
+//                date = SDF.parse(dateString);
+//            } else {
+//                date = SDF2.parse(dateString);
+//            }
+//            return date;
+//        } else {
+//            return null;
+//        }
+//    }
+//    
+    public static String createJobsPostCommandWithModelObject(final JobsFilterSchema body) {
         boolean compact = body.getCompact();
+        StringBuilder strb = new StringBuilder();
+        strb.append("<commands>");
+        // JSCmdShowState only works with one path(folder)
+        // create one command per folder
+        if(!body.getFolders().isEmpty()){
+            for (FoldersSchema folder : body.getFolders()) {
+                JSCmdShowState showStateCommand = Globals.schedulerObjectFactory.createShowState();
+                showStateCommand.setSubsystems("job folder");
+                showStateCommand.setPath(folder.getFolder());
+                if(!compact) {
+                    if(!folder.getRecursive()){
+                        showStateCommand.setWhat("job_orders folders task_queue job_params no_subfolders");
+                    } else {
+                        showStateCommand.setWhat("job_orders folders task_queue job_params");
+                    }
+                } else {
+                    showStateCommand.setWhat("job_orders folders");
+                }
+                strb.append(Globals.schedulerObjectFactory.toXMLString(showStateCommand));
+            }
+        } else {
+            JSCmdShowState showStateCommand = Globals.schedulerObjectFactory.createShowState();
+            showStateCommand.setSubsystems("job");
+            showStateCommand.setPath("/");
+            if (!compact){
+                showStateCommand.setWhat("job_orders task_queue job_params");
+            } else {
+                showStateCommand.setWhat("job_orders task_queue");
+            }
+            strb.append(Globals.schedulerObjectFactory.toXMLString(showStateCommand));
+        }
+        strb.append("</commands>");
+        return strb.toString();
+    }
+
+    public static String createJobsPostCommand(final JobsFilterSchema body) {
+        boolean compact = body.getCompact();
+        StringBuilder postCommand = new StringBuilder();
         postCommand.append("<commands>");
         if (!body.getFolders().isEmpty()) {
             for (FoldersSchema folder : body.getFolders()) {
-                postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders");
-                postCommand.append(" folders");
-                if(!compact){
+                postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders folders");
+                if (!compact) {
                     postCommand.append(" task_queue job_params");
                 }
                 String path = folder.getFolder();
                 Boolean recursive = folder.getRecursive();
-                if(!recursive) {
+                if (!recursive) {
                     postCommand.append(" no_subfolders");
                 }
                 postCommand.append("\"");
@@ -75,7 +112,7 @@ public class JobsUtils {
             }
         } else {
             postCommand.append("<show_state subsystems=\"job\" what=\"job_orders task_queue");
-            if(!compact){
+            if (!compact) {
                 postCommand.append(" job_params");
             }
             postCommand.append("\" path=\"/\"/>");
@@ -85,57 +122,19 @@ public class JobsUtils {
     }
 
     public static String createJobPostCommand(final JobFilterSchema body) {
-        
-        long start = System.currentTimeMillis();
-        StringBuilder postCommand = new StringBuilder();
         boolean compact = body.getCompact();
-        postCommand.append("<commands><show_job");
-        if (!body.getJob().isEmpty()) {
-            if(!compact){
-                postCommand.append(" what=\"job_params task_queue\"");
-            }
-            String path = body.getJob();
-            postCommand.append(" job=\"").append(path).append("\"/>");
-        }
-        postCommand.append("</commands>");
-        long end = System.currentTimeMillis();
-        System.out.println("benötigte Zeit StringBuilder: "+(end-start)+" ms");
-        
-      
-        
-        
-        
-        //Variante mit JobScheduler Modell
-        start = System.currentTimeMillis();
         JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
         if (!body.getJob().isEmpty()) {
-            if(!compact){
+            if(!compact) {
                 showJob.setWhat("job_params task_queue");
             }
             showJob.setJob(body.getJob());
         }
-
-        end = System.currentTimeMillis();
-        System.out.println("benötigte Zeit JaxB: "+(end-start)+" ms");
-
-        String xml = Globals.schedulerObjectFactory.toXMLString(showJob);
-        
-        return postCommand.toString();
-    }
-
-    public static String createJobRuntimePostCommand(final JobFilterSchema body) {
-        StringBuilder postCommand = new StringBuilder();
-        String path = body.getJob();
-        postCommand.append("<commands><show_job what=\"run_time\"")
-            .append(" job=\"")
-            .append(path)
-            .append("\"/>")
-            .append("</commands>");
-        return postCommand.toString();
+        return Globals.schedulerObjectFactory.toXMLString(showJob);
     }
 
     public static Integer getSeverityFromStateText(String stateText) {
-        switch(stateText.toUpperCase()) {
+        switch (stateText.toUpperCase()) {
         case "RUNNING":
             return 0;
         case "PENDING":
@@ -146,25 +145,25 @@ public class JobsUtils {
         case "STOPPED":
         case "REMOVED":
             return 2;
-        case "INITIALIZED": 
-        case "LOADED": 
-        case "WAITING_FOR_PROCESS": 
-        case "WAITING_FOR_LOCK": 
-        case "WAITING_FOR_TASK": 
-        case "NOT_IN_PERIOD": 
+        case "INITIALIZED":
+        case "LOADED":
+        case "WAITING_FOR_PROCESS":
+        case "WAITING_FOR_LOCK":
+        case "WAITING_FOR_TASK":
+        case "NOT_IN_PERIOD":
             return 3;
-        case "DISABLED": 
+        case "DISABLED":
             return 4;
         }
         return null;
     }
-    
+
     public static List<Lock_> getLocks(NodeList lockList) {
         if (lockList != null && lockList.getLength() > 0) {
             List<Lock_> listOfLocks = new ArrayList<Lock_>();
-            for (int j = 0; j < lockList.getLength(); j ++) {
+            for (int j = 0; j < lockList.getLength(); j++) {
                 Node lockNode = lockList.item(j);
-                Lock_ lock = new Lock_(); 
+                Lock_ lock = new Lock_();
                 Element lockElement = (Element) lockNode;
                 if (lockElement.getAttribute(WebserviceConstants.EXCLUSIVE) != null) {
                     lock.setExclusive(JobsUtils.getBoolValue(lockElement.getAttribute(WebserviceConstants.EXCLUSIVE)));
@@ -181,28 +180,28 @@ public class JobsUtils {
         }
         return null;
     }
-    
+
     public static List<TaskQueue> getQueuedTasks(NodeList queuedTasksList) throws Exception {
         List<TaskQueue> queuedTasks = new ArrayList<TaskQueue>();
         if (queuedTasksList != null && queuedTasksList.getLength() > 0) {
-            for(int queuedTasksCount = 0; queuedTasksCount < queuedTasksList.getLength(); queuedTasksCount++) {
+            for (int queuedTasksCount = 0; queuedTasksCount < queuedTasksList.getLength(); queuedTasksCount++) {
                 TaskQueue taskQueue = new TaskQueue();
-                Element taskQueueElement = (Element)queuedTasksList.item(queuedTasksCount);
+                Element taskQueueElement = (Element) queuedTasksList.item(queuedTasksCount);
                 taskQueue.setTaskId(Integer.parseInt(taskQueueElement.getAttribute(WebserviceConstants.ID)));
-                taskQueue.setEnqueued(JobsUtils.getDateFromString(taskQueueElement.getAttribute(WebserviceConstants.ENQUEUED)));
+                taskQueue.setEnqueued(JobSchedulerDate.getDate(taskQueueElement.getAttribute(WebserviceConstants.ENQUEUED)));
             }
             return queuedTasks;
         } else {
             return null;
         }
     }
-    
+
     public static List<NameValuePairsSchema> getParameters(NodeList paramList) {
         List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
         if (paramList != null && paramList.getLength() > 0) {
-            for(int paramsCount = 0; paramsCount < paramList.getLength(); paramsCount++) {
+            for (int paramsCount = 0; paramsCount < paramList.getLength(); paramsCount++) {
                 NameValuePairsSchema param = new NameValuePairsSchema();
-                Element paramElement = (Element)paramList.item(paramsCount);
+                Element paramElement = (Element) paramList.item(paramsCount);
                 param.setName(paramElement.getAttribute(WebserviceConstants.NAME));
                 param.setValue(paramElement.getAttribute(WebserviceConstants.VALUE));
                 params.add(param);
@@ -212,7 +211,7 @@ public class JobsUtils {
             return null;
         }
     }
-    
+
     public static List<RunningTask> getRunningTasks(NodeList runningTaskList, JOCXmlCommand jocXmlCommand) throws Exception {
         List<RunningTask> runningTasks = new ArrayList<RunningTask>();
         if (runningTaskList != null && runningTaskList.getLength() > 0) {
@@ -220,12 +219,12 @@ public class JobsUtils {
                 RunningTask task = new RunningTask();
                 Element taskElement = (Element) runningTaskList.item(runningTasksCount);
                 task.setCause(RunningTask.Cause.valueOf(taskElement.getAttribute(WebserviceConstants.CAUSE)));
-                task.setEnqueued(getDateFromString(taskElement.getAttribute(WebserviceConstants.ENQUEUED)));
-                task.setIdleSince(getDateFromString(taskElement.getAttribute(WebserviceConstants.IDLE_SINCE)));
+                task.setEnqueued(JobSchedulerDate.getDate(taskElement.getAttribute(WebserviceConstants.ENQUEUED)));
+                task.setIdleSince(JobSchedulerDate.getDate(taskElement.getAttribute(WebserviceConstants.IDLE_SINCE)));
                 if (taskElement.getAttribute(WebserviceConstants.PID) != null && !taskElement.getAttribute(WebserviceConstants.PID).isEmpty()) {
                     task.setPid(Integer.parseInt(taskElement.getAttribute(WebserviceConstants.PID)));
                 }
-                task.setStartedAt(getDateFromString(taskElement.getAttribute(WebserviceConstants.START_AT)));
+                task.setStartedAt(JobSchedulerDate.getDate(taskElement.getAttribute(WebserviceConstants.START_AT)));
                 if (taskElement.getAttribute(WebserviceConstants.STEPS) != null && !taskElement.getAttribute(WebserviceConstants.STEPS).isEmpty()) {
                     task.setSteps(Integer.parseInt(taskElement.getAttribute(WebserviceConstants.STEPS)));
                 }
@@ -235,7 +234,7 @@ public class JobsUtils {
                 Element orderElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(taskElement, WebserviceConstants.ORDER);
                 if (orderElement != null) {
                     Order order = new Order();
-                    order.setInProcessSince(getDateFromString(orderElement.getAttribute(WebserviceConstants.IN_PROCESS_SINCE)));
+                    order.setInProcessSince(JobSchedulerDate.getDate(orderElement.getAttribute(WebserviceConstants.IN_PROCESS_SINCE)));
                     order.setJobChain(orderElement.getAttribute(WebserviceConstants.JOB_CHAIN));
                     order.setOrderId(orderElement.getAttribute(WebserviceConstants.ID));
                     order.setPath(orderElement.getAttribute(WebserviceConstants.PATH));
@@ -249,43 +248,43 @@ public class JobsUtils {
             return null;
         }
     }
-    
-    public static boolean filterJobs(JobsFilterSchema filter, Element node, SOSXMLXPath sosXml) throws Exception{
+
+    public static boolean filterJobs(JobsFilterSchema filter, Element node, SOSXMLXPath sosXml) throws Exception {
         boolean isAvailable = false;
-        // no property to compare dateFrom and dateTo to
+        // TODO no property to compare dateFrom and dateTo to
         // clarification needed of which Date is relevant for comparison
-        Date dateFrom = getDateFromString(filter.getDateFrom());
-        Date dateTo = getDateFromString(filter.getDateTo());
-        // ??? What to do with regex 
+        Date dateFrom = JobSchedulerDate.getDate(filter.getDateFrom());
+        Date dateTo = JobSchedulerDate.getDate(filter.getDateTo());
+        // TODO What to do with regex
         String regex = filter.getRegex();
-        // ??? What to do with timezone
+        // TODO What to do with timezone
         String timezone = filter.getTimeZone();
-        if(dateFrom == null && dateTo == null && regex == null && timezone == null) {
+        if (dateFrom == null && dateTo == null && regex == null && timezone == null) {
             return true;
         }
-//        Date runningSince = getDateFromString(sosXml.selectSingleNodeValue(node, "tasks/task/@running_since"));
-//        Date startTime = getDateFromString(sosXml.selectSingleNodeValue(node, "tasks/task/order/@start_time"));
-//        Date nextStartTime = getDateFromString(node.getAttribute(NEXT_START_TIME));
-        if(node.getAttribute(WebserviceConstants.STATE) != null && !node.getAttribute(WebserviceConstants.STATE).isEmpty() 
-                && stateAvailable(node.getAttribute(WebserviceConstants.STATE), filter.getState())){
+        // Date runningSince = JobSchedulerDate.getDate(sosXml.selectSingleNodeValue(node, "tasks/task/@running_since"));
+        // Date startTime = JobSchedulerDate.getDate(sosXml.selectSingleNodeValue(node, "tasks/task/order/@start_time"));
+        // Date nextStartTime = JobSchedulerDate.getDate(node.getAttribute(NEXT_START_TIME));
+        if (node.getAttribute(WebserviceConstants.STATE) != null && !node.getAttribute(WebserviceConstants.STATE).isEmpty()
+                && stateAvailable(node.getAttribute(WebserviceConstants.STATE), filter.getState())) {
             isAvailable = true;
         }
-//        if (dateFrom != null && runningSince != null && dateFrom.compareTo(runningSince) <= 0) {
-//            isAvailable = true;
-//        } else {
-//            isAvailable = false;
-//        }
-//        if (dateTo != null && runningSince != null && runningSince.compareTo(dateTo) <= 0) {
-//            isAvailable = true;
-//        } else {
-//            isAvailable = false;
-//        }
+        // if (dateFrom != null && runningSince != null && dateFrom.compareTo(runningSince) <= 0) {
+        // isAvailable = true;
+        // } else {
+        // isAvailable = false;
+        // }
+        // if (dateTo != null && runningSince != null && runningSince.compareTo(dateTo) <= 0) {
+        // isAvailable = true;
+        // } else {
+        // isAvailable = false;
+        // }
         return isAvailable;
     }
 
     private static boolean stateAvailable(String stateText, List<State___> states) {
-        for(State___ state : states) {
-            if(state.toString().equalsIgnoreCase(stateText)){
+        for (State___ state : states) {
+            if (state.toString().equalsIgnoreCase(stateText)) {
                 return true;
             }
         }

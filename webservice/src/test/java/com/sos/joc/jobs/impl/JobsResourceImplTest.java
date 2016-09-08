@@ -3,6 +3,7 @@ package com.sos.joc.jobs.impl;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
@@ -52,6 +53,7 @@ public class JobsResourceImplTest {
 
     @Test
     public void postJobsWithFoldersRecursiveTest() throws Exception   {
+        Date start = new Date();
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
@@ -62,11 +64,22 @@ public class JobsResourceImplTest {
         folder.setFolder("/test_JS-1473");
         folder.setRecursive(true);
         folders.add(folder);
+        FoldersSchema folder2 = new FoldersSchema();
+        folder2.setFolder("/check_history");
+        folder2.setRecursive(true);
+        folders.add(folder2);
+        FoldersSchema folder3 = new FoldersSchema();
+        folder3.setFolder("/OrderJob");
+        folder3.setRecursive(true);
+        folders.add(folder3);
         jobsFilterSchema.setFolders(folders);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
         JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
 //        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
+        Date end = new Date();
+        long duration = end.getTime() - start.getTime();
+        LOGGER.info("duration: " + duration + "ms");
         LOGGER.info(jobsResponse.toString());
      }
 

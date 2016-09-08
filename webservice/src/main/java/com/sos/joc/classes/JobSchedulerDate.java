@@ -6,16 +6,19 @@ import java.util.Date;
 
 
 public class JobSchedulerDate {
-    private SimpleDateFormat sdf = new SimpleDateFormat(WebserviceConstants.JOBSCHEDULER_DATE_FORMAT);
-    private SimpleDateFormat sdf2 = new SimpleDateFormat(WebserviceConstants.JOBSCHEDULER_DATE_FORMAT2);
+    private static final SimpleDateFormat SDF = new SimpleDateFormat(WebserviceConstants.JOBSCHEDULER_DATE_FORMAT);
+    private static final SimpleDateFormat SDF2 = new SimpleDateFormat(WebserviceConstants.JOBSCHEDULER_DATE_FORMAT2);
 
     
-    public Date getDate(String dateString) throws ParseException{
-        if (!dateString.contains("T")) {
-            return sdf.parse(dateString);
+    public static Date getDate(String dateString) throws ParseException{
+        if (dateString != null) {
+            if (!dateString.contains("T")) {
+                return SDF.parse(dateString);
+            } else {
+                return SDF2.parse(dateString);
+            }
         } else {
-            return sdf2.parse(dateString);
-            
+            return null;
         }
     }
             

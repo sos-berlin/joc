@@ -1,16 +1,8 @@
 package com.sos.joc.job.impl;
 
-import java.io.StringWriter;
 import java.util.Date;
 
 import javax.ws.rs.Path;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +11,7 @@ import org.w3c.dom.Node;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.jobs.JobsUtils;
+import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.job.resource.IJobRunTimeResource;
 import com.sos.joc.model.common.Runtime200Schema;
 import com.sos.joc.model.common.RuntimeSchema;
@@ -39,24 +31,13 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
         try {
             Runtime200Schema runTimeAnswer = new Runtime200Schema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            String postCommand = JobsUtils.createJobRuntimePostCommand(jobFilterSchema);
+            String postCommand = RunTime.createJobRuntimePostCommand(jobFilterSchema);
             jocXmlCommand.excutePost(postCommand);
             runTimeAnswer.setDeliveryDate(new Date());
             Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode("//job/run_time");
 
-            Source source = new DOMSource(runtimeNode);
-            StringWriter writer = new StringWriter();
-            Result result = new StreamResult(writer);
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
-            transformer.transform(source, result);
-            
-            String runtime = writer.toString();
-            
             RuntimeSchema runTime = new RuntimeSchema();
-            runTime.setRunTime(runtime);
+            runTime.setRunTime(RunTime.getRuntimeXmlString(runtimeNode));
             runTimeAnswer.setRunTime(runTime);
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
 

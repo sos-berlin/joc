@@ -4,7 +4,7 @@ import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.configuration.ConfigurationEntity;
+import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.order.post.OrderConfigurationBody;
 import com.sos.joc.order.resource.IOrderConfigurationResource;
 
@@ -23,7 +23,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
         try {
  
             // TODO JOC Cockpit Webservice
-            ConfigurationEntity configurationEntity = new ConfigurationEntity();
+            ConfigurationUtils configurationEntity = new ConfigurationUtils();
             return JOCDefaultResponse.responseStatus200(configurationEntity.getEntity());
             
         } catch (Exception e) {
