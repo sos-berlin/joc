@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Error420Schema;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.common.OkSchema;
@@ -37,17 +38,28 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
 
     public static JOCDefaultResponse responseStatusJSError(String message) {
-        Response.ResponseBuilder responseBuilder = Response.status(420).header("Content-Type", MediaType.APPLICATION_JSON);
         Error420Schema entity = new Error420Schema();
         entity.setDeliveryDate(new Date());
          
         ErrorSchema errorSchema = new ErrorSchema();
-        errorSchema.setCode("420");
+        errorSchema.setCode("JOC-420");
         errorSchema.setMessage(message);
         entity.setError(errorSchema);
 
-        responseBuilder.entity(entity);
-        return new JOCDefaultResponse(responseBuilder.build());
+        return responseStatus420(entity);
+
+    }
+    
+    public static JOCDefaultResponse responseStatusJSError(JocException e) {
+        Error420Schema entity = new Error420Schema();
+        entity.setDeliveryDate(new Date());
+         
+        ErrorSchema errorSchema = new ErrorSchema();
+        errorSchema.setCode(e.getError().getCode());
+        errorSchema.setMessage(e.getClass().getSimpleName()+": "+e.getError().getMessage());
+        entity.setError(errorSchema);
+
+        return responseStatus420(entity);
 
     }
 
