@@ -20,7 +20,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
  
     @Override
     public JOCDefaultResponse postTask(String accessToken, TaskFilterSchema  taskFilterSchema) throws Exception {
-        LOGGER.debug("init Task");
+        LOGGER.debug("init task");
         JOCDefaultResponse jocDefaultResponse = init(taskFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;

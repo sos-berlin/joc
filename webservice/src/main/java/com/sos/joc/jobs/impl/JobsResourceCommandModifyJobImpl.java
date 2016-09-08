@@ -43,7 +43,7 @@ public class JobsResourceCommandModifyJobImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobsSchema modifyJobsSchema) {
-        LOGGER.debug("init Jobs: Stop");
+        LOGGER.debug("init jobs/stop");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
@@ -64,7 +64,7 @@ public class JobsResourceCommandModifyJobImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobsSchema modifyJobsSchema) throws Exception {
-        LOGGER.debug("init Jobs: unstop");
+        LOGGER.debug("init jobs/unstop");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
@@ -85,7 +85,7 @@ public class JobsResourceCommandModifyJobImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobsSchema modifyJobsSchema) {
-        LOGGER.debug("init Jobs: set_run_time");
+        LOGGER.debug("init jobs/set_run_time");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
@@ -106,7 +106,7 @@ public class JobsResourceCommandModifyJobImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobsSchema modifyJobsSchema) {
-        LOGGER.debug("init Jobs: end_all_tasks");
+        LOGGER.debug("init jobs/end_all_tasks");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
@@ -127,7 +127,7 @@ public class JobsResourceCommandModifyJobImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobsSchema modifyJobsSchema) {
-        LOGGER.debug("init Jobs: suspend_all_tasks");
+        LOGGER.debug("init job/suspend_all_tasks");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
@@ -148,7 +148,7 @@ public class JobsResourceCommandModifyJobImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobsSchema modifyJobsSchema) {
-        LOGGER.debug("init Jobs: continue_all_tasks");
+        LOGGER.debug("init jobs/continue_all_tasks");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {

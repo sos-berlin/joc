@@ -26,7 +26,7 @@ public class JobSchedulerResource extends JOCResourceImpl {
     JobSchedulerFilterSchema jobSchedulerFilterSchema;
 
     public JOCDefaultResponse postJobscheduler() {
-        LOGGER.debug("init Jobscheduler");
+        LOGGER.debug("init jobscheduler");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {

@@ -23,7 +23,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 
     @Override
     public JOCDefaultResponse postJobRunTime(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
-        LOGGER.debug("init Job RunTime");
+        LOGGER.debug("init job/runTime");
         JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;

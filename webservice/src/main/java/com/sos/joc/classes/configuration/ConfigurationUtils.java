@@ -1,8 +1,6 @@
 package com.sos.joc.classes.configuration;
 
-import java.io.File;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
 
@@ -23,7 +21,6 @@ import sos.xml.SOSXMLTransformer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.jobs.JobsUtils;
 import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.ConfigurationSchema;
 import com.sos.joc.model.common.Content;
@@ -32,7 +29,7 @@ import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 public class ConfigurationUtils {
 
-    public ConfigurationSchema getEntity(){
+    public static ConfigurationSchema getEntity(){
 
         ConfigurationSchema entity = new ConfigurationSchema();
 

@@ -22,7 +22,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceImpl.class);
 
     public JOCDefaultResponse postJob(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
-        LOGGER.debug("init Job");
+        LOGGER.debug("init job");
         JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;

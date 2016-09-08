@@ -33,7 +33,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
         }
 
         try {
-            LOGGER.debug("init Jobs");
+            LOGGER.debug("init jobs");
  
             JobsVSchema entity = new JobsVSchema();
             List<Job_> listJobs = new ArrayList<Job_>();

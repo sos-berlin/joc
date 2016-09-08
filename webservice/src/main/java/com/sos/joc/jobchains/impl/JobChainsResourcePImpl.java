@@ -20,7 +20,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
      
     @Override
     public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilterSchema  jobChainsFilterSchema) throws Exception {
-        LOGGER.debug("init Job Chains");
+        LOGGER.debug("init job_chains/p");
         JOCDefaultResponse jocDefaultResponse = init(jobChainsFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobChain().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;

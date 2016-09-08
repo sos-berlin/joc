@@ -58,7 +58,7 @@ public class JobsResourceCommandStartJobsImpl extends JOCResourceImpl implements
 
     @Override
     public JOCDefaultResponse postJobsStart(String accessToken, StartJobsSchema startJobsSchema) throws Exception {
-        LOGGER.debug("init Orders: Add");
+        LOGGER.debug("init orders: add");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
             jocDefaultResponse = init(startJobsSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getStart().isTask());

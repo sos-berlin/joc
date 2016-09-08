@@ -25,7 +25,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
     @Override
     public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilterSchema jobConfigurationFilterSchema) throws Exception {
 
-        LOGGER.debug("init Jobs Configuration");
+        LOGGER.debug("init jobs/configuration");
         JOCDefaultResponse jocDefaultResponse =
                 init(jobConfigurationFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {

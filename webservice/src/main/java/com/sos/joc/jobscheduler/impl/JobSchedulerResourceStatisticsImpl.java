@@ -24,7 +24,7 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
     @Override
     public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) throws Exception {
 
-        LOGGER.debug("init Statistics");
+        LOGGER.debug("init jobscheduler/statistics");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {

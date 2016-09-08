@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.jobchain.JobChains;
 import com.sos.joc.jobchains.resource.IJobChainsResource;
 import com.sos.joc.model.jobChain.JobChainsFilterSchema;
 import com.sos.joc.model.jobChain.JobChainsVSchema;
@@ -19,7 +20,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
      
     @Override
     public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilterSchema  jobChainsFilterSchema) throws Exception {
-        LOGGER.debug("init Job Chains");
+        LOGGER.debug("init job_chains");
         JOCDefaultResponse jocDefaultResponse = init(jobChainsFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobChain().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -30,7 +31,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
  
             JobChainsVSchema entity = new JobChainsVSchema();
             entity.setDeliveryDate(new Date());
-    //        entity.setJobChains(JobChains.getJobChains(jobChainsFilterSchema.getCompact())); 
+            entity.setJobChains(JobChains.getJobChains(jobChainsFilterSchema.getCompact())); 
               
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
