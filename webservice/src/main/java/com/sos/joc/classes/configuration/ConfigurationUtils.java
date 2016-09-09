@@ -98,7 +98,7 @@ public class ConfigurationUtils {
         return configuration;
     }
 
-    public static Content getContent(JobConfigurationFilterSchema jobConfigurationFilterSchema, Class clazz, String configurationXml) throws Exception {
+    public static Content getContent(JobConfigurationFilterSchema jobConfigurationFilterSchema, Class<?> clazz, String configurationXml) throws Exception {
         Content content = new Content();
         if(jobConfigurationFilterSchema.getMime().equals(JobConfigurationFilterSchema.Mime.HTML)) {
             InputStream inputStream = clazz.getResourceAsStream("/show_configuration.xsl");
