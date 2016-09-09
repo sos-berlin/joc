@@ -84,9 +84,11 @@ public class UsedNodes {
     }
     
     public void addEntries(JsonArray nodes){
-        for (JsonObject node : nodes.getValuesAs(JsonObject.class)) {
-            this.put(node);
-        }
+        if (this.nodes == null){
+            for (JsonObject node : nodes.getValuesAs(JsonObject.class)) {
+                this.put(node);
+            }
+        } //only fill map if empty
     }
    
     private void put(JsonObject node){

@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
+import com.sos.joc.classes.orders.UsedJobs.Job;
+import com.sos.joc.classes.orders.UsedJobChains.JobChain;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.NameValuePairsSchema;
@@ -34,6 +36,7 @@ public class OrderV extends OrderQueue {
         
         JsonObject pState = overview.getJsonObject("processingState");
         JsonArray obstacles = overview.getJsonArray("obstacles");
+        LOGGER.info(overview.toString());
         
         //setSurveyDate(null);
         setPathJobChainAndOrderId();
@@ -95,11 +98,11 @@ public class OrderV extends OrderQueue {
                         break;
                     }
                 }
-                if (getProcessingState().getText() == null && usedNodes.getNode(getJobChain(), getState()).isStopped()) {
+                if (getProcessingState() == null && usedNodes.getNode(getJobChain(), getState()).isStopped()) {
                     setSeverity(ProcessingState.Text.NODE_STOPPED);
                 }
-                if (getProcessingState().getText() == null) {
-                    needMoreInfos = true; 
+                if (getProcessingState() == null) {
+                    needMoreInfos = true;
                 }
                 break;
             case "Blacklisted":
@@ -108,6 +111,36 @@ public class OrderV extends OrderQueue {
             default:
         }
         return needMoreInfos;
+    }
+    
+    public boolean hasJobObstacles(Job job) {
+        ProcessingState.Text text = job.getState();
+        if (text == ProcessingState.Text.JOB_NOT_IN_PERIOD) {
+            setNextStartTime(JobSchedulerDate.getDateFromISO8601String(job.nextPeriodBeginsAt()));
+            return false;
+        }
+        if (text == ProcessingState.Text.JOB_STOPPED) {
+            return false;
+        }
+        if (text == ProcessingState.Text.WAITING_FOR_TASK) {
+            return false;
+        }
+        if (text == ProcessingState.Text.WAITING_FOR_PROCESS) {
+            return false;
+        }
+        if (text == ProcessingState.Text.WAITING_FOR_LOCK) {
+            setLock(job.getLock());
+            return false;
+        }
+        return true;
+    }
+    
+    public boolean hasJobChainObstacles(JobChain jobChain) {
+        if (jobChain.isStopped()) {
+            setSeverity(ProcessingState.Text.JOB_CHAIN_STOPPED);
+            return false;
+        }
+        return true;
     }
     
     private void setSeverity(ProcessingState.Text text) {
@@ -141,6 +174,7 @@ public class OrderV extends OrderQueue {
         if (path == null || path.isEmpty()) {
             throw new JobSchedulerInvalidResponseDataException("Invalid resonsed data: path is empty");
         }
+        LOGGER.debug("...processing Order " + path);
         String[] pathParts = path.split(",", 2);
         if (pathParts.length != 2) {
             throw new JobSchedulerInvalidResponseDataException(String.format("Invalid resonsed data: path ('%1$s') doesn't contain the orderId",path));

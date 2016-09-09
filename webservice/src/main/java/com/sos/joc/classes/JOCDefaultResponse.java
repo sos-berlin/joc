@@ -4,6 +4,10 @@ import java.util.Date;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Error420Schema;
@@ -11,7 +15,9 @@ import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.common.OkSchema;
 
 public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
-
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(JOCDefaultResponse.class);
+            
     private JOCDefaultResponse(Response delegate) {
         super(delegate);
     }
@@ -56,11 +62,28 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
          
         ErrorSchema errorSchema = new ErrorSchema();
         errorSchema.setCode(e.getError().getCode());
-        errorSchema.setMessage(e.getClass().getSimpleName()+": "+e.getError().getMessage());
+        String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getError().getMessage();
+        LOGGER.error(errorMsg, e);
+        errorSchema.setMessage(errorMsg);
         entity.setError(errorSchema);
 
         return responseStatus420(entity);
+    }
+    
+    public static JOCDefaultResponse responseStatusJSError(Exception e) {
+        if (e instanceof JocException) {
+            return responseStatusJSError((JocException) e);
+        }
+        Error420Schema entity = new Error420Schema();
+        entity.setDeliveryDate(new Date());
+        ErrorSchema errorSchema = new ErrorSchema();
+        errorSchema.setCode("JOC-420");
+        String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
+        LOGGER.error(errorMsg, e);
+        errorSchema.setMessage(errorMsg);
+        entity.setError(errorSchema);
 
+        return responseStatus420(entity);
     }
 
     public static JOCDefaultResponse responseStatus420(Error420Schema entity) {

@@ -31,9 +31,15 @@ public class UsedJobChains {
     }
 
     public void addEntries(JsonArray jobChains) {
-        for (JsonObject jobChain : jobChains.getValuesAs(JsonObject.class)) {
-            this.put(jobChain);
+        if (this.jobChains == null){
+            for (JsonObject jobChain : jobChains.getValuesAs(JsonObject.class)) {
+                this.put(jobChain);
+            }
         }
+    }
+    
+    public JobChain get(String path) {
+        return jobChains.containsKey(path) ? jobChains.get(path) : null;
     }
 
     public boolean isStopped(String path) {

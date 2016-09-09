@@ -7,17 +7,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.orders.post.orders.OrdersBody;
+import com.sos.joc.model.order.OrdersFilterSchema;
+
 
  
 public interface IOrdersResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrders(            
-            @HeaderParam("access_token") String accessToken, OrdersBody ordersBody) throws Exception;
+    public JOCDefaultResponse postOrders(@HeaderParam("access_token") String accessToken, OrdersFilterSchema ordersBody) throws Exception;
 
-
- 
-    
 }

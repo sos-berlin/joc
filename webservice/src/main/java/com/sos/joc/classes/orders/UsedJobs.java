@@ -19,7 +19,7 @@ public class UsedJobs {
     private static final Logger LOGGER = LoggerFactory.getLogger(UsedJobs.class);
     private HashMap <String,Job> jobs;
     
-    private class Job {
+    public class Job {
 
         private JsonArray obstacles;
         private String nextPeriodBeginsAt = null;
@@ -96,15 +96,24 @@ public class UsedJobs {
     }
     
     public void addEntries(JsonArray jobs){
-        for (JsonObject job : jobs.getValuesAs(JsonObject.class)) {
-            this.put(job);
-        }
+        if (this.jobs == null){
+            for (JsonObject job : jobs.getValuesAs(JsonObject.class)) {
+                this.put(job);
+            }
+        } 
     }
     
     public void parse(String path) {
         if (jobs.containsKey(path)) {
             jobs.get(path).parse();
         }
+    }
+    
+    public Job get(String path) {
+        if (jobs.containsKey(path)) {
+            return jobs.get(path);
+        }
+        return null;
     }
     
     public boolean isStopped(String path) {

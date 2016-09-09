@@ -19,6 +19,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.orders.OrderV;
+import com.sos.joc.classes.orders.UsedJobChains;
+import com.sos.joc.classes.orders.UsedJobs;
 import com.sos.joc.classes.orders.UsedNodes;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
@@ -47,6 +49,8 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             LOGGER.info(json.toString());
                        
             UsedNodes usedNodes = new UsedNodes();
+            UsedJobs usedJobs = new UsedJobs();
+            UsedJobChains usedJobChains = new UsedJobChains();
             usedNodes.addEntries(json.getJsonArray("usedNodes"));
             
             OrderV order = new OrderV((JsonObject) json.getJsonArray("orders").stream().findFirst().get());
@@ -57,23 +61,25 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             } else {
                 needMoreInfos = order.setDetailedFields(usedNodes);
             }
-//            if (needMoreInfos) {
-//                UsedJobChains usedJobChains = new UsedJobChains();
-//                usedJobChains.addEntries(json.getJsonArray("UsedJobChains"));
-//                usedJobChains.isStopped(order.getJobChain());
-//            }
+            if (needMoreInfos) {
+                usedJobs.addEntries(json.getJsonArray("usedJobs"));
+                needMoreInfos = order.hasJobObstacles(usedJobs.get(order.getJob()));
+            }
+            if (needMoreInfos) {
+                usedJobChains.addEntries(json.getJsonArray("usedJobChains"));
+                order.hasJobChainObstacles(usedJobChains.get(order.getJobChain()));
+            }
             
             Order200VSchema entity = new Order200VSchema();
             entity.setDeliveryDate(new Date());
             entity.setOrder(order);
-            LOGGER.info(entity.getOrder().toString());
+            //LOGGER.info(entity.getOrder().toString());
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
-            LOGGER.error(errorMsg, e);
-            return JOCDefaultResponse.responseStatusJSError(((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
 
     }
@@ -99,7 +105,9 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("path", jobChain);
         builder.add("orderId", orderId);
-        return builder.build().toString();
+        String postBody = builder.build().toString();
+        LOGGER.info("with POST body: " + postBody);
+        return postBody;
     }
     
     private JsonObject getJsonObjectFromResponse(OrderFilterWithCompactSchema orderBody, String masterUrl) throws Exception {
@@ -122,6 +130,4 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             throw new JobSchedulerBadRequestException(httpReplyCode+ " " +client.getHttpResponse().getStatusLine().getReasonPhrase());
         }
     }
-
-
 }
