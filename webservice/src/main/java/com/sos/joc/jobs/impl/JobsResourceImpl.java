@@ -39,7 +39,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             List<Job_> listJobs = new ArrayList<Job_>();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 //            String postCommand = JobsUtils.createJobsPostCommand(jobsFilterSchema);
-            String postCommand = JobsUtils.createJobsPostCommandWithModelObject(jobsFilterSchema);
+            String postCommand = JobsUtils.createJobsPostCommand(jobsFilterSchema);
             LOGGER.info(postCommand);
             jocXmlCommand.excutePost(postCommand);
             
@@ -62,7 +62,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
                 if (!JobsUtils.filterJobs(jobsFilterSchema, (Element)jobNode, jocXmlCommand.getSosxml())) {
                     continue;
                 }
-                Job_ job = Job.getJob(jobNode, jocXmlCommand, jobsFilterSchema.getCompact());
+                Job_ job = Job.getJob_(jobNode, jocXmlCommand, jobsFilterSchema.getCompact());
                 if(job != null) {
                     if (surveyDate != null) {
                         job.setSurveyDate(surveyDate);

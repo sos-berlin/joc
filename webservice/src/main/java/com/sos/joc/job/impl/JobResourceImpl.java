@@ -34,7 +34,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
             jocXmlCommand.excutePost(postCommand);
             entity.setDeliveryDate(new Date());
             Node jobNode = jocXmlCommand.getSosxml().selectSingleNode("//job");
-            entity.setJob(Job.getJob(jobNode, jocXmlCommand, jobFilterSchema.getCompact()));
+            entity.setJob(Job.getJob_(jobNode, jocXmlCommand, jobFilterSchema.getCompact()));
             entity.getJob().setSurveyDate(jocXmlCommand.getSurveyDate());
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {

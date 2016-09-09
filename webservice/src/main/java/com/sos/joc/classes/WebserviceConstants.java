@@ -1,5 +1,7 @@
 package com.sos.joc.classes;
 
+import org.w3c.dom.Element;
+
 public class WebserviceConstants {
 
     public static final String JOC_COCKPUT = "JOC_COCKPIT";
@@ -23,11 +25,16 @@ public class WebserviceConstants {
     public static final String STEPS = "steps";
     public static final String ORDER = "order";
     public static final String IN_PROCESS_SINCE = "in_process_since";
+    public static final String JOB = "job";
     public static final String JOB_CHAIN = "job_chain";
     public static final String PATH = "path";
     public static final String STATE = "state";
     public static final String NEXT_START_TIME = "next_start_time";
-
+    public static final String PRIORITY = "priority";
+    public static final String IN_PERIOD = "in_period";
+    public static final String WAITING_FOR_AGENT = "waiting_for_remote_scheduler";
+    public static final String WAITING_FOR_PROCESS = "waiting_for_process";
+    
     public static final String ORDER_API_PATH = "/jobscheduler/master/api/order";
     public static final String ORDER_OVERVIEW = "OrdersComplemented/OrderOverview";
     public static final String ORDER_DETAILED = "OrdersComplemented/OrderDetailed";

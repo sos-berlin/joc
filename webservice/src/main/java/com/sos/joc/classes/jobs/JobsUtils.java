@@ -1,10 +1,10 @@
 package com.sos.joc.classes.jobs;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -16,21 +16,20 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.JobFilterSchema;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.Lock_;
+import com.sos.joc.model.job.Lock__;
 import com.sos.joc.model.job.Order;
 import com.sos.joc.model.job.RunningTask;
+import com.sos.joc.model.job.State_;
+import com.sos.joc.model.job.State__;
 import com.sos.joc.model.job.State___;
 import com.sos.joc.model.job.TaskQueue;
 import com.sos.scheduler.model.commands.JSCmdShowJob;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
 public class JobsUtils {
-
-    private static final SimpleDateFormat SDF = new SimpleDateFormat(WebserviceConstants.JOBSCHEDULER_DATE_FORMAT);
-    private static final SimpleDateFormat SDF2 = new SimpleDateFormat(WebserviceConstants.JOBSCHEDULER_DATE_FORMAT2);
 
     public static Boolean getBoolValue(final String value) {
         if (WebserviceConstants.YES.equalsIgnoreCase(value)) {
@@ -41,33 +40,19 @@ public class JobsUtils {
         return null;
     }
 
-//    public static Date getDateFromString(final String dateString) throws Exception {
-//        if (dateString != null) {
-//            Date date = null;
-//            if (!dateString.contains("T")) {
-//                date = SDF.parse(dateString);
-//            } else {
-//                date = SDF2.parse(dateString);
-//            }
-//            return date;
-//        } else {
-//            return null;
-//        }
-//    }
-//    
-    public static String createJobsPostCommandWithModelObject(final JobsFilterSchema body) {
+    public static String createJobsPostCommand(final JobsFilterSchema body) {
         boolean compact = body.getCompact();
         StringBuilder strb = new StringBuilder();
         strb.append("<commands>");
         // JSCmdShowState only works with one path(folder)
         // create one command per folder
-        if(!body.getFolders().isEmpty()){
+        if (!body.getFolders().isEmpty()) {
             for (FoldersSchema folder : body.getFolders()) {
                 JSCmdShowState showStateCommand = Globals.schedulerObjectFactory.createShowState();
                 showStateCommand.setSubsystems("job folder");
                 showStateCommand.setPath(folder.getFolder());
-                if(!compact) {
-                    if(!folder.getRecursive()){
+                if (!compact) {
+                    if (!folder.getRecursive()) {
                         showStateCommand.setWhat("job_orders folders task_queue job_params no_subfolders");
                     } else {
                         showStateCommand.setWhat("job_orders folders task_queue job_params");
@@ -81,7 +66,7 @@ public class JobsUtils {
             JSCmdShowState showStateCommand = Globals.schedulerObjectFactory.createShowState();
             showStateCommand.setSubsystems("job");
             showStateCommand.setPath("/");
-            if (!compact){
+            if (!compact) {
                 showStateCommand.setWhat("job_orders task_queue job_params");
             } else {
                 showStateCommand.setWhat("job_orders task_queue");
@@ -92,49 +77,59 @@ public class JobsUtils {
         return strb.toString();
     }
 
-    public static String createJobsPostCommand(final JobsFilterSchema body) {
-        boolean compact = body.getCompact();
-        StringBuilder postCommand = new StringBuilder();
-        postCommand.append("<commands>");
-        if (!body.getFolders().isEmpty()) {
-            for (FoldersSchema folder : body.getFolders()) {
-                postCommand.append("<show_state subsystems=\"job folder\" what=\"job_orders folders");
-                if (!compact) {
-                    postCommand.append(" task_queue job_params");
-                }
-                String path = folder.getFolder();
-                Boolean recursive = folder.getRecursive();
-                if (!recursive) {
-                    postCommand.append(" no_subfolders");
-                }
-                postCommand.append("\"");
-                postCommand.append(" path=\"").append(path).append("\"/>");
-            }
-        } else {
-            postCommand.append("<show_state subsystems=\"job\" what=\"job_orders task_queue");
-            if (!compact) {
-                postCommand.append(" job_params");
-            }
-            postCommand.append("\" path=\"/\"/>");
-        }
-        postCommand.append("</commands>");
-        return postCommand.toString();
-    }
-
     public static String createJobPostCommand(final JobFilterSchema body) {
         boolean compact = body.getCompact();
         JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
         if (!body.getJob().isEmpty()) {
-            if(!compact) {
+            if (!compact) {
                 showJob.setWhat("job_params task_queue");
             }
             showJob.setJob(body.getJob());
         }
         return Globals.schedulerObjectFactory.toXMLString(showJob);
     }
+    
+    private static String overwriteStateValue(String stateValue, Node jobNode) throws Exception {
+        Boolean inPeriod = getBoolValue(((Element)jobNode).getAttribute(WebserviceConstants.IN_PERIOD));
+        if(inPeriod != null && !inPeriod) {
+            return State_.Text.NOT_IN_PERIOD.toString();
+        }
+        Boolean waitingForAgent = getBoolValue(((Element)jobNode).getAttribute(WebserviceConstants.WAITING_FOR_AGENT));
+        if(waitingForAgent != null && waitingForAgent) {
+            return State_.Text.WAITING_FOR_AGENT.toString();
+        }
+        Boolean waitingForProcess = getBoolValue(((Element)jobNode).getAttribute(WebserviceConstants.WAITING_FOR_PROCESS));
+        if(waitingForProcess != null && waitingForProcess) {
+            return State_.Text.WAITING_FOR_PROCESS.toString();
+        }
+        CachedXPathAPI xPath = new CachedXPathAPI();
+        NodeList locks = xPath.selectNodeList((Element)jobNode, "lock.requestor/lock.use[@is_available='no']");
+        boolean waitingForLock = locks.getLength() > 0;
+        if(waitingForLock) {
+            return State_.Text.WAITING_FOR_LOCK.toString();
+        }
+        // TODO: WaitingForTask
+        return stateValue;
+    }
 
-    public static Integer getSeverityFromStateText(String stateText) {
-        switch (stateText.toUpperCase()) {
+    public static State_ getOutputState_(String stateValue, Node jobNode) throws Exception {
+        stateValue = overwriteStateValue(stateValue, jobNode);
+        State_ state = new State_();
+        state.setSeverity(JobsUtils.getSeverityFromStateText(stateValue));
+        state.setText(State_.Text.valueOf(stateValue.toUpperCase()));
+        return state;
+    }
+    
+    public static State__ getOutputState__(String stateValue, Node jobNode) throws Exception {
+        stateValue = overwriteStateValue(stateValue, jobNode);
+        State__ state = new State__();
+        state.setSeverity(JobsUtils.getSeverityFromStateText(stateValue));
+        state.setText(State__.Text.valueOf(stateValue.toUpperCase()));
+        return state;
+    }
+    
+    public static Integer getSeverityFromStateText(String stateValue) {
+        switch (stateValue.toUpperCase()) {
         case "RUNNING":
             return 0;
         case "PENDING":
@@ -158,12 +153,60 @@ public class JobsUtils {
         return null;
     }
 
-    public static List<Lock_> getLocks(NodeList lockList) {
+    public static Integer getSeverityFromProcessingStateText(String stateValue) {
+        switch (stateValue.toUpperCase()) {
+        case "RUNNING":
+            return 0;
+        case "PENDING":
+            return 1;
+        case "WAITING_FOR_AGENT":
+        case "JOB_CHAIN_STOPPED":
+        case "NODE_STOPPED":
+        case "JOB_STOPPED":
+            return 2;
+        case "JOB_NOT_IN_PERIOD":
+        case "NODE_DELAY":
+        case "WAITING_FOR_PROCESS":
+        case "WAITING_FOR_LOCK":
+        case "WAITING_FOR_TASK":
+        case "NOT_IN_PERIOD":
+            return 3;
+        case "SETBACK":
+        case "SUSPENDED":
+            return 5;
+        }
+        return null;
+    }
+
+    public static List<Lock_> getLocks_(NodeList lockList) {
         if (lockList != null && lockList.getLength() > 0) {
             List<Lock_> listOfLocks = new ArrayList<Lock_>();
             for (int j = 0; j < lockList.getLength(); j++) {
                 Node lockNode = lockList.item(j);
                 Lock_ lock = new Lock_();
+                Element lockElement = (Element) lockNode;
+                if (lockElement.getAttribute(WebserviceConstants.EXCLUSIVE) != null) {
+                    lock.setExclusive(JobsUtils.getBoolValue(lockElement.getAttribute(WebserviceConstants.EXCLUSIVE)));
+                }
+                if (lockElement.getAttribute(WebserviceConstants.IS_AVAILABLE) != null) {
+                    lock.setAvailable(JobsUtils.getBoolValue(lockElement.getAttribute(WebserviceConstants.IS_AVAILABLE)));
+                }
+                if (lockElement.getAttribute(WebserviceConstants.LOCK) != null) {
+                    lock.setPath(lockElement.getAttribute(WebserviceConstants.LOCK));
+                }
+                listOfLocks.add(lock);
+            }
+            return listOfLocks;
+        }
+        return null;
+    }
+
+    public static List<Lock__> getLocks__(NodeList lockList) {
+        if (lockList != null && lockList.getLength() > 0) {
+            List<Lock__> listOfLocks = new ArrayList<Lock__>();
+            for (int j = 0; j < lockList.getLength(); j++) {
+                Node lockNode = lockList.item(j);
+                Lock__ lock = new Lock__();
                 Element lockElement = (Element) lockNode;
                 if (lockElement.getAttribute(WebserviceConstants.EXCLUSIVE) != null) {
                     lock.setExclusive(JobsUtils.getBoolValue(lockElement.getAttribute(WebserviceConstants.EXCLUSIVE)));
@@ -191,22 +234,6 @@ public class JobsUtils {
                 taskQueue.setEnqueued(JobSchedulerDate.getDate(taskQueueElement.getAttribute(WebserviceConstants.ENQUEUED)));
             }
             return queuedTasks;
-        } else {
-            return null;
-        }
-    }
-
-    public static List<NameValuePairsSchema> getParameters(NodeList paramList) {
-        List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
-        if (paramList != null && paramList.getLength() > 0) {
-            for (int paramsCount = 0; paramsCount < paramList.getLength(); paramsCount++) {
-                NameValuePairsSchema param = new NameValuePairsSchema();
-                Element paramElement = (Element) paramList.item(paramsCount);
-                param.setName(paramElement.getAttribute(WebserviceConstants.NAME));
-                param.setValue(paramElement.getAttribute(WebserviceConstants.VALUE));
-                params.add(param);
-            }
-            return params;
         } else {
             return null;
         }
