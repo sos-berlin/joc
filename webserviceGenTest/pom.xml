@@ -98,11 +98,8 @@
         <dependency>
             <groupId>com.sos-berlin.joc</groupId>
             <artifactId>webservice</artifactId>
-                    <version>1.11.0-SNAPSHOT</version>
-            
+			<version>${project.version}</version>
         </dependency>
-        
-      
  
 		<dependency>
 			<groupId>com.oracle</groupId>
