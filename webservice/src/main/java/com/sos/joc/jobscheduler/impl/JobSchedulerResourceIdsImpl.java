@@ -22,7 +22,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
 
     @Override
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {
-        LOGGER.debug("init JobschedulerIds");
+        LOGGER.debug("init jobscheduler/ids");
         try {
             JOCDefaultResponse jocDefaultResponse = init("", getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {

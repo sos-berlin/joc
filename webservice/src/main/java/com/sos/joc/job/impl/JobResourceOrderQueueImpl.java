@@ -33,7 +33,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
     @Override
     public JOCDefaultResponse postJobOrderQueue(String accessToken, JobOrderQueueFilterSchema jobOrderQueueFilterSchema) throws Exception {
 
-        LOGGER.debug("init Job Order Queue");
+        LOGGER.debug("init job/order_queue");
         JOCDefaultResponse jocDefaultResponse = init(jobOrderQueueFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;

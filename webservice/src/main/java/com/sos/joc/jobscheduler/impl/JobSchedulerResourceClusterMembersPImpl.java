@@ -23,7 +23,7 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
     @Override
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
 
-        LOGGER.debug("init JobschedulerClusterMembers");
+        LOGGER.debug("init jobscheduler/cluster/members/p");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {

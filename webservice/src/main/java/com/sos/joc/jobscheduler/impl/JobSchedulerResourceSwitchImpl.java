@@ -22,7 +22,7 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl  implements 
     @Override
     public JOCDefaultResponse postJobschedulerSwitch(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) throws Exception {
   
-        LOGGER.debug("init JobschedulerSwitch");
+        LOGGER.debug("init jobscheduler/switch");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {

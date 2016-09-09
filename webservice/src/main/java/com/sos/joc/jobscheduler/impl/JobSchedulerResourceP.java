@@ -31,7 +31,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
 
     public JOCDefaultResponse postJobschedulerP() {
 
-        LOGGER.debug("init JobschedulerClusterMembers");
+        LOGGER.debug("init jobscheduler/p");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {

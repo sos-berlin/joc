@@ -29,7 +29,7 @@ import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 public class ConfigurationUtils {
 
-    public ConfigurationSchema getEntity(){
+    public static ConfigurationSchema getEntity(){
 
         ConfigurationSchema entity = new ConfigurationSchema();
 

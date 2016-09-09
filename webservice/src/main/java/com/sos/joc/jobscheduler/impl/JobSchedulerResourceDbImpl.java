@@ -21,7 +21,7 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
     @Override
     public JOCDefaultResponse postJobschedulerDb(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
 
-        LOGGER.debug("init JobschedulerClusterMembers");
+        LOGGER.debug("init jobscheduler/db");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {

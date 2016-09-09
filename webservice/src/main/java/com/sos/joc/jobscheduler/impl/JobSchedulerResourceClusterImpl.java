@@ -20,7 +20,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
 
     @Override
     public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
-        LOGGER.debug("init JobschedulerCluster");
+        LOGGER.debug("init jobscheduler/cluster");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {

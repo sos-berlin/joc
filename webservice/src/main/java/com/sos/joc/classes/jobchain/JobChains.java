@@ -76,8 +76,7 @@ public class JobChains {
 
     }
     
-    public static List<JobChain__> getJobChains(boolean compact){
-        List<JobChain__> listOfJobChains = new ArrayList<JobChain__>();
+    public static JobChain__ getJobChain2(boolean compact){
         JobChain__ jobChain = new JobChain__();
         jobChain.setName("myName2");
         jobChain.setSurveyDate(new Date());
@@ -117,6 +116,12 @@ public class JobChains {
         jobChainState.setSeverity(-1);
         jobChainState.setText(State.Text.ACTIVE);
         jobChain.setState(jobChainState);
+        return jobChain;
+    }
+    
+    public static List<JobChain__> getJobChains(boolean compact){
+        List<JobChain__> listOfJobChains = new ArrayList<JobChain__>();
+        JobChain__ jobChain = getJobChain2(compact);
         listOfJobChains.add(jobChain);
         return listOfJobChains;
     }

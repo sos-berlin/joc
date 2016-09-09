@@ -22,7 +22,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilterSchema agentFilterSchema) {
-        LOGGER.debug("init JobschedulerAgentsP");
+        LOGGER.debug("init jobscheduler/agents/p");
         try {
             JOCDefaultResponse jocDefaultResponse = init(agentFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerUniversalAgent().getView()
                     .isStatus());

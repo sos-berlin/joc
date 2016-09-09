@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.job.Jobs;
@@ -23,7 +24,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     @Override
     public JOCDefaultResponse postJobP(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
 
-        LOGGER.debug("init JobsP");
+        LOGGER.debug("init jobs/p");
         JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
 
         if (jocDefaultResponse != null) {
@@ -37,7 +38,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             // TODO JOC Cockpit Webservice: Reading from database
             entity.setDeliveryDate(new Date());
 
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection(), jobFilterSchema.getJobschedulerId());
+            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection, jobFilterSchema.getJobschedulerId());
             DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(jobFilterSchema.getJob());
             Job job = new Job();
             job.setConfigurationDate(new Date());
