@@ -84,135 +84,64 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError("Error executing order." + command + ":" + e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing order.%s %s:%s",command, e.getCause(), e.getMessage()));
         }
+    }
+
+    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrdersBody ordersModifyOrderBody) {
+        LOGGER.debug("init Orders: Start");
+        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
+
+        try {
+            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), permission);
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            for (Order order : ordersModifyOrderBody.getOrders()) {
+                jocDefaultResponse = executeModifyOrderCommand(order, command);
+            }
+        } catch (Exception e) {
+            return jocDefaultResponse;
+        }
+
+        return jocDefaultResponse;
+
     }
 
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders: Start");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-
-        try {
-            jocDefaultResponse = init(ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isStart());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (Order order : ordersModifyOrderBody.getOrders()) {
-                jocDefaultResponse = executeModifyOrderCommand(order, "start");
-            }
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        return postOrdersCommand(accessToken, "start", getPermissons(accessToken).getOrder().isStart(), ordersModifyOrderBody);
     }
 
     @Override
     public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrdersBody ordersModifyOrderBody) throws Exception {
         LOGGER.debug("init Orders:Suspend");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-        try {
-            jocDefaultResponse = init(ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isSuspend());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (Order order : ordersModifyOrderBody.getOrders()) {
-                jocDefaultResponse = executeModifyOrderCommand(order, "suspend");
-            }
-
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        return postOrdersCommand(accessToken, "suspend", getPermissons(accessToken).getOrder().isSuspend(), ordersModifyOrderBody);
     }
 
     @Override
     public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders:Resume");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-        try {
-            jocDefaultResponse = init(ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isResume());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (Order order : ordersModifyOrderBody.getOrders()) {
-                jocDefaultResponse = executeModifyOrderCommand(order, "resume");
-            }
-
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        return postOrdersCommand(accessToken, "resume", getPermissons(accessToken).getOrder().isResume(), ordersModifyOrderBody);
     }
 
     @Override
     public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders: Reset");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-        try {
-            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isReset());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (Order order : ordersModifyOrderBody.getOrders()) {
-                jocDefaultResponse = executeModifyOrderCommand(order, "reset");
-            }
-
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        return postOrdersCommand(accessToken, "reset", getPermissons(accessToken).getOrder().isReset(), ordersModifyOrderBody);
     }
 
     @Override
     public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders: Set State");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-
-        try {
-            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isSetState());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (Order order : ordersModifyOrderBody.getOrders()) {
-                jocDefaultResponse = executeModifyOrderCommand(order, "set_state");
-            }
-
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        return postOrdersCommand(accessToken, "set_state", getPermissons(accessToken).getOrder().isSetState(), ordersModifyOrderBody);
     }
 
     @Override
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
         LOGGER.debug("init Orders: Set Runtime");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-        try {
-            jocDefaultResponse = init(accessToken, ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().isSetRunTime());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (Order order : ordersModifyOrderBody.getOrders()) {
-                jocDefaultResponse = executeModifyOrderCommand(order, "set_run_time");
-            }
-
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        return postOrdersCommand(accessToken, "set_run_time", getPermissons(accessToken).getOrder().isSetRunTime(), ordersModifyOrderBody);
     }
 
 }

@@ -12,7 +12,7 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
 
     @Override
     public JOCDefaultResponse getTaskLogHtml(String accessToken, String jobschedulerId) throws Exception {
-        LOGGER.debug("init OrderHistory");
+        LOGGER.debug("init task/log/html");
 
         JOCDefaultResponse jocDefaultResponse = init(jobschedulerId, getPermissons(accessToken).getJob().getView().isTaskLog());
         if (jocDefaultResponse != null) {

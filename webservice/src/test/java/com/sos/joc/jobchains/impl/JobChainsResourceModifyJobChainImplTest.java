@@ -14,7 +14,7 @@ import com.sos.joc.model.jobChain.JobChain_____;
 import com.sos.joc.model.jobChain.JobChainsPSchema;
 import com.sos.joc.model.jobChain.ModifySchema;
 
-public class JobChainsResourceCommandModifyJobChainImplTest {
+public class JobChainsResourceModifyJobChainImplTest {
     private static final String LDAP_PASSWORD = "secret";
     private static final String LDAP_USER = "root";
 
@@ -36,7 +36,7 @@ public class JobChainsResourceCommandModifyJobChainImplTest {
         
         modifySchema.setJobChains(listOfJobChains);
         
-        JobChainsResourceCommandModifyJobChainsImpl jobChainsResourceCommandModifyJobChainsImpl = new JobChainsResourceCommandModifyJobChainsImpl();
+        JobChainsResourceModifyJobChainsImpl jobChainsResourceCommandModifyJobChainsImpl = new JobChainsResourceModifyJobChainsImpl();
         JOCDefaultResponse jobsResponse = jobChainsResourceCommandModifyJobChainsImpl.postJobChainsStop(sosShiroCurrentUserAnswer.getAccessToken(), modifySchema);
         OkSchema okSchema = (OkSchema) jobsResponse.getEntity();
         assertEquals("postJobChainsStopTest", true, okSchema.getOk());
@@ -61,7 +61,7 @@ public class JobChainsResourceCommandModifyJobChainImplTest {
         
         modifySchema.setJobChains(listOfJobChains);
         
-        JobChainsResourceCommandModifyJobChainsImpl jobChainsResourceCommandModifyJobChainsImpl = new JobChainsResourceCommandModifyJobChainsImpl();
+        JobChainsResourceModifyJobChainsImpl jobChainsResourceCommandModifyJobChainsImpl = new JobChainsResourceModifyJobChainsImpl();
         JOCDefaultResponse jobsResponse = jobChainsResourceCommandModifyJobChainsImpl.postJobChainsUnStop(sosShiroCurrentUserAnswer.getAccessToken(), modifySchema);
         OkSchema okSchema = (OkSchema) jobsResponse.getEntity();
         assertEquals("postJobChainsUnStopTest", true, okSchema.getOk());

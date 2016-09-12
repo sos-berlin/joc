@@ -19,6 +19,9 @@ import com.sos.scheduler.model.objects.Spooler;
 
 @Path("tasks")
 public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksResourceKill {
+    private static final String KILL = "kill";
+    private static final String TERMINATE_WITHIN = "terminate_within";
+    private static final String TERMINATE = "terminate";
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceKillImpl.class);
     private ModifyTasksSchema modifyTasksSchema = null;
 
@@ -34,11 +37,11 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             jsCmdKillTask.setIdIfNotEmpty(taskId.getTaskId());
             jsCmdKillTask.setJobIfNotEmpty(job.getJob());
 
-            if ("terminate".equals(command)) {
+            if (TERMINATE.equals(command)) {
                 jsCmdKillTask.setTimeoutIfNotEmpty(WebserviceConstants.NEVER);
             }
 
-            if ("terminate_within".equals(command)) {
+            if (TERMINATE_WITHIN.equals(command)) {
                 jsCmdKillTask.setTimeout(modifyTasksSchema.getTimeout());
             }
 
@@ -47,78 +50,47 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError("Error executing order." + command + ":" + e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing task.%s %s:%s",command, e.getCause(), e.getMessage()));
         }
+    }
+
+    private JOCDefaultResponse postTasksCommand(String accessToken, String command, boolean permission, ModifyTasksSchema modifyTasksSchema) {
+        LOGGER.debug("init tasks/teminate_within");
+        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
+        this.modifyTasksSchema = modifyTasksSchema;
+        try {
+            jocDefaultResponse = init(accessToken, modifyTasksSchema.getJobschedulerId(), permission);
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            for (Job____ job : modifyTasksSchema.getJobs()) {
+                for (TaskId task : job.getTaskIds()) {
+                    jocDefaultResponse = executeKillCommand(job, task, command);
+                }
+            }
+        } catch (Exception e) {
+            return jocDefaultResponse;
+        }
+
+        return jocDefaultResponse;
+
     }
 
     @Override
     public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasksSchema modifyTasksSchema) {
-        LOGGER.debug("init Tasks: Terminate");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-
-        try {
-            jocDefaultResponse = init(modifyTasksSchema.getJobschedulerId(), getPermissons(accessToken).getJob().isKill());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            
-            for (Job____ job : modifyTasksSchema.getJobs()) {
-                for (TaskId task : job.getTaskIds()) {
-                    jocDefaultResponse = executeKillCommand(job, task, "terminate");
-                }
-            }
-
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        LOGGER.debug("init tasks/terminate");
+        return postTasksCommand(accessToken, TERMINATE, getPermissons(accessToken).getJob().isTerminate(), modifyTasksSchema);
     }
 
     @Override
-    public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasksSchema modifyTasksSchema) throws Exception {
-        LOGGER.debug("init Tasks: teminate_within");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-        this.modifyTasksSchema = modifyTasksSchema;
-        try {
-            jocDefaultResponse = init(modifyTasksSchema.getJobschedulerId(), getPermissons(accessToken).getJob().isKill());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (Job____ job : modifyTasksSchema.getJobs()) {
-                for (TaskId task : job.getTaskIds()) {
-                    jocDefaultResponse = executeKillCommand(job, task, "terminate_within");
-                }
-            }
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+    public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasksSchema modifyTasksSchema) {
+        LOGGER.debug("init tasks/teminate_within");
+        return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissons(accessToken).getJob().isTerminate(), modifyTasksSchema);
     }
 
     @Override
     public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasksSchema modifyTasksSchema) {
-        LOGGER.debug("init Tasks: kill");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-
-        try {
-            jocDefaultResponse = init(modifyTasksSchema.getJobschedulerId(), getPermissons(accessToken).getJob().isKill());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (Job____ job : modifyTasksSchema.getJobs()) {
-                for (TaskId task : job.getTaskIds()) {
-                    jocDefaultResponse = executeKillCommand(job, task, "kill");
-                }
-            }
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        LOGGER.debug("init tasks/kill");
+        return postTasksCommand(accessToken, KILL, getPermissons(accessToken).getJob().isKill(), modifyTasksSchema);
     }
 }

@@ -10,17 +10,17 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.jobchains.resource.IJobChainsResourceCommandModifyJobChains;
+import com.sos.joc.jobchains.resource.IJobChainsResourceModifyJobChains;
 import com.sos.joc.model.jobChain.JobChain_____;
 import com.sos.joc.model.jobChain.ModifySchema;
 import com.sos.scheduler.model.commands.JSCmdJobChainModify;
 import com.sos.scheduler.model.commands.JSCmdJobChainModify.enu4State;
 
 @Path("job_chains")
-public class JobChainsResourceCommandModifyJobChainsImpl extends JOCResourceImpl implements IJobChainsResourceCommandModifyJobChains {
+public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implements IJobChainsResourceModifyJobChains {
     private static final String UNSTOP = "unstop";
     private static final String STOP = "stop";
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourceCommandModifyJobChainsImpl.class);  
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourceModifyJobChainsImpl.class);  
      
     
     private JOCDefaultResponse executeModifyJobChainCommand(String jobChain,String cmd) {
@@ -41,23 +41,21 @@ public class JobChainsResourceCommandModifyJobChainsImpl extends JOCResourceImpl
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError("Error executing order.add:" + e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing jobchain.%s %s:%s",cmd, e.getCause(), e.getMessage()));
         }
     }
 
-    
-    @Override
-    public JOCDefaultResponse postJobChainsStop(String accessToken, ModifySchema  modifySchema) throws Exception {
-        LOGGER.debug("init job_chains/stop");
+
+    private JOCDefaultResponse postJobChainsCommand(String command, String accessToken, boolean permission, ModifySchema  modifySchema) throws Exception {
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(modifySchema.getJobschedulerId(), getPermissons(accessToken).getJobChain().isStop());
+            jocDefaultResponse = init(accessToken, modifySchema.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             for (JobChain_____ jobChain : modifySchema.getJobChains()){
-                jocDefaultResponse = executeModifyJobChainCommand(jobChain.getJobChain(), STOP);
+                jocDefaultResponse = executeModifyJobChainCommand(jobChain.getJobChain(), command);
             }
         } catch (Exception e) {
             return jocDefaultResponse;
@@ -65,27 +63,20 @@ public class JobChainsResourceCommandModifyJobChainsImpl extends JOCResourceImpl
 
         return jocDefaultResponse;
 
+    }
+    
+    
+    
+    @Override
+    public JOCDefaultResponse postJobChainsStop(String accessToken, ModifySchema  modifySchema) throws Exception {
+        LOGGER.debug("init job_chains/stop");
+        return postJobChainsCommand(STOP, accessToken, getPermissons(accessToken).getJobChain().isStop(), modifySchema);
     }
 
     @Override
     public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifySchema  modifySchema) throws Exception {
         LOGGER.debug("init job_chains/unstop");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-
-        try {
-            jocDefaultResponse = init(modifySchema.getJobschedulerId(), getPermissons(accessToken).getJobChain().isStop());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (JobChain_____ jobChain : modifySchema.getJobChains()){
-                jocDefaultResponse = executeModifyJobChainCommand(jobChain.getJobChain(), UNSTOP);
-            }
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
+        return postJobChainsCommand(UNSTOP, accessToken,getPermissons(accessToken).getJobChain().isUnstop(), modifySchema);
     }
 
 

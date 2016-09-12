@@ -61,7 +61,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError("Error executing order.add:" + e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing order.add %s:%s", e.getCause(), e.getMessage()));
         }
     }
 
