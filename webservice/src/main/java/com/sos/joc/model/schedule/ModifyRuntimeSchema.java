@@ -16,15 +16,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 public class ModifyRuntimeSchema {
 
-    private String schedulerId;
-    public String getSchedulerId() {
-        return schedulerId;
-    }
-
-    public void setSchedulerId(String schedulerId) {
-        this.schedulerId = schedulerId;
-    }
-
     /**
      * path
      * <p>
@@ -32,6 +23,15 @@ public class ModifyRuntimeSchema {
      * (Required)
      * 
      */
+    private String jobschedulerId;
+    public String getJobschedulerId() {
+        return jobschedulerId;
+    }
+
+    public void setJobschedulerId(String jobschedulerId) {
+        this.jobschedulerId = jobschedulerId;
+    }
+
     private String schedule;
     /**
      * Field to comment manually job modifications which can be logged.

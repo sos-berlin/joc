@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Generated;
+import com.sos.joc.model.common.TreeSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -33,6 +34,12 @@ public class JobsPSchema {
      * 
      */
     private List<Job> jobs = new ArrayList<Job>();
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    private List<TreeSchema> folders = new ArrayList<TreeSchema>();
 
     /**
      * delivery date
@@ -82,6 +89,28 @@ public class JobsPSchema {
         this.jobs = jobs;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     * @return
+     *     The folders
+     */
+    public List<TreeSchema> getFolders() {
+        return folders;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @param folders
+     *     The folders
+     */
+    public void setFolders(List<TreeSchema> folders) {
+        this.folders = folders;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -89,7 +118,7 @@ public class JobsPSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(jobs).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(jobs).append(folders).toHashCode();
     }
 
     @Override
@@ -101,7 +130,7 @@ public class JobsPSchema {
             return false;
         }
         JobsPSchema rhs = ((JobsPSchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(jobs, rhs.jobs).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(jobs, rhs.jobs).append(folders, rhs.folders).isEquals();
     }
 
 }

@@ -12,7 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class State_ {
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/removed, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
+     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
      * (Required)
      * 
      */
@@ -25,7 +25,7 @@ public class State_ {
     private State_.Text text;
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/removed, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
+     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
      * (Required)
      * 
      * @return
@@ -36,7 +36,7 @@ public class State_ {
     }
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/removed, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
+     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
      * (Required)
      * 
      * @param severity
@@ -105,7 +105,6 @@ public class State_ {
         NOT_IN_PERIOD("NOT_IN_PERIOD"),
         STOPPING("STOPPING"),
         STOPPED("STOPPED"),
-        REMOVED("REMOVED"),
         DISABLED("DISABLED");
         private final String value;
         private final static Map<String, State_.Text> CONSTANTS = new HashMap<String, State_.Text>();

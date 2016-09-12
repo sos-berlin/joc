@@ -18,7 +18,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
     public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRuntimeSchema modifyRuntimeSchema) throws Exception {
         LOGGER.debug("init schedule/set_run_time");
         
-            JOCDefaultResponse jocDefaultResponse = init(modifyRuntimeSchema.getSchedulerId(), getPermissons(accessToken).getSchedule().isEdit());
+            JOCDefaultResponse jocDefaultResponse = init(modifyRuntimeSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().isEdit());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
