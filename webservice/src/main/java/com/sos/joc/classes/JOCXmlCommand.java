@@ -9,6 +9,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.xml.SOSXmlCommand;
 
 public class JOCXmlCommand extends SOSXmlCommand {
@@ -60,6 +61,13 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 }
             }
         }
+    }
+    
+    public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
+        if (paramVal == null || paramVal.isEmpty()) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
     }
 
 }

@@ -1,7 +1,5 @@
 package com.sos.joc.classes.orders;
 
-import java.util.ArrayList;
-
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
@@ -12,10 +10,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.UsedJobs.Job;
+import com.sos.joc.classes.parameters.Parameters;
 import com.sos.joc.classes.orders.UsedJobChains.JobChain;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
-import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.OrderQueue;
 import com.sos.joc.model.job.ProcessingState;
 
@@ -32,14 +29,22 @@ public class OrderV extends OrderQueue {
         this.overview = getOrderOverview();
     }
     
-    public boolean setCompactFields(UsedNodes usedNodes) throws JocException {
+    public boolean setFields(UsedNodes usedNodes, boolean compact) throws JobSchedulerInvalidResponseDataException {
+        if (compact) {
+            return setCompactFields(usedNodes);
+        } else {
+            return setDetailedFields(usedNodes);
+        }
+    }
+    
+    public boolean setCompactFields(UsedNodes usedNodes) throws JobSchedulerInvalidResponseDataException {
         
         JsonObject pState = overview.getJsonObject("processingState");
         JsonArray obstacles = overview.getJsonArray("obstacles");
         LOGGER.info(overview.toString());
         
         //setSurveyDate(null);
-        setPathJobChainAndOrderId();
+        //setPathJobChainAndOrderId();
         setState(overview.getString("nodeId", null));
         setHistoryId(getIntField(overview, "historyId"));
         setStartedAt(JobSchedulerDate.getDateFromISO8601String(overview.getString("startedAt", ZERO_HOUR)));
@@ -63,13 +68,13 @@ public class OrderV extends OrderQueue {
         return needMoreInfos;
     }
     
-    public boolean setDetailedFields(UsedNodes usedNodes) throws JocException {
+    public boolean setDetailedFields(UsedNodes usedNodes) throws JobSchedulerInvalidResponseDataException {
         
         boolean needMoreInfos = setCompactFields(usedNodes);
         setStateText(order.getString("stateText", null));
         setPriority(getIntField(order,"priority"));
         setEndState(order.getString("endNodeId", null));
-        setParamsFromJson(order.getJsonObject("variables"));
+        setParams(Parameters.getParameters(order.getJsonObject("variables")));
         return needMoreInfos;
     }
     
@@ -143,6 +148,21 @@ public class OrderV extends OrderQueue {
         return true;
     }
     
+    public void setPathJobChainAndOrderId() throws JobSchedulerInvalidResponseDataException {
+        String path = overview.getString("path", null);
+        if (path == null || path.isEmpty()) {
+            throw new JobSchedulerInvalidResponseDataException("Invalid resonsed data: path is empty");
+        }
+        LOGGER.debug("...processing Order " + path);
+        String[] pathParts = path.split(",", 2);
+        if (pathParts.length != 2) {
+            throw new JobSchedulerInvalidResponseDataException(String.format("Invalid resonsed data: path ('%1$s') doesn't contain the orderId",path));
+        }
+        setPath(path);
+        setJobChain(pathParts[0]);
+        setOrderId(pathParts[1]);
+    }
+    
     private void setSeverity(ProcessingState.Text text) {
         setProcessingState(new ProcessingState());
         getProcessingState().setText(text);
@@ -167,21 +187,6 @@ public class OrderV extends OrderQueue {
             getProcessingState().setSeverity(3);
             break;
         }
-    }
-    
-    private void setPathJobChainAndOrderId() throws JocException {
-        String path = overview.getString("path", null);
-        if (path == null || path.isEmpty()) {
-            throw new JobSchedulerInvalidResponseDataException("Invalid resonsed data: path is empty");
-        }
-        LOGGER.debug("...processing Order " + path);
-        String[] pathParts = path.split(",", 2);
-        if (pathParts.length != 2) {
-            throw new JobSchedulerInvalidResponseDataException(String.format("Invalid resonsed data: path ('%1$s') doesn't contain the orderId",path));
-        }
-        setPath(path);
-        setJobChain(pathParts[0]);
-        setOrderId(pathParts[1]);
     }
     
     private Integer getTaskId(String taskId) {
@@ -215,22 +220,6 @@ public class OrderV extends OrderQueue {
             }
         }
         return null;
-    }
-    
-    private void setParamsFromJson(JsonObject variables) {
-        if (variables != null) {
-            if (getParams() == null) {
-                setParams(new ArrayList<NameValuePairsSchema>());
-            }
-            for (String key : variables.keySet()) {
-                NameValuePairsSchema param = new NameValuePairsSchema();
-                param.setName(key);
-                param.setValue(variables.getString(key, ""));
-                getParams().add(param);
-            }
-        } else {
-            setParams(null); 
-        }
     }
     
     private JsonObject getOrderOverview() {

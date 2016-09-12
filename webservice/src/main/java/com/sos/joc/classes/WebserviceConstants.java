@@ -1,6 +1,5 @@
 package com.sos.joc.classes;
 
-import org.w3c.dom.Element;
 
 public class WebserviceConstants {
 

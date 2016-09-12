@@ -18,19 +18,18 @@ import org.w3c.dom.Node;
 
 import sos.xml.SOSXMLTransformer;
 
-import com.sos.joc.Globals;
+import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.ConfigurationSchema;
 import com.sos.joc.model.common.Content;
-import com.sos.joc.model.job.JobConfigurationFilterSchema;
-import com.sos.scheduler.model.commands.JSCmdShowJob;
+import com.sos.joc.model.order.OrderConfigurationFilterSchema;
 
 public class ConfigurationUtils {
 
     public static ConfigurationSchema getEntity(){
-
+        //only for dummy values
         ConfigurationSchema entity = new ConfigurationSchema();
 
         entity.setDeliveryDate(new Date());
@@ -45,16 +44,6 @@ public class ConfigurationUtils {
         configuration.setType(Configuration.Type.ORDER);
         entity.setConfiguration(configuration);
         return entity;
-    }
-
-    public static String createJobConfigurationPostCommand(final JobConfigurationFilterSchema body) {
-        if (!body.getJob().isEmpty()) {
-            JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
-            showJob.setWhat("source");
-            showJob.setJob(body.getJob());
-            return Globals.schedulerObjectFactory.toXMLString(showJob);
-        }
-        return null;
     }
 
     public static String getSourceXmlString(Node sourceNode) throws Exception {
@@ -76,36 +65,35 @@ public class ConfigurationUtils {
         return writer.toString();
     }
     
-    public static Date getConfigurationDate(JOCXmlCommand jocXmlCommand) throws Exception {
-        Node node = jocXmlCommand.getSosxml().selectSingleNode("//job/file_based");
-        String lastWriteTime = ((Element)node).getAttribute("last_write_time");
-        return JobSchedulerDate.getDate(lastWriteTime);
-    }
-
-    public static Date getSurveyDate(JOCXmlCommand jocXmlCommand) throws Exception {
-        Node node = jocXmlCommand.getSosxml().selectSingleNode("//answer");
-        String time = ((Element)node).getAttribute("time");
-        return JobSchedulerDate.getDate(time);
-    }
-
-    public static Configuration getConfiguration(JobConfigurationFilterSchema jobConfigurationFilterSchema, JOCXmlCommand jocXmlCommand, Content content) throws Exception {
-        Configuration configuration = new Configuration();
-        configuration.setPath(jobConfigurationFilterSchema.getJob());
-        configuration.setSurveyDate(ConfigurationUtils.getSurveyDate(jocXmlCommand));
-        configuration.setType(Configuration.Type.JOB);
-        configuration.setConfigurationDate(ConfigurationUtils.getConfigurationDate(jocXmlCommand));
-        configuration.setContent(content);
-        return configuration;
-    }
-
-    public static Content getContent(JobConfigurationFilterSchema jobConfigurationFilterSchema, Class<?> clazz, String configurationXml) throws Exception {
+    public static Content getContent(boolean responseInHtml, String configurationXml) throws Exception {
         Content content = new Content();
-        if(jobConfigurationFilterSchema.getMime().equals(JobConfigurationFilterSchema.Mime.HTML)) {
-            InputStream inputStream = clazz.getResourceAsStream("/show_configuration.xsl");
+        if(responseInHtml) {
+            InputStream inputStream = JOCResourceImpl.class.getResourceAsStream("/show_configuration.xsl");
             content.setHtml(transformXmlToHtml("<source>" + configurationXml + "</source>", inputStream));
         } else {
             content.setXml(configurationXml);
         }
         return content;
+    }
+    
+    public static ConfigurationSchema getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String type,
+            int mime) throws Exception {
+        jocXmlCommand.excutePost(postCommand);
+        Configuration configuration = new Configuration();
+        configuration.setSurveyDate(jocXmlCommand.getSurveyDate());
+        Element objElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(xPathObjElement);
+        Element fileBased = (Element) jocXmlCommand.getSosxml().selectSingleNode(objElem, "file_based");
+        if (fileBased != null) {
+            configuration.setConfigurationDate(JobSchedulerDate.getDate(fileBased.getAttribute("last_write_time")));
+        }
+        configuration.setPath(objElem.getAttribute("path"));
+        configuration.setType(Configuration.Type.fromValue(type.replaceAll("_", "").toUpperCase()));
+        boolean responseInHtml = (mime == OrderConfigurationFilterSchema.Mime.HTML.ordinal());
+        Content content = getContent(responseInHtml, getSourceXmlString(jocXmlCommand.getSosxml().selectSingleNode(objElem, "source")));
+        configuration.setContent(content);
+        ConfigurationSchema entity = new ConfigurationSchema();
+        entity.setConfiguration(configuration);
+        entity.setDeliveryDate(new Date());
+        return entity;
     }
 }

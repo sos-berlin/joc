@@ -8,13 +8,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.order.post.OrderConfigurationBody;
+import com.sos.joc.model.order.OrderConfigurationFilterSchema;
 
 public interface IOrderConfigurationResource {
 
     @POST
     @Path("configuration")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrderConfiguration(@HeaderParam("access_token") String accessToken, OrderConfigurationBody orderBody) throws Exception;
+    public JOCDefaultResponse postOrderConfiguration(@HeaderParam("access_token") String accessToken, OrderConfigurationFilterSchema orderBody) throws Exception;
 
 }

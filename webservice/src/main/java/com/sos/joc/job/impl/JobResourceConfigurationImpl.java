@@ -1,21 +1,22 @@
 package com.sos.joc.job.impl;
 
-import java.util.Date;
+import java.math.BigInteger;
 
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceConfiguration;
 import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.common.Content;
 import com.sos.joc.model.job.JobConfigurationFilterSchema;
+import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJobResourceConfiguration {
@@ -23,32 +24,35 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceConfigurationImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilterSchema jobConfigurationFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilterSchema jobBody) throws Exception {
 
-        LOGGER.debug("init jobs/configuration");
+        LOGGER.debug("init job/configuration");
         JOCDefaultResponse jocDefaultResponse =
-                init(jobConfigurationFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+                init(jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-
+        
         try {
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            entity.setDeliveryDate(new Date());
-            String postCommand = ConfigurationUtils.createJobConfigurationPostCommand(jobConfigurationFilterSchema);
-            jocXmlCommand.excutePost(postCommand);
-            Node jobNode = jocXmlCommand.getSosxml().selectSingleNode("//job");
-            Node sourceNode = jocXmlCommand.getSosxml().selectSingleNode("//job/source/job");
-            String configurationXml = ConfigurationUtils.getSourceXmlString(sourceNode);
-            LOGGER.debug(configurationXml);
-            Content content = ConfigurationUtils.getContent(jobConfigurationFilterSchema, getClass(), configurationXml);
-            entity.setConfiguration(ConfigurationUtils.getConfiguration(jobConfigurationFilterSchema, jocXmlCommand, content));
+            if (jocXmlCommand.checkRequiredParameter("job", jobBody.getJob())) {
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job", "JOB", jobBody.getMime().ordinal());
+            }
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
-
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
-
+    
+    private String createJobConfigurationPostCommand(final JobConfigurationFilterSchema body) {
+        JSCmdShowJob showJob = new JSCmdShowJob(Globals.schedulerObjectFactory);
+        showJob.setWhat("source");
+        showJob.setJob(("/"+body.getJob()).replaceAll("//+", "/"));
+        showJob.setMaxOrders(BigInteger.valueOf(0));
+        showJob.setMaxTaskHistory(BigInteger.valueOf(0));
+        return Globals.schedulerObjectFactory.toXMLString(showJob);
+    }
 }

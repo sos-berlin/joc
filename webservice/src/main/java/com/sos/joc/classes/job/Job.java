@@ -16,8 +16,6 @@ import com.sos.joc.classes.parameters.Parameters;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.Job_;
 import com.sos.joc.model.job.Job__;
-import com.sos.joc.model.job.State_;
-import com.sos.joc.model.job.State__;
 
 
 public class Job {

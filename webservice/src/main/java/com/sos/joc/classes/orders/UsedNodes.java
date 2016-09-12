@@ -2,12 +2,9 @@ package com.sos.joc.classes.orders;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 
 public class UsedNodes {
@@ -47,20 +44,20 @@ public class UsedNodes {
         }
     }
     
-    private Function<JsonValue, String> key = json -> {
-        JsonObject nodeKey = ((JsonObject) json).getJsonObject("nodeKey");
-        return new StringBuilder().append(nodeKey.getString("jobChainPath", "")).append(",").append(nodeKey.getString("nodeId", "")).toString();
-    };
-    
-    private Function<JsonValue, Node> node = json -> {
-        JsonObject jsonO = (JsonObject) json;
-        JsonObject nodeKey = jsonO.getJsonObject("nodeKey");
-        return new Node(nodeKey.getString("jobChainPath", ""),nodeKey.getString("nodeId", ""),jsonO.getString("jobPath", null),"stop".equals(jsonO.getString("action", "")));
-    };
-    
-    public void setUsedNodes(JsonArray nodes) {
-        this.nodes = (Map<String, Node>) nodes.stream().collect( Collectors.toMap(key, node));
-    }
+//    private Function<JsonValue, String> key = json -> {
+//        JsonObject nodeKey = ((JsonObject) json).getJsonObject("nodeKey");
+//        return new StringBuilder().append(nodeKey.getString("jobChainPath", "")).append(",").append(nodeKey.getString("nodeId", "")).toString();
+//    };
+//    
+//    private Function<JsonValue, Node> node = json -> {
+//        JsonObject jsonO = (JsonObject) json;
+//        JsonObject nodeKey = jsonO.getJsonObject("nodeKey");
+//        return new Node(nodeKey.getString("jobChainPath", ""),nodeKey.getString("nodeId", ""),jsonO.getString("jobPath", null),"stop".equals(jsonO.getString("action", "")));
+//    };
+//    
+//    public void setUsedNodes(JsonArray nodes) {
+//        this.nodes = (Map<String, Node>) nodes.stream().collect( Collectors.toMap(key, node));
+//    }
         
     public Node getNode(String jobChain, String nodeId) {
         String s = new StringBuilder().append(jobChain).append(",").append(nodeId).toString();
@@ -79,7 +76,7 @@ public class UsedNodes {
     }
     
     public String hasDelay(String jobChain, String nodeId) {
-        //getNode(jobChain, nodeId).getObstacles();
+        //TODO getNode(jobChain, nodeId).getObstacles();
         return null;
     }
     

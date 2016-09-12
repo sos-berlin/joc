@@ -3,6 +3,8 @@ package com.sos.joc.classes.parameters;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.json.JsonObject;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -32,6 +34,21 @@ public class Parameters {
                 Element paramElement = (Element) paramList.item(paramsCount);
                 param.setName(paramElement.getAttribute(WebserviceConstants.NAME));
                 param.setValue(paramElement.getAttribute(WebserviceConstants.VALUE));
+                params.add(param);
+            }
+            return params;
+        } else {
+            return null;
+        }
+    }
+    
+    public static List<NameValuePairsSchema> getParameters(JsonObject paramList) {
+        List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
+        if (paramList != null) {
+            for (String key : paramList.keySet()) {
+                NameValuePairsSchema param = new NameValuePairsSchema();
+                param.setName(key);
+                param.setValue(paramList.getString(key, ""));
                 params.add(param);
             }
             return params;
