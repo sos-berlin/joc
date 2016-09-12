@@ -10,7 +10,7 @@ import com.sos.joc.lock.resource.ILockResourceConfiguration;
 import com.sos.joc.model.common.ConfigurationSchema;
 import com.sos.joc.model.lock.LockConfigurationFilterSchema;
 
-@Path("job_chain")
+@Path("lock")
 public class LockResourceConfigurationImpl extends JOCResourceImpl implements ILockResourceConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LockResourceConfigurationImpl.class);
