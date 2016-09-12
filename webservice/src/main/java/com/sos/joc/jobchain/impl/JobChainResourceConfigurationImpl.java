@@ -36,7 +36,7 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (jocXmlCommand.checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(jobChainBody), "/spooler/answer/job_chain", "JOBCHAIN", jobChainBody.getMime().ordinal());
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(jobChainBody), "/spooler/answer/job_chain", "job_chain", jobChainBody.getMime().ordinal());
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
