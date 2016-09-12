@@ -35,7 +35,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError("Error executing order.delete:" + e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing order.delete %s:%s", e.getCause(), e.getMessage()));
         }
     }
 

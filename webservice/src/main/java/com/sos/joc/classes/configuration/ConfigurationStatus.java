@@ -19,7 +19,11 @@ public class ConfigurationStatus {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationStatus.class);
 
     public static ConfigurationStatusSchema getConfigurationStatus() {
-        return null;
+        ConfigurationStatusSchema confStatus = new ConfigurationStatusSchema();
+        confStatus.setMessage("myMessage");
+        confStatus.setSeverity(-1);
+        confStatus.setText(ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
+        return confStatus;
     }
 
     /** @param element has to be an <order>...</order>, <job>...</job> ,

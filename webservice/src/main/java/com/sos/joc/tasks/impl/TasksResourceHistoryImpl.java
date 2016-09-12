@@ -24,7 +24,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
     @Override
     public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilterSchema jobsFilterSchema) throws Exception {
-        LOGGER.debug("init Tasks History");
+        LOGGER.debug("init tasks/history");
         JOCDefaultResponse jocDefaultResponse = init( jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getHistory().isView());
 
         if (jocDefaultResponse != null) {

@@ -12,15 +12,15 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.jobs.resource.IJobsResourceCommandStartJob;
+import com.sos.joc.jobs.resource.IJobsResourceStartJob;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.StartJobSchema;
 import com.sos.joc.model.job.StartJobsSchema;
 import com.sos.scheduler.model.commands.JSCmdStartJob;
 
 @Path("jobs")
-public class JobsResourceCommandStartJobsImpl extends JOCResourceImpl implements IJobsResourceCommandStartJob {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceCommandStartJobsImpl.class);
+public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsResourceStartJob {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceStartJobsImpl.class);
 
     private String[] getParams(List<NameValuePairsSchema> list) {
         String[] orderParams = new String[list.size() * 2];
@@ -52,7 +52,7 @@ public class JobsResourceCommandStartJobsImpl extends JOCResourceImpl implements
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError("Error executing order.add:" + e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing job.start %s:%s", e.getCause(), e.getMessage()));
         }
     }
 

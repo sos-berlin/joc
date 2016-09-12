@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.ModifyJobsSchema;
 
-public interface IJobsResourceCommandModifyJob {
+public interface IJobsResourceModifyJob {
 
     @POST
     @Path("stop")

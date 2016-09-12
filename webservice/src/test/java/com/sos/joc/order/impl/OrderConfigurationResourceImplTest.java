@@ -14,7 +14,7 @@ public class OrderConfigurationResourceImplTest {
     private static final String LDAP_USER = "root";
      
     @Test
-    public void postOrderPTest() throws Exception   {
+    public void postOrderConfigurationTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
@@ -25,7 +25,7 @@ public class OrderConfigurationResourceImplTest {
         OrderConfigurationResourceImpl orderConfigurationImpl = new OrderConfigurationResourceImpl();
         JOCDefaultResponse ordersResponse = orderConfigurationImpl.postOrderConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), orderConfigurationBody);
         ConfigurationSchema orderConfigurationSchema = (ConfigurationSchema) ordersResponse.getEntity();
-        assertEquals("postOrderPTest","myPath", orderConfigurationSchema.getConfiguration().getPath());
+        assertEquals("postOrderConfigurationTest","myPath", orderConfigurationSchema.getConfiguration().getPath());
      }
 
 }

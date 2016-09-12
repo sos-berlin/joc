@@ -62,7 +62,10 @@ public class JOCResourceImpl {
 
     public JOCDefaultResponse init(String schedulerId, boolean permission) throws Exception {
         JOCDefaultResponse jocDefaultResponse = null;
-
+        if (jobschedulerUser.getSosShiroCurrentUser() != null) {
+            jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession().touch();
+        }
+        
         try {
 
             if (!jobschedulerUser.isAuthenticated()) {
@@ -87,8 +90,7 @@ public class JOCResourceImpl {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
 
             if (dbItemInventoryInstance == null) {
-                return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId,
-                        DBLayer.TABLE_INVENTORY_INSTANCES));
+                return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES));
             }
         }
 

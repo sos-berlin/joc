@@ -42,7 +42,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing job.set_run_time:  %s:%s", e.getCause(), e.getMessage()));
         }
 
     }

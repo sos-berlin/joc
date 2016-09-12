@@ -17,9 +17,10 @@ import com.sos.scheduler.model.objects.Spooler;
 
 @Path("tasks")
 public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResourceEnd {
+    private static final String END = "end";
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceEndImpl.class);
      
-    private JOCDefaultResponse executeModifyJobCommand(Job____ job, String command) {
+    private JOCDefaultResponse executeModifyJobCommand(Job____ job) {
         try {
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
@@ -27,7 +28,7 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
             SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
             schedulerObjectFactory.initMarshaller(Spooler.class);
             JSCmdModifyJob jsCmdModifyJob = schedulerObjectFactory.createModifyJob();
-            jsCmdModifyJob.setCmdIfNotEmpty(command);
+            jsCmdModifyJob.setCmdIfNotEmpty(END);
             jsCmdModifyJob.setJobIfNotEmpty(job.getJob());
             
             String xml = schedulerObjectFactory.toXMLString(jsCmdModifyJob);
@@ -36,14 +37,14 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError("Error executing job." + command + ":" + e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing task.%s %s:%s",END, e.getCause(), e.getMessage()));
         }
     }
 
   
     @Override
     public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasksSchema modifyTasksSchema) {
-        LOGGER.debug("init Tasks: end");
+        LOGGER.debug("init tasks/end");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
@@ -52,7 +53,7 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
                 return jocDefaultResponse;
             }
             for (Job____ job : modifyTasksSchema.getJobs()) {
-                jocDefaultResponse = executeModifyJobCommand(job,"end");
+                jocDefaultResponse = executeModifyJobCommand(job);
             }
             
         } catch (Exception e) {

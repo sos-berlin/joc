@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.StartJobsSchema;
 
-public interface IJobsResourceCommandStartJob {
+public interface IJobsResourceStartJob {
 
     @POST
     @Path("start")

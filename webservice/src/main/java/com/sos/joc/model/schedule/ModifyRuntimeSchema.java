@@ -16,6 +16,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 public class ModifyRuntimeSchema {
 
+    private String schedulerId;
+    public String getSchedulerId() {
+        return schedulerId;
+    }
+
+    public void setSchedulerId(String schedulerId) {
+        this.schedulerId = schedulerId;
+    }
+
     /**
      * path
      * <p>
