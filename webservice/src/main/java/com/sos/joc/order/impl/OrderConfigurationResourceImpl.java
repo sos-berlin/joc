@@ -31,7 +31,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (jocXmlCommand.checkRequiredParameter("orderId", orderBody.getOrderId())
                     && jocXmlCommand.checkRequiredParameter("jobChain", orderBody.getJobChain())) {
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(orderBody), "/spooler/answer/order", "ORDER", orderBody.getMime().ordinal());
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(orderBody), "/spooler/answer/order", "order", orderBody.getMime().ordinal());
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

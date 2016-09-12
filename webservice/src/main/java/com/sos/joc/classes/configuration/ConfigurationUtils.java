@@ -36,8 +36,8 @@ public class ConfigurationUtils {
         Configuration configuration = new Configuration();
         configuration.setConfigurationDate(new Date());
         Content content = new Content();
-        content.setHtml("<html></html>");
-        content.setXml("myXml");
+        //content.setHtml("<html></html>");
+        content.setXml("<order><myXml/></order>");
         configuration.setContent(content);
         configuration.setPath("myPath");
         configuration.setSurveyDate(new Date());
@@ -76,7 +76,7 @@ public class ConfigurationUtils {
         return content;
     }
     
-    public static ConfigurationSchema getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String type,
+    public static ConfigurationSchema getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
             int mime) throws Exception {
         jocXmlCommand.excutePost(postCommand);
         Configuration configuration = new Configuration();
@@ -87,9 +87,9 @@ public class ConfigurationUtils {
             configuration.setConfigurationDate(JobSchedulerDate.getDate(fileBased.getAttribute("last_write_time")));
         }
         configuration.setPath(objElem.getAttribute("path"));
-        configuration.setType(Configuration.Type.fromValue(type.replaceAll("_", "").toUpperCase()));
+        configuration.setType(Configuration.Type.fromValue(objName.replaceAll("_", "").toUpperCase()));
         boolean responseInHtml = (mime == OrderConfigurationFilterSchema.Mime.HTML.ordinal());
-        Content content = getContent(responseInHtml, getSourceXmlString(jocXmlCommand.getSosxml().selectSingleNode(objElem, "source")));
+        Content content = getContent(responseInHtml, getSourceXmlString(jocXmlCommand.getSosxml().selectSingleNode(objElem, "source/"+objName)));
         configuration.setContent(content);
         ConfigurationSchema entity = new ConfigurationSchema();
         entity.setConfiguration(configuration);

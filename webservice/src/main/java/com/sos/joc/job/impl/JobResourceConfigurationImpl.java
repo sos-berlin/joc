@@ -37,7 +37,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (jocXmlCommand.checkRequiredParameter("job", jobBody.getJob())) {
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job", "JOB", jobBody.getMime().ordinal());
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job", "job", jobBody.getMime().ordinal());
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
