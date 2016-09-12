@@ -46,7 +46,7 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
     private String createLockConfigurationPostCommand(LockConfigurationFilterSchema lockBody) {
         JSCmdShowState showLocks = new JSCmdShowState(Globals.schedulerObjectFactory);
         showLocks.setSubsystems("folder lock");
-        showLocks.setWhat("folders");
+        showLocks.setWhat("folders source");
         return Globals.schedulerObjectFactory.toXMLString(showLocks);
     }
 
