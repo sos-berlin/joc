@@ -33,7 +33,9 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (jocXmlCommand.checkRequiredParameter("lock", lockBody.getLock())) {
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(lockBody), "/spooler/answer//locks/lock[@path='"+("/"+lockBody.getLock()).replaceAll("//+", "/")+"']", "lock", lockBody.getMime().ordinal());
+                boolean responseInHtml = lockBody.getMime() == LockConfigurationFilterSchema.Mime.HTML;
+                String xPath = "/spooler/answer//locks/lock[@path='"+("/"+lockBody.getLock()).replaceAll("//+", "/")+"']"; 
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(lockBody), xPath, "lock", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
