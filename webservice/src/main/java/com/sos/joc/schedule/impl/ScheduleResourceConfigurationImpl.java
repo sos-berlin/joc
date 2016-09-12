@@ -33,7 +33,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
         try {
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (jocXmlCommand.checkRequiredParameter("job", scheduleBody.getSchedule())) {
+            if (jocXmlCommand.checkRequiredParameter("schedule", scheduleBody.getSchedule())) {
                 boolean responseInHtml = scheduleBody.getMime() == ScheduleConfigurationFilterSchema.Mime.HTML;
                 String xPath = "/spooler/answer//schedules/schedule[@path='"+("/"+scheduleBody.getSchedule()).replaceAll("//+", "/")+"']"; 
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(scheduleBody), xPath, "schedule", responseInHtml);
