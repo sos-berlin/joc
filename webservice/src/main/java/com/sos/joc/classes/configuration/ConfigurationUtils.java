@@ -25,6 +25,7 @@ import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.ConfigurationSchema;
 import com.sos.joc.model.common.Content;
 import com.sos.joc.model.order.OrderConfigurationFilterSchema;
+import com.sos.joc.model.order.OrderConfigurationFilterSchema.Mime;
 
 public class ConfigurationUtils {
 
@@ -77,7 +78,7 @@ public class ConfigurationUtils {
     }
     
     public static ConfigurationSchema getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
-            int mime) throws Exception {
+            boolean responseInHtml) throws Exception {
         jocXmlCommand.excutePost(postCommand);
         Configuration configuration = new Configuration();
         configuration.setSurveyDate(jocXmlCommand.getSurveyDate());
@@ -88,7 +89,6 @@ public class ConfigurationUtils {
         }
         configuration.setPath(objElem.getAttribute("path"));
         configuration.setType(Configuration.Type.fromValue(objName.replaceAll("_", "").toUpperCase()));
-        boolean responseInHtml = (mime == OrderConfigurationFilterSchema.Mime.HTML.ordinal());
         Content content = getContent(responseInHtml, getSourceXmlString(jocXmlCommand.getSosxml().selectSingleNode(objElem, "source/"+objName)));
         configuration.setContent(content);
         ConfigurationSchema entity = new ConfigurationSchema();
