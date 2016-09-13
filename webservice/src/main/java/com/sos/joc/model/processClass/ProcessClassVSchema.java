@@ -1,7 +1,9 @@
 
 package com.sos.joc.model.processClass;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.annotation.Generated;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -48,10 +50,7 @@ public class ProcessClassVSchema {
      * 
      */
     private Integer numOfProcesses;
-    /**
-     * 
-     */
-    private Processes processes;
+    private List<ProcessSchema> processes = new ArrayList<ProcessSchema>();
     /**
      * configuration status
      * <p>
@@ -165,7 +164,7 @@ public class ProcessClassVSchema {
      * @return
      *     The processes
      */
-    public Processes getProcesses() {
+    public List<ProcessSchema> getProcesses() {
         return processes;
     }
 
@@ -174,7 +173,7 @@ public class ProcessClassVSchema {
      * @param processes
      *     The processes
      */
-    public void setProcesses(Processes processes) {
+    public void setProcesses(List<ProcessSchema> processes) {
         this.processes = processes;
     }
 

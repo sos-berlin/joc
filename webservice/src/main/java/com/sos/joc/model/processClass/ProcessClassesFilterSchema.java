@@ -17,7 +17,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  */
 @Generated("org.jsonschema2pojo")
-public class ProcessClassFilterSchema {
+public class ProcessClassesFilterSchema {
 
     /**
      * 
@@ -144,10 +144,10 @@ public class ProcessClassFilterSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof ProcessClassFilterSchema) == false) {
+        if ((other instanceof ProcessClassesFilterSchema) == false) {
             return false;
         }
-        ProcessClassFilterSchema rhs = ((ProcessClassFilterSchema) other);
+        ProcessClassesFilterSchema rhs = ((ProcessClassesFilterSchema) other);
         return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(processClasses, rhs.processClasses).append(regex, rhs.regex).append(folders, rhs.folders).isEquals();
     }
 

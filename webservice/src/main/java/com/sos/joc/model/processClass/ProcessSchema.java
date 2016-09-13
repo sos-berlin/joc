@@ -7,8 +7,15 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+
+/**
+ * process
+ * <p>
+ * 
+ * 
+ */
 @Generated("org.jsonschema2pojo")
-public class Processes {
+public class ProcessSchema {
 
     /**
      * path
@@ -162,10 +169,10 @@ public class Processes {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Processes) == false) {
+        if ((other instanceof ProcessSchema) == false) {
             return false;
         }
-        Processes rhs = ((Processes) other);
+        ProcessSchema rhs = ((ProcessSchema) other);
         return new EqualsBuilder().append(job, rhs.job).append(taskId, rhs.taskId).append(pid, rhs.pid).append(runningSince, rhs.runningSince).isEquals();
     }
 

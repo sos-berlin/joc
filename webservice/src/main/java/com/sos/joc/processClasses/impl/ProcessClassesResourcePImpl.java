@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.processClasses.resource.IProcessClassesResourceP;
-import com.sos.joc.model.processClass.ProcessClassFilterSchema;
 import com.sos.joc.model.processClass.ProcessClassPSchema;
+import com.sos.joc.model.processClass.ProcessClassesFilterSchema;
 import com.sos.joc.model.processClass.ProcessClassesPSchema;
 
 @Path("processClasses")
@@ -21,7 +21,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassesResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassFilterSchema processClassFilterSchema) throws Exception {
+    public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilterSchema processClassFilterSchema) throws Exception {
         JOCDefaultResponse jocDefaultResponse = init(processClassFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;

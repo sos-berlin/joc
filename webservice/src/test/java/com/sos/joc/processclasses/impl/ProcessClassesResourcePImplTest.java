@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.processClass.ProcessClassFilterSchema;
+import com.sos.joc.model.processClass.ProcessClassesFilterSchema;
 import com.sos.joc.model.processClass.ProcessClassesPSchema;
 import com.sos.joc.processClasses.impl.ProcessClassesResourcePImpl;
 
@@ -23,10 +23,10 @@ public class ProcessClassesResourcePImplTest {
     public void postProcessClassesTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        ProcessClassFilterSchema processClassFilterSchema = new ProcessClassFilterSchema();
-        processClassFilterSchema.setJobschedulerId(SCHEDULER_ID);
+        ProcessClassesFilterSchema processClassesFilterSchema = new ProcessClassesFilterSchema();
+        processClassesFilterSchema.setJobschedulerId(SCHEDULER_ID);
         ProcessClassesResourcePImpl processClassesResourcePImpl = new ProcessClassesResourcePImpl();
-        JOCDefaultResponse jobsResponse = processClassesResourcePImpl.postProcessClassesP(sosShiroCurrentUserAnswer.getAccessToken(), processClassFilterSchema);
+        JOCDefaultResponse jobsResponse = processClassesResourcePImpl.postProcessClassesP(sosShiroCurrentUserAnswer.getAccessToken(), processClassesFilterSchema);
         ProcessClassesPSchema processClassesPSchema = (ProcessClassesPSchema) jobsResponse.getEntity();
         assertEquals("postProcessClassesTest", "myName", processClassesPSchema.getProcessClasses().get(0).getName());
         LOGGER.info(jobsResponse.toString());

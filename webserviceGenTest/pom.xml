@@ -95,21 +95,26 @@
 			<version>2.0.0</version>
 		</dependency>
 
-        <dependency>
-            <groupId>com.sos-berlin.joc</groupId>
-            <artifactId>webservice</artifactId>
+		<dependency>
+			<groupId>com.sos-berlin.joc</groupId>
+			<artifactId>webservice</artifactId>
 			<version>${project.version}</version>
-        </dependency>
- 
+		</dependency>
+
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
 		</dependency>
 		<dependency>
-				<groupId>org.postgresql</groupId>
-				<artifactId>postgresql</artifactId>				
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.owlike</groupId>
+			<artifactId>genson</artifactId>
+			<version>1.3</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -143,10 +148,10 @@
 				<configuration>
 					<sourceDirectory>${basedir}/src/main/resources/schemas</sourceDirectory>
 					<targetPackage>com.sos.joc.model</targetPackage>
-					<removeOldOutput>true</removeOldOutput> 
+					<removeOldOutput>true</removeOldOutput>
 					<annotationStyle>none</annotationStyle>
 					<includeAdditionalProperties>false</includeAdditionalProperties>
-					
+
 					<excludes>
 						<exclude>**/*.xsd</exclude>
 					</excludes>

@@ -10,6 +10,12 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ModifyRuntimeSchema {
 
     /**
+     * 
+     * (Required)
+     * 
+     */
+    private String jobschedulerId;
+    /**
      * path
      * <p>
      * absolute path based on live folder of a JobScheduler object.
@@ -28,6 +34,28 @@ public class ModifyRuntimeSchema {
      * 
      */
     private String runTime;
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @return
+     *     The jobschedulerId
+     */
+    public String getJobschedulerId() {
+        return jobschedulerId;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @param jobschedulerId
+     *     The jobschedulerId
+     */
+    public void setJobschedulerId(String jobschedulerId) {
+        this.jobschedulerId = jobschedulerId;
+    }
 
     /**
      * path
@@ -104,7 +132,7 @@ public class ModifyRuntimeSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(comment).append(runTime).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(path).append(comment).append(runTime).toHashCode();
     }
 
     @Override
@@ -116,7 +144,7 @@ public class ModifyRuntimeSchema {
             return false;
         }
         ModifyRuntimeSchema rhs = ((ModifyRuntimeSchema) other);
-        return new EqualsBuilder().append(path, rhs.path).append(comment, rhs.comment).append(runTime, rhs.runTime).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(path, rhs.path).append(comment, rhs.comment).append(runTime, rhs.runTime).isEquals();
     }
 
 }

@@ -12,18 +12,18 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
-import com.sos.joc.model.processClass.ProcessClassFilterSchema;
 import com.sos.joc.model.processClass.ProcessClassVSchema;
+import com.sos.joc.model.processClass.ProcessClassesFilterSchema;
 import com.sos.joc.model.processClass.ProcessClassesVSchema;
-import com.sos.joc.model.processClass.Processes;
+import com.sos.joc.model.processClass.ProcessSchema;
 import com.sos.joc.processClasses.resource.IProcessClassesResource;
 
-@Path("processClasses")
+@Path("process_classes")
 public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProcessClassesResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassesResourceImpl.class);
     
     @Override
-    public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassFilterSchema processClassFilterSchema) throws Exception {
+    public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilterSchema processClassFilterSchema) throws Exception {
         JOCDefaultResponse jocDefaultResponse = init(processClassFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -41,13 +41,15 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             processClassVSchema.setNumOfProcesses(-1);
             processClassVSchema.setPath("myPath");
 
-            Processes processes = new Processes();
-            processes.setJob("myJob");
-            processes.setPid(-1);
-            processes.setRunningSince(new Date());
-            processes.setTaskId(-1);
+            List<ProcessSchema> listOfProcesses = new ArrayList<ProcessSchema>();
+            ProcessSchema processSchema = new ProcessSchema();
+            processSchema.setJob("myJob");
+            processSchema.setPid(-1);
+            processSchema.setRunningSince(new Date());
+            processSchema.setTaskId(-1);
+            listOfProcesses.add(processSchema);
             
-            processClassVSchema.setProcesses(processes);
+            processClassVSchema.setProcesses(listOfProcesses);
             processClassVSchema.setSurveyDate(new Date());
             listOfProcessClasses.add(processClassVSchema);
             entity.setProcessClasses(listOfProcessClasses);
