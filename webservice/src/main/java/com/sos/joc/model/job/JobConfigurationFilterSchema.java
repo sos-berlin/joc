@@ -18,6 +18,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 public class JobConfigurationFilterSchema {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     private String jobschedulerId;
     /**
      * path
@@ -31,6 +36,8 @@ public class JobConfigurationFilterSchema {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The jobschedulerId
      */
@@ -39,6 +46,8 @@ public class JobConfigurationFilterSchema {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param jobschedulerId
      *     The jobschedulerId

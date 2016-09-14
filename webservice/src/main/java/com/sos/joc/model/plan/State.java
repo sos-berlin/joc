@@ -12,14 +12,14 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class State {
 
     /**
-     *  0=EXECUTED, 1=LATE, 3=WAITING, 6=PLANNED
+     *  0=SUCCESSFUL, 1=INCOMPLETE, 2=FAILED, 4=PLANNED
      * 
      */
     private Integer severity;
     private State.Text text;
 
     /**
-     *  0=EXECUTED, 1=LATE, 3=WAITING, 6=PLANNED
+     *  0=SUCCESSFUL, 1=INCOMPLETE, 2=FAILED, 4=PLANNED
      * 
      * @return
      *     The severity
@@ -29,7 +29,7 @@ public class State {
     }
 
     /**
-     *  0=EXECUTED, 1=LATE, 3=WAITING, 6=PLANNED
+     *  0=SUCCESSFUL, 1=INCOMPLETE, 2=FAILED, 4=PLANNED
      * 
      * @param severity
      *     The severity
@@ -82,9 +82,9 @@ public class State {
     public enum Text {
 
         PLANNED("PLANNED"),
-        WAITING("WAITING"),
-        LATE("LATE"),
-        EXECUTED("EXECUTED");
+        SUCCESSFUL("SUCCESSFUL"),
+        INCOMPLETE("INCOMPLETE"),
+        FAILED("FAILED");
         private final String value;
         private final static Map<String, State.Text> CONSTANTS = new HashMap<String, State.Text>();
 

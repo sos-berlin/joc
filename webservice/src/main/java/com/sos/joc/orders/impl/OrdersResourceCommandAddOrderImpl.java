@@ -67,7 +67,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
 
     @Override
     public JOCDefaultResponse postOrdersAdd(String accessToken, ModifyOrdersBody ordersModifyOrderBody) throws Exception {
-        LOGGER.debug("init Orders: Add");
+        LOGGER.debug("init Orders: Add"); 
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
             jocDefaultResponse = init(ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getJobChain().isAddOrder());

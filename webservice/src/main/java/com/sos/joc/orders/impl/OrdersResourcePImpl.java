@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 import org.apache.log4j.Logger;
 
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
@@ -35,7 +36,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             OrdersPSchema entity = new OrdersPSchema();
             entity.setDeliveryDate(new Date());
 
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection(),ordersBody.getJobschedulerId());
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection,ordersBody.getJobschedulerId());
             List<DBItemInventoryOrder> listOfOrders = dbLayer.getInventoryOrders();
             List<Order> listOrder = new ArrayList<Order>();
             for (DBItemInventoryOrder inventoryOrder : listOfOrders) {

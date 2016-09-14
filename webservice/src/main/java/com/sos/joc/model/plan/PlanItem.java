@@ -3,6 +3,7 @@ package com.sos.joc.model.plan;
 
 import java.util.Date;
 import javax.annotation.Generated;
+import com.sos.joc.model.common.ErrorSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -15,8 +16,15 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  */
 @Generated("org.jsonschema2pojo")
-public class PlanItemSchema {
+public class PlanItem {
 
+    /**
+     * survey date of the inventory data; last time the inventory job has checked the live folder
+     * <p>
+     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * 
+     */
+    private Date surveyDate;
     /**
      * path
      * <p>
@@ -72,8 +80,54 @@ public class PlanItemSchema {
      * 
      */
     private String node;
-    private Boolean error = false;
+    /**
+     * only for standalone jobs
+     * 
+     */
+    private String exitCode;
+    /**
+     * error
+     * <p>
+     * 
+     * 
+     */
+    private ErrorSchema error;
+    /**
+     *  0=single_start, 1=start_start_repeat, 2=start_end_repeat
+     * 
+     */
+    private Integer startMode = 0;
+    /**
+     * undefined for startMode=0
+     * 
+     */
+    private Period period;
+    private Boolean late;
     private State state;
+
+    /**
+     * survey date of the inventory data; last time the inventory job has checked the live folder
+     * <p>
+     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * 
+     * @return
+     *     The surveyDate
+     */
+    public Date getSurveyDate() {
+        return surveyDate;
+    }
+
+    /**
+     * survey date of the inventory data; last time the inventory job has checked the live folder
+     * <p>
+     * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * 
+     * @param surveyDate
+     *     The surveyDate
+     */
+    public void setSurveyDate(Date surveyDate) {
+        this.surveyDate = surveyDate;
+    }
 
     /**
      * path
@@ -282,21 +336,105 @@ public class PlanItemSchema {
     }
 
     /**
+     * only for standalone jobs
+     * 
+     * @return
+     *     The exitCode
+     */
+    public String getExitCode() {
+        return exitCode;
+    }
+
+    /**
+     * only for standalone jobs
+     * 
+     * @param exitCode
+     *     The exitCode
+     */
+    public void setExitCode(String exitCode) {
+        this.exitCode = exitCode;
+    }
+
+    /**
+     * error
+     * <p>
+     * 
      * 
      * @return
      *     The error
      */
-    public Boolean getError() {
+    public ErrorSchema getError() {
         return error;
     }
 
     /**
+     * error
+     * <p>
+     * 
      * 
      * @param error
      *     The error
      */
-    public void setError(Boolean error) {
+    public void setError(ErrorSchema error) {
         this.error = error;
+    }
+
+    /**
+     *  0=single_start, 1=start_start_repeat, 2=start_end_repeat
+     * 
+     * @return
+     *     The startMode
+     */
+    public Integer getStartMode() {
+        return startMode;
+    }
+
+    /**
+     *  0=single_start, 1=start_start_repeat, 2=start_end_repeat
+     * 
+     * @param startMode
+     *     The startMode
+     */
+    public void setStartMode(Integer startMode) {
+        this.startMode = startMode;
+    }
+
+    /**
+     * undefined for startMode=0
+     * 
+     * @return
+     *     The period
+     */
+    public Period getPeriod() {
+        return period;
+    }
+
+    /**
+     * undefined for startMode=0
+     * 
+     * @param period
+     *     The period
+     */
+    public void setPeriod(Period period) {
+        this.period = period;
+    }
+
+    /**
+     * 
+     * @return
+     *     The late
+     */
+    public Boolean getLate() {
+        return late;
+    }
+
+    /**
+     * 
+     * @param late
+     *     The late
+     */
+    public void setLate(Boolean late) {
+        this.late = late;
     }
 
     /**
@@ -324,7 +462,7 @@ public class PlanItemSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(jobChain).append(orderId).append(plannedStartTime).append(expectedEndTime).append(startTime).append(endTime).append(historyId).append(node).append(error).append(state).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(job).append(jobChain).append(orderId).append(plannedStartTime).append(expectedEndTime).append(startTime).append(endTime).append(historyId).append(node).append(exitCode).append(error).append(startMode).append(period).append(late).append(state).toHashCode();
     }
 
     @Override
@@ -332,11 +470,11 @@ public class PlanItemSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof PlanItemSchema) == false) {
+        if ((other instanceof PlanItem) == false) {
             return false;
         }
-        PlanItemSchema rhs = ((PlanItemSchema) other);
-        return new EqualsBuilder().append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(plannedStartTime, rhs.plannedStartTime).append(expectedEndTime, rhs.expectedEndTime).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(historyId, rhs.historyId).append(node, rhs.node).append(error, rhs.error).append(state, rhs.state).isEquals();
+        PlanItem rhs = ((PlanItem) other);
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(plannedStartTime, rhs.plannedStartTime).append(expectedEndTime, rhs.expectedEndTime).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(historyId, rhs.historyId).append(node, rhs.node).append(exitCode, rhs.exitCode).append(error, rhs.error).append(startMode, rhs.startMode).append(period, rhs.period).append(late, rhs.late).append(state, rhs.state).isEquals();
     }
 
 }
