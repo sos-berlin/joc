@@ -48,7 +48,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 
         JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
         showJob.setWhat("run_time");
-        showJob.setJob(body.getJob());
+        showJob.setJob(("/"+body.getJob()).replaceAll("//+", "/"));
         showJob.setMaxOrders(BigInteger.valueOf(0));
         showJob.setMaxTaskHistory(BigInteger.valueOf(0));
         return Globals.schedulerObjectFactory.toXMLString(showJob);

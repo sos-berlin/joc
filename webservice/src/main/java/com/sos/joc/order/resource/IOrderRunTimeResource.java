@@ -13,7 +13,7 @@ import com.sos.joc.order.post.OrderRunTimeBody;
 public interface IOrderRunTimeResource {
 
     @POST
-    @Path("runtime")
+    @Path("run_time")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postOrderRunTime(@HeaderParam("access_token") String accessToken, OrderRunTimeBody orderRunTimeBody) throws Exception;
 

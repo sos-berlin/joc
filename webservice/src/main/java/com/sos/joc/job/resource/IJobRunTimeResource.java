@@ -13,7 +13,7 @@ import com.sos.joc.model.job.JobFilterSchema;
 public interface IJobRunTimeResource {
 
     @POST
-    @Path("runtime")
+    @Path("run_time")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobRunTime(@HeaderParam("access_token") String accessToken, JobFilterSchema jobFilterSchema) throws Exception;
 
