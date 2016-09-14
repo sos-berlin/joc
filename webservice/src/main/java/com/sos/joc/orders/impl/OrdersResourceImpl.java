@@ -50,9 +50,6 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             List<FoldersSchema> folders = ordersBody.getFolders();
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
-            if (orders == null || orders.isEmpty()) {
-                command.addOrderProcessingStateAndTypeQuery(ordersBody);
-            }
             URI uri = command.getURI();
 
             if (orders != null && !orders.isEmpty()) {

@@ -29,15 +29,15 @@ public class OrderV extends OrderQueue {
         this.overview = getOrderOverview();
     }
     
-    public boolean setFields(UsedNodes usedNodes, boolean compact) throws JobSchedulerInvalidResponseDataException {
+    public void setFields(UsedNodes usedNodes, boolean compact) throws JobSchedulerInvalidResponseDataException {
         if (compact) {
-            return setCompactFields(usedNodes);
+            setCompactFields(usedNodes);
         } else {
-            return setDetailedFields(usedNodes);
+            setDetailedFields(usedNodes);
         }
     }
     
-    public boolean setCompactFields(UsedNodes usedNodes) throws JobSchedulerInvalidResponseDataException {
+    public void setCompactFields(UsedNodes usedNodes) throws JobSchedulerInvalidResponseDataException {
         
         JsonObject pState = overview.getJsonObject("processingState");
         JsonArray obstacles = overview.getJsonArray("obstacles");
@@ -48,7 +48,6 @@ public class OrderV extends OrderQueue {
         setState(overview.getString("nodeId", null));
         setHistoryId(getIntField(overview, "historyId"));
         setStartedAt(JobSchedulerDate.getDateFromISO8601String(overview.getString("startedAt", ZERO_HOUR)));
-        setProcessedBy(overview.getString("occupyingClusterMemberId", null));
         //setType(OrderQueue.Type.fromValue(unCamelize(overview.getString("sourceType", null))));
         setType(getType(overview.getString("sourceType", "")));
         
@@ -58,30 +57,36 @@ public class OrderV extends OrderQueue {
         setTaskId(getTaskId(pState.getString("taskId", null)));
         setInProcessSince(JobSchedulerDate.getDateFromISO8601String(pState.getString("since", ZERO_HOUR)));
         setProcessClass(getProcessClass(pState.getString("processClassPath", null)));
-        setProcessedBy(pState.getString("agentUri", null));
-        //TODO setLock(null);
-        
-        boolean needMoreInfos = setProcessingState(pState, obstacles, usedNodes);
+        String agentUri = pState.getString("agentUri", null);
+        if (agentUri != null && !agentUri.isEmpty()) {
+            setProcessedBy(agentUri);
+        } else {
+            setProcessedBy(pState.getString("clusterMemberId", null));
+        }
+        setProcessingState(pState, obstacles, usedNodes);
         ConfigurationStatus.getConfigurationStatus(obstacles);
         setJob(usedNodes.getJob(getJobChain(), getState()));
         setParams(null);
-        return needMoreInfos;
     }
     
-    public boolean setDetailedFields(UsedNodes usedNodes) throws JobSchedulerInvalidResponseDataException {
+    public void setDetailedFields(UsedNodes usedNodes) throws JobSchedulerInvalidResponseDataException {
         
-        boolean needMoreInfos = setCompactFields(usedNodes);
+        setCompactFields(usedNodes);
         setStateText(order.getString("stateText", null));
         setPriority(getIntField(order,"priority"));
         setEndState(order.getString("endNodeId", null));
         setParams(Parameters.getParameters(order.getJsonObject("variables")));
-        return needMoreInfos;
     }
     
-    public boolean setProcessingState(JsonObject processingState, JsonArray obstacles, UsedNodes usedNodes) {
-        boolean needMoreInfos = false;
-        switch(processingState.getString("TYPE","")) {
-            case "NotPlanned": 
+    public void setProcessingState(JsonObject processingState, JsonArray obstacles, UsedNodes usedNodes) {
+        for (JsonObject obstacle : obstacles.getValuesAs(JsonObject.class)) {
+            if ("Suspended".equals(obstacle.getString("TYPE", null))) {
+                setSeverity(ProcessingState.Text.SUSPENDED);
+            }
+        }
+        if (!processingStateIsSet()) {
+            switch (processingState.getString("TYPE", "")) {
+            case "NotPlanned":
                 setSeverity(ProcessingState.Text.PENDING);
                 break;
             case "Planned":
@@ -91,61 +96,48 @@ public class OrderV extends OrderQueue {
                 setSeverity(ProcessingState.Text.SETBACK);
                 break;
             case "InTaskProcess":
+            case "OccupiedByClusterMember":
                 setSeverity(ProcessingState.Text.RUNNING);
             case "WaitingInTask":
                 setSeverity(ProcessingState.Text.WAITING_FOR_AGENT);
                 break;
             case "Pending":
             case "WaitingForOther":
-                for (JsonObject obstacle : obstacles.getValuesAs(JsonObject.class)) {
-                    if ("Suspended".equals(obstacle.getString("TYPE", null))) {
-                        setSeverity(ProcessingState.Text.SUSPENDED); 
-                        break;
-                    }
-                }
-                if (getProcessingState() == null && usedNodes.getNode(getJobChain(), getState()).isStopped()) {
+                if (!processingStateIsSet() && usedNodes.getNode(getJobChain(), getState()).isStopped()) {
                     setSeverity(ProcessingState.Text.NODE_STOPPED);
-                }
-                if (getProcessingState() == null) {
-                    needMoreInfos = true;
                 }
                 break;
             case "Blacklisted":
                 setSeverity(ProcessingState.Text.BLACKLIST);
                 break;
             default:
+                break;
+            }
         }
-        return needMoreInfos;
     }
     
-    public boolean hasJobObstacles(Job job) {
+    public boolean processingStateIsSet() {
+        return getProcessingState() != null;
+    }
+    
+    public void readJobObstacles(Job job) {
         ProcessingState.Text text = job.getState();
         if (text == ProcessingState.Text.JOB_NOT_IN_PERIOD) {
             setNextStartTime(JobSchedulerDate.getDateFromISO8601String(job.nextPeriodBeginsAt()));
-            return false;
-        }
-        if (text == ProcessingState.Text.JOB_STOPPED) {
-            return false;
-        }
-        if (text == ProcessingState.Text.WAITING_FOR_TASK) {
-            return false;
-        }
-        if (text == ProcessingState.Text.WAITING_FOR_PROCESS) {
-            return false;
         }
         if (text == ProcessingState.Text.WAITING_FOR_LOCK) {
             setLock(job.getLock());
-            return false;
         }
-        return true;
+        if (text == ProcessingState.Text.WAITING_FOR_PROCESS) {
+            //TODO setProcessClass
+            // see usedTasks of job
+        }
     }
     
-    public boolean hasJobChainObstacles(JobChain jobChain) {
+    public void readJobChainObstacles(JobChain jobChain) {
         if (jobChain.isStopped()) {
             setSeverity(ProcessingState.Text.JOB_CHAIN_STOPPED);
-            return false;
         }
-        return true;
     }
     
     public void setPathJobChainAndOrderId() throws JobSchedulerInvalidResponseDataException {

@@ -2,11 +2,14 @@ package com.sos.joc.classes.orders;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +26,7 @@ public class UsedJobs {
 
         private JsonArray obstacles;
         private String nextPeriodBeginsAt = null;
-        private String lock = null;
+        private JsonArray locks = null;
         private Integer taskLimit = null;
         private Integer processLimit = null;
         private boolean stopped = false;
@@ -55,8 +58,8 @@ public class UsedJobs {
                         processLimit = obstacle.getInt("limit");
                         state = ProcessingState.Text.WAITING_FOR_PROCESS;
                         break;
-                    case "Locked":
-                        lock = obstacle.getString("path");
+                    case "WaitingForLocks":
+                        locks = obstacle.getJsonArray("lockPaths");
                         state = ProcessingState.Text.WAITING_FOR_LOCK;
                         break;
                     }
@@ -84,9 +87,17 @@ public class UsedJobs {
             return processLimit;
         }
         
-        public String getLock() {
+        public JsonArray getLocks() {
             parse();
-            return lock;
+            return locks;
+        }
+        
+        public String getLock() {
+            JsonArray l = getLocks();
+            if (l != null) {
+                return l.get(0).toString();
+            }
+            return null;
         }
         
         public ProcessingState.Text getState() {
@@ -128,8 +139,24 @@ public class UsedJobs {
         return jobs.containsKey(path) ? jobs.get(path).getProcessLimit() : null;
     }
     
+    public List<String> getLocks(String path) {
+        JsonArray jlocks = jobs.containsKey(path) ? jobs.get(path).getLocks() : null;
+        if (jlocks != null) {
+            List<String> locks = new ArrayList<String>();
+            for (JsonString lock : jlocks.getValuesAs(JsonString.class)) {
+                locks.add(lock.getString());
+            }
+            return locks;
+        }
+        return null;
+    }
+    
     public String getLock(String path) {
-        return jobs.containsKey(path) ? jobs.get(path).getLock() : null;
+        JsonArray locks = jobs.containsKey(path) ? jobs.get(path).getLocks() : null;
+        if (locks != null) {
+            return locks.get(0).toString();
+        }
+        return null;
     }
     
     public ProcessingState.Text getState(String path) {

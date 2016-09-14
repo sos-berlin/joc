@@ -4,10 +4,12 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
@@ -26,6 +28,8 @@ import com.sos.joc.model.job.OrderQueue;
 import com.sos.joc.model.order.OrderFilterWithCompactSchema;
 import com.sos.joc.model.order.Order_;
 import com.sos.joc.model.order.OrdersFilterSchema;
+import com.sos.joc.model.order.ProcessingState;
+import com.sos.joc.model.order.Type;
 
 public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersVCallable.class);
@@ -84,7 +88,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     }
     
     private Map<String,OrderQueue> getOrders(FoldersSchema folder, OrdersFilterSchema ordersBody, URI uri) throws JocMissingRequiredParameterException, Exception {
-        return getOrders(getJsonObjectFromResponse(uri, getServiceBody(folder)), ordersBody.getCompact(), (folder.getRecursive()) ? null : folder.getFolder(), ordersBody.getRegex());
+        return getOrders(getJsonObjectFromResponse(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), (folder.getRecursive()) ? null : folder.getFolder(), ordersBody.getRegex());
     }
     
     private Map<String,OrderQueue> getOrders(JsonObject json, boolean compact) throws JobSchedulerInvalidResponseDataException {
@@ -104,21 +108,21 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
             order.setPathJobChainAndOrderId();
             if (FilterAfterResponse.isLocatedInSubFolder(refFolderIfNotRecursive, order.getJobChain())) {
                 LOGGER.info("...processing skipped caused by 'recursive=false'");
-               continue; 
+                continue; 
             }
             if (!FilterAfterResponse.matchReqex(regex, order.getPath())) {
                 LOGGER.info("...processing skipped caused by 'regex=" + regex + "'");
                 continue; 
             }
             order.setSurveyDate(surveyDate);
-            boolean needMoreInfos = order.setFields(usedNodes, compact);
-            if (needMoreInfos) {
+            order.setFields(usedNodes, compact);
+            if (!order.processingStateIsSet()) {
                 usedJobs.addEntries(json.getJsonArray("usedJobs"));
-                needMoreInfos = order.hasJobObstacles(usedJobs.get(order.getJob()));
+                order.readJobObstacles(usedJobs.get(order.getJob()));
             }
-            if (needMoreInfos) {
+            if (!order.processingStateIsSet()) {
                 usedJobChains.addEntries(json.getJsonArray("usedJobChains"));
-                order.hasJobChainObstacles(usedJobChains.get(order.getJobChain()));
+                order.readJobChainObstacles(usedJobChains.get(order.getJobChain()));
             }
             listOrderQueue.put(order.getPath(), order);
         }
@@ -170,13 +174,89 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         return postBody;
     }
     
-    private String getServiceBody(FoldersSchema folder) throws JocMissingRequiredParameterException {
+    private String getServiceBody(FoldersSchema folder, OrdersFilterSchema ordersBody) throws JocMissingRequiredParameterException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
+        
+        // add folder path from response body 
         String path = folder.getFolder();
         if (path != null && !path.isEmpty()) {
             path = ("/"+path.trim()+"/").replaceAll("//+", "/");
+            builder.add("path", path);
         }
-        builder.add("path", path);
+        
+        // add processingState from response body
+        List<ProcessingState> states = ordersBody.getProcessingState();
+        Map<String, Boolean> filterValues = new HashMap<String, Boolean>();
+        boolean suspended = false;
+        if (states != null && !states.isEmpty()) {
+            for (ProcessingState state : states) {
+                switch (state) {
+                case PENDING:
+                    filterValues.put("Planned", true);
+                    filterValues.put("NotPlanned", true);
+                    break;
+                case RUNNING:
+                    filterValues.put("InTaskProcess", true);
+                    filterValues.put("OccupiedByClusterMember", true);
+                    break;
+                case SUSPENDED:
+                    suspended = true;
+                    break;
+                case BLACKLIST:
+                    filterValues.put("Blacklisted", true);
+                    break;
+                case SETBACK:
+                    filterValues.put("Setback", true);
+                    break;
+                case WAITINGFORRESOURCE:
+                    filterValues.put("Pending", true);
+                    filterValues.put("WaitingInTask", true);
+                    filterValues.put("WaitingForOther", true);
+                    break;
+                }
+            }
+        }
+        if (!filterValues.isEmpty()) {
+            JsonArrayBuilder processingStates = Json.createArrayBuilder();
+            for (String key : filterValues.keySet()) {
+                processingStates.add(key);
+            }
+            builder.add("isOrderProcessingState", processingStates);
+            if (suspended) {
+                builder.add("orIsSuspended",true); 
+            }
+        } else {
+            if (suspended) {
+                builder.add("isSuspended",true); 
+            }
+        }
+        
+        // add type from response body
+        List<Type> types = ordersBody.getType();
+        filterValues.clear();
+        if (types != null && !types.isEmpty()) {
+            for (Type type : types) {
+                switch (type) {
+                case AD_HOC:
+                    filterValues.put("AdHoc", true);
+                    break;
+                case PERMANENT:
+                    filterValues.put("Permanent", true);
+                    break;
+                case FILE_ORDER:
+                    filterValues.put("FileOrder", true);
+                    break;
+                }
+            }
+        }
+        if (!filterValues.isEmpty()) {
+            JsonArrayBuilder sourceTypes = Json.createArrayBuilder();
+            for (String key : filterValues.keySet()) {
+                sourceTypes.add(key);
+            }
+            builder.add("isOrderSourceType", sourceTypes);
+        }
+        
         String postBody = builder.build().toString();
         return postBody;
     }
