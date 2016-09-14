@@ -1,21 +1,22 @@
 package com.sos.joc.job.impl;
 
-import java.util.Date;
+import java.math.BigInteger;
 
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.runtime.RunTime;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobRunTimeResource;
 import com.sos.joc.model.common.Runtime200Schema;
-import com.sos.joc.model.common.RuntimeSchema;
 import com.sos.joc.model.job.JobFilterSchema;
+import com.sos.scheduler.model.commands.JSCmdShowJob;
  
 @Path("job")
 public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTimeResource {
@@ -23,7 +24,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 
     @Override
     public JOCDefaultResponse postJobRunTime(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
-        LOGGER.debug("init job/runTime");
+        LOGGER.debug("init job/run_time");
         JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -31,20 +32,26 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
         try {
             Runtime200Schema runTimeAnswer = new Runtime200Schema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            String postCommand = RunTime.createJobRuntimePostCommand(jobFilterSchema);
-            jocXmlCommand.excutePost(postCommand);
-            runTimeAnswer.setDeliveryDate(new Date());
-            Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode("//job/run_time");
-
-            RuntimeSchema runTime = new RuntimeSchema();
-            runTime.setRunTime(RunTime.getRuntimeXmlString(runtimeNode));
-            runTimeAnswer.setRunTime(runTime);
+            if (jocXmlCommand.checkRequiredParameter("job", jobFilterSchema.getJob())) {
+                runTimeAnswer = RunTime.set(jocXmlCommand, createJobRuntimePostCommand(jobFilterSchema), "//job/run_time");
+            }
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
-
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing job.set_run_time:  %s:%s", e.getCause(), e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
 
+    }
+    
+    private String createJobRuntimePostCommand(JobFilterSchema body) {
+
+        JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
+        showJob.setWhat("run_time");
+        showJob.setJob(body.getJob());
+        showJob.setMaxOrders(BigInteger.valueOf(0));
+        showJob.setMaxTaskHistory(BigInteger.valueOf(0));
+        return Globals.schedulerObjectFactory.toXMLString(showJob);
     }
   
 }
