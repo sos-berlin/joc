@@ -15,10 +15,12 @@ import com.sos.xml.SOSXmlCommand;
 public class JOCXmlCommand extends SOSXmlCommand {
 
     private Date surveyDate;
-    private NodeList nodeList;
+    private HashMap<String,NodeList> listOfNodeLists;
 
     public JOCXmlCommand(String url) {
         super(url);
+        listOfNodeLists = new HashMap<String,NodeList>();
+ 
     }
 
     public Date getSurveyDate() {
@@ -38,31 +40,45 @@ public class JOCXmlCommand extends SOSXmlCommand {
         return surveyDate;
     }
 
+    public void createNodeList(String key,String xpath) throws Exception {
+        NodeList nodeList = selectNodelist(xpath);
+        listOfNodeLists.put(key, nodeList);
+    }
+    
     public void createNodeList(String xpath) throws Exception {
-        nodeList = selectNodelist("//spooler/answer/state/cluster/cluster_member");
-        nodeList = selectNodelist(xpath);
+        createNodeList("",xpath);
+    }
+
+    public NodeList getNodeList(String key) {
+        return listOfNodeLists.get(key);
     }
 
     public NodeList getNodeList() {
-        return nodeList;
+        return listOfNodeLists.get("");
     }
-
-    public void getElementFromList(int i) throws Exception {
+    
+    public void getElementFromList(String key, int i) throws Exception {
+        NodeList nodeList = listOfNodeLists.get(key);
         if (nodeList != null) {
             Node n = nodeList.item(i);
             if (n != null && n.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) n;
-                attributes = new HashMap<String, String>();
+                HashMap <String, String> attrs = new HashMap<String, String>();
                  if (element != null) {
                     NamedNodeMap map = n.getAttributes();
                     for (int j = 0; j < map.getLength(); j++) {
-                        attributes.put(map.item(j).getNodeName(), map.item(j).getNodeValue());
+                        attrs.put(map.item(j).getNodeName(), map.item(j).getNodeValue());
                     }
                 }
+                 attributes.put(key, attrs);
             }
         }
     }
     
+    public void getElementFromList(int i) throws Exception {
+        getElementFromList("",i);
+    }
+
     public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null || paramVal.isEmpty()) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));

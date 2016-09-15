@@ -1,5 +1,7 @@
 package com.sos.joc.classes;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -104,6 +106,10 @@ public class JOCResourceImpl {
         }
         return init(schedulerId, permission);
 
+    }
+    
+    public String normalizePath(String path){
+        return ("/"+path).replaceAll("//+","/");
     }
 
 }

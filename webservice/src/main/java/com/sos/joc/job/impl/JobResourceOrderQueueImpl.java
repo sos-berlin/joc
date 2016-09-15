@@ -11,20 +11,12 @@ import org.w3c.dom.Node;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.job.Job;
 import com.sos.joc.classes.job.JobOrderQueue;
-import com.sos.joc.classes.job.Jobs;
-import com.sos.joc.classes.jobs.JobsUtils;
-import com.sos.joc.classes.orders.Orders;
-import com.sos.joc.classes.parameters.Parameters;
 import com.sos.joc.job.resource.IJobResourceOrderQueue;
-import com.sos.joc.model.job.Job200VSchema;
 import com.sos.joc.model.job.JobOrderQueue200VSchema;
 import com.sos.joc.model.job.JobOrderQueueFilterSchema;
-import com.sos.joc.model.job.Job_;
 import com.sos.joc.model.job.Job__;
-import com.sos.joc.model.job.OrderQueue;
 
 @Path("job")
 public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobResourceOrderQueue {

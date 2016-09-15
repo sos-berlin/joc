@@ -29,5 +29,14 @@ public class JOCResourceImplTest {
        assertEquals("getDateFromStringTest", 8, date.getHours());
    }
 
+   @Test
+   public void normalizePathTest(){
+       JOCResourceImpl jocResourceImpl  = new JOCResourceImpl();
+       assertEquals("normalizePathTest", "/1/2/3",jocResourceImpl.normalizePath("1/2/3") );
+       assertEquals("normalizePathTest", "/1/2/3",jocResourceImpl.normalizePath("/1/2/3") );
+       assertEquals("normalizePathTest", "/1",jocResourceImpl.normalizePath("1") );
+       assertEquals("normalizePathTest", "/1",jocResourceImpl.normalizePath("/1") );
+   }
+
    
 }
