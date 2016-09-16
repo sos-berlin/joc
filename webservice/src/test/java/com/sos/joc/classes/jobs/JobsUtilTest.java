@@ -22,7 +22,7 @@ public class JobsUtilTest {
         jobFilterSchema.setCompact(false);
         jobFilterSchema.setJob("myJob");
         jobFilterSchema.setJobschedulerId("mySchedulerId");
-        JobsUtils.createJobPostCommand(jobFilterSchema);
+        JobsUtils.createJobPostCommand(jobFilterSchema.getJob(), jobFilterSchema.getCompact());
 
     }
 

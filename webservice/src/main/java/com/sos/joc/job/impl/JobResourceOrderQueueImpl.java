@@ -6,25 +6,17 @@ import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.configuration.ConfigurationStatus;
-import com.sos.joc.classes.job.Job;
-import com.sos.joc.classes.job.JobOrderQueue;
-import com.sos.joc.classes.job.Jobs;
+import com.sos.joc.classes.job.JobsVCallable;
 import com.sos.joc.classes.jobs.JobsUtils;
-import com.sos.joc.classes.orders.Orders;
-import com.sos.joc.classes.parameters.Parameters;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceOrderQueue;
 import com.sos.joc.model.job.Job200VSchema;
-import com.sos.joc.model.job.JobOrderQueue200VSchema;
 import com.sos.joc.model.job.JobOrderQueueFilterSchema;
-import com.sos.joc.model.job.Job_;
-import com.sos.joc.model.job.Job__;
-import com.sos.joc.model.job.OrderQueue;
 
 @Path("job")
 public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobResourceOrderQueue {
@@ -38,23 +30,22 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-
+        
         try {
-            JobOrderQueue200VSchema entity = new JobOrderQueue200VSchema();
-            entity.setDeliveryDate(new Date());
+            Job200VSchema entity = new Job200VSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            String postCommand = JobOrderQueue.createJobOrderQueuePostCommand(jobOrderQueueFilterSchema);
-            jocXmlCommand.excutePost(postCommand);
-            Node jobNode = jocXmlCommand.getSosxml().selectSingleNode("//job");
-            Job__ job = Job.getJob__(jobNode, jocXmlCommand, jobOrderQueueFilterSchema.getCompact());
-            job.setSurveyDate(jocXmlCommand.getSurveyDate());
-            Node orderQueueNode = jocXmlCommand.getSosxml().selectSingleNode("//job/order_queue");
-            job.setOrderQueue(JobOrderQueue.getOrderQueue(orderQueueNode, jocXmlCommand));
-            entity.setJob(job);
+            if (jocXmlCommand.checkRequiredParameter("job", jobOrderQueueFilterSchema.getJob())) {
+                jocXmlCommand.excutePost(JobsUtils.createJobPostCommand(jobOrderQueueFilterSchema.getJob(), jobOrderQueueFilterSchema.getCompact()));
+                Element jobElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/job");
+                JobsVCallable j = new JobsVCallable(jobElem, jocXmlCommand, false, true);
+                entity.setDeliveryDate(new Date());
+                entity.setJob(j.getJob());
+            }
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
-
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 

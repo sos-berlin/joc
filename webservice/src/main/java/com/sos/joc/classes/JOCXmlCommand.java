@@ -39,7 +39,6 @@ public class JOCXmlCommand extends SOSXmlCommand {
     }
 
     public void createNodeList(String xpath) throws Exception {
-        nodeList = selectNodelist("//spooler/answer/state/cluster/cluster_member");
         nodeList = selectNodelist(xpath);
     }
 
@@ -61,6 +60,14 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 }
             }
         }
+    }
+    
+    public String getAttributeValue(Element elem, String attributeName, String default_) {
+        String val = elem.getAttribute(attributeName);
+        if (val == null || val.isEmpty()) {
+            val = default_;
+        }
+        return val;
     }
     
     public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {

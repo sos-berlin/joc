@@ -24,8 +24,6 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.ConfigurationSchema;
 import com.sos.joc.model.common.Content;
-import com.sos.joc.model.order.OrderConfigurationFilterSchema;
-import com.sos.joc.model.order.OrderConfigurationFilterSchema.Mime;
 
 public class ConfigurationUtils {
 

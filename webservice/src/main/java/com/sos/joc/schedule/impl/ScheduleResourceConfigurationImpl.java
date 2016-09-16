@@ -11,7 +11,6 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.lock.LockConfigurationFilterSchema;
 import com.sos.joc.model.schedule.ScheduleConfigurationFilterSchema;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
 import com.sos.scheduler.model.commands.JSCmdShowState;
