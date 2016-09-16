@@ -44,7 +44,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
     
     private String createOrderConfigurationPostCommand(OrderConfigurationFilterSchema body) {
         JSCmdShowOrder showOrder = new JSCmdShowOrder(Globals.schedulerObjectFactory);
-        showOrder.setJobChain(("/"+body.getJobChain()).replaceAll("//+", "/"));
+        showOrder.setJobChain((normalizePath(body.getJobChain())));
         showOrder.setOrder(body.getOrderId());
         showOrder.setWhat("source");
         return Globals.schedulerObjectFactory.toXMLString(showOrder);
