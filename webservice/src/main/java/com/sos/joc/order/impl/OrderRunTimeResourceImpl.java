@@ -43,7 +43,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
     
     private String createOrderRunTimePostCommand(OrderRunTimeBody body) {
         JSCmdShowOrder showOrder = new JSCmdShowOrder(Globals.schedulerObjectFactory);
-        showOrder.setJobChain(("/"+body.getJobChain()).replaceAll("//+", "/"));
+        showOrder.setJobChain(normalizePath(body.getJobChain()));
         showOrder.setOrder(body.getOrderId());
         showOrder.setWhat("run_time");
         return Globals.schedulerObjectFactory.toXMLString(showOrder);

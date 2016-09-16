@@ -19,11 +19,9 @@ public class InventoryOrdersDBLayerTest {
     @Test
     public void getOrderschedulerOrders() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SOSShiroCurrentUser sosShiroCurrentUser = Globals.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
-
+        sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
          
-        InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosShiroCurrentUser.getSosHibernateConnection(), "scheduler_current");
+        InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection, "scheduler_current");
         
         List<DBItemInventoryOrder>  listOfOrders = dbLayer.getInventoryOrders();
         
@@ -35,11 +33,9 @@ public class InventoryOrdersDBLayerTest {
     @Test
     public void getOrderschedulerOrder() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SOSShiroCurrentUser sosShiroCurrentUser = Globals.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
-
-         
-        InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosShiroCurrentUser.getSosHibernateConnection(), "scheduler_current");
+        sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        
+        InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection, "scheduler_current");
         
         DBItemInventoryOrder order = dbLayer.getInventoryOrderByOrderId("dod_tools/active_ftp_accounts", "set_ftp_passwords");
         

@@ -19,11 +19,8 @@ public class InventoryJobsDBLayerTest {
     @Test
     public void getJobSchedulerJobs() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SOSShiroCurrentUser sosShiroCurrentUser = Globals.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
-
          
-        InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(sosShiroCurrentUser.getSosHibernateConnection(), "scheduler_current");
+        InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection, "scheduler_current");
         
         List<DBItemInventoryJob>  listOfJobs = dbLayer.getInventoryJobs();
         
@@ -35,11 +32,9 @@ public class InventoryJobsDBLayerTest {
     @Test
     public void getJobSchedulerJob() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SOSShiroCurrentUser sosShiroCurrentUser = Globals.currentUsersList.getUser(sosShiroCurrentUserAnswer.getAccessToken());
-
+        sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
          
-        InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(sosShiroCurrentUser.getSosHibernateConnection(), "scheduler_current");
+        InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection, "scheduler_current");
         
         DBItemInventoryJob job = dbLayer.getInventoryJobByName("batch_install_universal_agent/PerformInstall");
         

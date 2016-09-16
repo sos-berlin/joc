@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -38,7 +39,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             entity.setDeliveryDate(new Date());
             String first = "";
 
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(jobschedulerUser.getSosShiroCurrentUser().getSosHibernateConnection());
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getInventoryInstances();
             for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
                 jobschedulerIs.add(inventoryInstance.getSchedulerId());

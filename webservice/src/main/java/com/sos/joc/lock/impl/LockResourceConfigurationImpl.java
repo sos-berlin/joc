@@ -35,7 +35,7 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
             if (jocXmlCommand.checkRequiredParameter("lock", lockBody.getLock())) {
                 boolean responseInHtml = lockBody.getMime() == LockConfigurationFilterSchema.Mime.HTML;
                 String xPath = "/spooler/answer//locks/lock[@path='"+("/"+lockBody.getLock()).replaceAll("//+", "/")+"']"; 
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(lockBody), xPath, "lock", responseInHtml);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(), xPath, "lock", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -45,7 +45,7 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
         }
     }
 
-    private String createLockConfigurationPostCommand(LockConfigurationFilterSchema lockBody) {
+    private String createLockConfigurationPostCommand() {
         JSCmdShowState showLocks = new JSCmdShowState(Globals.schedulerObjectFactory);
         showLocks.setSubsystems("folder lock");
         showLocks.setWhat("folders source");

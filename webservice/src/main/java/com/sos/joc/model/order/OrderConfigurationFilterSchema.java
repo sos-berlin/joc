@@ -10,7 +10,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * order filter
+ * order conf filter
  * <p>
  * 
  * 
@@ -18,6 +18,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 public class OrderConfigurationFilterSchema {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     private String jobschedulerId;
     /**
      * path
@@ -37,6 +42,8 @@ public class OrderConfigurationFilterSchema {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The jobschedulerId
      */
@@ -45,6 +52,8 @@ public class OrderConfigurationFilterSchema {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param jobschedulerId
      *     The jobschedulerId

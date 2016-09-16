@@ -1,4 +1,4 @@
-package com.sos.joc.jobchains.impl;
+package com.sos.joc.jobchain.impl;
 
 import static org.junit.Assert.*;
 
@@ -15,7 +15,7 @@ public class JobChainsResourceConfigurationImplTest {
     private static final String LDAP_USER = "root";
 
     @Test
-    public void postJobChainCOnfigurationTest() throws Exception {
+    public void postJobChainConfigurationTest() throws Exception {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
@@ -25,7 +25,7 @@ public class JobChainsResourceConfigurationImplTest {
         JobChainResourceConfigurationImpl jobChainsImpl = new JobChainResourceConfigurationImpl();
         JOCDefaultResponse response = jobChainsImpl.postJobChainConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), jobChainFilterSchema);
         ConfigurationSchema configurationSchema = (ConfigurationSchema) response.getEntity();
-        assertEquals("postJobChainsTest", 116, configurationSchema.getConfiguration().getConfigurationDate().getYear());
+        assertEquals("postJobChainConfigurationTest", 116, configurationSchema.getConfiguration().getConfigurationDate().getYear());
     }
 
 }

@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.jobChain;
+package com.sos.joc.model.processClass;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,13 +10,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * jobChainConfigurationFilter
+ * process class conf filter
  * <p>
  * 
  * 
  */
 @Generated("org.jsonschema2pojo")
-public class JobChainConfigurationFilterSchema {
+public class ProcessClassConfigurationFilterSchema {
 
     /**
      * 
@@ -31,12 +31,8 @@ public class JobChainConfigurationFilterSchema {
      * (Required)
      * 
      */
-    private String jobChain;
-    /**
-     * The configuration can have a HTML representation where the XML gets a highlighting via CSS classes.
-     * 
-     */
-    private JobChainConfigurationFilterSchema.Mime mime = JobChainConfigurationFilterSchema.Mime.fromValue("XML");
+    private String processClass;
+    private ProcessClassConfigurationFilterSchema.Mime mime = ProcessClassConfigurationFilterSchema.Mime.fromValue("XML");
 
     /**
      * 
@@ -67,10 +63,10 @@ public class JobChainConfigurationFilterSchema {
      * (Required)
      * 
      * @return
-     *     The jobChain
+     *     The processClass
      */
-    public String getJobChain() {
-        return jobChain;
+    public String getProcessClass() {
+        return processClass;
     }
 
     /**
@@ -79,30 +75,28 @@ public class JobChainConfigurationFilterSchema {
      * absolute path based on live folder of a JobScheduler object.
      * (Required)
      * 
-     * @param jobChain
-     *     The jobChain
+     * @param processClass
+     *     The processClass
      */
-    public void setJobChain(String jobChain) {
-        this.jobChain = jobChain;
+    public void setProcessClass(String processClass) {
+        this.processClass = processClass;
     }
 
     /**
-     * The configuration can have a HTML representation where the XML gets a highlighting via CSS classes.
      * 
      * @return
      *     The mime
      */
-    public JobChainConfigurationFilterSchema.Mime getMime() {
+    public ProcessClassConfigurationFilterSchema.Mime getMime() {
         return mime;
     }
 
     /**
-     * The configuration can have a HTML representation where the XML gets a highlighting via CSS classes.
      * 
      * @param mime
      *     The mime
      */
-    public void setMime(JobChainConfigurationFilterSchema.Mime mime) {
+    public void setMime(ProcessClassConfigurationFilterSchema.Mime mime) {
         this.mime = mime;
     }
 
@@ -113,7 +107,7 @@ public class JobChainConfigurationFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobChain).append(mime).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(processClass).append(mime).toHashCode();
     }
 
     @Override
@@ -121,23 +115,23 @@ public class JobChainConfigurationFilterSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof JobChainConfigurationFilterSchema) == false) {
+        if ((other instanceof ProcessClassConfigurationFilterSchema) == false) {
             return false;
         }
-        JobChainConfigurationFilterSchema rhs = ((JobChainConfigurationFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChain, rhs.jobChain).append(mime, rhs.mime).isEquals();
+        ProcessClassConfigurationFilterSchema rhs = ((ProcessClassConfigurationFilterSchema) other);
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(processClass, rhs.processClass).append(mime, rhs.mime).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")
     public enum Mime {
 
-        XML("XML"),
-        HTML("HTML");
+        HTML("HTML"),
+        XML("XML");
         private final String value;
-        private final static Map<String, JobChainConfigurationFilterSchema.Mime> CONSTANTS = new HashMap<String, JobChainConfigurationFilterSchema.Mime>();
+        private final static Map<String, ProcessClassConfigurationFilterSchema.Mime> CONSTANTS = new HashMap<String, ProcessClassConfigurationFilterSchema.Mime>();
 
         static {
-            for (JobChainConfigurationFilterSchema.Mime c: values()) {
+            for (ProcessClassConfigurationFilterSchema.Mime c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -151,8 +145,8 @@ public class JobChainConfigurationFilterSchema {
             return this.value;
         }
 
-        public static JobChainConfigurationFilterSchema.Mime fromValue(String value) {
-            JobChainConfigurationFilterSchema.Mime constant = CONSTANTS.get(value);
+        public static ProcessClassConfigurationFilterSchema.Mime fromValue(String value) {
+            ProcessClassConfigurationFilterSchema.Mime constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

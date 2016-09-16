@@ -40,7 +40,7 @@ public class JobSchedulerUser {
 
     public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws Exception {
         if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier) == null) {
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(sosShiroCurrentUser.getSosHibernateConnection());
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerIdentifier, dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
         }
         return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier);

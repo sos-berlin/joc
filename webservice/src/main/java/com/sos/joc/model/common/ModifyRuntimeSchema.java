@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.schedule;
+package com.sos.joc.model.common;
 
 import javax.annotation.Generated;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -143,7 +143,7 @@ public class ModifyRuntimeSchema {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(java.lang.Object other) {
         if (other == this) {
             return true;
         }
