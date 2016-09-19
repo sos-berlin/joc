@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.orders.post.orders.OrdersBody;
+import com.sos.joc.model.order.OrdersFilterSchema;
 
  
 public interface IOrdersResourceP {
@@ -16,7 +16,7 @@ public interface IOrdersResourceP {
     @Path("p")
     @Produces({ "application/json" })
     public JOCDefaultResponse postOrdersP(            
-            @HeaderParam("access_token") String accessToken, OrdersBody orderBody) throws Exception;
+            @HeaderParam("access_token") String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception;
 
    
  

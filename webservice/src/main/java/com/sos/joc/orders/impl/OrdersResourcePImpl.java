@@ -13,8 +13,8 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.order.Order;
+import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.OrdersPSchema;
-import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceP;
 
 @Path("orders")
@@ -22,10 +22,10 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     private static final Logger LOGGER = Logger.getLogger(OrdersResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrdersP(String accessToken, OrdersBody ordersBody) throws Exception {
+    public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
 
         LOGGER.debug("init OrdersP");
-        JOCDefaultResponse jocDefaultResponse = init(ordersBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
 
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -36,7 +36,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             OrdersPSchema entity = new OrdersPSchema();
             entity.setDeliveryDate(new Date());
 
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection,ordersBody.getJobschedulerId());
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection,ordersFilterSchema.getJobschedulerId());
             List<DBItemInventoryOrder> listOfOrders = dbLayer.getInventoryOrders();
             List<Order> listOrder = new ArrayList<Order>();
             for (DBItemInventoryOrder inventoryOrder : listOfOrders) {
@@ -45,7 +45,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                 order.setPath(inventoryOrder.getName());
                 order.setOrderId(inventoryOrder.getOrderId());
                 order.setJobChain(inventoryOrder.getJobChain());
-                if (!ordersBody.getCompact()) {
+                if (!ordersFilterSchema.getCompact()) {
                     order.setEstimatedDuration(-1);
                     order.setConfigurationDate(new Date());
                     order.setEndState("myEndState");

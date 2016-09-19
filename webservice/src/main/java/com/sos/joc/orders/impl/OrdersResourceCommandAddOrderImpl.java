@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.orders.post.commands.modify.ModifyOrdersBody;
-import com.sos.joc.orders.post.commands.modify.Order;
-import com.sos.joc.orders.post.commands.modify.Param;
+import com.sos.joc.model.common.NameValuePairsSchema;
+import com.sos.joc.model.order.ModifyOrderSchema;
+import com.sos.joc.model.order.ModifyOrdersSchema;
 import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdAddOrder;
@@ -21,11 +21,11 @@ import com.sos.scheduler.model.objects.Spooler;
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandAddOrderImpl.class);
 
-    private String[] getParams(List<Param> list) {
+    private String[] getParams(List<NameValuePairsSchema> list) {
         String[] orderParams = new String[list.size() * 2];
 
         for (int i = 0; i < list.size(); i = i + 2) {
-            Param param = list.get(i);
+            NameValuePairsSchema param = list.get(i);
             orderParams[i] = param.getName();
             orderParams[i + 1] = param.getValue();
         }
@@ -33,9 +33,10 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         return orderParams;
     }
 
-    private JOCDefaultResponse executeAddOrderCommand(Order order) {
+    private JOCDefaultResponse executeAddOrderCommand(ModifyOrderSchema order) {
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
             objFactory.initMarshaller(Spooler.class);
             JSCmdAddOrder objOrder = objFactory.createAddOrder();
@@ -61,21 +62,25 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing order.add %s:%s", e.getCause(), e.getMessage()));
+            addError(listOfErrors, jocXmlCommand, order.getJobChain(), e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
-    public JOCDefaultResponse postOrdersAdd(String accessToken, ModifyOrdersBody ordersModifyOrderBody) throws Exception {
-        LOGGER.debug("init Orders: Add"); 
+    public JOCDefaultResponse postOrdersAdd(String accessToken, ModifyOrdersSchema modifyOrdersSchema) throws Exception {
+        LOGGER.debug("init Orders: Add");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
-            jocDefaultResponse = init(ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getJobChain().isAddOrder());
+            jocDefaultResponse = init(modifyOrdersSchema.getJobschedulerId(), getPermissons(accessToken).getJobChain().isAddOrder());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (Order order : ordersModifyOrderBody.getOrders()) {
+            for (ModifyOrderSchema order : modifyOrdersSchema.getOrders()) {
                 jocDefaultResponse = executeAddOrderCommand(order);
+            }
+            if (listOfErrors != null) {
+                return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
 
         } catch (Exception e) {

@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.orders.post.commands.modify.ModifyOrdersBody;
-import com.sos.joc.orders.post.commands.modify.Order;
+import com.sos.joc.model.order.ModifyOrderSchema;
+import com.sos.joc.model.order.ModifyOrdersSchema;
 import com.sos.joc.orders.resource.IOrdersResourceCommandDeleteOrder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdRemoveOrder;
@@ -19,12 +19,11 @@ import com.sos.scheduler.model.objects.Spooler;
 @Path("orders")
 public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandDeleteOrder {
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandDeleteOrderImpl.class);
- 
-    private JOCDefaultResponse executeDeleteOrderCommand(Order order) {
+
+    private JOCDefaultResponse executeDeleteOrderCommand(ModifyOrderSchema order) {
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+
         try {
-
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-
             SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
             objFactory.initMarshaller(Spooler.class);
             JSCmdRemoveOrder objRemoveOrder = objFactory.createRemoveOrder();
@@ -35,23 +34,29 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing order.delete %s:%s", e.getCause(), e.getMessage()));
+            addError(listOfErrors, jocXmlCommand, order.getJobChain(), e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
-    public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrdersBody ordersModifyOrderBody) {
+    public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrdersSchema modifyOrdersSchema) {
         LOGGER.debug("init Orders:Delete");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(ordersModifyOrderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getDelete().isTemporary());
+            jocDefaultResponse = init(modifyOrdersSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getDelete().isTemporary());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (Order order : ordersModifyOrderBody.getOrders()) {
+            for (ModifyOrderSchema order : modifyOrdersSchema.getOrders()) {
                 jocDefaultResponse = executeDeleteOrderCommand(order);
             }
+        
+            if (listOfErrors != null) {
+                return JOCDefaultResponse.responseStatus419(listOfErrors);
+            }
+
         } catch (Exception e) {
             return jocDefaultResponse;
         }

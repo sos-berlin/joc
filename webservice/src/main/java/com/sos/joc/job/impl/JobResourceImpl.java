@@ -28,7 +28,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
         try {
             Job200VSchema entity = new Job200VSchema();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl());
-            if (jocXmlCommand.checkRequiredParameter("job", jobFilterSchema.getJob())) {
+            if (checkRequiredParameter("job", jobFilterSchema.getJob())) {
                 entity.setDeliveryDate(new Date());
                 entity.setJob(jocXmlCommand.getJob(jobFilterSchema.getJob(), jobFilterSchema.getCompact(), true));
             }

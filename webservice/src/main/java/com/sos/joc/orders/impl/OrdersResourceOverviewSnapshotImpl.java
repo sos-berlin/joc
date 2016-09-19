@@ -14,8 +14,8 @@ import com.sos.jitl.restclient.JobSchedulerRestClient;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.order.Orders;
+import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.SnapshotSchema;
-import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
 
 @Path("orders")
@@ -23,9 +23,9 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceOverviewSnapshotImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, OrdersBody ordersBody) throws Exception {
+    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
         LOGGER.debug("init Orders");
-        JOCDefaultResponse jocDefaultResponse = init( ordersBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init( ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
 
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -42,8 +42,8 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             JsonReader rdr = Json.createReader(new StringReader(response));
             JsonObject obj = rdr.readObject();
 
-            ordersBody.getRegex();
-            ordersBody.getOrders(); // list of wanted orders.
+            ordersFilterSchema.getRegex();
+            ordersFilterSchema.getOrders(); // list of wanted orders.
 
             // TODO JOC Cockpit Webservice (Inventory_Orders)
 

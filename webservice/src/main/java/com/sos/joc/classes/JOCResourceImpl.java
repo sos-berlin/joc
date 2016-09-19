@@ -1,7 +1,5 @@
 package com.sos.joc.classes;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

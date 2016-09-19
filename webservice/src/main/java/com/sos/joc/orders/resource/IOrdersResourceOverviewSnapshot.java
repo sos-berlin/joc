@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.orders.post.orders.OrdersBody;
+import com.sos.joc.model.order.OrdersFilterSchema;
 
  
 public interface IOrdersResourceOverviewSnapshot {
@@ -17,7 +17,7 @@ public interface IOrdersResourceOverviewSnapshot {
     @Path("overview/snapshot")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postOrdersOverviewSnapshot(            
-            @HeaderParam("access_token") String accessToken, OrdersBody ordersBody) throws Exception;
+            @HeaderParam("access_token") String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception;
 
 
  

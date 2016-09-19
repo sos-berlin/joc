@@ -1,6 +1,7 @@
 package com.sos.joc.classes;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -9,9 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.common.Error;
 import com.sos.joc.model.common.Error420Schema;
 import com.sos.joc.model.common.ErrorSchema;
+import com.sos.joc.model.common.ErrorsSchema;
 import com.sos.joc.model.common.OkSchema;
 
 public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
@@ -70,6 +74,19 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatus420(entity);
     }
     
+    public static JOCDefaultResponse responseStatusJSError(JocError e) {
+        Error420Schema entity = new Error420Schema();
+        entity.setDeliveryDate(new Date());
+         
+        ErrorSchema errorSchema = new ErrorSchema();
+        errorSchema.setCode(e.getCode());
+        String errorMsg = e.getMessage();
+        LOGGER.error(errorMsg, e);
+        errorSchema.setMessage(errorMsg);
+        entity.setError(errorSchema);
+
+        return responseStatus420(entity);
+    }    
     public static JOCDefaultResponse responseStatusJSError(Exception e) {
         if (e instanceof JocException) {
             return responseStatusJSError((JocException) e);
@@ -91,6 +108,16 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         responseBuilder.entity(entity);
         return new JOCDefaultResponse(responseBuilder.build());
     }
+    
+    public static JOCDefaultResponse responseStatus419(List<Error> listOfErrors) {
+        ErrorsSchema errorsSchema = new ErrorsSchema();
+        errorsSchema.setErrors(listOfErrors);
+
+        Response.ResponseBuilder responseBuilder = Response.status(419).header("Content-Type", MediaType.APPLICATION_JSON);
+        responseBuilder.entity(errorsSchema);
+        return new JOCDefaultResponse(responseBuilder.build());
+    }
+
 
     public static JOCDefaultResponse responseStatus401(SOSShiroCurrentUserAnswer entity) {
         Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", MediaType.APPLICATION_JSON);

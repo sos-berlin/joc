@@ -11,7 +11,6 @@ import org.w3c.dom.NodeList;
 
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocError;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.xml.SOSXmlCommand;
 
 public class JOCXmlCommand extends SOSXmlCommand {
@@ -82,8 +81,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
     public Element getElementFromList(int i) throws Exception {
         return getElementFromList("", i);
     }
-
-}
+    
     public String getAttributeValue(Element elem, String attributeName, String default_) {
         String val = elem.getAttribute(attributeName);
         if (val == null || val.isEmpty()) {

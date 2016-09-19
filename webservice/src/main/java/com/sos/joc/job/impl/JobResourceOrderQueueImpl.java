@@ -36,7 +36,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
             Job200VSchema entity = new Job200VSchema();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.setUriForJsonCommand(masterJsonUrl, jobFilterSchema.getCompact());
-            if (jocXmlCommand.checkRequiredParameter("job", jobFilterSchema.getJob())) {
+            if (checkRequiredParameter("job", jobFilterSchema.getJob())) {
                 entity.setDeliveryDate(new Date());
                 entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobFilterSchema.getJob(), jobFilterSchema.getCompact()));
             }

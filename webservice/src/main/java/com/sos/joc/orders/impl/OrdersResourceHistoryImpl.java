@@ -11,8 +11,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.order.History;
 import com.sos.joc.model.order.HistorySchema;
+import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.State;
-import com.sos.joc.orders.post.orders.OrdersBody;
 import com.sos.joc.orders.resource.IOrdersResourceHistory;
 
 @Path("orders")
@@ -20,9 +20,9 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceHistoryImpl.class);
  
     @Override
-    public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersBody ordersBody) throws Exception {
+    public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilterSchema orderFilterSchema) throws Exception {
         LOGGER.debug("init Orders");
-        JOCDefaultResponse jocDefaultResponse = init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -31,11 +31,11 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
         try {
             
             // Reading orders from the database tale inventory history tables filtered by
-            ordersBody.getDateFrom(); // is ISO 8601 or something like 6h 1w 65y
-            ordersBody.getDateTo();   // same as dateFrom
-            ordersBody.getTimeZone();
-            ordersBody.getRegex();
-            ordersBody.getOrders();   //list of wanted orders.
+            orderFilterSchema.getDateFrom(); // is ISO 8601 or something like 6h 1w 65y
+            orderFilterSchema.getDateTo();   // same as dateFrom
+            orderFilterSchema.getTimeZone();
+            orderFilterSchema.getRegex();
+            orderFilterSchema.getOrders();   //list of wanted orders.
   
             // TODO JOC Cockpit Webservice (Data coming from db Inventory History Tables)
    
