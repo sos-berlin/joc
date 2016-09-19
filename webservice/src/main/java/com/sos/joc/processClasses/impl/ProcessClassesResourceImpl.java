@@ -24,7 +24,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     
     @Override
     public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilterSchema processClassFilterSchema) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(processClassFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(processClassFilterSchema.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

@@ -9,18 +9,18 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.model.common.ErrorSchema;
 import com.sos.xml.SOSXmlCommand;
 
 public class JOCXmlCommand extends SOSXmlCommand {
 
     private Date surveyDate;
-    private HashMap<String,NodeList> listOfNodeLists;
+    private HashMap<String, NodeList> listOfNodeLists;
 
     public JOCXmlCommand(String url) {
         super(url);
-        listOfNodeLists = new HashMap<String,NodeList>();
- 
+        listOfNodeLists = new HashMap<String, NodeList>();
+
     }
 
     public Date getSurveyDate() {
@@ -40,13 +40,13 @@ public class JOCXmlCommand extends SOSXmlCommand {
         return surveyDate;
     }
 
-    public void createNodeList(String key,String xpath) throws Exception {
+    public void createNodeList(String key, String xpath) throws Exception {
         NodeList nodeList = selectNodelist(xpath);
         listOfNodeLists.put(key, nodeList);
     }
-    
+
     public void createNodeList(String xpath) throws Exception {
-        createNodeList("",xpath);
+        createNodeList("", xpath);
     }
 
     public NodeList getNodeList(String key) {
@@ -56,36 +56,29 @@ public class JOCXmlCommand extends SOSXmlCommand {
     public NodeList getNodeList() {
         return listOfNodeLists.get("");
     }
-    
+
     public Element getElementFromList(String key, int i) throws Exception {
         NodeList nodeList = listOfNodeLists.get(key);
-        Element element=null;
+        Element element = null;
         if (nodeList != null) {
             Node n = nodeList.item(i);
             if (n != null && n.getNodeType() == Node.ELEMENT_NODE) {
                 element = (Element) n;
-                HashMap <String, String> attrs = new HashMap<String, String>();
-                 if (element != null) {
+                HashMap<String, String> attrs = new HashMap<String, String>();
+                if (element != null) {
                     NamedNodeMap map = n.getAttributes();
                     for (int j = 0; j < map.getLength(); j++) {
                         attrs.put(map.item(j).getNodeName(), map.item(j).getNodeValue());
                     }
                 }
-                 attributes.put(key, attrs);
+                attributes.put(key, attrs);
             }
         }
         return element;
     }
-    
-    public Element getElementFromList(int i) throws Exception {
-        return getElementFromList("",i);
-    }
 
-    public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
-        if (paramVal == null || paramVal.isEmpty()) {
-            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
-        }
-        return true;
+    public Element getElementFromList(int i) throws Exception {
+        return getElementFromList("", i);
     }
 
 }

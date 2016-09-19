@@ -37,8 +37,8 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             command.addCompactQuery(orderBody.getCompact());
             Order200VSchema entity = new Order200VSchema();
 
-            if (command.checkRequiredParameter("orderId", orderBody.getOrderId())
-                    && command.checkRequiredParameter("jobChain", orderBody.getJobChain())) {
+            if (checkRequiredParameter("orderId", orderBody.getOrderId())
+                    && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
                 OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI());
                 entity.setDeliveryDate(new Date());
                 entity.setOrder(o.getOrder());

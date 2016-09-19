@@ -35,7 +35,7 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
         try {
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (jocXmlCommand.checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
+            if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
                 boolean responseInHtml = jobChainBody.getMime() == JobChainConfigurationFilterSchema.Mime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(jobChainBody), "/spooler/answer/job_chain", "job_chain", responseInHtml);
             }
@@ -49,7 +49,7 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
 
     private String createOrderConfigurationPostCommand(JobChainConfigurationFilterSchema body) {
         JSCmdShowJobChain showJobChain = new JSCmdShowJobChain(Globals.schedulerObjectFactory);
-        showJobChain.setJobChain(("/"+body.getJobChain()).replaceAll("//+", "/"));
+        showJobChain.setJobChain(normalizePath(body.getJobChain()));
         showJobChain.setWhat("source");
         showJobChain.setMaxOrderHistory(BigInteger.valueOf(0));
         showJobChain.setMaxOrders(BigInteger.valueOf(0));

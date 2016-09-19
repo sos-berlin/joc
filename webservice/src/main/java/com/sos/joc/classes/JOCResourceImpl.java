@@ -4,7 +4,9 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -12,6 +14,8 @@ import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.model.common.Error;
 
 public class JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JOCResourceImpl.class);
@@ -22,6 +26,8 @@ public class JOCResourceImpl {
     private String accessToken;
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
+    protected List<Error> listOfErrors;
+
 
     protected SOSPermissionJocCockpit getPermissons(String accessToken) {
         if (jobschedulerUser == null) {
@@ -111,5 +117,39 @@ public class JOCResourceImpl {
     public String normalizePath(String path){
         return ("/"+path).replaceAll("//+","/");
     }
+   
+    public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
+        if (paramVal == null || paramVal.isEmpty()) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
+    }
+    
+    public void addError(List<Error> listOfErrors,JOCXmlCommand jocXmlCommand, String path, String message){
+        if (listOfErrors == null) {
+            listOfErrors = new ArrayList<Error>();
+        }
+        Error error = new Error();
+        try {
+            jocXmlCommand.executeXPath("//spooler/answer/ERROR");
+        } catch (Exception e) {
+            error.setCode("JOC-420");
+            error.setMessage(message);
+        }
+        String code = jocXmlCommand.getAttribute("code");
+        if (code != null && code.length() > 0){
+            error.setCode(code);
+            error.setMessage(jocXmlCommand.getAttribute("code"));
+        }else{
+            error.setCode("JOC-420");
+            error.setMessage(message);
+        }
+        error.setPath(path);
+        error.setSurveyDate(jocXmlCommand.getSurveyDate());
+        listOfErrors.add(error);
+
+    }
+    
+
 
 }

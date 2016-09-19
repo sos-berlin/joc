@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.UriBuilder;
 
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.ProcessingState;
 import com.sos.joc.model.order.Type;
@@ -114,11 +113,5 @@ public class JOCJsonCommand {
         }
     }
     
-    public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
-        if (paramVal == null || paramVal.isEmpty()) {
-            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
-        }
-        return true;
-    }
 
 }

@@ -29,8 +29,8 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
         try {
             Runtime200Schema runTimeAnswer = new Runtime200Schema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (jocXmlCommand.checkRequiredParameter("orderId", orderRunTimeBody.getOrderId())
-                    && jocXmlCommand.checkRequiredParameter("jobChain", orderRunTimeBody.getJobChain())) {
+            if (checkRequiredParameter("orderId", orderRunTimeBody.getOrderId())
+                    && checkRequiredParameter("jobChain", orderRunTimeBody.getJobChain())) {
                 runTimeAnswer = RunTime.set(jocXmlCommand, createOrderRunTimePostCommand(orderRunTimeBody), "//order/run_time");
             }
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);

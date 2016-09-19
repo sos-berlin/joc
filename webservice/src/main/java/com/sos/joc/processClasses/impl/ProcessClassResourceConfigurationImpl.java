@@ -32,9 +32,9 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
         try {
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (jocXmlCommand.checkRequiredParameter("schedule", processClassConfigurationFilterSchema.getProcessClass())) {
+            if (checkRequiredParameter("processClass", processClassConfigurationFilterSchema.getProcessClass())) {
                 boolean responseInHtml = processClassConfigurationFilterSchema.getMime() == ProcessClassConfigurationFilterSchema.Mime.HTML;
-                String xPath = "/spooler/answer//process_classes/process_class[@path='"+("/"+processClassConfigurationFilterSchema.getProcessClass()).replaceAll("//+", "/")+"']"; 
+                String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']",normalizePath(processClassConfigurationFilterSchema.getProcessClass())); 
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createProcessClassConfigurationPostCommand(), xPath, "process_class", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);

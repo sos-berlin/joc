@@ -32,7 +32,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
         try {
             Runtime200Schema runTimeAnswer = new Runtime200Schema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (jocXmlCommand.checkRequiredParameter("job", jobFilterSchema.getJob())) {
+            if (checkRequiredParameter("job", jobFilterSchema.getJob())) {
                 runTimeAnswer = RunTime.set(jocXmlCommand, createJobRuntimePostCommand(jobFilterSchema), "//job/run_time");
             }
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);

@@ -36,7 +36,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
         try {
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (jocXmlCommand.checkRequiredParameter("job", jobBody.getJob())) {
+            if (checkRequiredParameter("job", jobBody.getJob())) {
                 boolean responseInHtml = jobBody.getMime() == JobConfigurationFilterSchema.Mime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job", "job", responseInHtml);
             }
@@ -51,7 +51,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
     private String createJobConfigurationPostCommand(final JobConfigurationFilterSchema body) {
         JSCmdShowJob showJob = new JSCmdShowJob(Globals.schedulerObjectFactory);
         showJob.setWhat("source");
-        showJob.setJob(("/"+body.getJob()).replaceAll("//+", "/"));
+        showJob.setJob(normalizePath(body.getJob()));
         showJob.setMaxOrders(BigInteger.valueOf(0));
         showJob.setMaxTaskHistory(BigInteger.valueOf(0));
         return Globals.schedulerObjectFactory.toXMLString(showJob);

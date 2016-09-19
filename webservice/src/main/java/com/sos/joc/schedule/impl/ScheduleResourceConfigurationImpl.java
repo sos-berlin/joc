@@ -11,7 +11,6 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.lock.LockConfigurationFilterSchema;
 import com.sos.joc.model.schedule.ScheduleConfigurationFilterSchema;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
 import com.sos.scheduler.model.commands.JSCmdShowState;
@@ -33,9 +32,9 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
         try {
             ConfigurationSchema entity = new ConfigurationSchema();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (jocXmlCommand.checkRequiredParameter("schedule", scheduleBody.getSchedule())) {
+            if (checkRequiredParameter("schedule", scheduleBody.getSchedule())) {
                 boolean responseInHtml = scheduleBody.getMime() == ScheduleConfigurationFilterSchema.Mime.HTML;
-                String xPath = "/spooler/answer//schedules/schedule[@path='"+("/"+scheduleBody.getSchedule()).replaceAll("//+", "/")+"']"; 
+                String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']",normalizePath(scheduleBody.getSchedule())); 
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(), xPath, "schedule", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
