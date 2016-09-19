@@ -9,6 +9,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.xml.SOSXmlCommand;
 
@@ -78,6 +80,13 @@ public class JOCXmlCommand extends SOSXmlCommand {
     public void getElementFromList(int i) throws Exception {
         getElementFromList("",i);
     }
+
+    public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
+        if (paramVal == null || paramVal.isEmpty()) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
+    }
     
     public String getAttributeValue(Element elem, String attributeName, String default_) {
         String val = elem.getAttribute(attributeName);
@@ -86,12 +95,21 @@ public class JOCXmlCommand extends SOSXmlCommand {
         }
         return val;
     }
-
-    public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
-        if (paramVal == null || paramVal.isEmpty()) {
-            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+    
+    public Boolean getBoolValue(final String value, Boolean default_) {
+        if (WebserviceConstants.YES.equalsIgnoreCase(value)) {
+            return true;
+        } else if (WebserviceConstants.NO.equalsIgnoreCase(value)) {
+            return false;
         }
-        return true;
+        return default_;
     }
-
+    
+    public void throwJobSchedulerError() throws Exception {
+        String xPath = "/spooler/answer/ERROR";
+        Element errorElem = (Element) getSosxml().selectSingleNode(xPath);
+        if (errorElem != null) {
+            throw new JobSchedulerInvalidResponseDataException(new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text")));
+        }
+    }
 }

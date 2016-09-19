@@ -34,10 +34,10 @@ public class JobSchedulerDate {
     }
 
     public static Instant getInstantFromISO8601String(String dateString) {
-        dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
         Instant fromString = null;
         if (dateString != null) {
             try {
+                dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
                 fromString = Instant.parse(dateString);
                 // JobScheduler responses max or in time but means 'never'
                 if (fromString.getEpochSecond() == 0 || fromString.getEpochSecond() == Long.MAX_VALUE) {

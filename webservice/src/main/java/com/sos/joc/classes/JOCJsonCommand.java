@@ -1,16 +1,10 @@
 package com.sos.joc.classes;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.core.UriBuilder;
 
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.order.OrdersFilterSchema;
-import com.sos.joc.model.order.ProcessingState;
-import com.sos.joc.model.order.Type;
 
 public class JOCJsonCommand {
     

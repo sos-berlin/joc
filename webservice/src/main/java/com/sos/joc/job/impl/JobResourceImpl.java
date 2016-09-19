@@ -6,13 +6,10 @@ import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.job.JobsVCallable;
-import com.sos.joc.classes.jobs.JobsUtils;
+import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResource;
 import com.sos.joc.model.job.Job200VSchema;
@@ -30,13 +27,10 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
         }
         try {
             Job200VSchema entity = new Job200VSchema();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl());
             if (jocXmlCommand.checkRequiredParameter("job", jobFilterSchema.getJob())) {
-                jocXmlCommand.excutePost(JobsUtils.createJobPostCommand(jobFilterSchema.getJob(), jobFilterSchema.getCompact()));
-                Element jobElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/job");
-                JobsVCallable j = new JobsVCallable(jobElem, jocXmlCommand, jobFilterSchema.getCompact(), false);
                 entity.setDeliveryDate(new Date());
-                entity.setJob(j.getJob());
+                entity.setJob(jocXmlCommand.getJob(jobFilterSchema.getJob(), jobFilterSchema.getCompact(), true));
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

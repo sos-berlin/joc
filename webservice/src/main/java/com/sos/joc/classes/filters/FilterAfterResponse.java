@@ -1,10 +1,11 @@
 package com.sos.joc.classes.filters;
 
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class FilterAfterResponse {
-
+    
     public static boolean matchReqex(String regex, String path) {
         if (regex == null) {
             return true;
@@ -17,6 +18,20 @@ public class FilterAfterResponse {
             return false;
         }
         return Paths.get(jobSchedulerObject).getParent().getNameCount() > Paths.get(refFolder).getNameCount();
+    }
+    
+    public static boolean filterStatehasState(List<? extends Enum<?>> filterStates, Enum<?> state) {
+        if (filterStates == null || filterStates.isEmpty()) {
+            return true;
+        }
+        boolean filterStatesContainsState = false;
+        for (Enum<?> filterState : filterStates) {
+           if (filterState.name().equals(state.name())) {
+               filterStatesContainsState = true;
+               break;
+           }
+        }
+        return filterStatesContainsState;
     }
 
 }
