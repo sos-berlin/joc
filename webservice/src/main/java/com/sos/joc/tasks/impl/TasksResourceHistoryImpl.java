@@ -39,7 +39,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             
             History history1 = new History();
             history1.setAgent("myAgent");
-            history1.setClusterMember(-1);
+            history1.setClusterMember("myClusterMember");
             history1.setEndTime(new Date());
             ErrorSchema errorSchema = new ErrorSchema();
             errorSchema.setCode("myCode");
@@ -62,7 +62,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
             History history2 = new History();
             history2.setAgent("myAgent");
-            history2.setClusterMember(-1);
+            history2.setClusterMember("myClusterMember");
             history2.setEndTime(new Date());
             history2.setError(errorSchema);
             

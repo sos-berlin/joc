@@ -59,12 +59,13 @@ public class JOCXmlCommand extends SOSXmlCommand {
         return listOfNodeLists.get("");
     }
     
-    public void getElementFromList(String key, int i) throws Exception {
+    public Element getElementFromList(String key, int i) throws Exception {
         NodeList nodeList = listOfNodeLists.get(key);
+        Element element=null;
         if (nodeList != null) {
             Node n = nodeList.item(i);
             if (n != null && n.getNodeType() == Node.ELEMENT_NODE) {
-                Element element = (Element) n;
+                element = (Element) n;
                 HashMap <String, String> attrs = new HashMap<String, String>();
                  if (element != null) {
                     NamedNodeMap map = n.getAttributes();
@@ -75,10 +76,11 @@ public class JOCXmlCommand extends SOSXmlCommand {
                  attributes.put(key, attrs);
             }
         }
+        return element;
     }
     
-    public void getElementFromList(int i) throws Exception {
-        getElementFromList("",i);
+    public Element getElementFromList(int i) throws Exception {
+        return getElementFromList("",i);
     }
 
     public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {

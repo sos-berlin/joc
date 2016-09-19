@@ -59,7 +59,7 @@ public class History {
      * 
      * 
      */
-    private Integer clusterMember;
+    private String clusterMember;
     /**
      * non negative integer
      * <p>
@@ -215,7 +215,7 @@ public class History {
      * @return
      *     The clusterMember
      */
-    public Integer getClusterMember() {
+    public String getClusterMember() {
         return clusterMember;
     }
 
@@ -227,7 +227,7 @@ public class History {
      * @param clusterMember
      *     The clusterMember
      */
-    public void setClusterMember(Integer clusterMember) {
+    public void setClusterMember(String clusterMember) {
         this.clusterMember = clusterMember;
     }
 

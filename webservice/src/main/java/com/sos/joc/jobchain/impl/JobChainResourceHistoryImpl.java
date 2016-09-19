@@ -33,7 +33,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilterSchema jobChainHistoryFilterSchema) throws Exception {
 
         LOGGER.debug("init job_chain/history");
-        JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
 
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -44,7 +44,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
             entity.setDeliveryDate(new Date());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (jobChainHistoryFilterSchema.getMaxLastHistoryItems() == null){
+            if (jobChainHistoryFilterSchema.getMaxLastHistoryItems() == null) {
                 jobChainHistoryFilterSchema.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
             String postCommand = createJobchainHistoryPostCommand(jobChainHistoryFilterSchema);
@@ -78,7 +78,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                     history.setState(state);
 
                 }
-                history.setHistoryId(jocXmlCommand.getAttributeAsIntegerOr0("history_id"));
+                history.setHistoryId(jocXmlCommand.getAttributeAsInteger("history_id"));
                 history.setJobChain(normalizePath(jocXmlCommand.getAttribute("job_chain")));
                 history.setNode(node);
                 history.setOrderId(jocXmlCommand.getAttribute("id"));
