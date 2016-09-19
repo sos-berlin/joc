@@ -22,7 +22,7 @@ public class JobSchedulerResourceSupervisorImpl  implements IJobSchedulerResourc
             return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s",jobSchedulerFilterSchema. getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES));
         }
      
-        jobSchedulerFilterSchema.setJobschedulerId(dbItemInventoryInstance.getSupervisorId());
+        jobSchedulerFilterSchema.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
         return jobSchedulerResource.postJobscheduler();
 
 

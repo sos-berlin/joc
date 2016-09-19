@@ -39,7 +39,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             }
 
             DBItemInventoryInstance schedulerSupervisorInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(dbItemInventoryInstance
-                    .getSupervisorId()));
+                    .getSchedulerId()));
             if (schedulerSupervisorInstancesDBItem == null) {
                 return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",
                         dbItemInventoryInstance.getSupervisorId()));
@@ -54,11 +54,11 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             jobscheduler.setHost(dbItemInventoryInstance.getHostname());
             jobscheduler.setJobschedulerId(jobSchedulerFilterSchema.getJobschedulerId());
             jobscheduler.setPort(dbItemInventoryInstance.getPort());
-            jobscheduler.setStartedAt(dbItemInventoryInstance.getStartTime());
+            jobscheduler.setStartedAt(dbItemInventoryInstance.getStartedAt());
 
             ClusterMemberTypeSchema clusterMemberTypeSchema = new ClusterMemberTypeSchema();
             clusterMemberTypeSchema.setPrecedence(-1);
-            clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getClusterMemberPrecedence());
+            clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getPrecedence());
             // clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.fromValue(schedulerInstancesDBItem.getClusterMemberType()));
             clusterMemberTypeSchema.setType("myType");
             jobscheduler.setClusterType(clusterMemberTypeSchema);
@@ -77,7 +77,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             jobscheduler.setSupervisor(supervisor);
 
             jobscheduler.setTimeZone(dbItemInventoryInstance.getTimeZone());
-            jobscheduler.setVersion(dbItemInventoryInstance.getJobSchedulerVersion());
+            jobscheduler.setVersion(dbItemInventoryInstance.getVersion());
 
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
 

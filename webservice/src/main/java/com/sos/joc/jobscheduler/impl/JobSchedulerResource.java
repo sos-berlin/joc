@@ -39,7 +39,7 @@ public class JobSchedulerResource extends JOCResourceImpl {
             jobscheduler.setHost(dbItemInventoryInstance.getHostname());
             jobscheduler.setJobschedulerId(jobSchedulerFilterSchema.getJobschedulerId());
             jobscheduler.setPort(dbItemInventoryInstance.getPort());
-            jobscheduler.setStartedAt(dbItemInventoryInstance.getStartTime());
+            jobscheduler.setStartedAt(dbItemInventoryInstance.getStartedAt());
 
             // TODO JOC Cockpit Webservice
 
