@@ -30,13 +30,14 @@ public class JobSchedulerDate {
     
     public static Date getDateFromISO8601String(String dateString) {
         Instant fromString = getInstantFromISO8601String(dateString);
-        return (fromString != null) ? Date.from(getInstantFromISO8601String(dateString)) : null;
+        return (fromString != null) ? Date.from(fromString) : null;
     }
 
     public static Instant getInstantFromISO8601String(String dateString) {
         Instant fromString = null;
         if (dateString != null) {
             try {
+                dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
                 fromString = Instant.parse(dateString);
                 // JobScheduler responses max or in time but means 'never'
                 if (fromString.getEpochSecond() == 0 || fromString.getEpochSecond() == Long.MAX_VALUE) {

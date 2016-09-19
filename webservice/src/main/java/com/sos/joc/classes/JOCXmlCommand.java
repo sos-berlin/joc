@@ -9,7 +9,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.model.common.ErrorSchema;
+import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.xml.SOSXmlCommand;
 
 public class JOCXmlCommand extends SOSXmlCommand {
@@ -81,4 +83,29 @@ public class JOCXmlCommand extends SOSXmlCommand {
         return getElementFromList("", i);
     }
 
+}
+    public String getAttributeValue(Element elem, String attributeName, String default_) {
+        String val = elem.getAttribute(attributeName);
+        if (val == null || val.isEmpty()) {
+            val = default_;
+        }
+        return val;
+    }
+    
+    public Boolean getBoolValue(final String value, Boolean default_) {
+        if (WebserviceConstants.YES.equalsIgnoreCase(value)) {
+            return true;
+        } else if (WebserviceConstants.NO.equalsIgnoreCase(value)) {
+            return false;
+        }
+        return default_;
+    }
+    
+    public void throwJobSchedulerError() throws Exception {
+        String xPath = "/spooler/answer/ERROR";
+        Element errorElem = (Element) getSosxml().selectSingleNode(xPath);
+        if (errorElem != null) {
+            throw new JobSchedulerInvalidResponseDataException(new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text")));
+        }
+    }
 }

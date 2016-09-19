@@ -75,7 +75,7 @@ public class OrderV extends OrderQueue {
         setStateText(order.getString("stateText", null));
         setPriority(getIntField(order,"priority"));
         setEndState(order.getString("endNodeId", null));
-        setParams(Parameters.getParameters(order.getJsonObject("variables")));
+        setParams(Parameters.getParameters(order));
     }
     
     public void setProcessingState(JsonObject processingState, JsonArray obstacles, UsedNodes usedNodes) {

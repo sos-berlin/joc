@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.json.JsonObject;
+import javax.xml.transform.TransformerException;
 
+import org.apache.xpath.CachedXPathAPI;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -26,9 +28,11 @@ public class Parameters {
         return parameters;
     }
 
-    public static List<NameValuePairsSchema> getParameters(NodeList paramList) {
-        List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
+    public static List<NameValuePairsSchema> getParameters(Element elem) throws TransformerException {
+        CachedXPathAPI xPath = new CachedXPathAPI();
+        NodeList paramList = xPath.selectNodeList(elem, "params/param");
         if (paramList != null && paramList.getLength() > 0) {
+            List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
             for (int paramsCount = 0; paramsCount < paramList.getLength(); paramsCount++) {
                 NameValuePairsSchema param = new NameValuePairsSchema();
                 Element paramElement = (Element) paramList.item(paramsCount);
@@ -42,7 +46,8 @@ public class Parameters {
         }
     }
     
-    public static List<NameValuePairsSchema> getParameters(JsonObject paramList) {
+    public static List<NameValuePairsSchema> getParameters(JsonObject elem) {
+        JsonObject paramList = elem.getJsonObject("variables");
         List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
         if (paramList != null) {
             for (String key : paramList.keySet()) {

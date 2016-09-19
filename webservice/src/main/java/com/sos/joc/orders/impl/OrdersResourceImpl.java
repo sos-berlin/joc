@@ -45,7 +45,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             JOCJsonCommand command = new JOCJsonCommand(masterUrl);
             command.addCompactQuery(ordersBody.getCompact());
 
-            Map<String, OrderQueue> listOrderQueue = new HashMap<String, OrderQueue>();
+            Map<String, OrderQueue> listOrders = new HashMap<String, OrderQueue>();
             List<Order_> orders = ordersBody.getOrders();
             List<FoldersSchema> folders = ordersBody.getFolders();
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
@@ -69,12 +69,12 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (Future<Map<String, OrderQueue>> result : executorService.invokeAll(tasks)) {
-                listOrderQueue.putAll(result.get());
+                listOrders.putAll(result.get());
             }
 
             OrdersVSchema entity = new OrdersVSchema();
             entity.setDeliveryDate(new Date());
-            entity.setOrders(new ArrayList<OrderQueue>(listOrderQueue.values()));
+            entity.setOrders(new ArrayList<OrderQueue>(listOrders.values()));
 
             return JOCDefaultResponse.responseStatus200(entity);
             // } catch (JocException e) {

@@ -55,7 +55,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 os.setName("myName");
                 agent.setOs(os);
                 agent.setPort(dbItemInventoryInstance.getPort());
-                agent.setStartedAt(dbItemInventoryInstance.getStartTime());
+                agent.setStartedAt(dbItemInventoryInstance.getStartedAt());
                 ArrayList<String> listOfClusters = new ArrayList<String>();
                 listOfClusters.add("cluster1");
                 listOfClusters.add("cluster2");
