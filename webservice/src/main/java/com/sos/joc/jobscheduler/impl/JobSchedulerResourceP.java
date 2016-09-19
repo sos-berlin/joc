@@ -54,11 +54,11 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             jobscheduler.setHost(dbItemInventoryInstance.getHostname());
             jobscheduler.setJobschedulerId(jobSchedulerFilterSchema.getJobschedulerId());
             jobscheduler.setPort(dbItemInventoryInstance.getPort());
-            jobscheduler.setStartedAt(dbItemInventoryInstance.getStartedAt());
+            jobscheduler.setStartedAt(dbItemInventoryInstance.getStartTime());
 
             ClusterMemberTypeSchema clusterMemberTypeSchema = new ClusterMemberTypeSchema();
             clusterMemberTypeSchema.setPrecedence(-1);
-            clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getPrecedence());
+            clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getClusterMemberPrecedence());
             // clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.fromValue(schedulerInstancesDBItem.getClusterMemberType()));
             clusterMemberTypeSchema.setType("myType");
             jobscheduler.setClusterType(clusterMemberTypeSchema);
@@ -77,7 +77,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             jobscheduler.setSupervisor(supervisor);
 
             jobscheduler.setTimeZone(dbItemInventoryInstance.getTimeZone());
-            jobscheduler.setVersion(dbItemInventoryInstance.getVersion());
+            jobscheduler.setVersion(dbItemInventoryInstance.getJobSchedulerVersion());
 
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
 

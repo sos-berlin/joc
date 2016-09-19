@@ -34,7 +34,7 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
             Database database = new Database();
             database.setDbms("myDbms");
             database.setSurveyDate(dbItemInventoryInstance.getModified());
-            database.setVersion(dbItemInventoryInstance.getVersion());
+            database.setVersion(dbItemInventoryInstance.getJobSchedulerVersion());
             State__ state = new State__();
             state.setSeverity(0);
             state.setText(State__.Text.RUNNING);
