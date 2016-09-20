@@ -1,7 +1,6 @@
 package com.sos.joc.classes.jobs;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.State_;
 import com.sos.joc.model.job.TaskQueue;
 import com.sos.joc.model.order.Order_;
-import com.sos.joc.model.job.State_.Text;
 
 
 public class JobV extends Job_ {
@@ -81,7 +79,7 @@ public class JobV extends Job_ {
                 } else if (jocXmlCommand.getSosxml().selectNodeList(job, "lock.requestor/lock.use[@is_available='no']").getLength() > 0) {
                     getState().setText(State_.Text.WAITING_FOR_LOCK);
                 } else if (getNumOfRunningTasks() == Integer.valueOf(getAttributeValue("tasks", "1")) && getNumOfQueuedTasks() > 0) {
-                    // TODO: WaitingForTask has to improved
+                    // TODO: WaitingForTask has to be improved
                     // Look into queue items where start_time in the past
                     // it could be that a task is queued caused of a delayed
                     // start instead of max tasks is reached
@@ -118,15 +116,8 @@ public class JobV extends Job_ {
         setTaskQueue();
         setRunningTasks();
         setTemporary(WebserviceConstants.YES.equals(job.getAttribute("temporary")) ? true : null);
-        Date startTime = JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, WebserviceConstants.NEXT_START_TIME, null));
-        if (isOrderJob()) {
-            if (getState().getText() == Text.NOT_IN_PERIOD) {
-              //TODO setNextPeriodBegin(startTime);//TODO Is it the right time?
-            }
-        } else {
-            setDelayUntil(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, "delay_after_error", null)));
-            setNextStartTime(startTime);
-        }
+        setNextStartTime(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, WebserviceConstants.NEXT_START_TIME, null)));
+        setDelayUntil(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, "delay_after_error", null)));
     }
 
     private void setCompactFields() throws Exception {
@@ -139,7 +130,8 @@ public class JobV extends Job_ {
         setStateText(job.getAttribute("state_text"));
         setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(job));
-        setOrderQueueAndSummary();
+        setSummary();
+        setOrderQueue();
     }
     
     private String getAttributeValue(String attributeName, String default_) {
@@ -245,7 +237,15 @@ public class JobV extends Job_ {
         }
     }
     
-    private void setOrderQueueAndSummary() throws Exception {
+    private void setOrderQueue() throws Exception {
+        if (isOrderJob() && withOrderQueue) {
+            setOrderQueue(new OrdersVCallable(getPath(), false, jocXmlCommand.getUriForJsonCommand()).getOrdersOfJob());
+        } else {
+            setOrderQueue((List<OrderQueue>) null);
+        }
+    }
+    
+    private void setSummary() throws Exception {
         if (isOrderJob()) {
             NodeList orders = jocXmlCommand.getSosxml().selectNodeList(job, "order_queue/order");
             OrdersSummary ordersSummary = new OrdersSummary();
@@ -255,16 +255,9 @@ public class JobV extends Job_ {
             int pending = 0;
             int waiting = 0;
 
-            List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
-            Map<String, OrderQueue> listOrderQueue = new HashMap<String, OrderQueue>();
+            //TODO maybe use JsonApi
             for (int i = 0; i < orders.getLength(); i++) {
                 Element order = (Element) orders.item(i);
-                if (withOrderQueue) {
-                    Order_ o = new Order_();
-                    o.setJobChain(order.getAttribute("job_chain"));
-                    o.setOrderId(order.getAttribute("order"));
-                    tasks.add(new OrdersVCallable(o, false, jocXmlCommand.getUriForJsonCommand()));
-                }
                 if (order.hasAttribute("setback")) {
                     setback += 1;
                 } else if (order.hasAttribute("task")) {
@@ -273,7 +266,7 @@ public class JobV extends Job_ {
                     suspended += 1;
                 } else if (!order.hasAttribute("touched")) {
                     // that's not exact, orders are untouched too, if they
-                    // waitingFOrResource at the first node
+                    // waitingForResource at the first node
                     pending += 1;
                 } else {
                     waiting += 1;
@@ -285,17 +278,6 @@ public class JobV extends Job_ {
             ordersSummary.setSuspended(suspended);
             ordersSummary.setWaitingForResource(waiting);
             setOrdersSummary(ordersSummary);
-            if (withOrderQueue) {
-                ExecutorService executorService = Executors.newFixedThreadPool(10);
-                for (Future<Map<String, OrderQueue>> result : executorService.invokeAll(tasks)) {
-                    listOrderQueue.putAll(result.get());
-                }
-                setOrderQueue(new ArrayList<OrderQueue>(listOrderQueue.values()));
-            } else {
-                setOrderQueue((List<OrderQueue>) null);
-            }
-        } else {
-            setOrderQueue((List<OrderQueue>) null);
-        }
+        } 
     }
 }

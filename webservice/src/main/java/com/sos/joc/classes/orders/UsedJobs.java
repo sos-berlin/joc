@@ -51,10 +51,12 @@ public class UsedJobs {
                         state = ProcessingState.Text.JOB_STOPPED;
                         break;
                     case "TaskLimitReached":
+                        //TODO this not a sufficient criteria
                         taskLimit = obstacle.getInt("limit");
                         state = ProcessingState.Text.WAITING_FOR_TASK;
                         break;
                     case "ProcessLimitReached":
+                        //TODO this not a sufficient criteria
                         processLimit = obstacle.getInt("limit");
                         state = ProcessingState.Text.WAITING_FOR_PROCESS;
                         break;

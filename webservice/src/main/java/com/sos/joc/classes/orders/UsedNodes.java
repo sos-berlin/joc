@@ -55,8 +55,11 @@ public class UsedNodes {
 //        return new Node(nodeKey.getString("jobChainPath", ""),nodeKey.getString("nodeId", ""),jsonO.getString("jobPath", null),"stop".equals(jsonO.getString("action", "")));
 //    };
 //    
-//    public void setUsedNodes(JsonArray nodes) {
-//        this.nodes = (Map<String, Node>) nodes.stream().collect( Collectors.toMap(key, node));
+//    public void addEntries(JsonArray nodes) {
+//        if (this.nodes == null) {
+//            this.nodes = new HashMap<String, Node>();
+//            this.nodes = (Map<String, Node>) nodes.stream().collect( Collectors.toMap(key, node));
+//        }
 //    }
         
     public Node getNode(String jobChain, String nodeId) {
@@ -81,7 +84,8 @@ public class UsedNodes {
     }
     
     public void addEntries(JsonArray nodes){
-        if (this.nodes == null){
+        if (this.nodes == null) {
+            this.nodes = new HashMap<String, Node>();
             for (JsonObject node : nodes.getValuesAs(JsonObject.class)) {
                 this.put(node);
             }
@@ -89,9 +93,6 @@ public class UsedNodes {
     }
    
     private void put(JsonObject node){
-        if (nodes == null){
-            nodes  = new HashMap<String, Node>();
-        }
         JsonObject nodeKey = node.getJsonObject("nodeKey");
         String nodeId = nodeKey.getString("nodeId", null);
         String jobChain = nodeKey.getString("jobChainPath", null);

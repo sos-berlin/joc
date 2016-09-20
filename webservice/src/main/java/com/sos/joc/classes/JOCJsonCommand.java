@@ -38,6 +38,8 @@ public class JOCJsonCommand {
         String returnQuery = (compact) ? WebserviceConstants.ORDER_OVERVIEW : WebserviceConstants.ORDER_DETAILED;
         uriBuilder.queryParam("return", returnQuery);
     }
-    
 
+    public void addOrderStatisticsQuery() {
+        uriBuilder.queryParam("return", "OrderStatistics");
+    }
 }

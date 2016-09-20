@@ -18,7 +18,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.OrderQueue;
 import com.sos.joc.model.order.Order_;
@@ -51,10 +53,31 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
             URI uri = command.getURI();
+            
+            Map<String,OrdersPerJobChain> ordersLists = new HashMap<String,OrdersPerJobChain>();
+            for (Order_ order : orders) {
+                if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
+                    throw new JocMissingRequiredParameterException("jobChain");
+                }
+                OrdersPerJobChain opj;
+                if (ordersLists.containsKey(order.getJobChain())) {
+                    opj = ordersLists.get(order.getJobChain());
+                    if (opj.containsOrder(order.getOrderId())) {
+                        continue;
+                    } else {
+                        opj.addOrder(order.getOrderId());
+                    }
+                } else {
+                    opj = new OrdersPerJobChain();
+                    opj.setJobChain(order.getJobChain());
+                    opj.addOrder(order.getOrderId());
+                }
+                ordersLists.put(order.getJobChain(), opj);
+            }
 
-            if (orders != null && !orders.isEmpty()) {
-                for (Order_ order : orders) {
-                    tasks.add(new OrdersVCallable(order, ordersBody.getCompact(), uri));
+            if (!ordersLists.isEmpty()) {
+                for (OrdersPerJobChain opj : ordersLists.values()) {
+                    tasks.add(new OrdersVCallable(opj, ordersBody.getCompact(), uri));
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (FoldersSchema folder : folders) {

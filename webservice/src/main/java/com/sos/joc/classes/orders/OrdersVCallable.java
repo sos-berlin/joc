@@ -2,6 +2,7 @@ package com.sos.joc.classes.orders;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,21 +27,31 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.OrderQueue;
 import com.sos.joc.model.order.OrderFilterWithCompactSchema;
-import com.sos.joc.model.order.Order_;
 import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.ProcessingState;
 import com.sos.joc.model.order.Type;
 
 public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersVCallable.class);
-    private final Order_ order;
+    private final String job;
+    private final OrdersPerJobChain orders;
     private final FoldersSchema folder;
     private final OrdersFilterSchema ordersBody;
     private final Boolean compact;
     private final URI uri;
     
-    public OrdersVCallable(Order_ order, Boolean compact, URI uri) {
-        this.order = order;
+    public OrdersVCallable(String job, Boolean compact, URI uri) {
+        this.orders = null;
+        this.job = ("/"+job.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
+        this.folder = null;
+        this.ordersBody = null;
+        this.compact = compact;
+        this.uri = uri;
+    }
+    
+    public OrdersVCallable(OrdersPerJobChain orders, Boolean compact, URI uri) {
+        this.orders = orders;
+        this.job = null;
         this.folder = null;
         this.ordersBody = null;
         this.compact = compact;
@@ -48,10 +59,11 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     }
     
     public OrdersVCallable(OrderFilterWithCompactSchema order, URI uri) {
-        Order_ o = new Order_();
+        OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(order.getJobChain());
-        o.setOrderId(order.getOrderId());
-        this.order = o;
+        o.addOrder(order.getOrderId());
+        this.orders = o;
+        this.job = null;
         this.folder = null;
         this.ordersBody = null;
         this.compact = order.getCompact();
@@ -59,7 +71,8 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     }
     
     public OrdersVCallable(FoldersSchema folder, OrdersFilterSchema ordersBody, URI uri) {
-        this.order = null;
+        this.orders = null;
+        this.job = null;
         this.folder = folder;
         this.ordersBody = ordersBody;
         this.compact = ordersBody.getCompact();
@@ -68,23 +81,37 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     
     @Override
     public Map<String,OrderQueue> call() throws Exception {
-        if(order != null) {
-            return getOrders(order, compact, uri);
+        if(orders != null) {
+            return getOrders(orders, compact, uri);
+        } else if(job != null) { 
+            return getOrders(job, compact, uri);
         } else {
             return getOrders(folder, ordersBody, uri);
         }
     }
     
     public OrderQueue getOrder() throws Exception {
-        Map<String,OrderQueue> orderMap = getOrders(order, compact, uri);
+        Map<String,OrderQueue> orderMap = getOrders(orders, compact, uri);
         if (orderMap == null || orderMap.isEmpty()) {
-            throw new JobSchedulerInvalidResponseDataException(String.format("Order doesn't exist: %1$s,%2$s", order.getJobChain(), order.getOrderId()));
+            throw new JobSchedulerInvalidResponseDataException(String.format("Order doesn't exist: %1$s,%2$s", orders.getJobChain(), orders.getOrders().get(0)));
         }
         return orderMap.values().iterator().next();
     }
     
-    private Map<String,OrderQueue> getOrders(Order_ order, boolean compact, URI uri) throws Exception {
-        return getOrders(getJsonObjectFromResponse(uri, getServiceBody(order)), compact);
+    public List<OrderQueue> getOrdersOfJob() throws Exception {
+        Map<String,OrderQueue> orderMap = getOrders(job, compact, uri);
+        if (orderMap == null || orderMap.isEmpty()) {
+            return null;
+        }
+        return new ArrayList<OrderQueue>(orderMap.values());
+    }
+    
+    private Map<String,OrderQueue> getOrders(OrdersPerJobChain orders, boolean compact, URI uri) throws Exception {
+        return getOrders(getJsonObjectFromResponse(uri, getServiceBody(orders)), compact);
+    }
+    
+    private Map<String,OrderQueue> getOrders(String job, boolean compact, URI uri) throws Exception {
+        return getOrders(getJsonObjectFromResponse(uri, getServiceBody(job)), compact);
     }
     
     private Map<String,OrderQueue> getOrders(FoldersSchema folder, OrdersFilterSchema ordersBody, URI uri) throws JocMissingRequiredParameterException, Exception {
@@ -99,23 +126,21 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         UsedNodes usedNodes = new UsedNodes();
         UsedJobs usedJobs = new UsedJobs();
         UsedJobChains usedJobChains = new UsedJobChains();
+        UsedTasks usedTasks = new UsedTasks();
         usedNodes.addEntries(json.getJsonArray("usedNodes"));
+        usedTasks.addEntries(json.getJsonArray("usedTasks"));
         Date surveyDate = JobSchedulerDate.getDateFromEventId(json.getJsonNumber("eventId").longValue());
         Map<String,OrderQueue> listOrderQueue = new HashMap<String,OrderQueue>();
         
         for (JsonObject ordersItem: json.getJsonArray("orders").getValuesAs(JsonObject.class)) {
             OrderV order = new OrderV(ordersItem);
             order.setPathJobChainAndOrderId();
-            if (FilterAfterResponse.isLocatedInSubFolder(refFolderIfNotRecursive, order.getJobChain())) {
-                LOGGER.info("...processing skipped caused by 'recursive=false'");
-                continue; 
-            }
             if (!FilterAfterResponse.matchReqex(regex, order.getPath())) {
                 LOGGER.info("...processing skipped caused by 'regex=" + regex + "'");
                 continue; 
             }
             order.setSurveyDate(surveyDate);
-            order.setFields(usedNodes, compact);
+            order.setFields(usedNodes, usedTasks, compact);
             if (!order.processingStateIsSet()) {
                 usedJobs.addEntries(json.getJsonArray("usedJobs"));
                 order.readJobObstacles(usedJobs.get(order.getJob()));
@@ -141,7 +166,8 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         int httpReplyCode = client.statusCode();
         String contentType = client.getResponseHeader("Content-Type");
         
-        if (httpReplyCode == 200) {
+        switch (httpReplyCode) {
+        case 200:
             if (contentType.contains("application/json")) {
                 JsonReader rdr = Json.createReader(new StringReader(response));
                 JsonObject json = rdr.readObject();
@@ -150,28 +176,32 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
             } else {
                 throw new JobSchedulerInvalidResponseDataException("Unexpected content type '" + contentType + "'. Response: " + response);
             }
-        } else if (httpReplyCode == 400) {
-            //TODO check Content-Type
-            //Now the exception is plain/text instead of JSON
+        case 400:
+            // TODO check Content-Type
+            // Now the exception is plain/text instead of JSON
             throw new JobSchedulerBadRequestException(response);
-        } else {
-            throw new JobSchedulerBadRequestException(httpReplyCode+ " " +client.getHttpResponse().getStatusLine().getReasonPhrase());
+        default:
+            throw new JobSchedulerBadRequestException(httpReplyCode + " " + client.getHttpResponse().getStatusLine().getReasonPhrase());
         }
     }
     
-    private String getServiceBody(Order_ order) throws JocMissingRequiredParameterException {
+    private String getServiceBody(OrdersPerJobChain orders) throws JocMissingRequiredParameterException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        String jobChain = order.getJobChain();
-        if (jobChain == null || jobChain.isEmpty()) {
-            throw new JocMissingRequiredParameterException("jobChain");
-        }
+        String jobChain = orders.getJobChain();
         jobChain = ("/"+jobChain.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
         builder.add("path", jobChain);
-        if (order.getOrderId() != null && !order.getOrderId().isEmpty()) {
-            builder.add("orderId", order.getOrderId());
+        for (String order : orders.getOrders()) {
+            JsonArrayBuilder ordersArray = Json.createArrayBuilder();
+            ordersArray.add(order);
+            builder.add("orderIds", ordersArray);
         }
-        String postBody = builder.build().toString();
-        return postBody;
+        return builder.build().toString();
+    }
+    
+    private String getServiceBody(String job) throws JocMissingRequiredParameterException {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("jobPath", job);
+        return builder.build().toString();
     }
     
     private String getServiceBody(FoldersSchema folder, OrdersFilterSchema ordersBody) throws JocMissingRequiredParameterException {
@@ -181,6 +211,10 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         String path = folder.getFolder();
         if (path != null && !path.isEmpty()) {
             path = ("/"+path.trim()+"/").replaceAll("//+", "/");
+            if (!folder.getRecursive()) {
+                path += "*";
+                LOGGER.info(String.format("...consider 'recursive=%1$b' for folder '%2$s'", folder.getRecursive(), folder.getFolder()));
+            }
             builder.add("path", path);
         }
         
@@ -257,7 +291,6 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
             builder.add("isOrderSourceType", sourceTypes);
         }
         
-        String postBody = builder.build().toString();
-        return postBody;
+        return builder.build().toString();
     }
 }

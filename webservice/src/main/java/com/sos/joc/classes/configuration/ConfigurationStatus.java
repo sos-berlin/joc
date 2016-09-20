@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
 import org.apache.xpath.CachedXPathAPI;
@@ -67,8 +68,8 @@ public class ConfigurationStatus {
                     fileBasedElement = (Element) fileBasedElements.item(i);
                     if (fileBasedElement.hasAttribute("path")) {
                         if (fileBasedElement.hasAttribute("type")) {
-                            s.append(fileBasedElement.getAttribute("type").toLowerCase().replace('_', ' '));
-                            s.append(": ");
+                            s.append(fileBasedElement.getAttribute("type").replaceFirst("_c", "C"));
+                            s.append(":");
                         }
                         s.append(fileBasedElement.getAttribute("path"));
                         if (i < fileBasedElements.getLength() - 1) {
@@ -127,21 +128,18 @@ public class ConfigurationStatus {
                     if (!fileBasedObstacle.containsKey("error")) {
                         replacementStatus = new ConfigurationStatusSchema();
                         setSeverity(replacementStatus, ConfigurationStatusSchema.Text.REPLACEMENT_IS_STANDING_BY);
-                        // doesn't have a message
                     } else {
                         notLoadedStatus = new ConfigurationStatusSchema();
                         setSeverity(notLoadedStatus, ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
                         setMessage(notLoadedStatus, fileBasedObstacle);
                     }
                     break;
-                case "missingrequisite": // not yet in JSON response
-                    if (fileBasedObstacle.containsKey("path")) {
-                        if (fileBasedObstacle.containsKey("objType")) {
-                            s.append(fileBasedObstacle.getString("objType").toLowerCase().replace('_', ' '));
-                            s.append(": ");
+                case "missingrequisites":
+                    if (fileBasedObstacle.containsKey("paths")) {
+                        for (JsonString path : fileBasedObstacle.getJsonArray("paths").getValuesAs(JsonString.class)) {
+                            s.append(path.getString());
+                            s.append("; ");
                         }
-                        s.append(fileBasedObstacle.getString("path"));
-                        s.append("; ");
                     }
                     break;
                 }
@@ -159,10 +157,13 @@ public class ConfigurationStatus {
                 return replacementStatus;
             }
             if (s.length() > 0) {
-                ConfigurationStatusSchema missingResourceStatus = new ConfigurationStatusSchema();
-                setSeverity(missingResourceStatus, ConfigurationStatusSchema.Text.RESOURCE_IS_MISSING);
-                missingResourceStatus.setMessage(s.toString().replaceFirst(";\\s*$", ""));
-                return missingResourceStatus;
+                String message = s.toString().replaceFirst(";\\s*$", "");
+                if (!message.isEmpty()) {
+                    ConfigurationStatusSchema missingResourceStatus = new ConfigurationStatusSchema();
+                    setSeverity(missingResourceStatus, ConfigurationStatusSchema.Text.RESOURCE_IS_MISSING);
+                    missingResourceStatus.setMessage(message);
+                    return missingResourceStatus;
+                }
             }
 
         } catch (Exception e) {

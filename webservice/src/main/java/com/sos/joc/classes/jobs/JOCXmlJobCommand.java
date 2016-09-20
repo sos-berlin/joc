@@ -16,6 +16,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.Job_;
 import com.sos.joc.model.job.Job___;
@@ -67,7 +68,10 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         StringBuilder s = new StringBuilder();
         s.append("<commands>");
         for (Job___ job : jobs) {
-           s.append(createShowJobPostCommand(job.getJob(),jobsFilterSchema.getCompact())); 
+            if (job.getJob() == null || job.getJob().isEmpty()) {
+                throw new JocMissingRequiredParameterException("undefined job");
+            }
+            s.append(createShowJobPostCommand(job.getJob(),jobsFilterSchema.getCompact())); 
         }
         s.append("</commands>");
         return getJobs(s.toString(), jobsFilterSchema, "/spooler/answer/job");
@@ -77,6 +81,9 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         StringBuilder s = new StringBuilder();
         s.append("<commands>");
         for (FoldersSchema folder : folders) {
+            if (folder.getFolder() == null || folder.getFolder().isEmpty()) {
+                throw new JocMissingRequiredParameterException("undefined folder");
+            }
             s.append(createShowStatePostCommand(folder.getFolder(),folder.getRecursive(), jobsFilterSchema.getCompact())); 
         }
         s.append("</commands>");

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.UsedJobs.Job;
+import com.sos.joc.classes.orders.UsedTasks.Task;
 import com.sos.joc.classes.parameters.Parameters;
 import com.sos.joc.classes.orders.UsedJobChains.JobChain;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
@@ -21,23 +22,29 @@ public class OrderV extends OrderQueue {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderV.class);
     private static final String ZERO_HOUR = "1970-01-01T00:00:00Z";
-    private JsonObject order;
-    private JsonObject overview;
+    private final JsonObject order;
+    private final JsonObject overview;
     
     public OrderV(JsonObject order) {
         this.order = order;
         this.overview = getOrderOverview();
     }
     
-    public void setFields(UsedNodes usedNodes, boolean compact) throws JobSchedulerInvalidResponseDataException {
+    private void cleanArrays() {
+        setParams(null);
+        setPriority(null);
+    }
+    
+    public void setFields(UsedNodes usedNodes, UsedTasks usedTasks, boolean compact) throws JobSchedulerInvalidResponseDataException {
         if (compact) {
-            setCompactFields(usedNodes);
+            setCompactFields(usedNodes, usedTasks);
+            cleanArrays();
         } else {
-            setDetailedFields(usedNodes);
+            setDetailedFields(usedNodes, usedTasks);
         }
     }
     
-    public void setCompactFields(UsedNodes usedNodes) throws JobSchedulerInvalidResponseDataException {
+    public void setCompactFields(UsedNodes usedNodes, UsedTasks usedTasks) throws JobSchedulerInvalidResponseDataException {
         
         JsonObject pState = overview.getJsonObject("processingState");
         JsonArray obstacles = overview.getJsonArray("obstacles");
@@ -63,22 +70,22 @@ public class OrderV extends OrderQueue {
         } else {
             setProcessedBy(pState.getString("clusterMemberId", null));
         }
-        setProcessingState(pState, obstacles, usedNodes);
+        setProcessingState(pState, obstacles, usedNodes, usedTasks);
         ConfigurationStatus.getConfigurationStatus(obstacles);
         setJob(usedNodes.getJob(getJobChain(), getState()));
         setParams(null);
     }
     
-    public void setDetailedFields(UsedNodes usedNodes) throws JobSchedulerInvalidResponseDataException {
+    public void setDetailedFields(UsedNodes usedNodes, UsedTasks usedTasks) throws JobSchedulerInvalidResponseDataException {
         
-        setCompactFields(usedNodes);
+        setCompactFields(usedNodes, usedTasks);
         setStateText(order.getString("stateText", null));
         setPriority(getIntField(order,"priority"));
         setEndState(order.getString("endNodeId", null));
         setParams(Parameters.getParameters(order));
     }
     
-    public void setProcessingState(JsonObject processingState, JsonArray obstacles, UsedNodes usedNodes) {
+    public void setProcessingState(JsonObject processingState, JsonArray obstacles, UsedNodes usedNodes, UsedTasks usedTasks) {
         for (JsonObject obstacle : obstacles.getValuesAs(JsonObject.class)) {
             if ("Suspended".equals(obstacle.getString("TYPE", null))) {
                 setSeverity(ProcessingState.Text.SUSPENDED);
@@ -99,7 +106,11 @@ public class OrderV extends OrderQueue {
             case "OccupiedByClusterMember":
                 setSeverity(ProcessingState.Text.RUNNING);
             case "WaitingInTask":
-                setSeverity(ProcessingState.Text.WAITING_FOR_AGENT);
+                if (usedTasks.isWaitingForAgent(getTaskId())) {
+                    setSeverity(ProcessingState.Text.WAITING_FOR_AGENT); 
+                } else if (usedTasks.isWaitingForProcessClass(getTaskId())) {
+                    setSeverity(ProcessingState.Text.WAITING_FOR_PROCESS); 
+                }
                 break;
             case "Pending":
             case "WaitingForOther":
@@ -128,15 +139,17 @@ public class OrderV extends OrderQueue {
         if (text == ProcessingState.Text.WAITING_FOR_LOCK) {
             setLock(job.getLock());
         }
-        if (text == ProcessingState.Text.WAITING_FOR_PROCESS) {
-            //TODO setProcessClass
-            // see usedTasks of job
-        }
     }
     
     public void readJobChainObstacles(JobChain jobChain) {
         if (jobChain.isStopped()) {
             setSeverity(ProcessingState.Text.JOB_CHAIN_STOPPED);
+        }
+    }
+    
+    public void readTaskObstacles(Task task) {
+        if (task.isWaitingForAgent()) {
+            setSeverity(ProcessingState.Text.WAITING_FOR_AGENT);
         }
     }
     
