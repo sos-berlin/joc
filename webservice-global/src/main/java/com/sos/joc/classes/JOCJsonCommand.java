@@ -39,5 +39,7 @@ public class JOCJsonCommand {
         uriBuilder.queryParam("return", returnQuery);
     }
     
-
+    public void addOrderStatisticsQuery() {
+        uriBuilder.queryParam("return", "OrderStatistics");
+    }
 }
