@@ -14,6 +14,7 @@ import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.FoldersSchema;
+import com.sos.joc.model.job.Job__;
 import com.sos.joc.model.job.Job___;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsVSchema;
@@ -34,7 +35,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             
             JobsVSchema entity = new JobsVSchema();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl());
-            List<Job___> jobs = jobsFilterSchema.getJobs();
+            List<Job__> jobs = jobsFilterSchema.getJobs();
             List<FoldersSchema> folders = jobsFilterSchema.getFolders();
             if (jobs != null && !jobs.isEmpty()) {
                 entity.setJobs(jocXmlCommand.getJobsFromShowJob(jobs, jobsFilterSchema));

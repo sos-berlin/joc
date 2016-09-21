@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.model.job.Job____;
+import com.sos.joc.model.job.Job___;
 import com.sos.joc.model.job.ModifyTasksSchema;
 import com.sos.joc.tasks.resource.ITasksResourceEnd;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -20,7 +20,7 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
     private static final String END = "end";
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceEndImpl.class);
      
-    private JOCDefaultResponse executeModifyJobCommand(Job____ job) {
+    private JOCDefaultResponse executeModifyJobCommand(Job___ job) {
         try {
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
@@ -52,7 +52,7 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (Job____ job : modifyTasksSchema.getJobs()) {
+            for (Job___ job : modifyTasksSchema.getJobs()) {
                 jocDefaultResponse = executeModifyJobCommand(job);
             }
             

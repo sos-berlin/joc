@@ -49,17 +49,6 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             order.setInitialState("myInitialState");
             order.setEndState("myEndState");
 
-            List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
-            NameValuePairsSchema param1 = new NameValuePairsSchema();
-            NameValuePairsSchema param2 = new NameValuePairsSchema();
-            param1.setName("param1");
-            param1.setValue("value1");
-            param2.setName("param2");
-            param2.setValue("value2");
-            parameters.add(param1);
-            parameters.add(param2);
-            order.setParams(parameters);
-
             order.setPriority(-1);
             order.setTitle(dbItemInventoryOrder.getTitle());
             order.setType(Order.Type.PERMANENT);

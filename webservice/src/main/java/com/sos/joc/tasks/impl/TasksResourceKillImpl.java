@@ -9,7 +9,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.model.job.Job____;
+import com.sos.joc.model.job.Job___;
 import com.sos.joc.model.job.ModifyTasksSchema;
 import com.sos.joc.model.job.TaskId;
 import com.sos.joc.tasks.resource.ITasksResourceKill;
@@ -25,7 +25,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceKillImpl.class);
     private ModifyTasksSchema modifyTasksSchema = null;
 
-    private JOCDefaultResponse executeKillCommand(Job____ job, TaskId taskId, String command) {
+    private JOCDefaultResponse executeKillCommand(Job___ job, TaskId taskId, String command) {
         try {
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
@@ -63,7 +63,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (Job____ job : modifyTasksSchema.getJobs()) {
+            for (Job___ job : modifyTasksSchema.getJobs()) {
                 for (TaskId task : job.getTaskIds()) {
                     jocDefaultResponse = executeKillCommand(job, task, command);
                 }

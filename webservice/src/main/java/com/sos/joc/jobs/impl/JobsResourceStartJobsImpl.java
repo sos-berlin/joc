@@ -35,8 +35,10 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     }
 
     private JOCDefaultResponse executeStartJobCommand(StartJobSchema startJobSchema) {
+
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+
             JSCmdStartJob jsCmdStartJob = new JSCmdStartJob(Globals.schedulerObjectFactory);
             jsCmdStartJob.setJobIfNotEmpty(startJobSchema.getJob());
             jsCmdStartJob.setForceIfNotEmpty(WebserviceConstants.YES);
@@ -48,11 +50,12 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             }
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdStartJob);
             jocXmlCommand.excutePost(xml);
+            listOfErrors = addError(listOfErrors, jocXmlCommand, startJobSchema.getJob());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing job.start %s:%s", e.getCause(), e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing start job %s:%s", e.getCause(), e.getMessage()));
         }
     }
 
@@ -67,6 +70,9 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             }
             for (StartJobSchema startJobSchemab : startJobsSchema.getJobs()) {
                 jocDefaultResponse = executeStartJobCommand(startJobSchemab);
+            }
+            if (listOfErrors != null) {
+                return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
 
         } catch (Exception e) {

@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.Job200VSchema;
 import com.sos.joc.model.job.JobFilterSchema;
-import com.sos.joc.model.job.JobOrderQueue200VSchema;
-import com.sos.joc.model.job.JobOrderQueueFilterSchema;
 
 public class JobResourceOrderQueueImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -30,8 +27,7 @@ public class JobResourceOrderQueueImplTest {
         jobFilterSchema.setJob("check_history/check");
         JobResourceOrderQueueImpl jobOrderQueueImpl = new JobResourceOrderQueueImpl();
         JOCDefaultResponse jobsResponse = jobOrderQueueImpl.postJobOrderQueue(sosShiroCurrentUserAnswer.getAccessToken(), jobFilterSchema);
-        JobOrderQueue200VSchema jobOrderQueueV200Schema = (JobOrderQueue200VSchema) jobsResponse.getEntity();
-        assertEquals("postJobOrderQueueTest", "check", jobOrderQueueV200Schema.getJob().getName());
+        assertEquals("postJobOrderQueueTest", "check", jobFilterSchema.getJob());
     }
 
 }

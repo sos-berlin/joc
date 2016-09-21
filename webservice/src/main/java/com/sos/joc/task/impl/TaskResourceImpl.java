@@ -7,8 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.job.Order_;
-import com.sos.joc.model.job.State____;
-import com.sos.joc.model.job.State____.Text;
+import com.sos.joc.model.job.State___;
 import com.sos.joc.model.job.Task200Schema;
 import com.sos.joc.model.job.TaskFilterSchema;
 import com.sos.joc.model.job.TaskSchema;
@@ -47,9 +46,9 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
             taskSchema.setPid(-1);
             taskSchema.setRunningSince(new Date());
             taskSchema.setStartAt(new Date());
-            State____ state = new State____();
+            State___ state = new State___();
             state.setSeverity(-1);
-            state.setText(Text.RUNNING);
+            state.setText(State___.Text.RUNNING);
             taskSchema.setState(state);
             taskSchema.setSteps(-1);
             

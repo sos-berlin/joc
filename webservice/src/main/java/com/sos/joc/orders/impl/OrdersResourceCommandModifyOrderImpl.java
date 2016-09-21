@@ -34,9 +34,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     private JOCDefaultResponse executeModifyOrderCommand(ModifyOrderSchema order, String command) {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
         try {
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
             schedulerObjectFactory.initMarshaller(Spooler.class);
@@ -81,11 +81,11 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
             String xml = schedulerObjectFactory.toXMLString(jsCmdModifyOrder);
             jocXmlCommand.excutePost(xml);
+            listOfErrors = listOfErrors = addError(listOfErrors, jocXmlCommand, order.getJobChain());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            addError(listOfErrors, jocXmlCommand, order.getJobChain(), e.getMessage());
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing modify order.%s %s:%s", command, e.getCause(), e.getMessage()));
         }
     }
 
@@ -101,7 +101,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             for (ModifyOrderSchema order : modifyOrdersSchema.getOrders()) {
                 jocDefaultResponse = executeModifyOrderCommand(order, command);
             }
-            if (listOfErrors != null){
+            if (listOfErrors != null) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
         } catch (Exception e) {

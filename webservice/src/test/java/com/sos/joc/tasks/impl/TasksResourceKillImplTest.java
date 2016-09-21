@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.OkSchema;
-import com.sos.joc.model.job.Job____;
+import com.sos.joc.model.job.Job___;
 import com.sos.joc.model.job.ModifyTasksSchema;
 import com.sos.joc.model.job.TaskId;
 
@@ -25,8 +25,8 @@ public class TasksResourceKillImplTest {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         ModifyTasksSchema modifyTasksSchema = new ModifyTasksSchema();
-        List<Job____> listOfJobs = new ArrayList<Job____>();
-        Job____ jobKill1 = new Job____();
+        List<Job___> listOfJobs = new ArrayList<Job___>();
+        Job___ jobKill1 = new Job___();
         jobKill1.setComment("myComment1");
         jobKill1.setJob("/test/job2kill");
        
@@ -42,7 +42,7 @@ public class TasksResourceKillImplTest {
         jobKill1.setTaskIds(listOfTasks);
         listOfJobs.add(jobKill1);
 
-        Job____ jobKill2 = new Job____();
+        Job___ jobKill2 = new Job___();
         jobKill2.setComment("myComment2");
         jobKill2.setJob("/test/job3kill");
 

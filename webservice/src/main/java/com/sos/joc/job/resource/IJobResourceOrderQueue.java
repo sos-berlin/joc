@@ -9,7 +9,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.JobFilterSchema;
-import com.sos.joc.model.job.JobOrderQueueFilterSchema;
  
 public interface IJobResourceOrderQueue {
 

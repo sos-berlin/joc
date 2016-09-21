@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.OkSchema;
 import com.sos.joc.model.order.ModifyOrderSchema;
 import com.sos.joc.model.order.ModifyOrdersSchema;

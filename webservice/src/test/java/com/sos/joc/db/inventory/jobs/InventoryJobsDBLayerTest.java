@@ -7,8 +7,6 @@ import java.util.List;
 import org.junit.Test;
 
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUser;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 

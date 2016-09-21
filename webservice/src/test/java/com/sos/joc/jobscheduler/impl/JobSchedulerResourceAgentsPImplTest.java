@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceAgentsPImpl;
 import com.sos.joc.model.jobscheduler.AgentFilterSchema;
 import com.sos.joc.model.jobscheduler.Agent_;

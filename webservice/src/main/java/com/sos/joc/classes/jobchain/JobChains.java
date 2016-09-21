@@ -143,12 +143,9 @@ public class JobChains {
         
         List<FileWatchingNodePSchema> listOfFileWatchingNodes = new ArrayList<FileWatchingNodePSchema>();
         FileWatchingNodePSchema fileWatchingNodePSchema = new FileWatchingNodePSchema();
-        fileWatchingNodePSchema.setAlertWhenDirectoryMissing(true);
-        fileWatchingNodePSchema.setDelayAfterError(-1);
         fileWatchingNodePSchema.setDirectory("myDirectory");
         fileWatchingNodePSchema.setNextNode("myNextNode");
         fileWatchingNodePSchema.setRegex("myRegEx");
-        fileWatchingNodePSchema.setRepeat(-1);
         listOfFileWatchingNodes.add(fileWatchingNodePSchema);
         jobChain.setFileOrderSources(listOfFileWatchingNodes);
         

@@ -108,7 +108,6 @@ public class Jobs {
 
             job.setDelayUntil(new Date());
 
-            job.setNextPeriodBegin("myNextPeriodBegin");
             job.setNextStartTime(new Date());
 
             job.setParams(Parameters.getParameters());

@@ -11,8 +11,8 @@ import javax.ws.rs.core.UriBuilder;
 import org.junit.Test;
 
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.order.Order_;
 import com.sos.joc.model.order.OrdersFilterSchema;

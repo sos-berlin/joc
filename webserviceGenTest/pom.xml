@@ -83,6 +83,18 @@
 			<version>${project.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>com.sos-berlin.joc</groupId>
+            <artifactId>webservice-global</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 
 		<dependency>
 			<groupId>commons-lang</groupId>

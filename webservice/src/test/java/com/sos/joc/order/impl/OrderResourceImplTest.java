@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
  
 import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.order.Order200VSchema;
 import com.sos.joc.model.order.OrderFilterWithCompactSchema;
 

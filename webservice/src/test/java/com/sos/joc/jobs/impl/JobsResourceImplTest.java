@@ -16,7 +16,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsVSchema;
-import com.sos.joc.model.job.State___;
+import com.sos.joc.model.job.State__;
 
 public class JobsResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -109,8 +109,8 @@ public class JobsResourceImplTest {
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
-        List<State___> states = new ArrayList<State___>();
-        states.add(State___.PENDING);
+        List<State__> states = new ArrayList<State__>();
+        states.add(State__.PENDING);
         jobsFilterSchema.setState(states);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);

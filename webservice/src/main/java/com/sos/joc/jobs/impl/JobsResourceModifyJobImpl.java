@@ -25,25 +25,27 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private static final String UNSTOP = "unstop";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceModifyJobImpl.class);
 
-    private JOCDefaultResponse executeModifyJobCommand(ModifyJobSchema modifyJobsSchema, String command) {
+    private JOCDefaultResponse executeModifyJobCommand(ModifyJobSchema modifyJobSchema, String command) {
+
         try {
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
             jsCmdModifyJob.setCmdIfNotEmpty(command);
-            jsCmdModifyJob.setJobIfNotEmpty(modifyJobsSchema.getJob());
+            jsCmdModifyJob.setJobIfNotEmpty(modifyJobSchema.getJob());
             if (SET_RUN_TIME.equals(command)) {
-                RunTime runtime = (RunTime) Globals.schedulerObjectFactory.unMarshall(modifyJobsSchema.getRunTime());
+                RunTime runtime = (RunTime) Globals.schedulerObjectFactory.unMarshall(modifyJobSchema.getRunTime());
                 jsCmdModifyJob.setRunTime(runtime);
             }
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdModifyJob);
 
             jocXmlCommand.excutePost(xml);
+            listOfErrors = addError(listOfErrors, jocXmlCommand, modifyJobSchema.getJob());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing job.%s %s:%s",command, e.getCause(), e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing modify job.%s %s:%s", command, e.getCause(), e.getMessage()));
         }
     }
 
@@ -59,6 +61,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             for (ModifyJobSchema modifyJobschema : modifyJobsSchema.getJobs()) {
                 jocDefaultResponse = executeModifyJobCommand(modifyJobschema, command);
             }
+
+            if (listOfErrors != null) {
+                return JOCDefaultResponse.responseStatus419(listOfErrors);
+            }
+
         } catch (Exception e) {
             return jocDefaultResponse;
         }

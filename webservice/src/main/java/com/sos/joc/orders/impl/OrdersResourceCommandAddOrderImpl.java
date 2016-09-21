@@ -34,9 +34,10 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     }
 
     private JOCDefaultResponse executeAddOrderCommand(ModifyOrderSchema order) {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
         try {
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+
             SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
             objFactory.initMarshaller(Spooler.class);
             JSCmdAddOrder objOrder = objFactory.createAddOrder();
@@ -58,12 +59,12 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             }
             String xml = objFactory.toXMLString(objOrder);
             jocXmlCommand.excutePost(xml);
+            listOfErrors = addError(listOfErrors, jocXmlCommand, order.getJobChain());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 
         } catch (Exception e) {
-            addError(listOfErrors, jocXmlCommand, order.getJobChain(), e.getMessage());
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing delete order %s:%s", e.getCause(), e.getMessage()));
         }
     }
 

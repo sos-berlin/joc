@@ -21,9 +21,10 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandDeleteOrderImpl.class);
 
     private JOCDefaultResponse executeDeleteOrderCommand(ModifyOrderSchema order) {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
         try {
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+
             SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
             objFactory.initMarshaller(Spooler.class);
             JSCmdRemoveOrder objRemoveOrder = objFactory.createRemoveOrder();
@@ -31,11 +32,11 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
             objRemoveOrder.setOrderIfNotEmpty(order.getOrderId());
             String xml = objFactory.toXMLString(objRemoveOrder);
             jocXmlCommand.excutePost(xml);
+            listOfErrors = addError(listOfErrors, jocXmlCommand, order.getJobChain());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
-            addError(listOfErrors, jocXmlCommand, order.getJobChain(), e.getMessage());
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing delete order %s:%s", e.getCause(), e.getMessage()));
         }
     }
 
@@ -52,7 +53,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
             for (ModifyOrderSchema order : modifyOrdersSchema.getOrders()) {
                 jocDefaultResponse = executeDeleteOrderCommand(order);
             }
-        
+
             if (listOfErrors != null) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
             }

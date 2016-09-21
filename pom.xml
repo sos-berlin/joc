@@ -21,6 +21,7 @@
 	<modules>
 		<module>joc-html-cockpit</module>
 		<module>webservice</module>
+		<module>webservice-global</module>
 		<!-- module>joc-vaadin-cockpit</module -->
     	<!--module>webserviceGenTest</module-->
   </modules>
