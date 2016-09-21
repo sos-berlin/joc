@@ -15,7 +15,6 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.Job__;
-import com.sos.joc.model.job.Job___;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.joc.model.job.JobsVSchema;
 

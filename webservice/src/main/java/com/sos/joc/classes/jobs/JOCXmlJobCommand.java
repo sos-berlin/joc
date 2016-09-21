@@ -19,7 +19,7 @@ import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.Job_;
-import com.sos.joc.model.job.Job___;
+import com.sos.joc.model.job.Job__;
 import com.sos.joc.model.job.JobsFilterSchema;
 import com.sos.scheduler.model.commands.JSCmdShowJob;
 import com.sos.scheduler.model.commands.JSCmdShowState;
@@ -64,10 +64,10 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         return jobV;
     }
     
-    public List<Job_> getJobsFromShowJob(List<Job___> jobs, JobsFilterSchema jobsFilterSchema) throws Exception {
+    public List<Job_> getJobsFromShowJob(List<Job__> jobs, JobsFilterSchema jobsFilterSchema) throws Exception {
         StringBuilder s = new StringBuilder();
         s.append("<commands>");
-        for (Job___ job : jobs) {
+        for (Job__ job : jobs) {
             if (job.getJob() == null || job.getJob().isEmpty()) {
                 throw new JocMissingRequiredParameterException("undefined job");
             }
