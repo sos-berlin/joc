@@ -1,7 +1,9 @@
 package com.sos.joc.order.impl;
 
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -16,7 +18,7 @@ import com.sos.scheduler.model.commands.JSCmdShowOrder;
 
 @Path("order")
 public class OrderConfigurationResourceImpl extends JOCResourceImpl implements IOrderConfigurationResource {
-    private static final Logger LOGGER = Logger.getLogger(OrderConfigurationResourceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderConfigurationResourceImpl.class);
  
     @Override
     public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilterSchema orderBody) throws Exception {

@@ -1,6 +1,5 @@
 package com.sos.joc.job.impl;
 
-import java.net.URI;
 import java.util.Date;
 
 import javax.ws.rs.Path;

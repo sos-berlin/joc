@@ -18,7 +18,6 @@ import com.sos.joc.model.common.Error;
 public class JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JOCResourceImpl.class);
 
-    private static final String NO_ERROR_MESSAGE_IN_JOB_SCHEDULER_ANSWER = "No error message in JobScheduler answer";
     private static final String JOC_420 = "JOC-420";
     private static final String COULD_NOT_GET_ERROR_MESSAGE_FROM_JOB_SCHEDULER_ANSWER = "Could not get error message from JobScheduler answer";
     private static final String SPOOLER_ANSWER_ERROR = "//spooler/answer/ERROR";

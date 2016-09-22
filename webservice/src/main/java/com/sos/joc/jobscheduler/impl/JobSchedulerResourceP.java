@@ -22,6 +22,10 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
     private String accessToken;
     private JobSchedulerFilterSchema jobSchedulerFilterSchema;
 
+    public void setJobSchedulerFilterSchema(JobSchedulerFilterSchema jobSchedulerFilterSchema) {
+        this.jobSchedulerFilterSchema = jobSchedulerFilterSchema;
+    }
+
     public JobSchedulerResourceP(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
         super();
         this.accessToken = accessToken;

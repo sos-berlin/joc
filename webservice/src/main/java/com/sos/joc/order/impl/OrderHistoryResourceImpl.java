@@ -3,25 +3,28 @@ package com.sos.joc.order.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.order.History_;
+import com.sos.joc.model.order.OrderFilterSchema;
 import com.sos.joc.model.order.Step;
 import com.sos.joc.model.order.StepHistorySchema;
-import com.sos.joc.order.post.OrderBody;
 import com.sos.joc.order.resource.IOrderHistoryResource;
 
 @Path("order")
 public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderHistoryResource {
-    private static final Logger LOGGER = Logger.getLogger(OrderHistoryResourceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderHistoryResourceImpl.class);
  
     @Override
-    public JOCDefaultResponse postOrderHistory(String accessToken, OrderBody orderBody) throws Exception {
+    public JOCDefaultResponse postOrderHistory(String accessToken, OrderFilterSchema orderFilterSchema) throws Exception {
         LOGGER.debug("init OrderHistory");
       
-        JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

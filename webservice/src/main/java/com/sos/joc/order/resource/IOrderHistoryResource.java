@@ -8,14 +8,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.order.post.OrderBody;
+import com.sos.joc.model.order.OrderFilterSchema;
 
 public interface IOrderHistoryResource {
 
     @POST
     @Path("history")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrderHistory(@HeaderParam("access_token") String accessToken, OrderBody orderBody) throws Exception;
+    public JOCDefaultResponse postOrderHistory(@HeaderParam("access_token") String accessToken, OrderFilterSchema orderFilterSchema) throws Exception;
 
 }
 

@@ -7,7 +7,7 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.common.Runtime200Schema;
-import com.sos.joc.order.post.OrderRunTimeBody;
+import com.sos.joc.model.order.OrderFilterSchema;
 
 public class OrderRuntimeResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -18,12 +18,12 @@ public class OrderRuntimeResourceImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        OrderRunTimeBody orderRunTimeBody = new OrderRunTimeBody();
-        orderRunTimeBody.setJobChain("Cluster/cluster/job_chain1");
-        orderRunTimeBody.setOrderId("8");
-        orderRunTimeBody.setJobschedulerId("scheduler_current");
+        OrderFilterSchema orderFilterSchema = new OrderFilterSchema();
+        orderFilterSchema.setJobChain("Cluster/cluster/job_chain1");
+        orderFilterSchema.setOrderId("8");
+        orderFilterSchema.setJobschedulerId("scheduler_current");
         OrderRunTimeResourceImpl orderRunTimeImpl = new OrderRunTimeResourceImpl();
-        JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(sosShiroCurrentUserAnswer.getAccessToken(), orderRunTimeBody);
+        JOCDefaultResponse ordersResponse = orderRunTimeImpl.postOrderRunTime(sosShiroCurrentUserAnswer.getAccessToken(), orderFilterSchema);
         Runtime200Schema orderRunTimeSchema = (Runtime200Schema) ordersResponse.getEntity();
         assertEquals("postOrderRunTimeTest","myRuntime", orderRunTimeSchema.getRunTime().getRunTime());
      }

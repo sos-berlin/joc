@@ -1,7 +1,6 @@
 package com.sos.joc.orders.impl;
 
 import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Date;
 
