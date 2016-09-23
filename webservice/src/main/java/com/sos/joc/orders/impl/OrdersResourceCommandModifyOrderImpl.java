@@ -3,7 +3,9 @@ package com.sos.joc.orders.impl;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -19,7 +21,7 @@ import com.sos.scheduler.model.objects.Spooler;
 
 @Path("orders")
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
-    private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandModifyOrderImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandModifyOrderImpl.class);
 
     private String[] getParams(List<NameValuePairsSchema> list) {
         String[] orderParams = new String[list.size() * 2];
@@ -81,7 +83,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
             String xml = schedulerObjectFactory.toXMLString(jsCmdModifyOrder);
             jocXmlCommand.excutePost(xml);
-            listOfErrors = listOfErrors = addError(listOfErrors, jocXmlCommand, order.getJobChain());
+            listOfErrors = addError(listOfErrors, jocXmlCommand, order.getJobChain());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {

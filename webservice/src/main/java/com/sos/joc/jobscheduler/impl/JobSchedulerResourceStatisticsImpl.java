@@ -42,11 +42,8 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.excutePost(" <subsystem.show what=\"statistics\"/>");
 
-            Date surveyDate = jocXmlCommand.getSurveyDate();
-            if (surveyDate != null) {
-                entity.setSurveyDate(jocXmlCommand.getSurveyDate());
-            }
-
+            entity.setSurveyDate(jocXmlCommand.getSurveyDate());
+  
             jocXmlCommand.executeXPath("//subsystem[@name='job']//file_based.statistics");
             jobschedulerJobs.setAny(jocXmlCommand.getAttributeAsIntegerOr0("count"));
             jocXmlCommand.executeXPath("//subsystem[@name='job']//job.statistic[@need_process='true']");

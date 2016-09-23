@@ -2,7 +2,9 @@ package com.sos.joc.orders.impl;
 
 import java.util.Date;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -13,7 +15,7 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSummary;
 
 @Path("orders")
 public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implements IOrdersResourceOverviewSummary {
-    private static final Logger LOGGER = Logger.getLogger(OrdersResourceOverviewSummaryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceOverviewSummaryImpl.class);
 
     @Override
     public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {

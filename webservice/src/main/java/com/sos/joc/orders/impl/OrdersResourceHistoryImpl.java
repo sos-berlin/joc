@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -17,7 +19,7 @@ import com.sos.joc.orders.resource.IOrdersResourceHistory;
 
 @Path("orders")
 public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrdersResourceHistory {
-    private static final Logger LOGGER = Logger.getLogger(OrdersResourceHistoryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceHistoryImpl.class);
  
     @Override
     public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilterSchema orderFilterSchema) throws Exception {

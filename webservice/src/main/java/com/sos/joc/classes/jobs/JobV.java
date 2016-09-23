@@ -1,12 +1,7 @@
 package com.sos.joc.classes.jobs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +21,6 @@ import com.sos.joc.model.job.OrdersSummary;
 import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.State_;
 import com.sos.joc.model.job.TaskQueue;
-import com.sos.joc.model.order.Order_;
 
 
 public class JobV extends Job_ {

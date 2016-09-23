@@ -4,7 +4,8 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -18,7 +19,7 @@ import com.sos.scheduler.model.objects.Spooler;
 
 @Path("orders")
 public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandDeleteOrder {
-    private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandDeleteOrderImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandDeleteOrderImpl.class);
 
     private JOCDefaultResponse executeDeleteOrderCommand(ModifyOrderSchema order) {
 

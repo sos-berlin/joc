@@ -18,16 +18,17 @@ public class InventoryOrdersDBLayer extends DBLayer {
         this.jobSchedulerId = jobSchedulerID;
     }
     
+    @SuppressWarnings("unchecked")
     public DBItemInventoryOrder getInventoryOrderByOrderId(String jobChainName, String orderId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder("select order from ");
             sql.append(DBITEM_INVENTORY_ORDERS +" as order, " + DBITEM_INVENTORY_INSTANCES + " as instance");
             sql.append(" where order.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "'");
             sql.append(" and  (name) = :name");
+            LOGGER.debug(sql);
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("name", jobChainName + "," + orderId);
 
-            
             List<DBItemInventoryOrder> result = query.list();
             if (!result.isEmpty()) {
                 return result.get(0);
@@ -38,6 +39,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
         }
     }
    
+    @SuppressWarnings("unchecked")
     public List<DBItemInventoryOrder> getInventoryOrders() throws Exception {
         try {
             StringBuilder sql = new StringBuilder("select order from ");

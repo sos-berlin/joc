@@ -17,11 +17,12 @@ public class InventoryJobsDBLayer extends DBLayer {
         super(conn);
         this.jobSchedulerId = jobSchedulerId;
     }
-    
-     public DBItemInventoryJob getInventoryJobByName(String name) throws Exception {
+
+    @SuppressWarnings("unchecked")
+    public DBItemInventoryJob getInventoryJobByName(String name) throws Exception {
         try {
             StringBuilder sql = new StringBuilder("select job from ");
-            sql.append(DBITEM_INVENTORY_JOBS +" as job, " + DBITEM_INVENTORY_INSTANCES + " as instance");
+            sql.append(DBITEM_INVENTORY_JOBS + " as job, " + DBITEM_INVENTORY_INSTANCES + " as instance");
             sql.append(" where job.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "' and");
             sql.append(" (name)  = :name");
             LOGGER.debug(sql);
@@ -37,11 +38,12 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }
     }
-   
+
+    @SuppressWarnings("unchecked")
     public List<DBItemInventoryJob> getInventoryJobs() throws Exception {
         try {
             StringBuilder sql = new StringBuilder("select job from ");
-            sql.append(DBITEM_INVENTORY_JOBS +" as job, " + DBITEM_INVENTORY_INSTANCES + " as instance");
+            sql.append(DBITEM_INVENTORY_JOBS + " as job, " + DBITEM_INVENTORY_INSTANCES + " as instance");
             sql.append(" where job.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "'");
             Query query = getConnection().createQuery(sql.toString());
 
@@ -50,10 +52,5 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }
     }
-    
- 
-   
-
-  
 
 }

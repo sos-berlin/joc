@@ -88,5 +88,15 @@ public class SOSShiroCurrentUser {
         listOfSchedulerInstances.put(jobSchedulerIdentifier.getId(), schedulerInstancesDBItem);
     }
  
+    public DBItemInventoryInstance getSchedulerInstanceByKey(Long id){
+        for (HashMap.Entry<String, DBItemInventoryInstance> entry : listOfSchedulerInstances.entrySet()) {
+            DBItemInventoryInstance instance = entry.getValue();
+            if (instance.getId() == id){
+                return instance;
+            }
+        } 
+        return null;
+        
+    }
 
 }

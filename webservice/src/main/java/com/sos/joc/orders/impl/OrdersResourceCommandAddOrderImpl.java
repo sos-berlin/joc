@@ -3,7 +3,9 @@ package com.sos.joc.orders.impl;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -19,7 +21,7 @@ import com.sos.scheduler.model.objects.Spooler;
 
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
-    private static final Logger LOGGER = Logger.getLogger(OrdersResourceCommandAddOrderImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandAddOrderImpl.class);
 
     private String[] getParams(List<NameValuePairsSchema> list) {
         String[] orderParams = new String[list.size() * 2];

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Path;
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
@@ -18,7 +20,7 @@ import com.sos.joc.orders.resource.IOrdersResourceP;
 
 @Path("orders")
 public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResourceP {
-    private static final Logger LOGGER = Logger.getLogger(OrdersResourcePImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourcePImpl.class);
 
     @Override
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
