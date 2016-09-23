@@ -85,7 +85,7 @@ public class JobSchedulerResource extends JOCResourceImpl {
             State state = new State();
            
             state.setSeverity(getSeverityFromState(jobschedulerState));
-            state.setText(State.Text.valueOf(jobschedulerState.toUpperCase()));
+            state.setText(getText(jobschedulerState.toUpperCase()));
             jobscheduler.setState(state);
             
             entity.setJobscheduler(jobscheduler);
@@ -95,7 +95,8 @@ public class JobSchedulerResource extends JOCResourceImpl {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
     }
-
+    
+   
     private Integer getSeverityFromState(String state){
         HashMap<String,Integer> h = new HashMap<String, Integer>();
         

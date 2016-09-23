@@ -14,6 +14,8 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Error;
+import com.sos.joc.model.jobscheduler.State;
+
 
 public class JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JOCResourceImpl.class);
@@ -150,4 +152,14 @@ public class JOCResourceImpl {
         return listOfErrors;
     }
 
+    protected State.Text getText(String jobschedulerState){
+        try{
+           return State.Text.fromValue(jobschedulerState.toUpperCase());
+        }
+        catch (IllegalArgumentException e) {
+            LOGGER.error("IllegalArgumentException: " + jobschedulerState,e); 
+            return null;
+        }
+    }
+    
 }
