@@ -25,3 +25,6 @@ webservice/target/
 webserviceGenTest/target/java-gen/
 webserviceGenTest/target/
 webserviceGenTest/src/main/resources/schemas/
+
+webservice-global/target/
+webservice-global/target/*
