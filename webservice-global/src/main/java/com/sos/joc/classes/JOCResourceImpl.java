@@ -108,7 +108,7 @@ public class JOCResourceImpl {
             return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
         }
 
-        if (schedulerId == null || schedulerId.isEmpty()) {
+        if (schedulerId == null) {
             return JOCDefaultResponse.responseStatusJSError(String.format("undefined '%1$s'", "jobschedulerId"));
         }
         if (!"".equals(schedulerId)) {
