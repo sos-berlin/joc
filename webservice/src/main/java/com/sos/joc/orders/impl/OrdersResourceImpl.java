@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.OrderQueue;
@@ -31,16 +32,17 @@ import com.sos.joc.orders.resource.IOrdersResource;
 @Path("orders")
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceImpl.class);
-    
+
     @Override
     public JOCDefaultResponse postOrders(String accessToken, OrdersFilterSchema ordersBody) throws Exception {
         LOGGER.debug("init orders");
-        JOCDefaultResponse jocDefaultResponse = init(ordersBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
 
         try {
+            JOCDefaultResponse jocDefaultResponse = init(ordersBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             // TODO date post body parameters are not yet considered
             // TODO URL "http://localhost:40410" has to read from database
             String masterUrl = "http://localhost:40410";
@@ -53,8 +55,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
             URI uri = command.getURI();
-            
-            Map<String,OrdersPerJobChain> ordersLists = new HashMap<String,OrdersPerJobChain>();
+
+            Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
             for (Order_ order : orders) {
                 if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
                     throw new JocMissingRequiredParameterException("jobChain");
@@ -102,6 +104,9 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             return JOCDefaultResponse.responseStatus200(entity);
             // } catch (JocException e) {
             // return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }

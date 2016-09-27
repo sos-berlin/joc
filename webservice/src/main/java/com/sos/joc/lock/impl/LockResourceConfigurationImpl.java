@@ -24,17 +24,17 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
     public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilterSchema lockBody) throws Exception {
 
         LOGGER.debug("init lock/configuration");
-        JOCDefaultResponse jocDefaultResponse = init(lockBody.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isConfiguration());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
         try {
+            JOCDefaultResponse jocDefaultResponse = init(lockBody.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isConfiguration());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             ConfigurationSchema entity = new ConfigurationSchema();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("lock", lockBody.getLock())) {
                 boolean responseInHtml = lockBody.getMime() == LockConfigurationFilterSchema.Mime.HTML;
-                String xPath = String.format("/spooler/answer//locks/lock[@path='%s']",normalizePath(lockBody.getLock())); 
+                String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", normalizePath(lockBody.getLock()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(), xPath, "lock", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);

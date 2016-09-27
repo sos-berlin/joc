@@ -16,20 +16,18 @@ import com.sos.joc.model.order.Order200VSchema;
 import com.sos.joc.model.order.OrderFilterWithCompactSchema;
 import com.sos.joc.order.resource.IOrderResource;
 
-
 @Path("order")
 public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderResourceImpl.class);
-    
+
     @Override
     public JOCDefaultResponse postOrder(String accessToken, OrderFilterWithCompactSchema orderBody) throws Exception {
         LOGGER.debug("init order");
-        JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
- 
         try {
+            JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             // TODO URL "http://localhost:40410" has to read from database
             String masterUrl = "http://localhost:40410";
@@ -37,8 +35,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             command.addCompactQuery(orderBody.getCompact());
             Order200VSchema entity = new Order200VSchema();
 
-            if (checkRequiredParameter("orderId", orderBody.getOrderId())
-                    && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
+            if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
                 OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI());
                 entity.setDeliveryDate(new Date());
                 entity.setOrder(o.getOrder());

@@ -30,7 +30,7 @@ public class InventoryDBLayerTest {
         sosShiroCurrentUser.addSchedulerInstanceDBItem (jobSchedulerIdentifier,dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId()));
         DBItemInventoryInstance schedulerInstancesDBItem = sosShiroCurrentUser.getSchedulerInstanceDBItem(jobSchedulerIdentifier);
         
-        assertEquals("getJobSchedulerInstance", "http://localhost:4444", schedulerInstancesDBItem.getUrl());
+        assertEquals("getJobSchedulerInstance", "http://localhost:4444", schedulerInstancesDBItem.getCommandUrl());
 
     }
 

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.locks.resource.ILocksResourceP;
 import com.sos.joc.model.lock.LockPSchema;
 import com.sos.joc.model.lock.LocksFilterSchema;
@@ -22,13 +23,12 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 
     @Override
     public JOCDefaultResponse postLocksP(String accessToken, LocksFilterSchema locksFilterSchema) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(locksFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
+        LOGGER.debug("init locks");
         try {
-            LOGGER.debug("init locks");
+            JOCDefaultResponse jocDefaultResponse = init(locksFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             LocksPSchema entity = new LocksPSchema();
             entity.setDeliveryDate(new Date());
@@ -41,6 +41,8 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             listOfLocks.add(lockPSchema);
             entity.setLocks(listOfLocks);
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }

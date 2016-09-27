@@ -14,6 +14,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceIds;
 import com.sos.joc.model.jobscheduler.JobschedulerIdsSchema;
 
@@ -48,15 +49,16 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                 }
             }
             JOCPreferences jocPreferences = new JOCPreferences();
-            String selectedInstance = jocPreferences.get("selected_instance",first);
+            String selectedInstance = jocPreferences.get("selected_instance", first);
 
             entity.setSelected(selectedInstance);
             entity.setJobschedulerIds(jobschedulerIs);
 
             return JOCDefaultResponse.responseStatus200(entity);
 
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 

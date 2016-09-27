@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
 import com.sos.joc.model.schedule.ModifyRuntimeSchema;
 
@@ -17,14 +18,16 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
     @Override
     public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRuntimeSchema modifyRuntimeSchema) throws Exception {
         LOGGER.debug("init schedule/set_run_time");
-        
+
+        try {
             JOCDefaultResponse jocDefaultResponse = init(modifyRuntimeSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().isEdit());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            try {
 
             return JOCDefaultResponse.responseStatusJSOk(new Date());
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(String.format("Error executing schedule.set_run_time:  %s:%s", e.getCause(), e.getMessage()));
         }

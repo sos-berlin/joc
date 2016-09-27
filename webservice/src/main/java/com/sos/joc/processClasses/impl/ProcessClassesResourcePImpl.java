@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.processClasses.resource.IProcessClassesResourceP;
 import com.sos.joc.model.processClass.ProcessClassPSchema;
 import com.sos.joc.model.processClass.ProcessClassesFilterSchema;
@@ -22,26 +23,29 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
 
     @Override
     public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilterSchema processClassFilterSchema) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(processClassFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
+
+        LOGGER.debug("init processClasses");
 
         try {
-            LOGGER.debug("init processClasses");
+            JOCDefaultResponse jocDefaultResponse = init(processClassFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             ProcessClassesPSchema entity = new ProcessClassesPSchema();
             entity.setDeliveryDate(new Date());
             List<ProcessClassPSchema> listOfProcessClasses = new ArrayList<ProcessClassPSchema>();
-            ProcessClassPSchema processClassPSchema  = new ProcessClassPSchema();
+            ProcessClassPSchema processClassPSchema = new ProcessClassPSchema();
             processClassPSchema.setMaxProcesses(-1);
             processClassPSchema.setName("myName");
             processClassPSchema.setPath("myPath");
             processClassPSchema.setSurveyDate(new Date());
             listOfProcessClasses.add(processClassPSchema);
             entity.setProcessClasses(listOfProcessClasses);
-           
+
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }

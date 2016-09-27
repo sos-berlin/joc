@@ -24,17 +24,18 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
     public JOCDefaultResponse postProcessClassConfiguration(String accessToken, ProcessClassConfigurationFilterSchema processClassConfigurationFilterSchema) throws Exception {
 
         LOGGER.debug("init process_class/configuration");
-        JOCDefaultResponse jocDefaultResponse = init(processClassConfigurationFilterSchema.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView().isConfiguration());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
         try {
+            JOCDefaultResponse jocDefaultResponse = init(processClassConfigurationFilterSchema.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView()
+                    .isConfiguration());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             ConfigurationSchema entity = new ConfigurationSchema();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("processClass", processClassConfigurationFilterSchema.getProcessClass())) {
                 boolean responseInHtml = processClassConfigurationFilterSchema.getMime() == ProcessClassConfigurationFilterSchema.Mime.HTML;
-                String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']",normalizePath(processClassConfigurationFilterSchema.getProcessClass())); 
+                String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", normalizePath(processClassConfigurationFilterSchema.getProcessClass()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createProcessClassConfigurationPostCommand(), xPath, "process_class", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
@@ -44,7 +45,7 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
-    
+
     private String createProcessClassConfigurationPostCommand() {
         JSCmdShowState showProcessClasss = new JSCmdShowState(Globals.schedulerObjectFactory);
         showProcessClasss.setSubsystems("folder schedule");

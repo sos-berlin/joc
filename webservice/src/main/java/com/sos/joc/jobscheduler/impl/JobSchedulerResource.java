@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerFilterSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler_;
@@ -61,7 +62,7 @@ public class JobSchedulerResource extends JOCResourceImpl {
             Jobscheduler200VSchema entity = new Jobscheduler200VSchema();
             entity.setDeliveryDate(new Date());
             
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             
             JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
             jsCmdShowState.setWhat(FOLDERS_NO_SUBFOLDERS);;
@@ -90,6 +91,8 @@ public class JobSchedulerResource extends JOCResourceImpl {
             
             entity.setJobscheduler(jobscheduler);
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
 
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());

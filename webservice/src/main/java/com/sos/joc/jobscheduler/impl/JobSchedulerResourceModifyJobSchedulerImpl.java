@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
 import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
 import com.sos.scheduler.model.commands.JSCmdModifySpooler;
@@ -23,14 +24,17 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
     private JOCDefaultResponse check(boolean right) {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(urlTimeoutParamSchema.getJobschedulerId(),right);
+            JOCDefaultResponse jocDefaultResponse = init(urlTimeoutParamSchema.getJobschedulerId(), right);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+            
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
-    
+
         return null;
 
     }
@@ -38,16 +42,16 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     private JOCDefaultResponse executeModifyJobSchedulerCommand(String cmd) {
         try {
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
             JSCmdModifySpooler jsCmdModifySpooler = new JSCmdModifySpooler(Globals.schedulerObjectFactory);
             jsCmdModifySpooler.setCmd(cmd);
             jsCmdModifySpooler.setTimeoutIfNotEmpty(urlTimeoutParamSchema.getTimeout());
 
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdModifySpooler);
-            LOGGER.debug(String.format("Executing command: %s",xml));
+            LOGGER.debug(String.format("Executing command: %s", xml));
             jocXmlCommand.excutePost(xml);
-         
+
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
@@ -80,62 +84,86 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
 
-        init(accessToken, urlTimeoutParamSchema);
-        JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isTerminate());
+        try {
+            init(accessToken, urlTimeoutParamSchema);
+            JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isTerminate());
 
-        if (JOCDefaultResponse != null) {
-            return JOCDefaultResponse;
+            if (JOCDefaultResponse != null) {
+                return JOCDefaultResponse;
+            }
+
+            return executeModifyJobSchedulerCommand("terminate_and_restart");
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
-
-        return executeModifyJobSchedulerCommand("terminate_and_restart");
     }
 
     @Override
     public JOCDefaultResponse postJobschedulerAbort(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
 
-        init(accessToken, urlTimeoutParamSchema);
-        JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isAbort());
+        try {
+            init(accessToken, urlTimeoutParamSchema);
 
-        if (JOCDefaultResponse != null) {
-            return JOCDefaultResponse;
+            JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isAbort());
+
+            if (JOCDefaultResponse != null) {
+                return JOCDefaultResponse;
+            }
+
+            return executeModifyJobSchedulerCommand("abort_immediately");
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
-
-        return executeModifyJobSchedulerCommand("abort_immediately");
     }
 
     @Override
     public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
-        init(accessToken, jobSchedulerTerminateBody);
-        JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isAbort());
+        try {
+            init(accessToken, jobSchedulerTerminateBody);
+            JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isAbort());
 
-        if (JOCDefaultResponse != null) {
-            return JOCDefaultResponse;
+            if (JOCDefaultResponse != null) {
+                return JOCDefaultResponse;
+            }
+
+            return executeModifyJobSchedulerCommand("abort_immediately_and_restart");
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
 
-        return executeModifyJobSchedulerCommand("abort_immediately_and_restart");
     }
 
     @Override
     public JOCDefaultResponse postJobschedulerPause(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
-        init(accessToken, jobSchedulerTerminateBody);
-        JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isPause());
+        try {
+            init(accessToken, jobSchedulerTerminateBody);
 
-        if (JOCDefaultResponse != null) {
-            return JOCDefaultResponse;
+            JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isPause());
+
+            if (JOCDefaultResponse != null) {
+                return JOCDefaultResponse;
+            }
+
+            return executeModifyJobSchedulerCommand("pause");
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
-
-        return executeModifyJobSchedulerCommand("pause");
     }
 
     @Override
     public JOCDefaultResponse postJobschedulerContinue(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
-        init(accessToken, jobSchedulerTerminateBody);
-        JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isContinue());
+        try {
+            init(accessToken, jobSchedulerTerminateBody);
 
-        if (JOCDefaultResponse != null) {
-            return JOCDefaultResponse;
+            JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isContinue());
+
+            if (JOCDefaultResponse != null) {
+                return JOCDefaultResponse;
+            }
+
+            return executeModifyJobSchedulerCommand("continue");
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
-
-        return executeModifyJobSchedulerCommand("continue");
     }
 }

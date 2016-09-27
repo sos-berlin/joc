@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceStatistics;
 import com.sos.joc.model.common.JobSchedulerFilterSchema;
 import com.sos.joc.model.jobscheduler.JobChains;
@@ -26,7 +27,7 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
 
         LOGGER.debug("init jobscheduler/statistics");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -39,11 +40,11 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
             Orders jobschedulerOrders = new Orders();
             JobChains jobschedulerJobChains = new JobChains();
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             jocXmlCommand.excutePost(" <subsystem.show what=\"statistics\"/>");
 
             entity.setSurveyDate(jocXmlCommand.getSurveyDate());
-  
+
             jocXmlCommand.executeXPath("//subsystem[@name='job']//file_based.statistics");
             jobschedulerJobs.setAny(jocXmlCommand.getAttributeAsIntegerOr0("count"));
             jocXmlCommand.executeXPath("//subsystem[@name='job']//job.statistic[@need_process='true']");
@@ -85,11 +86,12 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
             entity.setJobChains(jobschedulerJobChains);
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
 
     }
 
- 
 }

@@ -26,18 +26,18 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
     public JOCDefaultResponse postJobChainConfiguration(String accessToken, JobChainConfigurationFilterSchema jobChainBody) throws Exception {
 
         LOGGER.debug("init job_chain/configuration");
-        JOCDefaultResponse jocDefaultResponse =
-                init(jobChainBody.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
         try {
+            JOCDefaultResponse jocDefaultResponse = init(jobChainBody.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             ConfigurationSchema entity = new ConfigurationSchema();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
                 boolean responseInHtml = jobChainBody.getMime() == JobChainConfigurationFilterSchema.Mime.HTML;
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(jobChainBody), "/spooler/answer/job_chain", "job_chain", responseInHtml);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(jobChainBody), "/spooler/answer/job_chain", "job_chain",
+                        responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

@@ -13,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceHistory;
 import com.sos.joc.model.jobChain.JobChainHistoryFilterSchema;
 import com.sos.joc.model.order.History;
@@ -33,17 +34,17 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilterSchema jobChainHistoryFilterSchema) throws Exception {
 
         LOGGER.debug("init job_chain/history");
-        JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
-
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
         try {
+            JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
+
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             HistorySchema entity = new HistorySchema();
 
             entity.setDeliveryDate(new Date());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (jobChainHistoryFilterSchema.getMaxLastHistoryItems() == null) {
                 jobChainHistoryFilterSchema.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
@@ -91,6 +92,9 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             entity.setHistory(listOfHistory);
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
 

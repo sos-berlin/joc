@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.Orders_;
 import com.sos.joc.model.order.SummarySchema;
@@ -20,17 +21,17 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
     @Override
     public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
         LOGGER.debug("init Orders");
-        JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
-
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
         try {
+            JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             // Reading orders from the database tale inventory.orders filtered
             // by
-            ordersFilterSchema.getDateFrom(); // is ISO 8601 or something like 6h 1w 65y
+            ordersFilterSchema.getDateFrom(); // is ISO 8601 or something like
+                                              // 6h 1w 65y
             ordersFilterSchema.getDateTo(); // same as dateFrom
             ordersFilterSchema.getTimeZone();
             ordersFilterSchema.getRegex();
@@ -49,6 +50,9 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             entity.setOrders(orders);
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }

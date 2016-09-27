@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.order.ModifyOrderSchema;
 import com.sos.joc.model.order.ModifyOrdersSchema;
@@ -38,7 +39,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     private JOCDefaultResponse executeAddOrderCommand(ModifyOrderSchema order) {
 
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
             SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
             objFactory.initMarshaller(Spooler.class);
@@ -85,6 +86,8 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             if (listOfErrors != null) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
 
         } catch (Exception e) {
             return jocDefaultResponse;

@@ -15,6 +15,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceHistory;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.job.History;
@@ -34,18 +35,18 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
     public JOCDefaultResponse postJobHistory(String accessToken, JobHistoryFilterSchema jobHistoryFilterSchema) throws Exception {
 
         LOGGER.debug("init job/history");
-        JOCDefaultResponse jocDefaultResponse = init(jobHistoryFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
 
         try {
+            JOCDefaultResponse jocDefaultResponse = init(jobHistoryFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             HistorySchema entity = new HistorySchema();
 
             entity.setDeliveryDate(new Date());
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (jobHistoryFilterSchema.getMaxLastHistoryItems() == null) {
                 jobHistoryFilterSchema.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
@@ -56,41 +57,39 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
 
             int count = jocXmlCommand.getNodeList().getLength();
 
-            List<History>listOfHistory = new ArrayList<History>();
-            
+            List<History> listOfHistory = new ArrayList<History>();
 
- 
             for (int i = 0; i < count; i++) {
                 Element historyEntry = jocXmlCommand.getElementFromList(i);
                 History history = new History();
-                //TODO JobScheduler muss Agent in der Antwort liefern
-                //history.setAgent("myAgent");
+                // TODO JobScheduler muss Agent in der Antwort liefern
+                // history.setAgent("myAgent");
                 history.setClusterMember(jocXmlCommand.getAttribute("cluster_member_id"));
                 Date endTime = jocXmlCommand.getAttributeAsDate("end_time");
                 history.setEndTime(endTime);
-                        
+
                 NodeList n = historyEntry.getElementsByTagName("ERROR");
-                if (n != null && n.getLength() > 0){
+                if (n != null && n.getLength() > 0) {
                     ErrorSchema errorSchema = new ErrorSchema();
                     errorSchema.setCode(n.item(0).getAttributes().getNamedItem("code").getNodeValue());
                     errorSchema.setMessage(n.item(0).getAttributes().getNamedItem("text").getNodeValue());
                     history.setError(errorSchema);
                 }
-                        
+
                 Integer exitCode = jocXmlCommand.getAttributeAsInteger("exit_code");
                 history.setExitCode(exitCode);
                 history.setJob(jocXmlCommand.getAttribute("job_name"));
                 history.setStartTime(jocXmlCommand.getAttributeAsDate("start_time"));
 
                 State state = new State();
-                if (endTime == null){
+                if (endTime == null) {
                     state.setSeverity(1);
                     state.setText(State.Text.INCOMPLETE);
-                }else{
-                    if ("0".equals(exitCode)){
+                } else {
+                    if ("0".equals(exitCode)) {
                         state.setSeverity(0);
                         state.setText(State.Text.SUCCESSFUL);
-                    }else{
+                    } else {
                         state.setSeverity(2);
                         state.setText(State.Text.FAILED);
                     }
@@ -102,14 +101,16 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
             }
 
             entity.setHistory(listOfHistory);
-           
+
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
 
         }
     }
-    
+
     public String createJobHistoryPostCommand(final JobHistoryFilterSchema jobHistoryFilterSchema) {
         JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
         showJob.setMaxTaskHistory(BigInteger.valueOf(jobHistoryFilterSchema.getMaxLastHistoryItems()));

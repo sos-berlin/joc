@@ -32,14 +32,13 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
     @Override
     public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
         LOGGER.debug("init orders/overview/summary");
-        JOCDefaultResponse jocDefaultResponse = init( ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-        
         try {
+            JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
-            //TODO consider OrdersFilterSchema
+            // TODO consider OrdersFilterSchema
             // TODO URL "http://localhost:40410" has to read from database
             String masterUrl = "http://localhost:40410";
             JOCJsonCommand command = new JOCJsonCommand(masterUrl);
@@ -47,9 +46,9 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             command.addOrderStatisticsQuery();
             URI uri = command.getURI();
             LOGGER.info("call " + uri.toString());
-            
+
             JsonObject json = getJsonObjectFromResponse(uri);
-            
+
             // {"inProcess":0,"notPlanned":14,"running":8,"setback":0,"inTask":0,"suspended":5,"total":25,"eventId":1474328805429000,"permanent":17,"planned":2,"blacklisted":0,"fileOrder":1,"pending":1}
             Orders orders = new Orders();
             orders.setBlacklist(json.getInt("blacklisted", 0));
@@ -57,8 +56,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             orders.setRunning(json.getInt("inProcess", 0));
             orders.setSetback(json.getInt("setback", 0));
             orders.setSuspended(json.getInt("suspended", 0));
-            orders.setWaitingForResource(json.getInt("total", 0) - orders.getBlacklist() - orders.getPending() - orders.getRunning()
-                    - orders.getSetback() - orders.getSuspended());
+            orders.setWaitingForResource(json.getInt("total", 0) - orders.getBlacklist() - orders.getPending() - orders.getRunning() - orders.getSetback() - orders.getSuspended());
 
             SnapshotSchema entity = new SnapshotSchema();
             entity.setOrders(orders);
@@ -73,15 +71,15 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         }
 
     }
-    
+
     private JsonObject getJsonObjectFromResponse(URI uri) throws Exception {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Accept", "application/json");
         String response = client.executeRestServiceCommand("get", uri.toURL());
-        
+
         int httpReplyCode = client.statusCode();
         String contentType = client.getResponseHeader("Content-Type");
-        
+
         switch (httpReplyCode) {
         case 200:
             if (contentType.contains("application/json")) {

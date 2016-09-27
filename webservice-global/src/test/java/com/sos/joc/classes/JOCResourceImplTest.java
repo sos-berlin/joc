@@ -38,5 +38,12 @@ public class JOCResourceImplTest {
        assertEquals("normalizePathTest", "/1",jocResourceImpl.normalizePath("/1") );
    }
 
-   
+   @Test
+   public void getParentTest(){
+       JOCResourceImpl jocResourceImpl  = new JOCResourceImpl();
+       assertEquals("normalizePathTest", "/1/2",jocResourceImpl.getParent("/1/2//3") );
+       assertEquals("normalizePathTest", "/1/2",jocResourceImpl.getParent("/1/2/3/") );
+       assertEquals("normalizePathTest", null,jocResourceImpl.getParent("/") );
+       assertEquals("normalizePathTest", "/",jocResourceImpl.getParent("/1") );
+   }   
 }

@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentsP;
 import com.sos.joc.model.jobscheduler.AgentFilterSchema;
 import com.sos.joc.model.jobscheduler.AgentPSchema;
@@ -68,6 +69,8 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             entity.setAgents(listOfAgents);
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.order.ModifyOrderSchema;
 import com.sos.joc.model.order.ModifyOrdersSchema;
@@ -38,7 +39,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private JOCDefaultResponse executeModifyOrderCommand(ModifyOrderSchema order, String command) {
 
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
             SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
             schedulerObjectFactory.initMarshaller(Spooler.class);
@@ -117,7 +118,11 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrdersSchema modifyOrdersSchema) {
         LOGGER.debug("init Orders: Start");
-        return postOrdersCommand(accessToken, "start", getPermissons(accessToken).getOrder().isStart(), modifyOrdersSchema);
+        try {
+            return postOrdersCommand(accessToken, "start", getPermissons(accessToken).getOrder().isStart(), modifyOrdersSchema);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
     }
 
     @Override
@@ -129,25 +134,41 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrdersSchema modifyOrdersSchema) {
         LOGGER.debug("init Orders:Resume");
-        return postOrdersCommand(accessToken, "resume", getPermissons(accessToken).getOrder().isResume(), modifyOrdersSchema);
+        try {
+            return postOrdersCommand(accessToken, "resume", getPermissons(accessToken).getOrder().isResume(), modifyOrdersSchema);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
     }
 
     @Override
     public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrdersSchema modifyOrdersSchema) {
         LOGGER.debug("init Orders: Reset");
-        return postOrdersCommand(accessToken, "reset", getPermissons(accessToken).getOrder().isReset(), modifyOrdersSchema);
+        try {
+            return postOrdersCommand(accessToken, "reset", getPermissons(accessToken).getOrder().isReset(), modifyOrdersSchema);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
     }
 
     @Override
     public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrdersSchema modifyOrdersSchema) {
         LOGGER.debug("init Orders: Set State");
-        return postOrdersCommand(accessToken, "set_state", getPermissons(accessToken).getOrder().isSetState(), modifyOrdersSchema);
+        try {
+            return postOrdersCommand(accessToken, "set_state", getPermissons(accessToken).getOrder().isSetState(), modifyOrdersSchema);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
     }
 
     @Override
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrdersSchema modifyOrdersSchema) {
         LOGGER.debug("init Orders: Set Runtime");
-        return postOrdersCommand(accessToken, "set_run_time", getPermissons(accessToken).getOrder().isSetRunTime(), modifyOrdersSchema);
+        try {
+            return postOrdersCommand(accessToken, "set_run_time", getPermissons(accessToken).getOrder().isSetRunTime(), modifyOrdersSchema);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
     }
 
 }

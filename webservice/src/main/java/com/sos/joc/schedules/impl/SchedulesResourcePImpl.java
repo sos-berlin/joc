@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.schedules.resource.ISchedulesResourceP;
 import com.sos.joc.model.schedule.Schedule;
 import com.sos.joc.model.schedule.SchedulesFilterSchema;
@@ -18,7 +19,6 @@ import com.sos.joc.model.schedule.SchedulesPSchema;
 import com.sos.joc.model.schedule.Substitute;
 import com.sos.joc.model.schedule.UsedByJob;
 import com.sos.joc.model.schedule.UsedByOrder;
- 
 
 @Path("schedules")
 public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedulesResourceP {
@@ -26,13 +26,12 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 
     @Override
     public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilterSchema schedulesFilterSchema) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(schedulesFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
+        LOGGER.debug("init schedules/p");
         try {
-            LOGGER.debug("init schedules/p");
+            JOCDefaultResponse jocDefaultResponse = init(schedulesFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             SchedulesPSchema entity = new SchedulesPSchema();
             entity.setDeliveryDate(new Date());
@@ -52,7 +51,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             UsedByJob usedByJob = new UsedByJob();
             usedByJob.setJob("myUsedByJob");
             listOfUsesByJob.add(usedByJob);
-           
+
             schedule.setUsedByJobs(listOfUsesByJob);
 
             List<UsedByOrder> listOfUsesByOrder = new ArrayList<UsedByOrder>();
@@ -62,17 +61,17 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             listOfUsesByOrder.add(usedByOrder);
 
             schedule.setUsedByOrders(listOfUsesByOrder);
-            
+
             listOfSchedules.add(schedule);
-            
+
             entity.setSchedules(listOfSchedules);
-             
+
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
     }
-
-     
 
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.LogContent200Schema;
 import com.sos.joc.model.common.LogContentSchema;
 import com.sos.joc.model.order.OrderFilterWithHistoryIdSchema;
@@ -21,12 +22,11 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     public JOCDefaultResponse postOrderLog(String accessToken, OrderFilterWithHistoryIdSchema orderFilterWithHistoryIdSchema) throws Exception {
         LOGGER.debug("init OrderHistory");
 
-        JOCDefaultResponse jocDefaultResponse = init(orderFilterWithHistoryIdSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
         try {
+            JOCDefaultResponse jocDefaultResponse = init(orderFilterWithHistoryIdSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             LogContent200Schema entity = new LogContent200Schema();
 
@@ -40,6 +40,9 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             // TODO JOC Cockpit Webservice
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }

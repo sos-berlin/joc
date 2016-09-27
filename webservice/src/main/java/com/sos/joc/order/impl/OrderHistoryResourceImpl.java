@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.ErrorSchema;
 import com.sos.joc.model.order.History_;
 import com.sos.joc.model.order.OrderFilterSchema;
@@ -19,24 +20,23 @@ import com.sos.joc.order.resource.IOrderHistoryResource;
 @Path("order")
 public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderHistoryResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderHistoryResourceImpl.class);
- 
+
     @Override
     public JOCDefaultResponse postOrderHistory(String accessToken, OrderFilterSchema orderFilterSchema) throws Exception {
         LOGGER.debug("init OrderHistory");
-      
-        JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(),getPermissons(accessToken).getOrder().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
- 
+
         try {
- 
+            JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             StepHistorySchema entity = new StepHistorySchema();
-            
+
             entity.setDeliveryDate(new Date());
             History_ history = new History_();
             history.setHistoryId(-1);
-           
+
             ArrayList<Step> listOfSteps = new ArrayList<Step>();
             Step step1 = new Step();
             step1.setEndTime(new Date());
@@ -65,20 +65,22 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             step2.setStep(1);
             step2.setClusterMember(-1);
             step2.setExitCode(-1);
-            step2.setTaskId(-1);            listOfSteps.add(step2);
+            step2.setTaskId(-1);
+            listOfSteps.add(step2);
 
             history.setSteps(listOfSteps);
             entity.setHistory(history);
-           
-      
+
             // TODO JOC Cockpit Webservice
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
- 
-     }
 
+    }
 
 }

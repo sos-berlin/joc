@@ -12,6 +12,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.job.Jobs;
 import com.sos.joc.classes.parameters.Parameters;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceP;
 import com.sos.joc.model.job.Job;
 import com.sos.joc.model.job.Job200PSchema;
@@ -25,13 +26,14 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     public JOCDefaultResponse postJobP(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
 
         LOGGER.debug("init jobs/p");
-        JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
-
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
 
         try {
+
+            JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             Job200PSchema entity = new Job200PSchema();
 
@@ -51,12 +53,11 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             jobChains.add("myJobChain3");
             job.setJobChains(jobChains);
 
-  
             job.setLocks(Jobs.getJobLocks());
 
             job.setMaxTasks(-1);
             job.setName(inventoryJob.getBaseName());
- 
+
             job.setParams(Parameters.getParameters());
             job.setPath(inventoryJob.getName());
 
@@ -68,6 +69,8 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             entity.setJob(job);
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
 

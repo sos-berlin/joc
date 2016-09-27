@@ -24,17 +24,17 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
     public JOCDefaultResponse postScheduleConfiguration(String accessToken, ScheduleConfigurationFilterSchema scheduleBody) throws Exception {
 
         LOGGER.debug("init schedule/configuration");
-        JOCDefaultResponse jocDefaultResponse = init(scheduleBody.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isConfiguration());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
         try {
+            JOCDefaultResponse jocDefaultResponse = init(scheduleBody.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isConfiguration());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             ConfigurationSchema entity = new ConfigurationSchema();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("schedule", scheduleBody.getSchedule())) {
                 boolean responseInHtml = scheduleBody.getMime() == ScheduleConfigurationFilterSchema.Mime.HTML;
-                String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']",normalizePath(scheduleBody.getSchedule())); 
+                String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", normalizePath(scheduleBody.getSchedule()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(), xPath, "schedule", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
@@ -44,7 +44,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
-    
+
     private String createScheduleConfigurationPostCommand() {
         JSCmdShowState showSchedules = new JSCmdShowState(Globals.schedulerObjectFactory);
         showSchedules.setSubsystems("folder schedule");

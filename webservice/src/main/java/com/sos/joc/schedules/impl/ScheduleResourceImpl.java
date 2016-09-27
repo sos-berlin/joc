@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.schedules.resource.ISchedulesResource;
 import com.sos.joc.model.schedule.Schedule_;
 import com.sos.joc.model.schedule.SchedulesFilterSchema;
@@ -21,17 +22,16 @@ import com.sos.joc.model.schedule.State;
 @Path("schedules")
 public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceImpl.class);
-    
+
     @Override
     public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilterSchema schedulesFilterSchema) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(schedulesFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
+        LOGGER.debug("init schedules");
         try {
-            LOGGER.debug("init schedules");
- 
+            JOCDefaultResponse jocDefaultResponse = init(schedulesFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             SchedulesVSchema entity = new SchedulesVSchema();
             entity.setDeliveryDate(new Date());
             List<Schedule_> listOfSchedules = new ArrayList<Schedule_>();
@@ -45,10 +45,13 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             schedule.setState(state);
             schedule.setSubstitutedBy("mySubstitutedBy");
             listOfSchedules.add(schedule);
-            
+
             entity.setSchedules(listOfSchedules);
-           
+
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }

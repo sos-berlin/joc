@@ -27,7 +27,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
     public Date getSurveyDate() {
         if (surveyDate == null || "".equals(surveyDate)) {
             try {
-                executeXPath("/spooler/answer");
+                executeXPath("survey_date","/spooler/answer");
                 SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT);
                 surveyDate = formatter.parse(getAttribute("time"));
             } catch (Exception e) {

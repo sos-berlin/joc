@@ -27,15 +27,14 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
     public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilterSchema jobBody) throws Exception {
 
         LOGGER.debug("init job/configuration");
-        JOCDefaultResponse jocDefaultResponse =
-                init(jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-        
         try {
+            JOCDefaultResponse jocDefaultResponse = init(jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             ConfigurationSchema entity = new ConfigurationSchema();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("job", jobBody.getJob())) {
                 boolean responseInHtml = jobBody.getMime() == JobConfigurationFilterSchema.Mime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job", "job", responseInHtml);
@@ -47,7 +46,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
-    
+
     private String createJobConfigurationPostCommand(final JobConfigurationFilterSchema body) {
         JSCmdShowJob showJob = new JSCmdShowJob(Globals.schedulerObjectFactory);
         showJob.setWhat("source");

@@ -1,5 +1,7 @@
 package com.sos.joc.classes;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Error;
 import com.sos.joc.model.jobscheduler.State;
@@ -31,11 +35,18 @@ public class JOCResourceImpl {
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
     protected List<Error> listOfErrors;
+    protected JocError jocError;
 
-    protected SOSPermissionJocCockpit getPermissons(String accessToken) {
+    protected SOSPermissionJocCockpit getPermissons(String accessToken) throws JocException {
         if (jobschedulerUser == null) {
             this.accessToken = accessToken;
             jobschedulerUser = new JobSchedulerUser(accessToken);
+        }
+        if (jobschedulerUser.getSosShiroCurrentUser() == null){
+            jocError = new JocError();
+            jocError.setCode("JOC-420");
+            jocError.setMessage("No User logged in with accessToken: " + accessToken);
+            throw new JocException(jocError);
         }
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
     }
@@ -58,6 +69,9 @@ public class JOCResourceImpl {
                 SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT2);
                 date = formatter.parse(dateString);
             } catch (Exception ee) {
+                jocError = new JocError();
+                jocError.setCode("JOC-420");
+                jocError.setMessage("Could not parse date: " + dateString);
             }
         }
 
@@ -94,8 +108,8 @@ public class JOCResourceImpl {
             return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
         }
 
-        if (schedulerId == null) {
-            return JOCDefaultResponse.responseStatusJSError("schedulerId is null");
+        if (schedulerId == null || schedulerId.isEmpty()) {
+            return JOCDefaultResponse.responseStatusJSError(String.format("undefined '%1$s'", "jobschedulerId"));
         }
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
@@ -159,6 +173,15 @@ public class JOCResourceImpl {
         catch (IllegalArgumentException e) {
             LOGGER.error("IllegalArgumentException: " + jobschedulerState,e); 
             return null;
+        }
+    }
+    
+    protected String getParent(String path){
+        Path  p = Paths.get(path).getParent();
+        if (p == null){
+            return null;
+        }else{
+            return Paths.get(path).getParent().toString().replace('\\','/');
         }
     }
     

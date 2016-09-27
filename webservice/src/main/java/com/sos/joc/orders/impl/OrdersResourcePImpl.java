@@ -13,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.Order;
 import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.OrdersPSchema;
@@ -26,18 +27,18 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
 
         LOGGER.debug("init OrdersP");
-        JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
-
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
 
         try {
+            JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             OrdersPSchema entity = new OrdersPSchema();
             entity.setDeliveryDate(new Date());
 
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection,ordersFilterSchema.getJobschedulerId());
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection, ordersFilterSchema.getJobschedulerId());
             List<DBItemInventoryOrder> listOfOrders = dbLayer.getInventoryOrders();
             List<Order> listOrder = new ArrayList<Order>();
             for (DBItemInventoryOrder inventoryOrder : listOfOrders) {
@@ -61,6 +62,9 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
 
             }
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
 

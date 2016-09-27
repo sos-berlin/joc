@@ -26,7 +26,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 
         try {
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             JSCmdJobChainModify jsCmdJobChainModify = new JSCmdJobChainModify(Globals.schedulerObjectFactory);
             jsCmdJobChainModify.setJobChainIfNotEmpty(jobChain);
             if (STOP.equals(cmd)) {

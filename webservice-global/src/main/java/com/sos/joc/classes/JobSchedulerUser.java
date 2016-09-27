@@ -17,7 +17,7 @@ public class JobSchedulerUser {
     }
 
     public SOSShiroCurrentUser getSosShiroCurrentUser() {
-        if (sosShiroCurrentUser == null) {
+        if (sosShiroCurrentUser == null && Globals.currentUsersList != null) {
             sosShiroCurrentUser = Globals.currentUsersList.getUser(accessToken);
         }
         return sosShiroCurrentUser;

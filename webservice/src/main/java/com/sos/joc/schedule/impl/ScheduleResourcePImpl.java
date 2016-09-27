@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.schedule.resource.IScheduleResourceP;
 import com.sos.joc.model.schedule.Schedule;
 import com.sos.joc.model.schedule.Schedule200PSchema;
@@ -25,13 +26,12 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
 
     @Override
     public JOCDefaultResponse postScheduleP(String accessToken, ScheduleFilterSchema scheduleFilterSchema) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(scheduleFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
+        LOGGER.debug("init schedule/p");
         try {
-            LOGGER.debug("init schedule/p");
+            JOCDefaultResponse jocDefaultResponse = init(scheduleFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             Schedule200PSchema entity = new Schedule200PSchema();
             entity.setDeliveryDate(new Date());
@@ -65,6 +65,8 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
             entity.setSchedule(schedule);
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }

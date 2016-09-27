@@ -23,16 +23,15 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
     @Override
     public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilterSchema orderFilterSchema) throws Exception {
         LOGGER.debug("init order/run_time");
-        JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-
         try {
+            JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
             Runtime200Schema runTimeAnswer = new Runtime200Schema();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (checkRequiredParameter("orderId", orderFilterSchema.getOrderId())
-                    && checkRequiredParameter("jobChain", orderFilterSchema.getJobChain())) {
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            if (checkRequiredParameter("orderId", orderFilterSchema.getOrderId()) && checkRequiredParameter("jobChain", orderFilterSchema.getJobChain())) {
                 runTimeAnswer = RunTime.set(jocXmlCommand, createOrderRunTimePostCommand(orderFilterSchema), "//order/run_time");
             }
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
@@ -42,7 +41,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
-    
+
     private String createOrderRunTimePostCommand(OrderFilterSchema orderFilterSchema) {
         JSCmdShowOrder showOrder = new JSCmdShowOrder(Globals.schedulerObjectFactory);
         showOrder.setJobChain(normalizePath(orderFilterSchema.getJobChain()));

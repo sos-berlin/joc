@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters;
 import com.sos.joc.model.jobscheduler.AgentClusterFilterSchema;
 import com.sos.joc.model.jobscheduler.AgentClusterVSchema;
@@ -89,6 +90,8 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             // TODO get a list of agents and set the data.
 
             return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
 
         } catch (Exception e) {
 

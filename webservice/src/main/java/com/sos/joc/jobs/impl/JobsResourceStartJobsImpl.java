@@ -12,6 +12,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceStartJob;
 import com.sos.joc.model.common.NameValuePairsSchema;
 import com.sos.joc.model.job.StartJobSchema;
@@ -37,7 +38,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     private JOCDefaultResponse executeStartJobCommand(StartJobSchema startJobSchema) {
 
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
             JSCmdStartJob jsCmdStartJob = new JSCmdStartJob(Globals.schedulerObjectFactory);
             jsCmdStartJob.setJobIfNotEmpty(startJobSchema.getJob());
@@ -74,9 +75,11 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             if (listOfErrors != null) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
 
         } catch (Exception e) {
-            return jocDefaultResponse;
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
 
         return jocDefaultResponse;

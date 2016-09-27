@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerFilterSchema;
 import com.sos.joc.model.jobscheduler.ClusterMemberTypeSchema;
 import com.sos.joc.model.jobscheduler.Jobscheduler;
@@ -37,7 +38,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
 
         LOGGER.debug("init jobscheduler/p");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -45,8 +46,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             DBItemInventoryInstance schedulerSupervisorInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(dbItemInventoryInstance
                     .getSchedulerId()));
             if (schedulerSupervisorInstancesDBItem == null) {
-                return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES",
-                        dbItemInventoryInstance.getSupervisorId()));
+                return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES", dbItemInventoryInstance.getSupervisorId()));
             }
 
             Jobscheduler200PSchema entity = new Jobscheduler200PSchema();
@@ -88,6 +88,8 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             entity.setJobscheduler(jobscheduler);
             return JOCDefaultResponse.responseStatus200(entity);
 
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
