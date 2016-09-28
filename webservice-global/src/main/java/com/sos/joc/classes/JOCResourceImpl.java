@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;

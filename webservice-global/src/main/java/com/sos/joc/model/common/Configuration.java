@@ -211,7 +211,6 @@ public class Configuration {
         PROCESSCLASS("PROCESSCLASS"),
         LOCK("LOCK"),
         SCHEDULE("SCHEDULE"),
-        PARAMS("PARAMS"),
         OTHER("OTHER");
         private final String value;
         private final static Map<String, Configuration.Type> CONSTANTS = new HashMap<String, Configuration.Type>();

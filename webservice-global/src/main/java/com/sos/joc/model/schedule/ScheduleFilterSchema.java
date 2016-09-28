@@ -30,13 +30,6 @@ public class ScheduleFilterSchema {
      * 
      */
     private String schedule;
-    /**
-     * compact parameter
-     * <p>
-     * controls if the object view is compact or detailed
-     * 
-     */
-    private Boolean compact = false;
 
     /**
      * 
@@ -86,30 +79,6 @@ public class ScheduleFilterSchema {
         this.schedule = schedule;
     }
 
-    /**
-     * compact parameter
-     * <p>
-     * controls if the object view is compact or detailed
-     * 
-     * @return
-     *     The compact
-     */
-    public Boolean getCompact() {
-        return compact;
-    }
-
-    /**
-     * compact parameter
-     * <p>
-     * controls if the object view is compact or detailed
-     * 
-     * @param compact
-     *     The compact
-     */
-    public void setCompact(Boolean compact) {
-        this.compact = compact;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -117,7 +86,7 @@ public class ScheduleFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(schedule).append(compact).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(schedule).toHashCode();
     }
 
     @Override
@@ -129,7 +98,7 @@ public class ScheduleFilterSchema {
             return false;
         }
         ScheduleFilterSchema rhs = ((ScheduleFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(schedule, rhs.schedule).append(compact, rhs.compact).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(schedule, rhs.schedule).isEquals();
     }
 
 }

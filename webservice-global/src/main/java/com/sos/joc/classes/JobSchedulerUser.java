@@ -1,6 +1,5 @@
 package com.sos.joc.classes;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;

@@ -2,11 +2,11 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSupervisor;
 import com.sos.joc.model.common.JobSchedulerFilterSchema;

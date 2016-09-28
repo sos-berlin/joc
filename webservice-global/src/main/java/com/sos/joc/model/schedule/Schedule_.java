@@ -1,6 +1,7 @@
 
 package com.sos.joc.model.schedule;
 
+import java.util.Date;
 import javax.annotation.Generated;
 import com.sos.joc.model.common.ConfigurationStatusSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -17,6 +18,14 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 public class Schedule_ {
 
+    /**
+     * survey date of the JobScheduler Master/Agent
+     * <p>
+     * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
+     * 
+     */
+    private Date surveyDate;
     /**
      * path
      * <p>
@@ -51,6 +60,32 @@ public class Schedule_ {
      * 
      */
     private ConfigurationStatusSchema configurationStatus;
+
+    /**
+     * survey date of the JobScheduler Master/Agent
+     * <p>
+     * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
+     * 
+     * @return
+     *     The surveyDate
+     */
+    public Date getSurveyDate() {
+        return surveyDate;
+    }
+
+    /**
+     * survey date of the JobScheduler Master/Agent
+     * <p>
+     * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
+     * 
+     * @param surveyDate
+     *     The surveyDate
+     */
+    public void setSurveyDate(Date surveyDate) {
+        this.surveyDate = surveyDate;
+    }
 
     /**
      * path
@@ -177,7 +212,7 @@ public class Schedule_ {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(name).append(state).append(substitutedBy).append(configurationStatus).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(state).append(substitutedBy).append(configurationStatus).toHashCode();
     }
 
     @Override
@@ -189,7 +224,7 @@ public class Schedule_ {
             return false;
         }
         Schedule_ rhs = ((Schedule_) other);
-        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(state, rhs.state).append(substitutedBy, rhs.substitutedBy).append(configurationStatus, rhs.configurationStatus).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(state, rhs.state).append(substitutedBy, rhs.substitutedBy).append(configurationStatus, rhs.configurationStatus).isEquals();
     }
 
 }

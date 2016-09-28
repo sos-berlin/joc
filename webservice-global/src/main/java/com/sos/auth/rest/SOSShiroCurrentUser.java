@@ -4,9 +4,9 @@ import java.util.HashMap;
 
 import org.apache.shiro.subject.Subject;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.classes.JobSchedulerIdentifier;
 
 public class SOSShiroCurrentUser {
 

@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.common;
+package com.sos.joc.model.tree;
 
 import java.util.ArrayList;
 import java.util.List;

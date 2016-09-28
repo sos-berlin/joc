@@ -28,7 +28,7 @@ public class Order200PSchema {
     /**
      * order (permanent part)
      * <p>
-     * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded
+     * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded, title is optional
      * (Required)
      * 
      */
@@ -63,7 +63,7 @@ public class Order200PSchema {
     /**
      * order (permanent part)
      * <p>
-     * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded
+     * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded, title is optional
      * (Required)
      * 
      * @return
@@ -76,7 +76,7 @@ public class Order200PSchema {
     /**
      * order (permanent part)
      * <p>
-     * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded
+     * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded, title is optional
      * (Required)
      * 
      * @param order

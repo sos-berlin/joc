@@ -17,6 +17,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
+import com.sos.joc.classes.schedule.Schedule;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.schedules.resource.ISchedulesResource;
@@ -33,11 +34,7 @@ import com.sos.joc.model.schedule.State_;
 @Path("schedules")
 public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesResource {
     private static final String ATTRIBUTE_ACTIVE = "active";
-    private static final String ATTRIBUTE_NOW_COVERED_BY_SCHEDULE = "now_covered_by_schedule";
-    private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_PATH = "path";
-    private static final String SLASH = "/";
-    private static final String DEFAULT_NAME = "(default)";
     private static final String WHAT = "folders";
     private static final String SUBSYSTEMS = "folder schedule";
     private static final String XPATH_SCHEDULES = "//schedule";
@@ -84,37 +81,20 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             for (int i = 0; i < count; i++) {
                 Element scheduleElement = jocXmlCommand.getElementFromList(i);
 
-                String path = jocXmlCommand.getAttributeWithDefault(ATTRIBUTE_PATH, SLASH + DEFAULT_NAME);
-                String activeValue = jocXmlCommand.getAttributeWithDefault(ATTRIBUTE_ACTIVE, SLASH + DEFAULT_NAME);
+                String path = jocXmlCommand.getAttribute(ATTRIBUTE_PATH);
+                String activeValue = jocXmlCommand.getAttribute(ATTRIBUTE_ACTIVE);
                 Text stateText;
                 if ("yes".equals(activeValue)){
                     stateText = State.Text.ACTIVE;
                 }else{
                     stateText = State.Text.INACTIVE;
                 }
-
                 boolean addSchedule = (!schedulesFilterSchema.getSchedules().isEmpty() && isInScheduleMap(path)) || (schedulesFilterSchema.getSchedules()
                         .isEmpty() && (matchesRegex(pattern, path) && isInFolderList(path) && isInActiveList(stateText)));
 
                 if (addSchedule) {
-
-                    Schedule_ schedule = new Schedule_();
-                 //   schedule.set(jocXmlCommand.getSurveyDate());
-                    schedule.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(scheduleElement));
-                    schedule.setName(jocXmlCommand.getAttribute(ATTRIBUTE_NAME));
-                    schedule.setPath(path);
-                    State state = new State();
-                    if ("yes".equals(activeValue)){
-                        state.setSeverity(0);
-                        state.setText(State.Text.ACTIVE);
-                    }else{
-                        state.setSeverity(1);
-                        state.setText(State.Text.INACTIVE);
-                    }
-                    
-                    schedule.setState(state);
-                    schedule.setSubstitutedBy(jocXmlCommand.getAttribute(ATTRIBUTE_NOW_COVERED_BY_SCHEDULE));
-                    listOfSchedules.add(schedule);
+                    Schedule schedule = new Schedule(jocXmlCommand,scheduleElement);
+                    listOfSchedules.add(schedule.getSchedule());
                 }
             }
             entity.setSchedules(listOfSchedules);
@@ -166,11 +146,11 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
     }
 
     private boolean isInActiveList(Text stateText)  {
-        if (schedulesFilterSchema.getState().size() == 0) {
+        if (schedulesFilterSchema.getStates().size() == 0) {
             return true;
         }
 
-        for (State_ stateEntry : schedulesFilterSchema.getState()) {
+        for (State_ stateEntry : schedulesFilterSchema.getStates()) {
             stateEntry.toString();
             if (stateEntry.toString().equals(stateText.toString())) {
                 return true;

@@ -23,6 +23,7 @@ public class Schedule {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
      * 
      */
     private Date surveyDate;
@@ -30,9 +31,15 @@ public class Schedule {
      * path
      * <p>
      * absolute path based on live folder of a JobScheduler object.
+     * (Required)
      * 
      */
     private String path;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     private String name;
     private String title;
     /**
@@ -40,7 +47,17 @@ public class Schedule {
      * 
      */
     private Substitute substitute;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     private List<UsedByOrder> usedByOrders = new ArrayList<UsedByOrder>();
+    /**
+     * 
+     * (Required)
+     * 
+     */
     private List<UsedByJob> usedByJobs = new ArrayList<UsedByJob>();
     /**
      * timestamp
@@ -54,6 +71,7 @@ public class Schedule {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
      * 
      * @return
      *     The surveyDate
@@ -66,6 +84,7 @@ public class Schedule {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
      * 
      * @param surveyDate
      *     The surveyDate
@@ -78,6 +97,7 @@ public class Schedule {
      * path
      * <p>
      * absolute path based on live folder of a JobScheduler object.
+     * (Required)
      * 
      * @return
      *     The path
@@ -90,6 +110,7 @@ public class Schedule {
      * path
      * <p>
      * absolute path based on live folder of a JobScheduler object.
+     * (Required)
      * 
      * @param path
      *     The path
@@ -100,6 +121,8 @@ public class Schedule {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The name
      */
@@ -108,6 +131,8 @@ public class Schedule {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param name
      *     The name
@@ -156,6 +181,8 @@ public class Schedule {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The usedByOrders
      */
@@ -164,6 +191,8 @@ public class Schedule {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param usedByOrders
      *     The usedByOrders
@@ -174,6 +203,8 @@ public class Schedule {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The usedByJobs
      */
@@ -182,6 +213,8 @@ public class Schedule {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param usedByJobs
      *     The usedByJobs

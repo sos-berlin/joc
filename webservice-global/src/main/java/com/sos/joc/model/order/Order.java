@@ -13,7 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * order (permanent part)
  * <p>
- * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded
+ * compact=true then ONLY surveyDate, path, id, jobChain and _type are responded, title is optional
  * 
  */
 @Generated("org.jsonschema2pojo")
@@ -76,6 +76,7 @@ public class Order {
      * non negative integer
      * <p>
      * 
+     * (Required)
      * 
      */
     private Integer estimatedDuration;
@@ -293,6 +294,7 @@ public class Order {
      * non negative integer
      * <p>
      * 
+     * (Required)
      * 
      * @return
      *     The estimatedDuration
@@ -305,6 +307,7 @@ public class Order {
      * non negative integer
      * <p>
      * 
+     * (Required)
      * 
      * @param estimatedDuration
      *     The estimatedDuration

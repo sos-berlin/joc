@@ -5,12 +5,12 @@ import static org.junit.Assert.*;
  
 import org.junit.Test;
 
-import com.sos.auth.classes.JobSchedulerIdentifier;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 
 public class InventoryDBLayerTest {

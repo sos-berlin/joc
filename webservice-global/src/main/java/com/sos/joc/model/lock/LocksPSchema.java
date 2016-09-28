@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Generated;
-import com.sos.joc.model.common.TreeSchema;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -34,12 +33,6 @@ public class LocksPSchema {
      * 
      */
     private List<LockPSchema> locks = new ArrayList<LockPSchema>();
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    private List<TreeSchema> folders = new ArrayList<TreeSchema>();
 
     /**
      * delivery date
@@ -89,28 +82,6 @@ public class LocksPSchema {
         this.locks = locks;
     }
 
-    /**
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The folders
-     */
-    public List<TreeSchema> getFolders() {
-        return folders;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param folders
-     *     The folders
-     */
-    public void setFolders(List<TreeSchema> folders) {
-        this.folders = folders;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -118,7 +89,7 @@ public class LocksPSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(locks).append(folders).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(locks).toHashCode();
     }
 
     @Override
@@ -130,7 +101,7 @@ public class LocksPSchema {
             return false;
         }
         LocksPSchema rhs = ((LocksPSchema) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(locks, rhs.locks).append(folders, rhs.folders).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(locks, rhs.locks).isEquals();
     }
 
 }

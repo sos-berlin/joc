@@ -1,4 +1,4 @@
-package com.sos.auth.classes;
+package com.sos.joc.classes;
 
 public class JobSchedulerIdentifier {
     String schedulerId;

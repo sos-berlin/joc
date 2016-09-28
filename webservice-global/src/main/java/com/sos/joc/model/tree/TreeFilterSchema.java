@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.schedule;
+package com.sos.joc.model.tree;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +11,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * schedulesFilter
+ * treeFilter
  * <p>
  * 
  * 
  */
 @Generated("org.jsonschema2pojo")
-public class SchedulesFilterSchema {
+public class TreeFilterSchema {
 
     /**
      * 
@@ -25,7 +25,20 @@ public class SchedulesFilterSchema {
      * 
      */
     private String jobschedulerId;
-    private List<Schedule__> schedules = new ArrayList<Schedule__>();
+    /**
+     * JobScheduler object types
+     * <p>
+     * 
+     * 
+     */
+    private List<com.sos.joc.model.common.Configuration.Type> types = new ArrayList<com.sos.joc.model.common.Configuration.Type>();
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     */
+    private Boolean compact = false;
     /**
      * filter with regex
      * <p>
@@ -40,7 +53,6 @@ public class SchedulesFilterSchema {
      * 
      */
     private List<FoldersSchema> folders = new ArrayList<FoldersSchema>();
-    private List<State_> states = new ArrayList<State_>();
 
     /**
      * 
@@ -65,21 +77,51 @@ public class SchedulesFilterSchema {
     }
 
     /**
+     * JobScheduler object types
+     * <p>
+     * 
      * 
      * @return
-     *     The schedules
+     *     The types
      */
-    public List<Schedule__> getSchedules() {
-        return schedules;
+    public List<com.sos.joc.model.common.Configuration.Type> getTypes() {
+        return types;
     }
 
     /**
+     * JobScheduler object types
+     * <p>
      * 
-     * @param schedules
-     *     The schedules
+     * 
+     * @param types
+     *     The types
      */
-    public void setSchedules(List<Schedule__> schedules) {
-        this.schedules = schedules;
+    public void setTypes(List<com.sos.joc.model.common.Configuration.Type> types) {
+        this.types = types;
+    }
+
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     * @return
+     *     The compact
+     */
+    public Boolean getCompact() {
+        return compact;
+    }
+
+    /**
+     * compact parameter
+     * <p>
+     * controls if the object view is compact or detailed
+     * 
+     * @param compact
+     *     The compact
+     */
+    public void setCompact(Boolean compact) {
+        this.compact = compact;
     }
 
     /**
@@ -130,24 +172,6 @@ public class SchedulesFilterSchema {
         this.folders = folders;
     }
 
-    /**
-     * 
-     * @return
-     *     The states
-     */
-    public List<State_> getStates() {
-        return states;
-    }
-
-    /**
-     * 
-     * @param states
-     *     The states
-     */
-    public void setStates(List<State_> states) {
-        this.states = states;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -155,7 +179,7 @@ public class SchedulesFilterSchema {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(schedules).append(regex).append(folders).append(states).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(types).append(compact).append(regex).append(folders).toHashCode();
     }
 
     @Override
@@ -163,11 +187,11 @@ public class SchedulesFilterSchema {
         if (other == this) {
             return true;
         }
-        if ((other instanceof SchedulesFilterSchema) == false) {
+        if ((other instanceof TreeFilterSchema) == false) {
             return false;
         }
-        SchedulesFilterSchema rhs = ((SchedulesFilterSchema) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(schedules, rhs.schedules).append(regex, rhs.regex).append(folders, rhs.folders).append(states, rhs.states).isEquals();
+        TreeFilterSchema rhs = ((TreeFilterSchema) other);
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(types, rhs.types).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).isEquals();
     }
 
 }

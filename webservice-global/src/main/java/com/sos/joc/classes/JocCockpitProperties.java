@@ -1,4 +1,4 @@
-package com.sos.auth.classes;
+package com.sos.joc.classes;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,13 +9,13 @@ import org.apache.log4j.Logger;
 
 import sos.scheduler.misc.ParameterSubstitutor;
 
-public class SOSShiroProperties {
-    private static final Logger LOGGER = Logger.getLogger(SOSShiroProperties.class);
+public class JocCockpitProperties {
+    private static final Logger LOGGER = Logger.getLogger(JocCockpitProperties.class);
     private Properties properties;
     private String propertiesFile;
     private ParameterSubstitutor parameterSubstitutor = new ParameterSubstitutor();
 
-    public SOSShiroProperties() {
+    public JocCockpitProperties() {
         super();
         propertiesFile = "/joc.properties";
         properties = new Properties();
