@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
@@ -130,22 +129,17 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
         }
     }
 
-    private boolean matchesRegex(Pattern p, String path) {
-        if (p != null) {
-            Matcher m = p.matcher(path);
-            return m.matches();
-        } else {
-            return true;
-        }
-    }
-
+ 
     private boolean isInProceccClassMap(String path) {
         return (processClassFilterSchema.getProcessClasses().isEmpty() || mapOfProcessClasses.get(path) != null);
     }
 
-    private void createProcessClassesMap() {
+    private void createProcessClassesMap() throws JocMissingRequiredParameterException {
         mapOfProcessClasses = new HashMap<String, String>();
         for (ProcessClass processClass : processClassFilterSchema.getProcessClasses()) {
+            String processClassName = processClass.getProcessClass();
+            checkRequiredParameter("processClasses.processClass", processClassName);
+            
             mapOfProcessClasses.put(processClass.getProcessClass(), processClass.getProcessClass());
         }
 

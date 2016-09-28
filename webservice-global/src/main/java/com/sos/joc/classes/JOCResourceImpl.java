@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -182,6 +184,15 @@ public class JOCResourceImpl {
             return null;
         }else{
             return Paths.get(path).getParent().toString().replace('\\','/');
+        }
+    }
+    
+    protected boolean matchesRegex(Pattern p, String path) {
+        if (p != null) {
+            Matcher m = p.matcher(path);
+            return m.matches();
+        } else {
+            return true;
         }
     }
     
