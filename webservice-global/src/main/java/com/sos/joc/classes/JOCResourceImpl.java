@@ -143,6 +143,14 @@ public class JOCResourceImpl {
         return true;
     }
 
+    public boolean checkRequiredParameter(String paramKey, Long paramVal) throws JocMissingRequiredParameterException {
+        return checkRequiredParameter(paramKey,String.valueOf(paramVal));
+    }
+    
+    public boolean checkRequiredParameter(String paramKey, Integer paramVal) throws JocMissingRequiredParameterException {
+        return checkRequiredParameter(paramKey,String.valueOf(paramVal));
+    }
+    
     public List<Error> addError(List<Error> listOfErrors, JOCXmlCommand jocXmlCommand, String path) {
         if (listOfErrors == null) {
             listOfErrors = new ArrayList<Error>();

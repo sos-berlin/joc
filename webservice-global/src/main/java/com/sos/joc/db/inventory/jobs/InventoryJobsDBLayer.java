@@ -1,8 +1,10 @@
 package com.sos.joc.db.inventory.jobs;
 
 import java.util.List;
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -10,7 +12,7 @@ import com.sos.jitl.reporting.db.DBLayer;
 /** @author Uwe Risse */
 public class InventoryJobsDBLayer extends DBLayer {
 
-    private static final Logger LOGGER = Logger.getLogger(InventoryJobsDBLayer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryJobsDBLayer.class);
     private String jobSchedulerId;
 
     public InventoryJobsDBLayer(SOSHibernateConnection conn, String jobSchedulerId) {
@@ -25,7 +27,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append(DBITEM_INVENTORY_JOBS + " as job, " + DBITEM_INVENTORY_INSTANCES + " as instance");
             sql.append(" where job.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "' and");
             sql.append(" (name)  = :name");
-            LOGGER.debug(sql);
+            LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("name", name);
 

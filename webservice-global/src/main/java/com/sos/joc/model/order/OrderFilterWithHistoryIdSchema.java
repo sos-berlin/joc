@@ -45,7 +45,7 @@ public class OrderFilterWithHistoryIdSchema {
      * (Required)
      * 
      */
-    private Integer historyId;
+    private Long historyId;
     private OrderFilterWithHistoryIdSchema.Mime mime = OrderFilterWithHistoryIdSchema.Mime.fromValue("PLAIN");
 
     /**
@@ -127,7 +127,7 @@ public class OrderFilterWithHistoryIdSchema {
      * @return
      *     The historyId
      */
-    public Integer getHistoryId() {
+    public Long getHistoryId() {
         return historyId;
     }
 
@@ -140,7 +140,7 @@ public class OrderFilterWithHistoryIdSchema {
      * @param historyId
      *     The historyId
      */
-    public void setHistoryId(Integer historyId) {
+    public void setHistoryId(Long historyId) {
         this.historyId = historyId;
     }
 
