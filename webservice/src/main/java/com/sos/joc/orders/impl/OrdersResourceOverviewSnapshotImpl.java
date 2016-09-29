@@ -39,8 +39,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             }
 
             // TODO consider OrdersFilterSchema
-            // TODO URL "http://localhost:40410" has to read from database
-            String masterUrl = "http://localhost:40410";
+            String masterUrl = dbItemInventoryInstance.getUrl();
             JOCJsonCommand command = new JOCJsonCommand(masterUrl);
             command.getUriBuilder().path("/");
             command.addOrderStatisticsQuery();

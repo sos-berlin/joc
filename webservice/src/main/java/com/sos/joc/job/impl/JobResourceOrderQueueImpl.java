@@ -29,12 +29,9 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
                 return jocDefaultResponse;
             }
 
-            // TODO URL "http://localhost:40410" has to read from database
-            String masterJsonUrl = "http://localhost:40410";
-
             Job200VSchema entity = new Job200VSchema();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getCommandUrl());
-            jocXmlCommand.setUriForJsonCommand(masterJsonUrl, jobFilterSchema.getCompact());
+            jocXmlCommand.setUriForJsonCommand(dbItemInventoryInstance.getUrl(), jobFilterSchema.getCompact());
             if (checkRequiredParameter("job", jobFilterSchema.getJob())) {
                 entity.setDeliveryDate(new Date());
                 entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobFilterSchema.getJob(), jobFilterSchema.getCompact()));

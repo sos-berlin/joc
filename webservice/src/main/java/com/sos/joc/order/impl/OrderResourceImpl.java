@@ -29,8 +29,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
                 return jocDefaultResponse;
             }
 
-            // TODO URL "http://localhost:40410" has to read from database
-            String masterUrl = "http://localhost:40410";
+            String masterUrl = dbItemInventoryInstance.getUrl();
             JOCJsonCommand command = new JOCJsonCommand(masterUrl);
             command.addCompactQuery(orderBody.getCompact());
             Order200VSchema entity = new Order200VSchema();
