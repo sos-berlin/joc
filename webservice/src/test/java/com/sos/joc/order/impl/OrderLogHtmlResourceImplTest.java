@@ -18,7 +18,7 @@ public class OrderLogHtmlResourceImplTest {
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
          
         OrderLogHtmlResourceImpl orderLogHtmlImpl = new OrderLogHtmlResourceImpl();
-        JOCDefaultResponse ordersResponse = orderLogHtmlImpl.getOrderLogHtml(sosShiroCurrentUserAnswer.getAccessToken(), "scheduler_current");
+        JOCDefaultResponse ordersResponse = orderLogHtmlImpl.getOrderLogHtml(sosShiroCurrentUserAnswer.getAccessToken(), "scheduler_current","orderId", "jobChain","0");
         String logContentSchema = (String) ordersResponse.getEntity();
         assertEquals("postOrderLogHtmlTest","<html><body>myLog</body></html>", logContentSchema);
      }

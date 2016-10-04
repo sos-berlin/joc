@@ -6,10 +6,13 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.classes.JobSchedulerUser;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerFilterSchema;
 import com.sos.joc.model.jobscheduler.ClusterMemberTypeSchema;
@@ -39,13 +42,18 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
 
         LOGGER.debug("init jobscheduler/p");
         try {
+            Globals.beginTransaction();
+
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            DBItemInventoryInstance schedulerSupervisorInstancesDBItem = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(dbItemInventoryInstance
-                    .getSchedulerId()));
+            
+            Long supervisorId = dbItemInventoryInstance.getSupervisorId();
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+            DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstancesByKey(supervisorId);
+            
             if (schedulerSupervisorInstancesDBItem == null) {
                 return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES", dbItemInventoryInstance.getSupervisorId()));
             }
@@ -93,6 +101,9 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+        }finally{
+            Globals.rollback();
+
         }
     }
 

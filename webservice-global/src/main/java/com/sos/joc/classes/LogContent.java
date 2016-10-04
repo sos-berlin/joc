@@ -1,13 +1,10 @@
 package com.sos.joc.classes;
 
-import java.util.Date;
 import java.util.Scanner;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
-import com.sos.joc.model.common.LogContent200Schema;
-import com.sos.joc.model.common.LogContentSchema;
 import com.sos.joc.model.order.OrderFilterWithHistoryIdSchema;
 
 public class LogContent {
@@ -75,16 +72,31 @@ public class LogContent {
         return line;
     }
 
-    public String htmlContent(String log) {
 
+    private String colouredLog(String log){
         Scanner scanner = new Scanner(log);
         StringBuilder s = new StringBuilder();
-        s.append(HTML_BEGIN);
         while (scanner.hasNextLine()) {
             s.append(addStyle(scanner.nextLine()));
         }
         scanner.close();
 
+        return s.toString();
+    
+    }
+    
+    
+    public String htmlWithColouredLogContent(String log){
+        StringBuilder s = new StringBuilder();
+        s.append(colouredLog(log));
+        return s.toString();
+    }
+    
+    public String htmlPageWithColouredLogContent(String log) {
+        StringBuilder s = new StringBuilder();
+
+        s.append(HTML_BEGIN);
+        s.append(colouredLog(log));
         s.append(HTML_END);
 
         return s.toString();
@@ -92,11 +104,13 @@ public class LogContent {
     
     public String getOrderLog() throws Exception{
         SOSHibernateConnection sosHibernateConnection = Globals.getConnection(orderFilterWithHistoryIdSchema.getJobschedulerId());
+        sosHibernateConnection.beginTransaction();
         JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateConnection);
         String log = jobSchedulerOrderHistoryDBLayer.getLogAsString(orderFilterWithHistoryIdSchema.getHistoryId());
         if (log==null){
             log = getOrderLogFromXmlCommand();
         }
+        sosHibernateConnection.rollback();
         return log;
     }
     

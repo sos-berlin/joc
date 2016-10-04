@@ -30,6 +30,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
 
         try {
 
+            Globals.beginTransaction();
             JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
 
             if (jocDefaultResponse != null) {
@@ -89,6 +90,9 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
 
+        }
+        finally{
+            Globals.rollback();
         }
     }
 

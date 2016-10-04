@@ -19,6 +19,7 @@ public class JobSchedulerResourceSupervisorPImpl  implements IJobSchedulerResour
     public JOCDefaultResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) throws Exception {
         JobSchedulerResourceP jobSchedulerPResource = new JobSchedulerResourceP(accessToken, jobSchedulerFilterSchema);
 
+        Globals.beginTransaction();
         DBItemInventoryInstance dbItemInventoryInstance = jobSchedulerPResource.getJobschedulerUser().getSchedulerInstance(new JobSchedulerIdentifier(jobSchedulerFilterSchema.getJobschedulerId()));  
         if (dbItemInventoryInstance == null) {
             return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s",jobSchedulerFilterSchema. getJobschedulerId(),DBLayer.TABLE_INVENTORY_INSTANCES));
@@ -33,6 +34,7 @@ public class JobSchedulerResourceSupervisorPImpl  implements IJobSchedulerResour
      
         jobSchedulerFilterSchema.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
         jobSchedulerPResource.setJobSchedulerFilterSchema(jobSchedulerFilterSchema);
+        Globals.rollback();
         return jobSchedulerPResource.postJobschedulerP();
 
 

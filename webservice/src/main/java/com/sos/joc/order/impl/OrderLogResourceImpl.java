@@ -24,7 +24,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
 
     @Override
     public JOCDefaultResponse postOrderLog(String accessToken, OrderFilterWithHistoryIdSchema orderFilterWithHistoryIdSchema) throws Exception {
-        LOGGER.debug("init OrderHistory");
+        LOGGER.debug("init order/log");
 
         try {
             checkRequiredParameter("jobschedulerId", orderFilterWithHistoryIdSchema.getJobschedulerId());
@@ -32,7 +32,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             checkRequiredParameter("orderId", orderFilterWithHistoryIdSchema.getOrderId());
             checkRequiredParameter("historyId", orderFilterWithHistoryIdSchema.getHistoryId());
 
-            JOCDefaultResponse jocDefaultResponse = init(orderFilterWithHistoryIdSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(orderFilterWithHistoryIdSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isOrderLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -45,7 +45,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             String log = logContent.getOrderLog();
              
             if (orderFilterWithHistoryIdSchema.getMime() != null && orderFilterWithHistoryIdSchema.getMime().toString().equals(Mime.HTML.toString())) {
-                logContentSchema.setHtml(logContent.htmlContent(log));
+                logContentSchema.setHtml(logContent.htmlWithColouredLogContent(log));
             } else {
                 if (orderFilterWithHistoryIdSchema.getMime() == null || orderFilterWithHistoryIdSchema.getMime().toString().equals(Mime.PLAIN.toString())) {
                     logContentSchema.setPlain(log);

@@ -53,5 +53,27 @@ public class Globals {
         return confFile;
 
     }
+    
+    public static void beginTransaction(){
+        try {
+            sosHibernateConnection.beginTransaction();
+        } catch (Exception e) {
+        }
+    }
+
+    public static void rollback(){
+        try {
+            sosHibernateConnection.rollback();
+        } catch (Exception e) {
+        }
+    }
+    
+    public static void commit(){
+        try {
+            sosHibernateConnection.commit();
+        } catch (Exception e) {
+        }
+    }
+
 
 }

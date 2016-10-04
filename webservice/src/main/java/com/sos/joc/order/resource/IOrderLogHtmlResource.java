@@ -14,11 +14,8 @@ public interface IOrderLogHtmlResource {
 
     @GET
     @Path("log/html")
-    @Produces({ MediaType.TEXT_HTML})
-    public JOCDefaultResponse getOrderLogHtml(@HeaderParam("access_token") String accessToken, @QueryParam("jobschedulerId")  String jobschedulerId) throws Exception;
+    @Produces({ MediaType.TEXT_HTML })
+    public JOCDefaultResponse getOrderLogHtml(@HeaderParam("access_token") String accessToken, @QueryParam("jobschedulerId") String jobschedulerId,
+            @QueryParam("orderId") String orderId, @QueryParam("jobChain") String jobChain, @QueryParam("historyId") String historyId) throws Exception;
 
 }
-
- 
-
-

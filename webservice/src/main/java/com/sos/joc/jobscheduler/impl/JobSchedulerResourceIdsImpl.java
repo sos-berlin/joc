@@ -26,6 +26,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {
         LOGGER.debug("init jobscheduler/ids");
         try {
+            Globals.beginTransaction();
             JOCDefaultResponse jocDefaultResponse = init("", getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -60,6 +61,9 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+        }
+        finally{
+            Globals.rollback();
         }
 
     }
