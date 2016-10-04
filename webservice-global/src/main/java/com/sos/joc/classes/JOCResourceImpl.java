@@ -45,7 +45,7 @@ public class JOCResourceImpl {
         }
         if (jobschedulerUser.getSosShiroCurrentUser() == null){
             jocError = new JocError();
-            jocError.setCode("JOC-420");
+            jocError.setCode(WebserviceConstants.NO_USER_WITH_ACCESS_TOKEN);
             jocError.setMessage("No User logged in with accessToken: " + accessToken);
             throw new JocException(jocError);
         }

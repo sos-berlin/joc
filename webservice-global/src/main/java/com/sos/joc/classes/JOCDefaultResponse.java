@@ -71,17 +71,28 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static JOCDefaultResponse responseStatusJSError(JocException e) {
-        Error420Schema entity = new Error420Schema();
-        entity.setDeliveryDate(new Date());
-         
-        ErrorSchema errorSchema = new ErrorSchema();
-        errorSchema.setCode(e.getError().getCode());
         String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getError().getMessage();
         LOGGER.error(errorMsg, e);
-        errorSchema.setMessage(errorMsg);
-        entity.setError(errorSchema);
+        
+        if (WebserviceConstants.NO_USER_WITH_ACCESS_TOKEN.equals(e.getError().getCode())){
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
+            sosShiroCurrentUserAnswer.setHasRole(false); 
+            sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+            sosShiroCurrentUserAnswer.setIsPermitted(false);
+            sosShiroCurrentUserAnswer.setMessage(errorMsg);
+            return responseStatus440(sosShiroCurrentUserAnswer);
+        }else{
+            
+            Error420Schema entity = new Error420Schema();
+            entity.setDeliveryDate(new Date());
+             
+            ErrorSchema errorSchema = new ErrorSchema();
+            errorSchema.setCode(e.getError().getCode());
+            errorSchema.setMessage(errorMsg);
+            entity.setError(errorSchema);
+            return responseStatus420(entity);
+        }
 
-        return responseStatus420(entity);
     }
     
     public static JOCDefaultResponse responseStatusJSError(JocError e) {
