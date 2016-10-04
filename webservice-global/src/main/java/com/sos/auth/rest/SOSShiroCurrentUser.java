@@ -14,6 +14,8 @@ public class SOSShiroCurrentUser {
     private String username;
     private String password;
     private String accessToken;
+    private String authorization;
+
     private SOSPermissionJocCockpit sosPermissionJocCockpit;
     private HashMap<String, DBItemInventoryInstance> listOfSchedulerInstances;
 
@@ -87,16 +89,24 @@ public class SOSShiroCurrentUser {
     public void addSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier, DBItemInventoryInstance schedulerInstancesDBItem) {
         listOfSchedulerInstances.put(jobSchedulerIdentifier.getId(), schedulerInstancesDBItem);
     }
- 
-    public DBItemInventoryInstance getSchedulerInstanceByKey(Long id){
+
+    public DBItemInventoryInstance getSchedulerInstanceByKey(Long id) {
         for (HashMap.Entry<String, DBItemInventoryInstance> entry : listOfSchedulerInstances.entrySet()) {
             DBItemInventoryInstance instance = entry.getValue();
-            if (instance.getId() == id){
+            if (instance.getId() == id) {
                 return instance;
             }
-        } 
+        }
         return null;
-        
+
+    }
+
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(String authorization) {
+        this.authorization = authorization;
     }
 
 }
