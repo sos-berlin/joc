@@ -1,7 +1,6 @@
 package com.sos.joc.classes.jobs;
 
 import java.math.BigInteger;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -27,24 +25,9 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 public class JOCXmlJobCommand extends JOCXmlCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlJobCommand.class);
-    private URI uriForJsonCommand = null;
     
     public JOCXmlJobCommand(String url) {
         super(url);
-    }
-    
-    public URI getUriForJsonCommand() {
-        return uriForJsonCommand;
-    }
-
-    public void setUriForJsonCommand(URI uriForJsonCommand) {
-        this.uriForJsonCommand = uriForJsonCommand;
-    }
-    
-    public void setUriForJsonCommand(String jsonUrl, boolean compact) {
-        JOCJsonCommand command = new JOCJsonCommand(jsonUrl);
-        command.addCompactQuery(compact);
-        this.uriForJsonCommand = command.getURI();
     }
     
     public Job_ getJob(String job, Boolean compact) throws Exception {

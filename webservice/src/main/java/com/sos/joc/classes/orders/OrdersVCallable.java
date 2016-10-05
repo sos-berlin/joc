@@ -1,6 +1,5 @@
 package com.sos.joc.classes.orders;
 
-import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,19 +12,18 @@ import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jitl.restclient.JobSchedulerRestApiClient;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.filters.FilterAfterResponse;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.FoldersSchema;
 import com.sos.joc.model.job.OrderQueue;
+import com.sos.joc.model.jobChain.JobChain__;
 import com.sos.joc.model.order.OrderFilterWithCompactSchema;
 import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.ProcessingState;
@@ -51,6 +49,17 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     
     public OrdersVCallable(OrdersPerJobChain orders, Boolean compact, URI uri) {
         this.orders = orders;
+        this.job = null;
+        this.folder = null;
+        this.ordersBody = null;
+        this.compact = compact;
+        this.uri = uri;
+    }
+    
+    public OrdersVCallable(JobChain__ jobChain, Boolean compact, URI uri) {
+        OrdersPerJobChain o = new OrdersPerJobChain();
+        o.setJobChain(jobChain.getPath());
+        this.orders = o;
         this.job = null;
         this.folder = null;
         this.ordersBody = null;
@@ -107,15 +116,15 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     }
     
     private Map<String,OrderQueue> getOrders(OrdersPerJobChain orders, boolean compact, URI uri) throws Exception {
-        return getOrders(getJsonObjectFromResponse(uri, getServiceBody(orders)), compact);
+        return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(orders)), compact);
     }
     
     private Map<String,OrderQueue> getOrders(String job, boolean compact, URI uri) throws Exception {
-        return getOrders(getJsonObjectFromResponse(uri, getServiceBody(job)), compact);
+        return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(job)), compact);
     }
     
     private Map<String,OrderQueue> getOrders(FoldersSchema folder, OrdersFilterSchema ordersBody, URI uri) throws JocMissingRequiredParameterException, Exception {
-        return getOrders(getJsonObjectFromResponse(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), (folder.getRecursive()) ? null : folder.getFolder(), ordersBody.getRegex());
+        return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), (folder.getRecursive()) ? null : folder.getFolder(), ordersBody.getRegex());
     }
     
     private Map<String,OrderQueue> getOrders(JsonObject json, boolean compact) throws JobSchedulerInvalidResponseDataException {
@@ -141,7 +150,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
             }
             order.setSurveyDate(surveyDate);
             order.setFields(usedNodes, usedTasks, compact);
-            if (!order.processingStateIsSet()) {
+            if (!order.processingStateIsSet() && order.isWaitingForJob()) {
                 usedJobs.addEntries(json.getJsonArray("usedJobs"));
                 order.readJobObstacles(usedJobs.get(order.getJob()));
             }
@@ -152,37 +161,6 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
             listOrderQueue.put(order.getPath(), order);
         }
         return listOrderQueue;
-    }
-    
-    private JsonObject getJsonObjectFromResponse(URI uri, String postBody) throws Exception {
-        JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
-        client.addHeader("Content-Type", "application/json");
-        client.addHeader("Accept", "application/json");
-        LOGGER.info("call " + uri.toString());
-        if (postBody != null) {
-            LOGGER.info("with POST body: " + postBody); 
-        }
-        String response = client.executeRestServiceCommand("post", uri.toURL(), postBody);
-        int httpReplyCode = client.statusCode();
-        String contentType = client.getResponseHeader("Content-Type");
-        
-        switch (httpReplyCode) {
-        case 200:
-            if (contentType.contains("application/json")) {
-                JsonReader rdr = Json.createReader(new StringReader(response));
-                JsonObject json = rdr.readObject();
-                LOGGER.info(json.toString());
-                return json;
-            } else {
-                throw new JobSchedulerInvalidResponseDataException("Unexpected content type '" + contentType + "'. Response: " + response);
-            }
-        case 400:
-            // TODO check Content-Type
-            // Now the exception is plain/text instead of JSON
-            throw new JobSchedulerBadRequestException(response);
-        default:
-            throw new JobSchedulerBadRequestException(httpReplyCode + " " + client.getHttpResponse().getStatusLine().getReasonPhrase());
-        }
     }
     
     private String getServiceBody(OrdersPerJobChain orders) throws JocMissingRequiredParameterException {
@@ -243,9 +221,9 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
                     filterValues.put("Setback", true);
                     break;
                 case WAITINGFORRESOURCE:
-                    filterValues.put("Pending", true);
+                    filterValues.put("Due", true);
                     filterValues.put("WaitingInTask", true);
-                    filterValues.put("WaitingForOther", true);
+                    filterValues.put("WaitingForResource", true);
                     break;
                 }
             }

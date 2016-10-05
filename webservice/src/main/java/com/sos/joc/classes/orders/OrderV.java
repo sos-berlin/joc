@@ -24,12 +24,17 @@ public class OrderV extends OrderQueue {
     private static final String ZERO_HOUR = "1970-01-01T00:00:00Z";
     private final JsonObject order;
     private final JsonObject overview;
+    private boolean isWaitingForJob = false;
     
     public OrderV(JsonObject order) {
         this.order = order;
         this.overview = getOrderOverview();
     }
     
+    public boolean isWaitingForJob() {
+        return isWaitingForJob;
+    }
+
     private void cleanArrays() {
         setParams(null);
         setPriority(null);
@@ -46,7 +51,7 @@ public class OrderV extends OrderQueue {
     
     public void setCompactFields(UsedNodes usedNodes, UsedTasks usedTasks) throws JobSchedulerInvalidResponseDataException {
         
-        JsonObject pState = overview.getJsonObject("processingState");
+        JsonObject pState = overview.getJsonObject("orderProcessingState");
         JsonArray obstacles = overview.getJsonArray("obstacles");
         LOGGER.info(overview.toString());
         
@@ -113,9 +118,15 @@ public class OrderV extends OrderQueue {
                 }
                 break;
             case "Pending":
+            case "Due":
+            case "WaitingForResource":
             case "WaitingForOther":
-                if (!processingStateIsSet() && usedNodes.getNode(getJobChain(), getState()).isStopped()) {
-                    setSeverity(ProcessingState.Text.NODE_STOPPED);
+                if (!processingStateIsSet()) {
+                    if (usedNodes.getNode(getJobChain(), getState()).isStopped()) {
+                        setSeverity(ProcessingState.Text.NODE_STOPPED); 
+                    } else if (usedNodes.getNode(getJobChain(), getState()).isWaitingForJob()) {
+                        isWaitingForJob = true; 
+                    }
                 }
                 break;
             case "Blacklisted":

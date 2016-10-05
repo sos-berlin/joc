@@ -9,8 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.jobchain.JobChains;
+import com.sos.joc.classes.jobchain.JOCXmlJobChainCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResource;
 import com.sos.joc.model.jobChain.JobChain200VSchema;
@@ -28,21 +27,17 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
                 return jocDefaultResponse;
             }
             JobChain200VSchema entity = new JobChain200VSchema();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
-            // String postCommand =
-            // JobChainUtils.createJobChainPostCommand(jobChainFilterSchema);
-            // jocXmlCommand.excutePost(postCommand);
+            JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(dbItemInventoryInstance.getCommandUrl(), dbItemInventoryInstance.getUrl());
+            if (checkRequiredParameter("jobChain", jobChainFilterSchema.getJobChain())) {
+                entity.setDeliveryDate(new Date());
+                entity.setJobChain(jocXmlCommand.getJobChain(jobChainFilterSchema.getJobChain(), jobChainFilterSchema.getCompact()));
+            }
 
-            entity.setDeliveryDate(new Date());
-            entity.setJobChain(JobChains.getJobChain2(jobChainFilterSchema.getCompact()));
-            entity.getJobChain().setSurveyDate(jocXmlCommand.getSurveyDate());
             return JOCDefaultResponse.responseStatus200(entity);
-
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 

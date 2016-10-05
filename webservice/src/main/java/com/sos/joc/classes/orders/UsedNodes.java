@@ -10,21 +10,26 @@ import javax.json.JsonObject;
 public class UsedNodes {
     
     private Map<String, Node> nodes;
+    public enum State {
+        STOPPED,
+        WAITINGFORJOB,
+        DELAYED,
+        NOOBSTACLE
+    }
     public class Node {
 
         private String job;
-        private boolean stopped;
         private String nodeId;
         private String jobChain;
+        private JsonArray obstacles;
+        private boolean parsed = false;
+        private State state = State.NOOBSTACLE;
         
-        public Node(String jobChain, String nodeId) {
-        }
-        
-        public Node(String jobChain, String nodeId, String job, boolean isStopped) {
+        public Node(String jobChain, String nodeId, String job, JsonArray obstacles) {
             this.jobChain = jobChain;
             this.nodeId = nodeId;
             this.job = job;
-            this.stopped = isStopped;
+            this.obstacles = obstacles;
         }
         
         public String getJobChain() {
@@ -39,20 +44,51 @@ public class UsedNodes {
             return job;
         }
         
+        public State getState() {
+            parse();
+            return state;
+        }
+        
         public boolean isStopped() {
-            return stopped;
+            return getState() == State.STOPPED;
+        }
+        
+        public boolean isWaitingForJob() {
+            return getState() == State.WAITINGFORJOB;
+        }
+        
+        public boolean hasNoObstacle() {
+            return getState() == State.NOOBSTACLE;
+        }
+        
+        private void parse() {
+            if (!parsed && obstacles != null) {
+                parsed = true;
+                for (JsonObject obstacle : obstacles.getValuesAs(JsonObject.class)) {
+                    switch(obstacle.getString("TYPE","")) {
+                    case "WaitingForJob":
+                        state = State.WAITINGFORJOB;
+                        break;
+                    case "Stopping":
+                        state = State.STOPPED;
+                        break;
+//                    case "Delaying":
+//                        duration = obstacle.getInt("duration");
+//                        break;
+                    }
+                }
+            }
         }
     }
     
 //    private Function<JsonValue, String> key = json -> {
-//        JsonObject nodeKey = ((JsonObject) json).getJsonObject("nodeKey");
-//        return new StringBuilder().append(nodeKey.getString("jobChainPath", "")).append(",").append(nodeKey.getString("nodeId", "")).toString();
+//        JsonObject jsonO = (JsonObject) json;
+//        return new StringBuilder().append(jsonO.getString("jobChainPath", "")).append(",").append(jsonO.getString("nodeId", "")).toString();
 //    };
 //    
 //    private Function<JsonValue, Node> node = json -> {
 //        JsonObject jsonO = (JsonObject) json;
-//        JsonObject nodeKey = jsonO.getJsonObject("nodeKey");
-//        return new Node(nodeKey.getString("jobChainPath", ""),nodeKey.getString("nodeId", ""),jsonO.getString("jobPath", null),"stop".equals(jsonO.getString("action", "")));
+//        return new Node(jsonO.getString("jobChainPath", ""),jsonO.getString("nodeId", ""),jsonO.getString("jobPath", null),"stop".equals(jsonO.getString("action", "")));
 //    };
 //    
 //    public void addEntries(JsonArray nodes) {
@@ -74,13 +110,16 @@ public class UsedNodes {
         return getNode(jobChain, nodeId).isStopped(); 
     }
     
-    public String getJob(String jobChain, String nodeId) {
-        return getNode(jobChain, nodeId).getJob(); 
+    public boolean isWaitingForJobs(String jobChain, String nodeId) {
+        return getNode(jobChain, nodeId).isWaitingForJob(); 
     }
     
-    public String hasDelay(String jobChain, String nodeId) {
-        //TODO getNode(jobChain, nodeId).getObstacles();
-        return null;
+    public boolean hasNoObstacle(String jobChain, String nodeId) {
+        return getNode(jobChain, nodeId).hasNoObstacle(); 
+    }
+    
+    public String getJob(String jobChain, String nodeId) {
+        return getNode(jobChain, nodeId).getJob(); 
     }
     
     public void addEntries(JsonArray nodes){
@@ -93,12 +132,11 @@ public class UsedNodes {
     }
    
     private void put(JsonObject node){
-        JsonObject nodeKey = node.getJsonObject("nodeKey");
-        String nodeId = nodeKey.getString("nodeId", null);
-        String jobChain = nodeKey.getString("jobChainPath", null);
-        String s = new StringBuilder().append(jobChain).append(",").append(nodeId).toString();
+        String nodeId = node.getString("nodeId", null);
+        String jobChain = node.getString("jobChainPath", null);
         if(nodeId != null && jobChain != null) {
-            Node n = new Node(jobChain,nodeId,node.getString("jobPath", null),"stop".equals(node.getString("action", "")));
+            String s = new StringBuilder().append(jobChain).append(",").append(nodeId).toString();
+            Node n = new Node(jobChain,nodeId,node.getString("jobPath", null),node.getJsonArray("obstacles"));
             nodes.put(s, n);
         }
     }

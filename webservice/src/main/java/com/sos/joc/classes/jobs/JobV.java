@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
@@ -29,16 +30,16 @@ public class JobV extends Job_ {
     private final Element job;
     private final Boolean orderJob;
     private final Boolean withOrderQueue;
-    private final JOCXmlJobCommand jocXmlCommand;
+    private final JOCXmlCommand jocXmlCommand;
 
-    public JobV(Element job, JOCXmlJobCommand jocXmlCommand, Boolean withOrderQueue) {
+    public JobV(Element job, JOCXmlCommand jocXmlCommand, Boolean withOrderQueue) {
         this.job = job;
         this.jocXmlCommand = jocXmlCommand;
         this.orderJob = "yes".equals(getAttributeValue("order", "no"));
         this.withOrderQueue = withOrderQueue;
     }
     
-    public JobV(Element job, JOCXmlJobCommand jocXmlCommand) {
+    public JobV(Element job, JOCXmlCommand jocXmlCommand) {
         this.job = job;
         this.jocXmlCommand = jocXmlCommand;
         this.orderJob = "yes".equals(getAttributeValue("order", "no"));

@@ -40,31 +40,37 @@ public class UsedJobs {
         public void parse() {
             if (!parsed && obstacles != null) {
                 parsed = true;
+                boolean stateIsSet = false;
                 for (JsonObject obstacle : obstacles.getValuesAs(JsonObject.class)) {
                     switch(obstacle.getString("TYPE","")) {
                     case "NoRuntime":
                         nextPeriodBeginsAt = obstacle.getString("plannedAt");
                         state = ProcessingState.Text.JOB_NOT_IN_PERIOD;
+                        stateIsSet = true;
                         break;
                     case "Stopped":
                         stopped = true;
                         state = ProcessingState.Text.JOB_STOPPED;
+                        stateIsSet = true;
                         break;
                     case "TaskLimitReached":
-                        //TODO this not a sufficient criteria
                         taskLimit = obstacle.getInt("limit");
                         state = ProcessingState.Text.WAITING_FOR_TASK;
                         break;
-                    case "ProcessLimitReached":
-                        //TODO this not a sufficient criteria
-                        processLimit = obstacle.getInt("limit");
+                    case "ProcessClassObstacles":
+                        processLimit = obstacle.getJsonObject("processClassObstacles").getInt("limit");
                         state = ProcessingState.Text.WAITING_FOR_PROCESS;
+                        stateIsSet = true;
                         break;
                     case "WaitingForLocks":
                         locks = obstacle.getJsonArray("lockPaths");
                         state = ProcessingState.Text.WAITING_FOR_LOCK;
+                        stateIsSet = true;
                         break;
                     }
+                }
+                if (!stateIsSet && taskLimit != null) {
+                    state = ProcessingState.Text.WAITING_FOR_TASK; 
                 }
             }
         }

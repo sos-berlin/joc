@@ -49,7 +49,7 @@ public class Parameters {
     public static List<NameValuePairsSchema> getParameters(JsonObject elem) {
         JsonObject paramList = elem.getJsonObject("variables");
         List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
-        if (paramList != null) {
+        if (paramList != null && !paramList.isEmpty()) {
             for (String key : paramList.keySet()) {
                 NameValuePairsSchema param = new NameValuePairsSchema();
                 param.setName(key);

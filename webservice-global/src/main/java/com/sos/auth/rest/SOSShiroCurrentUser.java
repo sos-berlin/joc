@@ -1,6 +1,7 @@
 package com.sos.auth.rest;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.shiro.subject.Subject;
 
@@ -17,7 +18,7 @@ public class SOSShiroCurrentUser {
     private String authorization;
 
     private SOSPermissionJocCockpit sosPermissionJocCockpit;
-    private HashMap<String, DBItemInventoryInstance> listOfSchedulerInstances;
+    private Map<String, DBItemInventoryInstance> listOfSchedulerInstances;
 
     public SOSShiroCurrentUser(String username, String password) {
         super();
@@ -91,7 +92,7 @@ public class SOSShiroCurrentUser {
     }
 
     public DBItemInventoryInstance getSchedulerInstanceByKey(Long id) {
-        for (HashMap.Entry<String, DBItemInventoryInstance> entry : listOfSchedulerInstances.entrySet()) {
+        for (Map.Entry<String, DBItemInventoryInstance> entry : listOfSchedulerInstances.entrySet()) {
             DBItemInventoryInstance instance = entry.getValue();
             if (instance.getId() == id) {
                 return instance;

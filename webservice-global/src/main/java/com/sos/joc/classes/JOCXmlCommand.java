@@ -1,6 +1,6 @@
 package com.sos.joc.classes;
 
-import java.text.SimpleDateFormat;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -17,6 +17,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
 
     private Date surveyDate;
     private HashMap<String, NodeList> listOfNodeLists;
+    private URI uriForJsonCommand;
 
     public JOCXmlCommand(String url) {
         super(url);
@@ -27,20 +28,27 @@ public class JOCXmlCommand extends SOSXmlCommand {
     public Date getSurveyDate() {
         if (surveyDate == null || "".equals(surveyDate)) {
             try {
-                executeXPath("survey_date","/spooler/answer");
-                SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT);
-                surveyDate = formatter.parse(getAttribute("time"));
-            } catch (Exception e) {
-                try {
-                    SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT2);
-                    surveyDate = formatter.parse(getAttribute("time"));
-                } catch (Exception ee) {
-                }
-            }
+                String surveyDateStr = getSosxml().selectSingleNodeValue("/spooler/answer/@time");
+                surveyDate = JobSchedulerDate.getDateFromISO8601String(surveyDateStr);
+            } catch (Exception e) {}
         }
         return surveyDate;
     }
+    
+    public URI getUriForJsonCommand() {
+        return uriForJsonCommand;
+    }
 
+    public void setUriForJsonCommand(URI uriForJsonCommand) {
+        this.uriForJsonCommand = uriForJsonCommand;
+    }
+    
+    public void setUriForJsonCommand(String jsonUrl, boolean compact) {
+        JOCJsonCommand command = new JOCJsonCommand(jsonUrl);
+        command.addCompactQuery(compact);
+        this.uriForJsonCommand = command.getURI();
+    }
+    
     public void createNodeList(String key, String xpath) throws Exception {
         NodeList nodeList = selectNodelist(xpath);
         listOfNodeLists.put(key, nodeList);
