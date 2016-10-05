@@ -44,8 +44,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             }
 
             // TODO date post body parameters are not yet considered
-            String masterUrl = dbItemInventoryInstance.getUrl();
-            JOCJsonCommand command = new JOCJsonCommand(masterUrl);
+            JOCJsonCommand command = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
             command.addCompactQuery(ordersBody.getCompact());
 
             Map<String, OrderQueue> listOrders = new HashMap<String, OrderQueue>();

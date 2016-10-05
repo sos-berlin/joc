@@ -10,12 +10,10 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 import com.sos.joc.classes.JOCJsonCommand;
-import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.jobchain.JobChainV;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.jobChain.OrdersSummary;
-import com.sos.joc.model.order.SnapshotSchema;
 
 public class OrdersSummaryCallable implements Callable<Map<String,JobChainV>> {
     private final JobChainV jobChain;
@@ -35,18 +33,11 @@ public class OrdersSummaryCallable implements Callable<Map<String,JobChainV>> {
     
     @Override
     public Map<String,JobChainV> call() throws Exception {
-        return getOrdersSummary(jobChain, uri);
+        return getOrdersSummary(jobChain, uri); 
     }
     
     public OrdersSummary getOrdersSummary() throws Exception {
         return getOrdersSummary(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(jobChain.getPath())));
-    }
-    
-    public SnapshotSchema getOrdersSnapshot(SnapshotSchema snapshot) throws Exception {
-        JsonObject json = new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(jobChain.getPath()));
-        snapshot.setOrders(getOrdersSnapshot(json));
-        snapshot.setSurveyDate(JobSchedulerDate.getDateFromEventId(json.getJsonNumber("eventId").longValue()));
-        return snapshot;
     }
     
     private Map<String,JobChainV> getOrdersSummary(JobChainV jobChain, URI uri) throws Exception {
@@ -58,17 +49,6 @@ public class OrdersSummaryCallable implements Callable<Map<String,JobChainV>> {
     
     private OrdersSummary getOrdersSummary(JsonObject json) throws JobSchedulerInvalidResponseDataException {
         OrdersSummary summary = new OrdersSummary();
-        summary.setBlacklist(json.getInt("blacklisted", 0));
-        summary.setPending(json.getInt("notPlanned", 0) + json.getInt("planned", 0));
-        summary.setRunning(json.getInt("inProcess", 0));
-        summary.setSetback(json.getInt("setback", 0));
-        summary.setSuspended(json.getInt("suspended", 0));
-        summary.setWaitingForResource(json.getInt("total", 0) - summary.getBlacklist() - summary.getPending() - summary.getRunning() - summary.getSetback() - summary.getSuspended());
-        return summary;
-    }
-    
-    private com.sos.joc.model.order.Orders getOrdersSnapshot(JsonObject json) throws JobSchedulerInvalidResponseDataException {
-        com.sos.joc.model.order.Orders summary = new com.sos.joc.model.order.Orders();
         summary.setBlacklist(json.getInt("blacklisted", 0));
         summary.setPending(json.getInt("notPlanned", 0) + json.getInt("planned", 0));
         summary.setRunning(json.getInt("inProcess", 0));
