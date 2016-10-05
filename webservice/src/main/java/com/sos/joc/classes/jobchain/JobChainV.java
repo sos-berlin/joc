@@ -133,8 +133,9 @@ public class JobChainV extends JobChain__ {
         jobNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job]");
         jobChainNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job_chain] | job_chain_node.job_chain[@job_chain]");
         setNumOfNodes(jobNodes.getLength() + jobChainNodes.getLength());
-        Integer numOfFileOrders = Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(jobChain, "file_order_source/files/@count", "0"));
-        setNumOfOrders(Integer.parseInt(jobChain.getAttribute("orders")) + numOfFileOrders);
+        //Integer numOfFileOrders = Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(jobChain, "file_order_source/files/@count", "0"));
+        Integer numOfBlacklistedOrders = Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(jobChain, "blacklist/@count", "0"));
+        setNumOfOrders(Integer.parseInt(jobChain.getAttribute("orders")) + numOfBlacklistedOrders);
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(jobChain));
         //OrdersSummary is set with OrdersSummaryCallable (look at JOCXmlJobChainCommand.getJobChains)
     }

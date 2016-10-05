@@ -98,7 +98,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
 
     private String createShowStatePostCommand(String folder, Boolean recursive, Boolean compact) {
         JSCmdShowState showState = Globals.schedulerObjectFactory.createShowState();
-        showState.setSubsystems("folder job_chain");
+        showState.setSubsystems("folder order");
         showState.setWhat("job_chains folders order_source_files blacklist");
         if (compact) {
             showState.setMaxOrders(BigInteger.valueOf(0));
