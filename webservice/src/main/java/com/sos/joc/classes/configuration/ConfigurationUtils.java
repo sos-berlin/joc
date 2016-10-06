@@ -83,7 +83,7 @@ public class ConfigurationUtils {
         Element objElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(xPathObjElement);
         Element fileBased = (Element) jocXmlCommand.getSosxml().selectSingleNode(objElem, "file_based");
         if (fileBased != null) {
-            configuration.setConfigurationDate(JobSchedulerDate.getDate(fileBased.getAttribute("last_write_time")));
+            configuration.setConfigurationDate(JobSchedulerDate.getDateFromISO8601String(fileBased.getAttribute("last_write_time")));
         }
         configuration.setPath(objElem.getAttribute("path"));
         configuration.setType(Configuration.Type.fromValue(objName.replaceAll("_", "").toUpperCase()));

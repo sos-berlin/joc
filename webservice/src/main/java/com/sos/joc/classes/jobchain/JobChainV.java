@@ -163,7 +163,7 @@ public class JobChainV extends JobChain__ {
            NodeList fileOrders = jocXmlCommand.getSosxml().selectNodeList(fileOrderSourceElement, "files/file");
            if (fileOrders.getLength() > 0) {
                List<File> files = new ArrayList<File>();
-               for (int j=0; i < fileOrders.getLength(); j++) {
+               for (int j=0; j < fileOrders.getLength(); j++) {
                    Element fileOrder = (Element) fileOrders.item(j);
                    File file = new File();
                    file.setPath(fileOrder.getAttribute(WebserviceConstants.PATH));

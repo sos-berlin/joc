@@ -2,8 +2,7 @@ package com.sos.joc.classes;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,8 +27,6 @@ public class JOCResourceImpl {
     private static final String JOC_420 = "JOC-420";
     private static final String COULD_NOT_GET_ERROR_MESSAGE_FROM_JOB_SCHEDULER_ANSWER = "Could not get error message from JobScheduler answer";
     private static final String SPOOLER_ANSWER_ERROR = "//spooler/answer/ERROR";
-    protected static final String JOBSCHEDULER_DATE_FORMAT = "yyyy-mm-dd hh:mm:ss.SSS'Z'";
-    protected static final String JOBSCHEDULER_DATE_FORMAT2 = "yyyy-mm-dd'T'hh:mm:ss.SSS'Z'";
     protected DBItemInventoryInstance dbItemInventoryInstance;
 
     private String accessToken;
@@ -63,27 +60,19 @@ public class JOCResourceImpl {
     public Date getDateFromString(String dateString) {
         Date date = null;
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT);
-            date = formatter.parse(dateString);
+            dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
+            date = Date.from(Instant.parse(dateString));
         } catch (Exception e) {
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat(JOBSCHEDULER_DATE_FORMAT2);
-                date = formatter.parse(dateString);
-            } catch (Exception ee) {
-                jocError = new JocError();
-                jocError.setCode("JOC-420");
-                jocError.setMessage("Could not parse date: " + dateString);
-            }
+            jocError = new JocError();
+            jocError.setCode("JOC-420");
+            jocError.setMessage("Could not parse date: " + dateString);
         }
-
         return date;
     }
 
     public Date getDateFromTimestamp(Long timeStamp) {
-        Long time = new Long(timeStamp / 1000);
-        Timestamp stamp = new Timestamp(time);
-        Date date = new Date(stamp.getTime());
-        return date;
+        Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp/1000);
+        return Date.from(fromEpochMilli);
     }
 
     public JOCDefaultResponse init(String schedulerId, boolean permission) throws Exception {

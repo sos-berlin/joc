@@ -12,9 +12,6 @@ public class WebserviceConstants {
     public static final String NEVER = "never";
     public static final String NO = "no";
     public static final String YES = "yes";
-    public static final String JOBSCHEDULER_DATE_FORMAT = "yyyy-mm-dd hh:mm:ss.SSS'Z'";
-    public static final String JOBSCHEDULER_DATE_FORMAT2 = "yyyy-mm-dd'T'hh:mm:ss.SSS'Z'";
-    public static final String JOBSCHEDULER_DATE_FORMAT3 = "yyyy-mm-dd'T'hh:mm:ss'Z'";
     public static final String EXCLUSIVE = "exclusive";
     public static final String IS_AVAILABLE = "is_available";
     public static final String LOCK = "lock";
