@@ -1,11 +1,12 @@
 package com.sos.joc.orders.impl;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -22,9 +23,9 @@ import com.sos.joc.classes.orders.OrdersSnapshotCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.order.Order_;
+import com.sos.joc.model.jobChain.JobChain____;
+import com.sos.joc.model.jobChain.JobChainsFilterSchema;
 import com.sos.joc.model.order.Orders;
-import com.sos.joc.model.order.OrdersFilterSchema;
 import com.sos.joc.model.order.SnapshotSchema;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
 
@@ -33,10 +34,10 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceOverviewSnapshotImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
+    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilterSchema filterSchema) throws Exception {
         LOGGER.debug("init orders/overview/summary");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(filterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -45,21 +46,17 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             command.addOrderStatisticsQuery();
             URI uri = command.getURI();
             
-            Map<String, Orders> listOrders = new HashMap<String, Orders>();
-            List<Order_> orders = ordersFilterSchema.getOrders();
-            List<FoldersSchema> folders = ordersFilterSchema.getFolders();
-            List<OrdersSnapshotCallable> tasks = new ArrayList<OrdersSnapshotCallable>();
+            Set<String> jobChains = getJobChainsWithoutDuplicates(filterSchema.getJobChains());
+            Set<String> folders = getFoldersWithoutDuplicatesAndSubfolders(filterSchema.getFolders());
+            Set<OrdersSnapshotCallable> tasks = new HashSet<OrdersSnapshotCallable>();
             
-            if (orders.size() > 0) {
-                for (Order_ order : orders) {
-                    if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
-                        throw new JocMissingRequiredParameterException("jobChain");
-                    }
-                    tasks.add(new OrdersSnapshotCallable(("/"+order.getJobChain().trim()).replaceAll("//+", "/").replaceFirst("/$", ""), uri));
+            if (jobChains.size() > 0) {
+                for (String jobChain : jobChains) {
+                    tasks.add(new OrdersSnapshotCallable(jobChain, uri));
                 }
             } else if (folders.size() > 0) {
-                for (FoldersSchema folder : folders) {
-                    tasks.add(new OrdersSnapshotCallable(getPath(folder), uri));
+                for (String folder : folders) {
+                    tasks.add(new OrdersSnapshotCallable(folder, uri));
                 }
             } else {
                 tasks.add(new OrdersSnapshotCallable("/", uri));
@@ -74,10 +71,8 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             summary.setWaitingForResource(0);
             
             ExecutorService executorService = Executors.newFixedThreadPool(10);
-            for (Future<Map<String, Orders>> result : executorService.invokeAll(tasks)) {
-                listOrders.putAll(result.get());
-            }
-            for (Orders o : listOrders.values()) {
+            for (Future<Orders> result : executorService.invokeAll(tasks)) {
+                Orders o = result.get();
                 summary.setBlacklist(summary.getBlacklist() + o.getBlacklist());
                 summary.setPending(summary.getPending() + o.getPending());
                 summary.setRunning(summary.getRunning() + o.getRunning());
@@ -99,10 +94,10 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 
     }
     
-    private String getPath(FoldersSchema folder) {
+    private String getPath(FoldersSchema folder) throws JocMissingRequiredParameterException {
         String path = folder.getFolder();
         if (path == null) {
-            return "/";
+            throw new JocMissingRequiredParameterException("folder");
         } else {
             path = ("/"+path.trim()+"/").replaceAll("//+", "/");
             if (!folder.getRecursive()) {
@@ -110,5 +105,46 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             } 
         }
         return path;
+    }
+    
+    private Set<String> getFoldersWithoutDuplicatesAndSubfolders(List<FoldersSchema> folders) throws JocMissingRequiredParameterException {
+        Set<String> set = new HashSet<String>();
+        if (folders == null || folders.size() == 0) {
+            return set;
+        }
+        SortedSet<String> sortedSet = new TreeSet<String>();
+        for (FoldersSchema folder : folders) {
+            sortedSet.add(getPath(folder));
+        }
+        String[] strA = new String[sortedSet.size()];
+        int index = 0;
+        for (String str : sortedSet) {
+            if (index > 0) {
+                if (!str.contains(strA[index-1])) {
+                    strA[index] = str;
+                    index += 1;
+                    set.add(str);
+                }
+            } else {
+                strA[index] = str;
+                index += 1;
+                set.add(str);
+            }
+        }
+        return set;
+    }
+    
+    private Set<String> getJobChainsWithoutDuplicates(List<JobChain____> jobChains) throws JocMissingRequiredParameterException {
+        Set<String> set = new HashSet<String>();
+        if (jobChains == null || jobChains.size() == 0) {
+            return set;
+        }
+        for (JobChain____ jobChain : jobChains) {
+            if (jobChain.getJobChain() == null || jobChain.getJobChain().isEmpty()) {
+                throw new JocMissingRequiredParameterException("jobChain");
+            }
+            set.add(("/"+jobChain.getJobChain().trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
+        }
+        return set;
     }
 }

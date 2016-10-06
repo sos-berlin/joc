@@ -64,7 +64,7 @@ public class Test {
         JsonArray results = obj.getJsonArray("orders");
         for (JsonObject result : results.getValuesAs(JsonObject.class)) {
             System.out.println(result.getString("nodeId", ""));
-            System.out.println(result.getString("sourceType", ""));
+            System.out.println(result.getString("orderSourceType", ""));
             System.out.println(result.getString("path", ""));
             System.out.println(result.getString("nextStepAt", ""));
             System.out.println(result.getString("fileBasedState", ""));

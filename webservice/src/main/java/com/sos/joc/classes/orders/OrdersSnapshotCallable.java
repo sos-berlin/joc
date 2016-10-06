@@ -1,8 +1,6 @@
 package com.sos.joc.classes.orders;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.json.Json;
@@ -14,7 +12,7 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.order.Orders;
 
-public class OrdersSnapshotCallable implements Callable<Map<String,Orders>> {
+public class OrdersSnapshotCallable implements Callable<Orders> {
     private final String path;
     private final URI uri;
     
@@ -29,7 +27,7 @@ public class OrdersSnapshotCallable implements Callable<Map<String,Orders>> {
     }
     
     @Override
-    public Map<String,Orders> call() throws Exception {
+    public Orders call() throws Exception {
         return getOrdersSnapshot(path, uri); 
     }
     
@@ -37,11 +35,9 @@ public class OrdersSnapshotCallable implements Callable<Map<String,Orders>> {
         return getOrdersSnapshot(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(path)));
     }
     
-    public Map<String,Orders> getOrdersSnapshot(String path, URI uri) throws Exception {
-        Map<String,Orders> snapshotMap = new HashMap<String,Orders>();
+    public Orders getOrdersSnapshot(String path, URI uri) throws Exception {
         JsonObject json = new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(path));
-        snapshotMap.put(path, getOrdersSnapshot(json));
-        return snapshotMap;
+        return getOrdersSnapshot(json);
     }
     
     private Orders getOrdersSnapshot(JsonObject json) throws JobSchedulerInvalidResponseDataException {

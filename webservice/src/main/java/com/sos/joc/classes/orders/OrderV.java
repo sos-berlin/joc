@@ -60,8 +60,11 @@ public class OrderV extends OrderQueue {
         setState(overview.getString("nodeId", null));
         setHistoryId(getIntField(overview, "historyId"));
         setStartedAt(JobSchedulerDate.getDateFromISO8601String(overview.getString("startedAt", ZERO_HOUR)));
-        //setType(OrderQueue.Type.fromValue(unCamelize(overview.getString("sourceType", null))));
-        setType(getType(overview.getString("sourceType", "")));
+        if (overview.containsKey("orderSourceType")) {
+            setType(getType(overview.getString("orderSourceType", ""))); 
+        } else {
+            setType(getType(overview.getString("sourceType", "")));
+        }
         
         
         setNextStartTime(JobSchedulerDate.getDateFromISO8601String(pState.getString("at", ZERO_HOUR)));
