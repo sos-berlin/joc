@@ -4,6 +4,9 @@ package com.sos.joc.classes;
 public class WebserviceConstants {
 
     public static final String NO_USER_WITH_ACCESS_TOKEN="JOC-001";
+    public static final String WRONG_MIME_TYPE = "JOC-100";
+
+    
     public static final String JOC_COCKPUT = "JOC_COCKPIT";
     public static final String SELECTED_INSTANCE = "selected_instance";
     public static final String NEVER = "never";

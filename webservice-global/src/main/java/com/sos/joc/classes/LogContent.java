@@ -2,12 +2,9 @@ package com.sos.joc.classes;
 
 import java.util.Scanner;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.joc.Globals;
-import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
-import com.sos.joc.model.order.OrderFilterWithHistoryIdSchema;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
-public class LogContent {
+public  class LogContent {
     
     private static final String SPAN_LINE = "<span class=%s>%s</span>";
     private static final String HTML_END = "</pre></body></html>";
@@ -38,12 +35,14 @@ public class LogContent {
     private static final String LOG_INFO_CLASS = "log_info";
     private static final String LOG_STDERR_CLASS = "log_stderr";
 
-    OrderFilterWithHistoryIdSchema orderFilterWithHistoryIdSchema;
+    protected DBItemInventoryInstance dbItemInventoryInstance; 
     
-    public LogContent(OrderFilterWithHistoryIdSchema orderFilterWithHistoryIdSchema) {
+    
+    public LogContent(DBItemInventoryInstance dbItemInventoryInstance) {
         super();
-        this.orderFilterWithHistoryIdSchema = orderFilterWithHistoryIdSchema;
+        this.dbItemInventoryInstance = dbItemInventoryInstance;
     }
+
 
     private String colorLine(String line, String marker, String cssClass) {
 
@@ -102,21 +101,6 @@ public class LogContent {
         return s.toString();
     }
     
-    public String getOrderLog() throws Exception{
-        SOSHibernateConnection sosHibernateConnection = Globals.getConnection(orderFilterWithHistoryIdSchema.getJobschedulerId());
-        sosHibernateConnection.beginTransaction();
-        JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateConnection);
-        String log = jobSchedulerOrderHistoryDBLayer.getLogAsString(orderFilterWithHistoryIdSchema.getHistoryId());
-        if (log==null){
-            log = getOrderLogFromXmlCommand();
-        }
-        sosHibernateConnection.rollback();
-        return log;
-    }
-    
-    private String getOrderLogFromXmlCommand(){
-        return "";
-    }
     
 }
 

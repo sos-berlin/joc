@@ -88,7 +88,7 @@ public class JOCResourceImpl {
 
     public JOCDefaultResponse init(String schedulerId, boolean permission) throws Exception {
         JOCDefaultResponse jocDefaultResponse = null;
-        if (jobschedulerUser.getSosShiroCurrentUser() != null) {
+        if (jobschedulerUser.getSosShiroCurrentUser().getAuthorization() != null) {
             jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession().touch();
         }
 
@@ -144,7 +144,10 @@ public class JOCResourceImpl {
     }
 
     public boolean checkRequiredParameter(String paramKey, Long paramVal) throws JocMissingRequiredParameterException {
-        return checkRequiredParameter(paramKey,String.valueOf(paramVal));
+        if (paramVal == null) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
     }
     
     public boolean checkRequiredParameter(String paramKey, Integer paramVal) throws JocMissingRequiredParameterException {

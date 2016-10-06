@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -31,9 +32,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
-            SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
-            schedulerObjectFactory.initMarshaller(Spooler.class);
-            JSCmdKillTask jsCmdKillTask = schedulerObjectFactory.createKillTask();
+            JSCmdKillTask jsCmdKillTask = Globals.schedulerObjectFactory.createKillTask();
             jsCmdKillTask.setImmediately(WebserviceConstants.YES);
             jsCmdKillTask.setIdIfNotEmpty(taskId.getTaskId());
             jsCmdKillTask.setJobIfNotEmpty(job.getJob());
@@ -46,7 +45,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
                 jsCmdKillTask.setTimeout(modifyTasksSchema.getTimeout());
             }
 
-            String xml = schedulerObjectFactory.toXMLString(jsCmdKillTask);
+            String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdKillTask);
             jocXmlCommand.excutePost(xml);
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());

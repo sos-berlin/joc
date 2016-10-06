@@ -48,6 +48,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws Exception {
         try {
             String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_INSTANCES);

@@ -9,6 +9,7 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
+ 
 public class SOSJobSchedulerUserTest {
  
 

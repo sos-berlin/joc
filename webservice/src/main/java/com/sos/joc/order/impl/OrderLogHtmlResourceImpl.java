@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.LogContent;
+import com.sos.joc.classes.LogOrderContent;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderFilterWithHistoryIdSchema;
 import com.sos.joc.order.resource.IOrderLogHtmlResource;
@@ -40,10 +40,10 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
                 return jocDefaultResponse;
             }
 
-            LogContent logContent = new LogContent(orderFilterWithHistoryIdSchema);
+            LogOrderContent logOrderContent = new LogOrderContent(orderFilterWithHistoryIdSchema, dbItemInventoryInstance);
 
-            String log = logContent.getOrderLog();
-            return JOCDefaultResponse.responseStatus200(logContent.htmlPageWithColouredLogContent(log));
+            String log = logOrderContent.getLog();
+            return JOCDefaultResponse.responseStatus200(logOrderContent.htmlPageWithColouredLogContent(log));
 
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

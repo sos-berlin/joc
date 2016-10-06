@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -12,9 +13,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.job.Job___;
 import com.sos.joc.model.job.ModifyTasksSchema;
 import com.sos.joc.tasks.resource.ITasksResourceEnd;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdModifyJob;
-import com.sos.scheduler.model.objects.Spooler;
 
 @Path("tasks")
 public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResourceEnd {
@@ -26,13 +25,11 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
-            SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
-            schedulerObjectFactory.initMarshaller(Spooler.class);
-            JSCmdModifyJob jsCmdModifyJob = schedulerObjectFactory.createModifyJob();
+            JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
             jsCmdModifyJob.setCmdIfNotEmpty(END);
             jsCmdModifyJob.setJobIfNotEmpty(job.getJob());
 
-            String xml = schedulerObjectFactory.toXMLString(jsCmdModifyJob);
+            String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdModifyJob);
 
             jocXmlCommand.excutePost(xml);
 

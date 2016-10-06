@@ -12,7 +12,7 @@
 	<groupId>com.sos-berlin.joc</groupId>
 	<artifactId>webservice-global</artifactId>
 	<packaging>jar</packaging>
-	<name>webserviceglobal</name>
+	<name>webservice-global</name>
 
   <dependencyManagement>
         <dependencies>
