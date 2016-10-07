@@ -95,7 +95,7 @@ public class JOCResourceImpl {
         }
 
         if (!permission) {
-            return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
+            return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, "Access denied"));
         }
 
         if (schedulerId == null) {
