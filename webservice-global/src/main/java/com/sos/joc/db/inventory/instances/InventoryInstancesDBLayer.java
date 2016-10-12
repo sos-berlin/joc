@@ -21,13 +21,12 @@ public class InventoryInstancesDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId) throws Exception {
         try {
-            String sql = String.format("from %s where upper(schedulerId) = :schedulerId",DBITEM_INVENTORY_INSTANCES);
+            String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
             Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("schedulerId", schedulerId.toUpperCase());
-
+            query.setParameter("schedulerId", schedulerId);
             List<DBItemInventoryInstance> result = query.list();
-            if (!result.isEmpty()) {
+            if (result != null && !result.isEmpty()) {
                 return result.get(0);
             }
             return null;
@@ -39,9 +38,8 @@ public class InventoryInstancesDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public List<DBItemInventoryInstance> getInventoryInstances() throws Exception {
         try {
-            String sql = "from " +DBITEM_INVENTORY_INSTANCES;
+            String sql = "from " + DBITEM_INVENTORY_INSTANCES;
             Query query = getConnection().createQuery(sql);
-
             return query.list();
         } catch (Exception ex) {
             throw new Exception(SOSHibernateConnection.getException(ex));
@@ -55,17 +53,14 @@ public class InventoryInstancesDBLayer extends DBLayer {
             LOGGER.debug(sql);
             Query query = getConnection().createQuery(sql);
             query.setParameter("id", id);
-
             List<DBItemInventoryInstance> result = query.list();
-            if (!result.isEmpty()) {
+            if (result != null && !result.isEmpty()) {
                 return result.get(0);
             }
             return null;
         } catch (Exception ex) {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }
-     
     }
-    
 
 }

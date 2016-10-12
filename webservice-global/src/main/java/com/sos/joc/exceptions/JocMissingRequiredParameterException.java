@@ -4,7 +4,7 @@ package com.sos.joc.exceptions;
 public class JocMissingRequiredParameterException extends JocException {
     
     private static final long serialVersionUID = 1L;
-    private static final String ERROR_CODE = "JOC-400";
+    private static final String ERROR_CODE = "JOC-406";
 
     public JocMissingRequiredParameterException() {
     }
