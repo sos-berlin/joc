@@ -132,10 +132,10 @@ public class InventoryAgentsDBLayer extends DBLayer {
     public List<DBItemInventoryAgentInstance> getInventoryAgentInstancesByClusterId(Long agentClusterId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ")
+            sql.append("select iai from ")
                 .append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ")
                 .append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm ")
-                .append("where iai.id = iacm.processClassId and iacm.agentClusterId = :agentClusterId");
+                .append("where iai.id = iacm.agentInstanceId and iacm.agentClusterId = :agentClusterId");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("agentClusterId", agentClusterId);
@@ -168,7 +168,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
     public DBItemInventoryAgentCluster getAgentClusterByProcessClass(String processClassName) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTER).append(" iac, ")
+            sql.append("select iac from ").append(DBITEM_INVENTORY_AGENT_CLUSTER).append(" iac, ")
             .append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, ")
             .append("where iac.processClassId = ipc.id and ipc.name = :processClassName");
             LOGGER.debug(sql.toString());
@@ -227,7 +227,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("select fileDirectory from ")
                 .append(DBITEM_INVENTORY_FILES)
-                .append("where id = fileId");
+                .append(" where id = :fileId");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("fileId", fileId);
@@ -253,6 +253,62 @@ public class InventoryAgentsDBLayer extends DBLayer {
             List<DBItemInventoryProcessClass> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryProcessClass> getInventoryProcessClassByRegex(String regex) throws Exception {
+        // MySQL:       column REGEXP 'regex'
+        // ORACLE:      REGEXP_LIKE(column, regex)
+        // MS SQL:      column LIKE 'regex'
+        // PostgreSQL:  column ~* 'regex'
+        // HQL:         column like regex ??? Not  a real regular expression syntax, depends on dbms
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ipc from ").append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, ");
+            sql.append(DBITEM_INVENTORY_FILES).append(" invf ");
+            sql.append(" where ipc.fileId = invf.id");
+            sql.append(" and invf.fileName like :regex");
+            LOGGER.debug(sql.toString());
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("regex", regex);
+            List<DBItemInventoryProcessClass> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryProcessClass> getInventoryProcessClassByState(Integer state) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ipc from ").append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, "); 
+            sql.append(DBITEM_INVENTORY_AGENT_CLUSTER).append(" iac, ");
+            sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, "); 
+            sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai "); 
+            sql.append("where ipc.id = iac.processClassId ");
+            sql.append("and iac.id = iacm.agentClusterId ");
+            sql.append("and iacm.agentInstanceId = iai.id ");
+            if(state != null) {
+                sql.append("and iai.state = :state ");
+            }
+            sql.append("group by ipc.id");
+            LOGGER.debug(sql.toString());
+            Query query = getConnection().createQuery(sql.toString());
+            if(state != null) {
+                query.setParameter("state", state);
+            }
+            List<DBItemInventoryProcessClass> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
             }
             return null;
         } catch (Exception ex) {

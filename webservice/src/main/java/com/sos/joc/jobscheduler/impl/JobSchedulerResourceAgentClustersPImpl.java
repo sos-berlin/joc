@@ -2,14 +2,26 @@ package com.sos.joc.jobscheduler.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import javax.ws.rs.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.jitl.reporting.db.DBItemInventoryAgentCluster;
+import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
+import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
+import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.inventory.InventoryAgentsDBLayer;
+import com.sos.joc.db.inventory.InventoryOperatingSystemsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
 import com.sos.joc.model.jobscheduler.Agent;
+import com.sos.joc.model.jobscheduler.AgentCluster;
 import com.sos.joc.model.jobscheduler.AgentClusterFilterSchema;
 import com.sos.joc.model.jobscheduler.AgentClusterPSchema;
 import com.sos.joc.model.jobscheduler.AgentClustersPSchema;
@@ -22,6 +34,10 @@ import com.sos.joc.model.jobscheduler.State_;
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
+    private Boolean compact;
+    private List<AgentCluster> agentClusters;
+    private Integer state;
+    private String regex;
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilterSchema jobSchedulerAgentClustersBody) {
@@ -31,73 +47,55 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
             AgentClustersPSchema entity = new AgentClustersPSchema();
-
-            // TODO JOC Cockpit Webservice
-
             entity.setDeliveryDate(new Date());
-
             ArrayList<AgentClusterPSchema> listOfAgentClusters = new ArrayList<AgentClusterPSchema>();
+            /** FILTERS:
+             * compact
+             * agentClusters (array of processClasses)
+             * state
+             * regex
+             */
+            // filters
+            compact = jobSchedulerAgentClustersBody.getCompact();
+            agentClusters = jobSchedulerAgentClustersBody.getAgentClusters();
+            state = jobSchedulerAgentClustersBody.getState();
+            regex = jobSchedulerAgentClustersBody.getRegex();
 
+            InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
             AgentClusterPSchema agentClusterPSchema = new AgentClusterPSchema();
-            agentClusterPSchema.setMaxProcesses(-1);
-            agentClusterPSchema.setName("myName");
-            agentClusterPSchema.setPath("myPath");
-            agentClusterPSchema.setType(AgentClusterPSchema.Type.ROUND_ROBIN);
-            agentClusterPSchema.setSurveyDate(new Date());
-
-            ArrayList<Agent> listOfAgents = new ArrayList<Agent>();
-            Agent agent1 = new Agent();
-            agent1.setHost("myHost");
-            Os os = new Os();
-            os.setArchitecture("64");
-            os.setDistribution("myDistribution");
-            os.setName("myName");
-            agent1.setOs(os);
-            agent1.setPort(4444);
-            agent1.setStartedAt(new Date());
-            State state1 = new State();
-            state1.setSeverity(1);
-            state1.setText(Text.TERMINATING);
-            agent1.setState(state1);
-            agent1.setSurveyDate(new Date());
-            agent1.setUrl("myUrl");
-            agent1.setVersion("myVersion");
-            agentClusterPSchema.setAgents(listOfAgents);
-
-            listOfAgents.add(agent1);
-
-            Agent agent2 = new Agent();
-            agent2.setHost("myHost");
-            Os os2 = new Os();
-            os2.setArchitecture("32");
-            os2.setDistribution("myDistribution");
-            os2.setName("myName");
-            agent2.setOs(os);
-            agent2.setPort(4444);
-            agent2.setStartedAt(new Date());
-            State state2 = new State();
-            state2.setSeverity(3);
-            state2.setText(Text.TERMINATING);
-            agent2.setState(state1);
-            agent2.setSurveyDate(new Date());
-            agent2.setUrl("myUrl");
-            agent2.setVersion("myVersion");
-            listOfAgents.add(agent2);
-
-            agentClusterPSchema.setAgents(listOfAgents);
-            NumOfAgents numOfAgents = new NumOfAgents();
-            numOfAgents.setAny(-1);
-            numOfAgents.setRunning(-1);
-            agentClusterPSchema.setNumOfAgents(numOfAgents);
-
-            State_ state = new State_();
-            state.setSeverity(2);
-            state.setText(State_.Text.ALL_AGENTS_ARE_UNREACHABLE);
-            agentClusterPSchema.setState(state);
-
-            listOfAgentClusters.add(agentClusterPSchema);
+            if(agentClusters != null && !agentClusters.isEmpty()) {
+                for (AgentCluster agentCluster : agentClusters) {
+                    agentClusterPSchema = processAgentClusterByClusterName(agentLayer, agentCluster.getAgentCluster());
+                    listOfAgentClusters.add(agentClusterPSchema);
+                }
+            } else if (state != null && regex != null) {
+                List<AgentClusterPSchema> agentClusterPSchemas = processAgentClusterByRegexAndState(agentLayer, regex, state);
+                if(agentClusterPSchemas != null) {
+                    listOfAgentClusters.addAll(agentClusterPSchemas);
+                }
+            } else if (state != null) {
+                List<AgentClusterPSchema> agentClusterPSchemas = processAgentClusterByState(agentLayer, state);
+                if (agentClusterPSchemas != null) {
+                    listOfAgentClusters.addAll(agentClusterPSchemas);
+                }
+            } else if (regex != null) {
+                List<AgentClusterPSchema> agentClusterPSchemas = processAgentClusterByRegex(agentLayer, regex);
+                if(agentClusterPSchemas != null) {
+                    listOfAgentClusters.addAll(agentClusterPSchemas);
+                }
+            } else {
+                List<DBItemInventoryAgentCluster> agentClusters = agentLayer.getAgentClusters();
+                if(agentClusters != null) {
+                    for(DBItemInventoryAgentCluster agentCluster : agentClusters) {
+                        DBItemInventoryProcessClass processClass = agentLayer.getInventoryProcessClassById(agentCluster.getProcessClassId());
+                        agentClusterPSchema = processAgentCluster(agentLayer, processClass, agentCluster);
+                        if (agentClusterPSchema != null) {
+                            listOfAgentClusters.add(agentClusterPSchema);
+                        }
+                    }
+                }
+            }
             entity.setAgentClusters(listOfAgentClusters);
 
             // TODO get a list of agents and set the data.
@@ -108,7 +106,135 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
-
     }
 
+    private AgentClusterPSchema processAgentClusterByClusterName(InventoryAgentsDBLayer agentLayer, String agentClusterName) throws Exception {
+        DBItemInventoryProcessClass processClass = agentLayer.getInventoryClusterProcessClass(agentClusterName);
+        if (processClass != null) {
+            DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId());
+            return processAgentCluster(agentLayer, processClass, agentCluster);
+        }
+        return null;
+    }
+
+    private List<AgentClusterPSchema> processAgentClusterByRegexAndState(InventoryAgentsDBLayer agentLayer, String regex, Integer state)
+            throws Exception {
+        List<AgentClusterPSchema> schemas = new ArrayList<AgentClusterPSchema>();
+        List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClassByRegex(regex);
+        if (processClasses != null) {
+            for (DBItemInventoryProcessClass processClass : processClasses) {
+                DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId());
+                if (agentCluster != null) {
+                    AgentClusterPSchema agentClusterPSchema = processAgentCluster(agentLayer, processClass, agentCluster);
+                    if(state != null && state == agentClusterPSchema.getState().getSeverity()) {
+                        schemas.add(agentClusterPSchema);
+                    } else if (state == null) {
+                        schemas.add(agentClusterPSchema);
+                    }
+                }
+            }
+        }
+        return schemas.isEmpty() ? null : schemas;
+    }
+
+    private List<AgentClusterPSchema> processAgentClusterByState(InventoryAgentsDBLayer agentLayer, Integer state) throws Exception {
+        List<AgentClusterPSchema> schemas = new ArrayList<AgentClusterPSchema>();
+        List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClassByState(state);
+        if(processClasses != null) {
+            for (DBItemInventoryProcessClass processClass : processClasses) {
+                DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId());
+                schemas.add(processAgentCluster(agentLayer, processClass, agentCluster));
+            }
+        }
+        return schemas.isEmpty() ? null : schemas;
+    }
+
+    private List<AgentClusterPSchema> processAgentClusterByRegex(InventoryAgentsDBLayer agentLayer, String regex) throws Exception {
+        return processAgentClusterByRegexAndState(agentLayer, regex, null);
+    }
+
+    private AgentClusterPSchema processAgentCluster(InventoryAgentsDBLayer agentLayer, DBItemInventoryProcessClass processClass,
+            DBItemInventoryAgentCluster agentCluster) throws Exception {
+        AgentClusterPSchema agentClusterPSchema = new AgentClusterPSchema();
+        agentClusterPSchema.setSurveyDate(new Date());
+        agentClusterPSchema.setMaxProcesses(processClass.getMaxProcesses());
+        agentClusterPSchema.setName(processClass.getBasename());
+        String path = agentLayer.getPathForProcessClass(processClass.getFileId());
+        if(path != null) {
+            agentClusterPSchema.setPath(path);
+        }
+        if(agentCluster != null) {
+            switch(agentCluster.getSchedulingType()) {
+            case "first":
+                agentClusterPSchema.setType(AgentClusterPSchema.Type.FIX_PRIORITY);
+                break;
+            case "next":
+                agentClusterPSchema.setType(AgentClusterPSchema.Type.ROUND_ROBIN);
+                break;
+            case "single":
+                agentClusterPSchema.setType(AgentClusterPSchema.Type.SINGLE_AGENT);
+                break;
+            }
+        }
+        NumOfAgents numOfAgents = new NumOfAgents();
+        numOfAgents.setAny(agentCluster.getNumberOfAgents());
+        List<DBItemInventoryAgentInstance> agents = agentLayer.getInventoryAgentInstancesByClusterId(agentCluster.getId());
+        int countRunning = 0;
+        for (DBItemInventoryAgentInstance agent : agents) {
+            if (agent.getState() == 0) {
+                countRunning++;
+            }
+        }
+        numOfAgents.setRunning(countRunning);
+        agentClusterPSchema.setNumOfAgents(numOfAgents);
+        State_ state = new State_();
+        int diff = numOfAgents.getAny() - numOfAgents.getRunning();
+        if(diff == 0) {
+            state.setSeverity(0);
+            state.setText(State_.Text.ALL_AGENTS_ARE_RUNNING);
+        } else if (diff == numOfAgents.getAny()) {
+            state.setSeverity(2);
+            state.setText(State_.Text.ALL_AGENTS_ARE_RUNNING);
+        } else {
+            state.setSeverity(1);
+            state.setText(State_.Text.ONLY_SOME_AGENTS_ARE_RUNNING);
+        }
+        agentClusterPSchema.setState(state);
+        if(compact == null || !compact) {
+            ArrayList<Agent> listOfAgents = new ArrayList<Agent>();
+            for(DBItemInventoryAgentInstance agentFromDb : agents) {
+                Agent agent = new Agent();
+                agent.setHost(agentFromDb.getHostname());
+                InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
+                DBItemInventoryOperatingSystem osFromDb = osLayer.getInventoryOperatingSystem(agentFromDb.getOsId());
+                if(osFromDb != null) {
+                    Os os = new Os();
+                    os.setArchitecture(osFromDb.getArchitecture());
+                    os.setDistribution(osFromDb.getDistribution());
+                    os.setName(osFromDb.getName());
+                    agent.setOs(os);
+                }
+                agent.setStartedAt(agentFromDb.getStartedAt());
+                State outputState = new State();
+                switch(agentFromDb.getState()) {
+                case 0:
+                    outputState.setSeverity(0);
+                    outputState.setText(Text.RUNNING);
+                    break;
+                case 1:
+                    outputState.setSeverity(2);
+                    outputState.setText(Text.UNREACHABLE);
+                    break;
+                }
+                agent.setState(outputState);
+                agent.setSurveyDate(new Date());
+                agent.setUrl(agentFromDb.getUrl());
+                agent.setVersion(agentFromDb.getVersion());
+                listOfAgents.add(agent);
+            }
+            agentClusterPSchema.setAgents(listOfAgents);
+        }
+        return agentClusterPSchema;
+    }
+    
 }
