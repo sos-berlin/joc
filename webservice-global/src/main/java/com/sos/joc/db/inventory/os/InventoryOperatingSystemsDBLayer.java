@@ -1,4 +1,4 @@
-package com.sos.joc.db.inventory;
+package com.sos.joc.db.inventory.os;
 
 import java.util.List;
 
