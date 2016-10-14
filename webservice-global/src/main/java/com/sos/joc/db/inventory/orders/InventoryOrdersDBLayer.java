@@ -78,5 +78,43 @@ public class InventoryOrdersDBLayer extends DBLayer {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }
     }
-   
+ 
+    public List<DBItemInventoryOrder> getInventoryOrdersFilteredByOrders(String jobChainName, String orderId) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_ORDERS);
+            sql.append(" where jobChainName = :jobChainName ");
+            if (orderId != null) {
+                sql.append("and orderId = :orderId");
+            }
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("jobChainName", jobChainName);
+            if (orderId != null) {
+                query.setParameter("orderId", orderId);
+            }
+            List<DBItemInventoryOrder> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
+    public List<DBItemInventoryOrder> getInventoryOrdersFilteredByFolders(String folderName) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_ORDERS);
+            sql.append(" where name like :folderName ");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("folderName", "%" + folderName + "%");
+            List<DBItemInventoryOrder> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
 }

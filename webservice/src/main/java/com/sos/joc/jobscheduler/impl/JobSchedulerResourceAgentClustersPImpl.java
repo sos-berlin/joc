@@ -3,6 +3,8 @@ package com.sos.joc.jobscheduler.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
@@ -56,7 +58,6 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
              * state
              * regex
              */
-            // filters
             compact = jobSchedulerAgentClustersBody.getCompact();
             agentClusters = jobSchedulerAgentClustersBody.getAgentClusters();
             state = jobSchedulerAgentClustersBody.getState();
@@ -97,9 +98,6 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 }
             }
             entity.setAgentClusters(listOfAgentClusters);
-
-            // TODO get a list of agents and set the data.
-
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -120,16 +118,19 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
     private List<AgentClusterPSchema> processAgentClusterByRegexAndState(InventoryAgentsDBLayer agentLayer, String regex, Integer state)
             throws Exception {
         List<AgentClusterPSchema> schemas = new ArrayList<AgentClusterPSchema>();
-        List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClassByRegex(regex);
+        List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClasses();
         if (processClasses != null) {
             for (DBItemInventoryProcessClass processClass : processClasses) {
                 DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId());
                 if (agentCluster != null) {
-                    AgentClusterPSchema agentClusterPSchema = processAgentCluster(agentLayer, processClass, agentCluster);
-                    if(state != null && state == agentClusterPSchema.getState().getSeverity()) {
-                        schemas.add(agentClusterPSchema);
-                    } else if (state == null) {
-                        schemas.add(agentClusterPSchema);
+                    Matcher regExMatcher = Pattern.compile(regex).matcher(processClass.getName());
+                    if (regExMatcher.find()) {
+                        AgentClusterPSchema agentClusterPSchema = processAgentCluster(agentLayer, processClass, agentCluster);
+                        if(state != null && state == agentClusterPSchema.getState().getSeverity()) {
+                            schemas.add(agentClusterPSchema);
+                        } else if (state == null) {
+                            schemas.add(agentClusterPSchema);
+                        }
                     }
                 }
             }

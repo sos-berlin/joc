@@ -48,7 +48,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
 //            order.setEstimatedDuration(-1); THIS INFORMATION IS VOLATILE!!!
             order.setTitle(dbItemInventoryOrder.getTitle());
             order.setType(Order.Type.PERMANENT);
-            if(compact != null && !compact) {
+            if(compact == null || !compact) {
                 Date orderFileModified = dbLayer.getOrderConfigurationDate(dbItemInventoryOrder.getId());
                 if (orderFileModified != null) {
                     order.setConfigurationDate(orderFileModified);

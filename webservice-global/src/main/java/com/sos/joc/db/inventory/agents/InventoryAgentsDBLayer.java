@@ -287,6 +287,45 @@ public class InventoryAgentsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
+    public List<DBItemInventoryProcessClass> getInventoryProcessClasses() throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ipc from ").append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, ");
+            sql.append(DBITEM_INVENTORY_AGENT_CLUSTER).append(" iac ");
+            sql.append(" where ipc.id = iac.processClassId");
+            LOGGER.debug(sql.toString());
+            Query query = getConnection().createQuery(sql.toString());
+            List<DBItemInventoryProcessClass> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+
+    public String getInventoryProcessClassFileName(Long processClassId) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ifile.fileName from ").append(DBITEM_INVENTORY_FILES).append(" invf, ");
+            sql.append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, ");
+            sql.append(" where ipc.fileId = invf.id");
+            sql.append(" and ipc.id = :id");
+            LOGGER.debug(sql.toString());
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("id", processClassId);
+            Object result = query.uniqueResult();
+            if (result != null) {
+                return (String)result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public List<DBItemInventoryProcessClass> getInventoryProcessClassByState(Integer state) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
