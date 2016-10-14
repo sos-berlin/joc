@@ -15,6 +15,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.FoldersSchema;
@@ -111,6 +112,12 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             order.setPath(inventoryOrder.getName());
             order.setOrderId(inventoryOrder.getOrderId());
             order.setJobChain(inventoryOrder.getJobChainName());
+            Integer estimatedDuration = getEstimatedDurationInSeconds(inventoryOrder);
+            if(estimatedDuration != null) {
+                order.setEstimatedDuration(estimatedDuration);
+            } else {
+                order.setEstimatedDuration(0);
+            }
             if (compact == null || !compact) {
                 Date configDate = dbLayer.getOrderConfigurationDate(inventoryOrder.getId());
                 if(configDate != null) {
@@ -127,4 +134,13 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
         return listOfOutputOrders;
     }
     
+    private Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
+        JobSchedulerOrderHistoryDBLayer dbLayer = new JobSchedulerOrderHistoryDBLayer(Globals.sosHibernateConnection);
+        Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order.getOrderId());
+        if (estimatedDurationInMillis != null) {
+            return estimatedDurationInMillis.intValue()/1000;
+        }
+        return null;
+    }
+
 }

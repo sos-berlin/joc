@@ -1,6 +1,7 @@
 package com.sos.joc.order.impl;
 
 import java.util.Date;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -10,12 +11,14 @@ import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.Order;
 import com.sos.joc.model.order.Order200PSchema;
 import com.sos.joc.model.order.OrderFilterWithCompactSchema;
 import com.sos.joc.order.resource.IOrderPResource;
+import com.sos.scheduler.history.db.SchedulerOrderHistoryDBLayer;
 
 @Path("order")
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
@@ -45,7 +48,12 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             order.setPath(dbItemInventoryOrder.getName());
             order.setOrderId(dbItemInventoryOrder.getOrderId());
             order.setJobChain(dbItemInventoryOrder.getJobChainName());
-//            order.setEstimatedDuration(-1); THIS INFORMATION IS VOLATILE!!!
+            Integer estimatedDuration = getEstimatedDurationInSeconds(dbItemInventoryOrder);
+            if(estimatedDuration != null) {
+                order.setEstimatedDuration(estimatedDuration);
+            } else {
+                order.setEstimatedDuration(0);
+            }
             order.setTitle(dbItemInventoryOrder.getTitle());
             order.setType(Order.Type.PERMANENT);
             if(compact == null || !compact) {
@@ -66,6 +74,15 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
         }
 
+    }
+
+    private Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
+        JobSchedulerOrderHistoryDBLayer dbLayer = new JobSchedulerOrderHistoryDBLayer(Globals.sosHibernateConnection);
+        Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order.getOrderId());
+        if (estimatedDurationInMillis != null) {
+            return estimatedDurationInMillis.intValue()/1000;
+        }
+        return null;
     }
 
 }

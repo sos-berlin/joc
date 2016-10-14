@@ -25,15 +25,15 @@ public class InventoryOrdersDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public DBItemInventoryOrder getInventoryOrderByOrderId(String jobChainName, String orderId) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("select io from ");
-            sql.append(DBITEM_INVENTORY_ORDERS).append(" io, ");
-            sql.append(DBITEM_INVENTORY_INSTANCES).append(" ii ");
-            sql.append("where io.instanceId = ii.id ");
-            sql.append("and ii.schedulerId = '" + this.jobSchedulerId + "' ");
-            sql.append("and io.baseName = :name");
+            StringBuilder sql = new StringBuilder("select order from ");
+            sql.append(DBITEM_INVENTORY_ORDERS +" as order, " + DBITEM_INVENTORY_INSTANCES + " as instance");
+            sql.append(" where order.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "'");
+            sql.append(" and order.jobChainName = :jobChainName");
+            sql.append(" and order.orderId = :orderId");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("name", jobChainName + "," + orderId);
+            query.setParameter("jobChainName", jobChainName);
+            query.setParameter("orderId", orderId);
             List<DBItemInventoryOrder> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
@@ -79,6 +79,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
         }
     }
  
+    @SuppressWarnings("unchecked")
     public List<DBItemInventoryOrder> getInventoryOrdersFilteredByOrders(String jobChainName, String orderId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_ORDERS);
@@ -101,6 +102,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public List<DBItemInventoryOrder> getInventoryOrdersFilteredByFolders(String folderName) throws Exception {
         try {
             StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_ORDERS);
