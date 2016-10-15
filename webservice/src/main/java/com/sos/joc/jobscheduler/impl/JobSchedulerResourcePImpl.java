@@ -11,8 +11,8 @@ import com.sos.joc.model.common.JobSchedulerId;
 public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSchedulerResourceP {
 
     @Override
-    public JOCDefaultResponse postJobschedulerP(String accessToken, JobSchedulerId jobSchedulerFilterSchema) throws Exception {
-        JobSchedulerResourceP jobSchedulerPResource = new JobSchedulerResourceP(accessToken, jobSchedulerFilterSchema);
+    public JOCDefaultResponse postJobschedulerP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
+        JobSchedulerResourceP jobSchedulerPResource = new JobSchedulerResourceP(accessToken, jobSchedulerId);
         return jobSchedulerPResource.postJobschedulerP();
     }
 
