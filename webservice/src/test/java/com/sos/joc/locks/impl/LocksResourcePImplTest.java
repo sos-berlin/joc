@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.lock.LocksFilterSchema;
-import com.sos.joc.model.lock.LocksPSchema;
+import com.sos.joc.model.lock.LocksFilter;
+import com.sos.joc.model.lock.LocksP;
 
 public class LocksResourcePImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -22,11 +22,11 @@ public class LocksResourcePImplTest {
     public void postLocksTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        LocksFilterSchema locksFilterSchema = new LocksFilterSchema();
+        LocksFilter locksFilterSchema = new LocksFilter();
         locksFilterSchema.setJobschedulerId(SCHEDULER_ID);
         LocksResourcePImpl locksResourcePImpl = new LocksResourcePImpl();
         JOCDefaultResponse jobsResponse = locksResourcePImpl.postLocksP(sosShiroCurrentUserAnswer.getAccessToken(), locksFilterSchema);
-        LocksPSchema locksVSchema = (LocksPSchema) jobsResponse.getEntity();
+        LocksP locksVSchema = (LocksP) jobsResponse.getEntity();
         assertEquals("postLocksTest", "myName", locksVSchema.getLocks().get(0).getName());
         LOGGER.info(jobsResponse.toString());
     }

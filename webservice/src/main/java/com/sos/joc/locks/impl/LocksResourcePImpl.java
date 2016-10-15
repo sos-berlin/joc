@@ -13,27 +13,27 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.locks.resource.ILocksResourceP;
-import com.sos.joc.model.lock.LockPSchema;
-import com.sos.joc.model.lock.LocksFilterSchema;
-import com.sos.joc.model.lock.LocksPSchema;
+import com.sos.joc.model.lock.LockP;
+import com.sos.joc.model.lock.LocksFilter;
+import com.sos.joc.model.lock.LocksP;
 
 @Path("locks")
 public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postLocksP(String accessToken, LocksFilterSchema locksFilterSchema) throws Exception {
+    public JOCDefaultResponse postLocksP(String accessToken, LocksFilter locksFilter) throws Exception {
         LOGGER.debug("init locks");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(locksFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(locksFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            LocksPSchema entity = new LocksPSchema();
+            LocksP entity = new LocksP();
             entity.setDeliveryDate(new Date());
-            List<LockPSchema> listOfLocks = new ArrayList<LockPSchema>();
-            LockPSchema lockPSchema = new LockPSchema();
+            List<LockP> listOfLocks = new ArrayList<LockP>();
+            LockP lockPSchema = new LockP();
             lockPSchema.setMaxNonExclusive(-1);
             lockPSchema.setName("myName");
             lockPSchema.setPath("myPath");

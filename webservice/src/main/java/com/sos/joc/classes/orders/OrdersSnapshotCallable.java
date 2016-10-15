@@ -8,11 +8,9 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 import com.sos.joc.classes.JOCJsonCommand;
-import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.order.Orders;
+import com.sos.joc.model.order.OrdersSummary;
 
-public class OrdersSnapshotCallable implements Callable<Orders> {
+public class OrdersSnapshotCallable implements Callable<OrdersSummary> {
     private final String path;
     private final URI uri;
     
@@ -27,21 +25,21 @@ public class OrdersSnapshotCallable implements Callable<Orders> {
     }
     
     @Override
-    public Orders call() throws Exception {
+    public OrdersSummary call() throws Exception {
         return getOrdersSnapshot(path, uri); 
     }
     
-    public Orders getOrdersSnapshot() throws Exception {
+    public OrdersSummary getOrdersSnapshot() throws Exception {
         return getOrdersSnapshot(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(path)));
     }
     
-    public Orders getOrdersSnapshot(String path, URI uri) throws Exception {
+    public OrdersSummary getOrdersSnapshot(String path, URI uri) throws Exception {
         JsonObject json = new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(path));
         return getOrdersSnapshot(json);
     }
     
-    private Orders getOrdersSnapshot(JsonObject json) throws JobSchedulerInvalidResponseDataException {
-        Orders summary = new Orders();
+    private OrdersSummary getOrdersSnapshot(JsonObject json) {
+        OrdersSummary summary = new OrdersSummary();
         summary.setBlacklist(json.getInt("blacklisted", 0));
         summary.setPending(json.getInt("notPlanned", 0) + json.getInt("planned", 0));
         summary.setRunning(json.getInt("inProcess", 0));
@@ -51,7 +49,7 @@ public class OrdersSnapshotCallable implements Callable<Orders> {
         return summary;
     }
     
-    private String getServiceBody(String path) throws JocMissingRequiredParameterException {
+    private String getServiceBody(String path) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("path", path);
         return builder.build().toString();

@@ -11,13 +11,11 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.job.Job___;
-import com.sos.joc.model.job.ModifyTasksSchema;
+import com.sos.joc.model.job.ModifyTasks;
 import com.sos.joc.model.job.TaskId;
+import com.sos.joc.model.job.TasksFilter;
 import com.sos.joc.tasks.resource.ITasksResourceKill;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdKillTask;
-import com.sos.scheduler.model.objects.Spooler;
 
 @Path("tasks")
 public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksResourceKill {
@@ -25,9 +23,9 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     private static final String TERMINATE_WITHIN = "terminate_within";
     private static final String TERMINATE = "terminate";
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceKillImpl.class);
-    private ModifyTasksSchema modifyTasksSchema = null;
+    private ModifyTasks modifyTasksSchema = null;
 
-    private JOCDefaultResponse executeKillCommand(Job___ job, TaskId taskId, String command) {
+    private JOCDefaultResponse executeKillCommand(TasksFilter job, TaskId taskId, String command) {
         try {
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
@@ -54,7 +52,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         }
     }
 
-    private JOCDefaultResponse postTasksCommand(String accessToken, String command, boolean permission, ModifyTasksSchema modifyTasksSchema) {
+    private JOCDefaultResponse postTasksCommand(String accessToken, String command, boolean permission, ModifyTasks modifyTasksSchema) {
         LOGGER.debug("init tasks/teminate_within");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         this.modifyTasksSchema = modifyTasksSchema;
@@ -63,7 +61,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (Job___ job : modifyTasksSchema.getJobs()) {
+            for (TasksFilter job : modifyTasksSchema.getJobs()) {
                 for (TaskId task : job.getTaskIds()) {
                     jocDefaultResponse = executeKillCommand(job, task, command);
                 }
@@ -77,7 +75,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     }
 
     @Override
-    public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasksSchema modifyTasksSchema) {
+    public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasks modifyTasksSchema) {
         LOGGER.debug("init tasks/terminate");
         try {
             return postTasksCommand(accessToken, TERMINATE, getPermissons(accessToken).getJob().isTerminate(), modifyTasksSchema);
@@ -87,7 +85,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     }
 
     @Override
-    public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasksSchema modifyTasksSchema) {
+    public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasks modifyTasksSchema) {
         LOGGER.debug("init tasks/teminate_within");
         try {
             return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissons(accessToken).getJob().isTerminate(), modifyTasksSchema);
@@ -97,7 +95,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     }
 
     @Override
-    public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasksSchema modifyTasksSchema) {
+    public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasks modifyTasksSchema) {
         LOGGER.debug("init tasks/kill");
         try {
             return postTasksCommand(accessToken, KILL, getPermissons(accessToken).getJob().isKill(), modifyTasksSchema);

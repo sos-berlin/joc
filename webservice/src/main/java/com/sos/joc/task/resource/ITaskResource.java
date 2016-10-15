@@ -7,12 +7,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.TaskFilterSchema;
+import com.sos.joc.model.job.TaskFilter;
 
 public interface ITaskResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTask(@HeaderParam("access_token") String accessToken, TaskFilterSchema taskFilterSchema) throws Exception;
+    public JOCDefaultResponse postTask(@HeaderParam("access_token") String accessToken, TaskFilter taskFilter) throws Exception;
 
 }

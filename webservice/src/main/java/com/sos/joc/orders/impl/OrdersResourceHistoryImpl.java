@@ -13,9 +13,11 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.History;
-import com.sos.joc.model.order.HistorySchema;
-import com.sos.joc.model.order.OrdersFilterSchema;
-import com.sos.joc.model.order.State;
+import com.sos.joc.model.order.OrderHistory;
+import com.sos.joc.model.order.OrderHistoryItem;
+import com.sos.joc.model.order.OrderHistoryState;
+import com.sos.joc.model.order.OrderHistoryStateText;
+import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.orders.resource.IOrdersResourceHistory;
 
 @Path("orders")
@@ -23,7 +25,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceHistoryImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilterSchema orderFilterSchema) throws Exception {
+    public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilter orderFilterSchema) throws Exception {
         LOGGER.debug("init Orders");
         try {
             JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
@@ -43,23 +45,23 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             // TODO JOC Cockpit Webservice (Data coming from db Inventory
             // History Tables)
 
-            HistorySchema entity = new HistorySchema();
-            List<History> listHistory = new ArrayList<History>();
+            List<OrderHistoryItem> listHistory = new ArrayList<OrderHistoryItem>();
 
-            History history = new History();
+            OrderHistoryItem history = new OrderHistoryItem();
             history.setEndTime(new Date());
-            history.setHistoryId(-1);
+            history.setHistoryId("-1");
             history.setJobChain("myJobChain");
             history.setNode("myNode");
             history.setOrderId("myOrderId");
             history.setPath("myPath");
             history.setStartTime(new Date());
-            State state = new State();
+            OrderHistoryState state = new OrderHistoryState();
             state.setSeverity(0);
-            state.setText(State.Text.INCOMPLETE);
+            state.set_text(OrderHistoryStateText.INCOMPLETE);
             history.setState(state);
             listHistory.add(history);
 
+            OrderHistory entity = new OrderHistory();
             entity.setDeliveryDate(new Date());
             entity.setHistory(listHistory);
 

@@ -17,8 +17,8 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.Error;
-import com.sos.joc.model.jobscheduler.State;
+import com.sos.joc.model.common.Error419;
+import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 
 
 public class JOCResourceImpl {
@@ -32,7 +32,7 @@ public class JOCResourceImpl {
     private String accessToken;
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
-    protected List<Error> listOfErrors;
+    protected List<Error419> listOfErrors;
     protected JocError jocError;
 
     protected SOSPermissionJocCockpit getPermissons(String accessToken) throws JocException {
@@ -63,9 +63,9 @@ public class JOCResourceImpl {
             dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
             date = Date.from(Instant.parse(dateString));
         } catch (Exception e) {
-            jocError = new JocError();
-            jocError.setCode("JOC-420");
-            jocError.setMessage("Could not parse date: " + dateString);
+            //TODO what should we do with this exception?
+            //jocError = new JocError("JOC-420","Could not parse date: " + dateString);
+            LOGGER.warn("Could not parse date: " + dateString, e);
         }
         return date;
     }
@@ -99,7 +99,7 @@ public class JOCResourceImpl {
         }
 
         if (schedulerId == null) {
-            return JOCDefaultResponse.responseStatusJSError(String.format("undefined '%1$s'", "jobschedulerId"));
+            return JOCDefaultResponse.responseStatusJSError(new JocMissingRequiredParameterException("undefined 'jobschedulerId'"));
         }
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
@@ -143,11 +143,11 @@ public class JOCResourceImpl {
         return checkRequiredParameter(paramKey,String.valueOf(paramVal));
     }
     
-    public List<Error> addError(List<Error> listOfErrors, JOCXmlCommand jocXmlCommand, String path) {
+    public List<Error419> addError(List<Error419> listOfErrors, JOCXmlCommand jocXmlCommand, String path) {
         if (listOfErrors == null) {
-            listOfErrors = new ArrayList<Error>();
+            listOfErrors = new ArrayList<Error419>();
         }
-        Error error = new Error();
+        Error419 error = new Error419();
         try {
             jocXmlCommand.executeXPath(SPOOLER_ANSWER_ERROR);
         } catch (Exception e) {
@@ -167,9 +167,9 @@ public class JOCResourceImpl {
         return listOfErrors;
     }
 
-    protected State.Text getText(String jobschedulerState){
+    protected JobSchedulerStateText getText(String jobschedulerState){
         try{
-           return State.Text.fromValue(jobschedulerState.toUpperCase());
+           return JobSchedulerStateText.fromValue(jobschedulerState.toUpperCase());
         }
         catch (IllegalArgumentException e) {
             LOGGER.error("IllegalArgumentException: " + jobschedulerState,e); 

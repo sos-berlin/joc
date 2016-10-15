@@ -9,20 +9,20 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentsP;
-import com.sos.joc.model.jobscheduler.AgentFilterSchema;
-import com.sos.joc.model.jobscheduler.AgentPSchema;
-import com.sos.joc.model.jobscheduler.Agent_;
-import com.sos.joc.model.jobscheduler.AgentsPSchema;
-import com.sos.joc.model.jobscheduler.Os;
-import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.model.jobscheduler.State.Text;
+import com.sos.joc.model.jobscheduler.AgentFilter;
+import com.sos.joc.model.jobscheduler.AgentP;
+import com.sos.joc.model.jobscheduler.AgentUrl;
+import com.sos.joc.model.jobscheduler.AgentsP;
+import com.sos.joc.model.jobscheduler.OperatingSystem;
+import com.sos.joc.model.jobscheduler.JobSchedulerState;
+import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilterSchema agentFilterSchema) {
+    public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilterSchema) {
         LOGGER.debug("init jobscheduler/agents/p");
         try {
             JOCDefaultResponse jocDefaultResponse = init(agentFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerUniversalAgent().getView()
@@ -31,31 +31,30 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 return jocDefaultResponse;
             }
 
-            AgentsPSchema entity = new AgentsPSchema();
+            AgentsP entity = new AgentsP();
 
             // TODO JOC Cockpit Webservice
 
             entity.setDeliveryDate(new Date());
 
             // TODO Hier muss die DB gelesen und mit dem Filter gefiltert werden
-            ArrayList<AgentPSchema> listOfAgents = new ArrayList<AgentPSchema>();
+            ArrayList<AgentP> listOfAgents = new ArrayList<AgentP>();
 
-            for (Agent_ agentFilter : agentFilterSchema.getAgents()) {
-                AgentPSchema agent = new AgentPSchema();
+            for (AgentUrl agentFilter : agentFilterSchema.getAgents()) {
+                AgentP agent = new AgentP();
                 agent.setStartedAt(new Date());
-                State state = new State();
+                JobSchedulerState state = new JobSchedulerState();
                 state.setSeverity(0);
-                state.setText(Text.PAUSED);
+                state.set_text(JobSchedulerStateText.PAUSED);
                 agent.setState(state);
                 agent.setSurveyDate(new Date());
                 agent.setHost(dbItemInventoryInstance.getHostname());
                 agent.setUrl(agentFilter.getAgent());
-                Os os = new Os();
+                OperatingSystem os = new OperatingSystem();
                 os.setArchitecture("32");
                 os.setDistribution("myDistribution");
                 os.setName("myName");
                 agent.setOs(os);
-                agent.setPort(dbItemInventoryInstance.getPort());
                 agent.setStartedAt(dbItemInventoryInstance.getStartedAt());
                 ArrayList<String> listOfClusters = new ArrayList<String>();
                 listOfClusters.add("cluster1");

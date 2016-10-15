@@ -2,42 +2,40 @@
 package com.sos.joc.model.job;
 
 import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
+@JsonPropertyOrder({
+    "taskId"
+})
 public class TaskId {
 
-    /**
-     * non negative integer
-     * <p>
-     * 
-     * 
-     */
-    private Integer taskId;
+    @JsonProperty("taskId")
+    private String taskId;
 
     /**
-     * non negative integer
-     * <p>
-     * 
      * 
      * @return
      *     The taskId
      */
-    public Integer getTaskId() {
+    @JsonProperty("taskId")
+    public String getTaskId() {
         return taskId;
     }
 
     /**
-     * non negative integer
-     * <p>
-     * 
      * 
      * @param taskId
      *     The taskId
      */
-    public void setTaskId(Integer taskId) {
+    @JsonProperty("taskId")
+    public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 

@@ -11,10 +11,10 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchain.JOCXmlJobChainCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchains.resource.IJobChainsResource;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.jobChain.JobChain____;
-import com.sos.joc.model.jobChain.JobChainsFilterSchema;
-import com.sos.joc.model.jobChain.JobChainsVSchema;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.jobChain.JobChainPath;
+import com.sos.joc.model.jobChain.JobChainsFilter;
+import com.sos.joc.model.jobChain.JobChainsV;
 
 @Path("job_chains")
 public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChainsResource {
@@ -23,25 +23,25 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
   
      
     @Override
-    public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilterSchema  jobChainsFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter  jobChainsFilter) throws Exception {
         LOGGER.debug("init job_chains");
         
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            JobChainsVSchema entity = new JobChainsVSchema();
+            JobChainsV entity = new JobChainsV();
             JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(dbItemInventoryInstance.getCommandUrl(), dbItemInventoryInstance.getUrl());
-            List<JobChain____> jobChains = jobChainsFilterSchema.getJobChains();
-            List<FoldersSchema> folders = jobChainsFilterSchema.getFolders();
+            List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
+            List<Folder> folders = jobChainsFilter.getFolders();
             if (jobChains != null && !jobChains.isEmpty()) {
-                entity.setJobChains(jocXmlCommand.getJobChainsFromShowJobChain(jobChains, jobChainsFilterSchema));
+                entity.setJobChains(jocXmlCommand.getJobChainsFromShowJobChain(jobChains, jobChainsFilter));
             } else if (folders != null && !folders.isEmpty()) {
-                entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(folders, jobChainsFilterSchema));
+                entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(folders, jobChainsFilter));
             } else {
-                entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(jobChainsFilterSchema));
+                entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(jobChainsFilter));
             }
             entity.setDeliveryDate(new Date());
 

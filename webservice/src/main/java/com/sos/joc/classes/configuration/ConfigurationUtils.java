@@ -22,25 +22,26 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.model.common.Configuration;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.common.Content;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.common.ConfigurationContent;
+import com.sos.joc.model.common.JobSchedulerObjectType;
 
 public class ConfigurationUtils {
 
-    public static ConfigurationSchema getEntity(){
+    public static Configuration200 getEntity(){
         //only for dummy values
-        ConfigurationSchema entity = new ConfigurationSchema();
+        Configuration200 entity = new Configuration200();
 
         entity.setDeliveryDate(new Date());
         Configuration configuration = new Configuration();
         configuration.setConfigurationDate(new Date());
-        Content content = new Content();
+        ConfigurationContent content = new ConfigurationContent();
         //content.setHtml("<html></html>");
         content.setXml("<order><myXml/></order>");
         configuration.setContent(content);
         configuration.setPath("myPath");
         configuration.setSurveyDate(new Date());
-        configuration.setType(Configuration.Type.ORDER);
+        configuration.setType(JobSchedulerObjectType.ORDER);
         entity.setConfiguration(configuration);
         return entity;
     }
@@ -64,8 +65,8 @@ public class ConfigurationUtils {
         return writer.toString();
     }
     
-    public static Content getContent(boolean responseInHtml, String configurationXml) throws Exception {
-        Content content = new Content();
+    public static ConfigurationContent getContent(boolean responseInHtml, String configurationXml) throws Exception {
+        ConfigurationContent content = new ConfigurationContent();
         if(responseInHtml) {
             InputStream inputStream = JOCResourceImpl.class.getResourceAsStream("/show_configuration.xsl");
             content.setHtml(transformXmlToHtml("<source>" + configurationXml + "</source>", inputStream));
@@ -75,7 +76,7 @@ public class ConfigurationUtils {
         return content;
     }
     
-    public static ConfigurationSchema getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
+    public static Configuration200 getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
             boolean responseInHtml) throws Exception {
         jocXmlCommand.excutePost(postCommand);
         Configuration configuration = new Configuration();
@@ -86,10 +87,10 @@ public class ConfigurationUtils {
             configuration.setConfigurationDate(JobSchedulerDate.getDateFromISO8601String(fileBased.getAttribute("last_write_time")));
         }
         configuration.setPath(objElem.getAttribute("path"));
-        configuration.setType(Configuration.Type.fromValue(objName.replaceAll("_", "").toUpperCase()));
-        Content content = getContent(responseInHtml, getSourceXmlString(jocXmlCommand.getSosxml().selectSingleNode(objElem, "source/"+objName)));
+        configuration.setType(JobSchedulerObjectType.fromValue(objName.replaceAll("_", "").toUpperCase()));
+        ConfigurationContent content = getContent(responseInHtml, getSourceXmlString(jocXmlCommand.getSosxml().selectSingleNode(objElem, "source/"+objName)));
         configuration.setContent(content);
-        ConfigurationSchema entity = new ConfigurationSchema();
+        Configuration200 entity = new Configuration200();
         entity.setConfiguration(configuration);
         entity.setDeliveryDate(new Date());
         return entity;

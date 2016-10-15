@@ -13,17 +13,18 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.model.common.ConfigurationStatusSchema;
+import com.sos.joc.model.common.ConfigurationState;
+import com.sos.joc.model.common.ConfigurationStateText;
 
 public class ConfigurationStatus {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationStatus.class);
 
-    public static ConfigurationStatusSchema getConfigurationStatus() {
-        ConfigurationStatusSchema confStatus = new ConfigurationStatusSchema();
+    public static ConfigurationState getConfigurationStatus() {
+        ConfigurationState confStatus = new ConfigurationState();
         confStatus.setMessage("myMessage");
         confStatus.setSeverity(-1);
-        confStatus.setText(ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
+        confStatus.set_text(ConfigurationStateText.CHANGED_FILE_NOT_LOADED);
         return confStatus;
     }
 
@@ -33,31 +34,31 @@ public class ConfigurationStatus {
      * 
      * @return ConfigurationStatusSchema
      */
-    public static ConfigurationStatusSchema getConfigurationStatus(Element element) {
-        ConfigurationStatusSchema confStatus = new ConfigurationStatusSchema();
+    public static ConfigurationState getConfigurationStatus(Element element) {
+        ConfigurationState confStatus = new ConfigurationState();
         CachedXPathAPI xPath = new CachedXPathAPI();
         try {
             Element fileBasedElement = (Element) xPath.selectSingleNode(element, "file_based/ERROR");
             if (fileBasedElement != null) {
-                setSeverity(confStatus, ConfigurationStatusSchema.Text.ERROR_IN_CONFIGURATION_FILE);
+                setSeverity(confStatus, ConfigurationStateText.ERROR_IN_CONFIGURATION_FILE);
                 setMessage(confStatus, fileBasedElement);
                 return confStatus;
             }
             fileBasedElement = (Element) xPath.selectSingleNode(element, "replacement/*/file_based/ERROR");
             if (fileBasedElement != null) {
-                setSeverity(confStatus, ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
+                setSeverity(confStatus, ConfigurationStateText.CHANGED_FILE_NOT_LOADED);
                 setMessage(confStatus, fileBasedElement);
                 return confStatus;
             }
             fileBasedElement = (Element) xPath.selectSingleNode(element, "file_based/removed/ERROR");
             if (fileBasedElement != null) {
-                setSeverity(confStatus, ConfigurationStatusSchema.Text.REMOVING_DELAYED);
+                setSeverity(confStatus, ConfigurationStateText.REMOVING_DELAYED);
                 setMessage(confStatus, fileBasedElement);
                 return confStatus;
             }
             fileBasedElement = (Element) xPath.selectSingleNode(element, "replacement");
             if (fileBasedElement != null) {
-                setSeverity(confStatus, ConfigurationStatusSchema.Text.REPLACEMENT_IS_STANDING_BY);
+                setSeverity(confStatus, ConfigurationStateText.REPLACEMENT_IS_STANDING_BY);
                 // doesn't have a message
                 return confStatus;
             }
@@ -83,7 +84,7 @@ public class ConfigurationStatus {
                         }
                     }
                 }
-                setSeverity(confStatus, ConfigurationStatusSchema.Text.RESOURCE_IS_MISSING);
+                setSeverity(confStatus, ConfigurationStateText.RESOURCE_IS_MISSING);
                 confStatus.setMessage(s.toString());
                 return confStatus;
             }
@@ -100,37 +101,37 @@ public class ConfigurationStatus {
      * 
      * @return ConfigurationStatusSchema
      */
-    public static ConfigurationStatusSchema getConfigurationStatus(JsonArray obstacles) {
+    public static ConfigurationState getConfigurationStatus(JsonArray obstacles) {
         try {
             Optional<JsonValue> fileBasedObstacleItem = obstacles.stream().filter(p -> "fileBasedObstacles".equals(((JsonObject) p).getString("TYPE"))).findFirst();
             if (!fileBasedObstacleItem.isPresent()) {
                 return null;
             }
             JsonArray fileBasedObstacles = ((JsonObject) fileBasedObstacleItem.get()).getJsonArray("fileBasedObstacles");
-            ConfigurationStatusSchema errorInConfFileStatus = null;
-            ConfigurationStatusSchema removingDelayedStatus = null;
-            ConfigurationStatusSchema replacementStatus = null;
-            ConfigurationStatusSchema notLoadedStatus = null;
+            ConfigurationState errorInConfFileStatus = null;
+            ConfigurationState removingDelayedStatus = null;
+            ConfigurationState replacementStatus = null;
+            ConfigurationState notLoadedStatus = null;
             StringBuilder s = new StringBuilder();
             for (JsonObject fileBasedObstacle : fileBasedObstacles.getValuesAs(JsonObject.class)) {
                 switch (fileBasedObstacle.getString("TYPE", "").toLowerCase()) {
                 case "notinitialized": // not yet in JSON response
-                    errorInConfFileStatus = new ConfigurationStatusSchema();
-                    setSeverity(errorInConfFileStatus, ConfigurationStatusSchema.Text.ERROR_IN_CONFIGURATION_FILE);
+                    errorInConfFileStatus = new ConfigurationState();
+                    setSeverity(errorInConfFileStatus, ConfigurationStateText.ERROR_IN_CONFIGURATION_FILE);
                     setMessage(errorInConfFileStatus, fileBasedObstacle);
                     break;
                 case "removed":
-                    removingDelayedStatus = new ConfigurationStatusSchema();
-                    setSeverity(removingDelayedStatus, ConfigurationStatusSchema.Text.REMOVING_DELAYED);
+                    removingDelayedStatus = new ConfigurationState();
+                    setSeverity(removingDelayedStatus, ConfigurationStateText.REMOVING_DELAYED);
                     setMessage(removingDelayedStatus, fileBasedObstacle);
                     break;
                 case "replaced":
                     if (!fileBasedObstacle.containsKey("error")) {
-                        replacementStatus = new ConfigurationStatusSchema();
-                        setSeverity(replacementStatus, ConfigurationStatusSchema.Text.REPLACEMENT_IS_STANDING_BY);
+                        replacementStatus = new ConfigurationState();
+                        setSeverity(replacementStatus, ConfigurationStateText.REPLACEMENT_IS_STANDING_BY);
                     } else {
-                        notLoadedStatus = new ConfigurationStatusSchema();
-                        setSeverity(notLoadedStatus, ConfigurationStatusSchema.Text.CHANGED_FILE_NOT_LOADED);
+                        notLoadedStatus = new ConfigurationState();
+                        setSeverity(notLoadedStatus, ConfigurationStateText.CHANGED_FILE_NOT_LOADED);
                         setMessage(notLoadedStatus, fileBasedObstacle);
                     }
                     break;
@@ -159,8 +160,8 @@ public class ConfigurationStatus {
             if (s.length() > 0) {
                 String message = s.toString().replaceFirst(";\\s*$", "");
                 if (!message.isEmpty()) {
-                    ConfigurationStatusSchema missingResourceStatus = new ConfigurationStatusSchema();
-                    setSeverity(missingResourceStatus, ConfigurationStatusSchema.Text.RESOURCE_IS_MISSING);
+                    ConfigurationState missingResourceStatus = new ConfigurationState();
+                    setSeverity(missingResourceStatus, ConfigurationStateText.RESOURCE_IS_MISSING);
                     missingResourceStatus.setMessage(message);
                     return missingResourceStatus;
                 }
@@ -172,17 +173,17 @@ public class ConfigurationStatus {
         return null;
     }
 
-    private static void setMessage(ConfigurationStatusSchema confStatus, Element errorElement) {
+    private static void setMessage(ConfigurationState confStatus, Element errorElement) {
         confStatus.setMessage(errorElement.getAttribute("text"));
     }
 
-    private static void setMessage(ConfigurationStatusSchema confStatus, JsonObject jsonObj) {
+    private static void setMessage(ConfigurationState confStatus, JsonObject jsonObj) {
         confStatus.setMessage(jsonObj.getString("error"));
     }
 
-    private static void setSeverity(ConfigurationStatusSchema confStatus, ConfigurationStatusSchema.Text text) {
-        confStatus.setText(text);
-        switch (confStatus.getText()) {
+    private static void setSeverity(ConfigurationState confStatus, ConfigurationStateText text) {
+        confStatus.set_text(text);
+        switch (confStatus.get_text()) {
         case CHANGED_FILE_NOT_LOADED:
         case RESOURCE_IS_MISSING:
         case ERROR_IN_CONFIGURATION_FILE:

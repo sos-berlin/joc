@@ -12,8 +12,8 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.order.Order200VSchema;
-import com.sos.joc.model.order.OrderFilterWithCompactSchema;
+import com.sos.joc.model.order.OrderV200;
+import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.order.resource.IOrderResource;
 
 @Path("order")
@@ -21,7 +21,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrder(String accessToken, OrderFilterWithCompactSchema orderBody) throws Exception {
+    public JOCDefaultResponse postOrder(String accessToken, OrderFilter orderBody) throws Exception {
         LOGGER.debug("init order");
         try {
             JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
@@ -32,7 +32,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             String masterUrl = dbItemInventoryInstance.getUrl();
             JOCJsonCommand command = new JOCJsonCommand(masterUrl);
             command.addCompactQuery(orderBody.getCompact());
-            Order200VSchema entity = new Order200VSchema();
+            OrderV200 entity = new OrderV200();
 
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
                 OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI());

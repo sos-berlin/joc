@@ -20,7 +20,7 @@ public class FilterAfterResponse {
         return Paths.get(jobSchedulerObject).getParent().getNameCount() > Paths.get(refFolder).getNameCount();
     }
     
-    public static boolean filterStatehasState(List<? extends Enum<?>> filterStates, Enum<?> state) {
+    public static boolean filterStateHasState(List<? extends Enum<?>> filterStates, Enum<?> state) {
         if (filterStates == null || filterStates.isEmpty()) {
             return true;
         }
@@ -33,5 +33,4 @@ public class FilterAfterResponse {
         }
         return filterStatesContainsState;
     }
-
 }

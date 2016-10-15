@@ -7,8 +7,8 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.schedule.Schedule200PSchema;
-import com.sos.joc.model.schedule.ScheduleFilterSchema;
+import com.sos.joc.model.schedule.ScheduleP200;
+import com.sos.joc.model.schedule.ScheduleFilter;
  
 
 public class ScheduleResourcePImplTest {
@@ -20,11 +20,11 @@ public class ScheduleResourcePImplTest {
     public void postschedulePTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        ScheduleFilterSchema scheduleFilterSchema = new ScheduleFilterSchema();
+        ScheduleFilter scheduleFilterSchema = new ScheduleFilter();
         scheduleFilterSchema.setJobschedulerId(SCHEDULER_ID);
         ScheduleResourcePImpl scheduleResourcePImpl = new ScheduleResourcePImpl();
         JOCDefaultResponse jobsResponse = scheduleResourcePImpl.postScheduleP(sosShiroCurrentUserAnswer.getAccessToken(), scheduleFilterSchema);
-        Schedule200PSchema schedulePSchema = (Schedule200PSchema) jobsResponse.getEntity();
+        ScheduleP200 schedulePSchema = (ScheduleP200) jobsResponse.getEntity();
         assertEquals("postschedulePTest", "myUsedByJob", schedulePSchema.getSchedule().getUsedByJobs().get(0).getJob());
      }
 

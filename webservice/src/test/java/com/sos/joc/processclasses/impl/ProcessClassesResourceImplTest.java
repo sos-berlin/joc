@@ -6,8 +6,8 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.processClass.ProcessClassesFilterSchema;
-import com.sos.joc.model.processClass.ProcessClassesVSchema;
+import com.sos.joc.model.processClass.ProcessClassesFilter;
+import com.sos.joc.model.processClass.ProcessClassesV;
 import com.sos.joc.processClasses.impl.ProcessClassesResourceImpl;
 
 public class ProcessClassesResourceImplTest {
@@ -19,11 +19,11 @@ public class ProcessClassesResourceImplTest {
     public void postProcessClassesTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        ProcessClassesFilterSchema processesClassFilterSchema = new ProcessClassesFilterSchema();
+        ProcessClassesFilter processesClassFilterSchema = new ProcessClassesFilter();
         processesClassFilterSchema.setJobschedulerId(SCHEDULER_ID);
         ProcessClassesResourceImpl processClassesResourceImpl = new ProcessClassesResourceImpl();
         JOCDefaultResponse jobsResponse = processClassesResourceImpl.postProcessClasses(sosShiroCurrentUserAnswer.getAccessToken(), processesClassFilterSchema);
-        ProcessClassesVSchema processClassesVSchema = (ProcessClassesVSchema) jobsResponse.getEntity();
+        ProcessClassesV processClassesVSchema = (ProcessClassesV) jobsResponse.getEntity();
         assertEquals("postProcessClassesTest", "myName", processClassesVSchema.getProcessClasses().get(0).getName());
      }
 

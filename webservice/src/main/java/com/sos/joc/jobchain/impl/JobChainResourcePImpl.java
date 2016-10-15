@@ -9,36 +9,34 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchain.JobChains;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceP;
-import com.sos.joc.model.jobChain.JobChain200PSchema;
-import com.sos.joc.model.jobChain.JobChainFilterSchema;
+import com.sos.joc.model.jobChain.JobChainP200;
+import com.sos.joc.model.jobChain.JobChainFilter;
 
 @Path("job_chain")
 public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobChainP(String accessToken, JobChainFilterSchema jobChainFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobChainP(String accessToken, JobChainFilter jobChainFilter) throws Exception {
 
         LOGGER.debug("init jobs_chain/p");
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
-
+            JOCDefaultResponse jocDefaultResponse = init(jobChainFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            JobChain200PSchema entity = new JobChain200PSchema();
-
             // TODO JOC Cockpit Webservice: Reading from database
-            entity.setDeliveryDate(new Date());
             // InventoryJobsDBLayer dbLayer = new
             // InventoryJobsDBLayer(Globals.sosHibernateConnection,
             // jobChainFilterSchema.getJobschedulerId());
             // DBItemInventoryJobChain inventoryJobChain =
             // dbLayer.getInventoryJobChainByName(jobChainFilterSchema.getJobChain());
-            entity.setJobChain(JobChains.getPJobChains(jobChainFilterSchema.getCompact()).get(0));
-
+            JobChainP200 entity = new JobChainP200();
+            entity.setJobChain(JobChains.getPJobChains(jobChainFilter.getCompact()).get(0));
+            entity.setDeliveryDate(new Date());
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

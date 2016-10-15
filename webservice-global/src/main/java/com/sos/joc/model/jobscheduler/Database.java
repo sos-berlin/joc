@@ -3,11 +3,21 @@ package com.sos.joc.model.jobscheduler;
 
 import java.util.Date;
 import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
+@JsonPropertyOrder({
+    "dbms",
+    "surveyDate",
+    "version",
+    "state"
+})
 public class Database {
 
     /**
@@ -15,6 +25,7 @@ public class Database {
      * (Required)
      * 
      */
+    @JsonProperty("dbms")
     private String dbms;
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -23,14 +34,17 @@ public class Database {
      * (Required)
      * 
      */
+    @JsonProperty("surveyDate")
     private Date surveyDate;
+    @JsonProperty("version")
     private String version;
     /**
      * 
      * (Required)
      * 
      */
-    private State__ state;
+    @JsonProperty("state")
+    private DBState state;
 
     /**
      * Possible values are MySQL,Oracle,Postgres,Sybase,DB2,MS SQL Server
@@ -39,6 +53,7 @@ public class Database {
      * @return
      *     The dbms
      */
+    @JsonProperty("dbms")
     public String getDbms() {
         return dbms;
     }
@@ -50,6 +65,7 @@ public class Database {
      * @param dbms
      *     The dbms
      */
+    @JsonProperty("dbms")
     public void setDbms(String dbms) {
         this.dbms = dbms;
     }
@@ -63,6 +79,7 @@ public class Database {
      * @return
      *     The surveyDate
      */
+    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -76,6 +93,7 @@ public class Database {
      * @param surveyDate
      *     The surveyDate
      */
+    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -85,6 +103,7 @@ public class Database {
      * @return
      *     The version
      */
+    @JsonProperty("version")
     public String getVersion() {
         return version;
     }
@@ -94,6 +113,7 @@ public class Database {
      * @param version
      *     The version
      */
+    @JsonProperty("version")
     public void setVersion(String version) {
         this.version = version;
     }
@@ -105,7 +125,8 @@ public class Database {
      * @return
      *     The state
      */
-    public State__ getState() {
+    @JsonProperty("state")
+    public DBState getState() {
         return state;
     }
 
@@ -116,7 +137,8 @@ public class Database {
      * @param state
      *     The state
      */
-    public void setState(State__ state) {
+    @JsonProperty("state")
+    public void setState(DBState state) {
         this.state = state;
     }
 

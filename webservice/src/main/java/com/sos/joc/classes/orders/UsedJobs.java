@@ -14,7 +14,7 @@ import javax.json.JsonString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.model.job.ProcessingState;
+import com.sos.joc.model.order.OrderStateText;
 
 
 public class UsedJobs {
@@ -31,7 +31,7 @@ public class UsedJobs {
         private Integer processLimit = null;
         private boolean stopped = false;
         private boolean parsed = false;
-        private ProcessingState.Text state;
+        private OrderStateText state;
 
         public Job(JsonArray obstacles) {
             this.obstacles = obstacles;
@@ -45,32 +45,32 @@ public class UsedJobs {
                     switch(obstacle.getString("TYPE","")) {
                     case "NoRuntime":
                         nextPeriodBeginsAt = obstacle.getString("plannedAt");
-                        state = ProcessingState.Text.JOB_NOT_IN_PERIOD;
+                        state = OrderStateText.JOB_NOT_IN_PERIOD;
                         stateIsSet = true;
                         break;
                     case "Stopped":
                         stopped = true;
-                        state = ProcessingState.Text.JOB_STOPPED;
+                        state = OrderStateText.JOB_STOPPED;
                         stateIsSet = true;
                         break;
                     case "TaskLimitReached":
                         taskLimit = obstacle.getInt("limit");
-                        state = ProcessingState.Text.WAITING_FOR_TASK;
+                        state = OrderStateText.WAITING_FOR_TASK;
                         break;
                     case "ProcessClassObstacles":
                         processLimit = obstacle.getJsonObject("processClassObstacles").getInt("limit");
-                        state = ProcessingState.Text.WAITING_FOR_PROCESS;
+                        state = OrderStateText.WAITING_FOR_PROCESS;
                         stateIsSet = true;
                         break;
                     case "WaitingForLocks":
                         locks = obstacle.getJsonArray("lockPaths");
-                        state = ProcessingState.Text.WAITING_FOR_LOCK;
+                        state = OrderStateText.WAITING_FOR_LOCK;
                         stateIsSet = true;
                         break;
                     }
                 }
                 if (!stateIsSet && taskLimit != null) {
-                    state = ProcessingState.Text.WAITING_FOR_TASK; 
+                    state = OrderStateText.WAITING_FOR_TASK; 
                 }
             }
         }
@@ -108,7 +108,7 @@ public class UsedJobs {
             return null;
         }
         
-        public ProcessingState.Text getState() {
+        public OrderStateText getState() {
             parse();
             return state;
         }
@@ -167,7 +167,7 @@ public class UsedJobs {
         return null;
     }
     
-    public ProcessingState.Text getState(String path) {
+    public OrderStateText getState(String path) {
         return jobs.containsKey(path) ? jobs.get(path).getState() : null;
     }
     

@@ -7,32 +7,34 @@ import java.util.List;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.job.Jobs;
 import com.sos.joc.classes.orders.Orders;
-import com.sos.joc.model.jobChain.EndNodeSchema;
-import com.sos.joc.model.jobChain.File;
-import com.sos.joc.model.jobChain.FileWatchingNodePSchema;
-import com.sos.joc.model.jobChain.FileWatchingNodeVSchema;
-import com.sos.joc.model.jobChain.JobChain;
-import com.sos.joc.model.jobChain.JobChain__;
-import com.sos.joc.model.jobChain.JobChain___;
-import com.sos.joc.model.jobChain.Node;
-import com.sos.joc.model.jobChain.Node__;
-import com.sos.joc.model.jobChain.Node___;
-import com.sos.joc.model.jobChain.OrdersSummary;
-import com.sos.joc.model.jobChain.State;
-import com.sos.joc.model.jobChain.State_;
-import com.sos.joc.model.jobChain.State__;
+import com.sos.joc.model.common.ConfigurationState;
+import com.sos.joc.model.jobChain.EndNode;
+import com.sos.joc.model.jobChain.FileWatchingNodeFile;
+import com.sos.joc.model.jobChain.FileWatchingNodeP;
+import com.sos.joc.model.jobChain.FileWatchingNodeV;
+import com.sos.joc.model.jobChain.JobChainNodeJobP;
+import com.sos.joc.model.jobChain.JobChainNodeJobV;
+import com.sos.joc.model.jobChain.JobChainNodeP;
+import com.sos.joc.model.jobChain.JobChainNodeState;
+import com.sos.joc.model.jobChain.JobChainNodeStateText;
+import com.sos.joc.model.jobChain.JobChainNodeV;
+import com.sos.joc.model.jobChain.JobChainP;
+import com.sos.joc.model.jobChain.JobChainState;
+import com.sos.joc.model.jobChain.JobChainStateText;
+import com.sos.joc.model.jobChain.JobChainV;
+import com.sos.joc.model.order.OrdersSummary;
 
 public class JobChains {
 
-    public static List<FileWatchingNodeVSchema> getFileOrderSources() {
-        List<FileWatchingNodeVSchema> listOfFileOrderSources = new ArrayList<FileWatchingNodeVSchema>();
-        FileWatchingNodeVSchema fileWatchingNodeVSchema = new FileWatchingNodeVSchema();
+    public static List<FileWatchingNodeV> getFileOrderSources() {
+        List<FileWatchingNodeV> listOfFileOrderSources = new ArrayList<FileWatchingNodeV>();
+        FileWatchingNodeV fileWatchingNodeVSchema = new FileWatchingNodeV();
         fileWatchingNodeVSchema.setDirectory("myDirectory");
-        List<File> listOfFiles = new ArrayList<File>();
-        File f1 = new File();
+        List<FileWatchingNodeFile> listOfFiles = new ArrayList<FileWatchingNodeFile>();
+        FileWatchingNodeFile f1 = new FileWatchingNodeFile();
         f1.setModified(new Date());
         f1.setPath("myFile1");
-        File f2 = new File();
+        FileWatchingNodeFile f2 = new FileWatchingNodeFile();
         f2.setModified(new Date());
         f2.setPath("myFile2");
         listOfFiles.add(f1);
@@ -45,39 +47,40 @@ public class JobChains {
     }
     
     
-    private static JobChain___ getJobChain(boolean compact){
-        JobChain___ jobChain = new JobChain___();
-        jobChain.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus());
-        jobChain.setFileOrderSources(JobChains.getFileOrderSources());
-        jobChain.setName("myName");
+    private static JobChainV getJobChain(boolean compact){
+        JobChainV jobChain = new JobChainV();
+//        jobChain.setConfigurationState(ConfigurationStatus.getConfigurationStatus());
+//        jobChain.setFileOrderSources(JobChains.getFileOrderSources());
+//        jobChain.setName("myName");
         
-        List<Node___> listOfNodes = new ArrayList<Node___>();
-        Node___ node2 = new Node___();
-        node2.setJob(Jobs.getJob(compact));
-        node2.setName("myName");
-        node2.setNumOfOrders(-1);
-        node2.setOrders(Orders.getOrderQueueList());
-        com.sos.joc.model.jobChain.State___ state = new com.sos.joc.model.jobChain.State___();
-        state.setSeverity(-1);
-        state.setText(com.sos.joc.model.jobChain.State___.Text.ACTIVE);
-        node2.setState(state);
+//        List<Node___> listOfNodes = new ArrayList<Node___>();
+//        Node___ node2 = new Node___();
+        //node2.setJob(Jobs.getJob(compact));
+//        node2.setJob(null);
+//        node2.setName("myName");
+//        node2.setNumOfOrders(-1);
+//        node2.setOrders(Orders.getOrderQueueList());
+//        com.sos.joc.model.jobChain.State___ state = new com.sos.joc.model.jobChain.State___();
+//        state.setSeverity(-1);
+//        state.setText(com.sos.joc.model.jobChain.State___.Text.ACTIVE);
+//        node2.setState(state);
         
-        jobChain.setNodes(listOfNodes);
-        jobChain.setNumOfNodes(-1);
-        jobChain.setNumOfOrders(-1);
+//        jobChain.setNodes(listOfNodes);
+//        jobChain.setNumOfNodes(-1);
+//        jobChain.setNumOfOrders(-1);
         jobChain.setPath("myPath");
         
-        State__ stateJobChain = new State__();
-        stateJobChain.setSeverity(-1);
-        stateJobChain.setText(State__.Text.ACTIVE);
-        jobChain.setState(stateJobChain);
-        jobChain.setSurveyDate(new Date());
+//        State__ stateJobChain = new State__();
+//        stateJobChain.setSeverity(-1);
+//        stateJobChain.setText(State__.Text.ACTIVE);
+////        jobChain.setState(stateJobChain);
+//        jobChain.setSurveyDate(new Date());
         return jobChain;
 
     }
     
-    public static JobChain__ getJobChain2(boolean compact){
-        JobChain__ jobChain = new JobChain__();
+    public static JobChainV getJobChain2(boolean compact){
+        JobChainV jobChain = new JobChainV();
         jobChain.setName("myName2");
         jobChain.setSurveyDate(new Date());
         jobChain.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus());
@@ -85,16 +88,19 @@ public class JobChains {
 
         
         //Nodes
-        List<Node__> listOfNodes = new ArrayList<Node__>();
-        Node__ node = new Node__();
-        node.setJob(Jobs.getJob(compact));
-        node.setJobChain(getJobChain(compact));
+        List<JobChainNodeV> listOfNodes = new ArrayList<JobChainNodeV>();
+        JobChainNodeV node = new JobChainNodeV();
+        JobChainNodeJobV job = new JobChainNodeJobV();
+        job.setPath("myJobPath");
+        job.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus());
+        node.setJob(job);
+        //node.setJobChain(getJobChain(compact));
         node.setName("myNodeName");
         node.setNumOfOrders(-1);
         node.setOrders(Orders.getOrderQueueList());
-        State_ state = new State_();
+        JobChainNodeState state = new JobChainNodeState();
         state.setSeverity(-1);
-        state.setText(State_.Text.ACTIVE);
+        state.set_text(JobChainNodeStateText.ACTIVE);
         node.setState(state);
         listOfNodes.add(node);
         jobChain.setNodes(listOfNodes);
@@ -112,37 +118,37 @@ public class JobChains {
         jobChain.setOrdersSummary(ordersSummary);
         jobChain.setPath("myPath");
         
-        State jobChainState = new State();
+        JobChainState jobChainState = new JobChainState();
         jobChainState.setSeverity(-1);
-        jobChainState.setText(State.Text.ACTIVE);
+        jobChainState.set_text(JobChainStateText.ACTIVE);
         jobChain.setState(jobChainState);
         return jobChain;
     }
     
-    public static List<JobChain__> getJobChains(boolean compact){
-        List<JobChain__> listOfJobChains = new ArrayList<JobChain__>();
-        JobChain__ jobChain = getJobChain2(compact);
+    public static List<JobChainV> getJobChains(boolean compact){
+        List<JobChainV> listOfJobChains = new ArrayList<JobChainV>();
+        JobChainV jobChain = getJobChain2(compact);
         listOfJobChains.add(jobChain);
         return listOfJobChains;
     }
     
-    public static List<JobChain> getPJobChains(boolean compact){
-        List<JobChain> listOfJobChains = new ArrayList<JobChain>();
-        JobChain jobChain = new JobChain();
+    public static List<JobChainP> getPJobChains(boolean compact){
+        List<JobChainP> listOfJobChains = new ArrayList<JobChainP>();
+        JobChainP jobChain = new JobChainP();
         jobChain.setName("myName2");
         jobChain.setSurveyDate(new Date());
         jobChain.setConfigurationDate(new Date());
         jobChain.setDistributed(false);
-        List<EndNodeSchema> listOfEndNodes = new ArrayList<EndNodeSchema>();
-        EndNodeSchema endNodeSchema = new EndNodeSchema();
+        List<EndNode> listOfEndNodes = new ArrayList<EndNode>();
+        EndNode endNodeSchema = new EndNode();
         endNodeSchema.setMove("myMove");
         endNodeSchema.setName("myName");
         endNodeSchema.setRemove(false);
         listOfEndNodes.add(endNodeSchema);
         jobChain.setEndNodes(listOfEndNodes);
         
-        List<FileWatchingNodePSchema> listOfFileWatchingNodes = new ArrayList<FileWatchingNodePSchema>();
-        FileWatchingNodePSchema fileWatchingNodePSchema = new FileWatchingNodePSchema();
+        List<FileWatchingNodeP> listOfFileWatchingNodes = new ArrayList<FileWatchingNodeP>();
+        FileWatchingNodeP fileWatchingNodePSchema = new FileWatchingNodeP();
         fileWatchingNodePSchema.setDirectory("myDirectory");
         fileWatchingNodePSchema.setNextNode("myNextNode");
         fileWatchingNodePSchema.setRegex("myRegEx");
@@ -153,11 +159,13 @@ public class JobChains {
         jobChain.setMaxOrders(-1);
         jobChain.setName("myName");
         
-        List<Node> listOfNodes = new ArrayList<Node>();
-        Node node = new Node();
+        List<JobChainNodeP> listOfNodes = new ArrayList<JobChainNodeP>();
+        JobChainNodeP node = new JobChainNodeP();
         node.setDelay(-1);
         node.setErrorNode("myErrorNode");
-        node.setJob(Jobs.getPJob(compact));
+        JobChainNodeJobP job = new JobChainNodeJobP();
+        job.setPath("myJobPath");
+        node.setJob(job);
         node.setLevel(-1);
         node.setName("myName");
         node.setNextNode("myNextNode");

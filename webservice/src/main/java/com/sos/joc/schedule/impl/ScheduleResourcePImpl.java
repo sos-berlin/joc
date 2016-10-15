@@ -13,9 +13,9 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.schedule.resource.IScheduleResourceP;
-import com.sos.joc.model.schedule.Schedule;
-import com.sos.joc.model.schedule.Schedule200PSchema;
-import com.sos.joc.model.schedule.ScheduleFilterSchema;
+import com.sos.joc.model.schedule.ScheduleP200;
+import com.sos.joc.model.schedule.ScheduleFilter;
+import com.sos.joc.model.schedule.ScheduleP;
 import com.sos.joc.model.schedule.Substitute;
 import com.sos.joc.model.schedule.UsedByJob;
 import com.sos.joc.model.schedule.UsedByOrder;
@@ -25,18 +25,15 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postScheduleP(String accessToken, ScheduleFilterSchema scheduleFilterSchema) throws Exception {
+    public JOCDefaultResponse postScheduleP(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
         LOGGER.debug("init schedule/p");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(scheduleFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(scheduleFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            Schedule200PSchema entity = new Schedule200PSchema();
-            entity.setDeliveryDate(new Date());
-
-            Schedule schedule = new Schedule();
+            ScheduleP schedule = new ScheduleP();
             schedule.setConfigurationDate(new Date());
             schedule.setName("myName");
             schedule.setPath("myPath");
@@ -62,6 +59,8 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
 
             schedule.setUsedByOrders(listOfUsesByOrder);
 
+            ScheduleP200 entity = new ScheduleP200();
+            entity.setDeliveryDate(new Date());
             entity.setSchedule(schedule);
 
             return JOCDefaultResponse.responseStatus200(entity);

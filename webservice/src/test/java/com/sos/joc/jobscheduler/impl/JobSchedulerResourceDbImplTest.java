@@ -7,8 +7,8 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceDbImpl;
-import com.sos.joc.model.common.JobSchedulerFilterSchema;
-import com.sos.joc.model.jobscheduler.DbSchema;
+import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.jobscheduler.DB;
 
 public class JobSchedulerResourceDbImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -19,11 +19,11 @@ public class JobSchedulerResourceDbImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobSchedulerFilterSchema jobSchedulerFilterSchema = new JobSchedulerFilterSchema();
+        JobSchedulerId jobSchedulerFilterSchema = new JobSchedulerId();
         jobSchedulerFilterSchema.setJobschedulerId("scheduler_current");
         JobSchedulerResourceDbImpl jobschedulerResourceDbImpl = new JobSchedulerResourceDbImpl();
         JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceDbImpl.postJobschedulerDb(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerFilterSchema);
-        DbSchema dbSchema = (DbSchema) jobschedulerClusterResponse.getEntity();
+        DB dbSchema = (DB) jobschedulerClusterResponse.getEntity();
         assertEquals("postjobschedulerDbTest", "myDbms", dbSchema.getDatabase().getDbms());
      }
 

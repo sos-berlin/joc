@@ -14,7 +14,7 @@ import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
-import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
+import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 import com.sos.scheduler.model.commands.JSCmdTerminate;
 
 @Path("jobscheduler")
@@ -22,7 +22,7 @@ import com.sos.scheduler.model.commands.JSCmdTerminate;
 public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobSchedulerCluster {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
-    private UrlTimeoutParamSchema jobSchedulerModifyJobSchedulerClusterBody;
+    private HostPortTimeOutParameter jobSchedulerModifyJobSchedulerClusterBody;
 
     private JOCDefaultResponse check(boolean right) {
         try {
@@ -38,7 +38,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
 
     }
 
-    private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String restart, UrlTimeoutParamSchema urlTimeoutParamSchema) {
+    private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String restart, HostPortTimeOutParameter urlTimeoutParamSchema) {
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
@@ -57,7 +57,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
         }
     }
 
-    private void init(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) {
+    private void init(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) {
         this.jobSchedulerModifyJobSchedulerClusterBody = urlTimeoutParamSchema;
         this.jobschedulerUser = new JobSchedulerUser(accessToken);
 
@@ -65,7 +65,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             init(accessToken, urlTimeoutParamSchema);
 
@@ -82,7 +82,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
 
         try {
             init(accessToken, urlTimeoutParamSchema);
@@ -101,7 +101,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             init(accessToken, urlTimeoutParamSchema);
 

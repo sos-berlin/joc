@@ -8,14 +8,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.schedule.ScheduleConfigurationFilterSchema;
+import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 
 public interface IScheduleResourceConfiguration {
 
     @POST
     @Path("configuration")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postScheduleConfiguration(@HeaderParam("access_token") String accessToken, ScheduleConfigurationFilterSchema scheduleConfigurationFilterSchema)
+    public JOCDefaultResponse postScheduleConfiguration(@HeaderParam("access_token") String accessToken, ScheduleConfigurationFilter scheduleConfigurationFilterSchema)
             throws Exception;
 
 }

@@ -6,23 +6,24 @@ import java.util.List;
 
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.parameters.Parameters;
-import com.sos.joc.model.job.ProcessingState;
-import com.sos.joc.model.job.OrderQueue;
-import com.sos.joc.model.job.OrdersSummary;
-import com.sos.joc.model.job.OrderQueue.Type;
+import com.sos.joc.model.order.OrderState;
+import com.sos.joc.model.order.OrderStateText;
+import com.sos.joc.model.order.OrderType;
+import com.sos.joc.model.order.OrderV;
+import com.sos.joc.model.order.OrdersSummary;
 
 public class Orders {
 
-    public static List<OrderQueue> getOrderQueueList() {
+    public static List<OrderV> getOrderQueueList() {
         
-        List<OrderQueue> listOrderQueue = new ArrayList<OrderQueue>();
+        List<OrderV> listOrderQueue = new ArrayList<OrderV>();
 
-        OrderQueue orderQueue = new OrderQueue();
+        OrderV orderQueue = new OrderV();
 
         orderQueue.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus());
 
         orderQueue.setEndState("myEndState");
-        orderQueue.setHistoryId(-1);
+        orderQueue.setHistoryId("-1");
         orderQueue.setInProcessSince(new Date());
         orderQueue.setJob("myJob");
         orderQueue.setJobChain("myJobChain");
@@ -38,9 +39,9 @@ public class Orders {
         orderQueue.setProcessClass("myProcessClass");
         orderQueue.setProcessedBy("myProcessedBy");
 
-        ProcessingState processingState = new ProcessingState();
+        OrderState processingState = new OrderState();
         processingState.setSeverity(1);
-        processingState.setText(ProcessingState.Text.RUNNING);
+        processingState.set_text(OrderStateText.RUNNING);
 
         orderQueue.setProcessingState(processingState);
 
@@ -49,8 +50,8 @@ public class Orders {
         orderQueue.setState("myState");
         orderQueue.setStateText("myStateText");
         orderQueue.setSurveyDate(new Date());
-        orderQueue.setTaskId(-1);
-        orderQueue.setType(Type.FILE_ORDER);
+        orderQueue.setTaskId("-1");
+        orderQueue.set_type(OrderType.FILE_ORDER);
         listOrderQueue.add(orderQueue);
         return listOrderQueue;
     }

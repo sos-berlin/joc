@@ -13,8 +13,9 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceConfiguration;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.jobChain.JobChainConfigurationFilterSchema;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.jobChain.JobChainConfigurationFilter;
 import com.sos.scheduler.model.commands.JSCmdShowJobChain;
 
 @Path("job_chain")
@@ -23,7 +24,7 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainResourceConfigurationImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobChainConfiguration(String accessToken, JobChainConfigurationFilterSchema jobChainBody) throws Exception {
+    public JOCDefaultResponse postJobChainConfiguration(String accessToken, JobChainConfigurationFilter jobChainBody) throws Exception {
 
         LOGGER.debug("init job_chain/configuration");
         try {
@@ -32,10 +33,10 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
                 return jocDefaultResponse;
             }
 
-            ConfigurationSchema entity = new ConfigurationSchema();
+            Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
-                boolean responseInHtml = jobChainBody.getMime() == JobChainConfigurationFilterSchema.Mime.HTML;
+                boolean responseInHtml = jobChainBody.getMime() == ConfigurationMime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(jobChainBody), "/spooler/answer/job_chain", "job_chain",
                         responseInHtml);
             }
@@ -47,7 +48,7 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
         }
     }
 
-    private String createOrderConfigurationPostCommand(JobChainConfigurationFilterSchema body) {
+    private String createOrderConfigurationPostCommand(JobChainConfigurationFilter body) {
         JSCmdShowJobChain showJobChain = new JSCmdShowJobChain(Globals.schedulerObjectFactory);
         showJobChain.setJobChain(normalizePath(body.getJobChain()));
         showJobChain.setWhat("source");

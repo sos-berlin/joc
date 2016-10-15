@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.ErrorSchema;
-import com.sos.joc.model.order.History_;
-import com.sos.joc.model.order.OrderFilterSchema;
-import com.sos.joc.model.order.Step;
-import com.sos.joc.model.order.StepHistorySchema;
+import com.sos.joc.model.common.Error;
+import com.sos.joc.model.order.History;
+import com.sos.joc.model.order.OrderFilter;
+import com.sos.joc.model.order.OrdersStepHistory;
+import com.sos.joc.model.order.OrdersStepHistoryItem;
 import com.sos.joc.order.resource.IOrderHistoryResource;
 
 @Path("order")
@@ -22,7 +22,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderHistoryResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrderHistory(String accessToken, OrderFilterSchema orderFilterSchema) throws Exception {
+    public JOCDefaultResponse postOrderHistory(String accessToken, OrderFilter orderFilterSchema) throws Exception {
         LOGGER.debug("init OrderHistory");
 
         try {
@@ -30,17 +30,15 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            // TODO JOC Cockpit Webservice
 
-            StepHistorySchema entity = new StepHistorySchema();
+            History history = new History();
+            history.setHistoryId("-1");
 
-            entity.setDeliveryDate(new Date());
-            History_ history = new History_();
-            history.setHistoryId(-1);
-
-            ArrayList<Step> listOfSteps = new ArrayList<Step>();
-            Step step1 = new Step();
+            ArrayList<OrdersStepHistoryItem> listOfSteps = new ArrayList<OrdersStepHistoryItem>();
+            OrdersStepHistoryItem step1 = new OrdersStepHistoryItem();
             step1.setEndTime(new Date());
-            ErrorSchema errorSchema1 = new ErrorSchema();
+            Error errorSchema1 = new Error();
             errorSchema1.setCode("myCode1");
             errorSchema1.setMessage("myMessage1");
             step1.setError(errorSchema1);
@@ -50,12 +48,12 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             step1.setStep(1);
             step1.setClusterMember(-1);
             step1.setExitCode(-1);
-            step1.setTaskId(-1);
+            step1.setTaskId("-1");
             listOfSteps.add(step1);
 
-            Step step2 = new Step();
+            OrdersStepHistoryItem step2 = new OrdersStepHistoryItem();
             step2.setEndTime(new Date());
-            ErrorSchema errorSchema2 = new ErrorSchema();
+            Error errorSchema2 = new Error();
             errorSchema2.setCode("myCode2");
             errorSchema2.setMessage("myMessage2");
             step2.setError(errorSchema2);
@@ -65,13 +63,14 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             step2.setStep(1);
             step2.setClusterMember(-1);
             step2.setExitCode(-1);
-            step2.setTaskId(-1);
+            step2.setTaskId("-1");
             listOfSteps.add(step2);
 
             history.setSteps(listOfSteps);
+            
+            OrdersStepHistory entity = new OrdersStepHistory();
+            entity.setDeliveryDate(new Date());
             entity.setHistory(history);
-
-            // TODO JOC Cockpit Webservice
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

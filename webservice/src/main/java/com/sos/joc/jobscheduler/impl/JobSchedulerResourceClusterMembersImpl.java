@@ -11,18 +11,18 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembers;
-import com.sos.joc.model.common.JobSchedulerFilterSchema;
-import com.sos.joc.model.jobscheduler.Jobscheduler_;
-import com.sos.joc.model.jobscheduler.MastersVSchema;
-import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.model.jobscheduler.State.Text;
+import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.jobscheduler.JobSchedulerState;
+import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
+import com.sos.joc.model.jobscheduler.JobSchedulerV;
+import com.sos.joc.model.jobscheduler.MastersV;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
+    public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilterSchema) {
         LOGGER.debug("init jobscheduler/cluster/members");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
@@ -36,24 +36,24 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
 
             int count = jocXmlCommand.getNodeList().getLength();
 
-            MastersVSchema entity = new MastersVSchema();
-            ArrayList<Jobscheduler_> masters = new ArrayList<Jobscheduler_>();
+            MastersV entity = new MastersV();
+            ArrayList<JobSchedulerV> masters = new ArrayList<JobSchedulerV>();
 
             for (int i = 0; i < count; i++) {
                 jocXmlCommand.getElementFromList(i);
 
                 entity.setDeliveryDate(new Date());
-                Jobscheduler_ jobscheduler = new Jobscheduler_();
+                JobSchedulerV jobscheduler = new JobSchedulerV();
                 jobscheduler.setHost(jocXmlCommand.getAttribute("host"));
                 jobscheduler.setJobschedulerId(jocXmlCommand.getAttribute("cluster_member_id"));
                 jobscheduler.setPort(jocXmlCommand.getAttributeAsIntegerOr0("tcp_port"));
                 jobscheduler.setStartedAt(jocXmlCommand.getAttributeAsDate("running_since"));
-                State state = new State();
+                JobSchedulerState state = new JobSchedulerState();
                 state.setSeverity(0);
-                state.setText(Text.RUNNING);
+                state.set_text(JobSchedulerStateText.RUNNING);
                 if ("yes".equals(jocXmlCommand.getAttribute("dead"))) {
                     state.setSeverity(1);
-                    state.setText(Text.DEAD);
+                    state.set_text(JobSchedulerStateText.DEAD);
                 }
                 jobscheduler.setState(state);
                 jobscheduler.setSurveyDate(jocXmlCommand.getSurveyDate());

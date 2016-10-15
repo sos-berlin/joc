@@ -10,8 +10,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.job.Job___;
-import com.sos.joc.model.job.ModifyTasksSchema;
+import com.sos.joc.model.job.ModifyTasks;
+import com.sos.joc.model.job.TasksFilter;
 import com.sos.joc.tasks.resource.ITasksResourceEnd;
 import com.sos.scheduler.model.commands.JSCmdModifyJob;
 
@@ -20,7 +20,7 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
     private static final String END = "end";
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceEndImpl.class);
 
-    private JOCDefaultResponse executeModifyJobCommand(Job___ job) {
+    private JOCDefaultResponse executeModifyJobCommand(TasksFilter job) {
         try {
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
@@ -40,16 +40,16 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
     }
 
     @Override
-    public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasksSchema modifyTasksSchema) {
+    public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasks modifyTasks) {
         LOGGER.debug("init tasks/end");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(modifyTasksSchema.getJobschedulerId(), getPermissons(accessToken).getJob().isEndAllTasks());
+            jocDefaultResponse = init(modifyTasks.getJobschedulerId(), getPermissons(accessToken).getJob().isEndAllTasks());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (Job___ job : modifyTasksSchema.getJobs()) {
+            for (TasksFilter job : modifyTasks.getJobs()) {
                 jocDefaultResponse = executeModifyJobCommand(job);
             }
         } catch (JocException e) {

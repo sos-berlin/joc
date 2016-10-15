@@ -7,8 +7,8 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceSupervisorPImpl;
-import com.sos.joc.model.common.JobSchedulerFilterSchema;
-import com.sos.joc.model.jobscheduler.Jobscheduler200PSchema;
+import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.jobscheduler.JobSchedulerP200;
 
 public class JobSchedulerResourceSupervisorPImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -19,11 +19,11 @@ public class JobSchedulerResourceSupervisorPImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobSchedulerFilterSchema jobSchedulerFilterSchema = new JobSchedulerFilterSchema();
+        JobSchedulerId jobSchedulerFilterSchema = new JobSchedulerId();
         jobSchedulerFilterSchema.setJobschedulerId("scheduler_current");
         JobSchedulerResourceSupervisorPImpl jobschedulerResourceSupervisorPImpl = new JobSchedulerResourceSupervisorPImpl();
         JOCDefaultResponse jobschedulerResponse = jobschedulerResourceSupervisorPImpl.postJobschedulerSupervisorP(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerFilterSchema);
-        Jobscheduler200PSchema jobschedulerSupervisorSchema = (Jobscheduler200PSchema) jobschedulerResponse.getEntity();
+        JobSchedulerP200 jobschedulerSupervisorSchema = (JobSchedulerP200) jobschedulerResponse.getEntity();
         assertEquals("postjobschedulerSupervisorPTest.javaTest", "scheduler_joc_cockpit", jobschedulerSupervisorSchema.getJobscheduler().getJobschedulerId());
      }
 

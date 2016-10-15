@@ -6,8 +6,8 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobChain.JobChainsFilterSchema;
-import com.sos.joc.model.jobChain.JobChainsPSchema;
+import com.sos.joc.model.jobChain.JobChainsFilter;
+import com.sos.joc.model.jobChain.JobChainsP;
 
 public class JobChainsResourcePImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -18,11 +18,11 @@ public class JobChainsResourcePImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobChainsFilterSchema jobChainsFilterSchema = new JobChainsFilterSchema();
+        JobChainsFilter jobChainsFilterSchema = new JobChainsFilter();
         jobChainsFilterSchema.setJobschedulerId("scheduler_current");
         JobChainsResourcePImpl jobChainsPImpl = new JobChainsResourcePImpl();
         JOCDefaultResponse jobsResponse = jobChainsPImpl.postJobChainsP(sosShiroCurrentUserAnswer.getAccessToken(), jobChainsFilterSchema);
-        JobChainsPSchema jobChainsPSchema = (JobChainsPSchema) jobsResponse.getEntity();
+        JobChainsP jobChainsPSchema = (JobChainsP) jobsResponse.getEntity();
         assertEquals("postJobChainsPTest", "myPath", jobChainsPSchema.getJobChains().get(0).getPath());
     }
 

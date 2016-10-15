@@ -9,10 +9,9 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.common.OkSchema;
-import com.sos.joc.model.jobChain.JobChain_____;
-import com.sos.joc.model.jobChain.JobChainsPSchema;
-import com.sos.joc.model.jobChain.ModifySchema;
+import com.sos.joc.model.common.Ok;
+import com.sos.joc.model.jobChain.ModifyJobChain;
+import com.sos.joc.model.jobChain.ModifyJobChains;
 
 public class JobChainsResourceModifyJobChainImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -23,14 +22,14 @@ public class JobChainsResourceModifyJobChainImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        ModifySchema modifySchema = new ModifySchema();
+        ModifyJobChains modifySchema = new ModifyJobChains();
         modifySchema.setJobschedulerId("scheduler_current");
         
-        List<JobChain_____> listOfJobChains = new ArrayList<JobChain_____>();
-        JobChain_____ jobChain1 = new JobChain_____();
+        List<ModifyJobChain> listOfJobChains = new ArrayList<ModifyJobChain>();
+        ModifyJobChain jobChain1 = new ModifyJobChain();
         jobChain1.setJobChain("test/job_chain1");
         listOfJobChains.add(jobChain1);
-        JobChain_____ jobChain2 = new JobChain_____();
+        ModifyJobChain jobChain2 = new ModifyJobChain();
         jobChain2.setJobChain("test/job_chain2");
         listOfJobChains.add(jobChain2);
         
@@ -38,7 +37,7 @@ public class JobChainsResourceModifyJobChainImplTest {
         
         JobChainsResourceModifyJobChainsImpl jobChainsResourceCommandModifyJobChainsImpl = new JobChainsResourceModifyJobChainsImpl();
         JOCDefaultResponse jobsResponse = jobChainsResourceCommandModifyJobChainsImpl.postJobChainsStop(sosShiroCurrentUserAnswer.getAccessToken(), modifySchema);
-        OkSchema okSchema = (OkSchema) jobsResponse.getEntity();
+        Ok okSchema = (Ok) jobsResponse.getEntity();
         assertEquals("postJobChainsStopTest", true, okSchema.getOk());
     }
 
@@ -48,14 +47,14 @@ public class JobChainsResourceModifyJobChainImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        ModifySchema modifySchema = new ModifySchema();
+        ModifyJobChains modifySchema = new ModifyJobChains();
         modifySchema.setJobschedulerId("scheduler_current");
         
-        List<JobChain_____> listOfJobChains = new ArrayList<JobChain_____>();
-        JobChain_____ jobChain1 = new JobChain_____();
+        List<ModifyJobChain> listOfJobChains = new ArrayList<ModifyJobChain>();
+        ModifyJobChain jobChain1 = new ModifyJobChain();
         jobChain1.setJobChain("test/job_chain1");
         listOfJobChains.add(jobChain1);
-        JobChain_____ jobChain2 = new JobChain_____();
+        ModifyJobChain jobChain2 = new ModifyJobChain();
         jobChain2.setJobChain("test/job_chain2");
         listOfJobChains.add(jobChain2);
         
@@ -63,7 +62,7 @@ public class JobChainsResourceModifyJobChainImplTest {
         
         JobChainsResourceModifyJobChainsImpl jobChainsResourceCommandModifyJobChainsImpl = new JobChainsResourceModifyJobChainsImpl();
         JOCDefaultResponse jobsResponse = jobChainsResourceCommandModifyJobChainsImpl.postJobChainsUnStop(sosShiroCurrentUserAnswer.getAccessToken(), modifySchema);
-        OkSchema okSchema = (OkSchema) jobsResponse.getEntity();
+        Ok okSchema = (Ok) jobsResponse.getEntity();
         assertEquals("postJobChainsUnStopTest", true, okSchema.getOk());
     }
 

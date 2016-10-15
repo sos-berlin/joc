@@ -8,13 +8,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.schedule.SchedulesFilterSchema;
+import com.sos.joc.model.schedule.SchedulesFilter;
 
 public interface ISchedulesResourceP {
 
     @POST
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postSchedulesP(@HeaderParam("access_token") String accessToken, SchedulesFilterSchema schedulesFilterSchema) throws Exception;
+    public JOCDefaultResponse postSchedulesP(@HeaderParam("access_token") String accessToken, SchedulesFilter schedulesFilter) throws Exception;
 
 }

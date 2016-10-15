@@ -7,12 +7,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.tree.TreeFilterSchema;
+import com.sos.joc.model.tree.TreeFilter;
 
 public interface ITreeResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTree(@HeaderParam("access_token") String accessToken, TreeFilterSchema treeBody) throws Exception;
+    public JOCDefaultResponse postTree(@HeaderParam("access_token") String accessToken, TreeFilter treeBody) throws Exception;
 
 }

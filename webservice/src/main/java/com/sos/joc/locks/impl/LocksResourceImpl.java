@@ -14,41 +14,41 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.locks.resource.ILocksResource;
-import com.sos.joc.model.lock.Holders;
-import com.sos.joc.model.lock.LockVSchema;
-import com.sos.joc.model.lock.LocksFilterSchema;
-import com.sos.joc.model.lock.LocksVSchema;
+import com.sos.joc.model.lock.LockHolder;
+import com.sos.joc.model.lock.LockHolders;
+import com.sos.joc.model.lock.LockV;
+import com.sos.joc.model.lock.LocksFilter;
+import com.sos.joc.model.lock.LocksV;
 import com.sos.joc.model.lock.Queue;
-import com.sos.joc.model.lock.Task;
 
 @Path("locks")
 public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postLocks(String accessToken, LocksFilterSchema locksFilterSchema) throws Exception {
+    public JOCDefaultResponse postLocks(String accessToken, LocksFilter locksFilter) throws Exception {
 
         LOGGER.debug("init locks");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(locksFilterSchema.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(locksFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            LocksVSchema entity = new LocksVSchema();
+            LocksV entity = new LocksV();
             entity.setDeliveryDate(new Date());
-            List<LockVSchema> listOfLocks = new ArrayList<LockVSchema>();
-            LockVSchema lockVSchema = new LockVSchema();
+            List<LockV> listOfLocks = new ArrayList<LockV>();
+            LockV lockVSchema = new LockV();
             lockVSchema.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus());
-            Holders holders = new Holders();
+            LockHolders holders = new LockHolders();
             holders.setExclusive(true);
 
-            List<Task> listOfTasks = new ArrayList<Task>();
-            Task task = new Task();
-            task.setJob("myJob");
-            task.setTaskId(-1);
-            listOfTasks.add(task);
-            holders.setTasks(listOfTasks);
+            List<LockHolder> listOfLockHolders = new ArrayList<LockHolder>();
+            LockHolder lockHolder = new LockHolder();
+            lockHolder.setJob("myJob");
+            lockHolder.setTaskId("-1");
+            listOfLockHolders.add(lockHolder);
+            holders.setTasks(listOfLockHolders);
             lockVSchema.setHolders(holders);
 
             lockVSchema.setMaxNonExclusive(-1);

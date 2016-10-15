@@ -7,11 +7,13 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.job.Order_;
-import com.sos.joc.model.job.State___;
-import com.sos.joc.model.job.Task200Schema;
-import com.sos.joc.model.job.TaskFilterSchema;
-import com.sos.joc.model.job.TaskSchema;
+import com.sos.joc.model.job.Order;
+import com.sos.joc.model.job.Task;
+import com.sos.joc.model.job.Task200;
+import com.sos.joc.model.job.TaskCause;
+import com.sos.joc.model.job.TaskFilter;
+import com.sos.joc.model.job.TaskState;
+import com.sos.joc.model.job.TaskStateText;
 import com.sos.joc.task.resource.ITaskResource;
 
 @Path("task")
@@ -19,41 +21,40 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postTask(String accessToken, TaskFilterSchema taskFilterSchema) throws Exception {
+    public JOCDefaultResponse postTask(String accessToken, TaskFilter taskFilter) throws Exception {
         LOGGER.debug("init task");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(taskFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             // TODO JOC Cockpit Webservice
 
-            Task200Schema entity = new Task200Schema();
-            entity.setDeliveryDate(new Date());
-            entity.setSurveyDate(new Date());
+            Task task = new Task();
+            task.set_cause(TaskCause.ORDER);
+            task.setEnqueued(new Date());
+            task.setId(-1);
+            task.setIdleSince(new Date());
+            task.setInProcessSince(new Date());
 
-            TaskSchema taskSchema = new TaskSchema();
-            taskSchema.setCause(TaskSchema.Cause.ORDER);
-            taskSchema.setEnqueued(new Date());
-            taskSchema.setId(-1);
-            taskSchema.setIdleSince(new Date());
-            taskSchema.setInProcessSince(new Date());
-
-            Order_ order = new Order_();
+            Order order = new Order();
             order.setPath("myPath");
             order.setTitle("myTitle");
-            taskSchema.setOrder(order);
-            taskSchema.setPid(-1);
-            taskSchema.setRunningSince(new Date());
-            taskSchema.setStartAt(new Date());
-            State___ state = new State___();
+            task.setOrder(order);
+            task.setPid(-1);
+            task.setRunningSince(new Date());
+            task.setStartAt(new Date());
+            TaskState state = new TaskState();
             state.setSeverity(-1);
-            state.setText(State___.Text.RUNNING);
-            taskSchema.setState(state);
-            taskSchema.setSteps(-1);
+            state.set_text(TaskStateText.RUNNING);
+            task.setState(state);
+            task.setSteps(-1);
 
-            entity.setTask(taskSchema);
+            Task200 entity = new Task200();
+            entity.setDeliveryDate(new Date());
+            entity.setSurveyDate(new Date());
+            entity.setTask(task);
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

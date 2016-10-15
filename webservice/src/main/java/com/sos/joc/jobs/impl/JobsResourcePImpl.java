@@ -14,22 +14,24 @@ import com.sos.joc.classes.job.Jobs;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
-import com.sos.joc.model.common.NameValuePairsSchema;
-import com.sos.joc.model.job.Job;
-import com.sos.joc.model.job.JobsFilterSchema;
-import com.sos.joc.model.job.JobsPSchema;
+import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.job.JobP;
+import com.sos.joc.model.job.JobsFilter;
+import com.sos.joc.model.job.JobsP;
 
 @Path("jobs")
 public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobsP(String accessToken, JobsFilterSchema jobsFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilterSchema) throws Exception {
 
         LOGGER.debug("init jobs p");
 
         try {
 
+            // TODO JOC Cockpit Webservice: Reading from database
+            
             Globals.beginTransaction();
             JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
 
@@ -37,16 +39,12 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                 return jocDefaultResponse;
             }
 
-            JobsPSchema entity = new JobsPSchema();
-
-            // TODO JOC Cockpit Webservice: Reading from database
-            entity.setDeliveryDate(new Date());
-            List<Job> listJobs = new ArrayList<Job>();
+            List<JobP> listJobs = new ArrayList<JobP>();
 
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection, jobsFilterSchema.getJobschedulerId());
             List<DBItemInventoryJob> listOfJobs = dbLayer.getInventoryJobs();
             for (DBItemInventoryJob inventoryJob : listOfJobs) {
-                Job job = new Job();
+                JobP job = new JobP();
                 job.setConfigurationDate(new Date());
                 job.setEstimatedDuration(-1);
                 job.setHasDescription(false);
@@ -62,9 +60,9 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                 job.setMaxTasks(-1);
                 job.setName(inventoryJob.getBaseName());
 
-                List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
-                NameValuePairsSchema param1 = new NameValuePairsSchema();
-                NameValuePairsSchema param2 = new NameValuePairsSchema();
+                List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+                NameValuePair param1 = new NameValuePair();
+                NameValuePair param2 = new NameValuePair();
                 param1.setName("param1");
                 param1.setValue("value1");
                 param2.setName("param2");
@@ -82,7 +80,10 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                 listJobs.add(job);
             }
 
+            JobsP entity = new JobsP();
+            entity.setDeliveryDate(new Date());
             entity.setJobs(listJobs);
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

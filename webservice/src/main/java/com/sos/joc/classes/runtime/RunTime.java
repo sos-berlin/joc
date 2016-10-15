@@ -14,18 +14,17 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Node;
 
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.model.common.Runtime200Schema;
-import com.sos.joc.model.common.RuntimeSchema;
+import com.sos.joc.model.common.RunTime200;
 
 
 public class RunTime {
 
-    public static Runtime200Schema set(JOCXmlCommand jocXmlCommand, String postCommand, String xPath) throws Exception {
+    public static RunTime200 set(JOCXmlCommand jocXmlCommand, String postCommand, String xPath) throws Exception {
         jocXmlCommand.excutePost(postCommand);
-        Runtime200Schema runTimeAnswer = new Runtime200Schema();
+        RunTime200 runTimeAnswer = new RunTime200();
         runTimeAnswer.setDeliveryDate(new Date());
         Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode(xPath);
-        RuntimeSchema runTime = new RuntimeSchema();
+        com.sos.joc.model.common.RunTime runTime = new com.sos.joc.model.common.RunTime();
         runTime.setRunTime(getRuntimeXmlString(runtimeNode));
         runTimeAnswer.setRunTime(runTime);
         return runTimeAnswer;

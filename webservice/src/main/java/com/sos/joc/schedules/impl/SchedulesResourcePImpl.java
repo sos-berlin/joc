@@ -13,9 +13,9 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.schedules.resource.ISchedulesResourceP;
-import com.sos.joc.model.schedule.Schedule;
-import com.sos.joc.model.schedule.SchedulesFilterSchema;
-import com.sos.joc.model.schedule.SchedulesPSchema;
+import com.sos.joc.model.schedule.ScheduleP;
+import com.sos.joc.model.schedule.SchedulesFilter;
+import com.sos.joc.model.schedule.SchedulesP;
 import com.sos.joc.model.schedule.Substitute;
 import com.sos.joc.model.schedule.UsedByJob;
 import com.sos.joc.model.schedule.UsedByOrder;
@@ -25,7 +25,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulesResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilterSchema schedulesFilterSchema) throws Exception {
+    public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilter schedulesFilterSchema) throws Exception {
         LOGGER.debug("init schedules/p");
         try {
             JOCDefaultResponse jocDefaultResponse = init(schedulesFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
@@ -33,10 +33,8 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                 return jocDefaultResponse;
             }
 
-            SchedulesPSchema entity = new SchedulesPSchema();
-            entity.setDeliveryDate(new Date());
-            List<Schedule> listOfSchedules = new ArrayList<Schedule>();
-            Schedule schedule = new Schedule();
+            List<ScheduleP> listOfSchedules = new ArrayList<ScheduleP>();
+            ScheduleP schedule = new ScheduleP();
             schedule.setConfigurationDate(new Date());
             schedule.setName("myName");
             schedule.setPath("myPath");
@@ -64,6 +62,8 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 
             listOfSchedules.add(schedule);
 
+            SchedulesP entity = new SchedulesP();
+            entity.setDeliveryDate(new Date());
             entity.setSchedules(listOfSchedules);
 
             return JOCDefaultResponse.responseStatus200(entity);

@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.ErrorSchema;
-import com.sos.joc.model.job.History;
-import com.sos.joc.model.job.HistorySchema;
-import com.sos.joc.model.job.JobsFilterSchema;
-import com.sos.joc.model.job.State.Text;
+import com.sos.joc.model.common.Error;
+import com.sos.joc.model.job.JobsFilter;
+import com.sos.joc.model.job.TaskHistory;
+import com.sos.joc.model.job.TaskHistoryItem;
+import com.sos.joc.model.job.TaskHistoryState;
+import com.sos.joc.model.job.TaskHistoryStateText;
 import com.sos.joc.tasks.resource.ITasksResourceHistory;
 
 @Path("tasks")
@@ -24,48 +25,49 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceHistoryImpl.class);
 
     @Override
-    public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilterSchema jobsFilterSchema) throws Exception {
+    public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
         LOGGER.debug("init tasks/history");
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getHistory().isView());
+            JOCDefaultResponse jocDefaultResponse = init(jobsFilter.getJobschedulerId(), getPermissons(accessToken).getHistory().isView());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            HistorySchema entity = new HistorySchema();
-            List<History> listOfHistory = new ArrayList<History>();
+            TaskHistory entity = new TaskHistory();
             entity.setDeliveryDate(new Date());
-
-            History history1 = new History();
+            
+            List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
+            
+            TaskHistoryItem history1 = new TaskHistoryItem();
             history1.setAgent("myAgent");
             history1.setClusterMember("myClusterMember");
             history1.setEndTime(new Date());
-            ErrorSchema errorSchema = new ErrorSchema();
-            errorSchema.setCode("myCode");
-            errorSchema.setMessage("myMessage");
-            history1.setError(errorSchema);
+            Error error = new Error();
+            error.setCode("myCode");
+            error.setMessage("myMessage");
+            history1.setError(error);
 
             history1.setExitCode(-1);
             history1.setJob("myJob");
             history1.setStartTime(new Date());
-            com.sos.joc.model.job.State state = new com.sos.joc.model.job.State();
+            TaskHistoryState state = new TaskHistoryState();
             state.setSeverity(-1);
-            state.setText(Text.SUCCESSFUL);
+            state.set_text(TaskHistoryStateText.SUCCESSFUL);
             history1.setState(state);
 
             history1.setSteps(-1);
-            history1.setTaskId(-1);
+            history1.setTaskId("-1");
             listOfHistory.add(history1);
 
             entity.setHistory(listOfHistory);
 
-            History history2 = new History();
+            TaskHistoryItem history2 = new TaskHistoryItem();
             history2.setAgent("myAgent");
             history2.setClusterMember("myClusterMember");
             history2.setEndTime(new Date());
-            history2.setError(errorSchema);
+            history2.setError(error);
 
             history2.setExitCode(-1);
             history2.setJob("myJob");
@@ -73,7 +75,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             history2.setState(state);
 
             history2.setSteps(-1);
-            history2.setTaskId(-1);
+            history2.setTaskId("-1");
             listOfHistory.add(history1);
             entity.setHistory(listOfHistory);
 

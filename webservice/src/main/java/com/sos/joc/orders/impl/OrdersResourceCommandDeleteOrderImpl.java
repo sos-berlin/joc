@@ -11,8 +11,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.order.ModifyOrderSchema;
-import com.sos.joc.model.order.ModifyOrdersSchema;
+import com.sos.joc.model.order.ModifyOrder;
+import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandDeleteOrder;
 import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdRemoveOrder;
@@ -22,7 +22,7 @@ import com.sos.scheduler.model.objects.Spooler;
 public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandDeleteOrder {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandDeleteOrderImpl.class);
 
-    private JOCDefaultResponse executeDeleteOrderCommand(ModifyOrderSchema order) {
+    private JOCDefaultResponse executeDeleteOrderCommand(ModifyOrder order) {
 
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
@@ -43,16 +43,16 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrdersSchema modifyOrdersSchema) {
+    public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrders modifyOrders) {
         LOGGER.debug("init Orders:Delete");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(modifyOrdersSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getDelete().isTemporary());
+            jocDefaultResponse = init(modifyOrders.getJobschedulerId(), getPermissons(accessToken).getOrder().getDelete().isTemporary());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (ModifyOrderSchema order : modifyOrdersSchema.getOrders()) {
+            for (ModifyOrder order : modifyOrders.getOrders()) {
                 jocDefaultResponse = executeDeleteOrderCommand(order);
             }
 

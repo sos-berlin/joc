@@ -8,15 +8,14 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.LogContent;
 import com.sos.joc.classes.LogOrderContent;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.LogContent200Schema;
-import com.sos.joc.model.common.LogContentSchema;
-import com.sos.joc.model.order.OrderFilterWithHistoryIdSchema;
-import com.sos.joc.model.order.OrderFilterWithHistoryIdSchema.Mime;
+import com.sos.joc.model.common.LogContent200;
+import com.sos.joc.model.common.LogContent;
+import com.sos.joc.model.common.LogMime;
+import com.sos.joc.model.order.OrderHistoryFilter;
 import com.sos.joc.order.resource.IOrderLogResource;
 
 @Path("order")
@@ -25,36 +24,36 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderLogResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrderLog(String accessToken, OrderFilterWithHistoryIdSchema orderFilterWithHistoryIdSchema) throws Exception {
+    public JOCDefaultResponse postOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
         LOGGER.debug("init order/log");
 
         try {
-            checkRequiredParameter("jobschedulerId", orderFilterWithHistoryIdSchema.getJobschedulerId());
-            checkRequiredParameter("jobChain", orderFilterWithHistoryIdSchema.getJobChain());
-            checkRequiredParameter("orderId", orderFilterWithHistoryIdSchema.getOrderId());
-            checkRequiredParameter("historyId", orderFilterWithHistoryIdSchema.getHistoryId());
+            checkRequiredParameter("jobschedulerId", orderHistoryFilter.getJobschedulerId());
+            checkRequiredParameter("jobChain", orderHistoryFilter.getJobChain());
+            checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
+            checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
 
-            JOCDefaultResponse jocDefaultResponse = init(orderFilterWithHistoryIdSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isOrderLog());
+            JOCDefaultResponse jocDefaultResponse = init(orderHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isOrderLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            LogContent200Schema entity = new LogContent200Schema();
-            LogOrderContent logOrderContent = new LogOrderContent(orderFilterWithHistoryIdSchema, dbItemInventoryInstance);
+            LogContent200 entity = new LogContent200();
+            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance);
 
             entity.setDeliveryDate(new Date());
-            LogContentSchema logContentSchema = new LogContentSchema();
+            LogContent logContentSchema = new LogContent();
             String log = logOrderContent.getLog();
              
-            if (orderFilterWithHistoryIdSchema.getMime() != null && orderFilterWithHistoryIdSchema.getMime().toString().equals(Mime.HTML.toString())) {
+            if (orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
                 logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(log));
             } else {
-                if (orderFilterWithHistoryIdSchema.getMime() == null || orderFilterWithHistoryIdSchema.getMime().toString().equals(Mime.PLAIN.toString())) {
+                if (orderHistoryFilter.getMime() == null || orderHistoryFilter.getMime() == LogMime.PLAIN) {
                     logContentSchema.setPlain(log);
                 } else {
                     JocError jocError = new JocError();
                     jocError.setCode(WebserviceConstants.WRONG_MIME_TYPE);
-                    jocError.setMessage("Unknow mime type: " + orderFilterWithHistoryIdSchema.getMime());
+                    jocError.setMessage("Unknow mime type: " + orderHistoryFilter.getMime());
                     throw new JocException(jocError);
                 }
             }

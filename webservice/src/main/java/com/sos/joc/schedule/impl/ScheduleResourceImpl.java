@@ -11,10 +11,10 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.schedule.Schedule;
+import com.sos.joc.classes.schedule.ScheduleVolatile;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.schedule.Schedule200VSchema;
-import com.sos.joc.model.schedule.ScheduleFilterSchema;
+import com.sos.joc.model.schedule.ScheduleV200;
+import com.sos.joc.model.schedule.ScheduleFilter;
 import com.sos.joc.schedule.resource.IScheduleResource;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
@@ -27,14 +27,14 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postSchedule(String accessToken, ScheduleFilterSchema scheduleFilterSchema) throws Exception {
+    public JOCDefaultResponse postSchedule(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
         LOGGER.debug("init schedule");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(scheduleFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(scheduleFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            String scheduleIn = scheduleFilterSchema.getSchedule();
+            String scheduleIn = scheduleFilter.getSchedule();
             this.checkRequiredParameter("schedule", scheduleIn);
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
@@ -47,18 +47,18 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
 
             Element scheduleElement  = jocXmlCommand.executeXPath(String.format(XPATH_SCHEDULES,scheduleIn));
 
-            Schedule200VSchema entity = new Schedule200VSchema();
+            ScheduleVolatile scheduleV = new ScheduleVolatile(jocXmlCommand, scheduleElement);
+            scheduleV.setValues();
+            
+            ScheduleV200 entity = new ScheduleV200();
             entity.setDeliveryDate(new Date());
-
-            Schedule schedule = new Schedule(jocXmlCommand, scheduleElement);
-            entity.setSchedule(schedule.getSchedule());
+            entity.setSchedule(scheduleV);
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 

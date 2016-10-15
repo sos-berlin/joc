@@ -8,13 +8,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.processClass.ProcessClassesFilterSchema;
+import com.sos.joc.model.processClass.ProcessClassesFilter;
 
 public interface IProcessClassesResourceP {
 
     @POST
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postProcessClassesP(@HeaderParam("access_token") String accessToken, ProcessClassesFilterSchema processClassFilterSchema) throws Exception;
-
+    public JOCDefaultResponse postProcessClassesP(@HeaderParam("access_token") String accessToken, ProcessClassesFilter processClassFilterSchema) throws Exception;
 }

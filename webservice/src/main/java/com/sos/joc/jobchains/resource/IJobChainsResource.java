@@ -7,12 +7,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobChain.JobChainsFilterSchema;
+import com.sos.joc.model.jobChain.JobChainsFilter;
 
 public interface IJobChainsResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobChains(@HeaderParam("access_token") String accessToken, JobChainsFilterSchema jobChainsFilterSchema) throws Exception;
+    public JOCDefaultResponse postJobChains(@HeaderParam("access_token") String accessToken, JobChainsFilter jobChainsFilter) throws Exception;
 
 }

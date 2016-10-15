@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.JobFilterSchema;
+import com.sos.joc.model.job.JobFilter;
 
 public class JobResourceOrderQueueImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -22,7 +22,7 @@ public class JobResourceOrderQueueImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobFilterSchema jobFilterSchema = new JobFilterSchema();
+        JobFilter jobFilterSchema = new JobFilter();
         jobFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobFilterSchema.setJob("check_history/check");
         JobResourceOrderQueueImpl jobOrderQueueImpl = new JobResourceOrderQueueImpl();

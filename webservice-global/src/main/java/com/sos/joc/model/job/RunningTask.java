@@ -2,9 +2,10 @@
 package com.sos.joc.model.job;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -16,7 +17,18 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * task object of an order job which is running
  * 
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
+@JsonPropertyOrder({
+    "taskId",
+    "pid",
+    "startedAt",
+    "enqueued",
+    "idleSince",
+    "steps",
+    "_cause",
+    "order"
+})
 public class RunningTask {
 
     /**
@@ -24,7 +36,9 @@ public class RunningTask {
      * (Required)
      * 
      */
-    private Integer taskId;
+    @JsonProperty("taskId")
+    private String taskId;
+    @JsonProperty("pid")
     private Integer pid;
     /**
      * timestamp
@@ -33,6 +47,7 @@ public class RunningTask {
      * (Required)
      * 
      */
+    @JsonProperty("startedAt")
     private Date startedAt;
     /**
      * timestamp
@@ -40,6 +55,7 @@ public class RunningTask {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
+    @JsonProperty("enqueued")
     private Date enqueued;
     /**
      * timestamp
@@ -47,18 +63,26 @@ public class RunningTask {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
+    @JsonProperty("idleSince")
     private Date idleSince;
+    @JsonProperty("steps")
     private Integer steps;
     /**
+     * task cause
+     * <p>
      * For order jobs only cause=order possible
      * 
      */
-    private RunningTask.Cause cause;
+    @JsonProperty("_cause")
+    private TaskCause _cause;
     /**
+     * order in running task
+     * <p>
      * Only relevant for order jobs; cause=order resp.
      * 
      */
-    private Order order;
+    @JsonProperty("order")
+    private OrderInRunningTask order;
 
     /**
      * 
@@ -67,7 +91,8 @@ public class RunningTask {
      * @return
      *     The taskId
      */
-    public Integer getTaskId() {
+    @JsonProperty("taskId")
+    public String getTaskId() {
         return taskId;
     }
 
@@ -78,7 +103,8 @@ public class RunningTask {
      * @param taskId
      *     The taskId
      */
-    public void setTaskId(Integer taskId) {
+    @JsonProperty("taskId")
+    public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
@@ -87,6 +113,7 @@ public class RunningTask {
      * @return
      *     The pid
      */
+    @JsonProperty("pid")
     public Integer getPid() {
         return pid;
     }
@@ -96,6 +123,7 @@ public class RunningTask {
      * @param pid
      *     The pid
      */
+    @JsonProperty("pid")
     public void setPid(Integer pid) {
         this.pid = pid;
     }
@@ -109,6 +137,7 @@ public class RunningTask {
      * @return
      *     The startedAt
      */
+    @JsonProperty("startedAt")
     public Date getStartedAt() {
         return startedAt;
     }
@@ -122,6 +151,7 @@ public class RunningTask {
      * @param startedAt
      *     The startedAt
      */
+    @JsonProperty("startedAt")
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
     }
@@ -134,6 +164,7 @@ public class RunningTask {
      * @return
      *     The enqueued
      */
+    @JsonProperty("enqueued")
     public Date getEnqueued() {
         return enqueued;
     }
@@ -146,6 +177,7 @@ public class RunningTask {
      * @param enqueued
      *     The enqueued
      */
+    @JsonProperty("enqueued")
     public void setEnqueued(Date enqueued) {
         this.enqueued = enqueued;
     }
@@ -158,6 +190,7 @@ public class RunningTask {
      * @return
      *     The idleSince
      */
+    @JsonProperty("idleSince")
     public Date getIdleSince() {
         return idleSince;
     }
@@ -170,6 +203,7 @@ public class RunningTask {
      * @param idleSince
      *     The idleSince
      */
+    @JsonProperty("idleSince")
     public void setIdleSince(Date idleSince) {
         this.idleSince = idleSince;
     }
@@ -179,6 +213,7 @@ public class RunningTask {
      * @return
      *     The steps
      */
+    @JsonProperty("steps")
     public Integer getSteps() {
         return steps;
     }
@@ -188,47 +223,60 @@ public class RunningTask {
      * @param steps
      *     The steps
      */
+    @JsonProperty("steps")
     public void setSteps(Integer steps) {
         this.steps = steps;
     }
 
     /**
+     * task cause
+     * <p>
      * For order jobs only cause=order possible
      * 
      * @return
-     *     The cause
-     */
-    public RunningTask.Cause getCause() {
-        return cause;
-    }
-
-    /**
-     * For order jobs only cause=order possible
-     * 
-     * @param cause
      *     The _cause
      */
-    public void setCause(RunningTask.Cause cause) {
-        this.cause = cause;
+    @JsonProperty("_cause")
+    public TaskCause get_cause() {
+        return _cause;
     }
 
     /**
+     * task cause
+     * <p>
+     * For order jobs only cause=order possible
+     * 
+     * @param _cause
+     *     The _cause
+     */
+    @JsonProperty("_cause")
+    public void set_cause(TaskCause _cause) {
+        this._cause = _cause;
+    }
+
+    /**
+     * order in running task
+     * <p>
      * Only relevant for order jobs; cause=order resp.
      * 
      * @return
      *     The order
      */
-    public Order getOrder() {
+    @JsonProperty("order")
+    public OrderInRunningTask getOrder() {
         return order;
     }
 
     /**
+     * order in running task
+     * <p>
      * Only relevant for order jobs; cause=order resp.
      * 
      * @param order
      *     The order
      */
-    public void setOrder(Order order) {
+    @JsonProperty("order")
+    public void setOrder(OrderInRunningTask order) {
         this.order = order;
     }
 
@@ -239,7 +287,7 @@ public class RunningTask {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(taskId).append(pid).append(startedAt).append(enqueued).append(idleSince).append(steps).append(cause).append(order).toHashCode();
+        return new HashCodeBuilder().append(taskId).append(pid).append(startedAt).append(enqueued).append(idleSince).append(steps).append(_cause).append(order).toHashCode();
     }
 
     @Override
@@ -251,49 +299,7 @@ public class RunningTask {
             return false;
         }
         RunningTask rhs = ((RunningTask) other);
-        return new EqualsBuilder().append(taskId, rhs.taskId).append(pid, rhs.pid).append(startedAt, rhs.startedAt).append(enqueued, rhs.enqueued).append(idleSince, rhs.idleSince).append(steps, rhs.steps).append(cause, rhs.cause).append(order, rhs.order).isEquals();
-    }
-
-    @Generated("org.jsonschema2pojo")
-    public enum Cause {
-
-        NONE("NONE"),
-        MIN_TASKS("MIN_TASKS"),
-        PERIOD_ONCE("PERIOD_ONCE"),
-        PERIOD_SINGLE("PERIOD_SINGLE"),
-        PERIOD_REPEAT("PERIOD_REPEAT"),
-        QUEUE("QUEUE"),
-        QUEUE_AT("QUEUE_AT"),
-        DIRECTORY("DIRECTORY"),
-        DELAY_AFTER_ERROR("DELAY_AFTER_ERROR"),
-        ORDER("ORDER");
-        private final String value;
-        private final static Map<String, RunningTask.Cause> CONSTANTS = new HashMap<String, RunningTask.Cause>();
-
-        static {
-            for (RunningTask.Cause c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Cause(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        public static RunningTask.Cause fromValue(String value) {
-            RunningTask.Cause constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
+        return new EqualsBuilder().append(taskId, rhs.taskId).append(pid, rhs.pid).append(startedAt, rhs.startedAt).append(enqueued, rhs.enqueued).append(idleSince, rhs.idleSince).append(steps, rhs.steps).append(_cause, rhs._cause).append(order, rhs.order).isEquals();
     }
 
 }

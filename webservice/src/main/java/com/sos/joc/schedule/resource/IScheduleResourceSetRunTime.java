@@ -8,13 +8,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.schedule.ModifyRuntimeSchema;
+import com.sos.joc.model.schedule.ModifyRunTime;
 
 public interface IScheduleResourceSetRunTime {
 
     @POST
     @Path("set_run_time")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postScheduleSetRuntime(@HeaderParam("access_token") String accessToken, ModifyRuntimeSchema modifyRuntimeSchema) throws Exception;
+    public JOCDefaultResponse postScheduleSetRuntime(@HeaderParam("access_token") String accessToken, ModifyRunTime modifyRuntimeSchema) throws Exception;
 
 }

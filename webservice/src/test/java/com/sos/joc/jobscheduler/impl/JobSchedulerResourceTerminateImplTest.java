@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.jobscheduler.impl.JobSchedulerResourceModifyJobSchedulerImpl;
-import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
+import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 
 public class JobSchedulerResourceTerminateImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -17,7 +17,7 @@ public class JobSchedulerResourceTerminateImplTest {
            
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        UrlTimeoutParamSchema urlTimeoutParamSchema = new UrlTimeoutParamSchema();
+        HostPortTimeOutParameter urlTimeoutParamSchema = new HostPortTimeOutParameter();
         urlTimeoutParamSchema.setJobschedulerId("scheduler_current");
         urlTimeoutParamSchema.setTimeout(30);
         JobSchedulerResourceModifyJobSchedulerImpl jobschedulerResourceTerminateImpl = new JobSchedulerResourceModifyJobSchedulerImpl();
@@ -29,7 +29,7 @@ public class JobSchedulerResourceTerminateImplTest {
            
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        UrlTimeoutParamSchema urlTimeoutParamSchema = new UrlTimeoutParamSchema();
+        HostPortTimeOutParameter urlTimeoutParamSchema = new HostPortTimeOutParameter();
         urlTimeoutParamSchema.setJobschedulerId("scheduler_current");
         urlTimeoutParamSchema.setTimeout(30);
         JobSchedulerResourceModifyJobSchedulerImpl jobschedulerResourceTerminateImpl = new JobSchedulerResourceModifyJobSchedulerImpl();

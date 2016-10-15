@@ -9,22 +9,24 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
-import com.sos.joc.model.jobscheduler.Agent;
-import com.sos.joc.model.jobscheduler.AgentClusterFilterSchema;
-import com.sos.joc.model.jobscheduler.AgentClusterPSchema;
-import com.sos.joc.model.jobscheduler.AgentClustersPSchema;
-import com.sos.joc.model.jobscheduler.NumOfAgents;
-import com.sos.joc.model.jobscheduler.Os;
-import com.sos.joc.model.jobscheduler.State;
-import com.sos.joc.model.jobscheduler.State.Text;
-import com.sos.joc.model.jobscheduler.State_;
+import com.sos.joc.model.jobscheduler.AgentClusterFilter;
+import com.sos.joc.model.jobscheduler.AgentClusterP;
+import com.sos.joc.model.jobscheduler.AgentClusterState;
+import com.sos.joc.model.jobscheduler.AgentClusterStateText;
+import com.sos.joc.model.jobscheduler.AgentClusterType;
+import com.sos.joc.model.jobscheduler.AgentClustersP;
+import com.sos.joc.model.jobscheduler.AgentOfCluster;
+import com.sos.joc.model.jobscheduler.JobSchedulerState;
+import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
+import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
+import com.sos.joc.model.jobscheduler.OperatingSystem;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilterSchema jobSchedulerAgentClustersBody) {
+    public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
         LOGGER.debug("init jobscheduler/agent/clusters/P");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerAgentClustersBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
@@ -32,34 +34,33 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 return jocDefaultResponse;
             }
 
-            AgentClustersPSchema entity = new AgentClustersPSchema();
+            AgentClustersP entity = new AgentClustersP();
 
             // TODO JOC Cockpit Webservice
 
             entity.setDeliveryDate(new Date());
 
-            ArrayList<AgentClusterPSchema> listOfAgentClusters = new ArrayList<AgentClusterPSchema>();
+            ArrayList<AgentClusterP> listOfAgentClusters = new ArrayList<AgentClusterP>();
 
-            AgentClusterPSchema agentClusterPSchema = new AgentClusterPSchema();
+            AgentClusterP agentClusterPSchema = new AgentClusterP();
             agentClusterPSchema.setMaxProcesses(-1);
             agentClusterPSchema.setName("myName");
             agentClusterPSchema.setPath("myPath");
-            agentClusterPSchema.setType(AgentClusterPSchema.Type.ROUND_ROBIN);
+            agentClusterPSchema.set_type(AgentClusterType.ROUND_ROBIN);
             agentClusterPSchema.setSurveyDate(new Date());
 
-            ArrayList<Agent> listOfAgents = new ArrayList<Agent>();
-            Agent agent1 = new Agent();
+            ArrayList<AgentOfCluster> listOfAgents = new ArrayList<AgentOfCluster>();
+            AgentOfCluster agent1 = new AgentOfCluster();
             agent1.setHost("myHost");
-            Os os = new Os();
+            OperatingSystem os = new OperatingSystem();
             os.setArchitecture("64");
             os.setDistribution("myDistribution");
             os.setName("myName");
             agent1.setOs(os);
-            agent1.setPort(4444);
             agent1.setStartedAt(new Date());
-            State state1 = new State();
+            JobSchedulerState state1 = new JobSchedulerState();
             state1.setSeverity(1);
-            state1.setText(Text.TERMINATING);
+            state1.set_text(JobSchedulerStateText.TERMINATING);
             agent1.setState(state1);
             agent1.setSurveyDate(new Date());
             agent1.setUrl("myUrl");
@@ -68,18 +69,17 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
 
             listOfAgents.add(agent1);
 
-            Agent agent2 = new Agent();
+            AgentOfCluster agent2 = new AgentOfCluster();
             agent2.setHost("myHost");
-            Os os2 = new Os();
+            OperatingSystem os2 = new OperatingSystem();
             os2.setArchitecture("32");
             os2.setDistribution("myDistribution");
             os2.setName("myName");
             agent2.setOs(os);
-            agent2.setPort(4444);
             agent2.setStartedAt(new Date());
-            State state2 = new State();
+            JobSchedulerState state2 = new JobSchedulerState();
             state2.setSeverity(3);
-            state2.setText(Text.TERMINATING);
+            state2.set_text(JobSchedulerStateText.TERMINATING);
             agent2.setState(state1);
             agent2.setSurveyDate(new Date());
             agent2.setUrl("myUrl");
@@ -87,14 +87,14 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             listOfAgents.add(agent2);
 
             agentClusterPSchema.setAgents(listOfAgents);
-            NumOfAgents numOfAgents = new NumOfAgents();
+            NumOfAgentsInCluster numOfAgents = new NumOfAgentsInCluster();
             numOfAgents.setAny(-1);
             numOfAgents.setRunning(-1);
             agentClusterPSchema.setNumOfAgents(numOfAgents);
 
-            State_ state = new State_();
+            AgentClusterState state = new AgentClusterState();
             state.setSeverity(2);
-            state.setText(State_.Text.ALL_AGENTS_ARE_UNREACHABLE);
+            state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_UNREACHABLE);
             agentClusterPSchema.setState(state);
 
             listOfAgentClusters.add(agentClusterPSchema);

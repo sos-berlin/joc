@@ -19,12 +19,12 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.processClass.ProcessClass;
-import com.sos.joc.model.processClass.ProcessClassVSchema;
-import com.sos.joc.model.processClass.ProcessClassesFilterSchema;
-import com.sos.joc.model.processClass.ProcessClassesVSchema;
-import com.sos.joc.model.processClass.ProcessSchema;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.processClass.Process;
+import com.sos.joc.model.processClass.ProcessClassPath;
+import com.sos.joc.model.processClass.ProcessClassV;
+import com.sos.joc.model.processClass.ProcessClassesFilter;
+import com.sos.joc.model.processClass.ProcessClassesV;
 import com.sos.joc.processClasses.resource.IProcessClassesResource;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
@@ -45,20 +45,20 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     private static final String XPATH_PROCESS_CLASSES = "//process_class";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassesResourceImpl.class);
 
-    private ProcessClassesFilterSchema processClassFilterSchema;
+    private ProcessClassesFilter processClassFilter;
     private HashMap<String, String> mapOfProcessClasses;
 
     @Override
-    public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilterSchema processClassFilterSchema) throws Exception {
+    public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
 
         LOGGER.debug("init processClasses");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(processClassFilterSchema.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(processClassFilter.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            this.processClassFilterSchema = processClassFilterSchema;
+            this.processClassFilter = processClassFilter;
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
@@ -72,13 +72,13 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
             int count = jocXmlCommand.getNodeList().getLength();
 
-            List<ProcessClassVSchema> listOfProcessClasses = new ArrayList<ProcessClassVSchema>();
-            ProcessClassesVSchema entity = new ProcessClassesVSchema();
+            List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
+            ProcessClassesV entity = new ProcessClassesV();
             entity.setDeliveryDate(new Date());
 
             Pattern pattern = null;
-            if (!("".equals(processClassFilterSchema.getRegex()) || processClassFilterSchema.getRegex() == null)) {
-                pattern = Pattern.compile(processClassFilterSchema.getRegex());
+            if (!("".equals(processClassFilter.getRegex()) || processClassFilter.getRegex() == null)) {
+                pattern = Pattern.compile(processClassFilter.getRegex());
             }
 
             createProcessClassesMap();
@@ -89,34 +89,34 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 String path = jocXmlCommand.getAttributeWithDefault(ATTRIBUTE_PATH, SLASH + DEFAULT_NAME);
 
                 boolean addProccessClass = 
-                        (!processClassFilterSchema.getProcessClasses().isEmpty() && isInProceccClassMap(path)) || 
-                        (processClassFilterSchema.getProcessClasses().isEmpty() && (matchesRegex(pattern, path) && isInFolderList(path)));
+                        (!processClassFilter.getProcessClasses().isEmpty() && isInProceccClassMap(path)) || 
+                        (processClassFilter.getProcessClasses().isEmpty() && (matchesRegex(pattern, path) && isInFolderList(path)));
 
                 if (addProccessClass) {
 
-                    ProcessClassVSchema processClassVSchema = new ProcessClassVSchema();
-                    processClassVSchema.setSurveyDate(jocXmlCommand.getSurveyDate());
-                    processClassVSchema.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(processClassElement));
-                    processClassVSchema.setName(jocXmlCommand.getAttributeWithDefault(ATTRIBUTE_NAME, DEFAULT_NAME));
-                    processClassVSchema.setPath(path);
+                    ProcessClassV processClassV = new ProcessClassV();
+                    processClassV.setSurveyDate(jocXmlCommand.getSurveyDate());
+                    processClassV.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(processClassElement));
+                    processClassV.setName(jocXmlCommand.getAttributeWithDefault(ATTRIBUTE_NAME, DEFAULT_NAME));
+                    processClassV.setPath(path);
 
                     jocXmlCommand.createNodeList(KEY_PROCESSES, String.format(XPATH_PROCESSES, path));
-                    List<ProcessSchema> listOfProcesses = new ArrayList<ProcessSchema>();
+                    List<Process> listOfProcesses = new ArrayList<Process>();
                     int countProcesses = jocXmlCommand.getNodeList(KEY_PROCESSES).getLength();
-                    processClassVSchema.setNumOfProcesses(countProcesses);
+                    processClassV.setNumOfProcesses(countProcesses);
 
                     for (int ii = 0; ii < countProcesses; ii++) {
                         jocXmlCommand.getElementFromList(KEY_PROCESSES, ii);
-                        ProcessSchema processSchema = new ProcessSchema();
-                        processSchema.setJob(jocXmlCommand.getAttribute(KEY_PROCESSES, ATTRIBUTE_JOB));
-                        processSchema.setPid(jocXmlCommand.getAttributeAsInteger(KEY_PROCESSES, ATTRIBUTE_PID));
-                        processSchema.setRunningSince(jocXmlCommand.getAttributeAsDate(KEY_PROCESSES, ATTRIBUTE_RUNNING_SINCE));
-                        processSchema.setTaskId(jocXmlCommand.getAttributeAsInteger(KEY_PROCESSES, ATTRIBUTE_TASK_ID));
-                        listOfProcesses.add(processSchema);
+                        Process process = new Process();
+                        process.setJob(jocXmlCommand.getAttribute(KEY_PROCESSES, ATTRIBUTE_JOB));
+                        process.setPid(jocXmlCommand.getAttributeAsInteger(KEY_PROCESSES, ATTRIBUTE_PID));
+                        process.setRunningSince(jocXmlCommand.getAttributeAsDate(KEY_PROCESSES, ATTRIBUTE_RUNNING_SINCE));
+                        process.setTaskId(jocXmlCommand.getAttribute(KEY_PROCESSES, ATTRIBUTE_TASK_ID));
+                        listOfProcesses.add(process);
                     }
 
-                    processClassVSchema.setProcesses(listOfProcesses);
-                    listOfProcessClasses.add(processClassVSchema);
+                    processClassV.setProcesses(listOfProcesses);
+                    listOfProcessClasses.add(processClassV);
                 }
             }
             entity.setProcessClasses(listOfProcessClasses);
@@ -131,12 +131,12 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
  
     private boolean isInProceccClassMap(String path) {
-        return (processClassFilterSchema.getProcessClasses().isEmpty() || mapOfProcessClasses.get(path) != null);
+        return (processClassFilter.getProcessClasses().isEmpty() || mapOfProcessClasses.get(path) != null);
     }
 
     private void createProcessClassesMap() throws JocMissingRequiredParameterException {
         mapOfProcessClasses = new HashMap<String, String>();
-        for (ProcessClass processClass : processClassFilterSchema.getProcessClasses()) {
+        for (ProcessClassPath processClass : processClassFilter.getProcessClasses()) {
             String processClassName = processClass.getProcessClass();
             checkRequiredParameter("processClasses.processClass", processClassName);
             
@@ -146,12 +146,12 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     }
 
     private boolean isInFolderList(String path) throws JocMissingRequiredParameterException {
-        if (processClassFilterSchema.getFolders().size() == 0) {
+        if (processClassFilter.getFolders().size() == 0) {
             return true;
         }
 
         path = getParent(path);
-        for (FoldersSchema folder : processClassFilterSchema.getFolders()) {
+        for (Folder folder : processClassFilter.getFolders()) {
             boolean isRecursive = (folder.getRecursive() || folder.getRecursive() == null);
 
             String folderName = folder.getFolder();

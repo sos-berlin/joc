@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.order.OrdersFilterSchema;
-import com.sos.joc.model.order.Orders_;
-import com.sos.joc.model.order.SummarySchema;
+import com.sos.joc.model.order.OrdersFilter;
+import com.sos.joc.model.order.OrdersHistoricSummary;
+import com.sos.joc.model.order.OrdersOverView;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSummary;
 
 @Path("orders")
@@ -19,10 +19,10 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceOverviewSummaryImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
+    public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
         LOGGER.debug("init Orders");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(ordersFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -30,21 +30,20 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 
             // Reading orders from the database tale inventory.orders filtered
             // by
-            ordersFilterSchema.getDateFrom(); // is ISO 8601 or something like
-                                              // 6h 1w 65y
-            ordersFilterSchema.getDateTo(); // same as dateFrom
-            ordersFilterSchema.getTimeZone();
-            ordersFilterSchema.getRegex();
-            ordersFilterSchema.getOrders(); // list of wanted orders.
+//            ordersFilter.getDateFrom(); // is ISO 8601 or something like
+//                                              // 6h 1w 65y
+//            ordersFilter.getDateTo(); // same as dateFrom
+//            ordersFilter.getTimeZone();
+//            ordersFilter.getRegex();
+//            ordersFilter.getOrders(); // list of wanted orders.
 
             // TODO JOC Cockpit Webservice (Inventory_Orders)
 
-            SummarySchema entity = new SummarySchema();
-            Orders_ orders = new Orders_();
-
+            OrdersHistoricSummary orders = new OrdersHistoricSummary();
             orders.setFailed(-1);
             orders.setSuccessful(-1);
 
+            OrdersOverView entity = new OrdersOverView();
             entity.setDeliveryDate(new Date());
             entity.setSurveyDate(new Date());
             entity.setOrders(orders);

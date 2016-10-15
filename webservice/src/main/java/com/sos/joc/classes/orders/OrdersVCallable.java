@@ -21,20 +21,20 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.job.OrderQueue;
-import com.sos.joc.model.jobChain.JobChain__;
-import com.sos.joc.model.order.OrderFilterWithCompactSchema;
-import com.sos.joc.model.order.OrdersFilterSchema;
-import com.sos.joc.model.order.ProcessingState;
-import com.sos.joc.model.order.Type;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.jobChain.JobChainV;
+import com.sos.joc.model.order.OrderFilter;
+import com.sos.joc.model.order.OrderStateText;
+import com.sos.joc.model.order.OrderType;
+import com.sos.joc.model.order.OrderV;
+import com.sos.joc.model.order.OrdersFilter;
 
-public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
+public class OrdersVCallable implements Callable<Map<String,OrderV>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersVCallable.class);
     private final String job;
     private final OrdersPerJobChain orders;
-    private final FoldersSchema folder;
-    private final OrdersFilterSchema ordersBody;
+    private final Folder folder;
+    private final OrdersFilter ordersBody;
     private final Boolean compact;
     private final URI uri;
     
@@ -56,7 +56,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         this.uri = uri;
     }
     
-    public OrdersVCallable(JobChain__ jobChain, Boolean compact, URI uri) {
+    public OrdersVCallable(JobChainV jobChain, Boolean compact, URI uri) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(jobChain.getPath());
         this.orders = o;
@@ -67,7 +67,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         this.uri = uri;
     }
     
-    public OrdersVCallable(OrderFilterWithCompactSchema order, URI uri) {
+    public OrdersVCallable(OrderFilter order, URI uri) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(order.getJobChain());
         o.addOrder(order.getOrderId());
@@ -79,7 +79,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         this.uri = uri;
     }
     
-    public OrdersVCallable(FoldersSchema folder, OrdersFilterSchema ordersBody, URI uri) {
+    public OrdersVCallable(Folder folder, OrdersFilter ordersBody, URI uri) {
         this.orders = null;
         this.job = null;
         this.folder = folder;
@@ -89,7 +89,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
     }
     
     @Override
-    public Map<String,OrderQueue> call() throws Exception {
+    public Map<String,OrderV> call() throws Exception {
         if(orders != null) {
             return getOrders(orders, compact, uri);
         } else if(job != null) { 
@@ -99,39 +99,39 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         }
     }
     
-    public OrderQueue getOrder() throws Exception {
-        Map<String,OrderQueue> orderMap = getOrders(orders, compact, uri);
+    public OrderV getOrder() throws Exception {
+        Map<String,OrderV> orderMap = getOrders(orders, compact, uri);
         if (orderMap == null || orderMap.isEmpty()) {
             throw new JobSchedulerInvalidResponseDataException(String.format("Order doesn't exist: %1$s,%2$s", orders.getJobChain(), orders.getOrders().get(0)));
         }
         return orderMap.values().iterator().next();
     }
     
-    public List<OrderQueue> getOrdersOfJob() throws Exception {
-        Map<String,OrderQueue> orderMap = getOrders(job, compact, uri);
+    public List<OrderV> getOrdersOfJob() throws Exception {
+        Map<String,OrderV> orderMap = getOrders(job, compact, uri);
         if (orderMap == null || orderMap.isEmpty()) {
             return null;
         }
-        return new ArrayList<OrderQueue>(orderMap.values());
+        return new ArrayList<OrderV>(orderMap.values());
     }
     
-    private Map<String,OrderQueue> getOrders(OrdersPerJobChain orders, boolean compact, URI uri) throws Exception {
+    private Map<String,OrderV> getOrders(OrdersPerJobChain orders, boolean compact, URI uri) throws Exception {
         return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(orders)), compact);
     }
     
-    private Map<String,OrderQueue> getOrders(String job, boolean compact, URI uri) throws Exception {
+    private Map<String,OrderV> getOrders(String job, boolean compact, URI uri) throws Exception {
         return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(job)), compact);
     }
     
-    private Map<String,OrderQueue> getOrders(FoldersSchema folder, OrdersFilterSchema ordersBody, URI uri) throws JocMissingRequiredParameterException, Exception {
+    private Map<String,OrderV> getOrders(Folder folder, OrdersFilter ordersBody, URI uri) throws JocMissingRequiredParameterException, Exception {
         return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), (folder.getRecursive()) ? null : folder.getFolder(), ordersBody.getRegex());
     }
     
-    private Map<String,OrderQueue> getOrders(JsonObject json, boolean compact) throws JobSchedulerInvalidResponseDataException {
+    private Map<String,OrderV> getOrders(JsonObject json, boolean compact) throws JobSchedulerInvalidResponseDataException {
         return getOrders(json, compact, null, null);
     }
     
-    private Map<String,OrderQueue> getOrders(JsonObject json, boolean compact, String refFolderIfNotRecursive, String regex) throws JobSchedulerInvalidResponseDataException {
+    private Map<String,OrderV> getOrders(JsonObject json, boolean compact, String refFolderIfNotRecursive, String regex) throws JobSchedulerInvalidResponseDataException {
         UsedNodes usedNodes = new UsedNodes();
         UsedJobs usedJobs = new UsedJobs();
         UsedJobChains usedJobChains = new UsedJobChains();
@@ -139,10 +139,10 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         usedNodes.addEntries(json.getJsonArray("usedNodes"));
         usedTasks.addEntries(json.getJsonArray("usedTasks"));
         Date surveyDate = JobSchedulerDate.getDateFromEventId(json.getJsonNumber("eventId").longValue());
-        Map<String,OrderQueue> listOrderQueue = new HashMap<String,OrderQueue>();
+        Map<String,OrderV> listOrderQueue = new HashMap<String,OrderV>();
         
         for (JsonObject ordersItem: json.getJsonArray("orders").getValuesAs(JsonObject.class)) {
-            OrderV order = new OrderV(ordersItem);
+            OrderVolatile order = new OrderVolatile(ordersItem);
             order.setPathJobChainAndOrderId();
             if (!FilterAfterResponse.matchReqex(regex, order.getPath())) {
                 LOGGER.info("...processing skipped caused by 'regex=" + regex + "'");
@@ -182,7 +182,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         return builder.build().toString();
     }
     
-    private String getServiceBody(FoldersSchema folder, OrdersFilterSchema ordersBody) throws JocMissingRequiredParameterException {
+    private String getServiceBody(Folder folder, OrdersFilter ordersBody) throws JocMissingRequiredParameterException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         
         // add folder path from response body 
@@ -197,11 +197,11 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         }
         
         // add processingState from response body
-        List<ProcessingState> states = ordersBody.getProcessingState();
+        List<OrderStateText> states = ordersBody.getProcessingStates();
         Map<String, Boolean> filterValues = new HashMap<String, Boolean>();
         boolean suspended = false;
         if (states != null && !states.isEmpty()) {
-            for (ProcessingState state : states) {
+            for (OrderStateText state : states) {
                 switch (state) {
                 case PENDING:
                     filterValues.put("Planned", true);
@@ -220,7 +220,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
                 case SETBACK:
                     filterValues.put("Setback", true);
                     break;
-                case WAITINGFORRESOURCE:
+                default:
                     filterValues.put("Due", true);
                     filterValues.put("WaitingInTask", true);
                     filterValues.put("WaitingForResource", true);
@@ -244,10 +244,10 @@ public class OrdersVCallable implements Callable<Map<String,OrderQueue>> {
         }
         
         // add type from response body
-        List<Type> types = ordersBody.getType();
+        List<OrderType> types = ordersBody.getTypes();
         filterValues.clear();
         if (types != null && !types.isEmpty()) {
-            for (Type type : types) {
+            for (OrderType type : types) {
                 switch (type) {
                 case AD_HOC:
                     filterValues.put("AdHoc", true);

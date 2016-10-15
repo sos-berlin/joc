@@ -12,9 +12,10 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.order.Order;
-import com.sos.joc.model.order.Order200PSchema;
-import com.sos.joc.model.order.OrderFilterWithCompactSchema;
+import com.sos.joc.model.order.OrderP200;
+import com.sos.joc.model.order.OrderType;
+import com.sos.joc.model.order.OrderFilter;
+import com.sos.joc.model.order.OrderP;
 import com.sos.joc.order.resource.IOrderPResource;
 
 @Path("order")
@@ -22,23 +23,19 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderPResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrderP(String accessToken, OrderFilterWithCompactSchema orderFilterWithCompactSchema) throws Exception {
+    public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {
         LOGGER.debug("init OrderP");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(orderFilterWithCompactSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            Order200PSchema entity = new Order200PSchema();
-
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection, accessToken);
-            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilterWithCompactSchema.getJobChain(), orderFilterWithCompactSchema.getOrderId());
+            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilter.getJobChain(), orderFilter.getOrderId());
 
-            entity.setDeliveryDate(new Date());
-            Order order = new Order();
+            OrderP order = new OrderP();
 
-            entity.setDeliveryDate(new Date());
             order.setSurveyDate(dbItemInventoryOrder.getModified());
             order.setPath(dbItemInventoryOrder.getName());
             order.setJobChain(dbItemInventoryOrder.getJobChain());
@@ -51,10 +48,12 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
 
             order.setPriority(-1);
             order.setTitle(dbItemInventoryOrder.getTitle());
-            order.setType(Order.Type.PERMANENT);
+            order.set_type(OrderType.PERMANENT);
 
+            OrderP200 entity = new OrderP200();
             entity.setOrder(order);
-
+            entity.setDeliveryDate(new Date());
+            
             // TODO JOC Cockpit Webservice
 
             return JOCDefaultResponse.responseStatus200(entity);

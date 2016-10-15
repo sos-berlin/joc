@@ -22,11 +22,11 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrdersSnapshotCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.jobChain.JobChain____;
-import com.sos.joc.model.jobChain.JobChainsFilterSchema;
-import com.sos.joc.model.order.Orders;
-import com.sos.joc.model.order.SnapshotSchema;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.jobChain.JobChainPath;
+import com.sos.joc.model.jobChain.JobChainsFilter;
+import com.sos.joc.model.order.OrdersSnapshot;
+import com.sos.joc.model.order.OrdersSummary;
 import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
 
 @Path("orders")
@@ -34,7 +34,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceOverviewSnapshotImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilterSchema filterSchema) throws Exception {
+    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter filterSchema) throws Exception {
         LOGGER.debug("init orders/overview/summary");
         try {
             JOCDefaultResponse jocDefaultResponse = init(filterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
@@ -62,7 +62,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 tasks.add(new OrdersSnapshotCallable("/", uri));
             }
             
-            Orders summary = new Orders();
+            OrdersSummary summary = new OrdersSummary();
             summary.setBlacklist(0);
             summary.setPending(0);
             summary.setRunning(0);
@@ -71,8 +71,8 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             summary.setWaitingForResource(0);
             
             ExecutorService executorService = Executors.newFixedThreadPool(10);
-            for (Future<Orders> result : executorService.invokeAll(tasks)) {
-                Orders o = result.get();
+            for (Future<OrdersSummary> result : executorService.invokeAll(tasks)) {
+                OrdersSummary o = result.get();
                 summary.setBlacklist(summary.getBlacklist() + o.getBlacklist());
                 summary.setPending(summary.getPending() + o.getPending());
                 summary.setRunning(summary.getRunning() + o.getRunning());
@@ -81,7 +81,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 summary.setWaitingForResource(summary.getWaitingForResource() + o.getWaitingForResource());
             }
             
-            SnapshotSchema entity = new SnapshotSchema();
+            OrdersSnapshot entity = new OrdersSnapshot();
             entity.setDeliveryDate(new Date());
             entity.setOrders(summary);
 
@@ -94,7 +94,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 
     }
     
-    private String getPath(FoldersSchema folder) throws JocMissingRequiredParameterException {
+    private String getPath(Folder folder) throws JocMissingRequiredParameterException {
         String path = folder.getFolder();
         if (path == null) {
             throw new JocMissingRequiredParameterException("folder");
@@ -107,13 +107,13 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         return path;
     }
     
-    private Set<String> getFoldersWithoutDuplicatesAndSubfolders(List<FoldersSchema> folders) throws JocMissingRequiredParameterException {
+    private Set<String> getFoldersWithoutDuplicatesAndSubfolders(List<Folder> folders) throws JocMissingRequiredParameterException {
         Set<String> set = new HashSet<String>();
         if (folders == null || folders.size() == 0) {
             return set;
         }
         SortedSet<String> sortedSet = new TreeSet<String>();
-        for (FoldersSchema folder : folders) {
+        for (Folder folder : folders) {
             sortedSet.add(getPath(folder));
         }
         String[] strA = new String[sortedSet.size()];
@@ -134,12 +134,12 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         return set;
     }
     
-    private Set<String> getJobChainsWithoutDuplicates(List<JobChain____> jobChains) throws JocMissingRequiredParameterException {
+    private Set<String> getJobChainsWithoutDuplicates(List<JobChainPath> jobChains) throws JocMissingRequiredParameterException {
         Set<String> set = new HashSet<String>();
         if (jobChains == null || jobChains.size() == 0) {
             return set;
         }
-        for (JobChain____ jobChain : jobChains) {
+        for (JobChainPath jobChain : jobChains) {
             if (jobChain.getJobChain() == null || jobChain.getJobChain().isEmpty()) {
                 throw new JocMissingRequiredParameterException("jobChain");
             }

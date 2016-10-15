@@ -13,7 +13,7 @@ import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
-import com.sos.joc.model.jobscheduler.UrlTimeoutParamSchema;
+import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 import com.sos.scheduler.model.commands.JSCmdModifySpooler;
 
 @Path("jobscheduler")
@@ -21,7 +21,7 @@ import com.sos.scheduler.model.commands.JSCmdModifySpooler;
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobScheduler {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
-    protected UrlTimeoutParamSchema urlTimeoutParamSchema;
+    protected HostPortTimeOutParameter urlTimeoutParamSchema;
 
     private JOCDefaultResponse check(boolean right) {
         try {
@@ -59,7 +59,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         }
     }
 
-    private void init(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) {
+    private void init(String accessToken, HostPortTimeOutParameter jobSchedulerTerminateBody) {
         this.urlTimeoutParamSchema = jobSchedulerTerminateBody;
         this.jobschedulerUser = new JobSchedulerUser(accessToken);
 
@@ -70,7 +70,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
 
         init(accessToken, urlTimeoutParamSchema);
         JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().isTerminate());
@@ -83,7 +83,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
 
         try {
             init(accessToken, urlTimeoutParamSchema);
@@ -100,7 +100,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerAbort(String accessToken, UrlTimeoutParamSchema urlTimeoutParamSchema) throws Exception {
+    public JOCDefaultResponse postJobschedulerAbort(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
 
         try {
             init(accessToken, urlTimeoutParamSchema);
@@ -118,7 +118,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, HostPortTimeOutParameter jobSchedulerTerminateBody) throws Exception {
         try {
             init(accessToken, jobSchedulerTerminateBody);
             JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMaster().getRestart().isAbort());
@@ -135,7 +135,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerPause(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerPause(String accessToken, HostPortTimeOutParameter jobSchedulerTerminateBody) throws Exception {
         try {
             init(accessToken, jobSchedulerTerminateBody);
 
@@ -152,7 +152,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
-    public JOCDefaultResponse postJobschedulerContinue(String accessToken, UrlTimeoutParamSchema jobSchedulerTerminateBody) throws Exception {
+    public JOCDefaultResponse postJobschedulerContinue(String accessToken, HostPortTimeOutParameter jobSchedulerTerminateBody) throws Exception {
         try {
             init(accessToken, jobSchedulerTerminateBody);
 

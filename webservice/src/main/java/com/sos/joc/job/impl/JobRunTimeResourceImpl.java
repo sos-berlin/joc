@@ -14,8 +14,8 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobRunTimeResource;
-import com.sos.joc.model.common.Runtime200Schema;
-import com.sos.joc.model.job.JobFilterSchema;
+import com.sos.joc.model.common.RunTime200;
+import com.sos.joc.model.job.JobFilter;
 import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
@@ -23,17 +23,17 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRunTimeResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobRunTime(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) throws Exception {
         LOGGER.debug("init job/run_time");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            Runtime200Schema runTimeAnswer = new Runtime200Schema();
+            RunTime200 runTimeAnswer = new RunTime200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
-            if (checkRequiredParameter("job", jobFilterSchema.getJob())) {
-                runTimeAnswer = RunTime.set(jocXmlCommand, createJobRuntimePostCommand(jobFilterSchema), "//job/run_time");
+            if (checkRequiredParameter("job", jobFilter.getJob())) {
+                runTimeAnswer = RunTime.set(jocXmlCommand, createJobRuntimePostCommand(jobFilter), "//job/run_time");
             }
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {
@@ -44,7 +44,7 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
 
     }
 
-    private String createJobRuntimePostCommand(JobFilterSchema body) {
+    private String createJobRuntimePostCommand(JobFilter body) {
 
         JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
         showJob.setWhat("run_time");

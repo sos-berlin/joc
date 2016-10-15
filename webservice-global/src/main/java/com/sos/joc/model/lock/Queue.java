@@ -2,11 +2,19 @@
 package com.sos.joc.model.lock;
 
 import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
+@JsonPropertyOrder({
+    "exclusive",
+    "job"
+})
 public class Queue {
 
     /**
@@ -14,6 +22,7 @@ public class Queue {
      * (Required)
      * 
      */
+    @JsonProperty("exclusive")
     private Boolean exclusive;
     /**
      * path
@@ -22,6 +31,7 @@ public class Queue {
      * (Required)
      * 
      */
+    @JsonProperty("job")
     private String job;
 
     /**
@@ -31,6 +41,7 @@ public class Queue {
      * @return
      *     The exclusive
      */
+    @JsonProperty("exclusive")
     public Boolean getExclusive() {
         return exclusive;
     }
@@ -42,6 +53,7 @@ public class Queue {
      * @param exclusive
      *     The exclusive
      */
+    @JsonProperty("exclusive")
     public void setExclusive(Boolean exclusive) {
         this.exclusive = exclusive;
     }
@@ -55,6 +67,7 @@ public class Queue {
      * @return
      *     The job
      */
+    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -68,6 +81,7 @@ public class Queue {
      * @param job
      *     The job
      */
+    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }

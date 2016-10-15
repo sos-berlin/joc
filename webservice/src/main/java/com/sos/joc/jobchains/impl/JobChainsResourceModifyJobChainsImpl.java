@@ -11,8 +11,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.jobchains.resource.IJobChainsResourceModifyJobChains;
-import com.sos.joc.model.jobChain.JobChain_____;
-import com.sos.joc.model.jobChain.ModifySchema;
+import com.sos.joc.model.jobChain.ModifyJobChain;
+import com.sos.joc.model.jobChain.ModifyJobChains;
 import com.sos.scheduler.model.commands.JSCmdJobChainModify;
 import com.sos.scheduler.model.commands.JSCmdJobChainModify.enu4State;
 
@@ -47,18 +47,17 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
         }
     }
 
-    private JOCDefaultResponse postJobChainsCommand(String command, String accessToken, boolean permission, ModifySchema modifySchema) throws Exception {
+    private JOCDefaultResponse postJobChainsCommand(String command, String accessToken, boolean permission, ModifyJobChains modifyJobChains) throws Exception {
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(accessToken, modifySchema.getJobschedulerId(), permission);
+            jocDefaultResponse = init(accessToken, modifyJobChains.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (JobChain_____ jobChain : modifySchema.getJobChains()) {
+            for (ModifyJobChain jobChain : modifyJobChains.getJobChains()) {
                 jocDefaultResponse = executeModifyJobChainCommand(jobChain.getJobChain(), command);
             }
-
             if (listOfErrors != null) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
@@ -72,15 +71,15 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postJobChainsStop(String accessToken, ModifySchema modifySchema) throws Exception {
+    public JOCDefaultResponse postJobChainsStop(String accessToken, ModifyJobChains modifyJobChains) throws Exception {
         LOGGER.debug("init job_chains/stop");
-        return postJobChainsCommand(STOP, accessToken, getPermissons(accessToken).getJobChain().isStop(), modifySchema);
+        return postJobChainsCommand(STOP, accessToken, getPermissons(accessToken).getJobChain().isStop(), modifyJobChains);
     }
 
     @Override
-    public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifySchema modifySchema) throws Exception {
+    public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifyJobChains modifyJobChains) throws Exception {
         LOGGER.debug("init job_chains/unstop");
-        return postJobChainsCommand(UNSTOP, accessToken, getPermissons(accessToken).getJobChain().isUnstop(), modifySchema);
+        return postJobChainsCommand(UNSTOP, accessToken, getPermissons(accessToken).getJobChain().isUnstop(), modifyJobChains);
     }
 
 }

@@ -13,11 +13,11 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.order.Order_;
-import com.sos.joc.model.order.OrdersFilterSchema;
-import com.sos.joc.model.order.OrdersVSchema;
-import com.sos.joc.model.order.Type;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.order.OrderPath;
+import com.sos.joc.model.order.OrderType;
+import com.sos.joc.model.order.OrdersFilter;
+import com.sos.joc.model.order.OrdersV;
 
 public class OrdersResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -26,102 +26,102 @@ public class OrdersResourceImplTest {
     @Test
     public void postOrdersTest() throws Exception   {
          
-        OrdersFilterSchema ordersBody = new OrdersFilterSchema();
-        OrdersVSchema ordersVSchema = TestHelper(ordersBody);
+        OrdersFilter ordersBody = new OrdersFilter();
+        OrdersV ordersVSchema = TestHelper(ordersBody);
         //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
     public void postOrdersTest2() throws Exception   {
          
-        OrdersFilterSchema ordersBody = new OrdersFilterSchema();
-        FoldersSchema folder = new FoldersSchema();
+        OrdersFilter ordersBody = new OrdersFilter();
+        Folder folder = new Folder();
         folder.setFolder("/webservice");
-        FoldersSchema folder2 = new FoldersSchema();
+        Folder folder2 = new Folder();
         folder2.setFolder("/examples");
         folder2.setRecursive(false);
-        List<FoldersSchema> folders = ordersBody.getFolders();
+        List<Folder> folders = ordersBody.getFolders();
         folders.add(folder);
         folders.add(folder2);
-        OrdersVSchema ordersVSchema = TestHelper(ordersBody);
+        OrdersV ordersVSchema = TestHelper(ordersBody);
         //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
     public void postOrdersTest3() throws Exception   {
          
-        OrdersFilterSchema ordersBody = new OrdersFilterSchema();
-        FoldersSchema folder = new FoldersSchema();
+        OrdersFilter ordersBody = new OrdersFilter();
+        Folder folder = new Folder();
         folder.setFolder("/webservice");
-        FoldersSchema folder2 = new FoldersSchema();
+        Folder folder2 = new Folder();
         folder2.setFolder("/examples");
-        List<FoldersSchema> folders = ordersBody.getFolders();
+        List<Folder> folders = ordersBody.getFolders();
         folders.add(folder);
         folders.add(folder2);
         ordersBody.setRegex("SplitAndSync");
-        OrdersVSchema ordersVSchema = TestHelper(ordersBody);
+        OrdersV ordersVSchema = TestHelper(ordersBody);
         //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
     public void postOrdersTest4() throws Exception   {
          
-        OrdersFilterSchema ordersBody = new OrdersFilterSchema();
-        FoldersSchema folder = new FoldersSchema();
+        OrdersFilter ordersBody = new OrdersFilter();
+        Folder folder = new Folder();
         folder.setFolder("/webservice");
-        FoldersSchema folder2 = new FoldersSchema();
+        Folder folder2 = new Folder();
         folder2.setFolder("/examples");
-        List<FoldersSchema> folders = ordersBody.getFolders();
+        List<Folder> folders = ordersBody.getFolders();
         folders.add(folder);
         folders.add(folder2);
         ordersBody.setRegex("SplitAndSync");
-        List<Order_> orders = ordersBody.getOrders();
-        Order_ order = new Order_();
+        List<OrderPath> orders = ordersBody.getOrders();
+        OrderPath order = new OrderPath();
         order.setJobChain("/webservice/setback");
         order.setOrderId("2");
         orders.add(order);
-        OrdersVSchema ordersVSchema = TestHelper(ordersBody);
+        OrdersV ordersVSchema = TestHelper(ordersBody);
         //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
     public void postOrdersTest5() throws Exception   {
          
-        OrdersFilterSchema ordersBody = new OrdersFilterSchema();
-        FoldersSchema folder = new FoldersSchema();
+        OrdersFilter ordersBody = new OrdersFilter();
+        Folder folder = new Folder();
         folder.setFolder("/webservice");
-        FoldersSchema folder2 = new FoldersSchema();
+        Folder folder2 = new Folder();
         folder2.setFolder("/examples");
-        List<FoldersSchema> folders = ordersBody.getFolders();
+        List<Folder> folders = ordersBody.getFolders();
         folders.add(folder);
         folders.add(folder2);
-        List<Type> types = ordersBody.getType();
-        types.add(Type.AD_HOC);
-        ordersBody.setType(types);
-        OrdersVSchema ordersVSchema = TestHelper(ordersBody);
+        List<OrderType> types = ordersBody.getTypes();
+        types.add(OrderType.AD_HOC);
+        ordersBody.setTypes(types);
+        OrdersV ordersVSchema = TestHelper(ordersBody);
         //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
     }
     
     @Test
     public void postOrdersTestWithException() throws Exception   {
          
-        OrdersFilterSchema ordersBody = new OrdersFilterSchema();
-        List<Order_> orders = ordersBody.getOrders();
-        Order_ order = new Order_();
+        OrdersFilter ordersBody = new OrdersFilter();
+        List<OrderPath> orders = ordersBody.getOrders();
+        OrderPath order = new OrderPath();
         order.setJobChain("/webservice/setbac");
         order.setOrderId("unknown");
         orders.add(order);
-        OrdersVSchema ordersVSchema = TestHelper(ordersBody);
+        OrdersV ordersVSchema = TestHelper(ordersBody);
         //assertEquals("postOrdersTest","myJob1", ordersVSchema.getOrders().get(0).getJob());
     }
     
-    private OrdersVSchema TestHelper(OrdersFilterSchema ordersBody) throws Exception {
+    private OrdersV TestHelper(OrdersFilter ordersBody) throws Exception {
         ordersBody.setJobschedulerId("scheduler.1.10");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrdersResourceImpl ordersImpl = new OrdersResourceImpl();
         JOCDefaultResponse ordersResponse = ordersImpl.postOrders(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
-        OrdersVSchema ordersVSchema = (OrdersVSchema) ordersResponse.getEntity();
+        OrdersV ordersVSchema = (OrdersV) ordersResponse.getEntity();
         return ordersVSchema;
     }
        

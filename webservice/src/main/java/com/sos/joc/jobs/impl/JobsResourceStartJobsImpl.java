@@ -14,20 +14,20 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceStartJob;
-import com.sos.joc.model.common.NameValuePairsSchema;
-import com.sos.joc.model.job.StartJobSchema;
-import com.sos.joc.model.job.StartJobsSchema;
+import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.job.StartJob;
+import com.sos.joc.model.job.StartJobs;
 import com.sos.scheduler.model.commands.JSCmdStartJob;
 
 @Path("jobs")
 public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsResourceStartJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceStartJobsImpl.class);
 
-    private String[] getParams(List<NameValuePairsSchema> list) {
+    private String[] getParams(List<NameValuePair> list) {
         String[] orderParams = new String[list.size() * 2];
 
         for (int i = 0; i < list.size(); i = i + 2) {
-            NameValuePairsSchema param = list.get(i);
+            NameValuePair param = list.get(i);
             orderParams[i] = param.getName();
             orderParams[i + 1] = param.getValue();
         }
@@ -35,23 +35,23 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
         return orderParams;
     }
 
-    private JOCDefaultResponse executeStartJobCommand(StartJobSchema startJobSchema) {
+    private JOCDefaultResponse executeStartJobCommand(StartJob startJob) {
 
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
             JSCmdStartJob jsCmdStartJob = new JSCmdStartJob(Globals.schedulerObjectFactory);
-            jsCmdStartJob.setJobIfNotEmpty(startJobSchema.getJob());
+            jsCmdStartJob.setJobIfNotEmpty(startJob.getJob());
             jsCmdStartJob.setForceIfNotEmpty(WebserviceConstants.YES);
-            jsCmdStartJob.setAtIfNotEmpty(startJobSchema.getAt());
-            jsCmdStartJob.setNameIfNotEmpty(startJobSchema.getJob());
-            String[] jobParams = getParams(startJobSchema.getParams());
+            jsCmdStartJob.setAtIfNotEmpty(startJob.getAt());
+            jsCmdStartJob.setNameIfNotEmpty(startJob.getJob());
+            String[] jobParams = getParams(startJob.getParams());
             if (jobParams != null) {
                 jsCmdStartJob.setParams(jobParams);
             }
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdStartJob);
             jocXmlCommand.excutePost(xml);
-            listOfErrors = addError(listOfErrors, jocXmlCommand, startJobSchema.getJob());
+            listOfErrors = addError(listOfErrors, jocXmlCommand, startJob.getJob());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 
@@ -61,16 +61,16 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsStart(String accessToken, StartJobsSchema startJobsSchema) throws Exception {
+    public JOCDefaultResponse postJobsStart(String accessToken, StartJobs startJobs) throws Exception {
         LOGGER.debug("init orders: add");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
         try {
-            jocDefaultResponse = init(startJobsSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getStart().isTask());
+            jocDefaultResponse = init(startJobs.getJobschedulerId(), getPermissons(accessToken).getJob().getStart().isTask());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (StartJobSchema startJobSchemab : startJobsSchema.getJobs()) {
-                jocDefaultResponse = executeStartJobCommand(startJobSchemab);
+            for (StartJob startJob : startJobs.getJobs()) {
+                jocDefaultResponse = executeStartJobCommand(startJob);
             }
             if (listOfErrors != null) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);

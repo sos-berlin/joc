@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.schedule.SchedulesFilterSchema;
-import com.sos.joc.model.schedule.SchedulesVSchema;
+import com.sos.joc.model.schedule.SchedulesFilter;
+import com.sos.joc.model.schedule.SchedulesV;
 
 public class SchedulesResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -22,11 +22,11 @@ public class SchedulesResourceImplTest {
     public void postSchedulesTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        SchedulesFilterSchema schedulesFilterSchema = new SchedulesFilterSchema();
+        SchedulesFilter schedulesFilterSchema = new SchedulesFilter();
         schedulesFilterSchema.setJobschedulerId(SCHEDULER_ID);
         ScheduleResourceImpl schedulesResourceImpl = new ScheduleResourceImpl();
         JOCDefaultResponse jobsResponse = schedulesResourceImpl.postSchedules(sosShiroCurrentUserAnswer.getAccessToken(), schedulesFilterSchema);
-        SchedulesVSchema schedulesVSchema = (SchedulesVSchema) jobsResponse.getEntity();
+        SchedulesV schedulesVSchema = (SchedulesV) jobsResponse.getEntity();
         assertEquals("postSchedulesTest", "myName", schedulesVSchema.getSchedules().get(0).getName());
         LOGGER.info(jobsResponse.toString());
     }

@@ -1,76 +1,141 @@
 package com.sos.joc.classes;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
-public  class LogContent {
+public class LogContent {
     
-    private static final String SPAN_LINE = "<span class=%s>%s</span>";
-    private static final String HTML_END = "</pre></body></html>";
-    private static final String HTML_BEGIN = "<html><head><style type='text/css'>@import 'scheduler.css';pre { font-family: Lucida Console, monospace; font-size: 10pt }</style><title>Scheduler log</title></head><body class='log'><script type='text/javascript'></script><script type='text/javascript' src='show_log.js'></script><pre class='log'>";
-    private static final String DEBUG_MARKER = "[debug]";
-    private static final String DEBUG2_MARKER = "[debug2]";
-    private static final String DEBUG3_MARKER = "[debug3]";
-    private static final String DEBUG4_MARKER = "[debug4]";
-    private static final String DEBUG5_MARKER = "[debug5]";
-    private static final String DEBUG6_MARKER = "[debug6]";
-    private static final String DEBUG7_MARKER = "[debug7]";
-    private static final String DEBUG8_MARKER = "[debug8]";
-    private static final String DEBUG9_MARKER = "[debug9]";
-    private static final String WARN_MARKER = "[WARN]";
-    private static final String ERROR_MARKER = "[ERROR]";
+    private static final String SPAN_LINE = "<div class=\"line %1$s\">%2$s</div>%n";
+    private static final String HTML = "<!DOCTYPE html>%n<html>%n"
+            + "<head>%n"
+            + "  <title>JobScheduler - %1$s</title>%n"
+            + "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>%n"
+            + "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>%n"
+            + "  <style type=\"text/css\">%n"
+            + "    div.log                         {font-family:\"Lucida Console\",monospace;font-size:12px;line-height:1.1em;margin-left:2px;padding-left:0}%n"
+            + "    div.line                        {padding-left:3em;text-indent:-3em;}%n"
+            + "    .log_error                      {color:red;}%n"
+            + "    .log_warn                       {color:tomato;}%n"
+            + "    .log_info                       {color:black;}%n"
+            + "    .log_stderr                     {color:red;}%n"
+            + "    .log_debug                      {color:darkgreen;}%n"
+            + "    .log_debug2                     {color:#408040;}%n"
+            + "    .log_debug3                     {color:#808080;}%n"
+            + "    .log_debug4                     {color:#8080FF;}%n"
+            + "    .log_debug5                     {color:#8080FF;}%n"
+            + "    .log_debug6                     {color:#8080FF;}%n"
+            + "    .log_debug7                     {color:#8080FF;}%n"
+            + "    .log_debug8                     {color:#8080FF;}%n"
+            + "    .log_debug9                     {color:#a0a0a0;}%n"
+            + "  </style>%n"
+            + "</head>%n"
+            + "<body class=\"log\">%n"
+            /* only for rolling logs senseful */
+//            + "  <script type=\"text/javascript\" language=\"javascript\">%n"
+//            + "    var timer;%n"
+//            + "    var program_is_scrolling    = true;%n"
+//            + "    var error                   = false;%n"
+//            + "    %n"
+//            + "    start_timer();%n"
+//            + "    %n"
+//            + "    window.onscroll             = window__onscroll;%n"
+//            + "    document.onmousewheel       = window__onscroll; /* IE, Chrome */%n"
+//            + "    %n"
+//            + "    if(document.addEventListener) { /* Safari, Firefox */%n"
+//            + "        document.addEventListener('DOMMouseScroll', window__onscroll, false);%n"
+//            + "    }%n"
+//            + "    %n"
+//            + "    if( window.navigator.appName == 'Netscape' ) {%n"
+//            + "        window.onkeydown        = stop_timer;%n"
+//            + "        window.onmousedown      = stop_timer;%n"
+//            + "        window.onkeyup          = window__onscroll;%n"
+//            + "        window.onmouseup        = window__onscroll;%n"
+//            + "    }%n"
+//            + "    %n"
+//            + "    function start_timer() {%n"
+//            + "        stop_timer();%n"
+//            + "        if( !error )  timer = window.setInterval( \"scroll_down()\", 200 );%n"
+//            + "    }%n"
+//            + "    %n"
+//            + "    function stop_timer() {%n"
+//            + "        if( timer != undefined ) {%n"
+//            + "            window.clearInterval( timer );%n"
+//            + "            timer = undefined;%n"
+//            + "        }%n"
+//            + "    }%n"
+//            + "    %n"
+//            + "    function scroll_down() {%n"
+//            + "        try {%n"
+//            + "            program_is_scrolling = true;%n"
+//            + "            window.scrollTo( document.body.scrollLeft, document.body.scrollHeight );%n"
+//            + "        } catch( x ) {%n"
+//            + "            error = true;%n"
+//            + "            window.clearInterval( timer );%n"
+//            + "            timer = undefined;%n"
+//            + "        }%n"
+//            + "    }%n"
+//            + "    %n"
+//            + "    function window__onscroll() {%n"
+//            + "        if( !program_is_scrolling ) {%n"
+//            + "            if( document.body.scrollTop + document.body.clientHeight == document.body.scrollHeight ) {%n"
+//            + "                if( timer == undefined )  start_timer();%n"
+//            + "            } else {%n"
+//            + "                stop_timer();%n"
+//            + "            }%n"
+//            + "        }%n"
+//            + "        program_is_scrolling = false;%n"
+//            + "    }%n"
+//            + "    %n"
+//            + "  </script>%n"
+            + "  <div class=\"log\">%n"
+            + "%2$s</div>%n</body>%n</html>%n";
     private static final String INFO_MARKER = "[info]";
-    private static final String LOG_DEBUG_CLASS = "log_debug";
-    private static final String LOG_DEBUG2_CLASS = "log_debug2";
-    private static final String LOG_DEBUG3_CLASS = "log_debug3";
-    private static final String LOG_DEBUG4_CLASS = "log_debug4";
-    private static final String LOG_DEBUG5_CLASS = "log_debug5";
-    private static final String LOG_DEBUG6_CLASS = "log_debug6";
-    private static final String LOG_DEBUG7_CLASS = "log_debug7";
-    private static final String LOG_DEBUG8_CLASS = "log_debug8";
-    private static final String LOG_DEBUG9_CLASS = "log_debug9";
-    private static final String LOG_ERROR_CLASS = "log_error";
-    private static final String LOG_WARN_CLASS = "log_warn";
-    private static final String LOG_INFO_CLASS = "log_info";
+    private static final String STDERR_MARKER = "[stderr]";
     private static final String LOG_STDERR_CLASS = "log_stderr";
+    private static final Map<String, String> MARKER_AND_CLASSES = new HashMap<String, String>() {
+
+        private static final long serialVersionUID = 1L;
+        {
+            put(INFO_MARKER, "log_info");
+            put("[ERROR]", "log_error");
+            put("[WARN]", "log_warn");
+            put("[debug]", "log_debug");
+            put("[debug9]", "log_debug9");
+            put("[debug3]", "log_debug3");
+            put("[debug6]", "log_debug6");
+            put("[debug2]", "log_debug2");
+            put("[debug4]", "log_debug4");
+            put("[debug5]", "log_debug5");
+            put("[debug7]", "log_debug7");
+            put("[debug8]", "log_debug8");
+        }
+    };
 
     protected DBItemInventoryInstance dbItemInventoryInstance; 
-    
     
     public LogContent(DBItemInventoryInstance dbItemInventoryInstance) {
         super();
         this.dbItemInventoryInstance = dbItemInventoryInstance;
     }
 
-
-    private String colorLine(String line, String marker, String cssClass) {
-
-        String s = line;
-        if (line.contains(marker)) {
-            s = String.format(SPAN_LINE, cssClass, line);
-        }
-        return s;
-
-    }
-
     private String addStyle(String line) {
-
-        line = colorLine(line, ERROR_MARKER, LOG_ERROR_CLASS);
-        line = colorLine(line, WARN_MARKER, LOG_WARN_CLASS);
-        line = colorLine(line, DEBUG_MARKER, LOG_DEBUG_CLASS);
-        line = colorLine(line, DEBUG2_MARKER, LOG_DEBUG2_CLASS);
-        line = colorLine(line, DEBUG3_MARKER, LOG_DEBUG3_CLASS);
-        line = colorLine(line, DEBUG4_MARKER, LOG_DEBUG4_CLASS);
-        line = colorLine(line, DEBUG5_MARKER, LOG_DEBUG5_CLASS);
-        line = colorLine(line, DEBUG6_MARKER, LOG_DEBUG6_CLASS);
-        line = colorLine(line, DEBUG7_MARKER, LOG_DEBUG7_CLASS);
-        line = colorLine(line, DEBUG8_MARKER, LOG_DEBUG8_CLASS);
-        line = colorLine(line, DEBUG9_MARKER, LOG_DEBUG9_CLASS);
-        line = colorLine(line, INFO_MARKER, LOG_INFO_CLASS);
+        for (String marker : MARKER_AND_CLASSES.keySet()) {
+            if (line.contains(marker)) {
+                String css = MARKER_AND_CLASSES.get(marker);
+                if (INFO_MARKER.equals(marker) && line.contains(STDERR_MARKER)) {
+                    css += " " + LOG_STDERR_CLASS;
+                }
+                line = String.format(SPAN_LINE, css, StringEscapeUtils.escapeHtml4(line));
+                break;
+            }
+        }
         return line;
     }
-
 
     private String colouredLog(String log){
         Scanner scanner = new Scanner(log);
@@ -79,29 +144,17 @@ public  class LogContent {
             s.append(addStyle(scanner.nextLine()));
         }
         scanner.close();
-
         return s.toString();
     
     }
-    
     
     public String htmlWithColouredLogContent(String log){
-        StringBuilder s = new StringBuilder();
-        s.append(colouredLog(log));
-        return s.toString();
+        return colouredLog(log);
     }
     
-    public String htmlPageWithColouredLogContent(String log) {
-        StringBuilder s = new StringBuilder();
-
-        s.append(HTML_BEGIN);
-        s.append(colouredLog(log));
-        s.append(HTML_END);
-
-        return s.toString();
+    public String htmlPageWithColouredLogContent(String log, String title) {
+        return String.format(HTML, title, colouredLog(log));
     }
-    
-    
 }
 
 

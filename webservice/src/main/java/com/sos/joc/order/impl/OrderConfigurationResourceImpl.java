@@ -11,8 +11,9 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.order.OrderConfigurationFilterSchema;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.order.OrderConfigurationFilter;
 import com.sos.joc.order.resource.IOrderConfigurationResource;
 import com.sos.scheduler.model.commands.JSCmdShowOrder;
 
@@ -21,7 +22,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderConfigurationResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilterSchema orderBody) throws Exception {
+    public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilter orderBody) throws Exception {
         LOGGER.debug("init order/configuration");
         try {
             JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
@@ -29,10 +30,10 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
                 return jocDefaultResponse;
             }
 
-            ConfigurationSchema entity = new ConfigurationSchema();
+            Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
-                boolean responseInHtml = orderBody.getMime() == OrderConfigurationFilterSchema.Mime.HTML;
+                boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(orderBody), "/spooler/answer/order", "order", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
@@ -43,7 +44,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
         }
     }
 
-    private String createOrderConfigurationPostCommand(OrderConfigurationFilterSchema body) {
+    private String createOrderConfigurationPostCommand(OrderConfigurationFilter body) {
         JSCmdShowOrder showOrder = new JSCmdShowOrder(Globals.schedulerObjectFactory);
         showOrder.setJobChain((normalizePath(body.getJobChain())));
         showOrder.setOrder(body.getOrderId());

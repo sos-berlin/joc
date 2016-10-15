@@ -10,29 +10,27 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 import com.sos.joc.classes.JOCJsonCommand;
-import com.sos.joc.classes.jobchain.JobChainV;
-import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.jobChain.OrdersSummary;
+import com.sos.joc.classes.jobchain.JobChainVolatile;
+import com.sos.joc.model.order.OrdersSummary;
 
-public class OrdersSummaryCallable implements Callable<Map<String,JobChainV>> {
-    private final JobChainV jobChain;
+public class OrdersSummaryCallable implements Callable<Map<String,JobChainVolatile>> {
+    private final JobChainVolatile jobChain;
     private final URI uri;
     
     public OrdersSummaryCallable(URI uri) {
-        JobChainV jobC = new JobChainV();
+        JobChainVolatile jobC = new JobChainVolatile();
         jobC.setPath("/");
         this.jobChain = jobC;
         this.uri = uri;
     }
     
-    public OrdersSummaryCallable(JobChainV jobChain, URI uri) {
+    public OrdersSummaryCallable(JobChainVolatile jobChain, URI uri) {
         this.jobChain = jobChain;
         this.uri = uri;
     }
     
     @Override
-    public Map<String,JobChainV> call() throws Exception {
+    public Map<String,JobChainVolatile> call() throws Exception {
         return getOrdersSummary(jobChain, uri); 
     }
     
@@ -40,14 +38,14 @@ public class OrdersSummaryCallable implements Callable<Map<String,JobChainV>> {
         return getOrdersSummary(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(jobChain.getPath())));
     }
     
-    private Map<String,JobChainV> getOrdersSummary(JobChainV jobChain, URI uri) throws Exception {
-        Map<String,JobChainV> summaryMap = new HashMap<String,JobChainV>();
+    private Map<String,JobChainVolatile> getOrdersSummary(JobChainVolatile jobChain, URI uri) throws Exception {
+        Map<String,JobChainVolatile> summaryMap = new HashMap<String,JobChainVolatile>();
         jobChain.setOrdersSummary(getOrdersSummary(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(jobChain.getPath()))));
         summaryMap.put(jobChain.getPath(), jobChain);
         return summaryMap;
     }
     
-    private OrdersSummary getOrdersSummary(JsonObject json) throws JobSchedulerInvalidResponseDataException {
+    private OrdersSummary getOrdersSummary(JsonObject json) {
         OrdersSummary summary = new OrdersSummary();
         summary.setBlacklist(json.getInt("blacklisted", 0));
         summary.setPending(json.getInt("notPlanned", 0) + json.getInt("planned", 0));
@@ -58,7 +56,7 @@ public class OrdersSummaryCallable implements Callable<Map<String,JobChainV>> {
         return summary;
     }
     
-    private String getServiceBody(String jobChain) throws JocMissingRequiredParameterException {
+    private String getServiceBody(String jobChain) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("path", jobChain);
         return builder.build().toString();

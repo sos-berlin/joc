@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.order.ModifyOrdersSchema;
+import com.sos.joc.model.order.ModifyOrders;
 
 public interface IOrdersResourceCommandDeleteOrder {
 
@@ -16,6 +16,5 @@ public interface IOrdersResourceCommandDeleteOrder {
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersDelete(@HeaderParam("access_token") String accessToken, ModifyOrdersSchema modifyOrdersSchema) throws Exception;
-
+    public JOCDefaultResponse postOrdersDelete(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
 }

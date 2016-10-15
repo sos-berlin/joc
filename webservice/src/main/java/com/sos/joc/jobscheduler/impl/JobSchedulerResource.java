@@ -11,10 +11,10 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.JobSchedulerFilterSchema;
-import com.sos.joc.model.jobscheduler.Jobscheduler200VSchema;
-import com.sos.joc.model.jobscheduler.Jobscheduler_;
-import com.sos.joc.model.jobscheduler.State;
+import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.jobscheduler.JobSchedulerV200;
+import com.sos.joc.model.jobscheduler.JobSchedulerState;
+import com.sos.joc.model.jobscheduler.JobSchedulerV;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
 public class JobSchedulerResource extends JOCResourceImpl {
@@ -34,32 +34,32 @@ public class JobSchedulerResource extends JOCResourceImpl {
     private static final String FOLDER = "folder";
     private static final String DOES_NOT_EXIST = "/does/not/exist";
     private static final String FOLDERS_NO_SUBFOLDERS = "folders no_subfolders";
+    private JobSchedulerId jobSchedulerId;
 
-    public void setJobSchedulerFilterSchema(JobSchedulerFilterSchema jobSchedulerFilterSchema) {
-        this.jobSchedulerFilterSchema = jobSchedulerFilterSchema;
+    public void setJobSchedulerFilterSchema(JobSchedulerId jobSchedulerId) {
+        this.jobSchedulerId = jobSchedulerId;
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
     private String accessToken;
 
-    public JobSchedulerResource(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
+    public JobSchedulerResource(String accessToken, JobSchedulerId jobSchedulerId) {
         super();
-        this.jobSchedulerFilterSchema = jobSchedulerFilterSchema;
+        this.jobSchedulerId = jobSchedulerId;
         jobschedulerUser = new JobSchedulerUser(accessToken);
         this.accessToken = accessToken;
     }
 
-    JobSchedulerFilterSchema jobSchedulerFilterSchema;
-
+    
     public JOCDefaultResponse postJobscheduler() {
         LOGGER.debug("init jobscheduler");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            Jobscheduler200VSchema entity = new Jobscheduler200VSchema();
+            JobSchedulerV200 entity = new JobSchedulerV200();
             entity.setDeliveryDate(new Date());
             
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
@@ -71,7 +71,7 @@ public class JobSchedulerResource extends JOCResourceImpl {
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowState);
             jocXmlCommand.excutePost(xml);
 
-            Jobscheduler_ jobscheduler = new Jobscheduler_();
+            JobSchedulerV jobscheduler = new JobSchedulerV();
             jobscheduler.setSurveyDate(jocXmlCommand.getSurveyDate());
 
             jocXmlCommand.executeXPath(XPATH_SPOOLER_STATE);
@@ -83,10 +83,10 @@ public class JobSchedulerResource extends JOCResourceImpl {
             jobscheduler.setStartedAt(jocXmlCommand.getAttributeAsDate(SPOOLER_RUNNING_SINCE));
             String jobschedulerState = jocXmlCommand.getAttribute(JOBSCHEDULER_STATE);
 
-            State state = new State();
+            JobSchedulerState state = new JobSchedulerState();
            
             state.setSeverity(getSeverityFromState(jobschedulerState));
-            state.setText(getText(jobschedulerState.toUpperCase()));
+            state.set_text(getText(jobschedulerState.toUpperCase()));
             jobscheduler.setState(state);
             
             entity.setJobscheduler(jobscheduler);

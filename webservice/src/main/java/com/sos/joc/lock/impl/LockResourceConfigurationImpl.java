@@ -11,8 +11,9 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.lock.resource.ILockResourceConfiguration;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.lock.LockConfigurationFilterSchema;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.lock.LockConfigurationFilter;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("lock")
@@ -21,7 +22,7 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
     private static final Logger LOGGER = LoggerFactory.getLogger(LockResourceConfigurationImpl.class);
 
     @Override
-    public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilterSchema lockBody) throws Exception {
+    public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilter lockBody) throws Exception {
 
         LOGGER.debug("init lock/configuration");
         try {
@@ -30,10 +31,10 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
                 return jocDefaultResponse;
             }
 
-            ConfigurationSchema entity = new ConfigurationSchema();
+            Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("lock", lockBody.getLock())) {
-                boolean responseInHtml = lockBody.getMime() == LockConfigurationFilterSchema.Mime.HTML;
+                boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", normalizePath(lockBody.getLock()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(), xPath, "lock", responseInHtml);
             }

@@ -11,14 +11,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.model.common.NameValuePairsSchema;
+import com.sos.joc.model.common.NameValuePair;
 
 public class Parameters {
 
-    public static List<NameValuePairsSchema> getParameters(){
-        List<NameValuePairsSchema> parameters = new ArrayList<NameValuePairsSchema>();
-        NameValuePairsSchema param1 = new NameValuePairsSchema();
-        NameValuePairsSchema param2 = new NameValuePairsSchema();
+    public static List<NameValuePair> getParameters(){
+        List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+        NameValuePair param1 = new NameValuePair();
+        NameValuePair param2 = new NameValuePair();
         param1.setName("param1");
         param1.setValue("value1");
         param2.setName("param2");
@@ -28,13 +28,13 @@ public class Parameters {
         return parameters;
     }
 
-    public static List<NameValuePairsSchema> getParameters(Element elem) throws TransformerException {
+    public static List<NameValuePair> getParameters(Element elem) throws TransformerException {
         CachedXPathAPI xPath = new CachedXPathAPI();
         NodeList paramList = xPath.selectNodeList(elem, "params/param");
         if (paramList != null && paramList.getLength() > 0) {
-            List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
             for (int paramsCount = 0; paramsCount < paramList.getLength(); paramsCount++) {
-                NameValuePairsSchema param = new NameValuePairsSchema();
+                NameValuePair param = new NameValuePair();
                 Element paramElement = (Element) paramList.item(paramsCount);
                 param.setName(paramElement.getAttribute(WebserviceConstants.NAME));
                 param.setValue(paramElement.getAttribute(WebserviceConstants.VALUE));
@@ -46,12 +46,12 @@ public class Parameters {
         }
     }
     
-    public static List<NameValuePairsSchema> getParameters(JsonObject elem) {
+    public static List<NameValuePair> getParameters(JsonObject elem) {
         JsonObject paramList = elem.getJsonObject("variables");
-        List<NameValuePairsSchema> params = new ArrayList<NameValuePairsSchema>();
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
         if (paramList != null && !paramList.isEmpty()) {
             for (String key : paramList.keySet()) {
-                NameValuePairsSchema param = new NameValuePairsSchema();
+                NameValuePair param = new NameValuePair();
                 param.setName(key);
                 param.setValue(paramList.getString(key, ""));
                 params.add(param);

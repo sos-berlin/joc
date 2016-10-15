@@ -101,25 +101,41 @@ public class UsedNodes {
     public Node getNode(String jobChain, String nodeId) {
         String s = new StringBuilder().append(jobChain).append(",").append(nodeId).toString();
         if (!nodes.containsKey(s)) {
-            throw new IllegalArgumentException(String.format("job chain node '%1$s' in job chain '%2$s' doesn't contain in JobScheduler response.",nodeId,jobChain));
+            return null;
         }
         return nodes.get(s);
     }
     
     public boolean isStopped(String jobChain, String nodeId) {
-        return getNode(jobChain, nodeId).isStopped(); 
+        Node n = getNode(jobChain, nodeId);
+        if (n == null) {
+            return false;
+        }
+        return n.isStopped(); 
     }
     
     public boolean isWaitingForJobs(String jobChain, String nodeId) {
-        return getNode(jobChain, nodeId).isWaitingForJob(); 
+        Node n = getNode(jobChain, nodeId);
+        if (n == null) {
+            return false;
+        }
+        return n.isWaitingForJob(); 
     }
     
     public boolean hasNoObstacle(String jobChain, String nodeId) {
-        return getNode(jobChain, nodeId).hasNoObstacle(); 
+        Node n = getNode(jobChain, nodeId);
+        if (n == null) {
+            return true;
+        }
+        return n.hasNoObstacle(); 
     }
     
     public String getJob(String jobChain, String nodeId) {
-        return getNode(jobChain, nodeId).getJob(); 
+        Node n = getNode(jobChain, nodeId);
+        if (n == null) {
+            return null;
+        }
+        return n.getJob(); 
     }
     
     public void addEntries(JsonArray nodes){

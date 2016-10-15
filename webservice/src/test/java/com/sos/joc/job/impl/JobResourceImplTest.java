@@ -10,8 +10,8 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.jobs.impl.JobsResourceImplTest;
-import com.sos.joc.model.job.Job200VSchema;
-import com.sos.joc.model.job.JobFilterSchema;
+import com.sos.joc.model.job.JobFilter;
+import com.sos.joc.model.job.JobV200;
 
 public class JobResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -24,12 +24,12 @@ public class JobResourceImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobFilterSchema jobFilterSchema = new JobFilterSchema();
+        JobFilter jobFilterSchema = new JobFilter();
         jobFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobFilterSchema.setJob("/sos/dailyschedule/CheckDaysSchedule");
         JobResourceImpl jobImpl = new JobResourceImpl();
         JOCDefaultResponse jobsResponse = jobImpl.postJob(sosShiroCurrentUserAnswer.getAccessToken(), jobFilterSchema);
-        Job200VSchema jobV200Schema = (Job200VSchema) jobsResponse.getEntity();
+        JobV200 jobV200Schema = (JobV200) jobsResponse.getEntity();
         assertEquals("postJobTest", "CheckDaysSchedule", jobV200Schema.getJob().getName());
     }
 

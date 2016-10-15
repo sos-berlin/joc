@@ -12,10 +12,10 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.Configuration.Type;
-import com.sos.joc.model.tree.TreeFilterSchema;
-import com.sos.joc.model.tree.TreeSchema;
-import com.sos.joc.model.tree.TreeViewSchema;
+import com.sos.joc.model.common.JobSchedulerObjectType;
+import com.sos.joc.model.tree.Tree;
+import com.sos.joc.model.tree.TreeFilter;
+import com.sos.joc.model.tree.TreeView;
 import com.sos.joc.tree.resource.ITreeResource;
 
 @Path("tree")
@@ -23,7 +23,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(TreeResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postTree(String accessToken, TreeFilterSchema treeBody) throws Exception {
+    public JOCDefaultResponse postTree(String accessToken, TreeFilter treeBody) throws Exception {
         LOGGER.debug("init tree");
 
         try {
@@ -32,7 +32,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             if (treeBody.getTypes() == null || treeBody.getTypes().size() == 0) {
                 permission = true;
             } else {
-                for (Type type : treeBody.getTypes()) {
+                for (JobSchedulerObjectType type : treeBody.getTypes()) {
                     switch (type) {
                     case JOB: 
                         permission = sosPermission.getJob().getView().isStatus();
@@ -67,16 +67,16 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 return jocDefaultResponse;
             }
 
-            TreeSchema sos = new TreeSchema();
+            Tree sos = new Tree();
             sos.setPath("/sos");
             sos.setName("sos");
             sos.setFolders(null);
-            TreeSchema root = new TreeSchema();
+            Tree root = new Tree();
             root.setPath("/");
             root.setName("");
             root.getFolders().add(sos);
             
-            TreeViewSchema entity = new TreeViewSchema();
+            TreeView entity = new TreeView();
             entity.setDeliveryDate(Date.from(Instant.now()));
             entity.getFolders().add(root);
             

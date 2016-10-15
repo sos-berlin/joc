@@ -2,14 +2,23 @@
 package com.sos.joc.model.common;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
+@JsonPropertyOrder({
+    "surveyDate",
+    "path",
+    "type",
+    "configurationDate",
+    "content"
+})
 public class Configuration {
 
     /**
@@ -19,6 +28,7 @@ public class Configuration {
      * (Required)
      * 
      */
+    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -27,6 +37,7 @@ public class Configuration {
      * (Required)
      * 
      */
+    @JsonProperty("path")
     private String path;
     /**
      * JobScheduler object type
@@ -34,7 +45,8 @@ public class Configuration {
      * 
      * 
      */
-    private Configuration.Type type;
+    @JsonProperty("type")
+    private JobSchedulerObjectType type;
     /**
      * timestamp
      * <p>
@@ -42,6 +54,7 @@ public class Configuration {
      * (Required)
      * 
      */
+    @JsonProperty("configurationDate")
     private Date configurationDate;
     /**
      * configuration content
@@ -50,7 +63,8 @@ public class Configuration {
      * (Required)
      * 
      */
-    private Content content;
+    @JsonProperty("content")
+    private ConfigurationContent content;
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -61,6 +75,7 @@ public class Configuration {
      * @return
      *     The surveyDate
      */
+    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -74,6 +89,7 @@ public class Configuration {
      * @param surveyDate
      *     The surveyDate
      */
+    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -87,6 +103,7 @@ public class Configuration {
      * @return
      *     The path
      */
+    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -100,6 +117,7 @@ public class Configuration {
      * @param path
      *     The path
      */
+    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -112,7 +130,8 @@ public class Configuration {
      * @return
      *     The type
      */
-    public Configuration.Type getType() {
+    @JsonProperty("type")
+    public JobSchedulerObjectType getType() {
         return type;
     }
 
@@ -124,7 +143,8 @@ public class Configuration {
      * @param type
      *     The type
      */
-    public void setType(Configuration.Type type) {
+    @JsonProperty("type")
+    public void setType(JobSchedulerObjectType type) {
         this.type = type;
     }
 
@@ -137,6 +157,7 @@ public class Configuration {
      * @return
      *     The configurationDate
      */
+    @JsonProperty("configurationDate")
     public Date getConfigurationDate() {
         return configurationDate;
     }
@@ -150,6 +171,7 @@ public class Configuration {
      * @param configurationDate
      *     The configurationDate
      */
+    @JsonProperty("configurationDate")
     public void setConfigurationDate(Date configurationDate) {
         this.configurationDate = configurationDate;
     }
@@ -163,7 +185,8 @@ public class Configuration {
      * @return
      *     The content
      */
-    public Content getContent() {
+    @JsonProperty("content")
+    public ConfigurationContent getContent() {
         return content;
     }
 
@@ -176,7 +199,8 @@ public class Configuration {
      * @param content
      *     The content
      */
-    public void setContent(Content content) {
+    @JsonProperty("content")
+    public void setContent(ConfigurationContent content) {
         this.content = content;
     }
 
@@ -200,45 +224,6 @@ public class Configuration {
         }
         Configuration rhs = ((Configuration) other);
         return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(type, rhs.type).append(configurationDate, rhs.configurationDate).append(content, rhs.content).isEquals();
-    }
-
-    @Generated("org.jsonschema2pojo")
-    public enum Type {
-
-        JOB("JOB"),
-        JOBCHAIN("JOBCHAIN"),
-        ORDER("ORDER"),
-        PROCESSCLASS("PROCESSCLASS"),
-        LOCK("LOCK"),
-        SCHEDULE("SCHEDULE"),
-        OTHER("OTHER");
-        private final String value;
-        private final static Map<String, Configuration.Type> CONSTANTS = new HashMap<String, Configuration.Type>();
-
-        static {
-            for (Configuration.Type c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private Type(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        public static Configuration.Type fromValue(String value) {
-            Configuration.Type constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
     }
 
 }

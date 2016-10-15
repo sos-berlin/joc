@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.lock.LockConfigurationFilterSchema;
+import com.sos.joc.model.lock.LockConfigurationFilter;
 
 public interface ILockResourceConfiguration {
 
@@ -16,7 +16,7 @@ public interface ILockResourceConfiguration {
     @Path("configuration")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postLockConfiguration(            
-            @HeaderParam("access_token") String accessToken, LockConfigurationFilterSchema lockConfigurationFilterSchema) throws Exception;
+            @HeaderParam("access_token") String accessToken, LockConfigurationFilter lockConfigurationFilter) throws Exception;
 
    
  

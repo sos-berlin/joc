@@ -11,16 +11,16 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCluster;
-import com.sos.joc.model.common.JobSchedulerFilterSchema;
-import com.sos.joc.model.jobscheduler.Cluster;
-import com.sos.joc.model.jobscheduler.ClusterSchema;
+import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.jobscheduler.ClusterType;
+import com.sos.joc.model.jobscheduler.Clusters;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceCluster {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
+    public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilterSchema) {
         LOGGER.debug("init jobscheduler/cluster");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
@@ -31,9 +31,9 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             jocXmlCommand.excutePost("<show_state subsystems=\"folder\" what=\"folders no_subfolders cluster\" path=\"/does/not/exist\"/>");
 
-            ClusterSchema entity = new ClusterSchema();
+            Clusters entity = new Clusters();
 
-            Cluster cluster = new Cluster();
+            ClusterType cluster = new ClusterType();
             cluster.setJobschedulerId(jobSchedulerFilterSchema.getJobschedulerId());
 
             // TODO JOC Cockpit Webservice

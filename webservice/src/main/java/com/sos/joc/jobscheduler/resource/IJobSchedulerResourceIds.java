@@ -19,8 +19,4 @@ public interface IJobSchedulerResourceIds {
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobschedulerIds(
             @HeaderParam("access_token") String accessToken) throws Exception;
-    
- 
- 
-
 }

@@ -12,15 +12,15 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceOrderQueue;
-import com.sos.joc.model.job.Job200VSchema;
-import com.sos.joc.model.job.JobFilterSchema;
+import com.sos.joc.model.job.JobV200;
+import com.sos.joc.model.job.JobFilter;
 
 @Path("job")
 public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobResourceOrderQueue {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceOrderQueueImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobOrderQueue(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobOrderQueue(String accessToken, JobFilter jobFilterSchema) throws Exception {
 
         LOGGER.debug("init job/order_queue");
         try {
@@ -29,7 +29,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
                 return jocDefaultResponse;
             }
 
-            Job200VSchema entity = new Job200VSchema();
+            JobV200 entity = new JobV200();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getCommandUrl());
             jocXmlCommand.setUriForJsonCommand(dbItemInventoryInstance.getUrl(), jobFilterSchema.getCompact());
             if (checkRequiredParameter("job", jobFilterSchema.getJob())) {

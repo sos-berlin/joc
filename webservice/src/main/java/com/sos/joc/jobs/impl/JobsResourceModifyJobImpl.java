@@ -11,8 +11,8 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
-import com.sos.joc.model.job.ModifyJobSchema;
-import com.sos.joc.model.job.ModifyJobsSchema;
+import com.sos.joc.model.job.ModifyJob;
+import com.sos.joc.model.job.ModifyJobs;
 import com.sos.scheduler.model.commands.JSCmdModifyJob;
 import com.sos.scheduler.model.objects.RunTime;
 
@@ -26,7 +26,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private static final String UNSTOP = "unstop";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceModifyJobImpl.class);
 
-    private JOCDefaultResponse executeModifyJobCommand(ModifyJobSchema modifyJobSchema, String command) {
+    private JOCDefaultResponse executeModifyJobCommand(ModifyJob modifyJob, String command) {
 
         try {
 
@@ -34,15 +34,15 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
             JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
             jsCmdModifyJob.setCmdIfNotEmpty(command);
-            jsCmdModifyJob.setJobIfNotEmpty(modifyJobSchema.getJob());
+            jsCmdModifyJob.setJobIfNotEmpty(modifyJob.getJob());
             if (SET_RUN_TIME.equals(command)) {
-                RunTime runtime = (RunTime) Globals.schedulerObjectFactory.unMarshall(modifyJobSchema.getRunTime());
+                RunTime runtime = (RunTime) Globals.schedulerObjectFactory.unMarshall(modifyJob.getRunTime());
                 jsCmdModifyJob.setRunTime(runtime);
             }
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdModifyJob);
 
             jocXmlCommand.excutePost(xml);
-            listOfErrors = addError(listOfErrors, jocXmlCommand, modifyJobSchema.getJob());
+            listOfErrors = addError(listOfErrors, jocXmlCommand, modifyJob.getJob());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
@@ -50,16 +50,16 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-    private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobsSchema modifyJobsSchema) {
+    private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobs modifyJobs) {
         LOGGER.debug("init jobs/stop");
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(accessToken, modifyJobsSchema.getJobschedulerId(), permission);
+            jocDefaultResponse = init(accessToken, modifyJobs.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            for (ModifyJobSchema modifyJobschema : modifyJobsSchema.getJobs()) {
+            for (ModifyJob modifyJobschema : modifyJobs.getJobs()) {
                 jocDefaultResponse = executeModifyJobCommand(modifyJobschema, command);
             }
 
@@ -75,60 +75,60 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobsSchema modifyJobsSchema) {
+    public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
         LOGGER.debug("init jobs/stop");
         try {
-            return postJobsCommand(accessToken, STOP, getPermissons(accessToken).getJob().isStop(), modifyJobsSchema);
+            return postJobsCommand(accessToken, STOP, getPermissons(accessToken).getJob().isStop(), modifyJobs);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
-    public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobsSchema modifyJobsSchema)  {
+    public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs)  {
         LOGGER.debug("init jobs/unstop");
         try {
-            return postJobsCommand(accessToken, UNSTOP, getPermissons(accessToken).getJob().isUnstop(), modifyJobsSchema);
+            return postJobsCommand(accessToken, UNSTOP, getPermissons(accessToken).getJob().isUnstop(), modifyJobs);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
-    public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobsSchema modifyJobsSchema) {
+    public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
         LOGGER.debug("init jobs/set_run_time");
         try {
-            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissons(accessToken).getJob().isSetRunTime(), modifyJobsSchema);
+            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissons(accessToken).getJob().isSetRunTime(), modifyJobs);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
-    public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobsSchema modifyJobsSchema) {
+    public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
         LOGGER.debug("init jobs/end_all_tasks");
         try {
-            return postJobsCommand(accessToken, END, getPermissons(accessToken).getJob().isEndAllTasks(), modifyJobsSchema);
+            return postJobsCommand(accessToken, END, getPermissons(accessToken).getJob().isEndAllTasks(), modifyJobs);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
-    public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobsSchema modifyJobsSchema) {
+    public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
         LOGGER.debug("init job/suspend_all_tasks");
         try {
-            return postJobsCommand(accessToken, SUSPEND, getPermissons(accessToken).getJob().isSuspendAllTasks(), modifyJobsSchema);
+            return postJobsCommand(accessToken, SUSPEND, getPermissons(accessToken).getJob().isSuspendAllTasks(), modifyJobs);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
-    public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobsSchema modifyJobsSchema) {
+    public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
         LOGGER.debug("init jobs/continue_all_tasks");
         try {
-            return postJobsCommand(accessToken, CONTINUE, getPermissons(accessToken).getJob().isContinueAllTasks(), modifyJobsSchema);
+            return postJobsCommand(accessToken, CONTINUE, getPermissons(accessToken).getJob().isContinueAllTasks(), modifyJobs);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }

@@ -10,19 +10,19 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembersP;
-import com.sos.joc.model.common.JobSchedulerFilterSchema;
-import com.sos.joc.model.jobscheduler.ClusterMemberTypeSchema;
-import com.sos.joc.model.jobscheduler.Jobscheduler;
-import com.sos.joc.model.jobscheduler.MastersPSchema;
-import com.sos.joc.model.jobscheduler.Os;
-import com.sos.joc.model.jobscheduler.Supervisor;
+import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.jobscheduler.ClusterMemberType;
+import com.sos.joc.model.jobscheduler.HostPortParameter;
+import com.sos.joc.model.jobscheduler.JobSchedulerP;
+import com.sos.joc.model.jobscheduler.MastersP;
+import com.sos.joc.model.jobscheduler.OperatingSystem;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembersP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) {
+    public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilterSchema) {
 
         LOGGER.debug("init jobscheduler/cluster/members/p");
         try {
@@ -31,30 +31,30 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
                 return jocDefaultResponse;
             }
 
-            MastersPSchema entity = new MastersPSchema();
+            MastersP entity = new MastersP();
 
             // TODO JOC Cockpit Webservice
 
             entity.setDeliveryDate(new Date());
-            ArrayList<Jobscheduler> masters = new ArrayList<Jobscheduler>();
-            Jobscheduler jobscheduler = new Jobscheduler();
+            ArrayList<JobSchedulerP> masters = new ArrayList<JobSchedulerP>();
+            JobSchedulerP jobscheduler = new JobSchedulerP();
             jobscheduler.setHost("myHost");
             jobscheduler.setJobschedulerId(jobSchedulerFilterSchema.getJobschedulerId());
             jobscheduler.setPort(-1);
             jobscheduler.setStartedAt(new Date());
 
-            ClusterMemberTypeSchema clusterMemberTypeSchema = new ClusterMemberTypeSchema();
+            ClusterMemberType clusterMemberTypeSchema = new ClusterMemberType();
             clusterMemberTypeSchema.setPrecedence(-1);
-            clusterMemberTypeSchema.setType("myType");
+            clusterMemberTypeSchema.set_type(ClusterMemberType._type.STANDALONE);
             jobscheduler.setClusterType(clusterMemberTypeSchema);
 
-            Os os = new Os();
+            OperatingSystem os = new OperatingSystem();
             os.setArchitecture("64");
             os.setDistribution("myDistribution");
             os.setName("myName");
             jobscheduler.setOs(os);
 
-            Supervisor supervisor = new Supervisor();
+            HostPortParameter supervisor = new HostPortParameter();
             supervisor.setHost("myHost");
             supervisor.setJobschedulerId("myJobScheduelerId");
             supervisor.setPort(-1);
@@ -65,24 +65,24 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
             jobscheduler.setSurveyDate(new Date());
             masters.add(jobscheduler);
 
-            Jobscheduler jobscheduler2 = new Jobscheduler();
+            JobSchedulerP jobscheduler2 = new JobSchedulerP();
             jobscheduler2.setHost("myHost2");
             jobscheduler2.setJobschedulerId(jobSchedulerFilterSchema.getJobschedulerId());
             jobscheduler2.setPort(-1);
             jobscheduler2.setStartedAt(new Date());
 
-            ClusterMemberTypeSchema clusterMemberTypeSchema2 = new ClusterMemberTypeSchema();
+            ClusterMemberType clusterMemberTypeSchema2 = new ClusterMemberType();
             clusterMemberTypeSchema2.setPrecedence(-1);
-            clusterMemberTypeSchema2.setType("myType");
+            clusterMemberTypeSchema2.set_type(ClusterMemberType._type.STANDALONE);
             jobscheduler.setClusterType(clusterMemberTypeSchema2);
 
-            Os os2 = new Os();
+            OperatingSystem os2 = new OperatingSystem();
             os2.setArchitecture("32");
             os2.setDistribution("myDistribution2");
             os2.setName("myName2");
             jobscheduler.setOs(os2);
 
-            Supervisor supervisor2 = new Supervisor();
+            HostPortParameter supervisor2 = new HostPortParameter();
             supervisor2.setHost("myHost2");
             supervisor2.setJobschedulerId("myJobScheduelerId2");
             supervisor2.setPort(-1);

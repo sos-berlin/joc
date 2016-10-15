@@ -9,8 +9,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.lock.LockConfigurationFilterSchema;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.lock.LockConfigurationFilter;
  
 public class LockResourceConfigurationImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -22,12 +23,12 @@ public class LockResourceConfigurationImplTest {
     public void postLockConfigurationDefaultTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        LockConfigurationFilterSchema lockConfigurationFilterSchema = new LockConfigurationFilterSchema();
+        LockConfigurationFilter lockConfigurationFilterSchema = new LockConfigurationFilter();
         lockConfigurationFilterSchema.setLock("myLock");
         lockConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
         LockResourceConfigurationImpl lockResourceConfigurationImpl = new LockResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), lockConfigurationFilterSchema);
-        ConfigurationSchema configurationSchema = (ConfigurationSchema) jobsResponse.getEntity();
+        Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertEquals("postLockConfigurationTest","myPath", configurationSchema.getConfiguration().getPath());
      }
 
@@ -35,13 +36,13 @@ public class LockResourceConfigurationImplTest {
     public void postLockConfigurationHtmlTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        LockConfigurationFilterSchema lockConfigurationFilterSchema = new LockConfigurationFilterSchema();
+        LockConfigurationFilter lockConfigurationFilterSchema = new LockConfigurationFilter();
         lockConfigurationFilterSchema.setLock("myLock");
         lockConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
-        lockConfigurationFilterSchema.setMime(LockConfigurationFilterSchema.Mime.HTML);
+        lockConfigurationFilterSchema.setMime(ConfigurationMime.HTML);
         LockResourceConfigurationImpl lockResourceConfigurationImpl = new LockResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = lockResourceConfigurationImpl.postLockConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), lockConfigurationFilterSchema);
-        ConfigurationSchema configurationSchema = (ConfigurationSchema) jobsResponse.getEntity();
+        Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertNotNull("postLockConfigurationHtmlTest", configurationSchema.getConfiguration().getContent().getHtml());
         LOGGER.info(configurationSchema.getConfiguration().getContent().getHtml());
      }

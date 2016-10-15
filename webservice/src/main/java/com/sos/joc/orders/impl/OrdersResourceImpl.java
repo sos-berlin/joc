@@ -22,11 +22,11 @@ import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.job.OrderQueue;
-import com.sos.joc.model.order.Order_;
-import com.sos.joc.model.order.OrdersFilterSchema;
-import com.sos.joc.model.order.OrdersVSchema;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.order.OrderPath;
+import com.sos.joc.model.order.OrderV;
+import com.sos.joc.model.order.OrdersFilter;
+import com.sos.joc.model.order.OrdersV;
 import com.sos.joc.orders.resource.IOrdersResource;
 
 @Path("orders")
@@ -34,7 +34,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrders(String accessToken, OrdersFilterSchema ordersBody) throws Exception {
+    public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
         LOGGER.debug("init orders");
 
         try {
@@ -47,15 +47,15 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             JOCJsonCommand command = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
             command.addCompactQuery(ordersBody.getCompact());
 
-            Map<String, OrderQueue> listOrders = new HashMap<String, OrderQueue>();
-            List<Order_> orders = ordersBody.getOrders();
-            List<FoldersSchema> folders = ordersBody.getFolders();
+            Map<String, OrderV> listOrders = new HashMap<String, OrderV>();
+            List<OrderPath> orders = ordersBody.getOrders();
+            List<Folder> folders = ordersBody.getFolders();
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
             URI uri = command.getURI();
 
             Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
-            for (Order_ order : orders) {
+            for (OrderPath order : orders) {
                 if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
                     throw new JocMissingRequiredParameterException("jobChain");
                 }
@@ -80,24 +80,24 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                     tasks.add(new OrdersVCallable(opj, ordersBody.getCompact(), uri));
                 }
             } else if (folders != null && !folders.isEmpty()) {
-                for (FoldersSchema folder : folders) {
+                for (Folder folder : folders) {
                     tasks.add(new OrdersVCallable(folder, ordersBody, uri));
                 }
             } else {
-                FoldersSchema rootFolder = new FoldersSchema();
+                Folder rootFolder = new Folder();
                 rootFolder.setFolder("/");
                 rootFolder.setRecursive(true);
                 tasks.add(new OrdersVCallable(rootFolder, ordersBody, uri));
             }
 
             ExecutorService executorService = Executors.newFixedThreadPool(10);
-            for (Future<Map<String, OrderQueue>> result : executorService.invokeAll(tasks)) {
+            for (Future<Map<String, OrderV>> result : executorService.invokeAll(tasks)) {
                 listOrders.putAll(result.get());
             }
 
-            OrdersVSchema entity = new OrdersVSchema();
+            OrdersV entity = new OrdersV();
             entity.setDeliveryDate(new Date());
-            entity.setOrders(new ArrayList<OrderQueue>(listOrders.values()));
+            entity.setOrders(new ArrayList<OrderV>(listOrders.values()));
 
             return JOCDefaultResponse.responseStatus200(entity);
             // } catch (JocException e) {

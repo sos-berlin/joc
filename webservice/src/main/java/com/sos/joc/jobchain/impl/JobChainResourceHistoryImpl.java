@@ -15,10 +15,11 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceHistory;
-import com.sos.joc.model.jobChain.JobChainHistoryFilterSchema;
-import com.sos.joc.model.order.History;
-import com.sos.joc.model.order.HistorySchema;
-import com.sos.joc.model.order.State;
+import com.sos.joc.model.jobChain.JobChainHistoryFilter;
+import com.sos.joc.model.order.OrderHistory;
+import com.sos.joc.model.order.OrderHistoryItem;
+import com.sos.joc.model.order.OrderHistoryState;
+import com.sos.joc.model.order.OrderHistoryStateText;
 import com.sos.scheduler.model.commands.JSCmdShowJobChain;
 
 @Path("job_chain")
@@ -27,59 +28,55 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     private static final String ORDER_HISTORY = "order_history";
     private static final String KEY_FOR_ERROR_NODE_LIST = "nodes";
     private static final String XPATH_FOR_ERROR_NODES = "//job_chain_node[@error_state='%s']";
-    private static final String XPATH_FOR_ORDER_HISTORY = "//spooler/answer/job_chain/order_history/order";
+    private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainResourceHistoryImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilterSchema jobChainHistoryFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
 
         LOGGER.debug("init job_chain/history");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
-
+            JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            HistorySchema entity = new HistorySchema();
-
-            entity.setDeliveryDate(new Date());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
-            if (jobChainHistoryFilterSchema.getMaxLastHistoryItems() == null) {
-                jobChainHistoryFilterSchema.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
+            if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
+                jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
-            String postCommand = createJobchainHistoryPostCommand(jobChainHistoryFilterSchema);
+            String postCommand = createJobchainHistoryPostCommand(jobChainHistoryFilter);
             jocXmlCommand.excutePost(postCommand);
 
             jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
 
             int count = jocXmlCommand.getNodeList().getLength();
 
-            List<History> listOfHistory = new ArrayList<History>();
+            List<OrderHistoryItem> listOfHistory = new ArrayList<OrderHistoryItem>();
 
             for (int i = 0; i < count; i++) {
-                State state = new State();
+                OrderHistoryState state = new OrderHistoryState();
                 jocXmlCommand.getElementFromList(i);
                 String node = jocXmlCommand.getAttribute("state");
-                History history = new History();
-                if (jocXmlCommand.getAttributeAsDate("end_time") != null) {
-                    history.setEndTime(jocXmlCommand.getAttributeAsDate("end_time"));
+                OrderHistoryItem history = new OrderHistoryItem();
+                history.setEndTime(jocXmlCommand.getAttributeAsDate("end_time"));
+                if (history.getEndTime() != null) {
                     jocXmlCommand.createNodeList(KEY_FOR_ERROR_NODE_LIST, String.format(XPATH_FOR_ERROR_NODES, node));
                     if (jocXmlCommand.getNodeList(KEY_FOR_ERROR_NODE_LIST).getLength() == 0) {
                         state.setSeverity(0);
-                        state.setText(State.Text.SUCCESSFUL);
+                        state.set_text(OrderHistoryStateText.SUCCESSFUL);
                     } else {
                         state.setSeverity(2);
-                        state.setText(State.Text.FAILED);
+                        state.set_text(OrderHistoryStateText.FAILED);
                     }
                     history.setState(state);
                 } else {
                     state.setSeverity(1);
-                    state.setText(State.Text.INCOMPLETE);
+                    state.set_text(OrderHistoryStateText.INCOMPLETE);
                     history.setState(state);
 
                 }
-                history.setHistoryId(jocXmlCommand.getAttributeAsInteger("history_id"));
+                history.setHistoryId(jocXmlCommand.getAttribute("history_id"));
                 history.setJobChain(normalizePath(jocXmlCommand.getAttribute("job_chain")));
                 history.setNode(node);
                 history.setOrderId(jocXmlCommand.getAttribute("id"));
@@ -89,6 +86,8 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 listOfHistory.add(history);
             }
 
+            OrderHistory entity = new OrderHistory();
+            entity.setDeliveryDate(new Date());
             entity.setHistory(listOfHistory);
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -101,7 +100,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         }
     }
 
-    public String createJobchainHistoryPostCommand(final JobChainHistoryFilterSchema jobChainHistoryFilterSchema) {
+    public String createJobchainHistoryPostCommand(final JobChainHistoryFilter jobChainHistoryFilterSchema) {
 
         JSCmdShowJobChain showJob = Globals.schedulerObjectFactory.createShowJobChain();
         showJob.setMaxOrders(BigInteger.valueOf(0));

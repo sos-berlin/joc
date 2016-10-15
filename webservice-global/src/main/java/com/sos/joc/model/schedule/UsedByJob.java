@@ -2,11 +2,18 @@
 package com.sos.joc.model.schedule;
 
 import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
+@JsonPropertyOrder({
+    "job"
+})
 public class UsedByJob {
 
     /**
@@ -15,6 +22,7 @@ public class UsedByJob {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
+    @JsonProperty("job")
     private String job;
 
     /**
@@ -25,6 +33,7 @@ public class UsedByJob {
      * @return
      *     The job
      */
+    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -37,6 +46,7 @@ public class UsedByJob {
      * @param job
      *     The job
      */
+    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }

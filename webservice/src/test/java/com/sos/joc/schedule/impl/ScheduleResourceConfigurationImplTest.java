@@ -9,8 +9,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.schedule.ScheduleConfigurationFilterSchema;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
  
 public class ScheduleResourceConfigurationImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -22,12 +23,12 @@ public class ScheduleResourceConfigurationImplTest {
     public void postScheduleConfigurationDefaultTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        ScheduleConfigurationFilterSchema scheduleConfigurationFilterSchema = new ScheduleConfigurationFilterSchema();
+        ScheduleConfigurationFilter scheduleConfigurationFilterSchema = new ScheduleConfigurationFilter();
         scheduleConfigurationFilterSchema.setSchedule("mySchedule");
         scheduleConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
         ScheduleResourceConfigurationImpl scheduleResourceConfigurationImpl = new ScheduleResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = scheduleResourceConfigurationImpl.postScheduleConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), scheduleConfigurationFilterSchema);
-        ConfigurationSchema configurationSchema = (ConfigurationSchema) jobsResponse.getEntity();
+        Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertEquals("postScheduleConfigurationDefaultTest","myPath", configurationSchema.getConfiguration().getPath());
      }
 
@@ -35,13 +36,13 @@ public class ScheduleResourceConfigurationImplTest {
     public void postScheduleConfigurationHtmlTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        ScheduleConfigurationFilterSchema scheduleConfigurationFilterSchema = new ScheduleConfigurationFilterSchema();
+        ScheduleConfigurationFilter scheduleConfigurationFilterSchema = new ScheduleConfigurationFilter();
         scheduleConfigurationFilterSchema.setSchedule("mySchedule");
         scheduleConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
-        scheduleConfigurationFilterSchema.setMime(ScheduleConfigurationFilterSchema.Mime.HTML);
+        scheduleConfigurationFilterSchema.setMime(ConfigurationMime.HTML);
         ScheduleResourceConfigurationImpl scheduleResourceConfigurationImpl = new ScheduleResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = scheduleResourceConfigurationImpl.postScheduleConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), scheduleConfigurationFilterSchema);
-        ConfigurationSchema configurationSchema = (ConfigurationSchema) jobsResponse.getEntity();
+        Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertNotNull("postScheduleConfigurationHtmlTest", configurationSchema.getConfiguration().getContent().getHtml());
         LOGGER.info(configurationSchema.getConfiguration().getContent().getHtml());
      }

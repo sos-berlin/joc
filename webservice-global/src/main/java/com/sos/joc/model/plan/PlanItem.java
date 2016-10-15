@@ -3,7 +3,10 @@ package com.sos.joc.model.plan;
 
 import java.util.Date;
 import javax.annotation.Generated;
-import com.sos.joc.model.common.ErrorSchema;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.common.Error;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -15,7 +18,26 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * 
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
+@JsonPropertyOrder({
+    "surveyDate",
+    "job",
+    "jobChain",
+    "orderId",
+    "plannedStartTime",
+    "expectedEndTime",
+    "startTime",
+    "endTime",
+    "historyId",
+    "node",
+    "exitCode",
+    "error",
+    "startMode",
+    "period",
+    "late",
+    "state"
+})
 public class PlanItem {
 
     /**
@@ -24,6 +46,7 @@ public class PlanItem {
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
      * 
      */
+    @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
      * path
@@ -31,6 +54,7 @@ public class PlanItem {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
+    @JsonProperty("job")
     private String job;
     /**
      * path
@@ -38,7 +62,9 @@ public class PlanItem {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
+    @JsonProperty("jobChain")
     private String jobChain;
+    @JsonProperty("orderId")
     private String orderId;
     /**
      * timestamp
@@ -46,6 +72,7 @@ public class PlanItem {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
+    @JsonProperty("plannedStartTime")
     private Date plannedStartTime;
     /**
      * timestamp
@@ -53,6 +80,7 @@ public class PlanItem {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
+    @JsonProperty("expectedEndTime")
     private Date expectedEndTime;
     /**
      * timestamp
@@ -60,6 +88,7 @@ public class PlanItem {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
+    @JsonProperty("startTime")
     private Date startTime;
     /**
      * timestamp
@@ -67,23 +96,21 @@ public class PlanItem {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
+    @JsonProperty("endTime")
     private Date endTime;
-    /**
-     * non negative integer
-     * <p>
-     * 
-     * 
-     */
-    private Integer historyId;
+    @JsonProperty("historyId")
+    private String historyId;
     /**
      * only for orders
      * 
      */
+    @JsonProperty("node")
     private String node;
     /**
      * only for standalone jobs
      * 
      */
+    @JsonProperty("exitCode")
     private String exitCode;
     /**
      * error
@@ -91,19 +118,30 @@ public class PlanItem {
      * 
      * 
      */
-    private ErrorSchema error;
+    @JsonProperty("error")
+    private Error error;
     /**
      *  0=single_start, 1=start_start_repeat, 2=start_end_repeat
      * 
      */
+    @JsonProperty("startMode")
     private Integer startMode = 0;
     /**
      * undefined for startMode=0
      * 
      */
+    @JsonProperty("period")
     private Period period;
+    @JsonProperty("late")
     private Boolean late;
-    private State state;
+    /**
+     * plan state
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("state")
+    private PlanState state;
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -113,6 +151,7 @@ public class PlanItem {
      * @return
      *     The surveyDate
      */
+    @JsonProperty("surveyDate")
     public Date getSurveyDate() {
         return surveyDate;
     }
@@ -125,6 +164,7 @@ public class PlanItem {
      * @param surveyDate
      *     The surveyDate
      */
+    @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
     }
@@ -137,6 +177,7 @@ public class PlanItem {
      * @return
      *     The job
      */
+    @JsonProperty("job")
     public String getJob() {
         return job;
     }
@@ -149,6 +190,7 @@ public class PlanItem {
      * @param job
      *     The job
      */
+    @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
     }
@@ -161,6 +203,7 @@ public class PlanItem {
      * @return
      *     The jobChain
      */
+    @JsonProperty("jobChain")
     public String getJobChain() {
         return jobChain;
     }
@@ -173,6 +216,7 @@ public class PlanItem {
      * @param jobChain
      *     The jobChain
      */
+    @JsonProperty("jobChain")
     public void setJobChain(String jobChain) {
         this.jobChain = jobChain;
     }
@@ -182,6 +226,7 @@ public class PlanItem {
      * @return
      *     The orderId
      */
+    @JsonProperty("orderId")
     public String getOrderId() {
         return orderId;
     }
@@ -191,6 +236,7 @@ public class PlanItem {
      * @param orderId
      *     The orderId
      */
+    @JsonProperty("orderId")
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
@@ -203,6 +249,7 @@ public class PlanItem {
      * @return
      *     The plannedStartTime
      */
+    @JsonProperty("plannedStartTime")
     public Date getPlannedStartTime() {
         return plannedStartTime;
     }
@@ -215,6 +262,7 @@ public class PlanItem {
      * @param plannedStartTime
      *     The plannedStartTime
      */
+    @JsonProperty("plannedStartTime")
     public void setPlannedStartTime(Date plannedStartTime) {
         this.plannedStartTime = plannedStartTime;
     }
@@ -227,6 +275,7 @@ public class PlanItem {
      * @return
      *     The expectedEndTime
      */
+    @JsonProperty("expectedEndTime")
     public Date getExpectedEndTime() {
         return expectedEndTime;
     }
@@ -239,6 +288,7 @@ public class PlanItem {
      * @param expectedEndTime
      *     The expectedEndTime
      */
+    @JsonProperty("expectedEndTime")
     public void setExpectedEndTime(Date expectedEndTime) {
         this.expectedEndTime = expectedEndTime;
     }
@@ -251,6 +301,7 @@ public class PlanItem {
      * @return
      *     The startTime
      */
+    @JsonProperty("startTime")
     public Date getStartTime() {
         return startTime;
     }
@@ -263,6 +314,7 @@ public class PlanItem {
      * @param startTime
      *     The startTime
      */
+    @JsonProperty("startTime")
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
@@ -275,6 +327,7 @@ public class PlanItem {
      * @return
      *     The endTime
      */
+    @JsonProperty("endTime")
     public Date getEndTime() {
         return endTime;
     }
@@ -287,31 +340,28 @@ public class PlanItem {
      * @param endTime
      *     The endTime
      */
+    @JsonProperty("endTime")
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
     /**
-     * non negative integer
-     * <p>
-     * 
      * 
      * @return
      *     The historyId
      */
-    public Integer getHistoryId() {
+    @JsonProperty("historyId")
+    public String getHistoryId() {
         return historyId;
     }
 
     /**
-     * non negative integer
-     * <p>
-     * 
      * 
      * @param historyId
      *     The historyId
      */
-    public void setHistoryId(Integer historyId) {
+    @JsonProperty("historyId")
+    public void setHistoryId(String historyId) {
         this.historyId = historyId;
     }
 
@@ -321,6 +371,7 @@ public class PlanItem {
      * @return
      *     The node
      */
+    @JsonProperty("node")
     public String getNode() {
         return node;
     }
@@ -331,6 +382,7 @@ public class PlanItem {
      * @param node
      *     The node
      */
+    @JsonProperty("node")
     public void setNode(String node) {
         this.node = node;
     }
@@ -341,6 +393,7 @@ public class PlanItem {
      * @return
      *     The exitCode
      */
+    @JsonProperty("exitCode")
     public String getExitCode() {
         return exitCode;
     }
@@ -351,6 +404,7 @@ public class PlanItem {
      * @param exitCode
      *     The exitCode
      */
+    @JsonProperty("exitCode")
     public void setExitCode(String exitCode) {
         this.exitCode = exitCode;
     }
@@ -363,7 +417,8 @@ public class PlanItem {
      * @return
      *     The error
      */
-    public ErrorSchema getError() {
+    @JsonProperty("error")
+    public Error getError() {
         return error;
     }
 
@@ -375,7 +430,8 @@ public class PlanItem {
      * @param error
      *     The error
      */
-    public void setError(ErrorSchema error) {
+    @JsonProperty("error")
+    public void setError(Error error) {
         this.error = error;
     }
 
@@ -385,6 +441,7 @@ public class PlanItem {
      * @return
      *     The startMode
      */
+    @JsonProperty("startMode")
     public Integer getStartMode() {
         return startMode;
     }
@@ -395,6 +452,7 @@ public class PlanItem {
      * @param startMode
      *     The startMode
      */
+    @JsonProperty("startMode")
     public void setStartMode(Integer startMode) {
         this.startMode = startMode;
     }
@@ -405,6 +463,7 @@ public class PlanItem {
      * @return
      *     The period
      */
+    @JsonProperty("period")
     public Period getPeriod() {
         return period;
     }
@@ -415,6 +474,7 @@ public class PlanItem {
      * @param period
      *     The period
      */
+    @JsonProperty("period")
     public void setPeriod(Period period) {
         this.period = period;
     }
@@ -424,6 +484,7 @@ public class PlanItem {
      * @return
      *     The late
      */
+    @JsonProperty("late")
     public Boolean getLate() {
         return late;
     }
@@ -433,25 +494,34 @@ public class PlanItem {
      * @param late
      *     The late
      */
+    @JsonProperty("late")
     public void setLate(Boolean late) {
         this.late = late;
     }
 
     /**
+     * plan state
+     * <p>
+     * 
      * 
      * @return
      *     The state
      */
-    public State getState() {
+    @JsonProperty("state")
+    public PlanState getState() {
         return state;
     }
 
     /**
+     * plan state
+     * <p>
+     * 
      * 
      * @param state
      *     The state
      */
-    public void setState(State state) {
+    @JsonProperty("state")
+    public void setState(PlanState state) {
         this.state = state;
     }
 

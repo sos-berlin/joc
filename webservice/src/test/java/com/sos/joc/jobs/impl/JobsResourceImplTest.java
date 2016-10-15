@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.job.JobsFilterSchema;
-import com.sos.joc.model.job.JobsVSchema;
-import com.sos.joc.model.job.State__;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.job.JobStateText;
+import com.sos.joc.model.job.JobsFilter;
+import com.sos.joc.model.job.JobsV;
 
 public class JobsResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -28,11 +28,11 @@ public class JobsResourceImplTest {
     public void postMinConfJobsTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
+        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
      }
@@ -41,12 +41,12 @@ public class JobsResourceImplTest {
     public void postCompactJobsTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
+        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
 //        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
      }
@@ -56,26 +56,26 @@ public class JobsResourceImplTest {
         Date start = new Date();
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
-        List<FoldersSchema> folders = new ArrayList<FoldersSchema>();
-        FoldersSchema folder = new FoldersSchema();
+        List<Folder> folders = new ArrayList<Folder>();
+        Folder folder = new Folder();
         folder.setFolder("/test_JS-1473");
         folder.setRecursive(true);
         folders.add(folder);
-        FoldersSchema folder2 = new FoldersSchema();
+        Folder folder2 = new Folder();
         folder2.setFolder("/check_history");
         folder2.setRecursive(true);
         folders.add(folder2);
-        FoldersSchema folder3 = new FoldersSchema();
+        Folder folder3 = new Folder();
         folder3.setFolder("/OrderJob");
         folder3.setRecursive(true);
         folders.add(folder3);
         jobsFilterSchema.setFolders(folders);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
+        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
 //        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         Date end = new Date();
         long duration = end.getTime() - start.getTime();
@@ -87,18 +87,18 @@ public class JobsResourceImplTest {
     public void postJobsWithFoldersNotRecursiveTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
-        List<FoldersSchema> folders = new ArrayList<FoldersSchema>();
-        FoldersSchema folder = new FoldersSchema();
+        List<Folder> folders = new ArrayList<Folder>();
+        Folder folder = new Folder();
         folder.setFolder("/sos/housekeeping/scheduler_cleanup_history");
         folder.setRecursive(false);
         folders.add(folder);
         jobsFilterSchema.setFolders(folders);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
+        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
 //        assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
      }
@@ -107,14 +107,14 @@ public class JobsResourceImplTest {
     public void postJobsPendingTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
-        List<State__> states = new ArrayList<State__>();
-        states.add(State__.PENDING);
-        jobsFilterSchema.setState(states);
+        List<JobStateText> states = new ArrayList<JobStateText>();
+        states.add(JobStateText.PENDING);
+        jobsFilterSchema.setStates(states);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
+        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
      }
@@ -123,13 +123,13 @@ public class JobsResourceImplTest {
     public void postJobsFromToTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobsFilterSchema jobsFilterSchema = new JobsFilterSchema();
+        JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setDateFrom("2016-09-06 00:00:00.000Z");
         jobsFilterSchema.setDateTo("2016-09-06 23:59:59.999Z");
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);
-        JobsVSchema jobsVSchema = (JobsVSchema) jobsResponse.getEntity();
+        JobsV jobsVSchema = (JobsV) jobsResponse.getEntity();
         assertEquals("postJobsTest","scheduler_file_order_sink", jobsVSchema.getJobs().get(0).getName());
         LOGGER.info(jobsResponse.toString());
      }

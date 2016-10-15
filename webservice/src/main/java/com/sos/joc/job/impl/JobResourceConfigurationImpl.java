@@ -14,8 +14,9 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceConfiguration;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.job.JobConfigurationFilterSchema;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.job.JobConfigurationFilter;
 import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
@@ -24,7 +25,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceConfigurationImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilterSchema jobBody) throws Exception {
+    public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilter jobBody) throws Exception {
 
         LOGGER.debug("init job/configuration");
         try {
@@ -33,10 +34,10 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
                 return jocDefaultResponse;
             }
 
-            ConfigurationSchema entity = new ConfigurationSchema();
+            Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("job", jobBody.getJob())) {
-                boolean responseInHtml = jobBody.getMime() == JobConfigurationFilterSchema.Mime.HTML;
+                boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job", "job", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
@@ -47,7 +48,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
         }
     }
 
-    private String createJobConfigurationPostCommand(final JobConfigurationFilterSchema body) {
+    private String createJobConfigurationPostCommand(final JobConfigurationFilter body) {
         JSCmdShowJob showJob = new JSCmdShowJob(Globals.schedulerObjectFactory);
         showJob.setWhat("source");
         showJob.setJob(normalizePath(body.getJob()));

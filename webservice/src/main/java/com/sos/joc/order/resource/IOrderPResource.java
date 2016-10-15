@@ -8,13 +8,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.order.OrderFilterWithCompactSchema;
+import com.sos.joc.model.order.OrderFilter;
 
 public interface IOrderPResource {
 
     @POST
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrderP(@HeaderParam("access_token") String accessToken, OrderFilterWithCompactSchema orderFilterWithCompactSchema) throws Exception;
-
+    public JOCDefaultResponse postOrderP(@HeaderParam("access_token") String accessToken, OrderFilter orderFilter) throws Exception;
 }

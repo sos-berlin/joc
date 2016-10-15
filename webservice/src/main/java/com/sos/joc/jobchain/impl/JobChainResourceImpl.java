@@ -1,5 +1,6 @@
 package com.sos.joc.jobchain.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -12,27 +13,29 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchain.JOCXmlJobChainCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResource;
-import com.sos.joc.model.jobChain.JobChain200VSchema;
-import com.sos.joc.model.jobChain.JobChainFilterSchema;
+import com.sos.joc.model.jobChain.JobChainV200;
+import com.sos.joc.model.jobChain.JobChainFilter;
 
 @Path("job_chain")
 public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainResourceImpl.class);
 
-    public JOCDefaultResponse postJobChain(String accessToken, JobChainFilterSchema jobChainFilterSchema) throws Exception {
+    @Override
+    public JOCDefaultResponse postJobChain(String accessToken, JobChainFilter jobChainFilter) throws Exception {
         LOGGER.debug("init job_chain");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobChainFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            JobChain200VSchema entity = new JobChain200VSchema();
+            JobChainV200 entity = new JobChainV200();
             JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(dbItemInventoryInstance.getCommandUrl(), dbItemInventoryInstance.getUrl());
-            if (checkRequiredParameter("jobChain", jobChainFilterSchema.getJobChain())) {
+            if (checkRequiredParameter("jobChain", jobChainFilter.getJobChain())) {
                 entity.setDeliveryDate(new Date());
-                entity.setJobChain(jocXmlCommand.getJobChain(jobChainFilterSchema.getJobChain(), jobChainFilterSchema.getCompact()));
+                entity.setJobChain(jocXmlCommand.getJobChain(jobChainFilter.getJobChain(), jobChainFilter.getCompact()));
             }
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

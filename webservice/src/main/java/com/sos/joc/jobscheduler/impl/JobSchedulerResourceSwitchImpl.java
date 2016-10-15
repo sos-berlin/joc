@@ -13,7 +13,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSwitch;
-import com.sos.joc.model.common.JobSchedulerFilterSchema;
+import com.sos.joc.model.common.JobSchedulerId;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements IJobSchedulerResourceSwitch {
@@ -21,7 +21,7 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerSwitch(String accessToken, JobSchedulerFilterSchema jobSchedulerFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobschedulerSwitch(String accessToken, JobSchedulerId jobSchedulerFilterSchema) throws Exception {
 
         LOGGER.debug("init jobscheduler/switch");
         try {

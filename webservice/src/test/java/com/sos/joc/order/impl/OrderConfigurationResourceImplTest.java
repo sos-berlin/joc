@@ -6,8 +6,8 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.order.OrderConfigurationFilterSchema;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.order.OrderConfigurationFilter;
 
 public class OrderConfigurationResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -18,13 +18,13 @@ public class OrderConfigurationResourceImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        OrderConfigurationFilterSchema orderConfigurationBody = new OrderConfigurationFilterSchema();
+        OrderConfigurationFilter orderConfigurationBody = new OrderConfigurationFilter();
         orderConfigurationBody.setJobChain("/webservice/setback");
         orderConfigurationBody.setOrderId("1");
         orderConfigurationBody.setJobschedulerId("scheduler.1.10");
         OrderConfigurationResourceImpl orderConfigurationImpl = new OrderConfigurationResourceImpl();
         JOCDefaultResponse ordersResponse = orderConfigurationImpl.postOrderConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), orderConfigurationBody);
-        ConfigurationSchema orderConfigurationSchema = (ConfigurationSchema) ordersResponse.getEntity();
+        Configuration200 orderConfigurationSchema = (Configuration200) ordersResponse.getEntity();
         assertEquals("postOrderConfTest","/webservice/setback,1", orderConfigurationSchema.getConfiguration().getPath());
      }
 

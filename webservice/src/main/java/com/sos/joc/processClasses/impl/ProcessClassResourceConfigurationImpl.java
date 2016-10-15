@@ -10,8 +10,9 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.processClass.ProcessClassConfigurationFilterSchema;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
 import com.sos.joc.processClasses.resource.IProcessClassResourceConfiguration;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
@@ -21,7 +22,7 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassResourceConfigurationImpl.class);
 
     @Override
-    public JOCDefaultResponse postProcessClassConfiguration(String accessToken, ProcessClassConfigurationFilterSchema processClassConfigurationFilterSchema) throws Exception {
+    public JOCDefaultResponse postProcessClassConfiguration(String accessToken, ProcessClassConfigurationFilter processClassConfigurationFilterSchema) throws Exception {
 
         LOGGER.debug("init process_class/configuration");
         try {
@@ -31,10 +32,10 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
                 return jocDefaultResponse;
             }
 
-            ConfigurationSchema entity = new ConfigurationSchema();
+            Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("processClass", processClassConfigurationFilterSchema.getProcessClass())) {
-                boolean responseInHtml = processClassConfigurationFilterSchema.getMime() == ProcessClassConfigurationFilterSchema.Mime.HTML;
+                boolean responseInHtml = processClassConfigurationFilterSchema.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", normalizePath(processClassConfigurationFilterSchema.getProcessClass()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createProcessClassConfigurationPostCommand(), xPath, "process_class", responseInHtml);
             }

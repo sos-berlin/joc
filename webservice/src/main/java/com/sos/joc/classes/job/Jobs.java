@@ -7,25 +7,25 @@ import java.util.List;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.Orders;
 import com.sos.joc.classes.parameters.Parameters;
-import com.sos.joc.model.job.Job;
-import com.sos.joc.model.job.Job_;
-import com.sos.joc.model.job.Lock;
-import com.sos.joc.model.job.Lock_;
-import com.sos.joc.model.job.Order;
+import com.sos.joc.model.job.JobP;
+import com.sos.joc.model.job.JobV;
+import com.sos.joc.model.job.LockUseP;
+import com.sos.joc.model.job.LockUseV;
+import com.sos.joc.model.job.OrderInRunningTask;
+import com.sos.joc.model.job.QueuedTask;
 import com.sos.joc.model.job.RunningTask;
-import com.sos.joc.model.job.TaskQueue;
-import com.sos.joc.model.job.RunningTask.Cause;
+import com.sos.joc.model.job.TaskCause;
 
 public class Jobs {
 
-    public static List<Lock_> getLocks() {
-        List<Lock_> listOfLocks = new ArrayList<Lock_>();
-        Lock_ lock = new Lock_();
+    public static List<LockUseV> getLocks() {
+        List<LockUseV> listOfLocks = new ArrayList<LockUseV>();
+        LockUseV lock = new LockUseV();
         lock.setExclusive(false);
         lock.setAvailable(true);
         lock.setPath("myPath");
         listOfLocks.add(lock);
-        Lock_ lock2 = new Lock_();
+        LockUseV lock2 = new LockUseV();
         lock2.setExclusive(true);
         lock2.setAvailable(false);
         lock2.setPath("myPath2");
@@ -33,14 +33,14 @@ public class Jobs {
         return listOfLocks;
     }
 
-    public static List<Lock> getJobLocks() {
-        List<Lock> listOfLocks = new ArrayList<Lock>();
-        Lock lock = new Lock();
+    public static List<LockUseP> getJobLocks() {
+        List<LockUseP> listOfLocks = new ArrayList<LockUseP>();
+        LockUseP lock = new LockUseP();
         lock.setExclusive(false);
         // lock.setAvailable(true);
         lock.setPath("myPath");
         listOfLocks.add(lock);
-        Lock lock2 = new Lock();
+        LockUseP lock2 = new LockUseP();
         lock2.setExclusive(true);
         // lock2.setAvailable(false);
         lock2.setPath("myPath2");
@@ -51,11 +51,11 @@ public class Jobs {
     public static List<RunningTask> getRunningTasks() {
         List<RunningTask> listOfRunningTask = new ArrayList<RunningTask>();
         RunningTask runningTask = new RunningTask();
-        runningTask.setCause(Cause.NONE);
+        runningTask.set_cause(TaskCause.NONE);
         runningTask.setEnqueued(new Date());
         runningTask.setIdleSince(new Date());
 
-        Order order = new Order();
+        OrderInRunningTask order = new OrderInRunningTask();
         order.setInProcessSince(new Date());
         order.setJobChain("myJobChain");
         order.setOrderId("myOrderId");
@@ -66,30 +66,30 @@ public class Jobs {
         runningTask.setPid(-1);
         runningTask.setStartedAt(new Date());
         runningTask.setSteps(-1);
-        runningTask.setTaskId(-1);
+        runningTask.setTaskId("-1");
         listOfRunningTask.add(runningTask);
         return listOfRunningTask;
 
     }
 
-    public static List<TaskQueue> getTaskQueue() {
-        List<TaskQueue> listOfTasks = new ArrayList<TaskQueue>();
-        TaskQueue taskQueue = new TaskQueue();
-        taskQueue.setTaskId(-1);
+    public static List<QueuedTask> getTaskQueue() {
+        List<QueuedTask> listOfTasks = new ArrayList<QueuedTask>();
+        QueuedTask taskQueue = new QueuedTask();
+        taskQueue.setTaskId("-1");
         listOfTasks.add(taskQueue);
         return listOfTasks;
     }
 
-    public static Job_ getJob(boolean compact) {
-        Job_ job = new Job_();
+    public static JobV getJob(boolean compact) {
+        JobV job = new JobV();
 
         job.setName("myName");
         job.setPath("myPath");
 
-        com.sos.joc.model.job.State_ state = new com.sos.joc.model.job.State_();
-        state.setSeverity(0);
-        state.setText(com.sos.joc.model.job.State_.Text.LOADED);
-        job.setState(state);
+//        com.sos.joc.model.job.State_ state = new com.sos.joc.model.job.State_();
+//        state.setSeverity(0);
+//        state.setText(com.sos.joc.model.job.State_.Text.LOADED);
+        job.setState(null);
         job.setStateText("myStateText");
         job.setSurveyDate(new Date());
 
@@ -120,8 +120,8 @@ public class Jobs {
         return job;
     }
     
-    public static Job getPJob(boolean compact) {
-        Job job = new Job();
+    public static JobP getPJob(boolean compact) {
+        JobP job = new JobP();
 
         job.setName("myName");
         job.setPath("myPath");

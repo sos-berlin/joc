@@ -8,7 +8,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.LogTaskContent;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.job.TaskFilterSchema;
+import com.sos.joc.model.common.LogMime;
+import com.sos.joc.model.job.TaskFilter;
 import com.sos.joc.task.resource.ITaskLogHtmlResource;
 
 @Path("task")
@@ -21,25 +22,25 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
 
         try {
             
-            TaskFilterSchema taskFilterSchema = new TaskFilterSchema();
+            TaskFilter taskFilter = new TaskFilter();
             if (taskId != null){
-                taskFilterSchema.setTaskId(Long.parseLong(taskId));
+                taskFilter.setTaskId(taskId);
             }
-            taskFilterSchema.setJobschedulerId(jobschedulerId);
-            taskFilterSchema.setMime(TaskFilterSchema.Mime.HTML);
+            taskFilter.setJobschedulerId(jobschedulerId);
+            taskFilter.setMime(LogMime.HTML);
            
-            checkRequiredParameter("jobschedulerId", taskFilterSchema.getJobschedulerId());
-            checkRequiredParameter("taskId", taskFilterSchema.getTaskId());
+            checkRequiredParameter("jobschedulerId", taskFilter.getJobschedulerId());
+            checkRequiredParameter("taskId", taskFilter.getTaskId());
 
             JOCDefaultResponse jocDefaultResponse = init(jobschedulerId, getPermissons(accessToken).getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            LogTaskContent logTaskContent = new LogTaskContent(taskFilterSchema, dbItemInventoryInstance);
+            LogTaskContent logTaskContent = new LogTaskContent(taskFilter, dbItemInventoryInstance);
 
             String log = logTaskContent.getLog();
-            return JOCDefaultResponse.responseStatus200(logTaskContent.htmlPageWithColouredLogContent(log));
+            return JOCDefaultResponse.responseStatus200(logTaskContent.htmlPageWithColouredLogContent(log, "Task " + taskFilter.getTaskId()));
 
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

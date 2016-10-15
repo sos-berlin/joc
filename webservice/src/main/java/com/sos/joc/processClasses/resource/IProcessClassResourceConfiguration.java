@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.processClass.ProcessClassConfigurationFilterSchema;
+import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
  
 public interface IProcessClassResourceConfiguration {
 
@@ -16,10 +16,6 @@ public interface IProcessClassResourceConfiguration {
     @Path("configuration")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postProcessClassConfiguration(            
-            @HeaderParam("access_token") String accessToken, ProcessClassConfigurationFilterSchema processClassConfigurationFilterSchema) throws Exception;
-
-   
- 
-    
+            @HeaderParam("access_token") String accessToken, ProcessClassConfigurationFilter processClassConfigurationFilterSchema) throws Exception;
 }
 

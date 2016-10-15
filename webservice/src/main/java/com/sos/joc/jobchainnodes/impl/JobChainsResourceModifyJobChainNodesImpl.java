@@ -12,8 +12,8 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchainnodes.resources.IJobChainsResourceModifyJobChainNodes;
-import com.sos.joc.model.jobChain.ModifyNodeSchema;
-import com.sos.joc.model.jobChain.Node____;
+import com.sos.joc.model.jobChain.ModifyJobChainNode;
+import com.sos.joc.model.jobChain.ModifyJobChainNodes;
 import com.sos.scheduler.model.commands.JSCmdJobChainNodeModify;
 
 @Path("job_chain_nodes")
@@ -23,7 +23,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     private static final String STOP = "stop";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourceModifyJobChainNodesImpl.class);
 
-    private JOCDefaultResponse executeModifyJobChainNodeCommand(Node____ jobChainNode, String cmd) {
+    private JOCDefaultResponse executeModifyJobChainNodeCommand(ModifyJobChainNode jobChainNode, String cmd) {
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             JSCmdJobChainNodeModify jsCmdJobChainNodeModify = Globals.schedulerObjectFactory.createJobChainNodeModify();
@@ -32,18 +32,21 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
             jsCmdJobChainNodeModify.setActionIfNotEmpty(cmd);
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdJobChainNodeModify);
             jocXmlCommand.excutePost(xml);
+            jocXmlCommand.throwJobSchedulerError();
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing jobchain_node.%s %s:%s", cmd, e.getCause(), e.getMessage()));
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
-    private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission, ModifyNodeSchema modifyNodeSchema) {
+    private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission, ModifyJobChainNodes jobChainNodes) {
         JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
 
         try {
-            jocDefaultResponse = init(accessToken, modifyNodeSchema.getJobschedulerId(), permission);
+            jocDefaultResponse = init(accessToken, jobChainNodes.getJobschedulerId(), permission);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
 
@@ -53,7 +56,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-        for (Node____ jobChainNode : modifyNodeSchema.getNodes()) {
+        for (ModifyJobChainNode jobChainNode : jobChainNodes.getNodes()) {
             jocDefaultResponse = executeModifyJobChainNodeCommand(jobChainNode, command);
         }
 
@@ -62,10 +65,10 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     }
 
     @Override
-    public JOCDefaultResponse postJobChainNodesStop(String accessToken, ModifyNodeSchema modifyNodeSchema) {
+    public JOCDefaultResponse postJobChainNodesStop(String accessToken, ModifyJobChainNodes modifyNodes) {
         LOGGER.debug("init job_chain_nodes/stop");
         try {
-            return postJobChainNodesCommands(accessToken, STOP, getPermissons(accessToken).getJobChain().isStopJobChainNode(), modifyNodeSchema);
+            return postJobChainNodesCommands(accessToken, STOP, getPermissons(accessToken).getJobChain().isStopJobChainNode(), modifyNodes);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
@@ -73,20 +76,20 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     }
 
     @Override
-    public JOCDefaultResponse postJobChainNodesSkip(String accessToken, ModifyNodeSchema modifyNodeSchema) {
+    public JOCDefaultResponse postJobChainNodesSkip(String accessToken, ModifyJobChainNodes modifyNodes) {
         LOGGER.debug("init job_chain_nodes/skip");
         try {
-            return postJobChainNodesCommands(accessToken, SKIP, getPermissons(accessToken).getJobChain().isSkipJobChainNode(), modifyNodeSchema);
+            return postJobChainNodesCommands(accessToken, SKIP, getPermissons(accessToken).getJobChain().isSkipJobChainNode(), modifyNodes);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
-    public JOCDefaultResponse postJobChainNodesActivate(String accessToken, ModifyNodeSchema modifyNodeSchema) {
+    public JOCDefaultResponse postJobChainNodesActivate(String accessToken, ModifyJobChainNodes modifyNodes) {
         LOGGER.debug("init job_chain_nodes/activate");
         try {
             return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissons(accessToken).getJobChain().isUnskipJobChainNode() || getPermissons(accessToken).getJobChain()
-                    .isUnstopJobChainNode(), modifyNodeSchema);
+                    .isUnstopJobChainNode(), modifyNodes);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }

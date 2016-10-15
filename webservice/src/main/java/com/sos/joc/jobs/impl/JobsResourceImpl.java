@@ -13,35 +13,35 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResource;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.job.Job__;
-import com.sos.joc.model.job.JobsFilterSchema;
-import com.sos.joc.model.job.JobsVSchema;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.job.JobPath;
+import com.sos.joc.model.job.JobsFilter;
+import com.sos.joc.model.job.JobsV;
 
 @Path("jobs")
 public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobs(String accessToken, JobsFilterSchema jobsFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobs(String accessToken, JobsFilter jobsFilter) throws Exception {
         LOGGER.debug("init jobs");
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobsFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            JobsVSchema entity = new JobsVSchema();
+            JobsV entity = new JobsV();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getCommandUrl());
-            List<Job__> jobs = jobsFilterSchema.getJobs();
-            List<FoldersSchema> folders = jobsFilterSchema.getFolders();
+            List<JobPath> jobs = jobsFilter.getJobs();
+            List<Folder> folders = jobsFilter.getFolders();
             if (jobs != null && !jobs.isEmpty()) {
-                entity.setJobs(jocXmlCommand.getJobsFromShowJob(jobs, jobsFilterSchema));
+                entity.setJobs(jocXmlCommand.getJobsFromShowJob(jobs, jobsFilter));
             } else if (folders != null && !folders.isEmpty()) {
-                entity.setJobs(jocXmlCommand.getJobsFromShowState(folders, jobsFilterSchema));
+                entity.setJobs(jocXmlCommand.getJobsFromShowState(folders, jobsFilter));
             } else {
-                entity.setJobs(jocXmlCommand.getJobsFromShowState(jobsFilterSchema));
+                entity.setJobs(jocXmlCommand.getJobsFromShowState(jobsFilter));
             }
             entity.setDeliveryDate(new Date());
 

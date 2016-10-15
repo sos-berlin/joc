@@ -10,8 +10,9 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.schedule.ScheduleConfigurationFilterSchema;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
@@ -21,7 +22,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceConfigurationImpl.class);
 
     @Override
-    public JOCDefaultResponse postScheduleConfiguration(String accessToken, ScheduleConfigurationFilterSchema scheduleBody) throws Exception {
+    public JOCDefaultResponse postScheduleConfiguration(String accessToken, ScheduleConfigurationFilter scheduleBody) throws Exception {
 
         LOGGER.debug("init schedule/configuration");
         try {
@@ -30,10 +31,10 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
                 return jocDefaultResponse;
             }
 
-            ConfigurationSchema entity = new ConfigurationSchema();
+            Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("schedule", scheduleBody.getSchedule())) {
-                boolean responseInHtml = scheduleBody.getMime() == ScheduleConfigurationFilterSchema.Mime.HTML;
+                boolean responseInHtml = scheduleBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", normalizePath(scheduleBody.getSchedule()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(), xPath, "schedule", responseInHtml);
             }

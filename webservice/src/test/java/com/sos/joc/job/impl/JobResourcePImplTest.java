@@ -6,8 +6,8 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.Job200PSchema;
-import com.sos.joc.model.job.JobFilterSchema;
+import com.sos.joc.model.job.JobFilter;
+import com.sos.joc.model.job.JobP200;
 
 public class JobResourcePImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -18,12 +18,12 @@ public class JobResourcePImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobFilterSchema jobFilterSchema = new JobFilterSchema();
+        JobFilter jobFilterSchema = new JobFilter();
         jobFilterSchema.setJobschedulerId("scheduler_current");
         jobFilterSchema.setJob("batch_install_universal_agent/PerformInstall");
         JobResourcePImpl jobPImpl = new JobResourcePImpl();
         JOCDefaultResponse jobsResponse = jobPImpl.postJobP(sosShiroCurrentUserAnswer.getAccessToken(), jobFilterSchema);
-        Job200PSchema jobP200Schema = (Job200PSchema) jobsResponse.getEntity();
+        JobP200 jobP200Schema = (JobP200) jobsResponse.getEntity();
         assertEquals("postJobPTest", "batch_install_universal_agent/PerformInstall", jobP200Schema.getJob().getPath());
     }
 

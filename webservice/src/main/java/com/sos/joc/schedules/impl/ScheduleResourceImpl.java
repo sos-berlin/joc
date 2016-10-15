@@ -16,20 +16,17 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.configuration.ConfigurationStatus;
-import com.sos.joc.classes.schedule.Schedule;
+import com.sos.joc.classes.schedule.ScheduleVolatile;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.schedules.resource.ISchedulesResource;
 import com.sos.scheduler.model.commands.JSCmdShowState;
-import com.sos.joc.model.common.FoldersSchema;
-import com.sos.joc.model.schedule.Schedule_;
-import com.sos.joc.model.schedule.Schedule__;
-import com.sos.joc.model.schedule.SchedulesFilterSchema;
-import com.sos.joc.model.schedule.SchedulesVSchema;
-import com.sos.joc.model.schedule.State;
-import com.sos.joc.model.schedule.State.Text;
-import com.sos.joc.model.schedule.State_;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.schedule.SchedulePath;
+import com.sos.joc.model.schedule.ScheduleStateText;
+import com.sos.joc.model.schedule.ScheduleV;
+import com.sos.joc.model.schedule.SchedulesFilter;
+import com.sos.joc.model.schedule.SchedulesV;
 
 @Path("schedules")
 public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesResource {
@@ -40,20 +37,20 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
     private static final String XPATH_SCHEDULES = "//schedule";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceImpl.class);
-    private SchedulesFilterSchema schedulesFilterSchema;
+    private SchedulesFilter schedulesFilter;
     private HashMap<String, String> mapOfSchedules;
 
 
     @Override
-    public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilterSchema schedulesFilterSchema) throws Exception {
+    public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
         LOGGER.debug("init schedules");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(schedulesFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            this.schedulesFilterSchema = schedulesFilterSchema;
+            this.schedulesFilter = schedulesFilter;
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
 
@@ -67,13 +64,11 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
 
             int count = jocXmlCommand.getNodeList().getLength();
 
-            List<Schedule_> listOfSchedules = new ArrayList<Schedule_>();
-            SchedulesVSchema entity = new SchedulesVSchema();
-            entity.setDeliveryDate(new Date());
-
+            List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
+            
             Pattern pattern = null;
-            if (!("".equals(schedulesFilterSchema.getRegex()) || schedulesFilterSchema.getRegex() == null)) {
-                pattern = Pattern.compile(schedulesFilterSchema.getRegex());
+            if (!("".equals(schedulesFilter.getRegex()) || schedulesFilter.getRegex() == null)) {
+                pattern = Pattern.compile(schedulesFilter.getRegex());
             }
 
             createSchedulesMap();
@@ -83,20 +78,24 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
 
                 String path = jocXmlCommand.getAttribute(ATTRIBUTE_PATH);
                 String activeValue = jocXmlCommand.getAttribute(ATTRIBUTE_ACTIVE);
-                Text stateText;
+                ScheduleStateText stateText;
                 if ("yes".equals(activeValue)){
-                    stateText = State.Text.ACTIVE;
+                    stateText = ScheduleStateText.ACTIVE;
                 }else{
-                    stateText = State.Text.INACTIVE;
+                    stateText = ScheduleStateText.INACTIVE;
                 }
-                boolean addSchedule = (!schedulesFilterSchema.getSchedules().isEmpty() && isInScheduleMap(path)) || (schedulesFilterSchema.getSchedules()
+                boolean addSchedule = (!schedulesFilter.getSchedules().isEmpty() && isInScheduleMap(path)) || (schedulesFilter.getSchedules()
                         .isEmpty() && (matchesRegex(pattern, path) && isInFolderList(path) && isInActiveList(stateText)));
 
                 if (addSchedule) {
-                    Schedule schedule = new Schedule(jocXmlCommand,scheduleElement);
-                    listOfSchedules.add(schedule.getSchedule());
+                    ScheduleVolatile schedule = new ScheduleVolatile(jocXmlCommand,scheduleElement);
+                    schedule.setValues();
+                    listOfSchedules.add(schedule);
                 }
             }
+            
+            SchedulesV entity = new SchedulesV();
+            entity.setDeliveryDate(new Date());
             entity.setSchedules(listOfSchedules);
             return JOCDefaultResponse.responseStatus200(entity);
 
@@ -109,12 +108,12 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
  
 
     private boolean isInScheduleMap(String path) {
-        return (schedulesFilterSchema.getSchedules().isEmpty() || mapOfSchedules.get(path) != null);
+        return (schedulesFilter.getSchedules().isEmpty() || mapOfSchedules.get(path) != null);
     }
 
     private void createSchedulesMap() throws JocMissingRequiredParameterException {
         mapOfSchedules = new HashMap<String, String>();
-        for (Schedule__ schedule : schedulesFilterSchema.getSchedules()) {
+        for (SchedulePath schedule : schedulesFilter.getSchedules()) {
             String scheduleName = schedule.getSchedule();
             checkRequiredParameter("schedules.schedule", scheduleName);
             mapOfSchedules.put(scheduleName, scheduleName);
@@ -123,12 +122,12 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
     }
 
     private boolean isInFolderList(String path) throws JocMissingRequiredParameterException {
-        if (schedulesFilterSchema.getFolders().size() == 0) {
+        if (schedulesFilter.getFolders().size() == 0) {
             return true;
         }
 
         path = getParent(path);
-        for (FoldersSchema folder : schedulesFilterSchema.getFolders()) {
+        for (Folder folder : schedulesFilter.getFolders()) {
             boolean isRecursive = (folder.getRecursive() || folder.getRecursive() == null);
 
             String folderName = folder.getFolder();
@@ -145,14 +144,12 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
         return false;
     }
 
-    private boolean isInActiveList(Text stateText)  {
-        if (schedulesFilterSchema.getStates().size() == 0) {
+    private boolean isInActiveList(ScheduleStateText stateText)  {
+        if (schedulesFilter.getStates().size() == 0) {
             return true;
         }
-
-        for (State_ stateEntry : schedulesFilterSchema.getStates()) {
-            stateEntry.toString();
-            if (stateEntry.toString().equals(stateText.toString())) {
+        for (ScheduleStateText stateEntry : schedulesFilter.getStates()) {
+            if (stateEntry == stateText) {
                 return true;
             }
         }

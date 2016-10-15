@@ -3,6 +3,9 @@ package com.sos.joc.model.schedule;
 
 import java.util.Date;
 import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -12,7 +15,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * this field and substitutedBy from the volatile part are exclusive
  * 
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
+@JsonPropertyOrder({
+    "path",
+    "validFrom",
+    "validTo"
+})
 public class Substitute {
 
     /**
@@ -21,6 +30,7 @@ public class Substitute {
      * absolute path based on live folder of a JobScheduler object.
      * 
      */
+    @JsonProperty("path")
     private String path;
     /**
      * timestamp
@@ -28,6 +38,7 @@ public class Substitute {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
+    @JsonProperty("validFrom")
     private Date validFrom;
     /**
      * timestamp
@@ -35,6 +46,7 @@ public class Substitute {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
+    @JsonProperty("validTo")
     private Date validTo;
 
     /**
@@ -45,6 +57,7 @@ public class Substitute {
      * @return
      *     The path
      */
+    @JsonProperty("path")
     public String getPath() {
         return path;
     }
@@ -57,6 +70,7 @@ public class Substitute {
      * @param path
      *     The path
      */
+    @JsonProperty("path")
     public void setPath(String path) {
         this.path = path;
     }
@@ -69,6 +83,7 @@ public class Substitute {
      * @return
      *     The validFrom
      */
+    @JsonProperty("validFrom")
     public Date getValidFrom() {
         return validFrom;
     }
@@ -81,6 +96,7 @@ public class Substitute {
      * @param validFrom
      *     The validFrom
      */
+    @JsonProperty("validFrom")
     public void setValidFrom(Date validFrom) {
         this.validFrom = validFrom;
     }
@@ -93,6 +109,7 @@ public class Substitute {
      * @return
      *     The validTo
      */
+    @JsonProperty("validTo")
     public Date getValidTo() {
         return validTo;
     }
@@ -105,6 +122,7 @@ public class Substitute {
      * @param validTo
      *     The validTo
      */
+    @JsonProperty("validTo")
     public void setValidTo(Date validTo) {
         this.validTo = validTo;
     }

@@ -9,8 +9,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchain.JobChains;
 import com.sos.joc.jobchains.resource.IJobChainsResourceP;
-import com.sos.joc.model.jobChain.JobChainsFilterSchema;
-import com.sos.joc.model.jobChain.JobChainsPSchema;
+import com.sos.joc.model.jobChain.JobChainsFilter;
+import com.sos.joc.model.jobChain.JobChainsP;
 
 @Path("job_chains")
 public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChainsResourceP {
@@ -19,9 +19,9 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
   
      
     @Override
-    public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilterSchema  jobChainsFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter  jobChainsFilter) throws Exception {
         LOGGER.debug("init job_chains/p");
-        JOCDefaultResponse jocDefaultResponse = init(jobChainsFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobChain().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(jobChainsFilter.getJobschedulerId(),getPermissons(accessToken).getJobChain().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -29,7 +29,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
         try {
             // TODO JOC Cockpit Webservice
  
-            JobChainsPSchema entity = new JobChainsPSchema();
+            JobChainsP entity = new JobChainsP();
             entity.setDeliveryDate(new Date());
             entity.setJobChains(JobChains.getPJobChains(true));
 

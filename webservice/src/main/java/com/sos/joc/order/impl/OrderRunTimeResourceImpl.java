@@ -11,8 +11,8 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.Runtime200Schema;
-import com.sos.joc.model.order.OrderFilterSchema;
+import com.sos.joc.model.common.RunTime200;
+import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.order.resource.IOrderRunTimeResource;
 import com.sos.scheduler.model.commands.JSCmdShowOrder;
 
@@ -21,18 +21,18 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderRunTimeResourceImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilterSchema orderFilterSchema) throws Exception {
+    public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilter orderFilter) throws Exception {
         LOGGER.debug("init order/run_time");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            Runtime200Schema runTimeAnswer = new Runtime200Schema();
+            RunTime200 runTimeAnswer = new RunTime200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
-            if (checkRequiredParameter("orderId", orderFilterSchema.getOrderId()) && checkRequiredParameter("jobChain", orderFilterSchema.getJobChain())) {
-                runTimeAnswer = RunTime.set(jocXmlCommand, createOrderRunTimePostCommand(orderFilterSchema), "//order/run_time");
+            if (checkRequiredParameter("orderId", orderFilter.getOrderId()) && checkRequiredParameter("jobChain", orderFilter.getJobChain())) {
+                runTimeAnswer = RunTime.set(jocXmlCommand, createOrderRunTimePostCommand(orderFilter), "//order/run_time");
             }
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {
@@ -42,7 +42,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
         }
     }
 
-    private String createOrderRunTimePostCommand(OrderFilterSchema orderFilterSchema) {
+    private String createOrderRunTimePostCommand(OrderFilter orderFilterSchema) {
         JSCmdShowOrder showOrder = new JSCmdShowOrder(Globals.schedulerObjectFactory);
         showOrder.setJobChain(normalizePath(orderFilterSchema.getJobChain()));
         showOrder.setOrder(orderFilterSchema.getOrderId());

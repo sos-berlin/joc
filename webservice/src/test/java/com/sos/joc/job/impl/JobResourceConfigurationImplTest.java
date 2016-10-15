@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.common.ConfigurationSchema;
-import com.sos.joc.model.job.JobConfigurationFilterSchema;
-import com.sos.joc.model.job.JobConfigurationFilterSchema.Mime;
+import com.sos.joc.model.common.ConfigurationMime;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.job.JobConfigurationFilter;
  
 public class JobResourceConfigurationImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -23,12 +23,12 @@ public class JobResourceConfigurationImplTest {
     public void postJobConfigurationDefaultTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobConfigurationFilterSchema jobConfigurationFilterSchema = new JobConfigurationFilterSchema();
+        JobConfigurationFilter jobConfigurationFilterSchema = new JobConfigurationFilter();
         jobConfigurationFilterSchema.setJob("check_history/check");
         jobConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
         JobResourceConfigurationImpl jobConfigurationImpl = new JobResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = jobConfigurationImpl.postJobConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), jobConfigurationFilterSchema);
-        ConfigurationSchema configurationSchema = (ConfigurationSchema) jobsResponse.getEntity();
+        Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertEquals("postJobConfigurationTest","check_history/check", configurationSchema.getConfiguration().getPath());
      }
 
@@ -36,13 +36,13 @@ public class JobResourceConfigurationImplTest {
     public void postJobConfigurationHtmlTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobConfigurationFilterSchema jobConfigurationFilterSchema = new JobConfigurationFilterSchema();
+        JobConfigurationFilter jobConfigurationFilterSchema = new JobConfigurationFilter();
         jobConfigurationFilterSchema.setJob("check_history/check");
         jobConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
-        jobConfigurationFilterSchema.setMime(Mime.HTML);
+        jobConfigurationFilterSchema.setMime(ConfigurationMime.HTML);
         JobResourceConfigurationImpl jobConfigurationImpl = new JobResourceConfigurationImpl();
         JOCDefaultResponse jobsResponse = jobConfigurationImpl.postJobConfiguration(sosShiroCurrentUserAnswer.getAccessToken(), jobConfigurationFilterSchema);
-        ConfigurationSchema configurationSchema = (ConfigurationSchema) jobsResponse.getEntity();
+        Configuration200 configurationSchema = (Configuration200) jobsResponse.getEntity();
         assertNotNull("postJobConfigurationTest", configurationSchema.getConfiguration().getContent().getHtml());
         LOGGER.info(configurationSchema.getConfiguration().getContent().getHtml());
      }

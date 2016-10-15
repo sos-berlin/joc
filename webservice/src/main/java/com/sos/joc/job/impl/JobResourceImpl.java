@@ -12,25 +12,25 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResource;
-import com.sos.joc.model.job.Job200VSchema;
-import com.sos.joc.model.job.JobFilterSchema;
+import com.sos.joc.model.job.JobV200;
+import com.sos.joc.model.job.JobFilter;
 
 @Path("job")
 public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceImpl.class);
 
-    public JOCDefaultResponse postJob(String accessToken, JobFilterSchema jobFilterSchema) throws Exception {
+    public JOCDefaultResponse postJob(String accessToken, JobFilter jobFilter) throws Exception {
         LOGGER.debug("init job");
-        JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
         try {
-            Job200VSchema entity = new Job200VSchema();
+            JobV200 entity = new JobV200();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getCommandUrl());
-            if (checkRequiredParameter("job", jobFilterSchema.getJob())) {
+            if (checkRequiredParameter("job", jobFilter.getJob())) {
                 entity.setDeliveryDate(new Date());
-                entity.setJob(jocXmlCommand.getJob(jobFilterSchema.getJob(), jobFilterSchema.getCompact(), true));
+                entity.setJob(jocXmlCommand.getJob(jobFilter.getJob(), jobFilter.getCompact(), true));
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

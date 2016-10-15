@@ -9,18 +9,18 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
-import com.sos.joc.model.schedule.ModifyRuntimeSchema;
+import com.sos.joc.model.schedule.ModifyRunTime;
 
 @Path("schedule")
 public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements IScheduleResourceSetRunTime {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceSetRunTimeImpl.class);
 
     @Override
-    public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRuntimeSchema modifyRuntimeSchema) throws Exception {
+    public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRunTime modifyRuntime) throws Exception {
         LOGGER.debug("init schedule/set_run_time");
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(modifyRuntimeSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().isEdit());
+            JOCDefaultResponse jocDefaultResponse = init(modifyRuntime.getJobschedulerId(), getPermissons(accessToken).getSchedule().isEdit());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

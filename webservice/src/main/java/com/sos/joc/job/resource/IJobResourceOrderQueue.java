@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.job.JobFilterSchema;
+import com.sos.joc.model.job.JobFilter;
  
 public interface IJobResourceOrderQueue {
 
@@ -16,10 +16,6 @@ public interface IJobResourceOrderQueue {
     @Path("order_queue")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobOrderQueue(            
-            @HeaderParam("access_token") String accessToken, JobFilterSchema jobFilterSchema) throws Exception;
-
-   
- 
-    
+            @HeaderParam("access_token") String accessToken, JobFilter jobFilter) throws Exception;
 }
 

@@ -16,7 +16,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceIds;
-import com.sos.joc.model.jobscheduler.JobschedulerIdsSchema;
+import com.sos.joc.model.jobscheduler.JobSchedulerIds;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJobSchedulerResourceIds {
@@ -32,19 +32,12 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                 return jocDefaultResponse;
             }
 
-            JobschedulerIdsSchema entity = new JobschedulerIdsSchema();
-
-            // TODO JOC Cockpit Webservice
-
-            ArrayList<String> jobschedulerIs = new ArrayList<String>();
-
-            entity.setDeliveryDate(new Date());
-            String first = "";
-
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            List<DBItemInventoryInstance> listOfInstance = dbLayer.getInventoryInstances();
+            List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
+            JobSchedulerIds entity = new JobSchedulerIds();
+            String first = "";
             for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
-                jobschedulerIs.add(inventoryInstance.getSchedulerId());
+                entity.getJobschedulerIds().add(inventoryInstance.getSchedulerId());
                 if ("".equals(first)) {
                     first = inventoryInstance.getSchedulerId();
                 }
@@ -53,14 +46,14 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             String selectedInstance = jocPreferences.get("selected_instance", first);
 
             entity.setSelected(selectedInstance);
-            entity.setJobschedulerIds(jobschedulerIs);
+            entity.setDeliveryDate(new Date());
 
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
         finally{
             Globals.rollback();

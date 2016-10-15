@@ -14,9 +14,10 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.order.Order;
-import com.sos.joc.model.order.OrdersFilterSchema;
-import com.sos.joc.model.order.OrdersPSchema;
+import com.sos.joc.model.order.OrderP;
+import com.sos.joc.model.order.OrderType;
+import com.sos.joc.model.order.OrdersFilter;
+import com.sos.joc.model.order.OrdersP;
 import com.sos.joc.orders.resource.IOrdersResourceP;
 
 @Path("orders")
@@ -24,7 +25,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourcePImpl.class);
 
     @Override
-    public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilterSchema ordersFilterSchema) throws Exception {
+    public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilter ordersFilterSchema) throws Exception {
 
         LOGGER.debug("init OrdersP");
 
@@ -34,15 +35,14 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            OrdersPSchema entity = new OrdersPSchema();
+            OrdersP entity = new OrdersP();
             entity.setDeliveryDate(new Date());
-
+            
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection, ordersFilterSchema.getJobschedulerId());
             List<DBItemInventoryOrder> listOfOrders = dbLayer.getInventoryOrders();
-            List<Order> listOrder = new ArrayList<Order>();
+            List<OrderP> listOrder = new ArrayList<OrderP>();
             for (DBItemInventoryOrder inventoryOrder : listOfOrders) {
-                Order order = new Order();
+                OrderP order = new OrderP();
                 order.setSurveyDate(inventoryOrder.getModified());
                 order.setPath(inventoryOrder.getName());
                 order.setOrderId(inventoryOrder.getOrderId());
@@ -53,14 +53,15 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                     order.setEndState("myEndState");
                     order.setInitialState("myInitialState");
                     order.setTitle("myTitle");
-                    order.setType(Order.Type.PERMANENT);
+                    order.set_type(OrderType.PERMANENT);
                     order.setPriority(-1);
 
                     listOrder.add(order);
                 }
+                
                 entity.setOrders(listOrder);
-
             }
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
