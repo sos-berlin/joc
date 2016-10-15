@@ -49,6 +49,18 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
+    public List<DBItemInventoryInstance> getJobSchedulerIds() throws Exception {
+        try {
+            String sql = String.format("select schedulerId,created from %1$s group by schedulerId,created order by created desc", DBITEM_INVENTORY_INSTANCES);
+            Query query = getConnection().createQuery(sql);
+
+            return query.list();
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
     public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws Exception {
         try {
             String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_INSTANCES);

@@ -1,12 +1,12 @@
 package com.sos.joc.db.history.order;
 
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem;
+import com.sos.scheduler.history.db.SchedulerOrderHistoryDBItemPostgres;
 
 /** @author Uwe Risse */
 public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
@@ -17,15 +17,24 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
         super(conn);
     }
 
-    public String getLogAsString(Long orderHistoryId) throws Exception {
+    public String getLogAsString(String orderHistoryId) throws Exception {
         String log = null;
         try {
-            SchedulerOrderHistoryDBItem schedulerHistoryDBItem = (SchedulerOrderHistoryDBItem) this.getConnection().get(SchedulerOrderHistoryDBItem.class,orderHistoryId);
-            if (schedulerHistoryDBItem != null && schedulerHistoryDBItem.getLog() != null) {
-                log = schedulerHistoryDBItem.getLogAsString();
+            if (this.getConnection().dbmsIsPostgres()) {
+                SchedulerOrderHistoryDBItemPostgres schedulerHistoryDBItem = (SchedulerOrderHistoryDBItemPostgres) this.getConnection().get(SchedulerOrderHistoryDBItemPostgres.class,Long.parseLong(orderHistoryId));
+                if (schedulerHistoryDBItem != null && schedulerHistoryDBItem.getLog() != null) {
+                    log = schedulerHistoryDBItem.getLogAsString();
+                }
+            } else {
+                SchedulerOrderHistoryDBItem schedulerHistoryDBItem = (SchedulerOrderHistoryDBItem) this.getConnection().get(SchedulerOrderHistoryDBItem.class,Long.parseLong(orderHistoryId));
+                if (schedulerHistoryDBItem != null && schedulerHistoryDBItem.getLog() != null) {
+                    log = schedulerHistoryDBItem.getLogAsString();
+                }
             }
-        } catch (IOException e1) {
+            
+        } catch (Exception e1) {
             LOGGER.error(e1.getMessage(), e1);
+            return null;
         }
         return log;
     }

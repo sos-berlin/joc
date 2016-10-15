@@ -14,9 +14,9 @@ public class JOCResourceImplTest {
 
    @Test
     public void getDateFromStringTest() {
-       int offset = Calendar.getInstance().getTimeZone().getOffset(new Date().getTime());
        JOCResourceImpl jocResourceImpl  = new JOCResourceImpl();
        Date date = jocResourceImpl.getDateFromString("2016-08-22T08:15:48.760Z");
+       int offset = Calendar.getInstance().getTimeZone().getOffset(date.getTime());
        date.setTime(date.getTime()-offset);
        assertEquals("getDateFromStringTest", 8, date.getHours());
        date = jocResourceImpl.getDateFromString("2016-08-22 08:15:48.760Z");
@@ -27,9 +27,9 @@ public class JOCResourceImplTest {
        
    @Test
    public void getDateFromTimestampTest(){
-       int offset = Calendar.getInstance().getTimeZone().getOffset(new Date().getTime());
        JOCResourceImpl jocResourceImpl  = new JOCResourceImpl();
        Date date = jocResourceImpl.getDateFromTimestamp(new Long("1471854067629000"));
+       int offset = Calendar.getInstance().getTimeZone().getOffset(date.getTime());
        date.setTime(date.getTime()-offset);
        assertEquals("getDateFromStringTest", 8, date.getHours());
    }
