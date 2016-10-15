@@ -2,23 +2,26 @@ package com.sos.joc.jobscheduler.impl;
 
 import java.util.Date;
 
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
+import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.ClusterMemberType;
 import com.sos.joc.model.jobscheduler.HostPortParameter;
+import com.sos.joc.model.jobscheduler.JobSchedulerP;
 import com.sos.joc.model.jobscheduler.JobSchedulerP200;
 import com.sos.joc.model.jobscheduler.OperatingSystem;
-import com.sos.joc.model.jobscheduler.JobSchedulerP;
 
 public class JobSchedulerResourceP extends JOCResourceImpl {
 
@@ -38,64 +41,59 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
     }
 
     public JOCDefaultResponse postJobschedulerP() {
-
         LOGGER.debug("init jobscheduler/p");
         try {
             Globals.beginTransaction();
-
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstancesByKey(supervisorId);
-            
-            if (schedulerSupervisorInstancesDBItem == null) {
-                return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table SCHEDULER_INSTANCES", dbItemInventoryInstance.getSupervisorId()));
-            }
-
-            JobSchedulerP200 entity = new JobSchedulerP200();
-            entity.setDeliveryDate(new Date());
-
             // TODO JOC Cockpit Webservice
-
             JobSchedulerP jobscheduler = new JobSchedulerP();
             jobscheduler.setHost(dbItemInventoryInstance.getHostname());
-            jobscheduler.setJobschedulerId(jobSchedulerId.getJobschedulerId());
+            jobscheduler.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
             jobscheduler.setPort(dbItemInventoryInstance.getPort());
             jobscheduler.setStartedAt(dbItemInventoryInstance.getStartedAt());
-
+            
             ClusterMemberType clusterMemberTypeSchema = new ClusterMemberType();
-            clusterMemberTypeSchema.setPrecedence(-1);
             clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getPrecedence());
-            // clusterMemberTypeSchema.setType(ClusterMemberTypeSchema.Type.fromValue(schedulerInstancesDBItem.getClusterMemberType()));
-            clusterMemberTypeSchema.set_type(ClusterMemberType._type.STANDALONE);
+            clusterMemberTypeSchema.set_type(ClusterMemberType._type.fromValue(dbItemInventoryInstance.getClusterType()));
             jobscheduler.setClusterType(clusterMemberTypeSchema);
 
+            InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
+            DBItemInventoryOperatingSystem osItem = osLayer.getInventoryOperatingSystem(dbItemInventoryInstance.getOsId());
             OperatingSystem os = new OperatingSystem();
-            // os.setArchitecture(Os.Architecture.fromValue(schedulerInstancesDBItem.getArchitecture()));
-            os.setArchitecture("32");
-            os.setDistribution("distribution");
-            os.setName("osName");
+            os.setArchitecture(osItem.getArchitecture());
+            os.setDistribution(osItem.getDistribution());
+            os.setName(osItem.getName());
             jobscheduler.setOs(os);
 
-            HostPortParameter supervisor = new HostPortParameter();
-            supervisor.setHost(schedulerSupervisorInstancesDBItem.getHostname());
-            supervisor.setPort(schedulerSupervisorInstancesDBItem.getPort());
-            supervisor.setJobschedulerId(schedulerSupervisorInstancesDBItem.getSchedulerId());
-            jobscheduler.setSupervisor(supervisor);
+            if (supervisorId != 0) {
+                DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstancesByKey(supervisorId);
+                if (schedulerSupervisorInstancesDBItem == null) {
+                    throw new DBInvalidDataException(String.format("supervisor with Id = %s not found in table INVENTORY_INSTANCES", 
+                            dbItemInventoryInstance.getSupervisorId()));
+                } else {
+                    HostPortParameter supervisor = new HostPortParameter();
+                    supervisor.setHost(schedulerSupervisorInstancesDBItem.getHostname());
+                    supervisor.setPort(schedulerSupervisorInstancesDBItem.getPort());
+                    supervisor.setJobschedulerId(schedulerSupervisorInstancesDBItem.getSchedulerId());
+                    jobscheduler.setSupervisor(supervisor);
+
+                }
+            }
 
             jobscheduler.setTimeZone(dbItemInventoryInstance.getTimeZone());
             jobscheduler.setVersion(dbItemInventoryInstance.getVersion());
-
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
-
+            
+            JobSchedulerP200 entity = new JobSchedulerP200();
+            entity.setDeliveryDate(new Date());
             entity.setJobscheduler(jobscheduler);
             return JOCDefaultResponse.responseStatus200(entity);
-
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
