@@ -144,7 +144,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
         for (JsonObject ordersItem: json.getJsonArray("orders").getValuesAs(JsonObject.class)) {
             OrderVolatile order = new OrderVolatile(ordersItem);
             order.setPathJobChainAndOrderId();
-            if (!FilterAfterResponse.matchReqex(regex, order.getPath())) {
+            if (!FilterAfterResponse.matchRegex(regex, order.getPath())) {
                 LOGGER.info("...processing skipped caused by 'regex=" + regex + "'");
                 continue; 
             }

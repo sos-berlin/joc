@@ -121,7 +121,7 @@ public class JobVolatile extends JobV {
         setState();
         setSurveyDate(jocXmlCommand.getSurveyDate());
         setName(job.getAttribute(WebserviceConstants.NAME));
-        setNumOfQueuedTasks(Integer.valueOf(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "queued_tasks/@length", "0")));
+        setNumOfQueuedTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "queued_tasks/@length", "0")));
         setLocks(getLocks(jocXmlCommand.getSosxml().selectNodeList(job, "lock.requestor/lock.use")));
         setStateText(job.getAttribute("state_text"));
         setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));

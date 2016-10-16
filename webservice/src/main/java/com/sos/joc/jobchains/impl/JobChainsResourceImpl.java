@@ -43,6 +43,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
             } else {
                 entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(jobChainsFilter));
             }
+            entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
             entity.setDeliveryDate(new Date());
 
             return JOCDefaultResponse.responseStatus200(entity);

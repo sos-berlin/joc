@@ -130,7 +130,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
            Element jobElem = (Element) jobNodes.item(i);
            JobVolatile jobV = new JobVolatile(jobElem, this);
            jobV.setPath();
-           if (!FilterAfterResponse.matchReqex(jobsFilter.getRegex(), jobV.getPath())) {
+           if (!FilterAfterResponse.matchRegex(jobsFilter.getRegex(), jobV.getPath())) {
                LOGGER.info("...processing skipped caused by 'regex=" + jobsFilter.getRegex() + "'");
                continue; 
            }

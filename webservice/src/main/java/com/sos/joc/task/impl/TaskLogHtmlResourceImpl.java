@@ -23,9 +23,7 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
         try {
             
             TaskFilter taskFilter = new TaskFilter();
-            if (taskId != null){
-                taskFilter.setTaskId(taskId);
-            }
+            taskFilter.setTaskId(taskId);
             taskFilter.setJobschedulerId(jobschedulerId);
             taskFilter.setMime(LogMime.HTML);
            
@@ -38,15 +36,15 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
             }
 
             LogTaskContent logTaskContent = new LogTaskContent(taskFilter, dbItemInventoryInstance);
-
             String log = logTaskContent.getLog();
-            return JOCDefaultResponse.responseStatus200(logTaskContent.htmlPageWithColouredLogContent(log, "Task " + taskFilter.getTaskId()));
+            
+            return JOCDefaultResponse.responseHtmlStatus200(logTaskContent.htmlPageWithColouredLogContent(log, "Task " + taskFilter.getTaskId()));
 
         } catch (JocException e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseHTMLStatusJSError(e);
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            return JOCDefaultResponse.responseHTMLStatusJSError(e);
         }
     }
 

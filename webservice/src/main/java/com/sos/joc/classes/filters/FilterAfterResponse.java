@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class FilterAfterResponse {
     
-    public static boolean matchReqex(String regex, String path) {
+    public static boolean matchRegex(String regex, String path) {
         if (regex == null) {
             return true;
         }

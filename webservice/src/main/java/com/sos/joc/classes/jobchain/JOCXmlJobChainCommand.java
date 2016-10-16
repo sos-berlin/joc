@@ -4,8 +4,10 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -34,6 +36,7 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 public class JOCXmlJobChainCommand extends JOCXmlCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlJobChainCommand.class);
     private String jsonUrl = null;
+    private Set<String> nestedJobChains = new HashSet<String>();
     
     public JOCXmlJobChainCommand(String url) {
         super(url);
@@ -50,20 +53,26 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job_chain");
         JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this);
         jobChainV.setFields(compact);
+        nestedJobChains.addAll(jobChainV.getNestedJobChains());
         jobChainV.setOrdersSummary(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand()).getOrdersSummary());
         return jobChainV;
     }
     
-//    public JobChainV getNestedJobChain(String jobChain, Boolean compact) throws Exception {
-//        excutePost(createShowJobChainPostCommand(jobChain, compact));
-//        throwJobSchedulerError();
-//        Element jobChainElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job_chain");
-////        NestedJobChainV jobChainV = new NestedJobChainV(jobChainElem, this);
-////        jobChainV.setFields(compact);
-//        JobChain___ jobChainV = new JobChain___();
-//        jobChainV.setPath(jobChainElem.getAttribute(WebserviceConstants.PATH));
-//        return jobChainV;
-//    }
+    public List<JobChainV> getNestedJobChains() throws Exception {
+        if (nestedJobChains.size() == 0) {
+            return null;
+        }
+        JobChainsFilter jobChainsFilter = new JobChainsFilter();
+        StringBuilder s = new StringBuilder();
+        s.append("<commands>");
+        for (String jobChainPath : nestedJobChains) {
+            if (jobChainPath != null) {
+                s.append(createShowJobChainPostCommand(jobChainPath,jobChainsFilter.getCompact()));
+            }
+        }
+        s.append("</commands>");
+        return getJobChains(s.toString(), jobChainsFilter, "/spooler/answer/job_chain");
+    }
     
     public List<JobChainV> getJobChainsFromShowJobChain(List<JobChainPath> jobChains, JobChainsFilter jobChainsFilter) throws Exception {
         StringBuilder s = new StringBuilder();
@@ -103,7 +112,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         if (compact) {
             showState.setMaxOrders(BigInteger.valueOf(0));
         } else {
-            showState.setWhat("job_chain_orders job_chain_jobs " + showState.getWhat());
+            showState.setWhat("job_chain_jobs " + showState.getWhat());
         }
         if (!recursive) {
             showState.setWhat("no_subfolders " + showState.getWhat());
@@ -121,7 +130,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         if (compact) {
             showJobChain.setMaxOrders(BigInteger.valueOf(0));
         } else {
-            showJobChain.setWhat("job_chain_orders job_chain_jobs " + showJobChain.getWhat());
+            showJobChain.setWhat("job_chain_jobs " + showJobChain.getWhat());
         }
         showJobChain.setJobChain(jobChain);
         showJobChain.setMaxOrderHistory(BigInteger.valueOf(0));
@@ -150,7 +159,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            Element jobChainElem = (Element) jobChainNodes.item(i);
            JobChainVolatile jobChainV = new JobChainVolatile(jobChainElem, this);
            jobChainV.setPath();
-           if (!FilterAfterResponse.matchReqex(jobChainsFilter.getRegex(), jobChainV.getPath())) {
+           if (!FilterAfterResponse.matchRegex(jobChainsFilter.getRegex(), jobChainV.getPath())) {
                LOGGER.info("...processing skipped caused by 'regex=" + jobChainsFilter.getRegex() + "'");
                continue; 
            }
@@ -160,6 +169,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                continue; 
            }
            jobChainV.setFields(jobChainsFilter.getCompact());
+           nestedJobChains.addAll(jobChainV.getNestedJobChains());
            summaryTasks.add(new OrdersSummaryCallable(jobChainV, uriForJsonSummaryCommand));
            if (!jobChainsFilter.getCompact() && jobChainV.hasJobNodes()) {
                orderTasks.add(new OrdersVCallable(jobChainV, false, uriForJsonOrdersCommand)); 
