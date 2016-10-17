@@ -43,12 +43,6 @@ public class JOCXmlCommand extends SOSXmlCommand {
         this.uriForJsonCommand = uriForJsonCommand;
     }
     
-    public void setUriForJsonCommand(String jsonUrl, boolean compact) {
-        JOCJsonCommand command = new JOCJsonCommand(jsonUrl);
-        command.addCompactQuery(compact);
-        this.uriForJsonCommand = command.getURI();
-    }
-    
     public void createNodeList(String key, String xpath) throws Exception {
         NodeList nodeList = selectNodelist(xpath);
         listOfNodeLists.put(key, nodeList);

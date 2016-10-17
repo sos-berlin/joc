@@ -1,7 +1,9 @@
 package com.sos.joc.tree.impl;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
@@ -32,34 +34,46 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             if (treeBody.getTypes() == null || treeBody.getTypes().size() == 0) {
                 permission = true;
             } else {
+                List<JobSchedulerObjectType> types = new ArrayList<JobSchedulerObjectType>();
                 for (JobSchedulerObjectType type : treeBody.getTypes()) {
                     switch (type) {
                     case JOB: 
-                        permission = sosPermission.getJob().getView().isStatus();
+                        if (sosPermission.getJob().getView().isStatus()) {
+                            types.add(type);
+                        }
                         break;
                     case JOBCHAIN: 
-                        permission = sosPermission.getJobChain().getView().isStatus();
+                        if (sosPermission.getJobChain().getView().isStatus()) {
+                            types.add(type);
+                        }
                         break;
                     case ORDER: 
-                        permission = sosPermission.getOrder().getView().isStatus();
+                        if (sosPermission.getOrder().getView().isStatus()) {
+                            types.add(type);
+                        }
                         break;
                     case PROCESSCLASS: 
-                        permission = sosPermission.getProcessClass().getView().isStatus();
+                        if (sosPermission.getProcessClass().getView().isStatus()) {
+                            types.add(type);
+                        }
                         break;
                     case LOCK: 
-                        permission = sosPermission.getLock().getView().isStatus();
+                        if (sosPermission.getLock().getView().isStatus()) {
+                            types.add(type);
+                        }
                         break;
                     case SCHEDULE: 
-                        permission = sosPermission.getSchedule().getView().isStatus();
+                        if (sosPermission.getSchedule().getView().isStatus()) {
+                            types.add(type);
+                        }
                         break;
                     case OTHER: 
-                        permission = true;
-                        break;
-                    }
-                    if (!permission) {
+                        types.add(type);
                         break;
                     }
                 }
+                treeBody.setTypes(types);
+                permission = (types.size() > 0);
             }
             
             JOCDefaultResponse jocDefaultResponse = init(treeBody.getJobschedulerId(), permission);

@@ -30,11 +30,11 @@ public class OrdersSnapshotCallable implements Callable<OrdersSummary> {
     }
     
     public OrdersSummary getOrdersSnapshot() throws Exception {
-        return getOrdersSnapshot(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(path)));
+        return getOrdersSnapshot(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(path)));
     }
     
     public OrdersSummary getOrdersSnapshot(String path, URI uri) throws Exception {
-        JsonObject json = new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(path));
+        JsonObject json = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(path));
         return getOrdersSnapshot(json);
     }
     

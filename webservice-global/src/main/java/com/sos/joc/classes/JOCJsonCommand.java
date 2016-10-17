@@ -28,9 +28,17 @@ public class JOCJsonCommand {
         setUriBuilder(url);
     }
     
+    public JOCJsonCommand(String url, String path) {
+        setUriBuilder(url, path);
+    }
+    
     public void setUriBuilder(String url) {
+        setUriBuilder(url, WebserviceConstants.ORDER_API_PATH);
+    }
+    
+    public void setUriBuilder(String url, String path) {
         StringBuilder s = new StringBuilder();
-        s.append(url).append(WebserviceConstants.ORDER_API_PATH);
+        s.append(url).append(path);
         uriBuilder = UriBuilder.fromPath(s.toString());
     }
     
@@ -46,7 +54,7 @@ public class JOCJsonCommand {
         return uriBuilder.build();
     }
     
-    public void addCompactQuery(boolean compact) {
+    public void addOrderCompactQuery(boolean compact) {
         String returnQuery = (compact) ? WebserviceConstants.ORDER_OVERVIEW : WebserviceConstants.ORDER_DETAILED;
         uriBuilder.queryParam("return", returnQuery);
     }
@@ -55,7 +63,15 @@ public class JOCJsonCommand {
         uriBuilder.queryParam("return", "OrderStatistics");
     }
     
-    public JsonObject getJsonObjectFromResponse(URI uri, String postBody) throws Exception {
+    public JsonObject getJsonObjectFromPost() throws Exception {
+        return getJsonObjectFromPost(uriBuilder.build(), null);
+    }
+    
+    public JsonObject getJsonObjectFromPost(String postBody) throws Exception {
+        return getJsonObjectFromPost(uriBuilder.build(), postBody);
+    }
+    
+    public JsonObject getJsonObjectFromPost(URI uri, String postBody) throws Exception {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Content-Type", "application/json");
         client.addHeader("Accept", "application/json");
@@ -64,6 +80,22 @@ public class JOCJsonCommand {
             LOGGER.info("with POST body: " + postBody); 
         }
         String response = client.executeRestServiceCommand("post", uri.toURL(), postBody);
+        return getJsonObjectFromResponse(response, client);
+    }
+    
+    public JsonObject getJsonObjectFromGet() throws Exception {
+        return getJsonObjectFromGet(uriBuilder.build());
+    }
+    
+    public JsonObject getJsonObjectFromGet(URI uri) throws Exception {
+        JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
+        client.addHeader("Accept", "application/json");
+        LOGGER.info("call " + uri.toString());
+        String response = client.executeRestServiceCommand("get", uri.toURL());
+        return getJsonObjectFromResponse(response, client);
+    }
+    
+    private JsonObject getJsonObjectFromResponse(String response, JobSchedulerRestApiClient client) throws Exception {
         int httpReplyCode = client.statusCode();
         String contentType = client.getResponseHeader("Content-Type");
         

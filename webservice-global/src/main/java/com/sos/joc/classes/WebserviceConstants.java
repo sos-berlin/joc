@@ -39,5 +39,7 @@ public class WebserviceConstants {
     public static final String ORDER_API_PATH = "/jobscheduler/master/api/order";
     public static final String ORDER_OVERVIEW = "OrdersComplemented/OrderOverview";
     public static final String ORDER_DETAILED = "OrdersComplemented/OrderDetailed";
-
+    public static final String AGENTS_API_LIST_PATH = "/jobscheduler/master/api/agent/";
+    public static final String AGENT_API_PATH = "/jobscheduler/agent/api";
+    
 }

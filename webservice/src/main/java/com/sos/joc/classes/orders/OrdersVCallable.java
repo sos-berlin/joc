@@ -116,15 +116,15 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
     }
     
     private Map<String,OrderV> getOrders(OrdersPerJobChain orders, boolean compact, URI uri) throws Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(orders)), compact);
+        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(orders)), compact);
     }
     
     private Map<String,OrderV> getOrders(String job, boolean compact, URI uri) throws Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(job)), compact);
+        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(job)), compact);
     }
     
     private Map<String,OrderV> getOrders(Folder folder, OrdersFilter ordersBody, URI uri) throws JocMissingRequiredParameterException, Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), (folder.getRecursive()) ? null : folder.getFolder(), ordersBody.getRegex());
+        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), (folder.getRecursive()) ? null : folder.getFolder(), ordersBody.getRegex());
     }
     
     private Map<String,OrderV> getOrders(JsonObject json, boolean compact) throws JobSchedulerInvalidResponseDataException {

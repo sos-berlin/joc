@@ -12,8 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "path",
-    "exclusive"
+    "path"
 })
 public class LockUseP {
 
@@ -26,13 +25,6 @@ public class LockUseP {
      */
     @JsonProperty("path")
     private String path;
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("exclusive")
-    private Boolean exclusive;
 
     /**
      * path
@@ -62,30 +54,6 @@ public class LockUseP {
         this.path = path;
     }
 
-    /**
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The exclusive
-     */
-    @JsonProperty("exclusive")
-    public Boolean getExclusive() {
-        return exclusive;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param exclusive
-     *     The exclusive
-     */
-    @JsonProperty("exclusive")
-    public void setExclusive(Boolean exclusive) {
-        this.exclusive = exclusive;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -93,7 +61,7 @@ public class LockUseP {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(exclusive).toHashCode();
+        return new HashCodeBuilder().append(path).toHashCode();
     }
 
     @Override
@@ -105,7 +73,7 @@ public class LockUseP {
             return false;
         }
         LockUseP rhs = ((LockUseP) other);
-        return new EqualsBuilder().append(path, rhs.path).append(exclusive, rhs.exclusive).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).isEquals();
     }
 
 }

@@ -35,12 +35,12 @@ public class OrdersSummaryCallable implements Callable<Map<String,JobChainVolati
     }
     
     public OrdersSummary getOrdersSummary() throws Exception {
-        return getOrdersSummary(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(jobChain.getPath())));
+        return getOrdersSummary(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(jobChain.getPath())));
     }
     
     private Map<String,JobChainVolatile> getOrdersSummary(JobChainVolatile jobChain, URI uri) throws Exception {
         Map<String,JobChainVolatile> summaryMap = new HashMap<String,JobChainVolatile>();
-        jobChain.setOrdersSummary(getOrdersSummary(new JOCJsonCommand().getJsonObjectFromResponse(uri, getServiceBody(jobChain.getPath()))));
+        jobChain.setOrdersSummary(getOrdersSummary(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(jobChain.getPath()))));
         summaryMap.put(jobChain.getPath(), jobChain);
         return summaryMap;
     }

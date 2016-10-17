@@ -2,12 +2,27 @@ package com.sos.joc.jobscheduler.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.classes.jobscheduler.AgentVCallable;
+import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgents;
 import com.sos.joc.model.jobscheduler.AgentFilter;
@@ -16,6 +31,7 @@ import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.AgentsV;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
+import com.sos.joc.model.order.OrderV;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements IJobSchedulerResourceAgents {
@@ -29,34 +45,24 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            AgentsV entity = new AgentsV();
-
-            // TODO JOC Cockpit Webservice
-
-            entity.setDeliveryDate(new Date());
-
-            ArrayList<AgentV> listOfAgents = new ArrayList<AgentV>();
-
-            // TODO Hier muss die DB gelesen und mit dem Filter gefiltert werden
-
-            for (AgentUrl agentFilter : agentFilterSchema.getAgents()) {
-                AgentV agent = new AgentV();
-                agent.setRunningTasks(-1);
-                agent.setStartedAt(new Date());
-                JobSchedulerState state = new JobSchedulerState();
-                state.setSeverity(0);
-                state.set_text(JobSchedulerStateText.PAUSED);
-                agent.setState(state);
-                agent.setUrl(agentFilter.getAgent());
-                agent.setSurveyDate(new Date());
-                listOfAgents.add(agent);
+            
+            JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl(), WebserviceConstants.AGENTS_API_LIST_PATH );
+            JsonObject json = jocJsonCommand.getJsonObjectFromGet();
+            JsonArray agentUris = json.getJsonArray("elements");
+            List<AgentV> listOfAgents = new ArrayList<AgentV>();
+            List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
+            for (JsonString agentUri : agentUris.getValuesAs(JsonString.class)) {
+                tasks.add(new AgentVCallable(agentUri.toString(), dbItemInventoryInstance.getUrl()));
             }
-
-            // TODO get a list of agents and set the data.
-
+            ExecutorService executorService = Executors.newFixedThreadPool(10);
+            for (Future<AgentV> result : executorService.invokeAll(tasks)) {
+                listOfAgents.add(result.get());
+            }
+            
+            AgentsV entity = new AgentsV();
             entity.setAgents(listOfAgents);
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.exceptions.JocException;
@@ -31,7 +32,9 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
 
             JobV200 entity = new JobV200();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getCommandUrl());
-            jocXmlCommand.setUriForJsonCommand(dbItemInventoryInstance.getUrl(), jobFilterSchema.getCompact());
+            JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
+            jocJsonCommand.addOrderCompactQuery(jobFilterSchema.getCompact());
+            jocXmlCommand.setUriForJsonCommand(jocJsonCommand.getURI());
             if (checkRequiredParameter("job", jobFilterSchema.getJob())) {
                 entity.setDeliveryDate(new Date());
                 entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobFilterSchema.getJob(), jobFilterSchema.getCompact()));

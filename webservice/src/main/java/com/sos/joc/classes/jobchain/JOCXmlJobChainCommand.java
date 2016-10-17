@@ -203,7 +203,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     
     private URI setUriForOrdersJsonCommand() {
         JOCJsonCommand jsonOrdersCommand = new JOCJsonCommand(jsonUrl);
-        jsonOrdersCommand.addCompactQuery(false);
+        jsonOrdersCommand.addOrderCompactQuery(false);
         return jsonOrdersCommand.getURI();
     }
 }

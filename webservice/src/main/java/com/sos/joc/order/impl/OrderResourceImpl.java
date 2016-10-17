@@ -31,7 +31,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
 
             String masterUrl = dbItemInventoryInstance.getUrl();
             JOCJsonCommand command = new JOCJsonCommand(masterUrl);
-            command.addCompactQuery(orderBody.getCompact());
+            command.addOrderCompactQuery(orderBody.getCompact());
             OrderV200 entity = new OrderV200();
 
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
