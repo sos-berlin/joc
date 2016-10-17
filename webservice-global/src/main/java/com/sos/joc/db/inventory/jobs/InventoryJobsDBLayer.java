@@ -11,6 +11,7 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
+import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBLayer;
 
 /** @author Uwe Risse */
@@ -53,6 +54,23 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append(" where job.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "'");
             Query query = getConnection().createQuery(sql.toString());
 
+            return query.list();
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder("select job from ");
+            sql.append(DBITEM_INVENTORY_JOBS).append(" job, ");
+            sql.append(DBITEM_INVENTORY_INSTANCES).append(" instance");
+            sql.append(" where job.instanceId = instance.id");
+            sql.append(" and instance.schedulerId = '" + this.jobSchedulerId + "'");
+            sql.append(" and job.isOrderJob = :isOrderJob");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("isOrderJob", isOrderJob);
             return query.list();
         } catch (Exception ex) {
             throw new Exception(SOSHibernateConnection.getException(ex));
@@ -119,4 +137,50 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
  
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where name = :jobPath");
+            if (isOrderJob != null) {
+                sql.append(" and isOrderJob = :isOrderJob");
+            }
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("jobPath", jobPath);
+            if (isOrderJob != null) {
+                query.setParameter("isOrderJob", isOrderJob);
+            }
+            List<DBItemInventoryJob> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where name like :folderName ");
+            if (isOrderJob != null) {
+                sql.append(" and isOrderJob = :isOrderJob");
+            }
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("folderName", "%" + folderName + "%");
+            if (isOrderJob != null) {
+                query.setParameter("isOrderJob", isOrderJob);
+            }
+            List<DBItemInventoryJob> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
 }
