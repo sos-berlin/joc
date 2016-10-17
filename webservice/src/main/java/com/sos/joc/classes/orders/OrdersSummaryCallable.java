@@ -10,7 +10,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
 import com.sos.joc.classes.JOCJsonCommand;
-import com.sos.joc.classes.jobchain.JobChainVolatile;
+import com.sos.joc.classes.jobchains.JobChainVolatile;
 import com.sos.joc.model.order.OrdersSummary;
 
 public class OrdersSummaryCallable implements Callable<Map<String,JobChainVolatile>> {

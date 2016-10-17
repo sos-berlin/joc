@@ -19,7 +19,6 @@ import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderP;
 import com.sos.joc.order.resource.IOrderPResource;
-import com.sos.scheduler.history.db.SchedulerOrderHistoryDBLayer;
 
 @Path("order")
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {

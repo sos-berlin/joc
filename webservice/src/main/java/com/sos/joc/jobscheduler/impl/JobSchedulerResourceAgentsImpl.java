@@ -6,8 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -22,38 +23,43 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.jobscheduler.AgentVCallable;
-import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgents;
 import com.sos.joc.model.jobscheduler.AgentFilter;
 import com.sos.joc.model.jobscheduler.AgentUrl;
 import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.AgentsV;
-import com.sos.joc.model.jobscheduler.JobSchedulerState;
-import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
-import com.sos.joc.model.order.OrderV;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements IJobSchedulerResourceAgents {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsImpl.class);
 
     @Override
-    public JOCDefaultResponse postJobschedulerAgents(String accessToken, AgentFilter agentFilterSchema) {
+    public JOCDefaultResponse postJobschedulerAgents(String accessToken, AgentFilter agentFilter) {
         LOGGER.debug("init jobscheduler/agents");
         try {
-            JOCDefaultResponse jocDefaultResponse = init(agentFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(agentFilter.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             
-            JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl(), WebserviceConstants.AGENTS_API_LIST_PATH );
-            JsonObject json = jocJsonCommand.getJsonObjectFromGet();
-            JsonArray agentUris = json.getJsonArray("elements");
             List<AgentV> listOfAgents = new ArrayList<AgentV>();
             List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
-            for (JsonString agentUri : agentUris.getValuesAs(JsonString.class)) {
-                tasks.add(new AgentVCallable(agentUri.toString(), dbItemInventoryInstance.getUrl()));
+            
+            if (agentFilter.getAgents() != null && agentFilter.getAgents().size() > 0) {
+                Set<AgentUrl> agentUris = new HashSet<AgentUrl>(agentFilter.getAgents());
+                for (AgentUrl agentUri : agentUris) {
+                    tasks.add(new AgentVCallable(agentUri.getAgent(), dbItemInventoryInstance.getUrl()));
+                }
+            } else {
+                JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl(), WebserviceConstants.AGENTS_API_LIST_PATH );
+                JsonObject json = jocJsonCommand.getJsonObjectFromGet();
+                JsonArray agentUris = json.getJsonArray("elements");
+                for (JsonString agentUri : agentUris.getValuesAs(JsonString.class)) {
+                    tasks.add(new AgentVCallable(agentUri.getString(), dbItemInventoryInstance.getUrl()));
+                }
             }
+            
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (Future<AgentV> result : executorService.invokeAll(tasks)) {
                 listOfAgents.add(result.get());

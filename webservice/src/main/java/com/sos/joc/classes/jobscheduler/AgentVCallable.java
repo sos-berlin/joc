@@ -10,26 +10,31 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 
 public class AgentVCallable implements Callable<AgentV> {
+
     private final String masterUrl;
     private final String agentUrl;
-    
+
     public AgentVCallable(String agentUrl, String masterUrl) {
         this.agentUrl = agentUrl;
         this.masterUrl = masterUrl;
     }
-    
+
     @Override
     public AgentV call() throws Exception {
         return getAgentV(agentUrl, masterUrl);
     }
-    
+
     public AgentV getAgentV(String agentUrl, String masterUrl) throws Exception {
-        JOCJsonCommand jocJsonCommand = new JOCJsonCommand(masterUrl, WebserviceConstants.AGENTS_API_LIST_PATH + agentUrl + WebserviceConstants.AGENT_API_PATH);
+        String jsonPath = new StringBuilder().append(WebserviceConstants.AGENTS_API_LIST_PATH).append(agentUrl).append(
+                WebserviceConstants.AGENT_API_PATH).toString();
+        JOCJsonCommand jocJsonCommand = new JOCJsonCommand(masterUrl, jsonPath);
         AgentV agent = new AgentV();
         agent.setSurveyDate(Date.from(Instant.now()));
         agent.setUrl(agentUrl);
@@ -39,15 +44,18 @@ public class AgentVCallable implements Callable<AgentV> {
             agent.setRunningTasks(json.getInt("currentTaskCount", 0));
             agent.setStartedAt(JobSchedulerDate.getDateFromISO8601String(json.getString("startedAt")));
             if (json.getBoolean("isTerminating", false)) {
-                state.set_text(JobSchedulerStateText.TERMINATING); 
+                state.set_text(JobSchedulerStateText.TERMINATING);
                 state.setSeverity(3);
             } else {
-                state.set_text(JobSchedulerStateText.RUNNING); 
+                state.set_text(JobSchedulerStateText.RUNNING);
                 state.setSeverity(0);
             }
-        } catch(JobSchedulerBadRequestException e) {
-            state.set_text(JobSchedulerStateText.UNREACHABLE); 
+        } catch (JobSchedulerBadRequestException e) {
+            state.set_text(JobSchedulerStateText.UNREACHABLE);
             state.setSeverity(2);
+        } catch (UnknownJobSchedulerAgentException e) {
+            e.setErrorMessage(agentUrl);
+            throw e;
         }
         agent.setState(state);
         return agent;

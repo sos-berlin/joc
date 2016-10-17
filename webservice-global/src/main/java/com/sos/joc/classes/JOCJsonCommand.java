@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 
 
 public class JOCJsonCommand {
@@ -115,6 +116,9 @@ public class JOCJsonCommand {
                 JsonObject json = rdr.readObject();
                 throw new JobSchedulerBadRequestException(json.getString("message", response));
             } else {
+                if ("Unknown Agent".equalsIgnoreCase(response)) {
+                    throw new UnknownJobSchedulerAgentException(); 
+                }
                 throw new JobSchedulerBadRequestException(response);
             }
         default:

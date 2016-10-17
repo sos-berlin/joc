@@ -1,4 +1,4 @@
-package com.sos.joc.classes.jobchain;
+package com.sos.joc.classes.jobchains;
 
 import java.util.ArrayList;
 import java.util.HashMap;

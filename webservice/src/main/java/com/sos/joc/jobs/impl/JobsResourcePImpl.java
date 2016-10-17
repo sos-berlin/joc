@@ -12,11 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
-import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.job.Jobs;
+import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
@@ -54,7 +53,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection, jobsFilterSchema.getJobschedulerId());
             List<DBItemInventoryJob> listOfJobs = processFilters(dbLayer);
             for (DBItemInventoryJob inventoryJob : listOfJobs) {
-                JobP job = Jobs.getJob(inventoryJob, dbLayer, compact);
+                JobP job = JobPermanent.getJob(inventoryJob, dbLayer, compact);
                 if (job != null) {
                     listJobs.add(job);
                 }

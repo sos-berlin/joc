@@ -32,5 +32,12 @@ public class JocException extends Exception {
     public void setError(JocError error) {
         this.error = error;
     }
+    
+    public void setErrorMessage(String message) {
+        if (this.error == null) {
+            this.error = new JocError(); 
+        }
+        this.error.setMessage(message);
+    }
 
 }

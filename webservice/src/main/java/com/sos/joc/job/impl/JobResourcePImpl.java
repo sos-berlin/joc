@@ -11,7 +11,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.job.Jobs;
+import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceP;
@@ -36,7 +36,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             // FILTER
             Boolean compact = jobFilterSchema.getCompact();
             
-            JobP job = Jobs.getJob(inventoryJob, dbLayer, compact); 
+            JobP job = JobPermanent.getJob(inventoryJob, dbLayer, compact); 
             JobP200 entity = new JobP200();
             entity.setDeliveryDate(new Date());
             entity.setJob(job);

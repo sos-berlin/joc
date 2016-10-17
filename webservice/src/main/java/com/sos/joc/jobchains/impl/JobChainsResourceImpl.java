@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.jobchain.JOCXmlJobChainCommand;
+import com.sos.joc.classes.jobchains.JOCXmlJobChainCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchains.resource.IJobChainsResource;
 import com.sos.joc.model.common.Folder;
