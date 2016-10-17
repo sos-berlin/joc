@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
 
 /** @author Uwe Risse */
 public class InventoryInstancesDBLayer extends DBLayer {
@@ -21,13 +23,13 @@ public class InventoryInstancesDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId) throws Exception {
         try {
-            String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
+            String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             List<DBItemInventoryInstance> result = query.list();
             if (result != null && !result.isEmpty()) {
-                return result.get(0);
+                return getRunningJobSchedulerClusterMember(result);
             }
             return null;
         } catch (Exception ex) {
@@ -74,5 +76,38 @@ public class InventoryInstancesDBLayer extends DBLayer {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }
     }
-
+    
+    private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList) {
+        switch (schedulerInstancesDBList.get(0).getClusterType()) {
+        case "active":
+            for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
+                try {
+                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getCommandUrl());
+                    resourceImpl.excutePost("<show_state subsystems=\"folder\" what=\"folders nosubfolders\" path=\"__unknown__\"/>");
+                    String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
+                    if (!"waiting_for_activation,dead".contains(state)) {
+                        return schedulerInstancesDBItem; 
+                    }
+                } catch (Exception e) {
+                    //unreachable
+                }
+            }
+            break;
+        case "passive":
+            for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
+                try {
+                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getCommandUrl());
+                    resourceImpl.excutePost("<param.get name=\"\"/>");
+                    return schedulerInstancesDBItem;
+                } catch (Exception e) {
+                    //unreachable
+                }
+            }
+            break;
+        default:
+            break;
+        }
+        return schedulerInstancesDBList.get(0);
+    }
+    
 }
