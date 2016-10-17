@@ -1,12 +1,16 @@
 package com.sos.joc.db.inventory.jobs;
 
+import java.util.Date;
 import java.util.List;
+
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
+import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
+import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.jitl.reporting.db.DBLayer;
 
 /** @author Uwe Risse */
@@ -55,4 +59,64 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
 
+    public Date getJobConfigurationDate(Long id) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder("select ifile.fileModified from ");
+            sql.append(DBITEM_INVENTORY_FILES).append(" ifile, ");
+            sql.append(DBITEM_INVENTORY_JOBS).append(" ij ");
+            sql.append(" where ifile.id = ij.fileId");
+            sql.append(" and ij.id = :id");
+            LOGGER.debug(sql.toString());
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("id", id);
+            Object result = query.uniqueResult();
+            if (result != null) {
+                return (Date)result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryLock> getLocksIfExists(Long id) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select il from ").append(DBITEM_INVENTORY_LOCKS).append(" il, ");
+            sql.append(DBITEM_INVENTORY_APPLIED_LOCKS).append(" ial ");
+            sql.append("where il.id = ial.lockId ");
+            sql.append("and ial.jobId = :id");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("id", id);
+            List<DBItemInventoryLock> result = query.list();
+            if (result != null) {
+                return result;
+            }
+            return null;
+        } catch (Exception e) {
+            throw new Exception(SOSHibernateConnection.getException(e));
+        }
+    }
+ 
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryJobChain> getJobChains(Long id) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ijc from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
+            sql.append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn ");
+            sql.append("where ijc.id = ijcn.jobChainId ");
+            sql.append("and ijcn.jobId = :id");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("id", id);
+            List<DBItemInventoryJobChain> result = query.list();
+            if (result != null) {
+                return result;
+            }
+            return null;
+        } catch (Exception e) {
+            throw new Exception(SOSHibernateConnection.getException(e));
+        }
+    }
+ 
 }

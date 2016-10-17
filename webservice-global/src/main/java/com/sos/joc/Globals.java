@@ -21,11 +21,9 @@ public class Globals {
         if (sosSchedulerHibernateConnections == null) {
             sosSchedulerHibernateConnections = new HashMap<String, SOSHibernateConnection>();
         }
-
         SOSHibernateConnection sosHibernateConnection = sosSchedulerHibernateConnections.get(schedulerId);
-
+        
         if (sosHibernateConnection == null) {
-
             String confFile = getConfFile(schedulerId);
             sosHibernateConnection = new SOSHibernateConnection(confFile);
             sosHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());

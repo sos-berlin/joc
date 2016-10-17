@@ -62,7 +62,9 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
                     duration.initDuration();
                     durationSum += duration.getDurationInMillis();
                 }
-                return durationSum / count;
+                if (count != null && count != 0) {
+                    return durationSum / count;
+                }
             }
             return null;
         } catch (Exception ex) {
