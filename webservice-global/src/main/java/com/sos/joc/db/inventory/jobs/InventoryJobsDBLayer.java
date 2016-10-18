@@ -11,7 +11,6 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
-import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBLayer;
 
 /** @author Uwe Risse */
@@ -63,7 +62,8 @@ public class InventoryJobsDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("select job from ");
+            StringBuilder sql = new StringBuilder();
+            sql.append("select job from ");
             sql.append(DBITEM_INVENTORY_JOBS).append(" job, ");
             sql.append(DBITEM_INVENTORY_INSTANCES).append(" instance");
             sql.append(" where job.instanceId = instance.id");
@@ -79,7 +79,8 @@ public class InventoryJobsDBLayer extends DBLayer {
 
     public Date getJobConfigurationDate(Long id) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("select ifile.fileModified from ");
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ifile.fileModified from ");
             sql.append(DBITEM_INVENTORY_FILES).append(" ifile, ");
             sql.append(DBITEM_INVENTORY_JOBS).append(" ij ");
             sql.append(" where ifile.id = ij.fileId");
@@ -118,7 +119,7 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
  
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChains(Long id) throws Exception {
+    public List<DBItemInventoryJobChain> getJobChainsByJobId(Long id) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ijc from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
@@ -140,7 +141,8 @@ public class InventoryJobsDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_JOBS);
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_JOBS);
             sql.append(" where name = :jobPath");
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
@@ -163,7 +165,8 @@ public class InventoryJobsDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_JOBS);
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_JOBS);
             sql.append(" where name like :folderName ");
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");

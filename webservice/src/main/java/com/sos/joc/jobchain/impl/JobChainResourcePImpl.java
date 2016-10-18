@@ -1,16 +1,25 @@
 package com.sos.joc.jobchain.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import javax.ws.rs.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.jobchains.JobChains;
+import com.sos.joc.classes.jobchains.JobChainPermanent;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceP;
-import com.sos.joc.model.jobChain.JobChainP200;
 import com.sos.joc.model.jobChain.JobChainFilter;
+import com.sos.joc.model.jobChain.JobChainP;
+import com.sos.joc.model.jobChain.JobChainP200;
 
 @Path("job_chain")
 public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainResourceP {
@@ -27,23 +36,42 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
                 return jocDefaultResponse;
             }
 
-            // TODO JOC Cockpit Webservice: Reading from database
-            // InventoryJobsDBLayer dbLayer = new
-            // InventoryJobsDBLayer(Globals.sosHibernateConnection,
-            // jobChainFilterSchema.getJobschedulerId());
-            // DBItemInventoryJobChain inventoryJobChain =
-            // dbLayer.getInventoryJobChainByName(jobChainFilterSchema.getJobChain());
             JobChainP200 entity = new JobChainP200();
-            entity.setJobChain(JobChains.getPJobChains(jobChainFilter.getCompact()).get(0));
+            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection, jobChainFilter.getJobschedulerId());
+            DBItemInventoryJobChain inventoryJobChain = dbLayer.getJobChainByPath(jobChainFilter.getJobChain());
+            JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, inventoryJobChain, jobChainFilter.getCompact());
+            if (jobChain != null) {
+                entity.setJobChain(jobChain);
+                if(!JobChainPermanent.NESTED_JOB_CHAIN_NAMES.isEmpty()) {
+                    List<JobChainP> nestedJobChains = new ArrayList<JobChainP>();
+                    for(String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
+                        DBItemInventoryJobChain nestedJobChain = null;
+                        if(nestedJobChainName.contains("/")) {
+                            nestedJobChain = dbLayer.getJobChainByPath(nestedJobChainName);
+                        } else {
+                            nestedJobChain = dbLayer.getJobChainByName(nestedJobChainName);
+                        }
+                        if (nestedJobChain != null) {
+                            JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, jobChainFilter.getCompact());
+                            if (nestedJobChainP != null) {
+                                nestedJobChains.add(nestedJobChainP);
+                            }
+                        }
+                    }
+                    if(!nestedJobChains.isEmpty()) {
+                        entity.setNestedJobChains(nestedJobChains);
+                        JobChainPermanent.NESTED_JOB_CHAIN_NAMES.clear();
+                    }
+                } else {
+                    entity.setNestedJobChains(null);
+                }
+            }
             entity.setDeliveryDate(new Date());
-            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
-
         }
     }
 

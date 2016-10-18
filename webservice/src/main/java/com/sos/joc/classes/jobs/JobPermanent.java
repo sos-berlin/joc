@@ -15,7 +15,7 @@ import com.sos.joc.model.job.JobP;
 import com.sos.joc.model.job.LockUseP;
 
 public class JobPermanent {
-
+    
     public static Integer getEstimatedDurationInSeconds(DBItemInventoryJob job) throws Exception {
         JobSchedulerTaskHistoryDBLayer dbLayer = new JobSchedulerTaskHistoryDBLayer(Globals.sosHibernateConnection);
         Long estimatedDurationInMillis = dbLayer.getTaskEstimatedDuration(job.getName());
@@ -41,7 +41,7 @@ public class JobPermanent {
     }
     
     public static List<DBItemInventoryJobChain> getJobChains(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer) throws Exception {
-        return dbLayer.getJobChains(job.getId());
+        return dbLayer.getJobChainsByJobId(job.getId());
     }
     
     public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, Boolean compact) throws Exception {
@@ -64,6 +64,8 @@ public class JobPermanent {
             if (inventoryJob.getProcessClassName() != null && !inventoryJob.getProcessClassName().isEmpty() 
                     && !inventoryJob.getProcessClassName().equalsIgnoreCase(DBLayer.DEFAULT_NAME)) {
                 job.setProcessClass(inventoryJob.getProcessClassName());
+            } else if (inventoryJob.getProcessClass() != null) {
+                job.setProcessClass(inventoryJob.getProcessClass());
             }
             List<LockUseP> locks = JobPermanent.getLocks(inventoryJob, dbLayer);
             if(locks != null && !locks.isEmpty()) {
@@ -93,5 +95,5 @@ public class JobPermanent {
         }
         return job;
     }
-    
+ 
 }
