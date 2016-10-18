@@ -112,14 +112,14 @@ public class JobChainPermanent {
                     jobChainNode.setErrorNode(node.getErrorState());
                     JobChainNodeJobP job = new JobChainNodeJobP();
                     if(node.getJob() != null && !"".equalsIgnoreCase(node.getJob())) {
-                        job.setPath(node.getJob());
+                        job.setPath(node.getJobName());
                         jobChainNode.setJob(job);
                     } else {
                         jobChainNode.setJob(null);
                     }
                     JobChainNodeJobChainP nodeJobChain = new JobChainNodeJobChainP();
-                    if(node.getJobChain() != null && !"".equalsIgnoreCase(node.getJobChain())) {
-                        nodeJobChain.setPath(node.getJobChain());
+                    if(node.getNestedJobChainName() != null && !DBLayer.DEFAULT_NAME.equalsIgnoreCase(node.getNestedJobChainName())) {
+                        nodeJobChain.setPath(node.getNestedJobChainName());
                         jobChainNode.setJobChain(nodeJobChain);
                     } else {
                         jobChainNode.setJobChain(null);
