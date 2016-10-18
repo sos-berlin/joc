@@ -24,6 +24,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         this.jobSchedulerId = jobSchedulerId;
     }
 
+    @SuppressWarnings("unchecked")
     public DBItemInventoryJobChain getJobChainByPath(String jobChainPath) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
@@ -41,6 +42,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }        
     }
     
+    @SuppressWarnings("unchecked")
     public DBItemInventoryJobChain getJobChainByName(String jobChainName) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
@@ -78,6 +80,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }
     }
     
+    @SuppressWarnings("unchecked")
     public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id) throws Exception {
         try {
             StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES);
@@ -93,6 +96,44 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         } catch (Exception ex) {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
+            sql.append(" where name like :name");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("name", "%" + folderPath + "%");
+            List<DBItemInventoryJobChain> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }        
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryJobChain> getJobChains() throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select jobchains from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" jobchains, ");
+            sql.append(DBITEM_INVENTORY_INSTANCES).append(" instance ");
+            sql.append("where jobchains.instanceId = instance.id ");
+            sql.append("and instance.schedulerId = :jobschedulerId");
+           Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("jobschedulerId", this.jobSchedulerId);
+            List<DBItemInventoryJobChain> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }        
     }
     
 }

@@ -104,7 +104,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
