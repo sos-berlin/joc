@@ -51,7 +51,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public List<DBItemInventoryInstance> getJobSchedulerIds() throws Exception {
         try {
-            String sql = String.format("select schedulerId,created from %1$s group by schedulerId,created order by created desc", DBITEM_INVENTORY_INSTANCES);
+            String sql = String.format("from %1$s order by created desc", DBITEM_INVENTORY_INSTANCES);
             Query query = getConnection().createQuery(sql);
 
             return query.list();

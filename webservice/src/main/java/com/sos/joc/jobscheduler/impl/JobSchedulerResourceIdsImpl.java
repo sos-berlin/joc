@@ -1,8 +1,9 @@
 package com.sos.joc.jobscheduler.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -34,10 +35,10 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
 
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
-            JobSchedulerIds entity = new JobSchedulerIds();
+            Set<String> jobSchedulerIds = new HashSet<String>();
             String first = "";
             for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
-                entity.getJobschedulerIds().add(inventoryInstance.getSchedulerId());
+                jobSchedulerIds.add(inventoryInstance.getSchedulerId());
                 if ("".equals(first)) {
                     first = inventoryInstance.getSchedulerId();
                 }
@@ -45,6 +46,8 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             JOCPreferences jocPreferences = new JOCPreferences();
             String selectedInstance = jocPreferences.get("selected_instance", first);
 
+            JobSchedulerIds entity = new JobSchedulerIds();
+            entity.getJobschedulerIds().addAll(jobSchedulerIds);
             entity.setSelected(selectedInstance);
             entity.setDeliveryDate(new Date());
 
