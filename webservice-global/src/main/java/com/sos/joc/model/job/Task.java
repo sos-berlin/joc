@@ -6,6 +6,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.order.OrderV;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -20,11 +21,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "id",
+    "taskId",
     "pid",
     "state",
-    "startAt",
-    "runningSince",
+    "plannedStart",
+    "startedAt",
     "enqueued",
     "idleSince",
     "inProcessSince",
@@ -39,8 +40,8 @@ public class Task {
      * (Required)
      * 
      */
-    @JsonProperty("id")
-    private Integer id;
+    @JsonProperty("taskId")
+    private String taskId;
     @JsonProperty("pid")
     private Integer pid;
     /**
@@ -58,16 +59,16 @@ public class Task {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("startAt")
-    private Date startAt;
+    @JsonProperty("plannedStart")
+    private Date plannedStart;
     /**
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      */
-    @JsonProperty("runningSince")
-    private Date runningSince;
+    @JsonProperty("startedAt")
+    private Date startedAt;
     /**
      * timestamp
      * <p>
@@ -109,33 +110,36 @@ public class Task {
     @JsonProperty("_cause")
     private TaskCause _cause;
     /**
+     * order (volatile part)
+     * <p>
+     * 
      * 
      */
     @JsonProperty("order")
-    private Order order;
+    private OrderV order;
 
     /**
      * 
      * (Required)
      * 
      * @return
-     *     The id
+     *     The taskId
      */
-    @JsonProperty("id")
-    public Integer getId() {
-        return id;
+    @JsonProperty("taskId")
+    public String getTaskId() {
+        return taskId;
     }
 
     /**
      * 
      * (Required)
      * 
-     * @param id
-     *     The id
+     * @param taskId
+     *     The taskId
      */
-    @JsonProperty("id")
-    public void setId(Integer id) {
-        this.id = id;
+    @JsonProperty("taskId")
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 
     /**
@@ -192,11 +196,11 @@ public class Task {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      * @return
-     *     The startAt
+     *     The plannedStart
      */
-    @JsonProperty("startAt")
-    public Date getStartAt() {
-        return startAt;
+    @JsonProperty("plannedStart")
+    public Date getPlannedStart() {
+        return plannedStart;
     }
 
     /**
@@ -204,12 +208,12 @@ public class Task {
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
-     * @param startAt
-     *     The startAt
+     * @param plannedStart
+     *     The plannedStart
      */
-    @JsonProperty("startAt")
-    public void setStartAt(Date startAt) {
-        this.startAt = startAt;
+    @JsonProperty("plannedStart")
+    public void setPlannedStart(Date plannedStart) {
+        this.plannedStart = plannedStart;
     }
 
     /**
@@ -218,11 +222,11 @@ public class Task {
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      * @return
-     *     The runningSince
+     *     The startedAt
      */
-    @JsonProperty("runningSince")
-    public Date getRunningSince() {
-        return runningSince;
+    @JsonProperty("startedAt")
+    public Date getStartedAt() {
+        return startedAt;
     }
 
     /**
@@ -230,12 +234,12 @@ public class Task {
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
-     * @param runningSince
-     *     The runningSince
+     * @param startedAt
+     *     The startedAt
      */
-    @JsonProperty("runningSince")
-    public void setRunningSince(Date runningSince) {
-        this.runningSince = runningSince;
+    @JsonProperty("startedAt")
+    public void setStartedAt(Date startedAt) {
+        this.startedAt = startedAt;
     }
 
     /**
@@ -369,22 +373,28 @@ public class Task {
     }
 
     /**
+     * order (volatile part)
+     * <p>
+     * 
      * 
      * @return
      *     The order
      */
     @JsonProperty("order")
-    public Order getOrder() {
+    public OrderV getOrder() {
         return order;
     }
 
     /**
+     * order (volatile part)
+     * <p>
+     * 
      * 
      * @param order
      *     The order
      */
     @JsonProperty("order")
-    public void setOrder(Order order) {
+    public void setOrder(OrderV order) {
         this.order = order;
     }
 
@@ -395,7 +405,7 @@ public class Task {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(id).append(pid).append(state).append(startAt).append(runningSince).append(enqueued).append(idleSince).append(inProcessSince).append(steps).append(_cause).append(order).toHashCode();
+        return new HashCodeBuilder().append(taskId).append(pid).append(state).append(plannedStart).append(startedAt).append(enqueued).append(idleSince).append(inProcessSince).append(steps).append(_cause).append(order).toHashCode();
     }
 
     @Override
@@ -407,7 +417,7 @@ public class Task {
             return false;
         }
         Task rhs = ((Task) other);
-        return new EqualsBuilder().append(id, rhs.id).append(pid, rhs.pid).append(state, rhs.state).append(startAt, rhs.startAt).append(runningSince, rhs.runningSince).append(enqueued, rhs.enqueued).append(idleSince, rhs.idleSince).append(inProcessSince, rhs.inProcessSince).append(steps, rhs.steps).append(_cause, rhs._cause).append(order, rhs.order).isEquals();
+        return new EqualsBuilder().append(taskId, rhs.taskId).append(pid, rhs.pid).append(state, rhs.state).append(plannedStart, rhs.plannedStart).append(startedAt, rhs.startedAt).append(enqueued, rhs.enqueued).append(idleSince, rhs.idleSince).append(inProcessSince, rhs.inProcessSince).append(steps, rhs.steps).append(_cause, rhs._cause).append(order, rhs.order).isEquals();
     }
 
 }

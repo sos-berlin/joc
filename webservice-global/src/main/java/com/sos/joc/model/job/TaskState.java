@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class TaskState {
 
     /**
-     * TODO mapping severity and _text
+     *  0=running*<!---->/ending/closed; 1=loading/starting; 3=waiting*<!---->/none/suspended
      * (Required)
      * 
      */
@@ -42,7 +42,7 @@ public class TaskState {
     private TaskStateText _text;
 
     /**
-     * TODO mapping severity and _text
+     *  0=running*<!---->/ending/closed; 1=loading/starting; 3=waiting*<!---->/none/suspended
      * (Required)
      * 
      * @return
@@ -54,7 +54,7 @@ public class TaskState {
     }
 
     /**
-     * TODO mapping severity and _text
+     *  0=running*<!---->/ending/closed; 1=loading/starting; 3=waiting*<!---->/none/suspended
      * (Required)
      * 
      * @param severity

@@ -18,7 +18,7 @@ import com.sos.joc.model.job.JobState;
 import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.job.LockUseV;
-import com.sos.joc.model.job.OrderInRunningTask;
+import com.sos.joc.model.job.OrderOfTask;
 import com.sos.joc.model.job.QueuedTask;
 import com.sos.joc.model.job.RunningTask;
 import com.sos.joc.model.job.TaskCause;
@@ -217,12 +217,13 @@ public class JobVolatile extends JobV {
                 task.setTaskId(jocXmlCommand.getAttributeValue(taskElement,WebserviceConstants.ID,"0"));
                 Element orderElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(taskElement, WebserviceConstants.ORDER);
                 if (orderElement != null) {
-                    OrderInRunningTask order = new OrderInRunningTask();
+                    OrderOfTask order = new OrderOfTask();
                     order.setInProcessSince(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(orderElement, WebserviceConstants.IN_PROCESS_SINCE, null)));
                     order.setJobChain(("/"+orderElement.getAttribute(WebserviceConstants.JOB_CHAIN)).replaceAll("//+", "/"));
                     order.setOrderId(orderElement.getAttribute(WebserviceConstants.ID));
-                    order.setPath(("/"+orderElement.getAttribute(WebserviceConstants.PATH)).replaceAll("//+", "/"));
+                    order.setPath(order.getJobChain()+","+order.getOrderId());
                     order.setState(orderElement.getAttribute(WebserviceConstants.STATE));
+                    order.setTitle(jocXmlCommand.getAttributeValue(orderElement,"title",null));
                     task.setOrder(order);
                 }
                 runningTasks.add(task);

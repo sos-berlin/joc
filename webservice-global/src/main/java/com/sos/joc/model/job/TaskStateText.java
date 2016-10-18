@@ -19,6 +19,7 @@ public enum TaskStateText {
     WAITING_FOR_PROCESS("WAITING_FOR_PROCESS"),
     WAITING_FOR_LOCKS("WAITING_FOR_LOCKS"),
     WAITING_FOR_ORDER("WAITING_FOR_ORDER"),
+    SUSPENDED("SUSPENDED"),
     ENDING("ENDING"),
     CLOSED("CLOSED");
     private final String value;

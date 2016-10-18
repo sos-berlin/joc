@@ -12,7 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * order in running task
+ * order in task
  * <p>
  * Only relevant for order jobs; cause=order resp.
  * 
@@ -23,10 +23,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "path",
     "orderId",
     "jobChain",
+    "title",
     "state",
     "inProcessSince"
 })
-public class OrderInRunningTask {
+public class OrderOfTask {
 
     /**
      * path
@@ -53,6 +54,8 @@ public class OrderInRunningTask {
      */
     @JsonProperty("jobChain")
     private String jobChain;
+    @JsonProperty("title")
+    private String title;
     /**
      * name of the current node
      * (Required)
@@ -150,6 +153,26 @@ public class OrderInRunningTask {
     }
 
     /**
+     * 
+     * @return
+     *     The title
+     */
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * 
+     * @param title
+     *     The title
+     */
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
      * name of the current node
      * (Required)
      * 
@@ -206,7 +229,7 @@ public class OrderInRunningTask {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(state).append(inProcessSince).toHashCode();
+        return new HashCodeBuilder().append(path).append(orderId).append(jobChain).append(title).append(state).append(inProcessSince).toHashCode();
     }
 
     @Override
@@ -214,11 +237,11 @@ public class OrderInRunningTask {
         if (other == this) {
             return true;
         }
-        if ((other instanceof OrderInRunningTask) == false) {
+        if ((other instanceof OrderOfTask) == false) {
             return false;
         }
-        OrderInRunningTask rhs = ((OrderInRunningTask) other);
-        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(inProcessSince, rhs.inProcessSince).isEquals();
+        OrderOfTask rhs = ((OrderOfTask) other);
+        return new EqualsBuilder().append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(title, rhs.title).append(state, rhs.state).append(inProcessSince, rhs.inProcessSince).isEquals();
     }
 
 }

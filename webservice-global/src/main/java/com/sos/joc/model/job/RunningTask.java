@@ -76,13 +76,13 @@ public class RunningTask {
     @JsonProperty("_cause")
     private TaskCause _cause;
     /**
-     * order in running task
+     * order in task
      * <p>
      * Only relevant for order jobs; cause=order resp.
      * 
      */
     @JsonProperty("order")
-    private OrderInRunningTask order;
+    private OrderOfTask order;
 
     /**
      * 
@@ -255,7 +255,7 @@ public class RunningTask {
     }
 
     /**
-     * order in running task
+     * order in task
      * <p>
      * Only relevant for order jobs; cause=order resp.
      * 
@@ -263,12 +263,12 @@ public class RunningTask {
      *     The order
      */
     @JsonProperty("order")
-    public OrderInRunningTask getOrder() {
+    public OrderOfTask getOrder() {
         return order;
     }
 
     /**
-     * order in running task
+     * order in task
      * <p>
      * Only relevant for order jobs; cause=order resp.
      * 
@@ -276,7 +276,7 @@ public class RunningTask {
      *     The order
      */
     @JsonProperty("order")
-    public void setOrder(OrderInRunningTask order) {
+    public void setOrder(OrderOfTask order) {
         this.order = order;
     }
 
