@@ -19,8 +19,7 @@ public class JobSchedulerResourceSupervisorPImpl implements IJobSchedulerResourc
         JobSchedulerResourceP jobSchedulerPResource = new JobSchedulerResourceP(accessToken, jobSchedulerFilterSchema);
 
         Globals.beginTransaction();
-        DBItemInventoryInstance dbItemInventoryInstance =
-                jobSchedulerPResource.getJobschedulerUser().getSchedulerInstance(
+        DBItemInventoryInstance dbItemInventoryInstance = jobSchedulerPResource.getJobschedulerUser().getSchedulerInstance(
                         new JobSchedulerIdentifier(jobSchedulerFilterSchema.getJobschedulerId()));
         if (dbItemInventoryInstance == null) {
             return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s",
