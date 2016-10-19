@@ -79,11 +79,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                     listOfLocks.addAll(locksToAdd);
                 }
             }
-            if(listOfLocks != null && !listOfLocks.isEmpty()){
-                entity.setLocks(listOfLocks);
-            } else {
-                entity.setLocks(null);
-            }
+            entity.setLocks(listOfLocks);
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

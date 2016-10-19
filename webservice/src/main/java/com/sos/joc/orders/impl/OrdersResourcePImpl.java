@@ -94,9 +94,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             } else {
                 ordersFromDB = dbLayer.getInventoryOrders();
             }
-            if(ordersFromDB != null && !ordersFromDB.isEmpty()) {
-                entity.setOrders(fillOutputOrders(ordersFromDB, dbLayer));
-            }
+            entity.setOrders(fillOutputOrders(ordersFromDB, dbLayer));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

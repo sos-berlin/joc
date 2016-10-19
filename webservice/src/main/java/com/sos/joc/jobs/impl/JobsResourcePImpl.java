@@ -60,11 +60,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             }
             JobsP entity = new JobsP();
             entity.setDeliveryDate(new Date());
-            if (listJobs != null && !listJobs.isEmpty()) {
-                entity.setJobs(listJobs);
-            } else {
-                entity.setJobs(null);
-            }
+            entity.setJobs(listJobs);
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

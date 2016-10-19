@@ -119,7 +119,6 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
-
     }
 
     private void initNestedJobChainsIfExists(InventoryJobChainsDBLayer dbLayer, JobChainP jobChain) throws Exception {
