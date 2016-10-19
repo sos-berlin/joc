@@ -60,10 +60,6 @@ public class ScheduleP {
     private String name;
     @JsonProperty("title")
     private String title;
-    /**
-     * this field and substitutedBy from the volatile part are exclusive
-     * 
-     */
     @JsonProperty("substitute")
     private Substitute substitute;
     /**
@@ -190,7 +186,6 @@ public class ScheduleP {
     }
 
     /**
-     * this field and substitutedBy from the volatile part are exclusive
      * 
      * @return
      *     The substitute
@@ -201,7 +196,6 @@ public class ScheduleP {
     }
 
     /**
-     * this field and substitutedBy from the volatile part are exclusive
      * 
      * @param substitute
      *     The substitute

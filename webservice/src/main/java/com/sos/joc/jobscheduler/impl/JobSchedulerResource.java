@@ -1,9 +1,9 @@
 package com.sos.joc.jobscheduler.impl;
 
 import java.util.Date;
-import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -14,19 +14,12 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
+import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.JobSchedulerV;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
 public class JobSchedulerResource extends JOCResourceImpl {
-    private static final String TERMINATING = "terminating";
-    private static final String WAITING_FOR_ACTIVATION = "waiting_for_activation";
-    private static final String UNREACHABLE = "unreachable";
-    private static final String DEAD = "dead";
-    private static final String WAITING_FOR_DATABASE = "waiting_for_database";
-    private static final String PAUSED = "paused";
-    private static final String RUNNING = "running";
-    private static final String JOBSCHEDULER_STATE = "state";
-    private static final String XPATH_SPOOLER_STATE = "//spooler/answer/state";
+    private static final String XPATH_SPOOLER_STATE = "/spooler/answer/state";
     private static final String SPOOLER_RUNNING_SINCE = "spooler_running_since";
     private static final String TCP_PORT = "tcp_port";
     private static final String ID = "id";
@@ -63,65 +56,92 @@ public class JobSchedulerResource extends JOCResourceImpl {
             entity.setDeliveryDate(new Date());
             
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            try {
+                jocXmlCommand.excutePost(getXMLCommand());
+            } catch (Exception e) {
+                entity.setJobscheduler(getUnreachableJobScheduler());
+                return JOCDefaultResponse.responseStatus200(entity);
+            }
+            jocXmlCommand.throwJobSchedulerError();
+            entity.setJobscheduler(getJobScheduler(jocXmlCommand));
             
-            JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-            jsCmdShowState.setWhat(FOLDERS_NO_SUBFOLDERS);;
-            jsCmdShowState.setPath(DOES_NOT_EXIST);
-            jsCmdShowState.setSubsystems(FOLDER);
-            String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowState);
-            jocXmlCommand.excutePost(xml);
-
-            JobSchedulerV jobscheduler = new JobSchedulerV();
-            jobscheduler.setSurveyDate(jocXmlCommand.getSurveyDate());
-
-            jocXmlCommand.executeXPath(XPATH_SPOOLER_STATE);
-
-            jobscheduler.setHost(jocXmlCommand.getAttribute(HOST));
-
-            jobscheduler.setJobschedulerId(jocXmlCommand.getAttribute(ID));
-            jobscheduler.setPort(jocXmlCommand.getAttributeAsInteger(TCP_PORT));
-            jobscheduler.setStartedAt(jocXmlCommand.getAttributeAsDate(SPOOLER_RUNNING_SINCE));
-            String jobschedulerState = jocXmlCommand.getAttribute(JOBSCHEDULER_STATE);
-
-            JobSchedulerState state = new JobSchedulerState();
-           
-            state.setSeverity(getSeverityFromState(jobschedulerState));
-            state.set_text(getText(jobschedulerState.toUpperCase()));
-            jobscheduler.setState(state);
-            
-            entity.setJobscheduler(jobscheduler);
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
     
-   
-    private Integer getSeverityFromState(String state){
-        HashMap<String,Integer> h = new HashMap<String, Integer>();
-        
-        if (state==null){
-            return null;
-        }
-        
-        state = state.toLowerCase();
-        h.put(RUNNING, 0);
-        h.put(PAUSED, 1);
-        h.put(WAITING_FOR_DATABASE, 2);
-        h.put(DEAD, 2);
-        h.put(UNREACHABLE, 2);
-        h.put(WAITING_FOR_ACTIVATION, 3);
-        h.put(TERMINATING, 3);
-        
-        Integer severity = h.get(state);
-        if (severity != null){
-            return severity;
-        }else{
-            return -1;
-        }
+    private String getXMLCommand() {
+        JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
+        jsCmdShowState.setWhat(FOLDERS_NO_SUBFOLDERS);;
+        jsCmdShowState.setPath(DOES_NOT_EXIST);
+        jsCmdShowState.setSubsystems(FOLDER);
+        return jsCmdShowState.toXMLString();
     }
-
+    
+    private JobSchedulerV getUnreachableJobScheduler() {
+        JobSchedulerV jobscheduler = new JobSchedulerV();
+        jobscheduler.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
+        jobscheduler.setHost(dbItemInventoryInstance.getHostname());
+        jobscheduler.setPort(dbItemInventoryInstance.getPort());
+        JobSchedulerState jobSchedulerState = new JobSchedulerState();
+        jobSchedulerState.set_text(JobSchedulerStateText.UNREACHABLE);
+        jobSchedulerState.setSeverity(2);
+        jobscheduler.setState(jobSchedulerState);
+        return jobscheduler;
+    }
+    
+    private JobSchedulerV getJobScheduler(JOCXmlCommand jocXmlCommand) throws Exception {
+        JobSchedulerV jobscheduler = new JobSchedulerV();
+        jobscheduler.setSurveyDate(jocXmlCommand.getSurveyDate());
+        Element stateElem = jocXmlCommand.executeXPath(XPATH_SPOOLER_STATE);
+        jobscheduler.setHost(jocXmlCommand.getAttribute(HOST));
+        jobscheduler.setJobschedulerId(jocXmlCommand.getAttribute(ID));
+        jobscheduler.setPort(jocXmlCommand.getAttributeAsInteger(TCP_PORT));
+        jobscheduler.setStartedAt(jocXmlCommand.getAttributeAsDate(SPOOLER_RUNNING_SINCE));
+        jobscheduler.setState(getJobSchedulerState(stateElem));
+        if (stateElem.hasAttribute("waiting_errno_text")) {
+            com.sos.joc.model.common.Error err = new com.sos.joc.model.common.Error();
+            err.setCode(stateElem.getAttribute("waiting_errno"));
+            err.setMessage(stateElem.getAttribute("waiting_errno_text"));
+            jobscheduler.setError(err);
+        }
+        return jobscheduler;
+    }
+    
+    private JobSchedulerState getJobSchedulerState(Element stateElem) {
+        JobSchedulerState  jobSchedulerState = new JobSchedulerState();
+        if ("yes".equals(stateElem.getAttribute("db_waiting"))) {
+            jobSchedulerState.set_text(JobSchedulerStateText.WAITING_FOR_DATABASE);
+            jobSchedulerState.setSeverity(2);
+        } else {
+            switch(stateElem.getAttribute("state")) {
+            case "starting":
+                jobSchedulerState.set_text(JobSchedulerStateText.STARTING);
+                jobSchedulerState.setSeverity(0);
+                break;
+            case "running":
+                jobSchedulerState.set_text(JobSchedulerStateText.RUNNING);
+                jobSchedulerState.setSeverity(0);
+                break;
+            case "paused":
+                jobSchedulerState.set_text(JobSchedulerStateText.PAUSED);
+                jobSchedulerState.setSeverity(1);
+                break;
+            case "stopping":
+            case "stopping_let_run":
+            case "stopped":
+                jobSchedulerState.set_text(JobSchedulerStateText.TERMINATING);
+                jobSchedulerState.setSeverity(3);
+                break;
+            case "waiting_for_activation":
+                jobSchedulerState.set_text(JobSchedulerStateText.WAITING_FOR_ACTIVATION);
+                jobSchedulerState.setSeverity(3);
+                break;
+            }
+        }
+        return jobSchedulerState;
+    }
 }

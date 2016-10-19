@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -101,10 +102,9 @@ public class JOCResourceImpl {
         }
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
-
             if (dbItemInventoryInstance == null) {
-                //TODO create JocException
-                return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES));
+                String errMessage = String.format("jobschedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES);
+                return JOCDefaultResponse.responseStatusJSError(new DBInvalidDataException(errMessage));
             }
         }
 
@@ -166,16 +166,6 @@ public class JOCResourceImpl {
         return listOfErrors;
     }
 
-    protected JobSchedulerStateText getText(String jobschedulerState){
-        try{
-           return JobSchedulerStateText.fromValue(jobschedulerState.toUpperCase());
-        }
-        catch (IllegalArgumentException e) {
-            LOGGER.error("IllegalArgumentException: " + jobschedulerState,e); 
-            return null;
-        }
-    }
-    
     protected String getParent(String path){
         Path  p = Paths.get(path).getParent();
         if (p == null){
@@ -187,8 +177,7 @@ public class JOCResourceImpl {
     
     protected boolean matchesRegex(Pattern p, String path) {
         if (p != null) {
-            Matcher m = p.matcher(path);
-            return m.matches();
+            return p.matcher(path).find();
         } else {
             return true;
         }

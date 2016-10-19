@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Generated("org.jsonschema2pojo")
 public enum JobSchedulerStateText {
 
+    STARTING("STARTING"),
     RUNNING("RUNNING"),
     PAUSED("PAUSED"),
     WAITING_FOR_ACTIVATION("WAITING_FOR_ACTIVATION"),

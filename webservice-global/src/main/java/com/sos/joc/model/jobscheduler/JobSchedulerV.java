@@ -6,6 +6,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.common.Error;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -25,7 +26,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "host",
     "port",
     "state",
-    "startedAt"
+    "startedAt",
+    "error"
 })
 public class JobSchedulerV {
 
@@ -65,6 +67,14 @@ public class JobSchedulerV {
      */
     @JsonProperty("startedAt")
     private Date startedAt;
+    /**
+     * error
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("error")
+    private Error error;
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -210,6 +220,32 @@ public class JobSchedulerV {
         this.startedAt = startedAt;
     }
 
+    /**
+     * error
+     * <p>
+     * 
+     * 
+     * @return
+     *     The error
+     */
+    @JsonProperty("error")
+    public Error getError() {
+        return error;
+    }
+
+    /**
+     * error
+     * <p>
+     * 
+     * 
+     * @param error
+     *     The error
+     */
+    @JsonProperty("error")
+    public void setError(Error error) {
+        this.error = error;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -217,7 +253,7 @@ public class JobSchedulerV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(host).append(port).append(state).append(startedAt).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(host).append(port).append(state).append(startedAt).append(error).toHashCode();
     }
 
     @Override
@@ -229,7 +265,7 @@ public class JobSchedulerV {
             return false;
         }
         JobSchedulerV rhs = ((JobSchedulerV) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(state, rhs.state).append(startedAt, rhs.startedAt).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(state, rhs.state).append(startedAt, rhs.startedAt).append(error, rhs.error).isEquals();
     }
 
 }

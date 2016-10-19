@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class JobSchedulerState {
 
     /**
-     *  0=running, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
+     *  0=running/starting, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
      * (Required)
      * 
      */
@@ -42,7 +42,7 @@ public class JobSchedulerState {
     private JobSchedulerStateText _text;
 
     /**
-     *  0=running, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
+     *  0=running/starting, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
      * (Required)
      * 
      * @return
@@ -54,7 +54,7 @@ public class JobSchedulerState {
     }
 
     /**
-     *  0=running, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
+     *  0=running/starting, 1=paused, 3=waiting_for_activation/terminating, 2=waiting_for_database/dead/unreachable
      * (Required)
      * 
      * @param severity
