@@ -43,7 +43,7 @@ public class JOCResourceImpl {
         if (jobschedulerUser.getSosShiroCurrentUser() == null){
             jocError = new JocError();
             jocError.setCode(WebserviceConstants.NO_USER_WITH_ACCESS_TOKEN);
-            jocError.setMessage("No User logged in with accessToken: " + accessToken);
+            jocError.setMessage("No user logged in with accessToken: " + accessToken);
             throw new JocException(jocError);
         }
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
@@ -77,21 +77,19 @@ public class JOCResourceImpl {
 
     public JOCDefaultResponse init(String schedulerId, boolean permission) throws Exception {
         JOCDefaultResponse jocDefaultResponse = null;
-        if (jobschedulerUser.getSosShiroCurrentUser().getAuthorization() != null) {
-            jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession().touch();
-        }
 
         try {
-
+            if (jobschedulerUser.getSosShiroCurrentUser().getAuthorization() != null) {
+                jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession().touch();
+            }
+            
             if (!jobschedulerUser.isAuthenticated()) {
                 return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
             }
         } catch (org.apache.shiro.session.ExpiredSessionException e) {
-            LOGGER.error(e.getMessage());
             return JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, e.getMessage()));
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
 
         if (!permission) {
@@ -105,6 +103,7 @@ public class JOCResourceImpl {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
 
             if (dbItemInventoryInstance == null) {
+                //TODO create JocException
                 return JOCDefaultResponse.responseStatusJSError(String.format("schedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES));
             }
         }

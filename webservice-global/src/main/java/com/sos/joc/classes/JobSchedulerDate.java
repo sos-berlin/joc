@@ -19,16 +19,16 @@ public class JobSchedulerDate {
 
     public static Instant getInstantFromISO8601String(String dateString) {
         Instant fromString = null;
-        if (dateString != null) {
+        if (dateString != null && !dateString.isEmpty()) {
             try {
                 dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
                 fromString = Instant.parse(dateString);
-                // JobScheduler responses max or in time but means 'never'
+                // JobScheduler responses max or min time but means 'never'
                 if (fromString == null || fromString.getEpochSecond() == 0 || fromString.getEpochSecond() == Long.MAX_VALUE) {
                     fromString = null;
                 }
             } catch (DateTimeParseException e) {
-                LOGGER.info(dateString, e);
+                LOGGER.warn(dateString, e);
                 fromString = null;
             }
         }

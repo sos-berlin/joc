@@ -216,6 +216,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
     public static JOCDefaultResponse responseStatus403(SOSShiroCurrentUserAnswer entity, String mediaType) {
         Response.ResponseBuilder responseBuilder = Response.status(403).header("Content-Type", mediaType);
+        LOGGER.error(entity.getMessage());
         if (mediaType.contains(MediaType.TEXT_HTML)) {
             String entityStr = String.format(ERROR_HTML, "JOC-403", StringEscapeUtils.escapeHtml4(entity.getMessage()));
             responseBuilder.entity(entityStr);
@@ -231,6 +232,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
     public static JOCDefaultResponse responseStatus440(SOSShiroCurrentUserAnswer entity, String mediaType) {
         Response.ResponseBuilder responseBuilder = Response.status(440).header("Content-Type", mediaType);
+        LOGGER.info(entity.getMessage());
         if (mediaType.contains(MediaType.TEXT_HTML)) {
             String entityStr = String.format(ERROR_HTML, "JOC-440", StringEscapeUtils.escapeHtml4(entity.getMessage()));
             responseBuilder.entity(entityStr);
@@ -258,6 +260,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if ("".equals(message)){
             message = "Authentication failure";
         }
+        LOGGER.info(message);
         entity.setMessage(message);
         return entity;
     }
