@@ -78,7 +78,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                 }
             } else if (foldersFilter != null && !foldersFilter.isEmpty()) {
                 for (Folder folder : foldersFilter) {
-                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(folder.getFolder());
+                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(folder.getFolder(), folder.getRecursive());
                     if (filteredOrders != null && !filteredOrders.isEmpty()) {
                         ordersFromDB.addAll(filteredOrders);
                     }

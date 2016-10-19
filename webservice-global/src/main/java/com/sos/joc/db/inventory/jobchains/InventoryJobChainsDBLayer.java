@@ -98,13 +98,21 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath) throws Exception {
+    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath, boolean recursive) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
-            sql.append(" where name like :name");
+            if (recursive) {
+                sql.append(" where name like :name");
+            } else {
+                sql.append(" where name = :name");
+            }
             Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("name", "%" + folderPath + "%");
+            if (recursive) {
+                query.setParameter("name", "%" + folderPath + "%");
+            } else {
+                query.setParameter("name", folderPath);
+            }
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;

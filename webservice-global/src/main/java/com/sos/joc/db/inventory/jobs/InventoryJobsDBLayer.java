@@ -163,16 +163,24 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob) throws Exception {
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, boolean recursive) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOBS);
-            sql.append(" where name like :folderName ");
+            if (recursive) {
+                sql.append(" where name like :folderName ");
+            } else {
+                sql.append(" where name = :folderName ");
+            }
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
             Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("folderName", "%" + folderName + "%");
+            if (recursive) {
+                query.setParameter("folderName", "%" + folderName + "%");
+            } else {
+                query.setParameter("folderName", folderName);
+            }
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
             }

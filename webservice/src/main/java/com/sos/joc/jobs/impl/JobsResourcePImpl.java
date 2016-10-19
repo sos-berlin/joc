@@ -110,11 +110,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
             for (Folder folderFilter : folders) {
-                if (isOrderJob != null) {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(folderFilter.getFolder(), isOrderJob);
-                } else {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(folderFilter.getFolder(), null);
-                }
+                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(folderFilter.getFolder(), isOrderJob, folderFilter.getRecursive());
                 if (filteredJobs != null && !filteredJobs.isEmpty()) {
                     if (regex != null && !regex.isEmpty()) {
                         List<DBItemInventoryJob> jobsFilteredByRegex = filterByRegex(filteredJobs, regex);
