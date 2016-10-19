@@ -11,6 +11,7 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.jitl.reporting.db.DBLayer;
 
@@ -111,6 +112,34 @@ public class InventorySchedulesDBLayer extends DBLayer {
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);                    
             List result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }        
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventorySchedule> getSchedulesByFolders(String folderPath, Long instanceId, boolean recursive) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
+            sql.append(" where instanceId = :instanceId");
+            if (recursive) {
+                sql.append(" and name like :folderPath");
+            } else {
+                sql.append(" and name = :folderPath");
+            }
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            if (recursive) {
+                query.setParameter("folderPath", "%" + folderPath + "%");
+            } else {
+                query.setParameter("folderPath", folderPath);
+            }
+            List<DBItemInventorySchedule> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
