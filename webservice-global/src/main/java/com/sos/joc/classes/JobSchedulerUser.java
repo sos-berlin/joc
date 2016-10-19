@@ -1,5 +1,7 @@
 package com.sos.joc.classes;
 
+import org.apache.shiro.session.Session;
+
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
@@ -49,7 +51,12 @@ public class JobSchedulerUser {
 
     private void resetTimeOut() {
         if (sosShiroCurrentUser != null) {
-            sosShiroCurrentUser.getCurrentSubject().getSession().touch();
+            Session curSession = sosShiroCurrentUser.getCurrentSubject().getSession(false);
+            if (curSession != null) {
+                curSession.touch();
+            } else {
+                throw new org.apache.shiro.session.InvalidSessionException("Session doesn't exist");
+            }
         }
     }
 }

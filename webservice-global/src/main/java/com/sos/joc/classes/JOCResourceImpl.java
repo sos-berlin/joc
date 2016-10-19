@@ -6,10 +6,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.apache.shiro.session.Session;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -19,7 +19,6 @@ import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Error419;
-import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 
 
 public class JOCResourceImpl {
@@ -81,13 +80,18 @@ public class JOCResourceImpl {
 
         try {
             if (jobschedulerUser.getSosShiroCurrentUser().getAuthorization() != null) {
-                jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession().touch();
+                Session curSession = jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession(false);
+                if (curSession != null) {
+                    curSession.touch();
+                } else {
+                    throw new org.apache.shiro.session.InvalidSessionException("Session doesn't exist");
+                }
             }
             
             if (!jobschedulerUser.isAuthenticated()) {
                 return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
             }
-        } catch (org.apache.shiro.session.ExpiredSessionException e) {
+        } catch (org.apache.shiro.session.InvalidSessionException e) {
             return JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, e.getMessage()));
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);
