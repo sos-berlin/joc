@@ -11,12 +11,11 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChainNode;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 
 /** @author SP */
 public class InventoryJobChainsDBLayer extends DBLayer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryJobsDBLayer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryJobChainsDBLayer.class);
     private String jobSchedulerId;
 
     public InventoryJobChainsDBLayer(SOSHibernateConnection connection, String jobSchedulerId) {
