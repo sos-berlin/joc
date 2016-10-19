@@ -27,19 +27,18 @@ public class JobSchedulerResourceSupervisorPImpl implements IJobSchedulerResourc
         }
         InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
         Long supervisorId = dbItemInventoryInstance.getSupervisorId();
-        dbItemInventoryInstance = dbLayer.getInventoryInstancesByKey(supervisorId);
-
+        if (supervisorId != DBLayer.DEFAULT_ID) {
+            dbItemInventoryInstance = dbLayer.getInventoryInstancesByKey(supervisorId);
+        }
         if (dbItemInventoryInstance == null) {
             return JOCDefaultResponse.responseStatusJSError(String.format(
                     "schedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerFilterSchema.getJobschedulerId(),
                     supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES));
         }
-
         jobSchedulerFilterSchema.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
         jobSchedulerPResource.setJobSchedulerFilterSchema(jobSchedulerFilterSchema);
         Globals.rollback();
         return jobSchedulerPResource.postJobschedulerP();
-
     }
 
 }
