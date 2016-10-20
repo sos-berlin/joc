@@ -22,8 +22,10 @@ public class InventoryOperatingSystemsDBLayer extends DBLayer {
     @SuppressWarnings("unchecked")
     public DBItemInventoryOperatingSystem getInventoryOperatingSystem(Long osId) throws Exception {
         try {
-            String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_OPERATING_SYSTEMS);
-            LOGGER.debug(sql);
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_OPERATING_SYSTEMS);
+            sql.append(" where id = :id");
+            LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", osId);
             List<DBItemInventoryOperatingSystem> result = query.list();
