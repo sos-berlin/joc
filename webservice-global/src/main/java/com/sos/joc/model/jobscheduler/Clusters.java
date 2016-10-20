@@ -40,7 +40,7 @@ public class Clusters {
      * 
      */
     @JsonProperty("cluster")
-    private ClusterType cluster;
+    private Cluster cluster;
 
     /**
      * delivery date
@@ -78,7 +78,7 @@ public class Clusters {
      *     The cluster
      */
     @JsonProperty("cluster")
-    public ClusterType getCluster() {
+    public Cluster getCluster() {
         return cluster;
     }
 
@@ -90,7 +90,7 @@ public class Clusters {
      *     The cluster
      */
     @JsonProperty("cluster")
-    public void setCluster(ClusterType cluster) {
+    public void setCluster(Cluster cluster) {
         this.cluster = cluster;
     }
 

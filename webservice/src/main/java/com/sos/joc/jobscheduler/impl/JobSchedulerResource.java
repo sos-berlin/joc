@@ -75,7 +75,7 @@ public class JobSchedulerResource extends JOCResourceImpl {
     
     private String getXMLCommand() {
         JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-        jsCmdShowState.setWhat(FOLDERS_NO_SUBFOLDERS);;
+        jsCmdShowState.setWhat(FOLDERS_NO_SUBFOLDERS);
         jsCmdShowState.setPath(DOES_NOT_EXIST);
         jsCmdShowState.setSubsystems(FOLDER);
         return jsCmdShowState.toXMLString();

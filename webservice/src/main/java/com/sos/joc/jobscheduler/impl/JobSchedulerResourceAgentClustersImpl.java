@@ -38,6 +38,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             AgentClustersV entity = new AgentClustersV();
 
             // TODO JOC Cockpit Webservice
+            //waiting for https://change.sos-berlin.com/browse/JS-1613
 
             entity.setDeliveryDate(new Date());
             ArrayList<AgentClusterV> listOfAgentClusters = new ArrayList<AgentClusterV>();
