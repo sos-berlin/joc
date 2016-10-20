@@ -15,6 +15,7 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.jobscheduler.ClusterMembersPermanent;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
 import com.sos.joc.exceptions.JocException;
@@ -43,55 +44,7 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
             }
             MastersP entity = new MastersP();
             entity.setDeliveryDate(new Date());
-            ArrayList<JobSchedulerP> masters = new ArrayList<JobSchedulerP>();
-
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            List<DBItemInventoryInstance> schedulersFromDb = instanceLayer.getInventoryInstancesBySchedulerId(jobSchedulerFilterSchema.getJobschedulerId());
-            if(schedulersFromDb != null && !schedulersFromDb.isEmpty()) {
-                for (DBItemInventoryInstance instance : schedulersFromDb) {
-                    JobSchedulerP jobscheduler = new JobSchedulerP();
-                    jobscheduler.setHost(instance.getHostname());
-                    jobscheduler.setJobschedulerId(instance.getSchedulerId());
-                    jobscheduler.setPort(instance.getPort());
-                    jobscheduler.setStartedAt(instance.getStartedAt());
-                    ClusterMemberType clusterMemberType = new ClusterMemberType();
-                    clusterMemberType.setPrecedence(instance.getPrecedence());
-                    switch (instance.getClusterType().toUpperCase()) {
-                        case "STANDALONE":
-                            clusterMemberType.set_type(ClusterType.STANDALONE);
-                            break;
-                        case "ACTIVE":
-                            clusterMemberType.set_type(ClusterType.ACTIVE);
-                            break;
-                        case "PASSIVE":
-                            clusterMemberType.set_type(ClusterType.PASSIVE);
-                            break;
-                    }
-                    jobscheduler.setClusterType(clusterMemberType);
-                    jobscheduler.setTimeZone(instance.getTimeZone());
-                    jobscheduler.setVersion(instance.getVersion());
-                    jobscheduler.setSurveyDate(instance.getModified());
-                    InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
-                    DBItemInventoryOperatingSystem osFromDb = osLayer.getInventoryOperatingSystem(instance.getOsId());
-                    if (osFromDb != null) {
-                        OperatingSystem os = new OperatingSystem();
-                        os.setArchitecture(osFromDb.getArchitecture());
-                        os.setDistribution(osFromDb.getDistribution());
-                        os.setName(osFromDb.getName());
-                        jobscheduler.setOs(os);
-                    }
-                    if(instance.getSupervisorId() != DBLayer.DEFAULT_ID) {
-                        DBItemInventoryInstance supervisorFromDb = instanceLayer.getInventoryInstancesByKey(instance.getSupervisorId());
-                        HostPortParameter supervisor = new HostPortParameter();
-                        supervisor.setHost(supervisorFromDb.getHostname());
-                        supervisor.setJobschedulerId(supervisorFromDb.getSchedulerId());
-                        supervisor.setPort(supervisorFromDb.getPort());
-                        jobscheduler.setSupervisor(supervisor);
-                    }
-                    masters.add(jobscheduler);
-                }               
-            }
-            entity.setMasters(masters);
+            entity.setMasters(ClusterMembersPermanent.getClusterMembers(jobSchedulerFilterSchema.getJobschedulerId()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
