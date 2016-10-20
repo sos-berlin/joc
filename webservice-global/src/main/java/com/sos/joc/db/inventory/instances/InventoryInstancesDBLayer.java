@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 
 /** @author Uwe Risse */
@@ -30,6 +29,23 @@ public class InventoryInstancesDBLayer extends DBLayer {
             List<DBItemInventoryInstance> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return getRunningJobSchedulerClusterMember(result);
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws Exception {
+        try {
+            String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
+            LOGGER.debug(sql);
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            List<DBItemInventoryInstance> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
             }
             return null;
         } catch (Exception ex) {
@@ -79,7 +95,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     
     private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList) {
         switch (schedulerInstancesDBList.get(0).getClusterType()) {
-        case "active":
+        case "passive":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getCommandUrl());
@@ -93,7 +109,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
                 }
             }
             break;
-        case "passive":
+        case "active":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getCommandUrl());
