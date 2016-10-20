@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -28,7 +29,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
 
     @Override
     public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilterSchema) {
-        LOGGER.debug("init jobscheduler/cluster");
+        LOGGER.debug("jobscheduler/cluster");
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
@@ -49,10 +50,13 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
             Element clusterElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/state/cluster");
             if (clusterElem == null) {
                 cluster.set_type(ClusterType.STANDALONE);
-            } else if (clusterElem.hasAttribute("exclusive") || clusterElem.hasAttribute("backup")) {
-                cluster.set_type(ClusterType.PASSIVE);
             } else {
-                cluster.set_type(ClusterType.ACTIVE);
+                NodeList clusterMembers = jocXmlCommand.getSosxml().selectNodeList(clusterElem,"cluster_member[@distributed_orders='yes']");
+                if (clusterMembers != null && clusterMembers.getLength() > 0) {
+                    cluster.set_type(ClusterType.ACTIVE);
+                } else {
+                    cluster.set_type(ClusterType.PASSIVE);
+                }
             }
             Clusters entity = new Clusters();
             entity.setDeliveryDate(Date.from(Instant.now()));
