@@ -59,7 +59,7 @@ public class JobChainVolatile extends JobChainV {
     public void setPath() {
         if (getPath() == null) {
             setPath(jobChain.getAttribute(WebserviceConstants.PATH));
-            LOGGER.info("...processing jobChain: " + getPath());
+            LOGGER.debug("...processing jobChain: " + getPath());
         }
     }
 

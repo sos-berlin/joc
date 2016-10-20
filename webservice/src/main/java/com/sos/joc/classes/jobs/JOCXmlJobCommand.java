@@ -116,7 +116,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         StringBuilder x = new StringBuilder();
         x.append(xPath);
         if (jobsFilter.getIsOrderJob() != null) {
-            LOGGER.info(String.format("...consider filtering by 'isOrderJob=%1$b'", jobsFilter.getIsOrderJob()));
+            LOGGER.debug(String.format("...consider filtering by 'isOrderJob=%1$b'", jobsFilter.getIsOrderJob()));
             if (jobsFilter.getIsOrderJob()) {
                 x.append("[@order='yes']"); 
             } else {
@@ -124,25 +124,25 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
             }
         }
         NodeList jobNodes = getSosxml().selectNodeList(x.toString());
-        LOGGER.info("..." + jobNodes.getLength() + " jobs found");
+        LOGGER.debug("..." + jobNodes.getLength() + " jobs found");
         Map<String, JobV> jobMap = new HashMap<String,JobV>();
         for (int i= 0; i < jobNodes.getLength(); i++) {
            Element jobElem = (Element) jobNodes.item(i);
            JobVolatile jobV = new JobVolatile(jobElem, this);
            jobV.setPath();
            if (!FilterAfterResponse.matchRegex(jobsFilter.getRegex(), jobV.getPath())) {
-               LOGGER.info("...processing skipped caused by 'regex=" + jobsFilter.getRegex() + "'");
+               LOGGER.debug("...processing skipped caused by 'regex=" + jobsFilter.getRegex() + "'");
                continue; 
            }
            jobV.setState();
            if (!FilterAfterResponse.filterStateHasState(jobsFilter.getStates(), jobV.getState().get_text())) {
-               LOGGER.info(String.format("...processing skipped because job's state '%1$s' doesn't contain in state filter '%2$s'", jobV.getState().get_text().name(),jobsFilter.getStates().toString()));
+               LOGGER.debug(String.format("...processing skipped because job's state '%1$s' doesn't contain in state filter '%2$s'", jobV.getState().get_text().name(),jobsFilter.getStates().toString()));
                continue; 
            }
            jobV.setFields(jobsFilter.getCompact());
            jobMap.put(jobV.getPath(), jobV);
         }
-        //LOGGER.info("..." + jobMap.size() + " jobs processed");
+        //LOGGER.debug("..." + jobMap.size() + " jobs processed");
         return new ArrayList<JobV>(jobMap.values());
     }
     

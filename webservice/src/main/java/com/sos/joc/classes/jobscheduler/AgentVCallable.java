@@ -10,7 +10,6 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;

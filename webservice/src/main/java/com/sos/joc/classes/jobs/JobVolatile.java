@@ -54,7 +54,7 @@ public class JobVolatile extends JobV {
     public void setPath() {
         if (getPath() == null) {
             setPath(job.getAttribute(WebserviceConstants.PATH));
-            LOGGER.info("...processing job: " + getPath());
+            LOGGER.debug("...processing job: " + getPath());
         }
     }
 

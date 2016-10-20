@@ -147,7 +147,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         StringBuilder x = new StringBuilder();
         x.append(xPath);
         NodeList jobChainNodes = getSosxml().selectNodeList(x.toString());
-        LOGGER.info("..." + jobChainNodes.getLength() + " jobChains found");
+        LOGGER.debug("..." + jobChainNodes.getLength() + " jobChains found");
         
         Map<String, JobChainVolatile> jobChainMap = new HashMap<String, JobChainVolatile>();
         List<OrdersSummaryCallable> summaryTasks = new ArrayList<OrdersSummaryCallable>();
@@ -160,12 +160,12 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            JobChainVolatile jobChainV = new JobChainVolatile(jobChainElem, this);
            jobChainV.setPath();
            if (!FilterAfterResponse.matchRegex(jobChainsFilter.getRegex(), jobChainV.getPath())) {
-               LOGGER.info("...processing skipped caused by 'regex=" + jobChainsFilter.getRegex() + "'");
+               LOGGER.debug("...processing skipped caused by 'regex=" + jobChainsFilter.getRegex() + "'");
                continue; 
            }
            jobChainV.setState();
            if (!FilterAfterResponse.filterStateHasState(jobChainsFilter.getStates(), jobChainV.getState().get_text())) {
-               LOGGER.info(String.format("...processing skipped because jobChain's state '%1$s' doesn't contain in state filter '%2$s'", jobChainV.getState().get_text().name(),jobChainsFilter.getStates().toString()));
+               LOGGER.debug(String.format("...processing skipped because jobChain's state '%1$s' doesn't contain in state filter '%2$s'", jobChainV.getState().get_text().name(),jobChainsFilter.getStates().toString()));
                continue; 
            }
            jobChainV.setFields(jobChainsFilter.getCompact());
@@ -191,7 +191,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                 } 
             }
         }
-        //LOGGER.info("..." + jobChainMap.size() + " jobChains processed");
+        //LOGGER.debug("..." + jobChainMap.size() + " jobChains processed");
         return new ArrayList<JobChainV>(jobChainMap.values());
     }
     
