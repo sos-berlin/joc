@@ -2,16 +2,19 @@ package com.sos.joc.jobscheduler.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembersP;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.ClusterMemberType;
+import com.sos.joc.model.jobscheduler.ClusterType;
 import com.sos.joc.model.jobscheduler.HostPortParameter;
 import com.sos.joc.model.jobscheduler.JobSchedulerP;
 import com.sos.joc.model.jobscheduler.MastersP;
@@ -45,7 +48,7 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
 
             ClusterMemberType clusterMemberTypeSchema = new ClusterMemberType();
             clusterMemberTypeSchema.setPrecedence(-1);
-            clusterMemberTypeSchema.set_type(ClusterMemberType._type.STANDALONE);
+            clusterMemberTypeSchema.set_type(ClusterType.STANDALONE);
             jobscheduler.setClusterType(clusterMemberTypeSchema);
 
             OperatingSystem os = new OperatingSystem();
@@ -73,7 +76,7 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
 
             ClusterMemberType clusterMemberTypeSchema2 = new ClusterMemberType();
             clusterMemberTypeSchema2.setPrecedence(-1);
-            clusterMemberTypeSchema2.set_type(ClusterMemberType._type.STANDALONE);
+            clusterMemberTypeSchema2.set_type(ClusterType.STANDALONE);
             jobscheduler.setClusterType(clusterMemberTypeSchema2);
 
             OperatingSystem os2 = new OperatingSystem();

@@ -18,6 +18,7 @@ import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.ClusterMemberType;
+import com.sos.joc.model.jobscheduler.ClusterType;
 import com.sos.joc.model.jobscheduler.HostPortParameter;
 import com.sos.joc.model.jobscheduler.JobSchedulerP;
 import com.sos.joc.model.jobscheduler.JobSchedulerP200;
@@ -60,7 +61,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             
             ClusterMemberType clusterMemberTypeSchema = new ClusterMemberType();
             clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getPrecedence());
-            clusterMemberTypeSchema.set_type(ClusterMemberType._type.fromValue(dbItemInventoryInstance.getClusterType()));
+            clusterMemberTypeSchema.set_type(ClusterType.fromValue(dbItemInventoryInstance.getClusterType()));
             jobscheduler.setClusterType(clusterMemberTypeSchema);
 
             InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
