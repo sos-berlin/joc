@@ -11,11 +11,13 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
@@ -36,6 +38,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     private List<OrderPath> ordersFilter = null;
     private List<Folder> foldersFilter = null;
     private Boolean compact = null;
+    private Long instanceId;
 
     @Override
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilter ordersFilterSchema) throws Exception {
@@ -57,7 +60,11 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             OrdersP entity = new OrdersP();
             entity.setDeliveryDate(new Date());
 
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection, ordersFilterSchema.getJobschedulerId());
+            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(ordersFilterSchema.getJobschedulerId());
+            instanceId = instance.getId();
+            
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
             // FILTERS
             dateFromFilter = ordersFilterSchema.getDateFrom();
             dateToFilter = ordersFilterSchema.getDateTo();
@@ -71,20 +78,22 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (ordersFilter != null && !ordersFilter.isEmpty()) {
                 for (OrderPath order : ordersFilter) {
-                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(order.getJobChain(), order.getOrderId());
+                    List<DBItemInventoryOrder> filteredOrders =
+                            dbLayer.getInventoryOrdersFilteredByOrders(order.getJobChain(), order.getOrderId(), instanceId);
                     if (filteredOrders != null && !filteredOrders.isEmpty()) {
                         ordersFromDB.addAll(filteredOrders);
                     }
                 }
             } else if (foldersFilter != null && !foldersFilter.isEmpty()) {
                 for (Folder folder : foldersFilter) {
-                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(folder.getFolder(), folder.getRecursive());
+                    List<DBItemInventoryOrder> filteredOrders =
+                            dbLayer.getInventoryOrdersFilteredByFolders(folder.getFolder(), folder.getRecursive(), instanceId);
                     if (filteredOrders != null && !filteredOrders.isEmpty()) {
                         ordersFromDB.addAll(filteredOrders);
                     }
                 }
             } else if (regex != null && !regex.isEmpty()) {
-                List<DBItemInventoryOrder> unfilteredOrders = dbLayer.getInventoryOrders();
+                List<DBItemInventoryOrder> unfilteredOrders = dbLayer.getInventoryOrders(instanceId);
                 for (DBItemInventoryOrder unfilteredOrder : unfilteredOrders) {
                     Matcher regExMatcher = Pattern.compile(regex).matcher(unfilteredOrder.getName());
                     if (regExMatcher.find()) {
@@ -92,7 +101,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                     }
                 }
             } else {
-                ordersFromDB = dbLayer.getInventoryOrders();
+                ordersFromDB = dbLayer.getInventoryOrders(instanceId);
             }
             entity.setOrders(fillOutputOrders(ordersFromDB, dbLayer));
             return JOCDefaultResponse.responseStatus200(entity);

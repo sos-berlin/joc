@@ -7,11 +7,13 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderP200;
@@ -24,6 +26,7 @@ import com.sos.joc.order.resource.IOrderPResource;
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderPResourceImpl.class);
+    private Long instanceId;
 
     @Override
     public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilterWithCompactSchema) throws Exception {
@@ -35,12 +38,16 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
                 return jocDefaultResponse;
             }
             /** FILTER: compact */
+            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(orderFilterWithCompactSchema.getJobschedulerId());
+            instanceId = instance.getId();
+            
+
             Boolean compact = orderFilterWithCompactSchema.getCompact();
             OrderP200 entity = new OrderP200();
-            InventoryOrdersDBLayer dbLayer =
-                    new InventoryOrdersDBLayer(Globals.sosHibernateConnection, orderFilterWithCompactSchema.getJobschedulerId());
-            DBItemInventoryOrder dbItemInventoryOrder =
-                    dbLayer.getInventoryOrderByOrderId(orderFilterWithCompactSchema.getJobChain(), orderFilterWithCompactSchema.getOrderId());
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
+            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilterWithCompactSchema.getJobChain(),
+                    orderFilterWithCompactSchema.getOrderId(), instanceId);
             entity.setDeliveryDate(new Date());
             OrderP order = new OrderP();
             // Required fields
