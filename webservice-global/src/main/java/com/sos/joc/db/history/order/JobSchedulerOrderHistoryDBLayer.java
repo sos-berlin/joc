@@ -45,16 +45,17 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
 
     public Long getOrderEstimatedDuration(String orderId) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("select history from ");
-            sql.append(SchedulerOrderHistoryDBItem.class.getSimpleName()).append(" history ");
-            sql.append("where history.orderId = :orderId");
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ");
+            sql.append(SchedulerOrderHistoryDBItem.class.getSimpleName());
+            sql.append(" where orderId = :orderId");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("orderId", orderId);
             List<SchedulerOrderHistoryDBItem> result = query.list();
             if (result != null) {
                 Long durationSum = 0L;
-                Integer count = result.size();
+                int count = result.size();
                 for (SchedulerOrderHistoryDBItem orderHistory : result) {
                     OrderDuration duration = new OrderDuration();
                     duration.setStartTime(orderHistory.getStartTime());
@@ -62,7 +63,7 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
                     duration.initDuration();
                     durationSum += duration.getDurationInMillis();
                 }
-                if (count != null && count != 0) {
+                if (count != 0) {
                     return durationSum / count;
                 }
             }
