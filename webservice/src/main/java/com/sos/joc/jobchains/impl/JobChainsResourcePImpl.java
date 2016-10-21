@@ -11,11 +11,13 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JobChainPermanent;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchains.resource.IJobChainsResourceP;
@@ -35,6 +37,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
     private String jobschedulerId;
     private String regex;
     private List<JobChainP> allNestedJobChains = new ArrayList<JobChainP>();
+    private Long instanceId;
   
      
     @Override
@@ -53,13 +56,17 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             jobschedulerId = jobChainsFilter.getJobschedulerId();
             regex = jobChainsFilter.getRegex();
             
+            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jobChainsFilter.getJobschedulerId());
+            instanceId = instance.getId();
+
             JobChainsP entity = new JobChainsP();
             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection, jobschedulerId);
             List<JobChainP> jobChains = new ArrayList<JobChainP>();
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 for (JobChainPath jobChainPath : jobChainPaths) {
-                    DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(jobChainPath.getJobChain());
-                    JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact);
+                    DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(jobChainPath.getJobChain(), instanceId);
+                    JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                     if (jobChain != null) {
                         jobChains.add(jobChain);
                         initNestedJobChainsIfExists(dbLayer, jobChain);
@@ -67,16 +74,17 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChainsByFolder(folder.getFolder(), folder.getRecursive());
+                    List<DBItemInventoryJobChain> jobChainsFromDb =
+                            dbLayer.getJobChainsByFolder(folder.getFolder(), folder.getRecursive(), instanceId);
                     for(DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
                         JobChainP jobChain = null;
                         if (regex != null && !regex.isEmpty()) {
                             Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
                             if (regExMatcher.find()) {
-                                jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact); 
+                                jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId); 
                             }
                         } else {
-                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact);
+                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                         }
                         if (jobChain != null) {
                             jobChains.add(jobChain);
@@ -85,16 +93,16 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                     }
                 }
             } else {
-                List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChains();
+                List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChains(instanceId);
                 for(DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
                     JobChainP jobChain = null;
                     if (regex != null && !regex.isEmpty()) {
                         Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
                         if (regExMatcher.find()) {
-                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact);
+                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                         }
                     } else {
-                        jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact);
+                        jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                     }
                     if (jobChain != null) {
                         jobChains.add(jobChain);
@@ -127,12 +135,12 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             for(String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
                 DBItemInventoryJobChain nestedJobChain = null;
                 if(nestedJobChainName.contains("/")) {
-                    nestedJobChain = dbLayer.getJobChainByPath(nestedJobChainName);
+                    nestedJobChain = dbLayer.getJobChainByPath(nestedJobChainName, instanceId);
                 } else {
-                    nestedJobChain = dbLayer.getJobChainByName(nestedJobChainName);
+                    nestedJobChain = dbLayer.getJobChainByName(nestedJobChainName, instanceId);
                 }
                 if (nestedJobChain != null) {
-                    JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, compact);
+                    JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, compact, instanceId);
                     if (nestedJobChainP != null) {
                         nestedJobChains.add(nestedJobChainP); 
                     }

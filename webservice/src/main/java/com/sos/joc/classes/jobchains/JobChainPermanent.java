@@ -21,12 +21,13 @@ public class JobChainPermanent {
 
     public static final Set<String> NESTED_JOB_CHAIN_NAMES = new HashSet<String>();
 
-    public static JobChainP initJobChainP(InventoryJobChainsDBLayer dbLayer, DBItemInventoryJobChain inventoryJobChain, Boolean compact) throws Exception {
+    public static JobChainP initJobChainP(InventoryJobChainsDBLayer dbLayer, DBItemInventoryJobChain inventoryJobChain, Boolean compact,
+            Long instanceId) throws Exception {
         JobChainP jobChain = new JobChainP();
         jobChain.setSurveyDate(inventoryJobChain.getModified());
         jobChain.setPath(inventoryJobChain.getName());
         jobChain.setName(inventoryJobChain.getBaseName());
-        List<DBItemInventoryJobChainNode> jobChainNodesFromDb = dbLayer.getJobChainNodesByJobChainId(inventoryJobChain.getId());
+        List<DBItemInventoryJobChainNode> jobChainNodesFromDb = dbLayer.getJobChainNodesByJobChainId(inventoryJobChain.getId(), instanceId);
         if (jobChainNodesFromDb != null) {
             jobChain.setNumOfNodes(jobChainNodesFromDb.size());
         }

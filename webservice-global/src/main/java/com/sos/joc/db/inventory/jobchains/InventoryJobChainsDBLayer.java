@@ -24,13 +24,15 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryJobChain getJobChainByPath(String jobChainPath) throws Exception {
+    public DBItemInventoryJobChain getJobChainByPath(String jobChainPath, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where name = :name");
+            sql.append(" and instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("name", jobChainPath);
+            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
@@ -42,13 +44,15 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public DBItemInventoryJobChain getJobChainByName(String jobChainName) throws Exception {
+    public DBItemInventoryJobChain getJobChainByName(String jobChainName, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where baseName = :name");
+            sql.append(" and instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("name", jobChainName);
+            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
@@ -80,13 +84,16 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id) throws Exception {
+    public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id, Long instanceId) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES);
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES);
             sql.append(" where jobChainId = :id");
+            sql.append(" and instanceId = :instanceId");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
+            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChainNode> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;
@@ -98,7 +105,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath, boolean recursive) throws Exception {
+    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath, boolean recursive, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
@@ -107,12 +114,14 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             } else {
                 sql.append(" where name = :name");
             }
+            sql.append(" and instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             if (recursive) {
                 query.setParameter("name", "%" + folderPath + "%");
             } else {
                 query.setParameter("name", folderPath);
             }
+            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;
@@ -124,15 +133,13 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChains() throws Exception {
+    public List<DBItemInventoryJobChain> getJobChains(Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select jobchains from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" jobchains, ");
-            sql.append(DBITEM_INVENTORY_INSTANCES).append(" instance ");
-            sql.append("where jobchains.instanceId = instance.id ");
-            sql.append("and instance.schedulerId = :jobschedulerId");
+            sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
+            sql.append(" where instanceId = :instanceId");
            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("jobschedulerId", this.jobSchedulerId);
+            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;
