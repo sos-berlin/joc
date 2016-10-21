@@ -11,11 +11,13 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JobPermanent;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
@@ -32,6 +34,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
     private List<Folder> folders;
     private List<JobPath> jobs;
     private Boolean isOrderJob;
+    private Long instanceId;
 
     @Override
     public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilterSchema) throws Exception {
@@ -50,10 +53,13 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             isOrderJob = jobsFilterSchema.getIsOrderJob();
             List<JobP> listJobs = new ArrayList<JobP>();
 
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection, jobsFilterSchema.getJobschedulerId());
+            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
+            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jobsFilterSchema.getJobschedulerId());
+            instanceId = instance.getId();
             List<DBItemInventoryJob> listOfJobs = processFilters(dbLayer);
             for (DBItemInventoryJob inventoryJob : listOfJobs) {
-                JobP job = JobPermanent.getJob(inventoryJob, dbLayer, compact);
+                JobP job = JobPermanent.getJob(inventoryJob, dbLayer, compact, instanceId);
                 if (job != null) {
                     listJobs.add(job);
                 }
@@ -94,9 +100,9 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             List<DBItemInventoryJob> filteredJobs = null;
             for (JobPath jobPathFilter : jobs) {
                 if (isOrderJob != null) {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(jobPathFilter.getJob(), isOrderJob);
+                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(jobPathFilter.getJob(), isOrderJob, instanceId);
                 } else {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(jobPathFilter.getJob(), null);
+                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(jobPathFilter.getJob(), null, instanceId);
                 }
                 if (filteredJobs != null) {
                     listOfJobs.addAll(filteredJobs);
@@ -106,7 +112,8 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
             for (Folder folderFilter : folders) {
-                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(folderFilter.getFolder(), isOrderJob, folderFilter.getRecursive());
+                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(folderFilter.getFolder(), isOrderJob, folderFilter.getRecursive(),
+                        instanceId);
                 if (filteredJobs != null && !filteredJobs.isEmpty()) {
                     if (regex != null && !regex.isEmpty()) {
                         List<DBItemInventoryJob> jobsFilteredByRegex = filterByRegex(filteredJobs, regex);
@@ -122,9 +129,9 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> unfilteredJobs = null;
             if (isOrderJob != null) {
-                unfilteredJobs = dbLayer.getInventoryJobs(isOrderJob);
+                unfilteredJobs = dbLayer.getInventoryJobs(isOrderJob, instanceId);
             } else {
-                unfilteredJobs = dbLayer.getInventoryJobs();
+                unfilteredJobs = dbLayer.getInventoryJobs(instanceId);
             }
             if (unfilteredJobs != null && !unfilteredJobs.isEmpty()) {
                 if (regex != null && !regex.isEmpty()) {

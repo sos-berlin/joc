@@ -25,8 +25,8 @@ public class JobPermanent {
         return null;
     }
 
-    public static List<LockUseP> getLocks(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer) throws Exception {
-        List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksIfExists(job.getId());
+    public static List<LockUseP> getLocks(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer, Long instanceId) throws Exception {
+        List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksIfExists(job.getId(), instanceId);
         List<LockUseP> locks = new ArrayList<LockUseP>();
         if (locksFromDb != null) {
             for (DBItemInventoryLock lockFromDb : locksFromDb) {
@@ -40,11 +40,12 @@ public class JobPermanent {
         }
     }
     
-    public static List<DBItemInventoryJobChain> getJobChains(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer) throws Exception {
-        return dbLayer.getJobChainsByJobId(job.getId());
+    public static List<DBItemInventoryJobChain> getJobChains(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer, Long instanceId)
+            throws Exception {
+        return dbLayer.getJobChainsByJobId(job.getId(), instanceId);
     }
     
-    public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, Boolean compact) throws Exception {
+    public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, Boolean compact, Long instanceId) throws Exception {
         JobP job = new JobP();
         job.setHasDescription(inventoryJob.getHasDescription());
         job.setIsOrderJob(inventoryJob.getIsOrderJob());
@@ -67,12 +68,12 @@ public class JobPermanent {
             } else if (inventoryJob.getProcessClass() != null) {
                 job.setProcessClass(inventoryJob.getProcessClass());
             }
-            List<LockUseP> locks = JobPermanent.getLocks(inventoryJob, dbLayer);
+            List<LockUseP> locks = JobPermanent.getLocks(inventoryJob, dbLayer, instanceId);
             if(locks != null && !locks.isEmpty()) {
                 job.setLocks(locks);
             }
             if (inventoryJob.getIsOrderJob()) {
-                List<DBItemInventoryJobChain> jobChainsFromDb = JobPermanent.getJobChains(inventoryJob, dbLayer);
+                List<DBItemInventoryJobChain> jobChainsFromDb = JobPermanent.getJobChains(inventoryJob, dbLayer, instanceId);
                 if (jobChainsFromDb != null && !jobChainsFromDb.isEmpty()) {
                     ArrayList<String> jobChains = new ArrayList<String>();
                     for (DBItemInventoryJobChain chain : jobChainsFromDb) {

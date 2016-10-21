@@ -61,7 +61,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             instanceId = instance.getId();
 
             JobChainsP entity = new JobChainsP();
-            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection, jobschedulerId);
+            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
             List<JobChainP> jobChains = new ArrayList<JobChainP>();
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 for (JobChainPath jobChainPath : jobChainPaths) {

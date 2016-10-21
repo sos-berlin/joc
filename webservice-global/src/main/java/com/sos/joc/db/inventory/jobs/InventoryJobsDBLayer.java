@@ -17,24 +17,22 @@ import com.sos.jitl.reporting.db.DBLayer;
 public class InventoryJobsDBLayer extends DBLayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryJobsDBLayer.class);
-    private String jobSchedulerId;
 
-    public InventoryJobsDBLayer(SOSHibernateConnection conn, String jobSchedulerId) {
+    public InventoryJobsDBLayer(SOSHibernateConnection conn) {
         super(conn);
-        this.jobSchedulerId = jobSchedulerId;
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryJob getInventoryJobByName(String name) throws Exception {
+    public DBItemInventoryJob getInventoryJobByName(String name, Long instanceId) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("select job from ");
-            sql.append(DBITEM_INVENTORY_JOBS + " as job, " + DBITEM_INVENTORY_INSTANCES + " as instance");
-            sql.append(" where job.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "' and");
-            sql.append(" (name)  = :name");
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ");
+            sql.append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where job.instanceId = :instanceId");
+            sql.append(" name  = :name");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("name", name);
-
             List<DBItemInventoryJob> result = query.list();
             if (!result.isEmpty()) {
                 return result.get(0);
@@ -46,13 +44,13 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobs() throws Exception {
+    public List<DBItemInventoryJob> getInventoryJobs(Long instanceId) throws Exception {
         try {
-            StringBuilder sql = new StringBuilder("select job from ");
-            sql.append(DBITEM_INVENTORY_JOBS + " as job, " + DBITEM_INVENTORY_INSTANCES + " as instance");
-            sql.append(" where job.instanceId = instance.id and instance.schedulerId = '" + this.jobSchedulerId + "'");
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where job.instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
-
+            query.setParameter("instanceId", instanceId);
             return query.list();
         } catch (Exception ex) {
             throw new Exception(SOSHibernateConnection.getException(ex));
@@ -60,17 +58,16 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob) throws Exception {
+    public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select job from ");
-            sql.append(DBITEM_INVENTORY_JOBS).append(" job, ");
-            sql.append(DBITEM_INVENTORY_INSTANCES).append(" instance");
-            sql.append(" where job.instanceId = instance.id");
-            sql.append(" and instance.schedulerId = '" + this.jobSchedulerId + "'");
-            sql.append(" and job.isOrderJob = :isOrderJob");
+            sql.append("from ");
+            sql.append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and isOrderJob = :isOrderJob");
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("isOrderJob", isOrderJob);
+            query.setParameter("instanceId", instanceId);
             return query.list();
         } catch (Exception ex) {
             throw new Exception(SOSHibernateConnection.getException(ex));
@@ -99,15 +96,17 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryLock> getLocksIfExists(Long id) throws Exception {
+    public List<DBItemInventoryLock> getLocksIfExists(Long id, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select il from ").append(DBITEM_INVENTORY_LOCKS).append(" il, ");
-            sql.append(DBITEM_INVENTORY_APPLIED_LOCKS).append(" ial ");
-            sql.append("where il.id = ial.lockId ");
-            sql.append("and ial.jobId = :id");
+            sql.append(DBITEM_INVENTORY_APPLIED_LOCKS).append(" ial");
+            sql.append(" where il.id = ial.lockId");
+            sql.append(" and ial.jobId = :id");
+            sql.append(" and il.instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
+            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryLock> result = query.list();
             if (result != null) {
                 return result;
@@ -119,15 +118,17 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
  
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChainsByJobId(Long id) throws Exception {
+    public List<DBItemInventoryJobChain> getJobChainsByJobId(Long id, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ijc from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
             sql.append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn ");
             sql.append("where ijc.id = ijcn.jobChainId ");
-            sql.append("and ijcn.jobId = :id");
+            sql.append("and ijcn.jobId = :id ");
+            sql.append("and ijc.instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
+            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null) {
                 return result;
@@ -139,7 +140,7 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
  
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob) throws Exception {
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOBS);
@@ -147,11 +148,13 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
+            sql.append(" and instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("jobPath", jobPath);
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
             }
+            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJob> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;
@@ -163,7 +166,8 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, boolean recursive) throws Exception {
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, boolean recursive, Long instanceId)
+            throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOBS);
@@ -172,6 +176,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             } else {
                 sql.append(" where name = :folderName ");
             }
+            sql.append(" and instanceId = :instanceId");
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
@@ -181,6 +186,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             } else {
                 query.setParameter("folderName", folderName);
             }
+            query.setParameter("instanceId", instanceId);
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
             }

@@ -40,7 +40,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
             }
 
             JobChainP200 entity = new JobChainP200();
-            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection, jobChainFilter.getJobschedulerId());
+            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jobChainFilter.getJobschedulerId());
             instanceId = instance.getId();

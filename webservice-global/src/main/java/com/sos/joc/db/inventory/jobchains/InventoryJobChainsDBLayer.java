@@ -16,11 +16,9 @@ import com.sos.jitl.reporting.db.DBLayer;
 public class InventoryJobChainsDBLayer extends DBLayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryJobChainsDBLayer.class);
-    private String jobSchedulerId;
 
-    public InventoryJobChainsDBLayer(SOSHibernateConnection connection, String jobSchedulerId) {
+    public InventoryJobChainsDBLayer(SOSHibernateConnection connection) {
         super(connection);
-        this.jobSchedulerId = jobSchedulerId;
     }
 
     @SuppressWarnings("unchecked")
