@@ -14,7 +14,6 @@ import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.ClusterMemberType;
@@ -26,7 +25,7 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;
 
 public class JobSchedulerResourceP extends JOCResourceImpl {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceP.class);
     private String accessToken;
     private JobSchedulerId jobSchedulerId;
 

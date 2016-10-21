@@ -25,11 +25,12 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceCluster {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceClusterImpl.class);
+    private static final String API_CALL = "API-CALL: ./jobscheduler/cluster";
 
     @Override
     public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilterSchema) {
-        LOGGER.debug("jobscheduler/cluster");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
@@ -64,6 +65,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);

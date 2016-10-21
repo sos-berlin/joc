@@ -76,9 +76,9 @@ public class JOCJsonCommand {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Content-Type", "application/json");
         client.addHeader("Accept", "application/json");
-        LOGGER.info("call " + uri.toString());
+        LOGGER.debug("call " + uri.toString());
         if (postBody != null) {
-            LOGGER.info("with POST body: " + postBody); 
+            LOGGER.debug("with POST body: " + postBody); 
         }
         String response = client.executeRestServiceCommand("post", uri.toURL(), postBody);
         return getJsonObjectFromResponse(response, client);
@@ -91,7 +91,7 @@ public class JOCJsonCommand {
     public JsonObject getJsonObjectFromGet(URI uri) throws Exception {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Accept", "application/json");
-        LOGGER.info("call " + uri.toString());
+        LOGGER.debug("call " + uri.toString());
         String response = client.executeRestServiceCommand("get", uri.toURL());
         return getJsonObjectFromResponse(response, client);
     }

@@ -1,38 +1,39 @@
 package com.sos.joc.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.model.common.Err;
 
-public class JocError {
+public class JocError extends Err{
     
-    private String code = "JOC-420";
-    private String message = "";
+    @JsonIgnore
+    private StringBuilder metaInfo = new StringBuilder();
 
+    @JsonIgnore
     public JocError() {
+        setCode("JOC-420");
     }
 
+    @JsonIgnore
+    public JocError(String message) {
+        setCode("JOC-420");
+        setMessage(message);
+    }
+
+    @JsonIgnore
     public JocError(String code, String message) {
-        this.code = code;
-        this.message = message;
+        setCode(code);
+        setMessage(message);
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+    @JsonIgnore
+    public void addMetaInfo(String ...str) {
+        for(String s : str) {
+            metaInfo.append(s + "\n");
+        }
     }
     
-    @Override
-    public String toString() {
-        return String.format("%1$s: %2$s", code, message);
+    @JsonIgnore
+    public String getMetaInfo() {
+        return metaInfo.toString();
     }
-
 }

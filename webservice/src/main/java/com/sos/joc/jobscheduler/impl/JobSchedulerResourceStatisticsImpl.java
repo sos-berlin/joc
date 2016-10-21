@@ -1,6 +1,5 @@
 package com.sos.joc.jobscheduler.impl;
 
-import java.util.Date;
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
@@ -8,14 +7,13 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceStatistics;
 import com.sos.joc.model.common.JobSchedulerId;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implements IJobSchedulerResourceStatistics {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceStatisticsImpl.class);
 
     @Override
     public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerId jobSchedulerFilterSchema) throws Exception {
@@ -27,60 +25,8 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
                 return jocDefaultResponse;
             }
 
-//            StatisticsSchema entity = new StatisticsSchema();
-//            entity.setDeliveryDate(new Date());
-
-//            Jobs jobschedulerJobs = new Jobs();
-//            Tasks jobschedulerTasks = new Tasks();
-//            Orders jobschedulerOrders = new Orders();
-//            JobChains jobschedulerJobChains = new JobChains();
-//
-//            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
-//            jocXmlCommand.excutePost(" <subsystem.show what=\"statistics\"/>");
-//
-//            entity.setSurveyDate(jocXmlCommand.getSurveyDate());
-//
-//            jocXmlCommand.executeXPath("//subsystem[@name='job']//file_based.statistics");
-//            jobschedulerJobs.setAny(jocXmlCommand.getAttributeAsIntegerOr0("count"));
-//            jocXmlCommand.executeXPath("//subsystem[@name='job']//job.statistic[@need_process='true']");
-//            jobschedulerJobs.setNeedProcess(jocXmlCommand.getAttributeAsIntegerOr0("count"));
-//
-//            jocXmlCommand.executeXPath("//subsystem[@name='job']//job.statistic[@job_state='running']");
-//            jobschedulerJobs.setRunning(jocXmlCommand.getAttributeAsIntegerOr0("count"));
-//
-//            jocXmlCommand.executeXPath("//subsystem[@name='job']//job.statistic[@job_state='stopped']");
-//            jobschedulerJobs.setStopped(jocXmlCommand.getAttributeAsIntegerOr0("count"));
-//
-//            jocXmlCommand.executeXPath("//subsystem[@name='task']//task.statistic[@task_state='exist']");
-//            jobschedulerTasks.setAny(jocXmlCommand.getAttributeAsIntegerOr0("count"));
-//
-//            jocXmlCommand.executeXPath("//subsystem[@name='task']//task.statistic[@task_state='running']");
-//            jobschedulerTasks.setRunning(jocXmlCommand.getAttributeAsIntegerOr0("count"));
-//
-//            jocXmlCommand.executeXPath("//subsystem[@name='order']//order.statistic[@order_state='any']");
-//            jobschedulerOrders.setAny(jocXmlCommand.getAttributeAsIntegerOr0("count"));
-//
-//            jocXmlCommand.executeXPath("//subsystem[@name='order']//order.statistic[@order_state='clustered']");
-//            jobschedulerOrders.setClustered(jocXmlCommand.getAttributeAsIntegerOr0("count"));
-//
-//            // TODO JOC Cockpit Webservice
-//
-//            jobschedulerOrders.setSuspended(-1);
-//            jobschedulerOrders.setBlacklist(-1);
-//            jobschedulerOrders.setPending(-1);
-//            jobschedulerOrders.setWaitingForResource(-1);
-//            jobschedulerOrders.setRunning(-1);
-//            jobschedulerOrders.setSetback(-1);
-//
-//            jobschedulerJobChains.setAny(-1);
-//            jobschedulerJobChains.setStopped(-1);
-
-//            entity.setJobs(jobschedulerJobs);
-//            entity.setTasks(jobschedulerTasks);
-//            entity.setOrders(jobschedulerOrders);
-//            entity.setJobChains(jobschedulerJobChains);
-
-//            return JOCDefaultResponse.responseStatus200(entity);
+            //TODO
+            
             return JOCDefaultResponse.responseStatus200(null);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

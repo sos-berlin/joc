@@ -9,6 +9,10 @@ public class JobSchedulerConnectionRefusedException extends JocException {
     public JobSchedulerConnectionRefusedException() {
     }
 
+    public JobSchedulerConnectionRefusedException(Throwable cause) {
+        super(new JocError(ERROR_CODE, cause.getMessage()), cause);
+    }
+
     public JobSchedulerConnectionRefusedException(String message) {
         super(new JocError(ERROR_CODE, message));
     }

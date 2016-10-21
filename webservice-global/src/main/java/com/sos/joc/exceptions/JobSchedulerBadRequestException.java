@@ -9,6 +9,10 @@ public class JobSchedulerBadRequestException extends JocException {
     public JobSchedulerBadRequestException() {
     }
 
+    public JobSchedulerBadRequestException(Throwable cause) {
+        super(new JocError(ERROR_CODE, cause.getMessage()), cause);
+    }
+
     public JobSchedulerBadRequestException(String message) {
         super(new JocError(ERROR_CODE, message));
     }

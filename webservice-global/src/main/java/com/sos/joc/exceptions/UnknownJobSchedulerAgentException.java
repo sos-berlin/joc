@@ -9,6 +9,10 @@ public class UnknownJobSchedulerAgentException extends JocException {
     public UnknownJobSchedulerAgentException() {
     }
 
+    public UnknownJobSchedulerAgentException(Throwable cause) {
+        super(new JocError(ERROR_CODE, cause.getMessage()), cause);
+    }
+
     public UnknownJobSchedulerAgentException(String message) {
         super(new JocError(ERROR_CODE, message));
     }

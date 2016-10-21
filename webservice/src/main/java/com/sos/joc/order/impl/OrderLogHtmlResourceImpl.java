@@ -18,7 +18,7 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
 
     @Override
     public JOCDefaultResponse getOrderLogHtml(String accessToken, String jobschedulerId, String orderId, String jobChain, String historyId) throws Exception {
-        LOGGER.info("init order/log/html");
+        LOGGER.debug("init order/log/html");
 
         try {
             OrderHistoryFilter orderHistoryFilter = new OrderHistoryFilter();

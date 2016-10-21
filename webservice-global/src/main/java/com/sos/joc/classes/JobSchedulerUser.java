@@ -33,8 +33,6 @@ public class JobSchedulerUser {
         return (sosShiroCurrentUser != null);
     }
 
- 
-
     public String getAccessToken() {
         return accessToken;
     }

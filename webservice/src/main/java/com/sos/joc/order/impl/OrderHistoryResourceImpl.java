@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.Error;
+import com.sos.joc.model.common.Err;
 import com.sos.joc.model.order.History;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrdersStepHistory;
@@ -38,7 +38,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             ArrayList<OrdersStepHistoryItem> listOfSteps = new ArrayList<OrdersStepHistoryItem>();
             OrdersStepHistoryItem step1 = new OrdersStepHistoryItem();
             step1.setEndTime(new Date());
-            Error errorSchema1 = new Error();
+            Err errorSchema1 = new Err();
             errorSchema1.setCode("myCode1");
             errorSchema1.setMessage("myMessage1");
             step1.setError(errorSchema1);
@@ -53,7 +53,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
 
             OrdersStepHistoryItem step2 = new OrdersStepHistoryItem();
             step2.setEndTime(new Date());
-            Error errorSchema2 = new Error();
+            Err errorSchema2 = new Err();
             errorSchema2.setCode("myCode2");
             errorSchema2.setMessage("myMessage2");
             step2.setError(errorSchema2);

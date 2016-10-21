@@ -18,7 +18,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "code",
     "message"
 })
-public class Error419 {
+public class Err419 {
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -172,10 +172,10 @@ public class Error419 {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Error419) == false) {
+        if ((other instanceof Err419) == false) {
             return false;
         }
-        Error419 rhs = ((Error419) other);
+        Err419 rhs = ((Err419) other);
         return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(code, rhs.code).append(message, rhs.message).isEquals();
     }
 

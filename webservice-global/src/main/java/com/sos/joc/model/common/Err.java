@@ -9,13 +9,20 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+
+/**
+ * error
+ * <p>
+ * 
+ * 
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "code",
     "message"
 })
-public class Error {
+public class Err {
 
     /**
      * 
@@ -95,10 +102,10 @@ public class Error {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Error) == false) {
+        if ((other instanceof Err) == false) {
             return false;
         }
-        Error rhs = ((Error) other);
+        Err rhs = ((Err) other);
         return new EqualsBuilder().append(code, rhs.code).append(message, rhs.message).isEquals();
     }
 

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.Error;
+import com.sos.joc.model.common.Err;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
@@ -44,7 +44,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             history1.setAgent("myAgent");
             history1.setClusterMember("myClusterMember");
             history1.setEndTime(new Date());
-            Error error = new Error();
+            Err error = new Err();
             error.setCode("myCode");
             error.setMessage("myMessage");
             history1.setError(error);

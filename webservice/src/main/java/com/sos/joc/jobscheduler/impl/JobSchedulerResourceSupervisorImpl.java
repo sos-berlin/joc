@@ -4,12 +4,15 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JobSchedulerIdentifier;
+import com.sos.joc.classes.jobscheduler.JobSchedulerVolatile;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
@@ -19,43 +22,40 @@ import com.sos.joc.model.jobscheduler.JobSchedulerV;
 import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 
 @Path("jobscheduler")
-public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl  implements IJobSchedulerResourceSupervisor {
-
+public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implements IJobSchedulerResourceSupervisor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceSupervisorImpl.class);
+    private static final String API_CALL = "API-CALL: ./jobscheduler/supervisor";
 
     @Override
     public JOCDefaultResponse postJobschedulerSupervisor(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
-        JobSchedulerResource jobSchedulerResource = new JobSchedulerResource(accessToken, jobSchedulerId);
-
+        LOGGER.debug(API_CALL);
         try {
             Globals.beginTransaction();
-            DBItemInventoryInstance dbItemInventoryInstance = jobSchedulerResource.getJobschedulerUser().getSchedulerInstance(
-                    new JobSchedulerIdentifier(jobSchedulerId.getJobschedulerId()));
-            if (dbItemInventoryInstance == null) {
-                String errMessage = String.format("jobschedulerId %s not found in table %s", jobSchedulerId.getJobschedulerId(),
-                        DBLayer.TABLE_INVENTORY_INSTANCES);
-                throw new DBInvalidDataException(errMessage);
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
             }
+
+            JobSchedulerV200 entity = new JobSchedulerV200();
+            entity.setDeliveryDate(new Date());
 
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
             if (supervisorId != DBLayer.DEFAULT_ID) {
                 InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-                dbItemInventoryInstance = dbLayer.getInventoryInstancesByKey(supervisorId);
+                DBItemInventoryInstance dbItemInventorySupervisorInstance = dbLayer.getInventoryInstancesByKey(supervisorId);
 
-                if (dbItemInventoryInstance == null) {
+                if (dbItemInventorySupervisorInstance == null) {
                     String errMessage = String.format("jobschedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerId
                             .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
-                jobSchedulerId.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
-                jobSchedulerResource.setJobSchedulerFilterSchema(jobSchedulerId);
-                return jobSchedulerResource.postJobscheduler();
+                entity.setJobscheduler(new JobSchedulerVolatile(dbItemInventorySupervisorInstance).getJobScheduler());
             } else {
-                JobSchedulerV200 entity = new JobSchedulerV200();
-                entity.setDeliveryDate(new Date());
                 entity.setJobscheduler(new JobSchedulerV());
-                return JOCDefaultResponse.responseStatus200(entity);
             }
+            return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);

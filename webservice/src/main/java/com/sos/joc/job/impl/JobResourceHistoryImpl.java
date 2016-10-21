@@ -16,7 +16,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceHistory;
-import com.sos.joc.model.common.Error;
+import com.sos.joc.model.common.Err;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryFilter;
 import com.sos.joc.model.job.TaskHistoryItem;
@@ -64,7 +64,7 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
                 history.setEndTime(jocXmlCommand.getAttributeAsDate("end_time"));
                 Element errElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(historyEntry, "ERROR");
                 if (errElem != null) {
-                    Error error = new Error();
+                    Err error = new Err();
                     error.setCode(errElem.getAttribute("code"));
                     error.setMessage(errElem.getAttribute("text"));
                     history.setError(error);

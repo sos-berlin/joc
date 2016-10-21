@@ -145,7 +145,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
             OrderVolatile order = new OrderVolatile(ordersItem);
             order.setPathJobChainAndOrderId();
             if (!FilterAfterResponse.matchRegex(regex, order.getPath())) {
-                LOGGER.info("...processing skipped caused by 'regex=" + regex + "'");
+                LOGGER.debug("...processing skipped caused by 'regex=" + regex + "'");
                 continue; 
             }
             order.setSurveyDate(surveyDate);
@@ -191,7 +191,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
             path = ("/"+path.trim()+"/").replaceAll("//+", "/");
             if (!folder.getRecursive()) {
                 path += "*";
-                LOGGER.info(String.format("...consider 'recursive=%1$b' for folder '%2$s'", folder.getRecursive(), folder.getFolder()));
+                LOGGER.debug(String.format("...consider 'recursive=%1$b' for folder '%2$s'", folder.getRecursive(), folder.getFolder()));
             }
             builder.add("path", path);
         }

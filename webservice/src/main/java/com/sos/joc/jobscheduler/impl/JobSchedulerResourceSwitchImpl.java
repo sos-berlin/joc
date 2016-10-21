@@ -17,13 +17,13 @@ import com.sos.joc.model.common.JobSchedulerId;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements IJobSchedulerResourceSwitch {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceSwitchImpl.class);
+    private static final String API_CALL = "API-CALL: ./jobscheduler/switch";
 
     @Override
     public JOCDefaultResponse postJobschedulerSwitch(String accessToken, JobSchedulerId jobSchedulerFilterSchema) throws Exception {
 
-        LOGGER.debug("init jobscheduler/switch");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -34,10 +34,10 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
             return JOCDefaultResponse.responseStatusJSOk(new Date());
 
         } catch (JocException e) {
+            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());
         }
     }
-
 }

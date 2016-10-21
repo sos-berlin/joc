@@ -18,7 +18,7 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.Error419;
+import com.sos.joc.model.common.Err419;
 
 
 public class JOCResourceImpl {
@@ -32,7 +32,7 @@ public class JOCResourceImpl {
     private String accessToken;
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
-    protected List<Error419> listOfErrors;
+    protected List<Err419> listOfErrors;
     protected JocError jocError;
 
     protected SOSPermissionJocCockpit getPermissons(String accessToken) throws JocException {
@@ -146,11 +146,11 @@ public class JOCResourceImpl {
         return checkRequiredParameter(paramKey,String.valueOf(paramVal));
     }
     
-    public List<Error419> addError(List<Error419> listOfErrors, JOCXmlCommand jocXmlCommand, String path) {
+    public List<Err419> addError(List<Err419> listOfErrors, JOCXmlCommand jocXmlCommand, String path) {
         if (listOfErrors == null) {
-            listOfErrors = new ArrayList<Error419>();
+            listOfErrors = new ArrayList<Err419>();
         }
-        Error419 error = new Error419();
+        Err419 error = new Err419();
         try {
             jocXmlCommand.executeXPath(SPOOLER_ANSWER_ERROR);
         } catch (Exception e) {

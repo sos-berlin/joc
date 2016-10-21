@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "deliveryDate",
     "errors"
 })
-public class Errors {
+public class Errs {
 
     /**
      * delivery date
@@ -42,7 +42,7 @@ public class Errors {
      * 
      */
     @JsonProperty("errors")
-    private List<Error419> errors = new ArrayList<Error419>();
+    private List<Err419> errors = new ArrayList<Err419>();
 
     /**
      * delivery date
@@ -80,7 +80,7 @@ public class Errors {
      *     The errors
      */
     @JsonProperty("errors")
-    public List<Error419> getErrors() {
+    public List<Err419> getErrors() {
         return errors;
     }
 
@@ -92,7 +92,7 @@ public class Errors {
      *     The errors
      */
     @JsonProperty("errors")
-    public void setErrors(List<Error419> errors) {
+    public void setErrors(List<Err419> errors) {
         this.errors = errors;
     }
 
@@ -111,10 +111,10 @@ public class Errors {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Errors) == false) {
+        if ((other instanceof Errs) == false) {
             return false;
         }
-        Errors rhs = ((Errors) other);
+        Errs rhs = ((Errs) other);
         return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(errors, rhs.errors).isEquals();
     }
 

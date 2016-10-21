@@ -24,7 +24,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "surveyDate",
     "error"
 })
-public class Error420 {
+public class Err420 {
 
     /**
      * delivery date
@@ -42,12 +42,14 @@ public class Error420 {
     @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
+     * error
+     * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("error")
-    private Error error;
+    private Err error;
 
     /**
      * delivery date
@@ -100,6 +102,8 @@ public class Error420 {
     }
 
     /**
+     * error
+     * <p>
      * 
      * (Required)
      * 
@@ -107,11 +111,13 @@ public class Error420 {
      *     The error
      */
     @JsonProperty("error")
-    public Error getError() {
+    public Err getError() {
         return error;
     }
 
     /**
+     * error
+     * <p>
      * 
      * (Required)
      * 
@@ -119,7 +125,7 @@ public class Error420 {
      *     The error
      */
     @JsonProperty("error")
-    public void setError(Error error) {
+    public void setError(Err error) {
         this.error = error;
     }
 
@@ -138,10 +144,10 @@ public class Error420 {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Error420) == false) {
+        if ((other instanceof Err420) == false) {
             return false;
         }
-        Error420 rhs = ((Error420) other);
+        Err420 rhs = ((Err420) other);
         return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(surveyDate, rhs.surveyDate).append(error, rhs.error).isEquals();
     }
 

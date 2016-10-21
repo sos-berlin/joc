@@ -9,6 +9,10 @@ public class JocMissingRequiredParameterException extends JocException {
     public JocMissingRequiredParameterException() {
     }
 
+    public JocMissingRequiredParameterException(Throwable cause) {
+        super(new JocError(ERROR_CODE, cause.getMessage()), cause);
+    }
+
     public JocMissingRequiredParameterException(String message) {
         super(new JocError(ERROR_CODE, message));
     }

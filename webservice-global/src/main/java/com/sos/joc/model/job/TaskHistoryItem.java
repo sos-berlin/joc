@@ -6,7 +6,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.sos.joc.model.common.Error;
+import com.sos.joc.model.common.Err;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -109,7 +109,7 @@ public class TaskHistoryItem {
      * 
      */
     @JsonProperty("error")
-    private Error error;
+    private Err error;
     /**
      * agent url
      * 
@@ -356,7 +356,7 @@ public class TaskHistoryItem {
      *     The error
      */
     @JsonProperty("error")
-    public Error getError() {
+    public Err getError() {
         return error;
     }
 
@@ -369,7 +369,7 @@ public class TaskHistoryItem {
      *     The error
      */
     @JsonProperty("error")
-    public void setError(Error error) {
+    public void setError(Err error) {
         this.error = error;
     }
 

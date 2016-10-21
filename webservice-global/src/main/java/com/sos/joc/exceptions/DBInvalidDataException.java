@@ -9,6 +9,10 @@ public class DBInvalidDataException extends JocException {
     public DBInvalidDataException() {
     }
 
+    public DBInvalidDataException(Throwable cause) {
+        super(new JocError(ERROR_CODE, cause.getMessage()), cause);
+    }
+
     public DBInvalidDataException(String message) {
         super(new JocError(ERROR_CODE, message));
     }

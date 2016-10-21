@@ -21,7 +21,7 @@ import com.sos.scheduler.model.commands.JSCmdTerminate;
 
 public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobSchedulerCluster {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceModifyJobSchedulerClusterImpl.class);
     private HostPortTimeOutParameter jobSchedulerModifyJobSchedulerClusterBody;
 
     private JOCDefaultResponse check(boolean right) {

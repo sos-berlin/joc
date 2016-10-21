@@ -19,10 +19,11 @@ import com.sos.joc.order.resource.IOrderResource;
 @Path("order")
 public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderResourceImpl.class);
-
+    private static final String API_CALL = "API-CALL: ./order";
+    
     @Override
     public JOCDefaultResponse postOrder(String accessToken, OrderFilter orderBody) throws Exception {
-        LOGGER.debug("init order");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -41,6 +42,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -8,6 +8,10 @@ public class JobSchedulerInvalidResponseDataException extends JocException {
 
     public JobSchedulerInvalidResponseDataException() {
     }
+    
+    public JobSchedulerInvalidResponseDataException(Throwable cause) {
+        super(new JocError(ERROR_CODE, cause.getMessage()), cause);
+    }
 
     public JobSchedulerInvalidResponseDataException(String message) {
         super(new JocError(ERROR_CODE, message));

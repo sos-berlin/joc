@@ -22,10 +22,11 @@ import com.sos.joc.model.jobscheduler.JobSchedulerIds;
 @Path("jobscheduler")
 public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJobSchedulerResourceIds {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceIdsImpl.class);
+    private static final String API_CALL = "API-CALL: ./jobscheduler/ids";
 
     @Override
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {
-        LOGGER.debug("init jobscheduler/ids");
+        LOGGER.debug(API_CALL);
         try {
             Globals.beginTransaction();
             JOCDefaultResponse jocDefaultResponse = init("", getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
@@ -54,6 +55,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
+            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -18,26 +18,26 @@ import com.sos.joc.model.jobscheduler.DBStateText;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobSchedulerResourceDb {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceDbImpl.class);
+    private static final String API_CALL = "API-CALL: ./jobscheduler/db";
+    
     @Override
     public JOCDefaultResponse postJobschedulerDb(String accessToken, JobSchedulerId jobSchedulerFilterSchema) {
 
-        LOGGER.debug("init jobscheduler/db");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            // TODO JOC Cockpit Webservice
-
             DB entity = new DB();
             Database database = new Database();
-            database.setDbms("myDbms");
+            database.setDbms(dbItemInventoryInstance.getDbmsName());
             database.setSurveyDate(dbItemInventoryInstance.getModified());
-            database.setVersion(dbItemInventoryInstance.getVersion());
+            database.setVersion(dbItemInventoryInstance.getDbmsVersion());
             DBState state = new DBState();
+            //TODO DB is not always running
             state.setSeverity(0);
             state.set_text(DBStateText.RUNNING);
             database.setState(state);
@@ -46,6 +46,7 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());

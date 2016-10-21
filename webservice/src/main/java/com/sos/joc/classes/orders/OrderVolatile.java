@@ -57,7 +57,7 @@ public class OrderVolatile extends OrderV {
         
         JsonObject pState = overview.getJsonObject("orderProcessingState");
         JsonArray obstacles = overview.getJsonArray("obstacles");
-        LOGGER.info(overview.toString());
+        LOGGER.debug(overview.toString());
         
         //setSurveyDate(null);
         //setPathJobChainAndOrderId();
@@ -223,7 +223,7 @@ public class OrderVolatile extends OrderV {
             try {
                 return num.intValue();
             } catch (Exception e) {
-                LOGGER.info(String.format("Invalid resonsed data: %1$s='%2$s'",fieldName, num.toString()));
+                LOGGER.warn(String.format("Invalid responsed data: %1$s='%2$s'",fieldName, num.toString()));
             }
         }
         return null;

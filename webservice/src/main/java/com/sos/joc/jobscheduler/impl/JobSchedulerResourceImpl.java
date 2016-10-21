@@ -1,20 +1,39 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.util.Date;
+
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.jobscheduler.JobSchedulerVolatile;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResource;
 import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 
 @Path("jobscheduler")
-public class JobSchedulerResourceImpl implements IJobSchedulerResource {
-
+public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSchedulerResource {
+    private static final String API_CALL = "API-CALL: ./jobscheduler";
+    
     @Override
-    public JOCDefaultResponse postJobscheduler(String accessToken, JobSchedulerId jobSchedulerFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobscheduler(String accessToken, JobSchedulerId jobSchedulerBody) throws Exception {
         
-        JobSchedulerResource jobSchedulerResource = new JobSchedulerResource(accessToken, jobSchedulerFilterSchema);
-        return jobSchedulerResource.postJobscheduler();
-       
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerBody.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            JobSchedulerV200 entity = new JobSchedulerV200();
+            entity.setJobscheduler(new JobSchedulerVolatile(dbItemInventoryInstance).getJobScheduler());
+            entity.setDeliveryDate(new Date());
+            return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
     }
 
 }

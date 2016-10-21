@@ -13,16 +13,15 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.Error;
-import com.sos.joc.model.common.Error420;
-import com.sos.joc.model.common.Error419;
-import com.sos.joc.model.common.Errors;
+import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.Err420;
+import com.sos.joc.model.common.Errs;
 import com.sos.joc.model.common.Ok;
 
 public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCDefaultResponse.class);
-    private static final String TIMEOUT = "timeout";
+    private static final String TIMEOUT = "X-JOC-Timeout";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String ERROR_HTML = "<!DOCTYPE html>%n"
             + "<html>%n"
@@ -76,52 +75,45 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     public static JOCDefaultResponse responseStatusJSOk(Date surveyDate) {
         Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", MediaType.APPLICATION_JSON);
         Ok entity = new Ok();
-
         if (surveyDate != null) {
             entity.setSurveyDate(surveyDate);
         }
-
         entity.setDeliveryDate(new Date());
         entity.setOk(true);
         responseBuilder.entity(entity);
         return new JOCDefaultResponse(responseBuilder.build());
-
     }
 
     public static JOCDefaultResponse responseStatusJSError(String message) {
-        Error420 entity = new Error420();
+        Err420 entity = new Err420();
+        entity.setError(new JocError(message));
+        entity.setSurveyDate(new Date());
         entity.setDeliveryDate(new Date());
-         
-        Error error = new Error();
-        error.setCode("JOC-420");
         LOGGER.error(message);
-        error.setMessage(message);
-        entity.setError(error);
-
         return responseStatus420(entity);
-
     }
     
     public static JOCDefaultResponse responseStatusJSError(JocException e, String mediaType) {
+        if (!"".equals(e.getError().getMetaInfo())) {
+            LOGGER.info(e.getError().getMetaInfo());
+        }
+        
         String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getError().getMessage();
-        LOGGER.error(errorMsg, e);
+        e.getError().setMessage(errorMsg);
+        Err420 entity = new Err420();
+        entity.setError(e.getError());
+        entity.setSurveyDate(new Date());
+        entity.setDeliveryDate(new Date());
         
         if (WebserviceConstants.NO_USER_WITH_ACCESS_TOKEN.equals(e.getError().getCode())){
             SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
             sosShiroCurrentUserAnswer.setHasRole(false); 
             sosShiroCurrentUserAnswer.setIsAuthenticated(false);
             sosShiroCurrentUserAnswer.setIsPermitted(false);
-            sosShiroCurrentUserAnswer.setMessage(errorMsg);
+            sosShiroCurrentUserAnswer.setMessage(entity.getError().getMessage());
             return responseStatus440(sosShiroCurrentUserAnswer, mediaType);
         } else {
-            
-            Error420 entity = new Error420();
-            entity.setDeliveryDate(new Date());
-             
-            Error error = new Error();
-            error.setCode(e.getError().getCode());
-            error.setMessage(errorMsg);
-            entity.setError(error);
+            LOGGER.error(errorMsg, e);
             return responseStatus420(entity, mediaType);
         }
     }
@@ -135,16 +127,14 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static JOCDefaultResponse responseStatusJSError(JocError e) {
-        Error420 entity = new Error420();
+        if (!"".equals(e.getMetaInfo())) {
+            LOGGER.info(e.getMetaInfo());
+        }
+        Err420 entity = new Err420();
+        entity.setError(e);
+        entity.setSurveyDate(new Date());
         entity.setDeliveryDate(new Date());
-         
-        Error error = new Error();
-        error.setCode(e.getCode());
-        String errorMsg = e.getMessage();
-        LOGGER.error(errorMsg, e);
-        error.setMessage(errorMsg);
-        entity.setError(error);
-
+        LOGGER.error(e.getMessage());
         return responseStatus420(entity);
     }
     
@@ -152,15 +142,12 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (e instanceof JocException) {
             return responseStatusJSError((JocException) e);
         }
-        Error420 entity = new Error420();
-        entity.setDeliveryDate(new Date());
-        Error error = new Error();
-        error.setCode("JOC-420");
+        Err420 entity = new Err420();
         String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
+        entity.setError(new JocError(errorMsg));
+        entity.setSurveyDate(new Date());
+        entity.setDeliveryDate(new Date());
         LOGGER.error(errorMsg, e);
-        error.setMessage(errorMsg);
-        entity.setError(error);
-
         return responseStatus420(entity, mediaType);
     }
     
@@ -172,7 +159,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatusJSError(e, MediaType.TEXT_HTML + "; charset=UTF-8");
     }
     
-    public static JOCDefaultResponse responseStatus420(Error420 entity, String mediaType) {
+    public static JOCDefaultResponse responseStatus420(Err420 entity, String mediaType) {
         Response.ResponseBuilder responseBuilder = Response.status(420).header("Content-Type", mediaType);
         if (mediaType.contains(MediaType.TEXT_HTML)) {
             String entityStr = String.format(ERROR_HTML, entity.getError().getCode(), StringEscapeUtils.escapeHtml4(entity.getError().getMessage()));
@@ -183,11 +170,11 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return new JOCDefaultResponse(responseBuilder.build());
     }
 
-    public static JOCDefaultResponse responseStatus420(Error420 entity) {
+    public static JOCDefaultResponse responseStatus420(Err420 entity) {
         return responseStatus420(entity, MediaType.APPLICATION_JSON);
     }
     
-    public static JOCDefaultResponse responseHTMLStatus420(Error420 entity) {
+    public static JOCDefaultResponse responseHTMLStatus420(Err420 entity) {
         return responseStatus420(entity, MediaType.TEXT_HTML + "; charset=UTF-8");
     }
     
@@ -198,8 +185,8 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return new JOCDefaultResponse(responseBuilder.build());
     }
     
-    public static JOCDefaultResponse responseStatus419(List<Error419> listOfErrors) {
-        Errors errors = new Errors();
+    public static JOCDefaultResponse responseStatus419(List<Err419> listOfErrors) {
+        Errs errors = new Errs();
         errors.setErrors(listOfErrors);
 
         Response.ResponseBuilder responseBuilder = Response.status(419).header("Content-Type", MediaType.APPLICATION_JSON);
@@ -232,7 +219,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
     public static JOCDefaultResponse responseStatus440(SOSShiroCurrentUserAnswer entity, String mediaType) {
         Response.ResponseBuilder responseBuilder = Response.status(440).header("Content-Type", mediaType);
-        LOGGER.info(entity.getMessage());
+        LOGGER.error(entity.getMessage());
         if (mediaType.contains(MediaType.TEXT_HTML)) {
             String entityStr = String.format(ERROR_HTML, "JOC-440", StringEscapeUtils.escapeHtml4(entity.getMessage()));
             responseBuilder.entity(entityStr);
@@ -260,7 +247,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if ("".equals(message)){
             message = "Authentication failure";
         }
-        LOGGER.info(message);
+        LOGGER.error(message);
         entity.setMessage(message);
         return entity;
     }

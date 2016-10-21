@@ -19,7 +19,7 @@ import com.sos.scheduler.model.commands.JSCmdModifySpooler;
 @Path("jobscheduler")
 
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobScheduler {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceModifyJobSchedulerImpl.class);
 
     protected HostPortTimeOutParameter urlTimeoutParamSchema;
 

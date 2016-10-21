@@ -31,7 +31,7 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsPImpl.class);
     private Long instanceId;
 
     @Override

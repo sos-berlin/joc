@@ -18,9 +18,10 @@ import com.sos.joc.model.job.JobFilter;
 @Path("job")
 public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceImpl.class);
+    private static final String API_CALL = "API-CALL: ./job";
 
     public JOCDefaultResponse postJob(String accessToken, JobFilter jobFilter) throws Exception {
-        LOGGER.debug("init job");
+        LOGGER.debug(API_CALL);
         JOCDefaultResponse jocDefaultResponse = init(jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -29,11 +30,12 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
             JobV200 entity = new JobV200();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getCommandUrl());
             if (checkRequiredParameter("job", jobFilter.getJob())) {
-                entity.setDeliveryDate(new Date());
                 entity.setJob(jocXmlCommand.getJob(jobFilter.getJob(), jobFilter.getCompact(), true));
+                entity.setDeliveryDate(new Date());
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);
