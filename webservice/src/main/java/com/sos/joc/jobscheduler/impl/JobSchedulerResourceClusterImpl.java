@@ -14,7 +14,6 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCluster;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -37,12 +36,8 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
                 return jocDefaultResponse;
             }
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
-            try {
-                jocXmlCommand.excutePost(getXMLCommand());
-            } catch (Exception e) {
-                throw new JobSchedulerConnectionRefusedException(dbItemInventoryInstance.getCommandUrl(), e);
-            }
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            jocXmlCommand.executePost(getXMLCommand());
             jocXmlCommand.throwJobSchedulerError();
             
             Cluster cluster = new Cluster();

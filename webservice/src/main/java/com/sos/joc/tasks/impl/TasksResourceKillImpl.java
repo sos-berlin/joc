@@ -28,7 +28,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     private JOCDefaultResponse executeKillCommand(TasksFilter job, TaskId taskId, String command) {
         try {
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdKillTask jsCmdKillTask = Globals.schedulerObjectFactory.createKillTask();
             jsCmdKillTask.setImmediately(WebserviceConstants.YES);
@@ -44,7 +44,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             }
 
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdKillTask);
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {

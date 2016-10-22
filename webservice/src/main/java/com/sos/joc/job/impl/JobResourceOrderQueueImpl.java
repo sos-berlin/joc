@@ -31,7 +31,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
             }
 
             JobV200 entity = new JobV200();
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl());
             JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
             jocJsonCommand.addOrderCompactQuery(jobFilterSchema.getCompact());
             jocXmlCommand.setUriForJsonCommand(jocJsonCommand.getURI());

@@ -142,6 +142,9 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (e instanceof JocException) {
             return responseStatusJSError((JocException) e);
         }
+        if (e.getCause() != null && e.getCause() instanceof JocException) {
+            return responseStatusJSError((JocException) e.getCause());
+        }
         Err420 entity = new Err420();
         String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
         entity.setError(new JocError(errorMsg));

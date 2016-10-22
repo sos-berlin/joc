@@ -38,7 +38,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     private JOCDefaultResponse executeStartJobCommand(StartJob startJob) {
 
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdStartJob jsCmdStartJob = new JSCmdStartJob(Globals.schedulerObjectFactory);
             jsCmdStartJob.setJobIfNotEmpty(startJob.getJob());
@@ -50,7 +50,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
                 jsCmdStartJob.setParams(jobParams);
             }
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdStartJob);
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
             listOfErrors = addError(listOfErrors, jocXmlCommand, startJob.getJob());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());

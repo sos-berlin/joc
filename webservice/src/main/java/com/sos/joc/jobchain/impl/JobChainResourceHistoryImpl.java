@@ -41,12 +41,12 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 return jocDefaultResponse;
             }
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
                 jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
             String postCommand = createJobchainHistoryPostCommand(jobChainHistoryFilter);
-            jocXmlCommand.excutePost(postCommand);
+            jocXmlCommand.executePost(postCommand);
 
             jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
 

@@ -40,7 +40,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
 
     private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String restart, HostPortTimeOutParameter urlTimeoutParamSchema) {
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdTerminate jsCmdTerminate = new JSCmdTerminate(Globals.schedulerObjectFactory);
             jsCmdTerminate.setAllSchedulersIfNotEmpty(WebserviceConstants.YES);
@@ -50,7 +50,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
 
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdTerminate);
             LOGGER.debug(String.format("Executing command: %s", xml));
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e.getMessage());

@@ -36,13 +36,13 @@ public class LogOrderContent extends LogContent {
     
     private String getOrderLogFromXmlCommand() throws Exception{
         
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
         JSCmdShowOrder jsCmdShowOrder = Globals.schedulerObjectFactory.createShowOrder();
         jsCmdShowOrder.setWhat(WHAT_LOG);
         jsCmdShowOrder.setJobChain(orderHistoryFilter.getJobChain());
         jsCmdShowOrder.setOrder(orderHistoryFilter.getOrderId());
         String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowOrder);
-        jocXmlCommand.excutePost(xml);
+        jocXmlCommand.executePost(xml);
         jocXmlCommand.throwJobSchedulerError();
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_ORDER_LOG, null);
     }

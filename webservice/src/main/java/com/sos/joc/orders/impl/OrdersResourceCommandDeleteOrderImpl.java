@@ -25,7 +25,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     private JOCDefaultResponse executeDeleteOrderCommand(ModifyOrder order) {
 
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             SchedulerObjectFactory objFactory = new SchedulerObjectFactory();
             objFactory.initMarshaller(Spooler.class);
@@ -33,7 +33,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
             objRemoveOrder.setJobChainIfNotEmpty(order.getJobChain());
             objRemoveOrder.setOrderIfNotEmpty(order.getOrderId());
             String xml = objFactory.toXMLString(objRemoveOrder);
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
             listOfErrors = addError(listOfErrors, jocXmlCommand, order.getJobChain());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());

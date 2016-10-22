@@ -39,13 +39,13 @@ public class LogTaskContent extends LogContent {
     
     private String getTaskLogFromXmlCommand() throws Exception{
         
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
         JSCmdShowTask jsCmdShowTask = Globals.schedulerObjectFactory.createShowTask();
         jsCmdShowTask.setWhat(WHAT_LOG);
         jsCmdShowTask.setId(new BigInteger(taskFilter.getTaskId()));
         String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowTask);
-        jocXmlCommand.excutePost(xml);
+        jocXmlCommand.executePost(xml);
         jocXmlCommand.throwJobSchedulerError();
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_TASK_LOG, null);
     }

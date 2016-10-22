@@ -23,7 +23,7 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
     private JOCDefaultResponse executeModifyJobCommand(TasksFilter job) {
         try {
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
             jsCmdModifyJob.setCmdIfNotEmpty(END);
@@ -31,7 +31,7 @@ public class TasksResourceEndImpl extends JOCResourceImpl implements ITasksResou
 
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdModifyJob);
 
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {

@@ -25,13 +25,13 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
 
     private JOCDefaultResponse executeModifyJobChainNodeCommand(ModifyJobChainNode jobChainNode, String cmd) {
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             JSCmdJobChainNodeModify jsCmdJobChainNodeModify = Globals.schedulerObjectFactory.createJobChainNodeModify();
             jsCmdJobChainNodeModify.setJobChainIfNotEmpty(jobChainNode.getJobChain());
             jsCmdJobChainNodeModify.setStateIfNotEmpty(jobChainNode.getNode());
             jsCmdJobChainNodeModify.setActionIfNotEmpty(cmd);
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdJobChainNodeModify);
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
             jocXmlCommand.throwJobSchedulerError();
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
 

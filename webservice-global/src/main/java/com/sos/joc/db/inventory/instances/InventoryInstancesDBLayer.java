@@ -98,8 +98,8 @@ public class InventoryInstancesDBLayer extends DBLayer {
         case "passive":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
-                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getCommandUrl());
-                    resourceImpl.excutePost("<show_state subsystems=\"folder\" what=\"folders nosubfolders\" path=\"__unknown__\"/>");
+                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
+                    resourceImpl.executePost("<show_state subsystems=\"folder\" what=\"folders nosubfolders\" path=\"__unknown__\"/>");
                     String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
                     if (!"waiting_for_activation,dead".contains(state)) {
                         return schedulerInstancesDBItem; 
@@ -112,8 +112,8 @@ public class InventoryInstancesDBLayer extends DBLayer {
         case "active":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
-                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getCommandUrl());
-                    resourceImpl.excutePost("<param.get name=\"\"/>");
+                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
+                    resourceImpl.executePost("<param.get name=\"\"/>");
                     return schedulerInstancesDBItem;
                 } catch (Exception e) {
                     //unreachable

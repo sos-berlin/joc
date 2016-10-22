@@ -21,9 +21,9 @@ public class JobSchedulerVolatile extends JobSchedulerV {
     }
     
     public JobSchedulerV getJobScheduler() throws Exception {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
         try {
-            jocXmlCommand.excutePost(getXMLCommand());
+            jocXmlCommand.executePost(getXMLCommand());
         } catch (Exception e) {
             return getUnreachableJobScheduler();
         }

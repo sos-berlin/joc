@@ -36,6 +36,7 @@ public class WebserviceConstants {
     public static final String WAITING_FOR_AGENT = "waiting_for_remote_scheduler";
     public static final String WAITING_FOR_PROCESS = "waiting_for_process";
     
+    public static final String XML_COMMAND_API_PATH = "/jobscheduler/master/api/command";
     public static final String ORDER_API_PATH = "/jobscheduler/master/api/order";
     public static final String ORDER_OVERVIEW = "OrdersComplemented/OrderOverview";
     public static final String ORDER_DETAILED = "OrdersComplemented/OrderDetailed";

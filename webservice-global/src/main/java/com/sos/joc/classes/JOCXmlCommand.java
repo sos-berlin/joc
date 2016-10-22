@@ -3,12 +3,14 @@ package com.sos.joc.classes;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.xml.SOSXmlCommand;
@@ -16,13 +18,12 @@ import com.sos.xml.SOSXmlCommand;
 public class JOCXmlCommand extends SOSXmlCommand {
 
     private Date surveyDate;
-    private HashMap<String, NodeList> listOfNodeLists;
+    private Map<String, NodeList> listOfNodeLists;
     private URI uriForJsonCommand;
 
     public JOCXmlCommand(String url) {
-        super(url);
+        super(url + WebserviceConstants.XML_COMMAND_API_PATH);
         listOfNodeLists = new HashMap<String, NodeList>();
-
     }
 
     public Date getSurveyDate() {
@@ -106,6 +107,15 @@ public class JOCXmlCommand extends SOSXmlCommand {
         Element errorElem = (Element) getSosxml().selectSingleNode(xPath);
         if (errorElem != null) {
             throw new JobSchedulerInvalidResponseDataException(new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text")));
+        }
+    }
+    
+    @Override
+    public String executePost(String xmlCommand) throws JobSchedulerConnectionRefusedException {
+        try {
+            return super.executePost(xmlCommand);
+        } catch (Exception e) {
+            throw new JobSchedulerConnectionRefusedException(getUrl(), e);
         }
     }
 }

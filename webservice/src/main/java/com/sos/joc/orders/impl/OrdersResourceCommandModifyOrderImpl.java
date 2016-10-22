@@ -39,7 +39,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private JOCDefaultResponse executeModifyOrderCommand(ModifyOrder order, String command) {
 
         try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
             schedulerObjectFactory.initMarshaller(Spooler.class);
@@ -83,7 +83,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             }
 
             String xml = schedulerObjectFactory.toXMLString(jsCmdModifyOrder);
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
             listOfErrors = addError(listOfErrors, jocXmlCommand, order.getJobChain());
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());

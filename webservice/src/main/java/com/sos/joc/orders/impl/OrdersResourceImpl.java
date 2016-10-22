@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -104,6 +105,12 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
         } catch (JocException e) {
             e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
             return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (ExecutionException e) {
+            if (e.getCause() != null) {
+                return JOCDefaultResponse.responseStatusJSError((Exception) e.getCause()); 
+            } else {
+                return JOCDefaultResponse.responseStatusJSError(e); 
+            }
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }

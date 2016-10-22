@@ -39,7 +39,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     }
     
     public JobV getJob(String job, Boolean compact, Boolean withOrderQueue) throws Exception {
-        excutePost(createShowJobPostCommand(job, compact));
+        executePost(createShowJobPostCommand(job, compact));
         throwJobSchedulerError();
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job");
         JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue);
@@ -111,7 +111,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     }
     
     private List<JobV> getJobs(String command, JobsFilter jobsFilter, String xPath) throws Exception {
-        excutePost(command);
+        executePost(command);
         throwJobSchedulerError();
         StringBuilder x = new StringBuilder();
         x.append(xPath);

@@ -37,13 +37,13 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             String scheduleIn = scheduleFilter.getSchedule();
             this.checkRequiredParameter("schedule", scheduleIn);
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
             jsCmdShowState.setSubsystems(SUBSYSTEMS);
             jsCmdShowState.setWhat(WHAT);
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowState);
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
 
             Element scheduleElement  = jocXmlCommand.executeXPath(String.format(XPATH_SCHEDULES,scheduleIn));
 

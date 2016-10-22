@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 
@@ -80,7 +81,12 @@ public class JOCJsonCommand {
         if (postBody != null) {
             LOGGER.debug("with POST body: " + postBody); 
         }
-        String response = client.executeRestServiceCommand("post", uri.toURL(), postBody);
+        String response;
+        try {
+            response = client.executeRestServiceCommand("post", uri.toURL(), postBody);
+        } catch (Exception e) {
+            throw new JobSchedulerConnectionRefusedException(e);
+        }
         return getJsonObjectFromResponse(response, client);
     }
     
@@ -92,7 +98,12 @@ public class JOCJsonCommand {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Accept", "application/json");
         LOGGER.debug("call " + uri.toString());
-        String response = client.executeRestServiceCommand("get", uri.toURL());
+        String response;
+        try {
+            response = client.executeRestServiceCommand("get", uri.toURL());
+        } catch (Exception e) {
+            throw new JobSchedulerConnectionRefusedException(e);
+        }
         return getJsonObjectFromResponse(response, client);
     }
     

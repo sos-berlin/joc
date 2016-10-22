@@ -26,7 +26,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 
         try {
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             JSCmdJobChainModify jsCmdJobChainModify = new JSCmdJobChainModify(Globals.schedulerObjectFactory);
             jsCmdJobChainModify.setJobChainIfNotEmpty(jobChain);
             if (STOP.equals(cmd)) {
@@ -37,7 +37,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
             }
 
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdJobChainModify);
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
             listOfErrors = addError(listOfErrors, jocXmlCommand, jobChain);
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());

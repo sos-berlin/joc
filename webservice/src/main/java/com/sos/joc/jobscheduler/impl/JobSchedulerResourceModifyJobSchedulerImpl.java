@@ -43,7 +43,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     private JOCDefaultResponse executeModifyJobSchedulerCommand(String cmd) {
         try {
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdModifySpooler jsCmdModifySpooler = new JSCmdModifySpooler(Globals.schedulerObjectFactory);
             jsCmdModifySpooler.setCmd(cmd);
@@ -51,7 +51,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdModifySpooler);
             LOGGER.debug(String.format("Executing command: %s", xml));
-            jocXmlCommand.excutePost(xml);
+            jocXmlCommand.executePost(xml);
 
             return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
         } catch (Exception e) {

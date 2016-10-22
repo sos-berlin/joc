@@ -33,7 +33,7 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
             }
 
             Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getCommandUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("processClass", processClassConfigurationFilterSchema.getProcessClass())) {
                 boolean responseInHtml = processClassConfigurationFilterSchema.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", normalizePath(processClassConfigurationFilterSchema.getProcessClass()));

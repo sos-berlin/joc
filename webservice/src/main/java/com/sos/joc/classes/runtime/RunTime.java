@@ -20,7 +20,7 @@ import com.sos.joc.model.common.RunTime200;
 public class RunTime {
 
     public static RunTime200 set(JOCXmlCommand jocXmlCommand, String postCommand, String xPath) throws Exception {
-        jocXmlCommand.excutePost(postCommand);
+        jocXmlCommand.executePost(postCommand);
         RunTime200 runTimeAnswer = new RunTime200();
         runTimeAnswer.setDeliveryDate(new Date());
         Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode(xPath);
