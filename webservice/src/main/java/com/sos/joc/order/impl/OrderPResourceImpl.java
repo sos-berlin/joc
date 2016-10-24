@@ -16,6 +16,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.db.reporting.ReportDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderP;
@@ -25,27 +26,27 @@ import com.sos.joc.order.resource.IOrderPResource;
 
 @Path("order")
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderPResourceImpl.class);
+    private static final String API_CALL = "./order/p";
     private Long instanceId;
 
     @Override
-    public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilterWithCompactSchema) throws Exception {
-        LOGGER.debug("init OrderP");
+    public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse =
-                    init(orderFilterWithCompactSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+                    init(orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(orderFilterWithCompactSchema.getJobschedulerId());
+            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(orderFilter.getJobschedulerId());
             instanceId = instance.getId();
-            Boolean compact = orderFilterWithCompactSchema.getCompact();
+            Boolean compact = orderFilter.getCompact();
             OrderP200 entity = new OrderP200();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilterWithCompactSchema.getJobChain(),
-                    orderFilterWithCompactSchema.getOrderId(), instanceId);
+            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilter.getJobChain(),
+                    orderFilter.getOrderId(), instanceId);
             OrderP order = new OrderP();
             order.setSurveyDate(dbItemInventoryOrder.getModified());
             order.setPath(dbItemInventoryOrder.getName());
@@ -72,9 +73,12 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, orderFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, orderFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
 
     }

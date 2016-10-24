@@ -1,5 +1,6 @@
 package com.sos.joc.order.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.ws.rs.Path;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.order.History;
@@ -20,13 +22,14 @@ import com.sos.joc.order.resource.IOrderHistoryResource;
 @Path("order")
 public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderHistoryResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderHistoryResourceImpl.class);
-
+    private static final String API_CALL = "./order/history";
+    
     @Override
-    public JOCDefaultResponse postOrderHistory(String accessToken, OrderFilter orderFilterSchema) throws Exception {
-        LOGGER.debug("init OrderHistory");
+    public JOCDefaultResponse postOrderHistory(String accessToken, OrderFilter orderFilter) throws Exception {
+        LOGGER.debug(API_CALL);
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -69,15 +72,17 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             history.setSteps(listOfSteps);
             
             OrdersStepHistory entity = new OrdersStepHistory();
-            entity.setDeliveryDate(new Date());
             entity.setHistory(history);
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, orderFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, orderFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
 
     }

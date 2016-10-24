@@ -1,5 +1,6 @@
 package com.sos.joc.order.impl;
 
+import java.time.Instant;
 import java.util.Date;
 import javax.ws.rs.Path;
 
@@ -20,12 +21,12 @@ import com.sos.joc.order.resource.IOrderLogResource;
 
 @Path("order")
 public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogResource {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderLogResourceImpl.class);
-
+    private static final String API_CALL = "./order/log";
+    
     @Override
     public JOCDefaultResponse postOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        LOGGER.debug("init order/log");
+        LOGGER.debug(API_CALL);
 
         try {
             checkRequiredParameter("jobschedulerId", orderHistoryFilter.getJobschedulerId());
@@ -39,9 +40,10 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             }
 
             LogContent200 entity = new LogContent200();
+            //TODO surveyDate from database
+            entity.setSurveyDate(Date.from(Instant.now()));
             LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance);
 
-            entity.setDeliveryDate(new Date());
             LogContent logContentSchema = new LogContent();
             String log = logOrderContent.getLog();
              
@@ -58,14 +60,16 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
                 }
             }
             entity.setLog(logContentSchema);
-            entity.setSurveyDate(new Date());
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, orderHistoryFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, orderHistoryFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
 
     }

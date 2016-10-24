@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.LogOrderContent;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.LogMime;
 import com.sos.joc.model.order.OrderHistoryFilter;
@@ -15,13 +16,14 @@ import com.sos.joc.order.resource.IOrderLogHtmlResource;
 @Path("order")
 public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderLogHtmlResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderLogHtmlResourceImpl.class);
-
+    private static final String API_CALL = "./order/log/html";
+    
     @Override
     public JOCDefaultResponse getOrderLogHtml(String accessToken, String jobschedulerId, String orderId, String jobChain, String historyId) throws Exception {
-        LOGGER.debug("init order/log/html");
-
+        LOGGER.debug(API_CALL);
+        OrderHistoryFilter orderHistoryFilter = new OrderHistoryFilter();
+        
         try {
-            OrderHistoryFilter orderHistoryFilter = new OrderHistoryFilter();
             orderHistoryFilter.setHistoryId(historyId);
             orderHistoryFilter.setJobChain(jobChain);
             orderHistoryFilter.setOrderId(orderId);
@@ -41,12 +43,14 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
             String log = logOrderContent.getLog();
             
             return JOCDefaultResponse.responseHtmlStatus200(logOrderContent.htmlPageWithColouredLogContent(log, "Order " + orderHistoryFilter.getOrderId()));
-
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, orderHistoryFilter));
             return JOCDefaultResponse.responseHTMLStatusJSError(e);
 
         } catch (Exception e) {
-            return JOCDefaultResponse.responseHTMLStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, orderHistoryFilter));
+            return JOCDefaultResponse.responseHTMLStatusJSError(e, err);
         }
     }
 

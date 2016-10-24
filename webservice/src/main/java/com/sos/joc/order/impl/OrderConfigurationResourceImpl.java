@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.common.Configuration200;
@@ -20,10 +21,11 @@ import com.sos.scheduler.model.commands.JSCmdShowOrder;
 @Path("order")
 public class OrderConfigurationResourceImpl extends JOCResourceImpl implements IOrderConfigurationResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderConfigurationResourceImpl.class);
-
+    private static final String API_CALL = "./order/configuration";
+    
     @Override
     public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilter orderBody) throws Exception {
-        LOGGER.debug("init order/configuration");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -38,9 +40,12 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, orderBody));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, orderBody));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -49,7 +54,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
         showOrder.setJobChain((normalizePath(body.getJobChain())));
         showOrder.setOrder(body.getOrderId());
         showOrder.setWhat("source");
-        return Globals.schedulerObjectFactory.toXMLString(showOrder);
+        return showOrder.toXMLString();
     }
 
 }
