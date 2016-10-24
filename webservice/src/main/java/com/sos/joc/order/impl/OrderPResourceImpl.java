@@ -1,5 +1,6 @@
 package com.sos.joc.order.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -48,7 +49,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilterWithCompactSchema.getJobChain(),
                     orderFilterWithCompactSchema.getOrderId(), instanceId);
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             OrderP order = new OrderP();
             // Required fields
             order.setSurveyDate(dbItemInventoryOrder.getModified());

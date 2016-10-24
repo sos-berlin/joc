@@ -1,5 +1,6 @@
 package com.sos.joc.schedule.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -42,7 +43,7 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
             ScheduleP schedule = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, instance);
 
             ScheduleP200 entity = new ScheduleP200();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setSchedule(schedule);
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

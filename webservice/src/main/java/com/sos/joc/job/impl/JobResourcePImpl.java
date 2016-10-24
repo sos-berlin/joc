@@ -1,5 +1,6 @@
 package com.sos.joc.job.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -44,7 +45,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             
             JobP job = JobPermanent.getJob(inventoryJob, dbLayer, compact, instanceId); 
             JobP200 entity = new JobP200();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setJob(job);
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

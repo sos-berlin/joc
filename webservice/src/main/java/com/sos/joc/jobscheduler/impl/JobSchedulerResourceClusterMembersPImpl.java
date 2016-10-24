@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -30,7 +31,7 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
                 return jocDefaultResponse;
             }
             MastersP entity = new MastersP();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setMasters(ClusterMembersPermanent.getClusterMembers(jobSchedulerFilterSchema.getJobschedulerId()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

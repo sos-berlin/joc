@@ -1,5 +1,6 @@
 package com.sos.joc.processClasses.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +48,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             regex = processClassFilter.getRegex();
 
             ProcessClassesP entity = new ProcessClassesP();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
 
             InventoryInstancesDBLayer instanceDBLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(processClassFilter.getJobschedulerId());

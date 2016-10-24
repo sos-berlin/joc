@@ -1,5 +1,6 @@
 package com.sos.joc.schedules.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -87,7 +88,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                 }
             }
             SchedulesP entity = new SchedulesP();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setSchedules(listOfSchedules);
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

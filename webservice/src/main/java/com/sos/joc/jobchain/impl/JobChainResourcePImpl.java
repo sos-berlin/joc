@@ -1,5 +1,6 @@
 package com.sos.joc.jobchain.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -73,7 +74,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
                     entity.setNestedJobChains(null);
                 }
             }
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
