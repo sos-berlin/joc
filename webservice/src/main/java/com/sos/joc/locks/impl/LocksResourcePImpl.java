@@ -51,7 +51,6 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(locksFilter.getJobschedulerId());
             InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(Globals.sosHibernateConnection);
             LocksP entity = new LocksP();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             List<LockP> listOfLocks = new ArrayList<LockP>();
             if (locks != null && !locks.isEmpty()) {
                 List<LockP> locksToAdd = new ArrayList<LockP>();
@@ -81,6 +80,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                 }
             }
             entity.setLocks(listOfLocks);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

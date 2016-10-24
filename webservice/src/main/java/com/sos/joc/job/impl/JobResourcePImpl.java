@@ -45,8 +45,8 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             
             JobP job = JobPermanent.getJob(inventoryJob, dbLayer, compact, instanceId); 
             JobP200 entity = new JobP200();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setJob(job);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

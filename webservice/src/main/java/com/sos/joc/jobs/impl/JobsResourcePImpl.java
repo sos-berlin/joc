@@ -1,5 +1,6 @@
 package com.sos.joc.jobs.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,14 +46,12 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            // FILTER
             Boolean compact = jobsFilterSchema.getCompact();
             regex = jobsFilterSchema.getRegex();
             folders = jobsFilterSchema.getFolders();
             jobs = jobsFilterSchema.getJobs();
             isOrderJob = jobsFilterSchema.getIsOrderJob();
             List<JobP> listJobs = new ArrayList<JobP>();
-
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jobsFilterSchema.getJobschedulerId());
@@ -65,8 +64,8 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                 }
             }
             JobsP entity = new JobsP();
-            entity.setDeliveryDate(new Date());
             entity.setJobs(listJobs);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -38,20 +38,15 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            /** FILTER: compact */
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(orderFilterWithCompactSchema.getJobschedulerId());
             instanceId = instance.getId();
-            
-
             Boolean compact = orderFilterWithCompactSchema.getCompact();
             OrderP200 entity = new OrderP200();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilterWithCompactSchema.getJobChain(),
                     orderFilterWithCompactSchema.getOrderId(), instanceId);
-            entity.setDeliveryDate(Date.from(Instant.now()));
             OrderP order = new OrderP();
-            // Required fields
             order.setSurveyDate(dbItemInventoryOrder.getModified());
             order.setPath(dbItemInventoryOrder.getName());
             order.setOrderId(dbItemInventoryOrder.getOrderId());
@@ -74,6 +69,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
                 order.setPriority(dbItemInventoryOrder.getPriority());
             }
             entity.setOrder(order);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

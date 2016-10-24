@@ -42,14 +42,10 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            // FILTER
             processClasses = processClassFilter.getProcessClasses();
             folders = processClassFilter.getFolders();
             regex = processClassFilter.getRegex();
-
             ProcessClassesP entity = new ProcessClassesP();
-            entity.setDeliveryDate(Date.from(Instant.now()));
-
             InventoryInstancesDBLayer instanceDBLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(processClassFilter.getJobschedulerId());
             InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(Globals.sosHibernateConnection);
@@ -82,6 +78,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 }
             }
             entity.setProcessClasses(listOfProcessClasses);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

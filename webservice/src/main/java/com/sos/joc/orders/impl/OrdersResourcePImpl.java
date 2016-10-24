@@ -54,28 +54,19 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
              * dateFrom
              * dateTo
              * timeZone
-             * regex
-             * orders
-             * folders
              */
             OrdersP entity = new OrdersP();
-            entity.setDeliveryDate(Date.from(Instant.now()));
-
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(ordersFilterSchema.getJobschedulerId());
             instanceId = instance.getId();
-            
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
-            // FILTERS
             dateFromFilter = ordersFilterSchema.getDateFrom();
             dateToFilter = ordersFilterSchema.getDateTo();
             timeZoneFilter = ordersFilterSchema.getTimeZone();
-            
             regex = ordersFilterSchema.getRegex();
             ordersFilter = ordersFilterSchema.getOrders();
             foldersFilter = ordersFilterSchema.getFolders();
             compact = ordersFilterSchema.getCompact();
-            
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (ordersFilter != null && !ordersFilter.isEmpty()) {
                 for (OrderPath order : ordersFilter) {
@@ -105,6 +96,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                 ordersFromDB = dbLayer.getInventoryOrders(instanceId);
             }
             entity.setOrders(fillOutputOrders(ordersFromDB, dbLayer));
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
