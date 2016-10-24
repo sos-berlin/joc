@@ -19,6 +19,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.processClass.ProcessClassP;
@@ -30,13 +31,14 @@ import com.sos.joc.processClasses.resource.IProcessClassesResourceP;
 @Path("process_classes")
 public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IProcessClassesResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassesResourcePImpl.class);
+    private static final String API_CALL = "./process_classes/p";
     private String regex;
     private List<Folder> folders;
     private List<ProcessClassPath> processClasses;
 
     @Override
     public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
-        LOGGER.debug("init processClasses");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(processClassFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -81,9 +83,12 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, processClassFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, processClassFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

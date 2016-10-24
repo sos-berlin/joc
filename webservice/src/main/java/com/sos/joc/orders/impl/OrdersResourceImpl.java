@@ -21,6 +21,7 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -33,7 +34,7 @@ import com.sos.joc.orders.resource.IOrdersResource;
 @Path("orders")
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceImpl.class);
-    private static final String API_CALL = "API-CALL: ./orders";
+    private static final String API_CALL = "./orders";
     
     @Override
     public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
@@ -103,16 +104,28 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, ordersBody));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (ExecutionException e) {
             if (e.getCause() != null) {
-                return JOCDefaultResponse.responseStatusJSError((Exception) e.getCause()); 
+                if (e.getCause() instanceof JocException) {
+                    JocException ee = (JocException) e.getCause();
+                    ee.addErrorMetaInfo(getMetaInfo(API_CALL, ordersBody));
+                    return JOCDefaultResponse.responseStatusJSError(ee);
+                } else {
+                    JocError err = new JocError();
+                    err.addMetaInfoOnTop(getMetaInfo(API_CALL, ordersBody));
+                    return JOCDefaultResponse.responseStatusJSError((Exception) e.getCause(), err);
+                }
             } else {
-                return JOCDefaultResponse.responseStatusJSError(e); 
+                JocError err = new JocError();
+                err.addMetaInfoOnTop(getMetaInfo(API_CALL, ordersBody));
+                return JOCDefaultResponse.responseStatusJSError(e, err); 
             }
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, ordersBody));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 }

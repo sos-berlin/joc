@@ -9,6 +9,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
@@ -18,13 +19,13 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("schedule")
 public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implements IScheduleResourceConfiguration {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceConfigurationImpl.class);
+    private static final String API_CALL = "./schedule/configuration";
 
     @Override
     public JOCDefaultResponse postScheduleConfiguration(String accessToken, ScheduleConfigurationFilter scheduleBody) throws Exception {
 
-        LOGGER.debug("init schedule/configuration");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(scheduleBody.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isConfiguration());
             if (jocDefaultResponse != null) {
@@ -40,9 +41,12 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, scheduleBody));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, scheduleBody));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -50,7 +54,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
         JSCmdShowState showSchedules = new JSCmdShowState(Globals.schedulerObjectFactory);
         showSchedules.setSubsystems("folder schedule");
         showSchedules.setWhat("folders source");
-        return Globals.schedulerObjectFactory.toXMLString(showSchedules);
+        return showSchedules.toXMLString();
     }
 
 }

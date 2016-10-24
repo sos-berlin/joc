@@ -81,7 +81,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                             if ("yes".equals(jocXmlCommand.getAttribute("active"))) {
                                 state.setSeverity(0);
                                 state.set_text(JobSchedulerStateText.RUNNING);
-                                //TODO Running is not necessarly right
+                                //TODO Running is not necessarily right
                             } else if ("yes".equals(jocXmlCommand.getAttribute("backup"))) {
                                 state.setSeverity(3);
                                 state.set_text(JobSchedulerStateText.WAITING_FOR_ACTIVATION);

@@ -16,6 +16,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ScheduleFilter;
 import com.sos.joc.model.schedule.ScheduleP;
@@ -24,12 +25,12 @@ import com.sos.joc.schedule.resource.IScheduleResourceP;
 
 @Path("schedule")
 public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleResourceP {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourcePImpl.class);
+    private static final String API_CALL = "./schedule/p";
 
     @Override
     public JOCDefaultResponse postScheduleP(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
-        LOGGER.debug("init schedule/p");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse =
                     init(scheduleFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
@@ -47,9 +48,12 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, scheduleFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, scheduleFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
