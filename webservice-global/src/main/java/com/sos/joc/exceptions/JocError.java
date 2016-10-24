@@ -1,12 +1,15 @@
 package com.sos.joc.exceptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.common.Err;
 
 public class JocError extends Err{
     
     @JsonIgnore
-    private StringBuilder metaInfo = new StringBuilder();
+    private List<String> metaInfo = new ArrayList<String>();
 
     @JsonIgnore
     public JocError() {
@@ -24,16 +27,38 @@ public class JocError extends Err{
         setCode(code);
         setMessage(message);
     }
+    
+    @JsonIgnore
+    public JocError(String code, String message, String ...metaInfos) {
+        setCode(code);
+        setMessage(message);
+        appendMetaInfo(metaInfos);
+    }
 
     @JsonIgnore
-    public void addMetaInfo(String ...str) {
-        for(String s : str) {
-            metaInfo.append(s + "\n");
+    public void appendMetaInfo(String ...metaInfos) {
+        for(String s : metaInfos) {
+            metaInfo.add(s + "\n");
         }
     }
     
     @JsonIgnore
-    public String getMetaInfo() {
-        return metaInfo.toString();
+    public void addMetaInfoOnTop(String ...metaInfos) {
+        List<String> onTop = new ArrayList<String>();
+        for(String s : metaInfos) {
+            onTop.add(s + "\n");
+        }
+        if (onTop.size() > 0) {
+            metaInfo.addAll(0,onTop); 
+        }
+    }
+    
+    @JsonIgnore
+    public String printMetaInfo() {
+        StringBuilder s = new StringBuilder();
+        for (String str : metaInfo) {
+            s.append(str);
+        }
+        return s.toString();
     }
 }

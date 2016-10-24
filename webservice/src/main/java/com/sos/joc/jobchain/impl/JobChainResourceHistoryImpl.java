@@ -13,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceHistory;
 import com.sos.joc.model.jobChain.JobChainHistoryFilter;
@@ -30,13 +31,14 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     private static final String XPATH_FOR_ERROR_NODES = "//job_chain_node[@error_state='%s']";
     private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainResourceHistoryImpl.class);
-
+    private static final String API_CALL = "./job_chain/history";
+    
     @Override
     public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
 
-        LOGGER.debug("init job_chain/history");
+        LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
+            JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isHistory());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -45,6 +47,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
                 jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
+            //TODO nested job chains have to consider too
             String postCommand = createJobchainHistoryPostCommand(jobChainHistoryFilter);
             jocXmlCommand.executePost(postCommand);
 
@@ -92,10 +95,12 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobChainHistoryFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobChainHistoryFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
 
         }
     }

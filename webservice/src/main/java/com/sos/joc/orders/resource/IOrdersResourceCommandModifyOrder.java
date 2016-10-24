@@ -47,5 +47,11 @@ public interface IOrdersResourceCommandModifyOrder {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postOrdersSetRunTime(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
-
+    
+    @POST
+    @Path("remove_setback")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse postOrdersRemoveSetBack(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    
 }

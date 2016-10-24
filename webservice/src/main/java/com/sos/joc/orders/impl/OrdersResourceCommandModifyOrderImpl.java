@@ -1,123 +1,41 @@
 package com.sos.joc.orders.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.jobscheduler.BulkError;
+import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 import com.sos.scheduler.model.commands.JSCmdModifyOrder;
 import com.sos.scheduler.model.objects.JSObjRunTime;
-import com.sos.scheduler.model.objects.Spooler;
 
 @Path("orders")
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandModifyOrderImpl.class);
-
-    private String[] getParams(List<NameValuePair> list) {
-        String[] orderParams = new String[list.size() * 2];
-
-        for (int i = 0; i < list.size(); i = i + 2) {
-            NameValuePair param = list.get(i);
-            orderParams[i] = param.getName();
-            orderParams[i + 1] = param.getValue();
-        }
-
-        return orderParams;
-    }
-
-    private JOCDefaultResponse executeModifyOrderCommand(ModifyOrder order, String command) {
-
-        try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-
-            SchedulerObjectFactory schedulerObjectFactory = new SchedulerObjectFactory();
-            schedulerObjectFactory.initMarshaller(Spooler.class);
-            JSCmdModifyOrder jsCmdModifyOrder = schedulerObjectFactory.createModifyOrder();
-            jsCmdModifyOrder.setJobChainIfNotEmpty(order.getJobChain());
-            jsCmdModifyOrder.setOrderIfNotEmpty(order.getOrderId());
-
-            if ("start".equals(command)) {
-                if (order.getAt() == null || "".equals(order.getAt())) {
-                    order.setAt("now");
-                }
-            } else {
-                jsCmdModifyOrder.setAtIfNotEmpty(order.getAt());
-            }
-
-            jsCmdModifyOrder.setEndStateIfNotEmpty(order.getEndState());
-            jsCmdModifyOrder.setPriorityIfNotEmpty("");
-            if ("set_state".equals(command)) {
-                jsCmdModifyOrder.setStateIfNotEmpty(order.getState());
-            }
-            jsCmdModifyOrder.setSetbackIfNotEmpty("");
-            if ("suspend".equals(command)) {
-                jsCmdModifyOrder.setSuspendedIfNotEmpty("yes");
-            }
-            if ("resume".equals(command)) {
-                jsCmdModifyOrder.setSuspendedIfNotEmpty("no");
-            }
-            if ("reset".equals(command)) {
-                jsCmdModifyOrder.setAction("reset");
-            }
-            jsCmdModifyOrder.setTitleIfNotEmpty("");
-            String[] jobParams = getParams(order.getParams());
-            if (jobParams != null) {
-                jsCmdModifyOrder.setParams(jobParams);
-            }
-            if ("set_run_time".equals(command)) {
-                if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
-                    JSObjRunTime objRuntime = new JSObjRunTime(schedulerObjectFactory, order.getRunTime());
-                    jsCmdModifyOrder.setRunTime(objRuntime);
-                }
-            }
-
-            String xml = schedulerObjectFactory.toXMLString(jsCmdModifyOrder);
-            jocXmlCommand.executePost(xml);
-            listOfErrors = addError(listOfErrors, jocXmlCommand, order.getJobChain());
-
-            return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(String.format("Error executing modify order.%s %s:%s", command, e.getCause(), e.getMessage()));
-        }
-    }
-
-    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) {
-        LOGGER.debug("init Orders: Start");
-        JOCDefaultResponse jocDefaultResponse = JOCDefaultResponse.responseStatusJSOk(new Date());
-
-        try {
-            jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), permission);
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            for (ModifyOrder order : modifyOrders.getOrders()) {
-                jocDefaultResponse = executeModifyOrderCommand(order, command);
-            }
-            if (listOfErrors != null) {
-                return JOCDefaultResponse.responseStatus419(listOfErrors);
-            }
-        } catch (Exception e) {
-            return jocDefaultResponse;
-        }
-
-        return jocDefaultResponse;
-
-    }
-
+    private static String API_CALL = "./jobs/";
+    private List<Err419> listOfErrors = new ArrayList<Err419>();
+    
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {
-        LOGGER.debug("init Orders: Start");
         try {
             return postOrdersCommand(accessToken, "start", getPermissons(accessToken).getOrder().isStart(), modifyOrders);
         } catch (JocException e) {
@@ -126,14 +44,16 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
-    public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrders modifyOrders) throws Exception {
-        LOGGER.debug("init Orders:Suspend");
-        return postOrdersCommand(accessToken, "suspend", getPermissons(accessToken).getOrder().isSuspend(), modifyOrders);
+    public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrders modifyOrders) {
+        try {
+            return postOrdersCommand(accessToken, "suspend", getPermissons(accessToken).getOrder().isSuspend(), modifyOrders);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
     }
 
     @Override
     public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrders modifyOrders) {
-        LOGGER.debug("init Orders:Resume");
         try {
             return postOrdersCommand(accessToken, "resume", getPermissons(accessToken).getOrder().isResume(), modifyOrders);
         } catch (JocException e) {
@@ -143,7 +63,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     @Override
     public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrders modifyOrders) {
-        LOGGER.debug("init Orders: Reset");
         try {
             return postOrdersCommand(accessToken, "reset", getPermissons(accessToken).getOrder().isReset(), modifyOrders);
         } catch (JocException e) {
@@ -153,7 +72,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     @Override
     public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrders modifyOrders) {
-        LOGGER.debug("init Orders: Set State");
         try {
             return postOrdersCommand(accessToken, "set_state", getPermissons(accessToken).getOrder().isSetState(), modifyOrders);
         } catch (JocException e) {
@@ -163,12 +81,132 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     @Override
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
-        LOGGER.debug("init Orders: Set Runtime");
         try {
             return postOrdersCommand(accessToken, "set_run_time", getPermissons(accessToken).getOrder().isSetRunTime(), modifyOrders);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
+    
+    @Override
+    public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
+        try {
+            return postOrdersCommand(accessToken, "remove_setback", getPermissons(accessToken).getOrder().isRemoveSetback(), modifyOrders);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+    }
+    
+    private Date executeModifyOrderCommand(ModifyOrder order, String command) {
 
+        try {
+            checkRequiredParameter("jobChain", order.getJobChain());
+            checkRequiredParameter("orderId", order.getOrderId());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JSCmdModifyOrder jsCmdModifyOrder = Globals.schedulerObjectFactory.createModifyOrder();
+            jsCmdModifyOrder.setJobChain(order.getJobChain());
+            jsCmdModifyOrder.setOrder(order.getOrderId());
+            
+            switch(command) {
+            case "start":
+                if (order.getAt() == null || "".equals(order.getAt())) {
+                    jsCmdModifyOrder.setAt("now");
+                } else {
+                    jsCmdModifyOrder.setAt(order.getAt());
+                }
+                if (order.getParams() != null || order.getParams().size() > 0) {
+                    jsCmdModifyOrder.setParams(getParams(order.getParams()));
+                }
+                break;
+            case "set_state":
+                if (order.getEndState() != null && !"".equals(order.getEndState())) {
+                    jsCmdModifyOrder.setEndState(order.getEndState());
+                }
+                if (order.getState() != null && !"".equals(order.getState())) {
+                    jsCmdModifyOrder.setState(order.getState());
+                }
+                if (order.getRemoveSetback() != null && !"".equals(order.getRemoveSetback())) {
+                    jsCmdModifyOrder.setSetback("no");
+                }
+                //TODO resume order implicitly if new state is an end state
+                //Here, asks database.
+                if (order.getResume() != null && !"".equals(order.getResume())) {
+                    jsCmdModifyOrder.setSuspended("no");
+                }
+                break;
+            case "suspend":
+                jsCmdModifyOrder.setSuspended("yes");
+                break;
+            case "resume":
+                jsCmdModifyOrder.setSuspended("no");
+                if (order.getParams() != null || order.getParams().size() > 0) {
+                    jsCmdModifyOrder.setParams(getParams(order.getParams()));
+                }
+                break;
+            case "reset":
+                jsCmdModifyOrder.setAction("reset");
+                break;
+            case "remove_setback":
+                jsCmdModifyOrder.setSetback("no");
+                break;
+            case "set_run_time":
+                if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
+                    try {
+                        //TODO order.getRunTime() is checked against scheduler.xsd
+                        JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, order.getRunTime());
+                        jsCmdModifyOrder.setRunTime(objRuntime);
+                    } catch (Exception e) {
+                        throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
+                    }
+                }
+            }
+            String xml = jsCmdModifyOrder.toXMLString();
+            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            return jocXmlCommand.getSurveyDate();
+        } catch (JocException e) {
+            listOfErrors.add(new BulkError().get(e, order));
+        } catch (Exception e) {
+            listOfErrors.add(new BulkError().get(e, order));
+        }
+        return null;
+    }
+
+    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) {
+        API_CALL += command;
+        LOGGER.debug(API_CALL);
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), permission);
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            if (modifyOrders.getOrders().size() == 0) {
+                throw new JocMissingRequiredParameterException("undefined 'orders'");
+            }
+            Date surveyDate = new Date();
+            for (ModifyOrder order : modifyOrders.getOrders()) {
+                surveyDate = executeModifyOrderCommand(order, command);
+            }
+            if (listOfErrors.size() > 0) {
+                JocError err = new JocError();
+                err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
+                return JOCDefaultResponse.responseStatus419(listOfErrors, err);
+            }
+            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+    }
+    
+    private Map<String,String> getParams(List<NameValuePair> params) {
+        Map<String,String> orderParams = new HashMap<String,String>();
+        for (NameValuePair param : params) {
+            orderParams.put(param.getName(), param.getValue());
+        }
+        return orderParams;
+    }
 }

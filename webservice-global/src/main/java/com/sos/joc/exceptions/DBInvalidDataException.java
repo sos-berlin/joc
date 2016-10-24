@@ -18,7 +18,7 @@ public class DBInvalidDataException extends JocException {
     }
     
     public DBInvalidDataException(JocError error) {
-        super(error);
+        super(updateJocErrorCode(error, ERROR_CODE));
     }
 
     public DBInvalidDataException(String message, Throwable cause) {
@@ -36,7 +36,7 @@ public class DBInvalidDataException extends JocException {
     
     public DBInvalidDataException(JocError error, Throwable cause, boolean enableSuppression,
             boolean writableStackTrace) {
-        super(error, cause, enableSuppression, writableStackTrace);
+        super(updateJocErrorCode(error, ERROR_CODE), cause, enableSuppression, writableStackTrace);
     }
 
 }

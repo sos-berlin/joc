@@ -3,14 +3,14 @@ package com.sos.joc.classes;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.session.Session;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -18,21 +18,17 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.Err419;
 
 
 public class JOCResourceImpl {
     private static final Logger LOGGER = Logger.getLogger(JOCResourceImpl.class);
+    private ObjectMapper mapper = new ObjectMapper();
 
-    private static final String JOC_420 = "JOC-420";
-    private static final String COULD_NOT_GET_ERROR_MESSAGE_FROM_JOB_SCHEDULER_ANSWER = "Could not get error message from JobScheduler answer";
-    private static final String SPOOLER_ANSWER_ERROR = "//spooler/answer/ERROR";
     protected DBItemInventoryInstance dbItemInventoryInstance;
 
     private String accessToken;
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
-    protected List<Err419> listOfErrors;
     protected JocError jocError;
 
     protected SOSPermissionJocCockpit getPermissons(String accessToken) throws JocException {
@@ -146,30 +142,6 @@ public class JOCResourceImpl {
         return checkRequiredParameter(paramKey,String.valueOf(paramVal));
     }
     
-    public List<Err419> addError(List<Err419> listOfErrors, JOCXmlCommand jocXmlCommand, String path) {
-        if (listOfErrors == null) {
-            listOfErrors = new ArrayList<Err419>();
-        }
-        Err419 error = new Err419();
-        try {
-            jocXmlCommand.executeXPath(SPOOLER_ANSWER_ERROR);
-        } catch (Exception e) {
-            error.setCode(JOC_420);
-            error.setMessage(COULD_NOT_GET_ERROR_MESSAGE_FROM_JOB_SCHEDULER_ANSWER);
-        }
-        String code = jocXmlCommand.getAttribute("code");
-        if (code != null) {
-            if (code != null && code.length() > 0) {
-                error.setCode(code);
-                error.setMessage(jocXmlCommand.getAttribute("text"));
-            }
-            error.setPath(path);
-            error.setSurveyDate(jocXmlCommand.getSurveyDate());
-            listOfErrors.add(error);
-        }
-        return listOfErrors;
-    }
-
     protected String getParent(String path){
         Path  p = Paths.get(path).getParent();
         if (p == null){
@@ -187,4 +159,19 @@ public class JOCResourceImpl {
         }
     }
     
+    public String[] getMetaInfo (String apiCall, Object body) {
+        String[] strings = new String[3];
+        strings[0] = "\nREQUEST: " + apiCall;
+        if (body != null) {
+            try {
+                strings[1] = "PARAMS: " + mapper.writeValueAsString(body);
+            } catch (JsonProcessingException e) {
+                strings[1] = "PARAMS: " + body.toString();
+            }
+        } else {
+            strings[1] = "PARAMS: -";
+        }
+        strings[2] = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
+        return strings;
+    }
 }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResource;
 import com.sos.joc.model.job.JobV200;
@@ -18,7 +19,7 @@ import com.sos.joc.model.job.JobFilter;
 @Path("job")
 public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceImpl.class);
-    private static final String API_CALL = "API-CALL: ./job";
+    private static final String API_CALL = "./job";
 
     public JOCDefaultResponse postJob(String accessToken, JobFilter jobFilter) throws Exception {
         LOGGER.debug(API_CALL);
@@ -27,18 +28,19 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
             return jocDefaultResponse;
         }
         try {
-            JobV200 entity = new JobV200();
+            checkRequiredParameter("job", jobFilter.getJob());
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl());
-            if (checkRequiredParameter("job", jobFilter.getJob())) {
-                entity.setJob(jocXmlCommand.getJob(jobFilter.getJob(), jobFilter.getCompact(), true));
-                entity.setDeliveryDate(new Date());
-            }
+            JobV200 entity = new JobV200();
+            entity.setJob(jocXmlCommand.getJob(jobFilter.getJob(), jobFilter.getCompact(), true));
+            entity.setDeliveryDate(new Date());
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

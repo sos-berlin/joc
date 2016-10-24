@@ -13,28 +13,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
-import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.schedules.resource.ISchedulesResourceP;
 import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.processClass.ProcessClassP;
-import com.sos.joc.model.processClass.ProcessClassPath;
 import com.sos.joc.model.schedule.ScheduleP;
 import com.sos.joc.model.schedule.SchedulePath;
 import com.sos.joc.model.schedule.SchedulesFilter;
 import com.sos.joc.model.schedule.SchedulesP;
-import com.sos.joc.model.schedule.Substitute;
-import com.sos.joc.model.schedule.UsedByJob;
-import com.sos.joc.model.schedule.UsedByOrder;
+import com.sos.joc.schedules.resource.ISchedulesResourceP;
 
 @Path("schedules")
 public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedulesResourceP {

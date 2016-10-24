@@ -35,7 +35,7 @@ public class OrdersResourceOrderCommandAddOrderImplTest {
         orders.add(order2);
 
         modifyOrderSchema.setOrders(orders);
-        modifyOrderSchema.setJobschedulerId("scheduler_current");
+        modifyOrderSchema.setJobschedulerId("scheduler.1.11");
         OrdersResourceCommandAddOrderImpl ordersResourceHistoryImpl = new OrdersResourceCommandAddOrderImpl();
         JOCDefaultResponse ordersResponse = ordersResourceHistoryImpl.postOrdersAdd(sosShiroCurrentUserAnswer.getAccessToken(), modifyOrderSchema);
         Ok okSchema = (Ok) ordersResponse.getEntity();
