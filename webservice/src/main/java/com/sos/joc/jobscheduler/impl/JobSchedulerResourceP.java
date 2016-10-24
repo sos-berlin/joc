@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -91,7 +92,7 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
             
             JobSchedulerP200 entity = new JobSchedulerP200();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setJobscheduler(jobscheduler);
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

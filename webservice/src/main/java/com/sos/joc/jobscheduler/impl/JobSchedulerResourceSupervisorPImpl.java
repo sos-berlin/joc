@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -47,7 +48,7 @@ public class JobSchedulerResourceSupervisorPImpl implements IJobSchedulerResourc
                 return jobSchedulerPResource.postJobschedulerP();
             } else {
                 JobSchedulerP200 entity = new JobSchedulerP200();
-                entity.setDeliveryDate(new Date());
+                entity.setDeliveryDate(Date.from(Instant.now()));
                 entity.setJobscheduler(new JobSchedulerP());
                 return JOCDefaultResponse.responseStatus200(entity);
             }

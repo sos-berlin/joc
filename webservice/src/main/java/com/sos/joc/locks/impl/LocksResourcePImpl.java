@@ -1,5 +1,6 @@
 package com.sos.joc.locks.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,7 +50,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(locksFilter.getJobschedulerId());
             InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(Globals.sosHibernateConnection);
             LocksP entity = new LocksP();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             List<LockP> listOfLocks = new ArrayList<LockP>();
             if (locks != null && !locks.isEmpty()) {
                 List<LockP> locksToAdd = new ArrayList<LockP>();

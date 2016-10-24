@@ -3,7 +3,7 @@ package com.sos.joc.classes;
 import java.util.Date;
 
 
-public class OrderDuration {
+public class Duration {
 
     private Date startTime;
     private Date endTime;

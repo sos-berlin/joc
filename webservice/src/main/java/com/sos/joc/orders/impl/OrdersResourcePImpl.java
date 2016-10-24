@@ -1,5 +1,6 @@
 package com.sos.joc.orders.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,9 +17,9 @@ import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.db.reporting.ReportDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderP;
@@ -58,7 +59,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
              * folders
              */
             OrdersP entity = new OrdersP();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
 
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(ordersFilterSchema.getJobschedulerId());
@@ -143,7 +144,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     }
     
     private Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
-        JobSchedulerOrderHistoryDBLayer dbLayer = new JobSchedulerOrderHistoryDBLayer(Globals.sosHibernateConnection);
+        ReportDBLayer dbLayer = new ReportDBLayer(Globals.sosHibernateConnection);
         Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order.getOrderId());
         if (estimatedDurationInMillis != null) {
             return estimatedDurationInMillis.intValue()/1000;

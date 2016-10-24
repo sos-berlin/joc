@@ -1,14 +1,10 @@
 package com.sos.joc.db.history.order;
 
-import java.util.List;
-
-import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.classes.OrderDuration;
 import com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem;
 import com.sos.scheduler.history.db.SchedulerOrderHistoryDBItemPostgres;
 
@@ -25,17 +21,19 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
         String log = null;
         try {
             if (this.getConnection().dbmsIsPostgres()) {
-                SchedulerOrderHistoryDBItemPostgres schedulerHistoryDBItem = (SchedulerOrderHistoryDBItemPostgres) this.getConnection().get(SchedulerOrderHistoryDBItemPostgres.class,Long.parseLong(orderHistoryId));
+                SchedulerOrderHistoryDBItemPostgres schedulerHistoryDBItem = (SchedulerOrderHistoryDBItemPostgres) this.getConnection()
+                        .get(SchedulerOrderHistoryDBItemPostgres.class, Long.parseLong(orderHistoryId));
                 if (schedulerHistoryDBItem != null && schedulerHistoryDBItem.getLog() != null) {
                     log = schedulerHistoryDBItem.getLogAsString();
                 }
             } else {
-                SchedulerOrderHistoryDBItem schedulerHistoryDBItem = (SchedulerOrderHistoryDBItem) this.getConnection().get(SchedulerOrderHistoryDBItem.class,Long.parseLong(orderHistoryId));
+                SchedulerOrderHistoryDBItem schedulerHistoryDBItem =
+                        (SchedulerOrderHistoryDBItem) this.getConnection().get(SchedulerOrderHistoryDBItem.class, Long.parseLong(orderHistoryId));
                 if (schedulerHistoryDBItem != null && schedulerHistoryDBItem.getLog() != null) {
                     log = schedulerHistoryDBItem.getLogAsString();
                 }
             }
-            
+
         } catch (Exception e1) {
             LOGGER.error(e1.getMessage(), e1);
             return null;
@@ -43,34 +41,4 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
         return log;
     }
 
-    public Long getOrderEstimatedDuration(String orderId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ");
-            sql.append(SchedulerOrderHistoryDBItem.class.getSimpleName());
-            sql.append(" where orderId = :orderId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("orderId", orderId);
-            List<SchedulerOrderHistoryDBItem> result = query.list();
-            if (result != null) {
-                Long durationSum = 0L;
-                int count = result.size();
-                for (SchedulerOrderHistoryDBItem orderHistory : result) {
-                    OrderDuration duration = new OrderDuration();
-                    duration.setStartTime(orderHistory.getStartTime());
-                    duration.setEndTime(orderHistory.getEndTime());
-                    duration.initDuration();
-                    durationSum += duration.getDurationInMillis();
-                }
-                if (count != 0) {
-                    return durationSum / count;
-                }
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-        
 }

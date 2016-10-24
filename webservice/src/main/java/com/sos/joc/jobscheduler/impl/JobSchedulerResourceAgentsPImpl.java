@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,7 +45,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 return jocDefaultResponse;
             }
             AgentsP entity = new AgentsP();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             List<AgentP> listOfAgents = new ArrayList<AgentP>();
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(agentFilterSchema.getJobschedulerId());

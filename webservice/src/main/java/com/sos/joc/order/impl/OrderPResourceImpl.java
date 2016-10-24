@@ -1,5 +1,6 @@
 package com.sos.joc.order.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -12,14 +13,14 @@ import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.db.reporting.ReportDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.order.OrderP200;
-import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderP;
+import com.sos.joc.model.order.OrderP200;
+import com.sos.joc.model.order.OrderType;
 import com.sos.joc.order.resource.IOrderPResource;
 
 @Path("order")
@@ -48,7 +49,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilterWithCompactSchema.getJobChain(),
                     orderFilterWithCompactSchema.getOrderId(), instanceId);
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             OrderP order = new OrderP();
             // Required fields
             order.setSurveyDate(dbItemInventoryOrder.getModified());
@@ -83,7 +84,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
     }
 
     private Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
-        JobSchedulerOrderHistoryDBLayer dbLayer = new JobSchedulerOrderHistoryDBLayer(Globals.sosHibernateConnection);
+        ReportDBLayer dbLayer = new ReportDBLayer(Globals.sosHibernateConnection);
         Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order.getOrderId());
         if (estimatedDurationInMillis != null) {
             return estimatedDurationInMillis.intValue()/1000;

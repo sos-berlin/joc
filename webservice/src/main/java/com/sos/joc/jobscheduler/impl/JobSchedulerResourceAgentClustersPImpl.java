@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,7 +58,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 return jocDefaultResponse;
             }
             AgentClustersP entity = new AgentClustersP();
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
             ArrayList<AgentClusterP> listOfAgentClusters = new ArrayList<AgentClusterP>();
             /** FILTERS:
              * compact
