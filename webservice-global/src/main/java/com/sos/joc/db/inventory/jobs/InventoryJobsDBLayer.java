@@ -28,10 +28,11 @@ public class InventoryJobsDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
             sql.append(DBITEM_INVENTORY_JOBS);
-            sql.append(" where job.instanceId = :instanceId");
-            sql.append(" name  = :name");
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and name  = :name");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
             query.setParameter("name", name);
             List<DBItemInventoryJob> result = query.list();
             if (!result.isEmpty()) {
@@ -48,7 +49,7 @@ public class InventoryJobsDBLayer extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOBS);
-            sql.append(" where job.instanceId = :instanceId");
+            sql.append(" where instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             return query.list();
