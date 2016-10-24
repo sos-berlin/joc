@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.time.Instant;
 import java.util.Date;
 
 import javax.ws.rs.Path;
@@ -38,8 +39,7 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
             }
 
             JobSchedulerV200 entity = new JobSchedulerV200();
-            entity.setDeliveryDate(new Date());
-
+            
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
             if (supervisorId != DBLayer.DEFAULT_ID) {
                 InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
@@ -54,6 +54,8 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
             } else {
                 entity.setJobscheduler(new JobSchedulerV());
             }
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerId));
