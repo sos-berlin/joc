@@ -23,6 +23,7 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.jobscheduler.AgentVCallable;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgents;
 import com.sos.joc.model.jobscheduler.AgentFilter;
@@ -33,10 +34,11 @@ import com.sos.joc.model.jobscheduler.AgentsV;
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements IJobSchedulerResourceAgents {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsImpl.class);
-
+    private static final String API_CALL = "./jobscheduler/agents";
+    
     @Override
     public JOCDefaultResponse postJobschedulerAgents(String accessToken, AgentFilter agentFilter) {
-        LOGGER.debug("init jobscheduler/agents");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(agentFilter.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -71,11 +73,13 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
             
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, agentFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, agentFilter));
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
-
     }
 
 }

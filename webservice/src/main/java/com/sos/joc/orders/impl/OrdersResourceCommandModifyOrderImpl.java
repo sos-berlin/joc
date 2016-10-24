@@ -32,75 +32,117 @@ import com.sos.scheduler.model.objects.JSObjRunTime;
 @Path("orders")
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandModifyOrderImpl.class);
-    private static String API_CALL = "./jobs/";
+    private static String API_CALL = "./orders/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {
+        API_CALL += "start";
+        LOGGER.debug(API_CALL);
         try {
             return postOrdersCommand(accessToken, "start", getPermissons(accessToken).getOrder().isStart(), modifyOrders);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+"start", modifyOrders));
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrders modifyOrders) {
+        API_CALL += "suspend";
+        LOGGER.debug(API_CALL);
         try {
             return postOrdersCommand(accessToken, "suspend", getPermissons(accessToken).getOrder().isSuspend(), modifyOrders);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+"suspend", modifyOrders));
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrders modifyOrders) {
+        API_CALL += "resume";
+        LOGGER.debug(API_CALL);
         try {
             return postOrdersCommand(accessToken, "resume", getPermissons(accessToken).getOrder().isResume(), modifyOrders);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+"resume", modifyOrders));
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrders modifyOrders) {
+        API_CALL += "reset";
+        LOGGER.debug(API_CALL);
         try {
             return postOrdersCommand(accessToken, "reset", getPermissons(accessToken).getOrder().isReset(), modifyOrders);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+"reset", modifyOrders));
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrders modifyOrders) {
+        API_CALL += "set_state";
+        LOGGER.debug(API_CALL);
         try {
             return postOrdersCommand(accessToken, "set_state", getPermissons(accessToken).getOrder().isSetState(), modifyOrders);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+"set_state", modifyOrders));
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
+        API_CALL += "set_run_time";
+        LOGGER.debug(API_CALL);
         try {
             return postOrdersCommand(accessToken, "set_run_time", getPermissons(accessToken).getOrder().isSetRunTime(), modifyOrders);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+"set_run_time", modifyOrders));
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
     
     @Override
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
+        API_CALL += "remove_setback";
+        LOGGER.debug(API_CALL);
         try {
             return postOrdersCommand(accessToken, "remove_setback", getPermissons(accessToken).getOrder().isRemoveSetback(), modifyOrders);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+"remove_setback", modifyOrders));
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -179,34 +221,24 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         return null;
     }
 
-    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) {
-        API_CALL += command;
-        LOGGER.debug(API_CALL);
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), permission);
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            if (modifyOrders.getOrders().size() == 0) {
-                throw new JocMissingRequiredParameterException("undefined 'orders'");
-            }
-            Date surveyDate = Date.from(Instant.now());
-            for (ModifyOrder order : modifyOrders.getOrders()) {
-                surveyDate = executeModifyOrderCommand(order, command);
-            }
-            if (listOfErrors.size() > 0) {
-                JocError err = new JocError();
-                err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-                return JOCDefaultResponse.responseStatus419(listOfErrors, err);
-            }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
-        } catch (JocException e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
+    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) throws Exception {
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), permission);
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
+        if (modifyOrders.getOrders().size() == 0) {
+            throw new JocMissingRequiredParameterException("undefined 'orders'");
+        }
+        Date surveyDate = Date.from(Instant.now());
+        for (ModifyOrder order : modifyOrders.getOrders()) {
+            surveyDate = executeModifyOrderCommand(order, command);
+        }
+        if (listOfErrors.size() > 0) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatus419(listOfErrors, err);
         }
+        return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
     
     private Map<String,String> getParams(List<NameValuePair> params) {

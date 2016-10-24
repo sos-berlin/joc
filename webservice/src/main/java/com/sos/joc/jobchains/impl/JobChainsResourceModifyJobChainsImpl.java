@@ -29,47 +29,14 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
     private static final String STOP = "stop";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourceModifyJobChainsImpl.class);
     private List<Err419> listOfErrors = new ArrayList<Err419>();
-    private static String API_CALL = "./orders/";
+    private static String API_CALL = "./job_chains/";
     
     @Override
     public JOCDefaultResponse postJobChainsStop(String accessToken, ModifyJobChains modifyJobChains) {
-        try {
-            return postJobChainsCommand(STOP, accessToken, getPermissons(accessToken).getJobChain().isStop(), modifyJobChains);
-        } catch (JocException e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-    }
-
-    @Override
-    public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifyJobChains modifyJobChains) {
-        try {
-            return postJobChainsCommand(UNSTOP, accessToken, getPermissons(accessToken).getJobChain().isUnstop(), modifyJobChains);
-        } catch (JocException e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-    }
-    
-    private JOCDefaultResponse postJobChainsCommand(String command, String accessToken, boolean permission, ModifyJobChains modifyJobChains) {
-        API_CALL += command;
+        API_CALL += STOP;
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobChains.getJobschedulerId(), permission);
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            if (modifyJobChains.getJobChains().size() == 0) {
-                throw new JocMissingRequiredParameterException("undefined 'jobChains'");
-            }
-            Date surveyDate = new Date();
-            for (ModifyJobChain jobChain : modifyJobChains.getJobChains()) {
-                surveyDate = executeModifyJobChainCommand(jobChain, command);
-            }
-            if (listOfErrors.size() > 0) {
-                JocError err = new JocError();
-                err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobChains));
-                return JOCDefaultResponse.responseStatus419(listOfErrors, err);
-            }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+            return postJobChainsCommand(STOP, accessToken, getPermissons(accessToken).getJobChain().isStop(), modifyJobChains);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobChains));
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -78,6 +45,42 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobChains));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
+    }
+
+    @Override
+    public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifyJobChains modifyJobChains) {
+        API_CALL += UNSTOP;
+        LOGGER.debug(API_CALL);
+        try {
+            return postJobChainsCommand(UNSTOP, accessToken, getPermissons(accessToken).getJobChain().isUnstop(), modifyJobChains);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobChains));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobChains));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+    }
+    
+    private JOCDefaultResponse postJobChainsCommand(String command, String accessToken, boolean permission, ModifyJobChains modifyJobChains) throws Exception {
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobChains.getJobschedulerId(), permission);
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
+        if (modifyJobChains.getJobChains().size() == 0) {
+            throw new JocMissingRequiredParameterException("undefined 'jobChains'");
+        }
+        Date surveyDate = new Date();
+        for (ModifyJobChain jobChain : modifyJobChains.getJobChains()) {
+            surveyDate = executeModifyJobChainCommand(jobChain, command);
+        }
+        if (listOfErrors.size() > 0) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobChains));
+            return JOCDefaultResponse.responseStatus419(listOfErrors, err);
+        }
+        return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
 
     private Date executeModifyJobChainCommand(ModifyJobChain jobChain, String cmd) {

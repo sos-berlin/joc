@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters;
 import com.sos.joc.model.jobscheduler.AgentClusterFilter;
@@ -25,10 +27,11 @@ import com.sos.joc.model.processClass.Process;
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClusters {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentClustersImpl.class);
-
+    private static final String API_CALL = "./jobscheduler/agent_clusters";
+    
     @Override
     public JOCDefaultResponse postJobschedulerAgentClusters(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
-        LOGGER.debug("init jobscheduler/agent/clusters");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobSchedulerAgentClustersBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -40,7 +43,6 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             // TODO JOC Cockpit Webservice
             //waiting for https://change.sos-berlin.com/browse/JS-1613
 
-            entity.setDeliveryDate(new Date());
             ArrayList<AgentClusterV> listOfAgentClusters = new ArrayList<AgentClusterV>();
 
             AgentClusterV agentClusterVSchema = new AgentClusterV();
@@ -93,14 +95,16 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             entity.setAgentClusters(listOfAgentClusters);
 
             // TODO get a list of agents and set the data.
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerAgentClustersBody));
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerAgentClustersBody));
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
 
     }

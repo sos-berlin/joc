@@ -7,6 +7,7 @@ import javax.ws.rs.Path;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.JobSchedulerVolatile;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResource;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -14,7 +15,7 @@ import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSchedulerResource {
-    private static final String API_CALL = "API-CALL: ./jobscheduler";
+    private static final String API_CALL = "./jobscheduler";
     
     @Override
     public JOCDefaultResponse postJobscheduler(String accessToken, JobSchedulerId jobSchedulerBody) throws Exception {
@@ -29,9 +30,11 @@ public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSch
             entity.setDeliveryDate(new Date());
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerBody));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerBody));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }

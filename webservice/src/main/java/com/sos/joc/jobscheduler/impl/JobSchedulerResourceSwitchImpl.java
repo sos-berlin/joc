@@ -11,6 +11,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSwitch;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -18,26 +19,28 @@ import com.sos.joc.model.common.JobSchedulerId;
 @Path("jobscheduler")
 public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements IJobSchedulerResourceSwitch {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceSwitchImpl.class);
-    private static final String API_CALL = "API-CALL: ./jobscheduler/switch";
+    private static final String API_CALL = "./jobscheduler/switch";
 
     @Override
-    public JOCDefaultResponse postJobschedulerSwitch(String accessToken, JobSchedulerId jobSchedulerFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobschedulerSwitch(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
 
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             JOCPreferences jocPreferences = new JOCPreferences();
-            jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, jobSchedulerFilterSchema.getJobschedulerId());
+            jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, jobSchedulerId.getJobschedulerId());
             return JOCDefaultResponse.responseStatusJSOk(new Date());
 
         } catch (JocException e) {
-            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerId));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerId));
+            return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 }

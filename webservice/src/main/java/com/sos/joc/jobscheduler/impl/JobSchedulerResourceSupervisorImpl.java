@@ -15,6 +15,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.JobSchedulerVolatile;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSupervisor;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -24,7 +25,7 @@ import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 @Path("jobscheduler")
 public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implements IJobSchedulerResourceSupervisor {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceSupervisorImpl.class);
-    private static final String API_CALL = "API-CALL: ./jobscheduler/supervisor";
+    private static final String API_CALL = "./jobscheduler/supervisor";
 
     @Override
     public JOCDefaultResponse postJobschedulerSupervisor(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
@@ -55,9 +56,11 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerId));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerId));
             return JOCDefaultResponse.responseStatusJSError(e);
         } finally {
             Globals.rollback();

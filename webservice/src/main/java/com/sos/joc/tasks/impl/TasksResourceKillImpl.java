@@ -39,78 +39,92 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 
     @Override
     public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasks modifyTasks) {
+        API_CALL += TERMINATE;
+        LOGGER.debug(API_CALL);
         try {
             return postTasksCommand(accessToken, TERMINATE, getPermissons(accessToken).getJob().isTerminate(), modifyTasks);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+TERMINATE, modifyTasks));
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-    }
-
-    @Override
-    public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasks modifyTasks) {
-        try {
-            return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissons(accessToken).getJob().isTerminate(), modifyTasks);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+TERMINATE_WITHIN, modifyTasks));
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-    }
-
-    @Override
-    public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasks modifyTasks) {
-        try {
-            return postTasksCommand(accessToken, KILL, getPermissons(accessToken).getJob().isKill(), modifyTasks);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+KILL, modifyTasks));
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-    }
-    
-    @Override
-    public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasks modifyTasks) {
-        try {
-            return postTasksCommand(accessToken, END, getPermissons(accessToken).getJob().isKill(), modifyTasks);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL+END, modifyTasks));
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-    }
-    
-    private JOCDefaultResponse postTasksCommand(String accessToken, String command, boolean permission, ModifyTasks modifyTasks) {
-        API_CALL += command;
-        LOGGER.debug(API_CALL);
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyTasks.getJobschedulerId(), permission);
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            Date surveyDate = Date.from(Instant.now());
-            for (TasksFilter job : modifyTasks.getJobs()) {
-                List<TaskId> taskIds = job.getTaskIds();
-                if (taskIds == null || taskIds.isEmpty()) {
-                    //terminate all tasks of job
-                    taskIds = getTaskIds(job);
-                }
-                if (taskIds != null) {
-                    for (TaskId task : taskIds) {
-                        surveyDate = executeKillCommand(job, task, command, modifyTasks);
-                    }
-                }
-            }
-            if (listOfErrors.size() > 0) {
-                JocError err = new JocError();
-                err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
-                return JOCDefaultResponse.responseStatus419(listOfErrors, err);
-            }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
-        } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyTasks));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
+    }
+
+    @Override
+    public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasks modifyTasks) {
+        API_CALL += TERMINATE_WITHIN;
+        LOGGER.debug(API_CALL);
+        try {
+            return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissons(accessToken).getJob().isTerminate(), modifyTasks);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyTasks));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+    }
+
+    @Override
+    public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasks modifyTasks) {
+        API_CALL += KILL;
+        LOGGER.debug(API_CALL);
+        try {
+            return postTasksCommand(accessToken, KILL, getPermissons(accessToken).getJob().isKill(), modifyTasks);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyTasks));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+    }
+    
+    @Override
+    public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasks modifyTasks) {
+        API_CALL += END;
+        LOGGER.debug(API_CALL);
+        try {
+            return postTasksCommand(accessToken, END, getPermissons(accessToken).getJob().isKill(), modifyTasks);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyTasks));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+    }
+    
+    private JOCDefaultResponse postTasksCommand(String accessToken, String command, boolean permission, ModifyTasks modifyTasks) throws Exception {
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyTasks.getJobschedulerId(), permission);
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
+        Date surveyDate = Date.from(Instant.now());
+        for (TasksFilter job : modifyTasks.getJobs()) {
+            List<TaskId> taskIds = job.getTaskIds();
+            if (taskIds == null || taskIds.isEmpty()) {
+                //terminate all tasks of job
+                taskIds = getTaskIds(job);
+            }
+            if (taskIds != null) {
+                for (TaskId task : taskIds) {
+                    surveyDate = executeKillCommand(job, task, command, modifyTasks);
+                }
+            }
+        }
+        if (listOfErrors.size() > 0) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
+            return JOCDefaultResponse.responseStatus419(listOfErrors, err);
+        }
+        return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
     
     private List<TaskId> getTaskIds(TasksFilter job) {

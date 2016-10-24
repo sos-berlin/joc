@@ -39,54 +39,96 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
     @Override
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
+        API_CALL += STOP;
+        LOGGER.debug(API_CALL);
         try {
             return postJobsCommand(accessToken, STOP, getPermissons(accessToken).getJob().isStop(), modifyJobs);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs)  {
+        API_CALL += UNSTOP;
+        LOGGER.debug(API_CALL);
         try {
             return postJobsCommand(accessToken, UNSTOP, getPermissons(accessToken).getJob().isUnstop(), modifyJobs);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
+        API_CALL += SET_RUN_TIME;
+        LOGGER.debug(API_CALL);
         try {
             return postJobsCommand(accessToken, SET_RUN_TIME, getPermissons(accessToken).getJob().isSetRunTime(), modifyJobs);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
+        API_CALL += END;
+        LOGGER.debug(API_CALL);
         try {
             return postJobsCommand(accessToken, END, getPermissons(accessToken).getJob().isEndAllTasks(), modifyJobs);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
+        API_CALL += SUSPEND;
+        LOGGER.debug(API_CALL);
         try {
             return postJobsCommand(accessToken, SUSPEND, getPermissons(accessToken).getJob().isSuspendAllTasks(), modifyJobs);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
+        API_CALL += CONTINUE;
+        LOGGER.debug(API_CALL);
         try {
             return postJobsCommand(accessToken, CONTINUE, getPermissons(accessToken).getJob().isContinueAllTasks(), modifyJobs);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -101,7 +143,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             jsCmdModifyJob.setJobIfNotEmpty(modifyJob.getJob());
             if (SET_RUN_TIME.equals(command)) {
                 try {
-                    //TODO order.getRunTime() is checked against scheduler.xsd
+                    //TODO order.getRunTime() should be checked against scheduler.xsd
                     JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, modifyJob.getRunTime());
                     jsCmdModifyJob.setRunTime(objRuntime);
                 } catch (Exception e) {
@@ -120,34 +162,23 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         return null;
     }
 
-    private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobs modifyJobs) {
-        API_CALL += command;
-        LOGGER.debug(API_CALL);
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(modifyJobs.getJobschedulerId(), permission);
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            if (modifyJobs.getJobs().size() == 0) {
-                throw new JocMissingRequiredParameterException("undefined 'jobs'");
-            }
-            Date surveyDate = new Date();
-            for (ModifyJob job : modifyJobs.getJobs()) {
-                surveyDate = executeModifyJobCommand(job, command);
-            }
-            if (listOfErrors.size() > 0) {
-                JocError err = new JocError();
-                err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-                return JOCDefaultResponse.responseStatus419(listOfErrors, err);
-            }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
+    private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobs modifyJobs) throws Exception {
+        JOCDefaultResponse jocDefaultResponse = init(modifyJobs.getJobschedulerId(), permission);
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
+        if (modifyJobs.getJobs().size() == 0) {
+            throw new JocMissingRequiredParameterException("undefined 'jobs'");
+        }
+        Date surveyDate = new Date();
+        for (ModifyJob job : modifyJobs.getJobs()) {
+            surveyDate = executeModifyJobCommand(job, command);
+        }
+        if (listOfErrors.size() > 0) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatus419(listOfErrors, err);
         }
+        return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
 }

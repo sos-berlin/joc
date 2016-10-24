@@ -36,62 +36,70 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
 
     @Override
     public JOCDefaultResponse postJobChainNodesStop(String accessToken, ModifyJobChainNodes modifyNodes) {
+        API_CALL += STOP;
+        LOGGER.debug(API_CALL);
         try {
             return postJobChainNodesCommands(accessToken, STOP, getPermissons(accessToken).getJobChain().isStopJobChainNode(), modifyNodes);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyNodes));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyNodes));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
-
     }
 
     @Override
     public JOCDefaultResponse postJobChainNodesSkip(String accessToken, ModifyJobChainNodes modifyNodes) {
+        API_CALL += SKIP;
+        LOGGER.debug(API_CALL);
         try {
             return postJobChainNodesCommands(accessToken, SKIP, getPermissons(accessToken).getJobChain().isSkipJobChainNode(), modifyNodes);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyNodes));
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyNodes));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
 
     public JOCDefaultResponse postJobChainNodesActivate(String accessToken, ModifyJobChainNodes modifyNodes) {
+        API_CALL += ACTIVATE;
+        LOGGER.debug(API_CALL);
         try {
             return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissons(accessToken).getJobChain().isUnskipJobChainNode() || getPermissons(
                     accessToken).getJobChain().isUnstopJobChainNode(), modifyNodes);
         } catch (JocException e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-
-    }
-
-    private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission, ModifyJobChainNodes jobChainNodes) {
-        API_CALL += command;
-        LOGGER.debug(API_CALL);
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainNodes.getJobschedulerId(), permission);
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            if (jobChainNodes.getNodes().size() == 0) {
-                throw new JocMissingRequiredParameterException("undefined 'nodes'");
-            }
-            Date surveyDate = new Date();
-            for (ModifyJobChainNode jobChainNode : jobChainNodes.getNodes()) {
-                surveyDate = executeModifyJobChainNodeCommand(jobChainNode, command);
-            }
-            if (listOfErrors.size() > 0) {
-                JocError err = new JocError();
-                err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobChainNodes));
-                return JOCDefaultResponse.responseStatus419(listOfErrors, err);
-            }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobChainNodes));
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyNodes));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobChainNodes));
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyNodes));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
+    }
+
+    private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission, ModifyJobChainNodes jobChainNodes) throws Exception {
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainNodes.getJobschedulerId(), permission);
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
+        if (jobChainNodes.getNodes().size() == 0) {
+            throw new JocMissingRequiredParameterException("undefined 'nodes'");
+        }
+        Date surveyDate = new Date();
+        for (ModifyJobChainNode jobChainNode : jobChainNodes.getNodes()) {
+            surveyDate = executeModifyJobChainNodeCommand(jobChainNode, command);
+        }
+        if (listOfErrors.size() > 0) {
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobChainNodes));
+            return JOCDefaultResponse.responseStatus419(listOfErrors, err);
+        }
+        return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
 
     private Date executeModifyJobChainNodeCommand(ModifyJobChainNode jobChainNode, String cmd) {

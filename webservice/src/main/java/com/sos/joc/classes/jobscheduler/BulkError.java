@@ -103,14 +103,14 @@ public class BulkError extends Err419 {
         }
         setCode(e.getError().getCode());
         setMessage(e.getError().getMessage());
-        LOGGER.error(getMessage());
+        LOGGER.error(getMessage(),e);
     }
     
     private void setCodeAndMessage(Throwable e) {
         setCode(JOC_419);
         String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
         setMessage(errorMsg);
-        LOGGER.error(getMessage());
+        LOGGER.error(getMessage(),e);
     }
     
     private void setPath(ModifyOrder order) {
