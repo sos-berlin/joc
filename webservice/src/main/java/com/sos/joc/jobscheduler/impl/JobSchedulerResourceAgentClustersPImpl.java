@@ -58,7 +58,6 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 return jocDefaultResponse;
             }
             AgentClustersP entity = new AgentClustersP();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             ArrayList<AgentClusterP> listOfAgentClusters = new ArrayList<AgentClusterP>();
             /** FILTERS:
              * compact
@@ -109,6 +108,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 }
             }
             entity.setAgentClusters(listOfAgentClusters);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

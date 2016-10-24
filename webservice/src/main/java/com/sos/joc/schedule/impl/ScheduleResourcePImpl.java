@@ -43,8 +43,8 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
             ScheduleP schedule = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, instance);
 
             ScheduleP200 entity = new ScheduleP200();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setSchedule(schedule);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

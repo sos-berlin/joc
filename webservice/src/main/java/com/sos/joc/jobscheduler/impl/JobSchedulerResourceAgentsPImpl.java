@@ -45,7 +45,6 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 return jocDefaultResponse;
             }
             AgentsP entity = new AgentsP();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             List<AgentP> listOfAgents = new ArrayList<AgentP>();
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(agentFilterSchema.getJobschedulerId());
@@ -66,6 +65,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
                 }
             }
             entity.setAgents(listOfAgents);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

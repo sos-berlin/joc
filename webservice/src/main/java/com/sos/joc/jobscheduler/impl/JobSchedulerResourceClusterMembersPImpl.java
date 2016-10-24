@@ -31,8 +31,8 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
                 return jocDefaultResponse;
             }
             MastersP entity = new MastersP();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setMasters(ClusterMembersPermanent.getClusterMembers(jobSchedulerFilterSchema.getJobschedulerId()));
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());

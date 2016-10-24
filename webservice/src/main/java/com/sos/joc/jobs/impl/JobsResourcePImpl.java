@@ -48,14 +48,12 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            // FILTER
             Boolean compact = jobsFilterSchema.getCompact();
             regex = jobsFilterSchema.getRegex();
             folders = jobsFilterSchema.getFolders();
             jobs = jobsFilterSchema.getJobs();
             isOrderJob = jobsFilterSchema.getIsOrderJob();
             List<JobP> listJobs = new ArrayList<JobP>();
-
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jobsFilterSchema.getJobschedulerId());

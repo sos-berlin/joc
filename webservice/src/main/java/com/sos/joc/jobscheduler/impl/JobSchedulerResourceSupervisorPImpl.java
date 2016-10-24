@@ -24,7 +24,6 @@ public class JobSchedulerResourceSupervisorPImpl implements IJobSchedulerResourc
     @Override
     public JOCDefaultResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerId jobSchedulerFilterSchema) throws Exception {
         JobSchedulerResourceP jobSchedulerPResource = new JobSchedulerResourceP(accessToken, jobSchedulerFilterSchema);
-
         try {
             Globals.beginTransaction();
             DBItemInventoryInstance dbItemInventoryInstance = jobSchedulerPResource.getJobschedulerUser().getSchedulerInstance(
@@ -48,8 +47,8 @@ public class JobSchedulerResourceSupervisorPImpl implements IJobSchedulerResourc
                 return jobSchedulerPResource.postJobschedulerP();
             } else {
                 JobSchedulerP200 entity = new JobSchedulerP200();
-                entity.setDeliveryDate(Date.from(Instant.now()));
                 entity.setJobscheduler(new JobSchedulerP());
+                entity.setDeliveryDate(Date.from(Instant.now()));
                 return JOCDefaultResponse.responseStatus200(entity);
             }
         } catch (JocException e) {

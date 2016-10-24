@@ -52,18 +52,15 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             }
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            // TODO JOC Cockpit Webservice
             JobSchedulerP jobscheduler = new JobSchedulerP();
             jobscheduler.setHost(dbItemInventoryInstance.getHostname());
             jobscheduler.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
             jobscheduler.setPort(dbItemInventoryInstance.getPort());
             jobscheduler.setStartedAt(dbItemInventoryInstance.getStartedAt());
-            
             ClusterMemberType clusterMemberTypeSchema = new ClusterMemberType();
             clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getPrecedence());
             clusterMemberTypeSchema.set_type(ClusterType.fromValue(dbItemInventoryInstance.getClusterType()));
             jobscheduler.setClusterType(clusterMemberTypeSchema);
-
             InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryOperatingSystem osItem = osLayer.getInventoryOperatingSystem(dbItemInventoryInstance.getOsId());
             OperatingSystem os = new OperatingSystem();
@@ -71,7 +68,6 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
             os.setDistribution(osItem.getDistribution());
             os.setName(osItem.getName());
             jobscheduler.setOs(os);
-
             if (supervisorId != 0) {
                 DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstancesByKey(supervisorId);
                 if (schedulerSupervisorInstancesDBItem == null) {
@@ -86,14 +82,12 @@ public class JobSchedulerResourceP extends JOCResourceImpl {
 
                 }
             }
-
             jobscheduler.setTimeZone(dbItemInventoryInstance.getTimeZone());
             jobscheduler.setVersion(dbItemInventoryInstance.getVersion());
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
-            
             JobSchedulerP200 entity = new JobSchedulerP200();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setJobscheduler(jobscheduler);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);

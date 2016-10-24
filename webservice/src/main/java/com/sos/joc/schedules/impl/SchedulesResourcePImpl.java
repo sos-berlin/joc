@@ -80,8 +80,8 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                 }
             }
             SchedulesP entity = new SchedulesP();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setSchedules(listOfSchedules);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             return JOCDefaultResponse.responseStatusJSError(e);
