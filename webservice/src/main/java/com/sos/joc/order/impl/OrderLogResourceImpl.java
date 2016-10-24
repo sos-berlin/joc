@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.LogOrderContent;
-import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.LogContent200;
@@ -40,24 +39,17 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             }
 
             LogContent200 entity = new LogContent200();
+            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance);
             //TODO surveyDate from database
             entity.setSurveyDate(Date.from(Instant.now()));
-            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance);
-
+            
             LogContent logContentSchema = new LogContent();
             String log = logOrderContent.getLog();
              
             if (orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
                 logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(log));
             } else {
-                if (orderHistoryFilter.getMime() == null || orderHistoryFilter.getMime() == LogMime.PLAIN) {
-                    logContentSchema.setPlain(log);
-                } else {
-                    JocError jocError = new JocError();
-                    jocError.setCode(WebserviceConstants.WRONG_MIME_TYPE);
-                    jocError.setMessage("Unknow mime type: " + orderHistoryFilter.getMime());
-                    throw new JocException(jocError);
-                }
+                logContentSchema.setPlain(log);
             }
             entity.setLog(logContentSchema);
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -71,7 +63,6 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, orderHistoryFilter));
             return JOCDefaultResponse.responseStatusJSError(e, err);
         }
-
     }
 
  

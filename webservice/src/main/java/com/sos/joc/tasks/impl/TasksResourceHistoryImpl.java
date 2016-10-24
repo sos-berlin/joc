@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.job.JobsFilter;
@@ -23,14 +24,14 @@ import com.sos.joc.tasks.resource.ITasksResourceHistory;
 @Path("tasks")
 public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksResourceHistory {
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceHistoryImpl.class);
-
+    private static final String API_CALL = "./tasks/history";
+    
     @Override
     public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
-        LOGGER.debug("init tasks/history");
+        LOGGER.debug(API_CALL);
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobsFilter.getJobschedulerId(), getPermissons(accessToken).getHistory().isView());
-
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -81,13 +82,12 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobsFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            System.out.println(e.getCause() + ":" + e.getMessage());
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobsFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
-
     }
-
 }
