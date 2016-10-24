@@ -125,6 +125,7 @@ public class JOCJsonCommand {
             if (contentType.contains("application/json")) {
                 JsonReader rdr = Json.createReader(new StringReader(response));
                 JsonObject json = rdr.readObject();
+                
                 throw new JobSchedulerBadRequestException(json.getString("message", response));
             } else {
                 if ("Unknown Agent".equalsIgnoreCase(response)) {

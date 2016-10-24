@@ -14,6 +14,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceHistory;
 import com.sos.joc.model.common.Err;
@@ -30,11 +31,12 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceHistoryImpl.class);
     private static final Integer DEFAULT_MAX_HISTORY_ITEMS = 25;
     private static final String XPATH_FOR_TASK_HISTORY = "/spooler/answer/job/history/history.entry";
+    private static final String API_CALL = "./job/configuration";
 
     @Override
     public JOCDefaultResponse postJobHistory(String accessToken, TaskHistoryFilter taskHistoryFilter) throws Exception {
 
-        LOGGER.debug("init job/history");
+        LOGGER.debug(API_CALL);
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(taskHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
@@ -42,6 +44,7 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
                 return jocDefaultResponse;
             }
 
+            checkRequiredParameter("job", taskHistoryFilter.getJob());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (taskHistoryFilter.getMaxLastHistoryItems() == null) {
                 taskHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
@@ -90,14 +93,17 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
                 listOfHistory.add(history);
             }
             TaskHistory entity = new TaskHistory();
-            entity.setDeliveryDate(new Date());
             entity.setHistory(listOfHistory);
-
+            entity.setDeliveryDate(new Date());
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, taskHistoryFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, taskHistoryFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
 
         }
     }

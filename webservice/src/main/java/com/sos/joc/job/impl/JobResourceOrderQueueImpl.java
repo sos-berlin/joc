@@ -11,6 +11,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceOrderQueue;
 import com.sos.joc.model.job.JobV200;
@@ -19,13 +20,14 @@ import com.sos.joc.model.job.JobFilter;
 @Path("job")
 public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobResourceOrderQueue {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceOrderQueueImpl.class);
+    private static final String API_CALL = "./job/order_queue";
 
     @Override
-    public JOCDefaultResponse postJobOrderQueue(String accessToken, JobFilter jobFilterSchema) throws Exception {
+    public JOCDefaultResponse postJobOrderQueue(String accessToken, JobFilter jobFilter) throws Exception {
 
-        LOGGER.debug("init job/order_queue");
+        LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobFilterSchema.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -33,17 +35,20 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
             JobV200 entity = new JobV200();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl());
             JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
-            jocJsonCommand.addOrderCompactQuery(jobFilterSchema.getCompact());
+            jocJsonCommand.addOrderCompactQuery(jobFilter.getCompact());
             jocXmlCommand.setUriForJsonCommand(jocJsonCommand.getURI());
-            if (checkRequiredParameter("job", jobFilterSchema.getJob())) {
+            if (checkRequiredParameter("job", jobFilter.getJob())) {
+                entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobFilter.getJob(), jobFilter.getCompact()));
                 entity.setDeliveryDate(new Date());
-                entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobFilterSchema.getJob(), jobFilterSchema.getCompact()));
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

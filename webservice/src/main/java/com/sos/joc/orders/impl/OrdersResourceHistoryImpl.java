@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.order.History;
 import com.sos.joc.model.order.OrderHistory;
 import com.sos.joc.model.order.OrderHistoryItem;
 import com.sos.joc.model.order.OrderHistoryState;

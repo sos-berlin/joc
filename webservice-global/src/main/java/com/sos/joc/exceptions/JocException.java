@@ -26,7 +26,7 @@ public class JocException extends Exception {
         this.error = error;
     }
 
-   public JocException(JocError error, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public JocException(JocError error, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(error.toString(), cause, enableSuppression, writableStackTrace);
         this.error = error;
     }
@@ -39,6 +39,13 @@ public class JocException extends Exception {
         this.error = error;
     }
     
+    public static JocError updateJocErrorCode(JocError jocError, String code) {
+        if (jocError.getCode() == null) {
+            jocError.setCode(code);
+        }
+        return jocError;
+    }
+    
     public void setErrorMessage(String message) {
         if (this.error == null) {
             this.error = new JocError(); 
@@ -46,16 +53,23 @@ public class JocException extends Exception {
         this.error.setMessage(message);
     }
     
-    public void addErrorMetaInfo(String ...metaInfo) {
+    public void addErrorMetaInfo(String ...metaInfos) {
         if (this.error == null) {
             this.error = new JocError(); 
         }
-        this.error.addMetaInfo(metaInfo);
+        this.error.addMetaInfoOnTop(metaInfos);
     }
     
-    public void setErrorMessageAndAddMetaInfo(String message, String ...metaInfo) {
+    public void appendErrorMetaInfo(String ...metaInfos) {
+        if (this.error == null) {
+            this.error = new JocError(); 
+        }
+        this.error.appendMetaInfo(metaInfos);
+    }
+    
+    public void setErrorMessageAndAddMetaInfo(String message, String ...metaInfos) {
         setErrorMessage(message);
-        this.error.addMetaInfo(metaInfo);
+        this.error.addMetaInfoOnTop(metaInfos);
     }
 
 }

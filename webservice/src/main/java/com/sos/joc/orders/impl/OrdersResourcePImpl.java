@@ -31,9 +31,9 @@ import com.sos.joc.orders.resource.IOrdersResourceP;
 @Path("orders")
 public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourcePImpl.class);
-    private String dateFromFilter = null;
-    private String dateToFilter = null;
-    private String timeZoneFilter = null;
+//    private String dateFromFilter = null;
+//    private String dateToFilter = null;
+//    private String timeZoneFilter = null;
     private String regex = null;
     private List<OrderPath> ordersFilter = null;
     private List<Folder> foldersFilter = null;
@@ -66,9 +66,9 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
             // FILTERS
-            dateFromFilter = ordersFilterSchema.getDateFrom();
-            dateToFilter = ordersFilterSchema.getDateTo();
-            timeZoneFilter = ordersFilterSchema.getTimeZone();
+//            dateFromFilter = ordersFilterSchema.getDateFrom();
+//            dateToFilter = ordersFilterSchema.getDateTo();
+//            timeZoneFilter = ordersFilterSchema.getTimeZone();
             
             regex = ordersFilterSchema.getRegex();
             ordersFilter = ordersFilterSchema.getOrders();

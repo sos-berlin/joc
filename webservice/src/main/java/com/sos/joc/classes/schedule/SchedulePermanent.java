@@ -61,10 +61,7 @@ public class SchedulePermanent {
                 schedule.setUsedByOrders(null);
             }
         }
-        if (schedule != null) {
-            return schedule;
-        }
-        return null;
+        return schedule;
     }
 
 }

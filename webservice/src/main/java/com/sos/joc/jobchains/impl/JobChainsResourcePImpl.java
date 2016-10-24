@@ -24,7 +24,6 @@ import com.sos.joc.jobchains.resource.IJobChainsResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainP;
 import com.sos.joc.model.jobChain.JobChainPath;
-import com.sos.joc.model.jobChain.JobChainStateText;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.jobChain.JobChainsP;
 
@@ -34,7 +33,6 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
     private Boolean compact;
     private List<Folder> folders;
     private List<JobChainPath> jobChainPaths;
-    private String jobschedulerId;
     private String regex;
     private List<JobChainP> allNestedJobChains = new ArrayList<JobChainP>();
     private Long instanceId;
@@ -53,7 +51,6 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             compact = jobChainsFilter.getCompact();
             folders = jobChainsFilter.getFolders();
             jobChainPaths = jobChainsFilter.getJobChains();
-            jobschedulerId = jobChainsFilter.getJobschedulerId();
             regex = jobChainsFilter.getRegex();
             
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);

@@ -12,6 +12,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceConfiguration;
 import com.sos.joc.model.common.Configuration200;
@@ -21,13 +22,13 @@ import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJobResourceConfiguration {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceConfigurationImpl.class);
+    private static final String API_CALL = "./job/configuration";
 
     @Override
     public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilter jobBody) throws Exception {
 
-        LOGGER.debug("init job/configuration");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -42,9 +43,12 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobBody));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobBody));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

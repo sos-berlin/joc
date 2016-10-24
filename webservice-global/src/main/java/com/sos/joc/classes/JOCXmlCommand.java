@@ -10,8 +10,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
-import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.xml.SOSXmlCommand;
 
@@ -20,6 +20,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
     private Date surveyDate;
     private Map<String, NodeList> listOfNodeLists;
     private URI uriForJsonCommand;
+    private String xmlCommand = null;
 
     public JOCXmlCommand(String url) {
         super(url + WebserviceConstants.XML_COMMAND_API_PATH);
@@ -31,7 +32,9 @@ public class JOCXmlCommand extends SOSXmlCommand {
             try {
                 String surveyDateStr = getSosxml().selectSingleNodeValue("/spooler/answer/@time");
                 surveyDate = JobSchedulerDate.getDateFromISO8601String(surveyDateStr);
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                surveyDate = new Date();
+            }
         }
         return surveyDate;
     }
@@ -106,16 +109,29 @@ public class JOCXmlCommand extends SOSXmlCommand {
         String xPath = "/spooler/answer/ERROR";
         Element errorElem = (Element) getSosxml().selectSingleNode(xPath);
         if (errorElem != null) {
-            throw new JobSchedulerInvalidResponseDataException(new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text")));
+            JocError err = new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text"));
+            if (xmlCommand != null) {
+                err.appendMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand); 
+            }
+            JobSchedulerBadRequestException badRequestException = new JobSchedulerBadRequestException(err);
+            badRequestException.setSurveyDate(getSurveyDate());
+            throw badRequestException;
         }
     }
     
     @Override
     public String executePost(String xmlCommand) throws JobSchedulerConnectionRefusedException {
+        this.xmlCommand = xmlCommand;
         try {
             return super.executePost(xmlCommand);
         } catch (Exception e) {
             throw new JobSchedulerConnectionRefusedException(getUrl(), e);
         }
+    }
+    
+    public String executePostWithThrowBadRequest(String xmlCommand) throws Exception {
+        String s = executePost(xmlCommand);
+        throwJobSchedulerError();
+        return s;
     }
 }

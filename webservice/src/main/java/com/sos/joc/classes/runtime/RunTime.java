@@ -22,11 +22,11 @@ public class RunTime {
     public static RunTime200 set(JOCXmlCommand jocXmlCommand, String postCommand, String xPath) throws Exception {
         jocXmlCommand.executePost(postCommand);
         RunTime200 runTimeAnswer = new RunTime200();
-        runTimeAnswer.setDeliveryDate(new Date());
         Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode(xPath);
         com.sos.joc.model.common.RunTime runTime = new com.sos.joc.model.common.RunTime();
         runTime.setRunTime(getRuntimeXmlString(runtimeNode));
         runTimeAnswer.setRunTime(runTime);
+        runTimeAnswer.setDeliveryDate(new Date());
         return runTimeAnswer;
     }
     
