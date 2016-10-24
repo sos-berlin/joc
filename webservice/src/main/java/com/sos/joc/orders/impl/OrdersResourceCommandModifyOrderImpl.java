@@ -1,5 +1,6 @@
 package com.sos.joc.orders.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             return postOrdersCommand(accessToken, "start", getPermissons(accessToken).getOrder().isStart(), modifyOrders);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL+"start", modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -48,6 +50,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             return postOrdersCommand(accessToken, "suspend", getPermissons(accessToken).getOrder().isSuspend(), modifyOrders);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL+"suspend", modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -57,6 +60,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             return postOrdersCommand(accessToken, "resume", getPermissons(accessToken).getOrder().isResume(), modifyOrders);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL+"resume", modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -66,6 +70,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             return postOrdersCommand(accessToken, "reset", getPermissons(accessToken).getOrder().isReset(), modifyOrders);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL+"reset", modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -75,6 +80,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             return postOrdersCommand(accessToken, "set_state", getPermissons(accessToken).getOrder().isSetState(), modifyOrders);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL+"set_state", modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -84,6 +90,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             return postOrdersCommand(accessToken, "set_run_time", getPermissons(accessToken).getOrder().isSetRunTime(), modifyOrders);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL+"set_run_time", modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -93,6 +100,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             return postOrdersCommand(accessToken, "remove_setback", getPermissons(accessToken).getOrder().isRemoveSetback(), modifyOrders);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL+"remove_setback", modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         }
     }
@@ -182,7 +190,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             if (modifyOrders.getOrders().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'orders'");
             }
-            Date surveyDate = new Date();
+            Date surveyDate = Date.from(Instant.now());
             for (ModifyOrder order : modifyOrders.getOrders()) {
                 surveyDate = executeModifyOrderCommand(order, command);
             }
@@ -193,7 +201,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             }
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             JocError err = new JocError();

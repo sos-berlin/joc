@@ -100,7 +100,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         if (!compact) {
             showJob.setWhat("job_params " + showJob.getWhat());
         }
-        showJob.setJob(job);
+        showJob.setJobName(job);
         // showJob.setMaxOrders(BigInteger.valueOf(0));
         showJob.setMaxTaskHistory(BigInteger.valueOf(0));
         return showJob.toXMLString();

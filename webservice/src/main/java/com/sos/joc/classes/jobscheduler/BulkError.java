@@ -10,6 +10,8 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.StartJob;
+import com.sos.joc.model.job.TaskId;
+import com.sos.joc.model.job.TasksFilter;
 import com.sos.joc.model.jobChain.ModifyJobChain;
 import com.sos.joc.model.jobChain.ModifyJobChainNode;
 import com.sos.joc.model.order.ModifyOrder;
@@ -83,6 +85,18 @@ public class BulkError extends Err419 {
         return this;
     }
     
+    public Err419 get(JocException e, TasksFilter job, TaskId taskId) {
+        setCodeAndMessage(e);
+        setPath(job, taskId);
+        return this;
+    }
+    
+    public Err419 get(Throwable e, TasksFilter job, TaskId taskId) {
+        setCodeAndMessage(e);
+        setPath(job, taskId);
+        return this;
+    }
+    
     private void setCodeAndMessage(JocException e) {
         if (e instanceof JobSchedulerBadRequestException) {
             setSurveyDate(((JobSchedulerBadRequestException) e).getSurveyDate());
@@ -109,6 +123,14 @@ public class BulkError extends Err419 {
     
     private void setPath(ModifyJobChainNode node) {
         StringBuilder path = new StringBuilder().append(node.getJobChain()).append(",").append(node.getNode());
+        setPath(path.toString());
+    }
+    
+    private void setPath(TasksFilter job, TaskId taskId) {
+        StringBuilder path = new StringBuilder().append(job.getJob());
+        if (taskId != null) {
+            path.append(",").append(taskId.getTaskId());
+        }
         setPath(path.toString());
     }
 }
