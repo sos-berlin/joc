@@ -19,6 +19,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.locks.InventoryLocksDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.locks.resource.ILocksResourceP;
 import com.sos.joc.model.common.Folder;
@@ -30,13 +31,14 @@ import com.sos.joc.model.lock.LocksP;
 @Path("locks")
 public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourcePImpl.class);
+    private static final String API_CALL = "./locks/p";
     private String regex;
     private List<Folder> folders;
     private List<LockPath> locks;
 
     @Override
     public JOCDefaultResponse postLocksP(String accessToken, LocksFilter locksFilter) throws Exception {
-        LOGGER.debug("init locks");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(locksFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -50,7 +52,6 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(locksFilter.getJobschedulerId());
             InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(Globals.sosHibernateConnection);
             LocksP entity = new LocksP();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             List<LockP> listOfLocks = new ArrayList<LockP>();
             if (locks != null && !locks.isEmpty()) {
                 List<LockP> locksToAdd = new ArrayList<LockP>();
@@ -80,11 +81,15 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                 }
             }
             entity.setLocks(listOfLocks);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, locksFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, locksFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
     

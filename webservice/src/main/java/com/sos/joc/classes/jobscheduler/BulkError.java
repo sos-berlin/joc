@@ -11,6 +11,7 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.jobChain.ModifyJobChain;
+import com.sos.joc.model.jobChain.ModifyJobChainNode;
 import com.sos.joc.model.order.ModifyOrder;
 
 
@@ -70,6 +71,18 @@ public class BulkError extends Err419 {
         return this;
     }
     
+    public Err419 get(JocException e, ModifyJobChainNode node) {
+        setCodeAndMessage(e);
+        setPath(node);
+        return this;
+    }
+    
+    public Err419 get(Throwable e, ModifyJobChainNode node) {
+        setCodeAndMessage(e);
+        setPath(node);
+        return this;
+    }
+    
     private void setCodeAndMessage(JocException e) {
         if (e instanceof JobSchedulerBadRequestException) {
             setSurveyDate(((JobSchedulerBadRequestException) e).getSurveyDate());
@@ -91,6 +104,11 @@ public class BulkError extends Err419 {
         if (order.getOrderId() != null) {
             path.append(",").append(order.getOrderId());
         }
-        setPath(order.getJobChain());
+        setPath(path.toString());
+    }
+    
+    private void setPath(ModifyJobChainNode node) {
+        StringBuilder path = new StringBuilder().append(node.getJobChain()).append(",").append(node.getNode());
+        setPath(path.toString());
     }
 }
