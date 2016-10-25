@@ -1,5 +1,6 @@
 package com.sos.joc.schedules.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.schedule.ScheduleVolatile;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.schedules.resource.ISchedulesResource;
@@ -37,13 +39,14 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
     private static final String XPATH_SCHEDULES = "//schedule";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceImpl.class);
+    private static final String API_CALL = "./schedules";
     private SchedulesFilter schedulesFilter;
     private HashMap<String, String> mapOfSchedules;
 
 
     @Override
     public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
-        LOGGER.debug("init schedules");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -95,14 +98,17 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             }
             
             SchedulesV entity = new SchedulesV();
-            entity.setDeliveryDate(new Date());
             entity.setSchedules(listOfSchedules);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, schedulesFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, schedulesFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
  

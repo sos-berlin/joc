@@ -1,12 +1,14 @@
 package com.sos.joc.orders.impl;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -20,6 +22,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrdersSnapshotCallable;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -32,12 +35,13 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
 @Path("orders")
 public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implements IOrdersResourceOverviewSnapshot {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceOverviewSnapshotImpl.class);
-
+    private static final String API_CALL = "./orders/overview/snapshot";
+    
     @Override
-    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter filterSchema) throws Exception {
-        LOGGER.debug("init orders/overview/summary");
+    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
+        LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(filterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -46,8 +50,8 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             command.addOrderStatisticsQuery();
             URI uri = command.getURI();
             
-            Set<String> jobChains = getJobChainsWithoutDuplicates(filterSchema.getJobChains());
-            Set<String> folders = getFoldersWithoutDuplicatesAndSubfolders(filterSchema.getFolders());
+            Set<String> jobChains = getJobChainsWithoutDuplicates(jobChainsFilter.getJobChains());
+            Set<String> folders = getFoldersWithoutDuplicatesAndSubfolders(jobChainsFilter.getFolders());
             Set<OrdersSnapshotCallable> tasks = new HashSet<OrdersSnapshotCallable>();
             
             if (jobChains.size() > 0) {
@@ -72,24 +76,35 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (Future<OrdersSummary> result : executorService.invokeAll(tasks)) {
-                OrdersSummary o = result.get();
-                summary.setBlacklist(summary.getBlacklist() + o.getBlacklist());
-                summary.setPending(summary.getPending() + o.getPending());
-                summary.setRunning(summary.getRunning() + o.getRunning());
-                summary.setSetback(summary.getSetback() + o.getSetback());
-                summary.setSuspended(summary.getSuspended() + o.getSuspended());
-                summary.setWaitingForResource(summary.getWaitingForResource() + o.getWaitingForResource());
+                try {
+                    OrdersSummary o = result.get();
+                    summary.setBlacklist(summary.getBlacklist() + o.getBlacklist());
+                    summary.setPending(summary.getPending() + o.getPending());
+                    summary.setRunning(summary.getRunning() + o.getRunning());
+                    summary.setSetback(summary.getSetback() + o.getSetback());
+                    summary.setSuspended(summary.getSuspended() + o.getSuspended());
+                    summary.setWaitingForResource(summary.getWaitingForResource() + o.getWaitingForResource());
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
+                }
             }
             
             OrdersSnapshot entity = new OrdersSnapshot();
-            entity.setDeliveryDate(new Date());
             entity.setOrders(summary);
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobChainsFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobChainsFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
 
     }

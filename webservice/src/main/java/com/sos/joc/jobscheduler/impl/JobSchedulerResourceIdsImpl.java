@@ -1,5 +1,6 @@
 package com.sos.joc.jobscheduler.impl;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceIds;
 import com.sos.joc.model.jobscheduler.JobSchedulerIds;
@@ -23,7 +25,7 @@ import com.sos.joc.model.jobscheduler.JobSchedulerIds;
 @Path("jobscheduler")
 public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJobSchedulerResourceIds {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceIdsImpl.class);
-    private static final String API_CALL = "API-CALL: ./jobscheduler/ids";
+    private static final String API_CALL = "./jobscheduler/ids";
 
     @Override
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {
@@ -51,17 +53,18 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             JobSchedulerIds entity = new JobSchedulerIds();
             entity.getJobschedulerIds().addAll(jobSchedulerIds);
             entity.setSelected(selectedInstance);
-            entity.setDeliveryDate(new Date());
+            entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
-            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, null));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-        finally{
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, null));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
+        } finally{
             Globals.rollback();
         }
 

@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JobChainPermanent;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchains.resource.IJobChainsResourceP;
 import com.sos.joc.model.common.Folder;
@@ -37,11 +38,12 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
     private String regex;
     private List<JobChainP> allNestedJobChains = new ArrayList<JobChainP>();
     private Long instanceId;
-  
+    private static final String API_CALL = "./job_chains/p";
+    
      
     @Override
     public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        LOGGER.debug("init job_chains/p");
+        LOGGER.debug(API_CALL);
         JOCDefaultResponse jocDefaultResponse = init(jobChainsFilter.getJobschedulerId(),
                 getPermissons(accessToken).getJobChain().getView().isStatus());
         if (jocDefaultResponse != null) {
@@ -121,9 +123,12 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobChainsFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobChainsFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

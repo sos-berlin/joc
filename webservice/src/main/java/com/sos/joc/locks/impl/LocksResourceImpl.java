@@ -1,5 +1,6 @@
 package com.sos.joc.locks.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.locks.LockVolatile;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.locks.resource.ILocksResource;
@@ -32,11 +34,11 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 @Path("locks")
 public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourceImpl.class);
-
+    private static final String API_CALL = "./locks";
+    
     @Override
     public JOCDefaultResponse postLocks(String accessToken, LocksFilter locksFilter) throws Exception {
-
-        LOGGER.debug("init locks");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(locksFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -66,14 +68,17 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             }
             
             LocksV entity = new LocksV();
-            entity.setDeliveryDate(new Date());
             entity.setLocks(locksV);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, locksFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, locksFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
     

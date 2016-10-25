@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderHistory;
 import com.sos.joc.model.order.OrderHistoryItem;
@@ -22,24 +23,25 @@ import com.sos.joc.orders.resource.IOrdersResourceHistory;
 @Path("orders")
 public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrdersResourceHistory {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceHistoryImpl.class);
-
+    private static final String API_CALL = "./orders/history";
+    
     @Override
-    public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilter orderFilterSchema) throws Exception {
-        LOGGER.debug("init Orders");
+    public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilter ordersFilter) throws Exception {
+        LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(orderFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(ordersFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             // Reading orders from the database tale inventory history tables
             // filtered by
-            orderFilterSchema.getDateFrom(); // is ISO 8601 or something like 6h
+            ordersFilter.getDateFrom(); // is ISO 8601 or something like 6h
                                              // 1w 65y
-            orderFilterSchema.getDateTo(); // same as dateFrom
-            orderFilterSchema.getTimeZone();
-            orderFilterSchema.getRegex();
-            orderFilterSchema.getOrders(); // list of wanted orders.
+            ordersFilter.getDateTo(); // same as dateFrom
+            ordersFilter.getTimeZone();
+            ordersFilter.getRegex();
+            ordersFilter.getOrders(); // list of wanted orders.
 
             // TODO JOC Cockpit Webservice (Data coming from db Inventory
             // History Tables)
@@ -66,10 +68,12 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, ordersFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, ordersFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
 
     }

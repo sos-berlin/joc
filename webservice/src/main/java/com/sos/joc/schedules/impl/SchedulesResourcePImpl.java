@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.schedule.ScheduleP;
@@ -31,24 +32,25 @@ import com.sos.joc.schedules.resource.ISchedulesResourceP;
 @Path("schedules")
 public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedulesResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulesResourcePImpl.class);
+    private static final String API_CALL = "./schedules/p";
     private String regex;
     private List<Folder> folders;
     private List<SchedulePath> schedules;
     @Override
-    public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilter schedulesFilterSchema) throws Exception {
-        LOGGER.debug("init schedules/p");
+    public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
+        LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(schedulesFilterSchema.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             // FILTER
-            folders = schedulesFilterSchema.getFolders();
-            schedules = schedulesFilterSchema.getSchedules();
-            regex = schedulesFilterSchema.getRegex();
+            folders = schedulesFilter.getFolders();
+            schedules = schedulesFilter.getSchedules();
+            regex = schedulesFilter.getRegex();
 
             InventoryInstancesDBLayer instanceDBLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(schedulesFilterSchema.getJobschedulerId());
+            DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(schedulesFilter.getJobschedulerId());
             InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(Globals.sosHibernateConnection);
             List<ScheduleP> listOfSchedules = new ArrayList<ScheduleP>();
 
@@ -84,9 +86,12 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, schedulesFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, schedulesFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

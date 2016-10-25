@@ -23,6 +23,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.agents.InventoryAgentsDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
 import com.sos.joc.model.jobscheduler.AgentClusterPath;
@@ -41,6 +42,7 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;;
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
+    private static final String API_CALL = "./jobscheduler/agent_clusters/p";
     private Boolean compact;
     private List<AgentClusterPath> agentClusters;
     private Integer state;
@@ -49,7 +51,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
-        LOGGER.debug("init jobscheduler/agent/clusters/P");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse =
                     init(jobSchedulerAgentClustersBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView()
@@ -111,9 +113,12 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerAgentClustersBody));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerAgentClustersBody));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

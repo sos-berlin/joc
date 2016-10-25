@@ -150,6 +150,9 @@ public class JOCResourceImpl {
     
     public String[] getMetaInfo (String apiCall, Object body) {
         String[] strings = new String[3];
+        if (apiCall == null) {
+            apiCall = "-";
+        }
         strings[0] = "\nREQUEST: " + apiCall;
         if (body != null) {
             try {
@@ -160,7 +163,11 @@ public class JOCResourceImpl {
         } else {
             strings[1] = "PARAMS: -";
         }
-        strings[2] = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
+        try {
+            strings[2] = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
+        } catch (Exception e) {
+            strings[2] = "USER: -";
+        }
         return strings;
     }
 }

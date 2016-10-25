@@ -30,5 +30,10 @@ public interface ITasksResourceKill {
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postTasksKill(@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
 
-   
+    @POST
+    @Path("end")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse postTasksEnd(@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
+
 }

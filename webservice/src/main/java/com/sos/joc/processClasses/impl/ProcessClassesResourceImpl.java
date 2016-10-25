@@ -1,5 +1,6 @@
 package com.sos.joc.processClasses.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -44,14 +46,14 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     private static final String SUBSYSTEMS = "folder process_class";
     private static final String XPATH_PROCESS_CLASSES = "//process_class";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassesResourceImpl.class);
+    private static final String API_CALL = "./process_classes";
 
     private ProcessClassesFilter processClassFilter;
     private HashMap<String, String> mapOfProcessClasses;
 
     @Override
     public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
-
-        LOGGER.debug("init processClasses");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(processClassFilter.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -74,8 +76,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
             List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
             ProcessClassesV entity = new ProcessClassesV();
-            entity.setDeliveryDate(new Date());
-
+            
             Pattern pattern = null;
             if (!("".equals(processClassFilter.getRegex()) || processClassFilter.getRegex() == null)) {
                 pattern = Pattern.compile(processClassFilter.getRegex());
@@ -120,12 +121,16 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 }
             }
             entity.setProcessClasses(listOfProcessClasses);
+            entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, processClassFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, processClassFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

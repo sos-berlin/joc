@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.Folder;
@@ -31,6 +32,7 @@ import com.sos.joc.model.job.JobsP;
 @Path("jobs")
 public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourcePImpl.class);
+    private static final String API_CALL = "./jobs/p";
     private String regex;
     private List<Folder> folders;
     private List<JobPath> jobs;
@@ -39,7 +41,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
 
     @Override
     public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilterSchema) throws Exception {
-        LOGGER.debug("init jobs p");
+        LOGGER.debug(API_CALL);
         try {
             Globals.beginTransaction();
             JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
@@ -68,9 +70,12 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobsFilterSchema));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobsFilterSchema));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
         finally{
             Globals.rollback();

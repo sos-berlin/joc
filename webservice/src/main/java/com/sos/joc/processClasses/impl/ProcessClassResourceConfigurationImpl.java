@@ -9,6 +9,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
@@ -18,15 +19,15 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("process_class")
 public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl implements IProcessClassResourceConfiguration {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassResourceConfigurationImpl.class);
+    private static final String API_CALL = "./process_class/configuration";
 
     @Override
-    public JOCDefaultResponse postProcessClassConfiguration(String accessToken, ProcessClassConfigurationFilter processClassConfigurationFilterSchema) throws Exception {
+    public JOCDefaultResponse postProcessClassConfiguration(String accessToken, ProcessClassConfigurationFilter processClassConfigurationFilter) throws Exception {
 
-        LOGGER.debug("init process_class/configuration");
+        LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(processClassConfigurationFilterSchema.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView()
+            JOCDefaultResponse jocDefaultResponse = init(processClassConfigurationFilter.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView()
                     .isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -34,16 +35,19 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
 
             Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            if (checkRequiredParameter("processClass", processClassConfigurationFilterSchema.getProcessClass())) {
-                boolean responseInHtml = processClassConfigurationFilterSchema.getMime() == ConfigurationMime.HTML;
-                String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", normalizePath(processClassConfigurationFilterSchema.getProcessClass()));
+            if (checkRequiredParameter("processClass", processClassConfigurationFilter.getProcessClass())) {
+                boolean responseInHtml = processClassConfigurationFilter.getMime() == ConfigurationMime.HTML;
+                String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", normalizePath(processClassConfigurationFilter.getProcessClass()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createProcessClassConfigurationPostCommand(), xPath, "process_class", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, processClassConfigurationFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, processClassConfigurationFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

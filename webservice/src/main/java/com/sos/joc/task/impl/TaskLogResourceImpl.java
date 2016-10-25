@@ -1,5 +1,6 @@
 package com.sos.joc.task.impl;
 
+import java.time.Instant;
 import java.util.Date;
 import javax.ws.rs.Path;
 
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.LogTaskContent;
-import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.LogContent200;
@@ -20,12 +20,12 @@ import com.sos.joc.task.resource.ITaskLogResource;
 
 @Path("task")
 public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogResource {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskLogResourceImpl.class);
-
+    private static final String API_CALL = "./task/log";
+    
     @Override
     public JOCDefaultResponse postTaskLog(String accessToken, TaskFilter taskFilter) throws Exception {
-        LOGGER.debug("init task/log");
+        LOGGER.debug(API_CALL);
 
         try {
             checkRequiredParameter("jobschedulerId", taskFilter.getJobschedulerId());
@@ -38,34 +38,29 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
 
             LogContent200 entity = new LogContent200();
             LogTaskContent logOrderContent = new LogTaskContent(taskFilter,dbItemInventoryInstance);
-
-            entity.setDeliveryDate(new Date());
+            //TODO surveyDate from database
+            entity.setSurveyDate(Date.from(Instant.now()));
+            
             LogContent logContentSchema = new LogContent();
             String log = logOrderContent.getLog();
              
             if (taskFilter.getMime() != null && taskFilter.getMime() == LogMime.HTML) {
                 logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(log));
             } else {
-                if (taskFilter.getMime() == null || taskFilter.getMime() == LogMime.PLAIN) {
-                    logContentSchema.setPlain(log);
-                } else {
-                    JocError jocError = new JocError();
-                    jocError.setCode(WebserviceConstants.WRONG_MIME_TYPE);
-                    jocError.setMessage("Unknow mime type: " + taskFilter.getMime());
-                    throw new JocException(jocError);
-                }
+                logContentSchema.setPlain(log);
             }
             entity.setLog(logContentSchema);
-            entity.setSurveyDate(new Date());
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, taskFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
-
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e.getCause() + ":" + e.getMessage());
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, taskFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
-
     }
 
  

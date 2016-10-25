@@ -14,6 +14,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCluster;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -25,13 +26,13 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceCluster {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceClusterImpl.class);
-    private static final String API_CALL = "API-CALL: ./jobscheduler/cluster";
+    private static final String API_CALL = "./jobscheduler/cluster";
 
     @Override
-    public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilterSchema) {
+    public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilter) {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilterSchema.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
+            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilter.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -41,7 +42,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
             jocXmlCommand.throwJobSchedulerError();
             
             Cluster cluster = new Cluster();
-            cluster.setJobschedulerId(jobSchedulerFilterSchema.getJobschedulerId());
+            cluster.setJobschedulerId(jobSchedulerFilter.getJobschedulerId());
             cluster.setSurveyDate(jocXmlCommand.getSurveyDate());
             Element clusterElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/state/cluster");
             if (clusterElem == null) {
@@ -55,15 +56,17 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
                 }
             }
             Clusters entity = new Clusters();
-            entity.setDeliveryDate(Date.from(Instant.now()));
             entity.setCluster(cluster);
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(API_CALL, "USER: "+getJobschedulerUser().getSosShiroCurrentUser().getUsername());
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
 
     }

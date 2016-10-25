@@ -18,6 +18,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.job.Task;
@@ -33,10 +34,11 @@ import com.sos.scheduler.model.commands.JSCmdShowTask;
 @Path("task")
 public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskResourceImpl.class);
+    private static final String API_CALL = "./task";
 
     @Override
     public JOCDefaultResponse postTask(String accessToken, TaskFilter taskFilter) throws Exception {
-        LOGGER.debug("init task");
+        LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse = init(taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -91,11 +93,13 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.addErrorMetaInfo(getMetaInfo(API_CALL, taskFilter));
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
+            JocError err = new JocError();
+            err.addMetaInfoOnTop(getMetaInfo(API_CALL, taskFilter));
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
-
     }
 
     private String createTaskPostCommand(String taskId) {

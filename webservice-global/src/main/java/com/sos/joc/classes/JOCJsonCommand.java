@@ -77,17 +77,15 @@ public class JOCJsonCommand {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Content-Type", "application/json");
         client.addHeader("Accept", "application/json");
-        LOGGER.debug("call " + uri.toString());
-        if (postBody != null) {
-            LOGGER.debug("with POST body: " + postBody); 
-        }
+        //client.addHeader("X-CSRF-Token", "4711");
+        String[] metaInfo = {"JS-URL: " + uri, "JS-PostBody: " + postBody};
         String response;
         try {
             response = client.executeRestServiceCommand("post", uri.toURL(), postBody);
         } catch (Exception e) {
             throw new JobSchedulerConnectionRefusedException(e);
         }
-        return getJsonObjectFromResponse(response, client);
+        return getJsonObjectFromResponse(response, client, metaInfo);
     }
     
     public JsonObject getJsonObjectFromGet() throws Exception {
@@ -97,17 +95,18 @@ public class JOCJsonCommand {
     public JsonObject getJsonObjectFromGet(URI uri) throws Exception {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Accept", "application/json");
-        LOGGER.debug("call " + uri.toString());
+        //client.addHeader("X-CSRF-Token", "4711");
+        String[] metaInfo = {"JS-URL: " + uri};
         String response;
         try {
             response = client.executeRestServiceCommand("get", uri.toURL());
         } catch (Exception e) {
             throw new JobSchedulerConnectionRefusedException(e);
         }
-        return getJsonObjectFromResponse(response, client);
+        return getJsonObjectFromResponse(response, client, metaInfo);
     }
     
-    private JsonObject getJsonObjectFromResponse(String response, JobSchedulerRestApiClient client) throws Exception {
+    private JsonObject getJsonObjectFromResponse(String response, JobSchedulerRestApiClient client, String[] metaInfo) throws Exception {
         int httpReplyCode = client.statusCode();
         String contentType = client.getResponseHeader("Content-Type");
         
@@ -125,16 +124,23 @@ public class JOCJsonCommand {
             if (contentType.contains("application/json")) {
                 JsonReader rdr = Json.createReader(new StringReader(response));
                 JsonObject json = rdr.readObject();
-                
-                throw new JobSchedulerBadRequestException(json.getString("message", response));
+                JobSchedulerBadRequestException e = new JobSchedulerBadRequestException(json.getString("message", response));
+                e.addErrorMetaInfo(metaInfo);
+                throw e;
             } else {
                 if ("Unknown Agent".equalsIgnoreCase(response)) {
-                    throw new UnknownJobSchedulerAgentException(); 
+                    UnknownJobSchedulerAgentException e = new UnknownJobSchedulerAgentException();
+                    e.addErrorMetaInfo(metaInfo);
+                    throw e; 
                 }
-                throw new JobSchedulerBadRequestException(response);
+                JobSchedulerBadRequestException e = new JobSchedulerBadRequestException(response);
+                e.addErrorMetaInfo(metaInfo);
+                throw e;
             }
         default:
-            throw new JobSchedulerBadRequestException(httpReplyCode + " " + client.getHttpResponse().getStatusLine().getReasonPhrase());
+            JobSchedulerBadRequestException e = new JobSchedulerBadRequestException(httpReplyCode + " " + client.getHttpResponse().getStatusLine().getReasonPhrase());
+            e.addErrorMetaInfo(metaInfo);
+            throw e;
         }
     }
 }
