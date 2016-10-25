@@ -70,13 +70,13 @@
           
           try {
             _scheduler.readCustomSettings();
-            try {
+            //try {
               //solange die locks nicht in der Statistic enthalten sind, werden sie im show_state aufgerufen
               _response = _scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster" subsystems="lock schedule process_class folder"/></commands>', false, false ); 
               _scheduler._tree_view_enabled = true;
-            } catch(x) {
-              _response = _scheduler.executeSynchron( '<show_state max_orders="0" max_task_history="0" what="job_chain_orders"/>', false, false ); 
-            }
+            //} catch(x) {
+            //  _response = _scheduler.executeSynchron( '<show_state max_orders="0" max_task_history="0" what="job_chain_orders"/>', false, false ); 
+            //}
             _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
             document.title  = _scheduler._host + ":" + _scheduler._port;
             document.title += ( _scheduler._id ) ? "/" + _scheduler._id : "";
