@@ -28,6 +28,7 @@ public class JobSchedulerUser {
         if (sosShiroCurrentUser == null && Globals.currentUsersList != null) {
             sosShiroCurrentUser = Globals.currentUsersList.getUser(accessToken);
         }
+
         resetTimeOut();
 
         return (sosShiroCurrentUser != null);

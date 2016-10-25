@@ -7,8 +7,6 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.apache.shiro.session.Session;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
@@ -75,15 +73,6 @@ public class JOCResourceImpl {
         JOCDefaultResponse jocDefaultResponse = null;
 
         try {
-            if (jobschedulerUser.getSosShiroCurrentUser().getAuthorization() != null) {
-                Session curSession = jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession(false);
-                if (curSession != null) {
-                    curSession.touch();
-                } else {
-                    throw new org.apache.shiro.session.InvalidSessionException("Session doesn't exist");
-                }
-            }
-            
             if (!jobschedulerUser.isAuthenticated()) {
                 return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
             }

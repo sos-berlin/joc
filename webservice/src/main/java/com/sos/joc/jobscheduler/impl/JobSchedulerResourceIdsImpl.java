@@ -14,6 +14,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceIds;
@@ -45,7 +46,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                 }
             }
             JOCPreferences jocPreferences = new JOCPreferences();
-            String selectedInstance = jocPreferences.get("selected_instance", first);
+            String selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first);
 
             JobSchedulerIds entity = new JobSchedulerIds();
             entity.getJobschedulerIds().addAll(jobSchedulerIds);
