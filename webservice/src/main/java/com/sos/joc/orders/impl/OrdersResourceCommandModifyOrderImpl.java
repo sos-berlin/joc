@@ -47,7 +47,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -63,7 +63,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -79,7 +79,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -95,7 +95,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -111,7 +111,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -127,7 +127,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
     
@@ -143,7 +143,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
     

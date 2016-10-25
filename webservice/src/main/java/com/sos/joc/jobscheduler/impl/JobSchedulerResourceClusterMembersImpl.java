@@ -108,7 +108,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerFilter));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         } finally {
             Globals.rollback();
         }

@@ -49,7 +49,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -65,7 +65,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -81,7 +81,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
     
@@ -97,7 +97,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyTasks));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
     

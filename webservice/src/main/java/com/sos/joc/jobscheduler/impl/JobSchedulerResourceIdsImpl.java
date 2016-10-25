@@ -62,7 +62,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, null));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         } finally{
             Globals.rollback();
         }
