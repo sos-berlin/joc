@@ -41,7 +41,11 @@ public class ReportDBLayer extends DBLayer {
                     duration.setStartTime(reportTrigger.getStartTime());
                     duration.setEndTime(reportTrigger.getEndTime());
                     duration.initDuration();
-                    durationSum += duration.getDurationInMillis();
+                    if(duration.getDurationInMillis() == 0) {
+                        count--;
+                    } else {
+                        durationSum += duration.getDurationInMillis();
+                    }
                 }
                 if (count != 0) {
                     return durationSum / count;
@@ -72,7 +76,11 @@ public class ReportDBLayer extends DBLayer {
                     duration.setStartTime(reportExecution.getStartTime());
                     duration.setEndTime(reportExecution.getEndTime());
                     duration.initDuration();
-                    durationSum += duration.getDurationInMillis();
+                    if(duration.getDurationInMillis() == 0) {
+                        count--;
+                    } else {
+                        durationSum += duration.getDurationInMillis();
+                    }
                 }
                 if(count != null && count != 0) {
                     return durationSum / count;

@@ -32,6 +32,8 @@ public class Duration {
     public void initDuration(){
         if(startTime != null && endTime != null) {
             durationInMillis = endTime.getTime() - startTime.getTime();
+        } else {
+            durationInMillis = 0L;
         }
     }
     
