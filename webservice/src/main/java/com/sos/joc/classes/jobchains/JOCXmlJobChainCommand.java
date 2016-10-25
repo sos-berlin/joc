@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,6 +24,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.orders.OrdersSummaryCallable;
 import com.sos.joc.classes.orders.OrdersVCallable;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainPath;
@@ -174,17 +176,33 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         for (Future<Map<String, JobChainVolatile>> result : executorService.invokeAll(summaryTasks)) {
-            jobChainMap.putAll(result.get());
+            try {
+                jobChainMap.putAll(result.get());
+            } catch (ExecutionException e) {
+                if (e.getCause() instanceof JocException) {
+                    throw (JocException) e.getCause();
+                } else {
+                    throw (Exception) e.getCause();
+                }
+            }
         }
         if (!jobChainsFilter.getCompact()) {
             for (Future<Map<String, OrderV>> result : executorService.invokeAll(orderTasks)) {
-                Map<String, OrderV> orders = result.get();
-                if (orders.size() > 0) {
-                    List<OrderV> o = new ArrayList<OrderV>(orders.values());
-                    JobChainVolatile j = jobChainMap.get(o.get(0).getJobChain());
-                    j.setOrders(o);
-                    // jobChainMap.put(jobChain, j);
-                } 
+                try {
+                    Map<String, OrderV> orders = result.get();
+                    if (orders.size() > 0) {
+                        List<OrderV> o = new ArrayList<OrderV>(orders.values());
+                        JobChainVolatile j = jobChainMap.get(o.get(0).getJobChain());
+                        j.setOrders(o);
+                        // jobChainMap.put(jobChain, j);
+                    }
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
+                }
             }
         }
         //LOGGER.debug("..." + jobChainMap.size() + " jobChains processed");

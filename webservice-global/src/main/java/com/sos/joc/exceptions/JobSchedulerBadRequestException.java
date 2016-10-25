@@ -16,7 +16,7 @@ public class JobSchedulerBadRequestException extends JocException {
     }
 
     public void setSurveyDate(Date surveyDate) {
-        surveyDate = surveyDate;
+        this.surveyDate = surveyDate;
     }
 
     public JobSchedulerBadRequestException(Throwable cause) {

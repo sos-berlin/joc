@@ -20,7 +20,7 @@ public class JobSchedulerResourceClusterMembersImplTest {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobSchedulerId jobSchedulerFilterSchema = new JobSchedulerId();
-        jobSchedulerFilterSchema.setJobschedulerId("scheduler_joc_cockpit");
+        jobSchedulerFilterSchema.setJobschedulerId("scheduler.1.11");
         JobSchedulerResourceClusterMembersImpl jobschedulerResourceClusterMembersImpl = new JobSchedulerResourceClusterMembersImpl();
         JOCDefaultResponse jobschedulerClusterMembersResponse = jobschedulerResourceClusterMembersImpl.postJobschedulerClusterMembers(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerFilterSchema);
         MastersV mastersVSchema = (MastersV) jobschedulerClusterMembersResponse.getEntity();

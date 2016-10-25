@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -75,13 +76,21 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (Future<OrdersSummary> result : executorService.invokeAll(tasks)) {
-                OrdersSummary o = result.get();
-                summary.setBlacklist(summary.getBlacklist() + o.getBlacklist());
-                summary.setPending(summary.getPending() + o.getPending());
-                summary.setRunning(summary.getRunning() + o.getRunning());
-                summary.setSetback(summary.getSetback() + o.getSetback());
-                summary.setSuspended(summary.getSuspended() + o.getSuspended());
-                summary.setWaitingForResource(summary.getWaitingForResource() + o.getWaitingForResource());
+                try {
+                    OrdersSummary o = result.get();
+                    summary.setBlacklist(summary.getBlacklist() + o.getBlacklist());
+                    summary.setPending(summary.getPending() + o.getPending());
+                    summary.setRunning(summary.getRunning() + o.getRunning());
+                    summary.setSetback(summary.getSetback() + o.getSetback());
+                    summary.setSuspended(summary.getSuspended() + o.getSuspended());
+                    summary.setWaitingForResource(summary.getWaitingForResource() + o.getWaitingForResource());
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
+                }
             }
             
             OrdersSnapshot entity = new OrdersSnapshot();

@@ -95,7 +95,15 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (Future<Map<String, OrderV>> result : executorService.invokeAll(tasks)) {
-                listOrders.putAll(result.get());
+                try {
+                    listOrders.putAll(result.get());
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
+                }
             }
 
             OrdersV entity = new OrdersV();
@@ -106,22 +114,6 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, ordersBody));
             return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (ExecutionException e) {
-            if (e.getCause() != null) {
-                if (e.getCause() instanceof JocException) {
-                    JocException ee = (JocException) e.getCause();
-                    ee.addErrorMetaInfo(getMetaInfo(API_CALL, ordersBody));
-                    return JOCDefaultResponse.responseStatusJSError(ee);
-                } else {
-                    JocError err = new JocError();
-                    err.addMetaInfoOnTop(getMetaInfo(API_CALL, ordersBody));
-                    return JOCDefaultResponse.responseStatusJSError((Exception) e.getCause(), err);
-                }
-            } else {
-                JocError err = new JocError();
-                err.addMetaInfoOnTop(getMetaInfo(API_CALL, ordersBody));
-                return JOCDefaultResponse.responseStatusJSError(e, err); 
-            }
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, ordersBody));
