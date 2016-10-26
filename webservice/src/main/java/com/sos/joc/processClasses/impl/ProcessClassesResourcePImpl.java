@@ -12,12 +12,10 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -40,7 +38,8 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
     public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(processClassFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = 
+                    init(processClassFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -48,14 +47,13 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             folders = processClassFilter.getFolders();
             regex = processClassFilter.getRegex();
             ProcessClassesP entity = new ProcessClassesP();
-            InventoryInstancesDBLayer instanceDBLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(processClassFilter.getJobschedulerId());
             InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(Globals.sosHibernateConnection);
             List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
             if (processClasses != null && !processClasses.isEmpty()) {
                 List<ProcessClassP> processClassesToAdd = new ArrayList<ProcessClassP>();
                 for(ProcessClassPath processClassPath : processClasses) {
-                    DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(processClassPath.getProcessClass(), instance.getId());
+                    DBItemInventoryProcessClass processClassFromDb = 
+                            dbLayer.getProcessClass(processClassPath.getProcessClass(), dbItemInventoryInstance.getId());
                     ProcessClassP processClass = getProcessClassP(dbLayer, processClassFromDb);
                     if (processClass != null) {
                         processClassesToAdd.add(processClass);
@@ -66,14 +64,15 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(folder.getFolder(), instance.getId(), folder.getRecursive().booleanValue());
+                    List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(folder.getFolder(),
+                            dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
                     List<ProcessClassP> processClassesToAdd = getProcessClassesToAdd(dbLayer, processClassesFromDb);
                     if(processClassesToAdd != null && !processClassesToAdd.isEmpty()){
                         listOfProcessClasses.addAll(processClassesToAdd);
                     }
                 }
             } else {
-                List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClasses(instance.getId());
+                List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClasses(dbItemInventoryInstance.getId());
                 List<ProcessClassP> processClassesToAdd = getProcessClassesToAdd(dbLayer, processClassesFromDb);
                 if(processClassesToAdd != null && !processClassesToAdd.isEmpty()){
                     listOfProcessClasses.addAll(processClassesToAdd);
@@ -92,8 +91,8 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
         }
     }
 
-    private List<ProcessClassP> getProcessClassesToAdd(InventoryProcessClassesDBLayer dbLayer, List<DBItemInventoryProcessClass> processClassesFromDb)
-            throws Exception {
+    private List<ProcessClassP> getProcessClassesToAdd(InventoryProcessClassesDBLayer dbLayer,
+            List<DBItemInventoryProcessClass> processClassesFromDb) throws Exception {
         List<ProcessClassP> processClassesToAdd = new ArrayList<ProcessClassP>();
         if (processClassesFromDb != null) {
             for (DBItemInventoryProcessClass processClassFromDb : processClassesFromDb) {

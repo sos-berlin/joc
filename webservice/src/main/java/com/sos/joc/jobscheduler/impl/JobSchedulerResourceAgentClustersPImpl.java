@@ -37,53 +37,48 @@ import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
-import com.sos.joc.model.jobscheduler.OperatingSystem;;
+import com.sos.joc.model.jobscheduler.OperatingSystem;
+
+;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
     private static final String API_CALL = "./jobscheduler/agent_clusters/p";
     private Boolean compact;
     private List<AgentClusterPath> agentClusters;
     private Integer state;
     private String regex;
-    private Long instanceId;
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
         LOGGER.debug(API_CALL);
         try {
             JOCDefaultResponse jocDefaultResponse =
-                    init(jobSchedulerAgentClustersBody.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView()
-                            .isStatus());
+                    init(jobSchedulerAgentClustersBody.getJobschedulerId(),
+                            getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             AgentClustersP entity = new AgentClustersP();
             ArrayList<AgentClusterP> listOfAgentClusters = new ArrayList<AgentClusterP>();
-            /** FILTERS:
-             * compact
-             * agentClusters (array of processClasses)
-             * state
-             * regex
-             */
+            /** FILTERS: compact agentClusters (array of processClasses) state regex */
             compact = jobSchedulerAgentClustersBody.getCompact();
             agentClusters = jobSchedulerAgentClustersBody.getAgentClusters();
             state = jobSchedulerAgentClustersBody.getState();
             regex = jobSchedulerAgentClustersBody.getRegex();
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jobSchedulerAgentClustersBody.getJobschedulerId());
-            instanceId = instance.getId();
+            Long instanceId = dbItemInventoryInstance.getId();
             InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
             AgentClusterP agentClusterPSchema = new AgentClusterP();
-            if(agentClusters != null && !agentClusters.isEmpty()) {
+            if (agentClusters != null && !agentClusters.isEmpty()) {
                 for (AgentClusterPath agentCluster : agentClusters) {
                     agentClusterPSchema = processAgentClusterByClusterName(agentLayer, agentCluster.getAgentCluster());
                     listOfAgentClusters.add(agentClusterPSchema);
                 }
             } else if (state != null && regex != null) {
                 List<AgentClusterP> agentClusterPSchemas = processAgentClusterByRegexAndState(agentLayer, regex, state);
-                if(agentClusterPSchemas != null) {
+                if (agentClusterPSchemas != null) {
                     listOfAgentClusters.addAll(agentClusterPSchemas);
                 }
             } else if (state != null) {
@@ -93,14 +88,14 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 }
             } else if (regex != null) {
                 List<AgentClusterP> agentClusterPSchemas = processAgentClusterByRegex(agentLayer, regex);
-                if(agentClusterPSchemas != null) {
+                if (agentClusterPSchemas != null) {
                     listOfAgentClusters.addAll(agentClusterPSchemas);
                 }
             } else {
                 List<DBItemInventoryAgentCluster> agentClusters = agentLayer.getAgentClusters(instanceId);
-                if(agentClusters != null) {
-                    for(DBItemInventoryAgentCluster agentCluster : agentClusters) {
-                        DBItemInventoryProcessClass processClass = 
+                if (agentClusters != null) {
+                    for (DBItemInventoryAgentCluster agentCluster : agentClusters) {
+                        DBItemInventoryProcessClass processClass =
                                 agentLayer.getInventoryProcessClassById(agentCluster.getProcessClassId(), instanceId);
                         agentClusterPSchema = processAgentCluster(agentLayer, processClass, agentCluster);
                         if (agentClusterPSchema != null) {
@@ -123,9 +118,11 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
     }
 
     private AgentClusterP processAgentClusterByClusterName(InventoryAgentsDBLayer agentLayer, String agentClusterName) throws Exception {
-        DBItemInventoryProcessClass processClass = agentLayer.getInventoryClusterProcessClass(agentClusterName, instanceId);
+        DBItemInventoryProcessClass processClass = 
+                agentLayer.getInventoryClusterProcessClass(agentClusterName, dbItemInventoryInstance.getId());
         if (processClass != null) {
-            DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), instanceId);
+            DBItemInventoryAgentCluster agentCluster =
+                    agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), dbItemInventoryInstance.getId());
             return processAgentCluster(agentLayer, processClass, agentCluster);
         }
         return null;
@@ -134,15 +131,16 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
     private List<AgentClusterP> processAgentClusterByRegexAndState(InventoryAgentsDBLayer agentLayer, String regex, Integer state)
             throws Exception {
         List<AgentClusterP> schemas = new ArrayList<AgentClusterP>();
-        List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClasses(instanceId);
+        List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClasses(dbItemInventoryInstance.getId());
         if (processClasses != null) {
             for (DBItemInventoryProcessClass processClass : processClasses) {
-                DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), instanceId);
+                DBItemInventoryAgentCluster agentCluster =
+                        agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), dbItemInventoryInstance.getId());
                 if (agentCluster != null) {
                     Matcher regExMatcher = Pattern.compile(regex).matcher(processClass.getName());
                     if (regExMatcher.find()) {
                         AgentClusterP agentClusterPSchema = processAgentCluster(agentLayer, processClass, agentCluster);
-                        if(state != null && state == agentClusterPSchema.getState().getSeverity()) {
+                        if (state != null && state == agentClusterPSchema.getState().getSeverity()) {
                             schemas.add(agentClusterPSchema);
                         } else if (state == null) {
                             schemas.add(agentClusterPSchema);
@@ -156,10 +154,11 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
 
     private List<AgentClusterP> processAgentClusterByState(InventoryAgentsDBLayer agentLayer, Integer state) throws Exception {
         List<AgentClusterP> schemas = new ArrayList<AgentClusterP>();
-        List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClassByState(state, instanceId);
-        if(processClasses != null) {
+        List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClassByState(state, dbItemInventoryInstance.getId());
+        if (processClasses != null) {
             for (DBItemInventoryProcessClass processClass : processClasses) {
-                DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), instanceId);
+                DBItemInventoryAgentCluster agentCluster =
+                        agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), dbItemInventoryInstance.getId());
                 schemas.add(processAgentCluster(agentLayer, processClass, agentCluster));
             }
         }
@@ -177,11 +176,11 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         agentClusterPSchema.setMaxProcesses(processClass.getMaxProcesses());
         agentClusterPSchema.setName(processClass.getBasename());
         String path = agentLayer.getPathForProcessClass(processClass.getFileId());
-        if(path != null) {
+        if (path != null) {
             agentClusterPSchema.setPath(path);
         }
-        if(agentCluster != null) {
-            switch(agentCluster.getSchedulingType()) {
+        if (agentCluster != null) {
+            switch (agentCluster.getSchedulingType()) {
             case "first":
                 agentClusterPSchema.set_type(AgentClusterType.FIX_PRIORITY);
                 break;
@@ -195,7 +194,8 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         }
         NumOfAgentsInCluster numOfAgents = new NumOfAgentsInCluster();
         numOfAgents.setAny(agentCluster.getNumberOfAgents());
-        List<DBItemInventoryAgentInstance> agents = agentLayer.getInventoryAgentInstancesByClusterId(agentCluster.getId(), instanceId);
+        List<DBItemInventoryAgentInstance> agents =
+                agentLayer.getInventoryAgentInstancesByClusterId(agentCluster.getId(), dbItemInventoryInstance.getId());
         int countRunning = 0;
         for (DBItemInventoryAgentInstance agent : agents) {
             if (agent.getState() == 0) {
@@ -206,7 +206,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         agentClusterPSchema.setNumOfAgents(numOfAgents);
         AgentClusterState state = new AgentClusterState();
         int diff = numOfAgents.getAny() - numOfAgents.getRunning();
-        if(diff == 0) {
+        if (diff == 0) {
             state.setSeverity(0);
             state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_RUNNING);
         } else if (diff == numOfAgents.getAny()) {
@@ -217,14 +217,14 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             state.set_text(AgentClusterStateText.ONLY_SOME_AGENTS_ARE_RUNNING);
         }
         agentClusterPSchema.setState(state);
-        if(compact == null || !compact) {
+        if (compact == null || !compact) {
             ArrayList<AgentOfCluster> listOfAgents = new ArrayList<AgentOfCluster>();
-            for(DBItemInventoryAgentInstance agentFromDb : agents) {
+            for (DBItemInventoryAgentInstance agentFromDb : agents) {
                 AgentOfCluster agent = new AgentOfCluster();
                 agent.setHost(agentFromDb.getHostname());
                 InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
                 DBItemInventoryOperatingSystem osFromDb = osLayer.getInventoryOperatingSystem(agentFromDb.getOsId());
-                if(osFromDb != null) {
+                if (osFromDb != null) {
                     OperatingSystem os = new OperatingSystem();
                     os.setArchitecture(osFromDb.getArchitecture());
                     os.setDistribution(osFromDb.getDistribution());
@@ -233,7 +233,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 }
                 agent.setStartedAt(agentFromDb.getStartedAt());
                 JobSchedulerState outputState = new JobSchedulerState();
-                switch(agentFromDb.getState()) {
+                switch (agentFromDb.getState()) {
                 case 0:
                     outputState.setSeverity(0);
                     outputState.set_text(JobSchedulerStateText.RUNNING);
@@ -253,5 +253,5 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         }
         return agentClusterPSchema;
     }
-    
+
 }

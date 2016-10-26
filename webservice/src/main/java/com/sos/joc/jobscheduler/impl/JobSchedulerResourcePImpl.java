@@ -37,7 +37,7 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerId));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 }

@@ -8,12 +8,10 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.db.reporting.ReportDBLayer;
 import com.sos.joc.exceptions.JocError;
@@ -28,7 +26,6 @@ import com.sos.joc.order.resource.IOrderPResource;
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderPResourceImpl.class);
     private static final String API_CALL = "./order/p";
-    private Long instanceId;
 
     @Override
     public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {
@@ -39,9 +36,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(orderFilter.getJobschedulerId());
-            instanceId = instance.getId();
+            Long instanceId = dbItemInventoryInstance.getId();
             Boolean compact = orderFilter.getCompact();
             OrderP200 entity = new OrderP200();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);

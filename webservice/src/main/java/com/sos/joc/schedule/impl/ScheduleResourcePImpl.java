@@ -37,11 +37,9 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            InventoryInstancesDBLayer instanceDBLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceDBLayer.getInventoryInstanceBySchedulerId(scheduleFilter.getJobschedulerId());
             InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(scheduleFilter.getSchedule(), instance.getId());
-            ScheduleP schedule = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, instance);
+            DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(scheduleFilter.getSchedule(), dbItemInventoryInstance.getId());
+            ScheduleP schedule = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
 
             ScheduleP200 entity = new ScheduleP200();
             entity.setSchedule(schedule);

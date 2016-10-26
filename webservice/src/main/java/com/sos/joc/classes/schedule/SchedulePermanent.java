@@ -18,8 +18,8 @@ import com.sos.joc.model.schedule.UsedByOrder;
 public class SchedulePermanent {
 
     @SuppressWarnings("unchecked")
-    public static ScheduleP initSchedule(InventorySchedulesDBLayer dbLayer, DBItemInventorySchedule scheduleFromDb, DBItemInventoryInstance instance)
-            throws Exception {
+    public static ScheduleP initSchedule(InventorySchedulesDBLayer dbLayer, DBItemInventorySchedule scheduleFromDb,
+            DBItemInventoryInstance instance) throws Exception {
         ScheduleP schedule = new ScheduleP();
         if (scheduleFromDb != null) {
             schedule.setConfigurationDate(dbLayer.getScheduleConfigurationDate(scheduleFromDb.getId()));
@@ -47,7 +47,8 @@ public class SchedulePermanent {
             } else {
                 schedule.setUsedByJobs(null);
             }
-            List<DBItemInventoryOrder> ordersFromDb = dbLayer.getUsedIn(scheduleFromDb.getId(), instance.getId(), DBLayer.DBITEM_INVENTORY_ORDERS);
+            List<DBItemInventoryOrder> ordersFromDb = 
+                    dbLayer.getUsedIn(scheduleFromDb.getId(), instance.getId(), DBLayer.DBITEM_INVENTORY_ORDERS);
             if (ordersFromDb != null && !ordersFromDb.isEmpty()) {
                 List<UsedByOrder> listOfUsesByOrder = new ArrayList<UsedByOrder>();
                 for (DBItemInventoryOrder order : ordersFromDb) {

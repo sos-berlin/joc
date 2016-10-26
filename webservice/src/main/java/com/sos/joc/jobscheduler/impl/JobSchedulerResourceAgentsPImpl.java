@@ -11,13 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.agents.InventoryAgentsDBLayer;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -34,7 +32,6 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsPImpl.class);
     private static final String API_CALL = "./jobscheduler/agents/p";
-    private Long instanceId;
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {
@@ -47,9 +44,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             }
             AgentsP entity = new AgentsP();
             List<AgentP> listOfAgents = new ArrayList<AgentP>();
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(agentFilter.getJobschedulerId());
-            instanceId = instance.getId();
+            Long instanceId = dbItemInventoryInstance.getId();
             InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
             if(!agentFilter.getAgents().isEmpty()) {
                 for (AgentUrl agentUrl : agentFilter.getAgents()) {
@@ -109,7 +104,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             agent.setOs(os);
         }
         List<String> listOfClusters = new ArrayList<String>();
-        List<String> listFromDb = agentLayer.getProcessClassesFromAgentCluster(agentInstance.getId(), instanceId);
+        List<String> listFromDb = agentLayer.getProcessClassesFromAgentCluster(agentInstance.getId(), dbItemInventoryInstance.getId());
         if(listFromDb != null && !listFromDb.isEmpty()) {
             listOfClusters.addAll(listFromDb);
         }

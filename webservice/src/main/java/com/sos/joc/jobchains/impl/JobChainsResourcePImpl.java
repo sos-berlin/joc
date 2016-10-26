@@ -12,13 +12,11 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JobChainPermanent;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -32,14 +30,12 @@ import com.sos.joc.model.jobChain.JobChainsP;
 @Path("job_chains")
 public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChainsResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourcePImpl.class);  
+    private static final String API_CALL = "./job_chains/p";
     private Boolean compact;
     private List<Folder> folders;
     private List<JobChainPath> jobChainPaths;
     private String regex;
     private List<JobChainP> allNestedJobChains = new ArrayList<JobChainP>();
-    private Long instanceId;
-    private static final String API_CALL = "./job_chains/p";
-    
      
     @Override
     public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
@@ -56,9 +52,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             jobChainPaths = jobChainsFilter.getJobChains();
             regex = jobChainsFilter.getRegex();
             
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jobChainsFilter.getJobschedulerId());
-            instanceId = instance.getId();
+            Long instanceId = dbItemInventoryInstance.getId();
 
             JobChainsP entity = new JobChainsP();
             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
@@ -138,12 +132,13 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             for(String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
                 DBItemInventoryJobChain nestedJobChain = null;
                 if(nestedJobChainName.contains("/")) {
-                    nestedJobChain = dbLayer.getJobChainByPath(nestedJobChainName, instanceId);
+                    nestedJobChain = dbLayer.getJobChainByPath(nestedJobChainName, dbItemInventoryInstance.getId());
                 } else {
-                    nestedJobChain = dbLayer.getJobChainByName(nestedJobChainName, instanceId);
+                    nestedJobChain = dbLayer.getJobChainByName(nestedJobChainName, dbItemInventoryInstance.getId());
                 }
                 if (nestedJobChain != null) {
-                    JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, compact, instanceId);
+                    JobChainP nestedJobChainP = 
+                            JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, compact, dbItemInventoryInstance.getId());
                     if (nestedJobChainP != null) {
                         nestedJobChains.add(nestedJobChainP); 
                     }

@@ -8,13 +8,11 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JobPermanent;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -27,7 +25,6 @@ import com.sos.joc.model.job.JobP200;
 public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourcePImpl.class);
     private static final String API_CALL = "./job/p";
-    private Long instanceId;
 
     @Override
     public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) throws Exception {
@@ -39,9 +36,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             }
             checkRequiredParameter("job", jobFilter.getJob());
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jobFilter.getJobschedulerId());
-            instanceId = instance.getId();
+            Long instanceId = dbItemInventoryInstance.getId();
             DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(jobFilter.getJob(), instanceId);
             
             JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId); 

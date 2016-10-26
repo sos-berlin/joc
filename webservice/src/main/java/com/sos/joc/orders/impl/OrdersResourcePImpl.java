@@ -38,7 +38,6 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     private List<OrderPath> ordersFilter = null;
     private List<Folder> foldersFilter = null;
     private Boolean compact = null;
-    private Long instanceId;
 
     @Override
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilter ordersFilterSchema) throws Exception {
@@ -49,9 +48,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                 return jocDefaultResponse;
             }
             OrdersP entity = new OrdersP();
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(ordersFilterSchema.getJobschedulerId());
-            instanceId = instance.getId();
+            Long instanceId = dbItemInventoryInstance.getId();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
             regex = ordersFilterSchema.getRegex();
             ordersFilter = ordersFilterSchema.getOrders();
