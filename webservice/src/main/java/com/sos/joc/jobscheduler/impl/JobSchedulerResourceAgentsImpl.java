@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -64,7 +65,15 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
             
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (Future<AgentV> result : executorService.invokeAll(tasks)) {
-                listOfAgents.add(result.get());
+                try {
+                    listOfAgents.add(result.get());
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
+                }
             }
             
             AgentsV entity = new AgentsV();
@@ -78,7 +87,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, agentFilter));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

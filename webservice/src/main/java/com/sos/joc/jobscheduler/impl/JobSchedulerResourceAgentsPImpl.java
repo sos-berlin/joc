@@ -69,7 +69,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, agentFilter));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

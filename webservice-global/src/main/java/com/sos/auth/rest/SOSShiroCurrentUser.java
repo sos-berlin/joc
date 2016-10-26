@@ -7,7 +7,9 @@ import org.apache.shiro.subject.Subject;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JobSchedulerIdentifier;
+import com.sos.joc.classes.WebserviceConstants;
 
 public class SOSShiroCurrentUser {
 
@@ -16,6 +18,7 @@ public class SOSShiroCurrentUser {
     private String password;
     private String accessToken;
     private String authorization;
+    private String selectedInstance;
 
     private SOSPermissionJocCockpit sosPermissionJocCockpit;
     private Map<String, DBItemInventoryInstance> listOfSchedulerInstances;
@@ -66,10 +69,24 @@ public class SOSShiroCurrentUser {
             return false;
         }
     }
+    
+    private boolean getPermissionFromSubject(String permission,String permissionMaster){
+        boolean excluded = currentSubject.isPermitted("-" + permission) || currentSubject.isPermitted("-" + permissionMaster);
+        return (currentSubject.isPermitted(permission) || currentSubject.isPermitted(permissionMaster))  && !excluded;
+    }
+    
+    private boolean getPermissionFromMaster(String permission){
+        if (selectedInstance == null) {
+            JOCPreferences jocPreferences = new JOCPreferences();
+            selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
+        }
+        String permissionMaster = selectedInstance + ":" + permission;
+        return getPermissionFromSubject(permission,permissionMaster);
+    }
 
     public boolean isPermitted(String permission) {
         if (currentSubject != null) {
-            return currentSubject.isPermitted(permission) && !currentSubject.isPermitted("-" + permission);
+            return getPermissionFromMaster(permission);
         } else {
             return false;
         }

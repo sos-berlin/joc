@@ -104,7 +104,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerAgentClustersBody));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
 
     }

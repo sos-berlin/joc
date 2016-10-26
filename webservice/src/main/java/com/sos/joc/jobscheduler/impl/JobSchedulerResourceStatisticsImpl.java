@@ -36,7 +36,7 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerFilter));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 

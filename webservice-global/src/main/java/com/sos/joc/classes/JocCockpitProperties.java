@@ -61,5 +61,15 @@ public class JocCockpitProperties {
         }
         return s;
     }
+    
+    public String getProperty(String property, String defaultValue) {
+        String s = getProperty(property);
+        if (s == null){
+            return defaultValue;
+        }else{
+            return s;
+        }
+    }
+
 
 }

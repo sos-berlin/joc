@@ -19,7 +19,7 @@ import com.sos.joc.model.order.ModifyOrder;
 
 public class BulkError extends Err419 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BulkError.class);
-    private static final String JOC_419 = "JOC-419";
+    private static final String ERROR_CODE = "JOC-419";
 
     public BulkError() {
         setSurveyDate(new Date());
@@ -107,7 +107,7 @@ public class BulkError extends Err419 {
     }
     
     private void setCodeAndMessage(Throwable e) {
-        setCode(JOC_419);
+        setCode(ERROR_CODE);
         String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
         setMessage(errorMsg);
         LOGGER.error(getMessage(),e);

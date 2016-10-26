@@ -43,7 +43,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobChains));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
 
@@ -59,7 +59,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobChains));
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
     
