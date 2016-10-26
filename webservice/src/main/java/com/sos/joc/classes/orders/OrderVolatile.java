@@ -81,7 +81,7 @@ public class OrderVolatile extends OrderV {
             setProcessedBy(pState.getString("clusterMemberId", null));
         }
         setProcessingState(pState, obstacles, usedNodes, usedTasks);
-        ConfigurationStatus.getConfigurationStatus(obstacles);
+        setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(obstacles));
         setJob(usedNodes.getJob(getJobChain(), getState()));
     }
     

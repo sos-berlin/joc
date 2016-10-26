@@ -21,21 +21,22 @@ import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 public class JOCJsonCommand {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCJsonCommand.class);
+    private static final String MASTER_API_PATH = "/jobscheduler/master/api/";
     private UriBuilder uriBuilder;
     
     public JOCJsonCommand() {
-    }
-    
-    public JOCJsonCommand(String url) {
-        setUriBuilder(url);
     }
     
     public JOCJsonCommand(String url, String path) {
         setUriBuilder(url, path);
     }
     
-    public void setUriBuilder(String url) {
-        setUriBuilder(url, WebserviceConstants.ORDER_API_PATH);
+    public void setUriBuilderForOrders(String url) {
+        setUriBuilder(url, MASTER_API_PATH + "order");
+    }
+    
+    public void setUriBuilderForProcessClasses(String url) {
+        setUriBuilder(url, MASTER_API_PATH + "processClass");
     }
     
     public void setUriBuilder(String url, String path) {
@@ -57,12 +58,17 @@ public class JOCJsonCommand {
     }
     
     public void addOrderCompactQuery(boolean compact) {
-        String returnQuery = (compact) ? WebserviceConstants.ORDER_OVERVIEW : WebserviceConstants.ORDER_DETAILED;
+        String returnQuery = (compact) ? "OrdersComplemented/OrderOverview" : "OrdersComplemented/OrderDetailed";
         uriBuilder.queryParam("return", returnQuery);
     }
     
     public void addOrderStatisticsQuery() {
         uriBuilder.queryParam("return", "OrderStatistics");
+    }
+    
+    public void addProcessClassCompactQuery(boolean compact) {
+        String returnQuery = (compact) ? "ProcessClassOverview" : "ProcessClassDetailed";
+        uriBuilder.queryParam("return", returnQuery);
     }
     
     public JsonObject getJsonObjectFromPost() throws Exception {

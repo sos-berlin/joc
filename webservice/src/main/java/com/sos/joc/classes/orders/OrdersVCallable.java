@@ -123,15 +123,15 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
         return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(job)), compact);
     }
     
-    private Map<String,OrderV> getOrders(Folder folder, OrdersFilter ordersBody, URI uri) throws JocMissingRequiredParameterException, Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), (folder.getRecursive()) ? null : folder.getFolder(), ordersBody.getRegex());
+    private Map<String,OrderV> getOrders(Folder folder, OrdersFilter ordersBody, URI uri) throws Exception {
+        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), ordersBody.getRegex());
     }
     
     private Map<String,OrderV> getOrders(JsonObject json, boolean compact) throws JobSchedulerInvalidResponseDataException {
-        return getOrders(json, compact, null, null);
+        return getOrders(json, compact, null);
     }
     
-    private Map<String,OrderV> getOrders(JsonObject json, boolean compact, String refFolderIfNotRecursive, String regex) throws JobSchedulerInvalidResponseDataException {
+    private Map<String,OrderV> getOrders(JsonObject json, boolean compact, String regex) throws JobSchedulerInvalidResponseDataException {
         UsedNodes usedNodes = new UsedNodes();
         UsedJobs usedJobs = new UsedJobs();
         UsedJobChains usedJobChains = new UsedJobChains();

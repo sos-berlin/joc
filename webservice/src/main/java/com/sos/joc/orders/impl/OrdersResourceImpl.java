@@ -1,6 +1,7 @@
 package com.sos.joc.orders.impl;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,7 +48,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             }
 
             // TODO date post body parameters are not yet considered
-            JOCJsonCommand command = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
+            JOCJsonCommand command = new JOCJsonCommand();
+            command.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
             command.addOrderCompactQuery(ordersBody.getCompact());
 
             Map<String, OrderV> listOrders = new HashMap<String, OrderV>();
@@ -107,9 +109,9 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             }
 
             OrdersV entity = new OrdersV();
-            entity.setDeliveryDate(new Date());
             entity.setOrders(new ArrayList<OrderV>(listOrders.values()));
-
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, ordersBody));

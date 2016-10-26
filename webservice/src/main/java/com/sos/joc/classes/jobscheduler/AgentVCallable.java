@@ -8,7 +8,6 @@ import javax.json.JsonObject;
 
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 import com.sos.joc.model.jobscheduler.AgentV;
@@ -17,6 +16,7 @@ import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 
 public class AgentVCallable implements Callable<AgentV> {
 
+    public static final String AGENT_API_PATH_FORMAT = "/jobscheduler/master/api/agent/%1$s/jobscheduler/agent/api";
     private final String masterUrl;
     private final String agentUrl;
 
@@ -27,12 +27,12 @@ public class AgentVCallable implements Callable<AgentV> {
 
     @Override
     public AgentV call() throws Exception {
-        return getAgentV(agentUrl, masterUrl);
+        // "/jobscheduler/master/api/agent/http://[agent-host]:{agent-port]/jobscheduler/agent/api"
+        String jsonPath = String.format(AGENT_API_PATH_FORMAT, agentUrl);
+        return getAgentV(agentUrl, masterUrl, jsonPath);
     }
 
-    public AgentV getAgentV(String agentUrl, String masterUrl) throws Exception {
-        String jsonPath = new StringBuilder().append(WebserviceConstants.AGENTS_API_LIST_PATH).append(agentUrl).append(
-                WebserviceConstants.AGENT_API_PATH).toString();
+    public AgentV getAgentV(String agentUrl, String masterUrl, String jsonPath) throws Exception {
         JOCJsonCommand jocJsonCommand = new JOCJsonCommand(masterUrl, jsonPath);
         AgentV agent = new AgentV();
         agent.setSurveyDate(Date.from(Instant.now()));

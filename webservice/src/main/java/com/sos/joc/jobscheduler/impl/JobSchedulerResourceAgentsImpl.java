@@ -22,7 +22,6 @@ import javax.ws.rs.Path;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.jobscheduler.AgentVCallable;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -36,6 +35,7 @@ import com.sos.joc.model.jobscheduler.AgentsV;
 public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements IJobSchedulerResourceAgents {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsImpl.class);
     private static final String API_CALL = "./jobscheduler/agents";
+    private static final String AGENTS_API_LIST_PATH = "/jobscheduler/master/api/agent/";
     
     @Override
     public JOCDefaultResponse postJobschedulerAgents(String accessToken, AgentFilter agentFilter) {
@@ -55,7 +55,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                     tasks.add(new AgentVCallable(agentUri.getAgent(), dbItemInventoryInstance.getUrl()));
                 }
             } else {
-                JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl(), WebserviceConstants.AGENTS_API_LIST_PATH );
+                JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl(), AGENTS_API_LIST_PATH);
                 JsonObject json = jocJsonCommand.getJsonObjectFromGet();
                 JsonArray agentUris = json.getJsonArray("elements");
                 for (JsonString agentUri : agentUris.getValuesAs(JsonString.class)) {

@@ -7,8 +7,11 @@ import java.util.regex.Pattern;
 public class FilterAfterResponse {
     
     public static boolean matchRegex(String regex, String path) {
-        if (regex == null) {
+        if (regex == null || regex.isEmpty()) {
             return true;
+        }
+        if (path == null) {
+            return false;
         }
         return Pattern.compile(regex).matcher(path).find();
     }

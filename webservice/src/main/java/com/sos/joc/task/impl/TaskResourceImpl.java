@@ -73,7 +73,8 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
                 try {
                     checkRequiredParameter("order", orderElem.getAttribute("order"));
                     checkRequiredParameter("job_chain", orderElem.getAttribute("job_chain"));
-                    JOCJsonCommand command = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
+                    JOCJsonCommand command = new JOCJsonCommand();
+                    command.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
                     OrderFilter orderBody = new OrderFilter();
                     orderBody.setCompact(false);
                     orderBody.setJobChain(orderElem.getAttribute("job_chain"));

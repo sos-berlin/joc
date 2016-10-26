@@ -32,7 +32,8 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
                 return jocDefaultResponse;
             }
 
-            JOCJsonCommand command = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
+            JOCJsonCommand command = new JOCJsonCommand();
+            command.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
             command.addOrderCompactQuery(orderBody.getCompact());
             OrderV200 entity = new OrderV200();
 

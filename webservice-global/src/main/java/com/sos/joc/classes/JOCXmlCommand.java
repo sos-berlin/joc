@@ -17,13 +17,14 @@ import com.sos.xml.SOSXmlCommand;
 
 public class JOCXmlCommand extends SOSXmlCommand {
 
+    public static final String XML_COMMAND_API_PATH = "/jobscheduler/master/api/command";
     private Date surveyDate;
     private Map<String, NodeList> listOfNodeLists;
     private URI uriForJsonCommand;
     private String xmlCommand = null;
 
     public JOCXmlCommand(String url) {
-        super(url + WebserviceConstants.XML_COMMAND_API_PATH);
+        super(url + XML_COMMAND_API_PATH);
         listOfNodeLists = new HashMap<String, NodeList>();
     }
 

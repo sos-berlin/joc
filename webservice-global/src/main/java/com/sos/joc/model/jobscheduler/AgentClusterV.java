@@ -8,6 +8,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.common.ConfigurationState;
 import com.sos.joc.model.processClass.Process;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -29,7 +30,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "numOfAgents",
     "agents",
     "numOfProcesses",
-    "processes"
+    "processes",
+    "configurationStatus"
 })
 public class AgentClusterV {
 
@@ -77,6 +79,14 @@ public class AgentClusterV {
     private Integer numOfProcesses;
     @JsonProperty("processes")
     private List<Process> processes = new ArrayList<Process>();
+    /**
+     * configuration status
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("configurationStatus")
+    private ConfigurationState configurationStatus;
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -248,6 +258,32 @@ public class AgentClusterV {
         this.processes = processes;
     }
 
+    /**
+     * configuration status
+     * <p>
+     * 
+     * 
+     * @return
+     *     The configurationStatus
+     */
+    @JsonProperty("configurationStatus")
+    public ConfigurationState getConfigurationStatus() {
+        return configurationStatus;
+    }
+
+    /**
+     * configuration status
+     * <p>
+     * 
+     * 
+     * @param configurationStatus
+     *     The configurationStatus
+     */
+    @JsonProperty("configurationStatus")
+    public void setConfigurationStatus(ConfigurationState configurationStatus) {
+        this.configurationStatus = configurationStatus;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -255,7 +291,7 @@ public class AgentClusterV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(state).append(numOfAgents).append(agents).append(numOfProcesses).append(processes).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(state).append(numOfAgents).append(agents).append(numOfProcesses).append(processes).append(configurationStatus).toHashCode();
     }
 
     @Override
@@ -267,7 +303,7 @@ public class AgentClusterV {
             return false;
         }
         AgentClusterV rhs = ((AgentClusterV) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(state, rhs.state).append(numOfAgents, rhs.numOfAgents).append(agents, rhs.agents).append(numOfProcesses, rhs.numOfProcesses).append(processes, rhs.processes).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(state, rhs.state).append(numOfAgents, rhs.numOfAgents).append(agents, rhs.agents).append(numOfProcesses, rhs.numOfProcesses).append(processes, rhs.processes).append(configurationStatus, rhs.configurationStatus).isEquals();
     }
 
 }

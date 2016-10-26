@@ -60,8 +60,8 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
             jsCmdShowState.setSubsystems(SUBSYSTEMS);
             jsCmdShowState.setWhat(WHAT);
-            String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowState);
-            jocXmlCommand.executePost(xml);
+            String xml = jsCmdShowState.toXMLString();
+            jocXmlCommand.executePostWithThrowBadRequest(xml);
 
             jocXmlCommand.createNodeList(XPATH_SCHEDULES);
 

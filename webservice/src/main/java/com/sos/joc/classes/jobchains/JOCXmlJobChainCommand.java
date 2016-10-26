@@ -210,13 +210,15 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     }
     
     private URI setUriForOrdersSummaryJsonCommand() {
-        JOCJsonCommand jsonSummaryCommand = new JOCJsonCommand(jsonUrl);
+        JOCJsonCommand jsonSummaryCommand = new JOCJsonCommand();
+        jsonSummaryCommand.setUriBuilderForOrders(jsonUrl);
         jsonSummaryCommand.addOrderStatisticsQuery();
         return jsonSummaryCommand.getURI();
     }
     
     private URI setUriForOrdersJsonCommand() {
-        JOCJsonCommand jsonOrdersCommand = new JOCJsonCommand(jsonUrl);
+        JOCJsonCommand jsonOrdersCommand = new JOCJsonCommand();
+        jsonOrdersCommand.setUriBuilderForOrders(jsonUrl);
         jsonOrdersCommand.addOrderCompactQuery(false);
         return jsonOrdersCommand.getURI();
     }

@@ -46,7 +46,8 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 return jocDefaultResponse;
             }
 
-            JOCJsonCommand command = new JOCJsonCommand(dbItemInventoryInstance.getUrl());
+            JOCJsonCommand command = new JOCJsonCommand();
+            command.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
             command.addOrderStatisticsQuery();
             URI uri = command.getURI();
             
