@@ -5,17 +5,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.tree.Tree;
 import com.sos.joc.model.tree.TreeFilter;
-import com.sos.joc.model.tree.TreeView;
 
 
 public class TreePermanent {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TreePermanent.class);
+    
     public static List<JobSchedulerObjectType> getAllowedTypes(TreeFilter treeBody, SOSPermissionJocCockpit sosPermission) {
         List<JobSchedulerObjectType> types = new ArrayList<JobSchedulerObjectType>();
         for (JobSchedulerObjectType type : treeBody.getTypes()) {
@@ -109,36 +113,93 @@ public class TreePermanent {
         return folders;
     }
  
-    public static Tree getTree(Tree rootTree, Set<String> folders) {
-        Tree tree = new Tree();
+    public static void getTree(Tree rootTree, Set<String> folders) {
         for(String folder : folders) {
-            Tree child = initTree(rootTree, folder);
-            if(child != null) {
-                tree.getFolders().add(child);
+            LOGGER.debug("*** getTree() processing folder: " + folder);
+            Tree childTree = initTreeNode(rootTree, folder, null);
+            if(childTree != null) {
+                if(folder.contains("/")) {
+                    String[] splitFolders = folder.split("/");
+                    childTree.setName(splitFolders[0]);
+                    childTree.setPath("/" + splitFolders[0]);
+                } else {
+                    childTree.setName(folder);
+                    childTree.setPath("/" + folder);
+                }            
+                rootTree.getFolders().add(childTree);
             }
         }
-        return tree;
     }
 
-    private static Tree initTree(Tree tree, String folder) {
+    private static Tree initTreeNode(Tree tree, String folder, String parentFolder) {
         if(folder.startsWith(tree.getPath())){
            return null; 
         } else {
-            Tree child = new Tree();
-            child.setName(folder.split("/")[0]);
-            child.setPath("/" + folder);
-            String subfolder = folder.substring(folder.indexOf("/") + 1);
-            if(subfolder == null || subfolder.isEmpty()) {
-                child.setFolders(null);
-                return child;
+            LOGGER.debug("*** initTreeNode() processing folder: " + folder);
+            Tree childTree = new Tree();
+            if(folder.contains("/")) {
+                childTree.setName(folder.substring(0, folder.indexOf("/")));
+                LOGGER.debug("*** initTreeNode() processing name: " + childTree.getName());
             } else {
-                Tree newChild = initTree(child, subfolder);
-                if (newChild != null) {
-                    child.getFolders().add(newChild);
+                childTree.setName(folder);
+                LOGGER.debug("*** initTreeNode() processing name: " + childTree.getName());
+            }
+            String newPath = null;
+            if(parentFolder != null) {
+                if(parentFolder.contains("/")) {
+                    String[] splits = parentFolder.split("/");
+                    if(splits.length > 1){
+                        newPath = parentFolder.substring(0, parentFolder.indexOf("/" + childTree.getName()) + ("/" + childTree.getName()).length());
+                        childTree.setPath(newPath);
+                        LOGGER.debug("*** initTreeNode() processing path: " + newPath);
+                    } else {
+                        childTree.setPath(parentFolder);
+                        LOGGER.debug("*** initTreeNode() processing path: " + parentFolder);
+                    }
                 }
-                return child;
+            } else {
+                newPath = "/" + folder;
+                childTree.setPath(newPath);
+                LOGGER.debug("*** initTreeNode() processing path: " + newPath);
+                parentFolder = newPath;
+            }
+            if(folder != null && folder.contains("/")) {
+                String subfolder = folder.substring(folder.indexOf("/") + 1);
+                if(subfolder == null || subfolder.isEmpty()) {
+                    childTree.setFolders(null);
+                    return childTree;
+                } else {
+                    Tree newChild = initTreeNode(childTree, subfolder, parentFolder);
+                    if (newChild != null) {
+                        childTree.getFolders().add(newChild);
+                    }
+                    return childTree;
+                }
+            } else {
+                childTree.setFolders(null);
+                return childTree;
             }
         }
+    }
+
+    public static Tree mergeTreeDuplications(Tree tree) {
+        Set<Tree> foldersToRemove = new HashSet<Tree>();
+        int i = 1;
+        for (Tree treeItem : tree.getFolders()) {
+            for (int counter = i ; counter < tree.getFolders().size(); counter++) {
+                if (tree.getFolders().get(counter).getName().equals(treeItem.getName())) {
+                    for(Tree folder : treeItem.getFolders()) {
+                        if(!tree.getFolders().get(counter).getFolders().contains(folder)) {
+                            tree.getFolders().get(counter).getFolders().add(folder);
+                        }
+                    }
+                    foldersToRemove.add(treeItem);
+                }
+            }
+            i++;
+        }
+        tree.getFolders().removeAll(foldersToRemove);
+        return tree;
     }
     
 }

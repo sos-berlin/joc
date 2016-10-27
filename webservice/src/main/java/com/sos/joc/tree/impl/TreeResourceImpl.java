@@ -2,6 +2,7 @@ package com.sos.joc.tree.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -52,17 +53,11 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             if(folders != null && !folders.isEmpty()) {
                 folderSet.addAll(folders);
             }
-//            Tree sos = new Tree();
-//            sos.setPath("/sos");
-//            sos.setName("sos");
-//            sos.setFolders(null);
             Tree root = new Tree();
             root.setPath("/");
             root.setName("");
-            List<Tree> childs = new ArrayList<Tree>();
-            childs.add(TreePermanent.getTree(root, folderSet));
-            root.setFolders(childs);
-//            root.getFolders().add(sos);
+            TreePermanent.getTree(root, folderSet);
+            TreePermanent.mergeTreeDuplications(root);
             
             TreeView entity = new TreeView();
             entity.getFolders().add(root);
