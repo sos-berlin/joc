@@ -16,6 +16,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.locks.LockPermanent;
 import com.sos.joc.db.inventory.locks.InventoryLocksDBLayer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -54,7 +55,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                 List<LockP> locksToAdd = new ArrayList<LockP>();
                 for(LockPath lockPath :locks) {
                     DBItemInventoryLock lockFromDb = dbLayer.getLock(lockPath.getLock(), dbItemInventoryInstance.getId());
-                    LockP lock = getLockP(dbLayer, lockFromDb);
+                    LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
                     if (lock != null) {
                         locksToAdd.add(lock);
                     }
@@ -66,14 +67,14 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                 for (Folder folder : folders) {
                     List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksByFolders(folder.getFolder(), dbItemInventoryInstance.getId(),
                             folder.getRecursive().booleanValue());
-                    List<LockP> locksToAdd = getListOfLocksToAdd(dbLayer, locksFromDb);
+                    List<LockP> locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
                     if(locksToAdd != null && !locksToAdd.isEmpty()){
                         listOfLocks.addAll(locksToAdd);
                     }
                 }
             } else {
                 List<DBItemInventoryLock> locksFromDb = dbLayer.getLocks(dbItemInventoryInstance.getId());
-                List<LockP> locksToAdd = getListOfLocksToAdd(dbLayer, locksFromDb);
+                List<LockP> locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
                 if(locksToAdd != null && !locksToAdd.isEmpty()){
                     listOfLocks.addAll(locksToAdd);
                 }
@@ -88,37 +89,6 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, locksFilter));
             return JOCDefaultResponse.responseStatusJSError(e, err);
-        }
-    }
-    
-    private List<LockP> getListOfLocksToAdd(InventoryLocksDBLayer dbLayer, List<DBItemInventoryLock> locksFromDb) throws Exception {
-        List<LockP> locksToAdd = new ArrayList<LockP>();
-        if (locksFromDb != null) {
-            for (DBItemInventoryLock lockFromDb : locksFromDb) {
-                if (regex != null && !regex.isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(regex).matcher(lockFromDb.getName());
-                    if (regExMatcher.find()) {
-                        locksToAdd.add(getLockP(dbLayer, lockFromDb));
-                    }
-                } else {
-                    locksToAdd.add(getLockP(dbLayer, lockFromDb));
-                }
-            }
-        }
-        return locksToAdd;
-    }
-
-    private LockP getLockP(InventoryLocksDBLayer dbLayer, DBItemInventoryLock lockFromDb) throws Exception {
-        if (lockFromDb != null) {
-            LockP lockP = new LockP();
-            lockP.setMaxNonExclusive(lockFromDb.getMaxNonExclusive());
-            lockP.setName(lockFromDb.getBasename());
-            lockP.setPath(lockFromDb.getName());
-            lockP.setSurveyDate(lockFromDb.getModified());
-            lockP.setConfigurationDate(dbLayer.getLockConfigurationDate(lockFromDb.getId()));
-            return lockP;
-        } else {
-            return null;
         }
     }
     

@@ -16,6 +16,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.processclasses.ProcessClassPermanent;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -54,7 +55,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 for(ProcessClassPath processClassPath : processClasses) {
                     DBItemInventoryProcessClass processClassFromDb = 
                             dbLayer.getProcessClass(processClassPath.getProcessClass(), dbItemInventoryInstance.getId());
-                    ProcessClassP processClass = getProcessClassP(dbLayer, processClassFromDb);
+                    ProcessClassP processClass = ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb);
                     if (processClass != null) {
                         processClassesToAdd.add(processClass);
                     }
@@ -66,14 +67,14 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 for (Folder folder : folders) {
                     List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(folder.getFolder(),
                             dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-                    List<ProcessClassP> processClassesToAdd = getProcessClassesToAdd(dbLayer, processClassesFromDb);
+                    List<ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesToAdd(dbLayer, processClassesFromDb, regex);
                     if(processClassesToAdd != null && !processClassesToAdd.isEmpty()){
                         listOfProcessClasses.addAll(processClassesToAdd);
                     }
                 }
             } else {
                 List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClasses(dbItemInventoryInstance.getId());
-                List<ProcessClassP> processClassesToAdd = getProcessClassesToAdd(dbLayer, processClassesFromDb);
+                List<ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesToAdd(dbLayer, processClassesFromDb, regex);
                 if(processClassesToAdd != null && !processClassesToAdd.isEmpty()){
                     listOfProcessClasses.addAll(processClassesToAdd);
                 }
@@ -91,37 +92,4 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
         }
     }
 
-    private List<ProcessClassP> getProcessClassesToAdd(InventoryProcessClassesDBLayer dbLayer,
-            List<DBItemInventoryProcessClass> processClassesFromDb) throws Exception {
-        List<ProcessClassP> processClassesToAdd = new ArrayList<ProcessClassP>();
-        if (processClassesFromDb != null) {
-            for (DBItemInventoryProcessClass processClassFromDb : processClassesFromDb) {
-                if (regex != null && !regex.isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(regex).matcher(processClassFromDb.getName());
-                    if (regExMatcher.find()) {
-                        processClassesToAdd.add(getProcessClassP(dbLayer, processClassFromDb));
-                    }
-                } else {
-                    processClassesToAdd.add(getProcessClassP(dbLayer, processClassFromDb));
-                }
-            }
-        }
-        return processClassesToAdd;
-    }
-
-    private ProcessClassP getProcessClassP(InventoryProcessClassesDBLayer dbLayer, DBItemInventoryProcessClass processClassFromDb)
-            throws Exception {
-        if (processClassFromDb != null) {
-            ProcessClassP processClassP = new ProcessClassP();
-            processClassP.setMaxProcesses(processClassFromDb.getMaxProcesses());
-            processClassP.setName(processClassFromDb.getBasename());
-            processClassP.setPath(processClassFromDb.getName());
-            processClassP.setSurveyDate(processClassFromDb.getModified());
-            processClassP.setConfigurationDate(dbLayer.getProcessClassConfigurationDate(processClassFromDb.getId()));
-            return processClassP;
-        } else {
-            return null;
-        }
-    }
-    
 }
