@@ -107,7 +107,11 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                       InventoryJobsDBLayer jobsLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
                       List<DBItemInventoryJob> jobsFromDb = new ArrayList<DBItemInventoryJob>();
                       for(String folder : folderSet) {
-                          jobsFromDb.addAll(jobsLayer.getInventoryJobsFilteredByFolder(folder, null, true, dbItemInventoryInstance.getId()));
+                          List<DBItemInventoryJob> jobResults =
+                                  jobsLayer.getInventoryJobsFilteredByFolder(folder, null, true, dbItemInventoryInstance.getId());
+                          if (jobResults != null && !jobResults.isEmpty()) {
+                              jobsFromDb.addAll(jobResults);
+                          }
                       }
                       for(DBItemInventoryJob jobFromDb : jobsFromDb) {
                           JobP job = JobPermanent.getJob(jobFromDb, jobsLayer, compact, dbItemInventoryInstance.getId());
