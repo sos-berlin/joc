@@ -18,7 +18,7 @@ public class SOSShiroCurrentUserAnswer {
     private boolean isAuthenticated;
     private String accessToken;
     private String message;
-    private String sessionTimeout;
+    private Long sessionTimeout;
     private boolean enableTouch = true;
 
     public SOSShiroCurrentUserAnswer() {
@@ -117,11 +117,11 @@ public class SOSShiroCurrentUserAnswer {
     }
     
     @XmlAttribute
-    public void setSessionTimeout(String sessionTimeout) {
+    public void setSessionTimeout(Long sessionTimeout) {
         this.sessionTimeout = sessionTimeout;
     }
 
-    public String getSessionTimeout() {
+    public Long getSessionTimeout() {
         return this.sessionTimeout;
     }
     

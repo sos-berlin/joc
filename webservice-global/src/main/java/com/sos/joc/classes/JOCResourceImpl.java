@@ -12,8 +12,10 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -27,6 +29,8 @@ public class JOCResourceImpl {
     private String accessToken;
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
     private ObjectMapper mapper = new ObjectMapper();
+    private static final String DBITEM_INVENTORY_INSTANCES = DBItemInventoryInstance.class.getSimpleName();
+
 
     protected SOSPermissionJocCockpit getPermissons(String accessToken) throws JocException {
         if (jobschedulerUser == null) {
@@ -162,6 +166,13 @@ public class JOCResourceImpl {
                 throw new DBInvalidDataException(errMessage);
             }
         }
+        
+        String checkConnectionResult = checkConnection();
+        if (!"".equals(checkConnectionResult)) {
+            JocError jocError = new JocError(String.format("Error with database connection: %s", checkConnectionResult), WebserviceConstants.DB_CONNECTION_ERROR);
+            jocDefaultResponse = JOCDefaultResponse.responseStatusJSError(new JocException(jocError));
+        }
+
         return jocDefaultResponse;
     }
 
@@ -171,4 +182,40 @@ public class JOCResourceImpl {
         }
         return null;
     }
+    
+    private static String checkConnection(SOSHibernateConnection connection) {
+        try {
+            connection.createQuery(String.format("from %s where 1=0", DBITEM_INVENTORY_INSTANCES).toString()).list();
+            return "";
+        } catch (Exception ex) {
+
+            if (connection != null) {
+                connection.disconnect();
+            }
+
+
+            try {
+                connection.connect();
+                return "";
+            } catch (Exception e) {
+                return (e.getMessage());
+            }
+
+        }
+    }
+
+    private static String checkConnection() {
+       String s = checkConnection(Globals.sosHibernateConnection);
+       if (!"".equals(s)){
+           return s;
+       }
+       for (SOSHibernateConnection connection : Globals.sosSchedulerHibernateConnections.values()) {
+           s = checkConnection(connection);
+           if (!"".equals(s)){
+               return s;
+           }
+       }
+       return "";
+     }    
+    
 }

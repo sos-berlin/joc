@@ -7,7 +7,7 @@ public class WebserviceConstants {
     public static final String WRONG_MIME_TYPE = "JOC-100";
     public static final String DB_CONNECTION_ERROR = "JOC-200";
     public static final String DEFAULT_ERROR_CODE = "JOC-420";
-
+ 
     
     public static final String JOC_COCKPIT = "JOC_COCKPIT";
     public static final String SELECTED_INSTANCE = "selected_instance";
@@ -37,4 +37,7 @@ public class WebserviceConstants {
     public static final String IN_PERIOD = "in_period";
     public static final String WAITING_FOR_AGENT = "waiting_for_remote_scheduler";
     public static final String WAITING_FOR_PROCESS = "waiting_for_process";
+    public static final String ENABLE_SESSION_TOUCH = "ENABLE_SESSION_TOUCH";
+    public static final String ENABLE_SESSION_TOUCH_DEFAULT = "true";
+
 }

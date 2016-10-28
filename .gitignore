@@ -28,3 +28,4 @@ webserviceGenTest/src/main/resources/schemas/
 
 webservice-global/target/
 webservice-global/target/*
+webserviceGenTest/bin
