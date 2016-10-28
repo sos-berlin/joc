@@ -7,7 +7,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
+import com.sos.joc.model.jobscheduler.TimeoutParameter;
 
 public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     
@@ -16,15 +16,15 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerTerminate(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
 
     
     @POST
-    @Path("cluster/terminate_and_restart")
+    @Path("cluster/restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerRestartTerminate(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
 
     
     
@@ -33,5 +33,5 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerTerminateFailSafe(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
 }

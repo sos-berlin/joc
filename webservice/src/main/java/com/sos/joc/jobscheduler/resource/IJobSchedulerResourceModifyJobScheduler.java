@@ -20,7 +20,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
 
     
     @POST
-    @Path("terminate_and_restart")
+    @Path("restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerRestartTerminate(
