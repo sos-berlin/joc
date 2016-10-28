@@ -5,6 +5,8 @@ public class WebserviceConstants {
 
     public static final String NO_USER_WITH_ACCESS_TOKEN="JOC-001";
     public static final String WRONG_MIME_TYPE = "JOC-100";
+    public static final String DB_CONNECTION_ERROR = "JOC-200";
+    public static final String DEFAULT_ERROR_CODE = "JOC-420";
 
     
     public static final String JOC_COCKPIT = "JOC_COCKPIT";

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.Err;
 
 public class JocError extends Err{
@@ -18,7 +19,7 @@ public class JocError extends Err{
 
     @JsonIgnore
     public JocError(String message) {
-        setCode("JOC-420");
+        setCode(WebserviceConstants.DEFAULT_ERROR_CODE);
         setMessage(message);
     }
 

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem;
-import com.sos.scheduler.history.db.SchedulerOrderHistoryDBItemPostgres;
+import com.sos.scheduler.history.db.SchedulerOrderHistoryLogDBItemPostgres;
 
 /** @author Uwe Risse */
 public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
@@ -21,8 +21,8 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
         String log = null;
         try {
             if (this.getConnection().dbmsIsPostgres()) {
-                SchedulerOrderHistoryDBItemPostgres schedulerHistoryDBItem = (SchedulerOrderHistoryDBItemPostgres) this.getConnection()
-                        .get(SchedulerOrderHistoryDBItemPostgres.class, Long.parseLong(orderHistoryId));
+                SchedulerOrderHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerOrderHistoryLogDBItemPostgres) this.getConnection()
+                        .get(SchedulerOrderHistoryLogDBItemPostgres.class, Long.parseLong(orderHistoryId));
                 if (schedulerHistoryDBItem != null && schedulerHistoryDBItem.getLog() != null) {
                     log = schedulerHistoryDBItem.getLogAsString();
                 }
