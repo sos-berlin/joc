@@ -182,7 +182,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTER);
-            sql.append( "where instanceId = :instanceId");
+            sql.append(" where instanceId = :instanceId");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
