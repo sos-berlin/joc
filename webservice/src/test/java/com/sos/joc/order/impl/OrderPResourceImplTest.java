@@ -17,7 +17,7 @@ public class OrderPResourceImplTest {
     public void postOrderPTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrderFilter orderFilterWithCompactSchema = new OrderFilter();
         orderFilterWithCompactSchema.setJobChain("Cluster/cluster/job_chain1");
         orderFilterWithCompactSchema.setOrderId("8");

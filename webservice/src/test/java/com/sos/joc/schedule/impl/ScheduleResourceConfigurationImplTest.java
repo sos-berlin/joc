@@ -22,7 +22,7 @@ public class ScheduleResourceConfigurationImplTest {
     @Test
     public void postScheduleConfigurationDefaultTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         ScheduleConfigurationFilter scheduleConfigurationFilterSchema = new ScheduleConfigurationFilter();
         scheduleConfigurationFilterSchema.setSchedule("mySchedule");
         scheduleConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
@@ -35,7 +35,7 @@ public class ScheduleResourceConfigurationImplTest {
     @Test
     public void postScheduleConfigurationHtmlTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         ScheduleConfigurationFilter scheduleConfigurationFilterSchema = new ScheduleConfigurationFilter();
         scheduleConfigurationFilterSchema.setSchedule("mySchedule");
         scheduleConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);

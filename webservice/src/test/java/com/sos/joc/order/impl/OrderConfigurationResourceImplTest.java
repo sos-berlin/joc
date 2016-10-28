@@ -17,7 +17,7 @@ public class OrderConfigurationResourceImplTest {
     public void postOrderConfTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrderConfigurationFilter orderConfigurationBody = new OrderConfigurationFilter();
         orderConfigurationBody.setJobChain("/webservice/setback");
         orderConfigurationBody.setOrderId("1");

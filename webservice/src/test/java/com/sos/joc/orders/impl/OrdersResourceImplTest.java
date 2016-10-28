@@ -118,7 +118,7 @@ public class OrdersResourceImplTest {
     private OrdersV TestHelper(OrdersFilter ordersBody) throws Exception {
         ordersBody.setJobschedulerId("scheduler.1.10");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrdersResourceImpl ordersImpl = new OrdersResourceImpl();
         JOCDefaultResponse ordersResponse = ordersImpl.postOrders(sosShiroCurrentUserAnswer.getAccessToken(), ordersBody);
         OrdersV ordersVSchema = (OrdersV) ordersResponse.getEntity();

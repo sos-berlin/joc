@@ -19,7 +19,7 @@ public class InventoryOrdersDBLayerTest {
     @Test
     public void getOrderschedulerOrders() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current");
         InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
@@ -31,7 +31,7 @@ public class InventoryOrdersDBLayerTest {
     @Test
     public void getOrderschedulerOrder() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current");
         InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);

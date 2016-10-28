@@ -17,7 +17,7 @@ public class JobChainResourcePImplTest {
     public void postJobChainPTest() throws Exception {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobChainFilter jobChainsFilterSchema = new JobChainFilter();
         jobChainsFilterSchema.setJobschedulerId("scheduler_current");
         JobChainResourcePImpl jobChainsPImpl = new JobChainResourcePImpl();

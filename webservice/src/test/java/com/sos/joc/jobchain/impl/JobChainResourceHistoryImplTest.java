@@ -17,7 +17,7 @@ public class JobChainResourceHistoryImplTest {
     public void postJobChainHistoryTest() throws Exception {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobChainHistoryFilter jobChainHistoryFilterSchema = new JobChainHistoryFilter();
         jobChainHistoryFilterSchema.setJobschedulerId("scheduler_current");
         jobChainHistoryFilterSchema.setJobChain("batch_install_universal_agent/PerformInstall");

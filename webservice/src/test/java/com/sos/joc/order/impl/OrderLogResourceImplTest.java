@@ -18,7 +18,7 @@ public class OrderLogResourceImplTest {
     public void postOrderHistoryTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrderHistoryFilter orderFilterWithHistoryIdSchema = new OrderHistoryFilter();
         orderFilterWithHistoryIdSchema.setJobChain("Cluster/cluster/job_chain1");
         orderFilterWithHistoryIdSchema.setOrderId("8");

@@ -18,7 +18,7 @@ public class TreeResourceImplTest {
     @Test
     public void postTreeTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         TreeFilter treeFilterSchema = new TreeFilter();
         treeFilterSchema.setJobschedulerId(SCHEDULER_ID);
         TreeResourceImpl treeResourceImpl = new TreeResourceImpl();

@@ -21,7 +21,7 @@ public class JobSchedulerResourceAgentsImplTest {
     public void postjobschedulerAgentsTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         AgentFilter agentFilterSchema = new AgentFilter();
         ArrayList <AgentUrl>agents = new ArrayList<AgentUrl>();
         AgentUrl jobSchedulerAgent = new AgentUrl();

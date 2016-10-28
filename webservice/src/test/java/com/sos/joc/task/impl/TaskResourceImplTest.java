@@ -17,7 +17,7 @@ public class TaskResourceImplTest {
     public void postOrderTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         TaskFilter taskFilterSchema = new TaskFilter();
         taskFilterSchema.setJobschedulerId("scheduler_current");
         TaskResourceImpl taskImpl = new TaskResourceImpl();

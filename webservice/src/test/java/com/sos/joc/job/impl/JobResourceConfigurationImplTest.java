@@ -22,7 +22,7 @@ public class JobResourceConfigurationImplTest {
     @Test
     public void postJobConfigurationDefaultTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobConfigurationFilter jobConfigurationFilterSchema = new JobConfigurationFilter();
         jobConfigurationFilterSchema.setJob("check_history/check");
         jobConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
@@ -35,7 +35,7 @@ public class JobResourceConfigurationImplTest {
     @Test
     public void postJobConfigurationHtmlTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobConfigurationFilter jobConfigurationFilterSchema = new JobConfigurationFilter();
         jobConfigurationFilterSchema.setJob("check_history/check");
         jobConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);

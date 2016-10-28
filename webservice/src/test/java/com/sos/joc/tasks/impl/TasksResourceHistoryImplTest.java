@@ -17,7 +17,7 @@ public class TasksResourceHistoryImplTest {
     public void postTasksHistoryTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId("scheduler_current");
         TasksResourceHistoryImpl tasksHistoryImpl = new TasksResourceHistoryImpl();

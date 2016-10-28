@@ -27,7 +27,7 @@ public class JobsResourceImplTest {
     @Test
     public void postMinConfJobsTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
@@ -40,7 +40,7 @@ public class JobsResourceImplTest {
     @Test
     public void postCompactJobsTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
@@ -55,7 +55,7 @@ public class JobsResourceImplTest {
     public void postJobsWithFoldersRecursiveTest() throws Exception   {
         Date start = new Date();
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
@@ -86,7 +86,7 @@ public class JobsResourceImplTest {
     @Test
     public void postJobsWithFoldersNotRecursiveTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setCompact(true);
@@ -106,7 +106,7 @@ public class JobsResourceImplTest {
     @Test
     public void postJobsPendingTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         List<JobStateText> states = new ArrayList<JobStateText>();
@@ -122,7 +122,7 @@ public class JobsResourceImplTest {
     @Test
     public void postJobsFromToTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobsFilterSchema.setDateFrom("2016-09-06 00:00:00.000Z");

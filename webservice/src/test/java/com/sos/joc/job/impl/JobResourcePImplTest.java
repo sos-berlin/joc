@@ -17,7 +17,7 @@ public class JobResourcePImplTest {
     public void postJobPTest() throws Exception {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobFilter jobFilterSchema = new JobFilter();
         jobFilterSchema.setJobschedulerId("scheduler_current");
         jobFilterSchema.setJob("batch_install_universal_agent/PerformInstall");

@@ -19,7 +19,7 @@ public class OrdersResourcePImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer =
-                (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+                (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrdersFilter ordersFilterSchema = new OrdersFilter();
         ordersFilterSchema.setJobschedulerId("scheduler_current");
         OrdersResourcePImpl ordersPImpl = new OrdersResourcePImpl();
@@ -37,7 +37,7 @@ public class OrdersResourcePImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer =
-                (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+                (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         OrdersFilter ordersFilterSchema = new OrdersFilter();
         ordersFilterSchema.setJobschedulerId("sp_scheduler_cluster");
         OrdersResourcePImpl ordersPImpl = new OrdersResourcePImpl();

@@ -21,7 +21,7 @@ public class LocksResourcePImplTest {
     @Test
     public void postLocksTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         LocksFilter locksFilterSchema = new LocksFilter();
         locksFilterSchema.setJobschedulerId(SCHEDULER_ID);
         LocksResourcePImpl locksResourcePImpl = new LocksResourcePImpl();

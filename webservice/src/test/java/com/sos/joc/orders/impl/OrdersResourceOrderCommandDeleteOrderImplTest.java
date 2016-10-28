@@ -20,7 +20,7 @@ public class OrdersResourceOrderCommandDeleteOrderImplTest {
     public void postOrdersCommandDeleteOrder() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         ModifyOrders modifyOrdersSchema = new ModifyOrders();
         ArrayList<ModifyOrder> orders = new ArrayList<ModifyOrder>();
         ModifyOrder order = new ModifyOrder();

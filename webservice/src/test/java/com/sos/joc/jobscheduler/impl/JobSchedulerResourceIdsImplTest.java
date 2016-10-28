@@ -16,7 +16,7 @@ public class JobSchedulerResourceIdsImplTest {
     public void postjobschedulerIdsTest() throws Exception   {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobSchedulerResourceIdsImpl jobschedulerResourceIdsImpl = new JobSchedulerResourceIdsImpl();
         JOCDefaultResponse jobschedulerClusterResponse = jobschedulerResourceIdsImpl.postJobschedulerIds(sosShiroCurrentUserAnswer.getAccessToken());
         JobSchedulerIds idsSchema = (JobSchedulerIds) jobschedulerClusterResponse.getEntity();

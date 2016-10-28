@@ -22,7 +22,7 @@ public class LockResourceConfigurationImplTest {
     @Test
     public void postLockConfigurationDefaultTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         LockConfigurationFilter lockConfigurationFilterSchema = new LockConfigurationFilter();
         lockConfigurationFilterSchema.setLock("myLock");
         lockConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);
@@ -35,7 +35,7 @@ public class LockResourceConfigurationImplTest {
     @Test
     public void postLockConfigurationHtmlTest() throws Exception   {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         LockConfigurationFilter lockConfigurationFilterSchema = new LockConfigurationFilter();
         lockConfigurationFilterSchema.setLock("myLock");
         lockConfigurationFilterSchema.setJobschedulerId(SCHEDULER_ID);

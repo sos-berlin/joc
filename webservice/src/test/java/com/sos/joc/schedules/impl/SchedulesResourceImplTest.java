@@ -21,7 +21,7 @@ public class SchedulesResourceImplTest {
     @Test
     public void postSchedulesTest() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginGet("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         SchedulesFilter schedulesFilterSchema = new SchedulesFilter();
         schedulesFilterSchema.setJobschedulerId(SCHEDULER_ID);
         ScheduleResourceImpl schedulesResourceImpl = new ScheduleResourceImpl();
