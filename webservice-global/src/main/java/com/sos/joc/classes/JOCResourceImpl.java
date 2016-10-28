@@ -166,14 +166,9 @@ public class JOCResourceImpl {
     }
 
     private JOCDefaultResponse init401And440() {
-        try {
-            if (!jobschedulerUser.isAuthenticated()) {
-                return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
-            }
-            //TODO delete catch when JOC-Client uses ./touch API
-        } catch (org.apache.shiro.session.InvalidSessionException e) {
-            return JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, e.getMessage()));
-        } 
+        if (!jobschedulerUser.isAuthenticated()) {
+            return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
+        }
         return null;
     }
 }

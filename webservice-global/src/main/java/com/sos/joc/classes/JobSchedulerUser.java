@@ -28,9 +28,6 @@ public class JobSchedulerUser {
         if (sosShiroCurrentUser == null && Globals.currentUsersList != null) {
             sosShiroCurrentUser = Globals.currentUsersList.getUser(accessToken);
         }
-        //TODO delete resetTimeOut when JOC-Client uses ./touch API
-        resetTimeOut();
-
         return (sosShiroCurrentUser != null);
     }
 
