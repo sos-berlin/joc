@@ -34,15 +34,17 @@ import com.sos.joc.orders.resource.IOrdersResource;
 
 @Path("orders")
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceImpl.class);
     private static final String API_CALL = "./orders";
-    
+
     @Override
     public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
         LOGGER.debug(API_CALL);
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(ordersBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -111,7 +113,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             OrdersV entity = new OrdersV();
             entity.setOrders(new ArrayList<OrderV>(listOrders.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, ordersBody));

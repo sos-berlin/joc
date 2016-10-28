@@ -21,6 +21,7 @@ import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTimeResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRunTimeResourceImpl.class);
     private static final String API_CALL = "./job/run_time";
 
@@ -28,7 +29,8 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
     public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

@@ -24,9 +24,64 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceModifyJobSchedulerClusterImpl.class);
     private HostPortTimeOutParameter jobSchedulerModifyJobSchedulerClusterBody;
 
-    private JOCDefaultResponse check(boolean right) {
+    @Override
+    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerModifyJobSchedulerClusterBody.getJobschedulerId(), right);
+            init(accessToken, urlTimeoutParamSchema);
+
+            JOCDefaultResponse JOCDefaultResponse = check(accessToken, getPermissons(accessToken).getJobschedulerMasterCluster().isTerminate());
+
+            if (JOCDefaultResponse != null) {
+                return JOCDefaultResponse;
+            }
+
+            return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, urlTimeoutParamSchema);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+    }
+
+    @Override
+    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
+
+        try {
+            init(accessToken, urlTimeoutParamSchema);
+
+            JOCDefaultResponse JOCDefaultResponse = check(accessToken, getPermissons(accessToken).getJobschedulerMasterCluster().isRestart());
+
+            if (JOCDefaultResponse != null) {
+                return JOCDefaultResponse;
+            }
+
+            return executeModifyJobSchedulerClusterCommand(WebserviceConstants.YES, urlTimeoutParamSchema);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+
+    }
+
+    @Override
+    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
+        try {
+            init(accessToken, urlTimeoutParamSchema);
+
+            JOCDefaultResponse JOCDefaultResponse = check(accessToken, getPermissons(accessToken).getJobschedulerMasterCluster()
+                    .isTerminateFailSafe());
+
+            if (JOCDefaultResponse != null) {
+                return JOCDefaultResponse;
+            }
+
+            return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, urlTimeoutParamSchema);
+        } catch (JocException e) {
+            return JOCDefaultResponse.responseStatusJSError(e);
+        }
+
+    }
+    
+    private JOCDefaultResponse check(String accessToken, boolean right) {
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerModifyJobSchedulerClusterBody.getJobschedulerId(), right);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -63,59 +118,4 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
 
         jobSchedulerIdentifier = new JobSchedulerIdentifier(urlTimeoutParamSchema.getJobschedulerId());
     }
-
-    @Override
-    public JOCDefaultResponse postJobschedulerTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-        try {
-            init(accessToken, urlTimeoutParamSchema);
-
-            JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminate());
-
-            if (JOCDefaultResponse != null) {
-                return JOCDefaultResponse;
-            }
-
-            return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, urlTimeoutParamSchema);
-        } catch (JocException e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-    }
-
-    @Override
-    public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-
-        try {
-            init(accessToken, urlTimeoutParamSchema);
-
-            JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isRestart());
-
-            if (JOCDefaultResponse != null) {
-                return JOCDefaultResponse;
-            }
-
-            return executeModifyJobSchedulerClusterCommand(WebserviceConstants.YES, urlTimeoutParamSchema);
-        } catch (JocException e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-
-    }
-
-    @Override
-    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-        try {
-            init(accessToken, urlTimeoutParamSchema);
-
-            JOCDefaultResponse JOCDefaultResponse = check(getPermissons(accessToken).getJobschedulerMasterCluster().isTerminateFailSafe());
-
-            if (JOCDefaultResponse != null) {
-                return JOCDefaultResponse;
-            }
-
-            return executeModifyJobSchedulerClusterCommand(WebserviceConstants.NO, urlTimeoutParamSchema);
-        } catch (JocException e) {
-            return JOCDefaultResponse.responseStatusJSError(e);
-        }
-
-    }
-
 }

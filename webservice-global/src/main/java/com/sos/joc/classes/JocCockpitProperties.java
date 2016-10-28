@@ -5,12 +5,13 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import sos.scheduler.misc.ParameterSubstitutor;
 
 public class JocCockpitProperties {
-    private static final Logger LOGGER = Logger.getLogger(JocCockpitProperties.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JocCockpitProperties.class);
     private Properties properties;
     private String propertiesFile;
     private ParameterSubstitutor parameterSubstitutor = new ParameterSubstitutor();

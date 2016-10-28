@@ -22,8 +22,8 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
     @Override
     public JOCDefaultResponse postJobschedulerP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

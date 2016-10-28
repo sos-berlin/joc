@@ -18,6 +18,7 @@ import com.sos.joc.model.common.JobSchedulerId;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements IJobSchedulerResourceSwitch {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceSwitchImpl.class);
     private static final String API_CALL = "./jobscheduler/switch";
 
@@ -26,7 +27,8 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
 
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

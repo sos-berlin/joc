@@ -33,22 +33,24 @@ import com.sos.joc.model.jobscheduler.AgentsV;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements IJobSchedulerResourceAgents {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsImpl.class);
     private static final String API_CALL = "./jobscheduler/agents";
     private static final String AGENTS_API_LIST_PATH = "/jobscheduler/master/api/agent/";
-    
+
     @Override
     public JOCDefaultResponse postJobschedulerAgents(String accessToken, AgentFilter agentFilter) {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(agentFilter.getJobschedulerId(),getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, agentFilter.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             List<AgentV> listOfAgents = new ArrayList<AgentV>();
             List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
-            
+
             if (agentFilter.getAgents() != null && agentFilter.getAgents().size() > 0) {
                 Set<AgentUrl> agentUris = new HashSet<AgentUrl>(agentFilter.getAgents());
                 for (AgentUrl agentUri : agentUris) {
@@ -62,7 +64,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                     tasks.add(new AgentVCallable(agentUri.getString(), dbItemInventoryInstance.getUrl()));
                 }
             }
-            
+
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (Future<AgentV> result : executorService.invokeAll(tasks)) {
                 try {
@@ -75,11 +77,11 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                     }
                 }
             }
-            
+
             AgentsV entity = new AgentsV();
             entity.setAgents(listOfAgents);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, agentFilter));

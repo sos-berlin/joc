@@ -29,6 +29,7 @@ import com.sos.joc.processClasses.resource.IProcessClassesResourceP;
 
 @Path("process_classes")
 public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IProcessClassesResourceP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassesResourcePImpl.class);
     private static final String API_CALL = "./process_classes/p";
     private String regex;
@@ -39,8 +40,8 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
     public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = 
-                    init(processClassFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassFilter.getJobschedulerId(), getPermissons(accessToken).getLock()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -52,9 +53,9 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
             if (processClasses != null && !processClasses.isEmpty()) {
                 List<ProcessClassP> processClassesToAdd = new ArrayList<ProcessClassP>();
-                for(ProcessClassPath processClassPath : processClasses) {
-                    DBItemInventoryProcessClass processClassFromDb = 
-                            dbLayer.getProcessClass(processClassPath.getProcessClass(), dbItemInventoryInstance.getId());
+                for (ProcessClassPath processClassPath : processClasses) {
+                    DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(processClassPath.getProcessClass(),
+                            dbItemInventoryInstance.getId());
                     ProcessClassP processClass = ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb);
                     if (processClass != null) {
                         processClassesToAdd.add(processClass);
@@ -68,14 +69,14 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                     List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(folder.getFolder(),
                             dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
                     List<ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesToAdd(dbLayer, processClassesFromDb, regex);
-                    if(processClassesToAdd != null && !processClassesToAdd.isEmpty()){
+                    if (processClassesToAdd != null && !processClassesToAdd.isEmpty()) {
                         listOfProcessClasses.addAll(processClassesToAdd);
                     }
                 }
             } else {
                 List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClasses(dbItemInventoryInstance.getId());
                 List<ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesToAdd(dbLayer, processClassesFromDb, regex);
-                if(processClassesToAdd != null && !processClassesToAdd.isEmpty()){
+                if (processClassesToAdd != null && !processClassesToAdd.isEmpty()) {
                     listOfProcessClasses.addAll(processClassesToAdd);
                 }
             }

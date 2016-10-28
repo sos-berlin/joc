@@ -20,14 +20,16 @@ import com.sos.scheduler.model.commands.JSCmdShowOrder;
 
 @Path("order")
 public class OrderConfigurationResourceImpl extends JOCResourceImpl implements IOrderConfigurationResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderConfigurationResourceImpl.class);
     private static final String API_CALL = "./order/configuration";
-    
+
     @Override
     public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilter orderBody) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -36,7 +38,8 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
                 boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(orderBody), "/spooler/answer/order", "order", responseInHtml);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(orderBody),
+                        "/spooler/answer/order", "order", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

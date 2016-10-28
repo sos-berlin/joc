@@ -20,9 +20,10 @@ import com.sos.joc.order.resource.IOrderLogResource;
 
 @Path("order")
 public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderLogResourceImpl.class);
     private static final String API_CALL = "./order/log";
-    
+
     @Override
     public JOCDefaultResponse postOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
         LOGGER.debug(API_CALL);
@@ -33,19 +34,20 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
             checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
 
-            JOCDefaultResponse jocDefaultResponse = init(orderHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isOrderLog());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getOrder()
+                    .getView().isOrderLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             LogContent200 entity = new LogContent200();
             LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance);
-            //TODO surveyDate from database
+            // TODO surveyDate from database
             entity.setSurveyDate(Date.from(Instant.now()));
-            
+
             LogContent logContentSchema = new LogContent();
             String log = logOrderContent.getLog();
-             
+
             if (orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
                 logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(log));
             } else {
@@ -53,7 +55,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             }
             entity.setLog(logContentSchema);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, orderHistoryFilter));
@@ -64,7 +66,5 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
-
- 
 
 }

@@ -21,15 +21,17 @@ import com.sos.joc.model.job.JobsV;
 
 @Path("jobs")
 public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceImpl.class);
     private static final String API_CALL = "./jobs";
-    
+
     @Override
     public JOCDefaultResponse postJobs(String accessToken, JobsFilter jobsFilter) throws Exception {
         LOGGER.debug(API_CALL);
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobsFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

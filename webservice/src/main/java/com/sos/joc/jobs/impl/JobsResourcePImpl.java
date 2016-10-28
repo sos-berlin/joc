@@ -29,6 +29,7 @@ import com.sos.joc.model.job.JobsP;
 
 @Path("jobs")
 public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourcePImpl.class);
     private static final String API_CALL = "./jobs/p";
     private String regex;
@@ -41,7 +42,8 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         LOGGER.debug(API_CALL);
         try {
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -71,27 +73,26 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobsFilterSchema));
             return JOCDefaultResponse.responseStatusJSError(e, err);
-        }
-        finally{
+        } finally {
             Globals.rollback();
         }
     }
-    
+
     private List<DBItemInventoryJob> filterByRegex(List<DBItemInventoryJob> unfilteredJobs, String regex) throws Exception {
         List<DBItemInventoryJob> filteredJobs = new ArrayList<DBItemInventoryJob>();
         for (DBItemInventoryJob unfilteredJob : unfilteredJobs) {
             Matcher regExMatcher = Pattern.compile(regex).matcher(unfilteredJob.getName());
             if (regExMatcher.find()) {
-                filteredJobs.add(unfilteredJob); 
+                filteredJobs.add(unfilteredJob);
             }
         }
-        if(!filteredJobs.isEmpty()) {
+        if (!filteredJobs.isEmpty()) {
             return filteredJobs;
         } else {
             return null;
         }
     }
-    
+
     private List<DBItemInventoryJob> processFilters(InventoryJobsDBLayer dbLayer) throws Exception {
         List<DBItemInventoryJob> listOfJobs = null;
         if (jobs != null && !jobs.isEmpty()) {
@@ -99,8 +100,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             List<DBItemInventoryJob> filteredJobs = null;
             for (JobPath jobPathFilter : jobs) {
                 if (isOrderJob != null) {
-                    filteredJobs = 
-                            dbLayer.getInventoryJobsFilteredByJobPath(jobPathFilter.getJob(), isOrderJob, dbItemInventoryInstance.getId());
+                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(jobPathFilter.getJob(), isOrderJob, dbItemInventoryInstance.getId());
                 } else {
                     filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(jobPathFilter.getJob(), null, dbItemInventoryInstance.getId());
                 }

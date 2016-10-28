@@ -25,6 +25,7 @@ import com.sos.joc.model.jobChain.JobChainP200;
 
 @Path("job_chain")
 public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainResourceP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainResourcePImpl.class);
     private static final String API_CALL = "./job_chain/p";
 
@@ -34,7 +35,8 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
         LOGGER.debug(API_CALL);
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainFilter.getJobschedulerId(), getPermissons(accessToken).getJob()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -46,24 +48,24 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
             JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, inventoryJobChain, jobChainFilter.getCompact(), instanceId);
             if (jobChain != null) {
                 entity.setJobChain(jobChain);
-                if(!JobChainPermanent.NESTED_JOB_CHAIN_NAMES.isEmpty()) {
+                if (!JobChainPermanent.NESTED_JOB_CHAIN_NAMES.isEmpty()) {
                     List<JobChainP> nestedJobChains = new ArrayList<JobChainP>();
-                    for(String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
+                    for (String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
                         DBItemInventoryJobChain nestedJobChain = null;
-                        if(nestedJobChainName.contains("/")) {
+                        if (nestedJobChainName.contains("/")) {
                             nestedJobChain = dbLayer.getJobChainByPath(nestedJobChainName, instanceId);
                         } else {
                             nestedJobChain = dbLayer.getJobChainByName(nestedJobChainName, instanceId);
                         }
                         if (nestedJobChain != null) {
-                            JobChainP nestedJobChainP =
-                                    JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, jobChainFilter.getCompact(), instanceId);
+                            JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, jobChainFilter.getCompact(),
+                                    instanceId);
                             if (nestedJobChainP != null) {
                                 nestedJobChains.add(nestedJobChainP);
                             }
                         }
                     }
-                    if(!nestedJobChains.isEmpty()) {
+                    if (!nestedJobChains.isEmpty()) {
                         entity.setNestedJobChains(nestedJobChains);
                         JobChainPermanent.NESTED_JOB_CHAIN_NAMES.clear();
                     }

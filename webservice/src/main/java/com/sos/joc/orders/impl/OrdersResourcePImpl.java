@@ -31,6 +31,7 @@ import com.sos.joc.orders.resource.IOrdersResourceP;
 
 @Path("orders")
 public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResourceP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourcePImpl.class);
     private static final String API_CALL = "./orders/p";
     private String regex = null;
@@ -42,7 +43,8 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilter ordersFilterSchema) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -56,16 +58,16 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (ordersFilter != null && !ordersFilter.isEmpty()) {
                 for (OrderPath order : ordersFilter) {
-                    List<DBItemInventoryOrder> filteredOrders =
-                            dbLayer.getInventoryOrdersFilteredByOrders(order.getJobChain(), order.getOrderId(), instanceId);
+                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(order.getJobChain(), order.getOrderId(),
+                            instanceId);
                     if (filteredOrders != null && !filteredOrders.isEmpty()) {
                         ordersFromDB.addAll(filteredOrders);
                     }
                 }
             } else if (foldersFilter != null && !foldersFilter.isEmpty()) {
                 for (Folder folder : foldersFilter) {
-                    List<DBItemInventoryOrder> filteredOrders =
-                            dbLayer.getInventoryOrdersFilteredByFolders(folder.getFolder(), folder.getRecursive(), instanceId);
+                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(folder.getFolder(), folder.getRecursive(),
+                            instanceId);
                     if (filteredOrders != null && !filteredOrders.isEmpty()) {
                         ordersFromDB.addAll(filteredOrders);
                     }
@@ -75,7 +77,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                 for (DBItemInventoryOrder unfilteredOrder : unfilteredOrders) {
                     Matcher regExMatcher = Pattern.compile(regex).matcher(unfilteredOrder.getName());
                     if (regExMatcher.find()) {
-                        ordersFromDB.add(unfilteredOrder); 
+                        ordersFromDB.add(unfilteredOrder);
                     }
                 }
             } else {

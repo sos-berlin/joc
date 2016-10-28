@@ -32,7 +32,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
         LOGGER.debug(API_CALL);
         try {
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init("", getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

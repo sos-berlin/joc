@@ -24,6 +24,7 @@ import com.sos.joc.order.resource.IOrderPResource;
 
 @Path("order")
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderPResourceImpl.class);
     private static final String API_CALL = "./order/p";
 
@@ -31,8 +32,8 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
     public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse =
-                    init(orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -40,22 +41,22 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             Boolean compact = orderFilter.getCompact();
             OrderP200 entity = new OrderP200();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilter.getJobChain(),
-                    orderFilter.getOrderId(), instanceId);
+            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilter.getJobChain(), orderFilter.getOrderId(),
+                    instanceId);
             OrderP order = new OrderP();
             order.setSurveyDate(dbItemInventoryOrder.getModified());
             order.setPath(dbItemInventoryOrder.getName());
             order.setOrderId(dbItemInventoryOrder.getOrderId());
             order.setJobChain(dbItemInventoryOrder.getJobChainName());
             Integer estimatedDuration = getEstimatedDurationInSeconds(dbItemInventoryOrder);
-            if(estimatedDuration != null) {
+            if (estimatedDuration != null) {
                 order.setEstimatedDuration(estimatedDuration);
             } else {
                 order.setEstimatedDuration(0);
             }
             order.setTitle(dbItemInventoryOrder.getTitle());
             order.set_type(OrderType.PERMANENT);
-            if(compact == null || !compact) {
+            if (compact == null || !compact) {
                 Date orderFileModified = dbLayer.getOrderConfigurationDate(dbItemInventoryOrder.getId());
                 if (orderFileModified != null) {
                     order.setConfigurationDate(orderFileModified);
@@ -82,7 +83,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
         ReportDBLayer dbLayer = new ReportDBLayer(Globals.sosHibernateConnection);
         Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order.getOrderId());
         if (estimatedDurationInMillis != null) {
-            return estimatedDurationInMillis.intValue()/1000;
+            return estimatedDurationInMillis.intValue() / 1000;
         }
         return null;
     }

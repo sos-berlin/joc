@@ -19,6 +19,7 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("schedule")
 public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implements IScheduleResourceConfiguration {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceConfigurationImpl.class);
     private static final String API_CALL = "./schedule/configuration";
 
@@ -27,7 +28,8 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
 
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(scheduleBody.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isConfiguration());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, scheduleBody.getJobschedulerId(), getPermissons(accessToken).getSchedule()
+                    .getView().isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -37,7 +39,8 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             if (checkRequiredParameter("schedule", scheduleBody.getSchedule())) {
                 boolean responseInHtml = scheduleBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", normalizePath(scheduleBody.getSchedule()));
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(), xPath, "schedule", responseInHtml);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(), xPath, "schedule",
+                        responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

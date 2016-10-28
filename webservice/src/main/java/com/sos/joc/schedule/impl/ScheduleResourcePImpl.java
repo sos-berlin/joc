@@ -25,6 +25,7 @@ import com.sos.joc.schedule.resource.IScheduleResourceP;
 
 @Path("schedule")
 public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleResourceP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourcePImpl.class);
     private static final String API_CALL = "./schedule/p";
 
@@ -32,8 +33,8 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
     public JOCDefaultResponse postScheduleP(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse =
-                    init(scheduleFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, scheduleFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

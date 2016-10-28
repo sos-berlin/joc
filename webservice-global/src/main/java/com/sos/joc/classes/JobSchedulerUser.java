@@ -28,7 +28,7 @@ public class JobSchedulerUser {
         if (sosShiroCurrentUser == null && Globals.currentUsersList != null) {
             sosShiroCurrentUser = Globals.currentUsersList.getUser(accessToken);
         }
-
+        //TODO delete resetTimeOut when JOC-Client uses ./touch API
         resetTimeOut();
 
         return (sosShiroCurrentUser != null);
@@ -48,7 +48,7 @@ public class JobSchedulerUser {
         return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier);
     }
 
-    private void resetTimeOut() {
+    public boolean resetTimeOut() {
         if (sosShiroCurrentUser != null) {
             Session curSession = sosShiroCurrentUser.getCurrentSubject().getSession(false);
             if (curSession != null) {
@@ -57,5 +57,6 @@ public class JobSchedulerUser {
                 throw new org.apache.shiro.session.InvalidSessionException("Session doesn't exist");
             }
         }
+        return (sosShiroCurrentUser != null);
     }
 }

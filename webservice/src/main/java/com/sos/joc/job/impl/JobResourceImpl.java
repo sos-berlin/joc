@@ -18,12 +18,14 @@ import com.sos.joc.model.job.JobFilter;
 
 @Path("job")
 public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceImpl.class);
     private static final String API_CALL = "./job";
 
     public JOCDefaultResponse postJob(String accessToken, JobFilter jobFilter) throws Exception {
         LOGGER.debug(API_CALL);
-        JOCDefaultResponse jocDefaultResponse = init(jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                .isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

@@ -34,14 +34,16 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
 
 @Path("orders")
 public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implements IOrdersResourceOverviewSnapshot {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceOverviewSnapshotImpl.class);
     private static final String API_CALL = "./orders/overview/snapshot";
-    
+
     @Override
     public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getOrder()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -50,11 +52,11 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             command.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
             command.addOrderStatisticsQuery();
             URI uri = command.getURI();
-            
+
             Set<String> jobChains = getJobChainsWithoutDuplicates(jobChainsFilter.getJobChains());
             Set<String> folders = getFoldersWithoutDuplicatesAndSubfolders(jobChainsFilter.getFolders());
             Set<OrdersSnapshotCallable> tasks = new HashSet<OrdersSnapshotCallable>();
-            
+
             if (jobChains.size() > 0) {
                 for (String jobChain : jobChains) {
                     tasks.add(new OrdersSnapshotCallable(jobChain, uri));
@@ -66,7 +68,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             } else {
                 tasks.add(new OrdersSnapshotCallable("/", uri));
             }
-            
+
             OrdersSummary summary = new OrdersSummary();
             summary.setBlacklist(0);
             summary.setPending(0);
@@ -74,7 +76,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             summary.setSetback(0);
             summary.setSuspended(0);
             summary.setWaitingForResource(0);
-            
+
             ExecutorService executorService = Executors.newFixedThreadPool(10);
             for (Future<OrdersSummary> result : executorService.invokeAll(tasks)) {
                 try {
@@ -93,11 +95,11 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                     }
                 }
             }
-            
+
             OrdersSnapshot entity = new OrdersSnapshot();
             entity.setOrders(summary);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, jobChainsFilter));
@@ -109,20 +111,20 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         }
 
     }
-    
+
     private String getPath(Folder folder) throws JocMissingRequiredParameterException {
         String path = folder.getFolder();
         if (path == null) {
             throw new JocMissingRequiredParameterException("folder");
         } else {
-            path = ("/"+path.trim()+"/").replaceAll("//+", "/");
+            path = ("/" + path.trim() + "/").replaceAll("//+", "/");
             if (!folder.getRecursive()) {
                 path += "*";
-            } 
+            }
         }
         return path;
     }
-    
+
     private Set<String> getFoldersWithoutDuplicatesAndSubfolders(List<Folder> folders) throws JocMissingRequiredParameterException {
         Set<String> set = new HashSet<String>();
         if (folders == null || folders.size() == 0) {
@@ -136,7 +138,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         int index = 0;
         for (String str : sortedSet) {
             if (index > 0) {
-                if (!str.contains(strA[index-1])) {
+                if (!str.contains(strA[index - 1])) {
                     strA[index] = str;
                     index += 1;
                     set.add(str);
@@ -149,7 +151,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         }
         return set;
     }
-    
+
     private Set<String> getJobChainsWithoutDuplicates(List<JobChainPath> jobChains) throws JocMissingRequiredParameterException {
         Set<String> set = new HashSet<String>();
         if (jobChains == null || jobChains.size() == 0) {
@@ -159,7 +161,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             if (jobChain.getJobChain() == null || jobChain.getJobChain().isEmpty()) {
                 throw new JocMissingRequiredParameterException("jobChain");
             }
-            set.add(("/"+jobChain.getJobChain().trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
+            set.add(("/" + jobChain.getJobChain().trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
         }
         return set;
     }

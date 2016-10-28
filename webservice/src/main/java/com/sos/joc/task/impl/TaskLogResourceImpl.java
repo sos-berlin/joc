@@ -20,9 +20,10 @@ import com.sos.joc.task.resource.ITaskLogResource;
 
 @Path("task")
 public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskLogResourceImpl.class);
     private static final String API_CALL = "./task/log";
-    
+
     @Override
     public JOCDefaultResponse postTaskLog(String accessToken, TaskFilter taskFilter) throws Exception {
         LOGGER.debug(API_CALL);
@@ -31,19 +32,20 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
             checkRequiredParameter("jobschedulerId", taskFilter.getJobschedulerId());
             checkRequiredParameter("taskId", taskFilter.getTaskId());
 
-            JOCDefaultResponse jocDefaultResponse = init(taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isTaskLog());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                    .isTaskLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             LogContent200 entity = new LogContent200();
-            LogTaskContent logOrderContent = new LogTaskContent(taskFilter,dbItemInventoryInstance);
-            //TODO surveyDate from database
+            LogTaskContent logOrderContent = new LogTaskContent(taskFilter, dbItemInventoryInstance);
+            // TODO surveyDate from database
             entity.setSurveyDate(Date.from(Instant.now()));
-            
+
             LogContent logContentSchema = new LogContent();
             String log = logOrderContent.getLog();
-             
+
             if (taskFilter.getMime() != null && taskFilter.getMime() == LogMime.HTML) {
                 logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(log));
             } else {
@@ -51,7 +53,7 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
             }
             entity.setLog(logContentSchema);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, taskFilter));
@@ -62,7 +64,5 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
             return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
-
- 
 
 }

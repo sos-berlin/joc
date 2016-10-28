@@ -34,6 +34,7 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceClusterMembersImpl.class);
     private static final String API_CALL = "./jobscheduler/cluster/members";
 
@@ -41,7 +42,8 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilter.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -49,25 +51,26 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.executePost(getXMLClusterCommand());
             NodeList clusterMembers = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer/state/cluster/cluster_member");
-            
+
             InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             Globals.beginTransaction();
-            List<DBItemInventoryInstance> schedulerInstances = instancesDbLayer.getInventoryInstancesBySchedulerId(jobSchedulerFilter.getJobschedulerId());
+            List<DBItemInventoryInstance> schedulerInstances = instancesDbLayer.getInventoryInstancesBySchedulerId(jobSchedulerFilter
+                    .getJobschedulerId());
             List<JobSchedulerV> masters = new ArrayList<JobSchedulerV>();
-            
+
             if (clusterMembers.getLength() == 0) {
-                //standalone
+                // standalone
                 JobSchedulerV jobscheduler = new JobSchedulerVolatile(schedulerInstances.get(0)).getJobScheduler();
                 masters.add(jobscheduler);
             } else {
-                Map<String,DBItemInventoryInstance> jobSchedulerClusterMemberUrls = new HashMap<String,DBItemInventoryInstance>();
+                Map<String, DBItemInventoryInstance> jobSchedulerClusterMemberUrls = new HashMap<String, DBItemInventoryInstance>();
                 for (DBItemInventoryInstance schedulerInstance : schedulerInstances) {
-                    String clusterMemberId = schedulerInstance.getHostname()+":"+schedulerInstance.getPort();
+                    String clusterMemberId = schedulerInstance.getHostname() + ":" + schedulerInstance.getPort();
                     jobSchedulerClusterMemberUrls.put(clusterMemberId.toLowerCase(), schedulerInstance);
                 }
                 Date surveyDate = jocXmlCommand.getSurveyDate();
-                
-                for (int i=0; i < clusterMembers.getLength(); i++) {
+
+                for (int i = 0; i < clusterMembers.getLength(); i++) {
                     Element clusterMember = (Element) clusterMembers.item(i);
                     JobSchedulerState state = new JobSchedulerState();
                     JobSchedulerV jobscheduler = null;
@@ -76,14 +79,15 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                         state.set_text(JobSchedulerStateText.DEAD);
                         jobscheduler = getJobScheduler(clusterMember, state, surveyDate);
                     } else {
-                        DBItemInventoryInstance schedulerInstance = jobSchedulerClusterMemberUrls.get(clusterMember.getAttribute("host").toLowerCase()+":"+clusterMember.getAttribute("tcp_port"));
+                        DBItemInventoryInstance schedulerInstance = jobSchedulerClusterMemberUrls.get(clusterMember.getAttribute("host").toLowerCase()
+                                + ":" + clusterMember.getAttribute("tcp_port"));
                         if (schedulerInstance != null) {
                             jobscheduler = new JobSchedulerVolatile(schedulerInstance).getJobScheduler();
                         } else {
                             if ("yes".equals(jocXmlCommand.getAttribute("active"))) {
                                 state.setSeverity(0);
                                 state.set_text(JobSchedulerStateText.RUNNING);
-                                //TODO Running is not necessarily right
+                                // TODO Running is not necessarily right
                             } else if ("yes".equals(jocXmlCommand.getAttribute("backup"))) {
                                 state.setSeverity(3);
                                 state.set_text(JobSchedulerStateText.WAITING_FOR_ACTIVATION);
@@ -96,11 +100,11 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                     }
                 }
             }
-            
+
             MastersV entity = new MastersV();
             entity.setMasters(masters);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerFilter));
@@ -113,7 +117,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             Globals.rollback();
         }
     }
-    
+
     private String getXMLClusterCommand() {
         JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
         jsCmdShowState.setWhat("folders no_subfolders cluster");
@@ -121,7 +125,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         jsCmdShowState.setSubsystems("folder");
         return jsCmdShowState.toXMLString();
     }
-    
+
     private JobSchedulerV getJobScheduler(Element clusterMember, JobSchedulerState state, Date surveyDate) {
         JobSchedulerV jobscheduler = new JobSchedulerV();
         jobscheduler.setHost(clusterMember.getAttribute("host"));

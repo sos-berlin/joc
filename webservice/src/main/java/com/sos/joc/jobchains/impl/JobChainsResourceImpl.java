@@ -19,15 +19,17 @@ import com.sos.joc.model.jobChain.JobChainsV;
 
 @Path("job_chains")
 public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChainsResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourceImpl.class);  
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourceImpl.class);
     private static final String API_CALL = "./job_chains";
-     
+
     @Override
-    public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter  jobChainsFilter) throws Exception {
+    public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
         LOGGER.debug(API_CALL);
-        
+
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -56,6 +58,5 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
             return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
-
 
 }

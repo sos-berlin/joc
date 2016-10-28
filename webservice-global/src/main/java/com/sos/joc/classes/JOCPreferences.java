@@ -10,9 +10,9 @@ public class JOCPreferences {
     }
 
     public void put(String key, String value){
-        prefs.node(WebserviceConstants.JOC_COCKPUT).put(key,value);
+        prefs.node(WebserviceConstants.JOC_COCKPIT).put(key,value);
     }
     public String get(String key, String defaultValue){
-        return prefs.node(WebserviceConstants.JOC_COCKPUT).get(key,defaultValue);
+        return prefs.node(WebserviceConstants.JOC_COCKPIT).get(key,defaultValue);
     }
 }

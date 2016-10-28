@@ -22,13 +22,15 @@ import com.sos.joc.model.jobscheduler.JobSchedulerP200;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl implements IJobSchedulerResourcePSupervisor {
+
     private static final String API_CALL = "./jobscheduler/supervisor/p";
-    
+
     @Override
     public JOCDefaultResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
         try {
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -50,7 +52,7 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
                 entity.setJobscheduler(new JobSchedulerP());
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerId));

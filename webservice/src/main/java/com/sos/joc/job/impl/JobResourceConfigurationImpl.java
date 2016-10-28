@@ -22,6 +22,7 @@ import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJobResourceConfiguration {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceConfigurationImpl.class);
     private static final String API_CALL = "./job/configuration";
 
@@ -30,7 +31,8 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
 
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -39,7 +41,8 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("job", jobBody.getJob())) {
                 boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job", "job", responseInHtml);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job",
+                        "job", responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

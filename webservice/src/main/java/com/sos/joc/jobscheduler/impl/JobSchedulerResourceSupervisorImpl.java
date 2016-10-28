@@ -25,6 +25,7 @@ import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implements IJobSchedulerResourceSupervisor {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceSupervisorImpl.class);
     private static final String API_CALL = "./jobscheduler/supervisor";
 
@@ -33,13 +34,14 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
         LOGGER.debug(API_CALL);
         try {
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerId.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             JobSchedulerV200 entity = new JobSchedulerV200();
-            
+
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
             if (supervisorId != DBLayer.DEFAULT_ID) {
                 InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
@@ -55,7 +57,7 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
                 entity.setJobscheduler(new JobSchedulerV());
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerId));

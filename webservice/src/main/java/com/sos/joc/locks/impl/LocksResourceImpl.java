@@ -33,18 +33,20 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("locks")
 public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourceImpl.class);
     private static final String API_CALL = "./locks";
-    
+
     @Override
     public JOCDefaultResponse postLocks(String accessToken, LocksFilter locksFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(locksFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, locksFilter.getJobschedulerId(), getPermissons(accessToken).getLock().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.executePost(createLocksPostCommand(locksFilter));
             jocXmlCommand.throwJobSchedulerError();
@@ -52,25 +54,25 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             boolean filteredByLocks = (locksFilter.getLocks() != null && locksFilter.getLocks().size() > 0);
 
             List<LockV> locksV = new ArrayList<LockV>();
-            for (int i=0; i < locks.getLength(); i++) {
+            for (int i = 0; i < locks.getLength(); i++) {
                 Element lock = (Element) locks.item(i);
-                
+
                 if (filteredByLocks && !locksFilter.getLocks().contains(lock.getAttribute("path"))) {
                     continue;
                 }
                 if (!FilterAfterResponse.matchRegex(locksFilter.getRegex(), lock.getAttribute("path"))) {
                     continue;
                 }
-                
+
                 LockVolatile lockV = new LockVolatile(lock, jocXmlCommand);
                 lockV.setFields();
                 locksV.add(lockV);
             }
-            
+
             LocksV entity = new LocksV();
             entity.setLocks(locksV);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, locksFilter));
@@ -81,7 +83,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
-    
+
     private String createLocksPostCommand(LocksFilter lockFilter) throws JocMissingRequiredParameterException {
         List<LockPath> locks = lockFilter.getLocks();
         if (locks == null || locks.size() == 0) {
@@ -90,17 +92,17 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             Set<Folder> folders = new HashSet<Folder>();
             for (LockPath lockPath : locks) {
                 Folder folder = new Folder();
-                folder.setFolder(("/"+lockPath.getLock()).replaceAll("//+", "/").replaceFirst("/[^/]+$", ""));
+                folder.setFolder(("/" + lockPath.getLock()).replaceAll("//+", "/").replaceFirst("/[^/]+$", ""));
                 folder.setRecursive(false);
                 folders.add(folder);
             }
             return createLocksPostCommand(folders);
         }
     }
-    
+
     private String createLocksPostCommand(Set<Folder> folders) throws JocMissingRequiredParameterException {
         if (folders == null || folders.size() == 0) {
-            return createShowStatePostCommand(null,true);
+            return createShowStatePostCommand(null, true);
         } else {
             StringBuilder s = new StringBuilder();
             s.append("<commands>");
@@ -108,7 +110,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
                 if (folder.getFolder() == null || folder.getFolder().isEmpty()) {
                     throw new JocMissingRequiredParameterException("undefined folder");
                 }
-                s.append(createShowStatePostCommand(folder.getFolder(),folder.getRecursive())); 
+                s.append(createShowStatePostCommand(folder.getFolder(), folder.getRecursive()));
             }
             s.append("</commands>");
             return s.toString();
@@ -123,7 +125,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             showState.setWhat("no_subfolders " + showState.getWhat());
         }
         if (folder != null) {
-            showState.setPath(("/"+folder).replaceAll("//+", "/"));
+            showState.setPath(("/" + folder).replaceAll("//+", "/"));
         }
         return showState.toXMLString();
     }

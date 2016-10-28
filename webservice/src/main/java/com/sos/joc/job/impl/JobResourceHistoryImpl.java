@@ -27,6 +27,7 @@ import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResourceHistory {
+
     private static final String TASK_HISTORY = "task_history";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceHistoryImpl.class);
     private static final Integer DEFAULT_MAX_HISTORY_ITEMS = 25;
@@ -39,7 +40,8 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
         LOGGER.debug(API_CALL);
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(taskHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isHistory());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, taskHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getJob()
+                    .getView().isHistory());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -95,7 +97,7 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
             TaskHistory entity = new TaskHistory();
             entity.setHistory(listOfHistory);
             entity.setDeliveryDate(new Date());
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, taskHistoryFilter));

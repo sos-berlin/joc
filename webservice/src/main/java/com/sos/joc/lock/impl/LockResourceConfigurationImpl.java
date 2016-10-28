@@ -19,14 +19,16 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("lock")
 public class LockResourceConfigurationImpl extends JOCResourceImpl implements ILockResourceConfiguration {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LockResourceConfigurationImpl.class);
     private static final String API_CALL = "./lock/configuration";
-    
+
     @Override
     public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilter lockBody) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(lockBody.getJobschedulerId(), getPermissons(accessToken).getLock().getView().isConfiguration());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, lockBody.getJobschedulerId(), getPermissons(accessToken).getLock().getView()
+                    .isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -36,7 +38,8 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
             if (checkRequiredParameter("lock", lockBody.getLock())) {
                 boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", normalizePath(lockBody.getLock()));
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(), xPath, "lock", responseInHtml);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(), xPath, "lock",
+                        responseInHtml);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

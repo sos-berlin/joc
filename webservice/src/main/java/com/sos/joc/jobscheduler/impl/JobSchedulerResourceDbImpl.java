@@ -19,15 +19,17 @@ import com.sos.joc.model.jobscheduler.DBStateText;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobSchedulerResourceDb {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceDbImpl.class);
     private static final String API_CALL = "./jobscheduler/db";
-    
+
     @Override
     public JOCDefaultResponse postJobschedulerDb(String accessToken, JobSchedulerId jobSchedulerFilter) {
 
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilter.getJobschedulerId(),getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -38,7 +40,7 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
             database.setSurveyDate(dbItemInventoryInstance.getModified());
             database.setVersion(dbItemInventoryInstance.getDbmsVersion());
             DBState state = new DBState();
-            //TODO DB is not always running
+            // TODO DB is not always running
             state.setSeverity(0);
             state.set_text(DBStateText.RUNNING);
             database.setState(state);

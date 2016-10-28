@@ -19,14 +19,16 @@ import com.sos.scheduler.model.commands.JSCmdShowOrder;
 
 @Path("order")
 public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderRunTimeResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderRunTimeResourceImpl.class);
     private static final String API_CALL = "./order/run_time";
-    
+
     @Override
     public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilter orderFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

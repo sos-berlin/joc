@@ -20,14 +20,16 @@ import com.sos.joc.order.resource.IOrderResource;
 
 @Path("order")
 public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderResourceImpl.class);
     private static final String API_CALL = "./order";
-    
+
     @Override
     public JOCDefaultResponse postOrder(String accessToken, OrderFilter orderBody) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

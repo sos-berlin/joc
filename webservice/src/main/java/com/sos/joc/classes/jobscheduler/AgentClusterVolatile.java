@@ -14,6 +14,7 @@ import javax.json.JsonString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.model.jobscheduler.AgentClusterState;
@@ -22,6 +23,7 @@ import com.sos.joc.model.jobscheduler.AgentClusterV;
 import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
+import com.sos.joc.model.processClass.Process;
 
 public class AgentClusterVolatile extends AgentClusterV {
 
@@ -107,11 +109,24 @@ public class AgentClusterVolatile extends AgentClusterV {
 
     private void setDetailedFields(Map<String,AgentV> mapOfAgents) throws JobSchedulerInvalidResponseDataException {
         setCompactFields(mapOfAgents);
-        //TODO setProcesses(processes);
+        List<Process> processList = new ArrayList<Process>();
+        JsonArray processes = agent.getJsonArray("processes");
+        if (processes != null) {
+            for (JsonObject processObj : processes.getValuesAs(JsonObject.class)) {
+               Process process = new Process();
+               process.setAgent(processObj.getString("agent", null));
+               process.setJob(processObj.getString("jobPath", null));
+               process.setPid(processObj.getInt("pid", 0));
+               process.setRunningSince(JobSchedulerDate.getDateFromISO8601String(processObj.getString("startedAt", null)));
+               process.setTaskId(processObj.getString("taskId", null));
+               processList.add(process);
+            }
+        }
+        setProcesses(processList);
     }
 
     private void setCompactFields(Map<String,AgentV> mapOfAgents) throws JobSchedulerInvalidResponseDataException {
-        setAgentClusterPath(); //usedProcessCount
+        setAgentClusterPath();
         setNumOfProcesses(overview.getInt("usedProcessCount", 0));
         JsonArray obstacles = overview.getJsonArray("obstacles");
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(obstacles));
@@ -125,6 +140,4 @@ public class AgentClusterVolatile extends AgentClusterV {
         setAgents(null);
         setProcesses(null);
     }
-    
-    
 }

@@ -18,6 +18,8 @@ public class SOSShiroCurrentUserAnswer {
     private boolean isAuthenticated;
     private String accessToken;
     private String message;
+    private String sessionTimeout;
+    private boolean enableTouch = true;
 
     public SOSShiroCurrentUserAnswer() {
     }
@@ -112,6 +114,24 @@ public class SOSShiroCurrentUserAnswer {
     @XmlAttribute
     public void setMessage(String message) {
         this.message = message;
+    }
+    
+    @XmlAttribute
+    public void setSessionTimeout(String sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
+    }
+
+    public String getSessionTimeout() {
+        return this.sessionTimeout;
+    }
+    
+    @XmlAttribute
+    public void setEnableTouch(boolean enableTouch) {
+        this.enableTouch = enableTouch;
+    }
+
+    public boolean getEnableTouch() {
+        return this.enableTouch;
     }
 
     @Override

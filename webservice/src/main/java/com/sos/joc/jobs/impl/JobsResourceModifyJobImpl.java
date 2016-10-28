@@ -27,6 +27,7 @@ import com.sos.scheduler.model.objects.JSObjRunTime;
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
+
     private static final String CONTINUE = "continue";
     private static final String END = "end";
     private static final String SUSPEND = "suspend";
@@ -54,7 +55,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
-    public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs)  {
+    public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
         API_CALL += UNSTOP;
         LOGGER.debug(API_CALL);
         try {
@@ -132,18 +133,19 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
-    
+
     private Date executeModifyJobCommand(ModifyJob modifyJob, String command) {
 
         try {
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            
+
             JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
             jsCmdModifyJob.setCmdIfNotEmpty(command);
             jsCmdModifyJob.setJobIfNotEmpty(modifyJob.getJob());
             if (SET_RUN_TIME.equals(command)) {
                 try {
-                    //TODO order.getRunTime() should be checked against scheduler.xsd
+                    // TODO order.getRunTime() should be checked against
+                    // scheduler.xsd
                     JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, modifyJob.getRunTime());
                     jsCmdModifyJob.setRunTime(objRuntime);
                 } catch (Exception e) {
@@ -152,7 +154,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             }
             String xml = jsCmdModifyJob.toXMLString();
             jocXmlCommand.executePostWithThrowBadRequest(xml);
-            
+
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, modifyJob));
@@ -163,7 +165,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobs modifyJobs) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(modifyJobs.getJobschedulerId(), permission);
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobs.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

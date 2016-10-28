@@ -14,21 +14,23 @@ import com.sos.joc.model.common.JobSchedulerId;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implements IJobSchedulerResourceStatistics {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceStatisticsImpl.class);
     private static final String API_CALL = "./jobscheduler/statistics";
-    
+
     @Override
     public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerId jobSchedulerFilter) throws Exception {
 
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilter.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            //TODO
-            
+            // TODO
+
             return JOCDefaultResponse.responseStatus200(null);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerFilter));

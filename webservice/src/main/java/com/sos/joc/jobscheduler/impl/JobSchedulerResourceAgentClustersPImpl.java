@@ -55,15 +55,15 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
     public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse =
-                    init(jobSchedulerAgentClustersBody.getJobschedulerId(),
-                            getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentClustersBody.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             AgentClustersP entity = new AgentClustersP();
             ArrayList<AgentClusterP> listOfAgentClusters = new ArrayList<AgentClusterP>();
-            /** FILTERS: compact agentClusters (array of processClasses) state regex */
+            /** FILTERS: compact agentClusters (array of processClasses) state
+             * regex */
             compact = jobSchedulerAgentClustersBody.getCompact();
             agentClusters = jobSchedulerAgentClustersBody.getAgentClusters();
             state = jobSchedulerAgentClustersBody.getState();
@@ -95,8 +95,8 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 List<DBItemInventoryAgentCluster> agentClusters = agentLayer.getAgentClusters(instanceId);
                 if (agentClusters != null) {
                     for (DBItemInventoryAgentCluster agentCluster : agentClusters) {
-                        DBItemInventoryProcessClass processClass =
-                                agentLayer.getInventoryProcessClassById(agentCluster.getProcessClassId(), instanceId);
+                        DBItemInventoryProcessClass processClass = agentLayer.getInventoryProcessClassById(agentCluster.getProcessClassId(),
+                                instanceId);
                         agentClusterPSchema = processAgentCluster(agentLayer, processClass, agentCluster);
                         if (agentClusterPSchema != null) {
                             listOfAgentClusters.add(agentClusterPSchema);
@@ -118,24 +118,22 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
     }
 
     private AgentClusterP processAgentClusterByClusterName(InventoryAgentsDBLayer agentLayer, String agentClusterName) throws Exception {
-        DBItemInventoryProcessClass processClass = 
-                agentLayer.getInventoryClusterProcessClass(agentClusterName, dbItemInventoryInstance.getId());
+        DBItemInventoryProcessClass processClass = agentLayer.getInventoryClusterProcessClass(agentClusterName, dbItemInventoryInstance.getId());
         if (processClass != null) {
-            DBItemInventoryAgentCluster agentCluster =
-                    agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), dbItemInventoryInstance.getId());
+            DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), dbItemInventoryInstance
+                    .getId());
             return processAgentCluster(agentLayer, processClass, agentCluster);
         }
         return null;
     }
 
-    private List<AgentClusterP> processAgentClusterByRegexAndState(InventoryAgentsDBLayer agentLayer, String regex, Integer state)
-            throws Exception {
+    private List<AgentClusterP> processAgentClusterByRegexAndState(InventoryAgentsDBLayer agentLayer, String regex, Integer state) throws Exception {
         List<AgentClusterP> schemas = new ArrayList<AgentClusterP>();
         List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClasses(dbItemInventoryInstance.getId());
         if (processClasses != null) {
             for (DBItemInventoryProcessClass processClass : processClasses) {
-                DBItemInventoryAgentCluster agentCluster =
-                        agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), dbItemInventoryInstance.getId());
+                DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId(),
+                        dbItemInventoryInstance.getId());
                 if (agentCluster != null) {
                     Matcher regExMatcher = Pattern.compile(regex).matcher(processClass.getName());
                     if (regExMatcher.find()) {
@@ -157,8 +155,8 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         List<DBItemInventoryProcessClass> processClasses = agentLayer.getInventoryProcessClassByState(state, dbItemInventoryInstance.getId());
         if (processClasses != null) {
             for (DBItemInventoryProcessClass processClass : processClasses) {
-                DBItemInventoryAgentCluster agentCluster =
-                        agentLayer.getInventoryClusterByProcessClassId(processClass.getId(), dbItemInventoryInstance.getId());
+                DBItemInventoryAgentCluster agentCluster = agentLayer.getInventoryClusterByProcessClassId(processClass.getId(),
+                        dbItemInventoryInstance.getId());
                 schemas.add(processAgentCluster(agentLayer, processClass, agentCluster));
             }
         }
@@ -194,8 +192,8 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         }
         NumOfAgentsInCluster numOfAgents = new NumOfAgentsInCluster();
         numOfAgents.setAny(agentCluster.getNumberOfAgents());
-        List<DBItemInventoryAgentInstance> agents =
-                agentLayer.getInventoryAgentInstancesByClusterId(agentCluster.getId(), dbItemInventoryInstance.getId());
+        List<DBItemInventoryAgentInstance> agents = agentLayer.getInventoryAgentInstancesByClusterId(agentCluster.getId(), dbItemInventoryInstance
+                .getId());
         int countRunning = 0;
         for (DBItemInventoryAgentInstance agent : agents) {
             if (agent.getState() == 0) {

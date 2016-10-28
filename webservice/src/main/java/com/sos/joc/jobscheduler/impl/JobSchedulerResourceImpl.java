@@ -15,13 +15,15 @@ import com.sos.joc.model.jobscheduler.JobSchedulerV200;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSchedulerResource {
+
     private static final String API_CALL = "./jobscheduler";
-    
+
     @Override
     public JOCDefaultResponse postJobscheduler(String accessToken, JobSchedulerId jobSchedulerBody) throws Exception {
-        
+
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerBody.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerBody.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

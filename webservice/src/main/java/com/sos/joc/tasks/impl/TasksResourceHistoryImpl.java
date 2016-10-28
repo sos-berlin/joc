@@ -23,24 +23,26 @@ import com.sos.joc.tasks.resource.ITasksResourceHistory;
 
 @Path("tasks")
 public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksResourceHistory {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TasksResourceHistoryImpl.class);
     private static final String API_CALL = "./tasks/history";
-    
+
     @Override
     public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
         LOGGER.debug(API_CALL);
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobsFilter.getJobschedulerId(), getPermissons(accessToken).getHistory().isView());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissons(accessToken).getHistory()
+                    .isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             TaskHistory entity = new TaskHistory();
             entity.setDeliveryDate(new Date());
-            
+
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
-            
+
             TaskHistoryItem history1 = new TaskHistoryItem();
             history1.setAgent("myAgent");
             history1.setClusterMember("myClusterMember");

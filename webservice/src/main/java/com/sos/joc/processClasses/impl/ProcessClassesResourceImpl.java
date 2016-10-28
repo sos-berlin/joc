@@ -32,6 +32,7 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("process_classes")
 public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProcessClassesResource {
+
     private static final String SLASH = "/";
     private static final String DEFAULT_NAME = "(default)";
     private static final String ATTRIBUTE_RUNNING_SINCE = "running_since";
@@ -55,7 +56,8 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(processClassFilter.getJobschedulerId(), getPermissons(accessToken).getProcessClass().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassFilter.getJobschedulerId(), getPermissons(accessToken)
+                    .getProcessClass().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -76,7 +78,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
             List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
             ProcessClassesV entity = new ProcessClassesV();
-            
+
             Pattern pattern = null;
             if (!("".equals(processClassFilter.getRegex()) || processClassFilter.getRegex() == null)) {
                 pattern = Pattern.compile(processClassFilter.getRegex());
@@ -89,9 +91,8 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
                 String path = jocXmlCommand.getAttributeWithDefault(ATTRIBUTE_PATH, SLASH + DEFAULT_NAME);
 
-                boolean addProccessClass = 
-                        (!processClassFilter.getProcessClasses().isEmpty() && isInProceccClassMap(path)) || 
-                        (processClassFilter.getProcessClasses().isEmpty() && (matchesRegex(pattern, path) && isInFolderList(path)));
+                boolean addProccessClass = (!processClassFilter.getProcessClasses().isEmpty() && isInProceccClassMap(path)) || (processClassFilter
+                        .getProcessClasses().isEmpty() && (matchesRegex(pattern, path) && isInFolderList(path)));
 
                 if (addProccessClass) {
 
@@ -113,6 +114,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                         process.setPid(jocXmlCommand.getAttributeAsInteger(KEY_PROCESSES, ATTRIBUTE_PID));
                         process.setRunningSince(jocXmlCommand.getAttributeAsDate(KEY_PROCESSES, ATTRIBUTE_RUNNING_SINCE));
                         process.setTaskId(jocXmlCommand.getAttribute(KEY_PROCESSES, ATTRIBUTE_TASK_ID));
+                        // TODO agent is missing
                         listOfProcesses.add(process);
                     }
 
@@ -134,7 +136,6 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
         }
     }
 
- 
     private boolean isInProceccClassMap(String path) {
         return (processClassFilter.getProcessClasses().isEmpty() || mapOfProcessClasses.get(path) != null);
     }
@@ -144,7 +145,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
         for (ProcessClassPath processClass : processClassFilter.getProcessClasses()) {
             String processClassName = processClass.getProcessClass();
             checkRequiredParameter("processClasses.processClass", processClassName);
-            
+
             mapOfProcessClasses.put(processClass.getProcessClass(), processClass.getProcessClass());
         }
 
@@ -161,10 +162,10 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
             String folderName = folder.getFolder();
             checkRequiredParameter("folders.folder", folderName);
-           
+
             folderName = normalizePath(folderName);
             path = normalizePath(path);
-            
+
             if (path.equals(folderName) || (isRecursive && path.startsWith(folderName))) {
                 return true;
             }

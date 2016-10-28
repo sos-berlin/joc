@@ -18,14 +18,16 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSummary;
 
 @Path("orders")
 public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implements IOrdersResourceOverviewSummary {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceOverviewSummaryImpl.class);
     private static final String API_CALL = "./orders/overview/summary";
-    
+
     @Override
     public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(ordersFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissons(accessToken).getOrder()
+                    .getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -33,12 +35,12 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 
             // Reading orders from the database tale inventory.orders filtered
             // by
-//            ordersFilter.getDateFrom(); // is ISO 8601 or something like
-//                                              // 6h 1w 65y
-//            ordersFilter.getDateTo(); // same as dateFrom
-//            ordersFilter.getTimeZone();
-//            ordersFilter.getRegex();
-//            ordersFilter.getOrders(); // list of wanted orders.
+            // ordersFilter.getDateFrom(); // is ISO 8601 or something like
+            // // 6h 1w 65y
+            // ordersFilter.getDateTo(); // same as dateFrom
+            // ordersFilter.getTimeZone();
+            // ordersFilter.getRegex();
+            // ordersFilter.getOrders(); // list of wanted orders.
 
             // TODO JOC Cockpit Webservice (Inventory_Orders)
 
@@ -50,7 +52,7 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             entity.setSurveyDate(Date.from(Instant.now()));
             entity.setOrders(orders);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, ordersFilter));

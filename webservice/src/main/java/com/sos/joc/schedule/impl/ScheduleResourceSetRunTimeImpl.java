@@ -1,5 +1,6 @@
 package com.sos.joc.schedule.impl;
 
+import java.time.Instant;
 import java.util.Date;
 import javax.ws.rs.Path;
 
@@ -14,6 +15,7 @@ import com.sos.joc.model.schedule.ModifyRunTime;
 
 @Path("schedule")
 public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements IScheduleResourceSetRunTime {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceSetRunTimeImpl.class);
     private static final String API_CALL = "./schedule/set_run_time";
 
@@ -22,12 +24,13 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
         LOGGER.debug(API_CALL);
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(modifyRuntime.getJobschedulerId(), getPermissons(accessToken).getSchedule().isEdit());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyRuntime.getJobschedulerId(), getPermissons(accessToken).getSchedule()
+                    .isEdit());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            //TODO 
-            return JOCDefaultResponse.responseStatusJSOk(new Date());
+            // TODO
+            return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyRuntime));
             return JOCDefaultResponse.responseStatusJSError(e);

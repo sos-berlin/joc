@@ -30,6 +30,7 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsPImpl.class);
     private static final String API_CALL = "./jobscheduler/agents/p";
 
@@ -37,7 +38,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(agentFilter.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, agentFilter.getJobschedulerId(), getPermissons(accessToken)
                     .getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -46,16 +47,16 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             List<AgentP> listOfAgents = new ArrayList<AgentP>();
             Long instanceId = dbItemInventoryInstance.getId();
             InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
-            if(!agentFilter.getAgents().isEmpty()) {
+            if (!agentFilter.getAgents().isEmpty()) {
                 for (AgentUrl agentUrl : agentFilter.getAgents()) {
-                    DBItemInventoryAgentInstance agentInstance = agentLayer.getInventoryAgentInstances(agentUrl.getAgent(),instanceId);
+                    DBItemInventoryAgentInstance agentInstance = agentLayer.getInventoryAgentInstances(agentUrl.getAgent(), instanceId);
                     listOfAgents.add(processAgent(agentLayer, agentInstance));
                 }
             } else {
                 List<DBItemInventoryAgentInstance> agentInstances = agentLayer.getInventoryAgentInstances(instanceId);
-                for(DBItemInventoryAgentInstance agentInstance : agentInstances){
+                for (DBItemInventoryAgentInstance agentInstance : agentInstances) {
                     AgentP agentSchema = processAgent(agentLayer, agentInstance);
-                    if(agentSchema != null) {
+                    if (agentSchema != null) {
                         listOfAgents.add(agentSchema);
                     }
                 }
@@ -75,11 +76,11 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
 
     private AgentP processAgent(InventoryAgentsDBLayer agentLayer, DBItemInventoryAgentInstance agentInstance) throws Exception {
         AgentP agent = new AgentP();
-        if(agentInstance.getStartedAt() != null) {
+        if (agentInstance.getStartedAt() != null) {
             agent.setStartedAt(agentInstance.getStartedAt());
         }
         JobSchedulerState state = new JobSchedulerState();
-        switch(agentInstance.getState()) {
+        switch (agentInstance.getState()) {
         case 0:
             state.setSeverity(0);
             state.set_text(JobSchedulerStateText.RUNNING);
@@ -96,7 +97,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
         agent.setVersion(agentInstance.getVersion());
         InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
         DBItemInventoryOperatingSystem osInstance = osLayer.getInventoryOperatingSystem(agentInstance.getOsId());
-        if(osInstance != null) {
+        if (osInstance != null) {
             OperatingSystem os = new OperatingSystem();
             os.setArchitecture(osInstance.getArchitecture());
             os.setDistribution(osInstance.getDistribution());
@@ -105,13 +106,13 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
         }
         List<String> listOfClusters = new ArrayList<String>();
         List<String> listFromDb = agentLayer.getProcessClassesFromAgentCluster(agentInstance.getId(), dbItemInventoryInstance.getId());
-        if(listFromDb != null && !listFromDb.isEmpty()) {
+        if (listFromDb != null && !listFromDb.isEmpty()) {
             listOfClusters.addAll(listFromDb);
         }
-        if(!listOfClusters.isEmpty()) {
+        if (!listOfClusters.isEmpty()) {
             agent.setClusters(listOfClusters);
         }
         return agent;
     }
-    
+
 }

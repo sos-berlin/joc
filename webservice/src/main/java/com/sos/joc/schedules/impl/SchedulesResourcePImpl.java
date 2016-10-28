@@ -18,7 +18,6 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -31,17 +30,19 @@ import com.sos.joc.schedules.resource.ISchedulesResourceP;
 
 @Path("schedules")
 public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedulesResourceP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SchedulesResourcePImpl.class);
     private static final String API_CALL = "./schedules/p";
     private String regex;
     private List<Folder> folders;
     private List<SchedulePath> schedules;
+
     @Override
     public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = 
-                    init(schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -55,7 +56,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 
             if (schedules != null && !schedules.isEmpty()) {
                 List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
-               for (SchedulePath schedulePath : schedules) {
+                for (SchedulePath schedulePath : schedules) {
                     DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(schedulePath.getSchedule(), dbItemInventoryInstance.getId());
                     ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
                     if (scheduleP != null) {
@@ -67,17 +68,17 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventorySchedule> schedulesFromDb = dbLayer.getSchedulesByFolders(folder.getFolder(),
-                            dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
+                    List<DBItemInventorySchedule> schedulesFromDb = dbLayer.getSchedulesByFolders(folder.getFolder(), dbItemInventoryInstance.getId(),
+                            folder.getRecursive().booleanValue());
                     List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, schedulesFromDb, dbItemInventoryInstance);
-                    if(schedulesToAdd != null && !schedulesToAdd.isEmpty()){
+                    if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                         listOfSchedules.addAll(schedulesToAdd);
                     }
                 }
             } else {
                 List<DBItemInventorySchedule> processClassesFromDb = dbLayer.getSchedules(dbItemInventoryInstance.getId());
                 List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, processClassesFromDb, dbItemInventoryInstance);
-                if(schedulesToAdd != null && !schedulesToAdd.isEmpty()){
+                if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                     listOfSchedules.addAll(schedulesToAdd);
                 }
             }
@@ -112,5 +113,5 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
         }
         return schedulesToAdd;
     }
-    
+
 }

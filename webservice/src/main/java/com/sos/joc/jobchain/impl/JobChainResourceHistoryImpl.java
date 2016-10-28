@@ -25,6 +25,7 @@ import com.sos.scheduler.model.commands.JSCmdShowJobChain;
 
 @Path("job_chain")
 public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJobChainResourceHistory {
+
     private static final int DEFAULT_MAX_HISTORY_ITEMS = 25;
     private static final String ORDER_HISTORY = "order_history";
     private static final String KEY_FOR_ERROR_NODE_LIST = "nodes";
@@ -32,13 +33,14 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
     private static final Logger LOGGER = LoggerFactory.getLogger(JobChainResourceHistoryImpl.class);
     private static final String API_CALL = "./job_chain/history";
-    
+
     @Override
     public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
 
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobChainHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain().getView().isHistory());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainHistoryFilter.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobChain().getView().isHistory());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -47,7 +49,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
                 jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
-            //TODO nested job chains have to consider too
+            // TODO nested job chains have to consider too
             String postCommand = createJobchainHistoryPostCommand(jobChainHistoryFilter);
             jocXmlCommand.executePost(postCommand);
 

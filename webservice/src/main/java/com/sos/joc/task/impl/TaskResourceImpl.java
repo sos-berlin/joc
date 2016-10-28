@@ -33,6 +33,7 @@ import com.sos.scheduler.model.commands.JSCmdShowTask;
 
 @Path("task")
 public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskResourceImpl.class);
     private static final String API_CALL = "./task";
 
@@ -40,11 +41,12 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
     public JOCDefaultResponse postTask(String accessToken, TaskFilter taskFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             checkRequiredParameter("taskId", taskFilter.getTaskId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.executePost(createTaskPostCommand(taskFilter.getTaskId()));
@@ -54,8 +56,8 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
             Task task = new Task();
             try {
                 task.set_cause(TaskCause.fromValue(taskElem.getAttribute("cause").toUpperCase()));
-            } catch(Exception e) {
-                task.set_cause(TaskCause.NONE); 
+            } catch (Exception e) {
+                task.set_cause(TaskCause.NONE);
             }
             task.setEnqueued(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(taskElem, "enqueued", null)));
             String pid = jocXmlCommand.getAttributeValue(taskElem, "pid", null);
@@ -67,7 +69,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
             task.setPlannedStart(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(taskElem, "start_at", null)));
             task.setSteps(Integer.parseInt(jocXmlCommand.getAttributeValue(taskElem, "steps", "0")));
             task.setState(getState(taskElem));
-            
+
             Element orderElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(taskElem, "order");
             if (orderElem != null) {
                 try {
@@ -82,7 +84,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
                     command.addOrderCompactQuery(orderBody.getCompact());
                     OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI());
                     task.setOrder(o.getOrder());
-                } catch(JocMissingRequiredParameterException e) {
+                } catch (JocMissingRequiredParameterException e) {
                     throw new JobSchedulerBadRequestException("missing attributes in order element", e);
                 }
             }
@@ -109,10 +111,10 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
         showTask.setWhat("all");
         return showTask.toXMLString();
     }
-    
+
     private TaskState getState(Element taskElem) {
         TaskState state = new TaskState();
-        switch(taskElem.getAttribute("state")) {
+        switch (taskElem.getAttribute("state")) {
         case "none":
             state.set_text(TaskStateText.NONE);
             state.setSeverity(3);

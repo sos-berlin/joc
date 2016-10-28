@@ -22,14 +22,16 @@ import com.sos.joc.orders.resource.IOrdersResourceHistory;
 
 @Path("orders")
 public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrdersResourceHistory {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceHistoryImpl.class);
     private static final String API_CALL = "./orders/history";
-    
+
     @Override
     public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilter ordersFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(ordersFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissons(accessToken).getOrder()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -37,7 +39,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             // Reading orders from the database tale inventory history tables
             // filtered by
             ordersFilter.getDateFrom(); // is ISO 8601 or something like 6h
-                                             // 1w 65y
+                                        // 1w 65y
             ordersFilter.getDateTo(); // same as dateFrom
             ordersFilter.getTimeZone();
             ordersFilter.getRegex();

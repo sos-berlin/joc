@@ -19,6 +19,7 @@ import com.sos.joc.model.job.JobFilter;
 
 @Path("job")
 public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobResourceOrderQueue {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceOrderQueueImpl.class);
     private static final String API_CALL = "./job/order_queue";
 
@@ -27,7 +28,8 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
 
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

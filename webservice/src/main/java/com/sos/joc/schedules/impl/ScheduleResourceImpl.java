@@ -32,6 +32,7 @@ import com.sos.joc.model.schedule.SchedulesV;
 
 @Path("schedules")
 public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesResource {
+
     private static final String ATTRIBUTE_ACTIVE = "active";
     private static final String ATTRIBUTE_PATH = "path";
     private static final String WHAT = "folders";
@@ -43,12 +44,12 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
     private SchedulesFilter schedulesFilter;
     private HashMap<String, String> mapOfSchedules;
 
-
     @Override
     public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -68,7 +69,7 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             int count = jocXmlCommand.getNodeList().getLength();
 
             List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
-            
+
             Pattern pattern = null;
             if (!("".equals(schedulesFilter.getRegex()) || schedulesFilter.getRegex() == null)) {
                 pattern = Pattern.compile(schedulesFilter.getRegex());
@@ -82,21 +83,21 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
                 String path = jocXmlCommand.getAttribute(ATTRIBUTE_PATH);
                 String activeValue = jocXmlCommand.getAttribute(ATTRIBUTE_ACTIVE);
                 ScheduleStateText stateText;
-                if ("yes".equals(activeValue)){
+                if ("yes".equals(activeValue)) {
                     stateText = ScheduleStateText.ACTIVE;
-                }else{
+                } else {
                     stateText = ScheduleStateText.INACTIVE;
                 }
                 boolean addSchedule = (!schedulesFilter.getSchedules().isEmpty() && isInScheduleMap(path)) || (schedulesFilter.getSchedules()
                         .isEmpty() && (matchesRegex(pattern, path) && isInFolderList(path) && isInActiveList(stateText)));
 
                 if (addSchedule) {
-                    ScheduleVolatile schedule = new ScheduleVolatile(jocXmlCommand,scheduleElement);
+                    ScheduleVolatile schedule = new ScheduleVolatile(jocXmlCommand, scheduleElement);
                     schedule.setValues();
                     listOfSchedules.add(schedule);
                 }
             }
-            
+
             SchedulesV entity = new SchedulesV();
             entity.setSchedules(listOfSchedules);
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -111,7 +112,6 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             return JOCDefaultResponse.responseStatusJSError(e, err);
         }
     }
- 
 
     private boolean isInScheduleMap(String path) {
         return (schedulesFilter.getSchedules().isEmpty() || mapOfSchedules.get(path) != null);
@@ -138,10 +138,10 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
 
             String folderName = folder.getFolder();
             checkRequiredParameter("folders.folder", folderName);
-           
+
             folderName = normalizePath(folderName);
             path = normalizePath(path);
-            
+
             if (path.equals(folderName) || (isRecursive && path.startsWith(folderName))) {
                 return true;
             }
@@ -150,7 +150,7 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
         return false;
     }
 
-    private boolean isInActiveList(ScheduleStateText stateText)  {
+    private boolean isInActiveList(ScheduleStateText stateText) {
         if (schedulesFilter.getStates().size() == 0) {
             return true;
         }

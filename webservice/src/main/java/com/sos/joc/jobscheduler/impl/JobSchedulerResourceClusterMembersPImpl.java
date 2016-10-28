@@ -19,6 +19,7 @@ import com.sos.joc.model.jobscheduler.MastersP;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembersP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceClusterMembersPImpl.class);
     private static final String API_CALL = "./jobscheduler/cluster/members/p";
 
@@ -26,8 +27,8 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobSchedulerFilter.getJobschedulerId(),
-                    getPermissons(accessToken).getJobschedulerMasterCluster().getView().isClusterStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissons(accessToken)
+                    .getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

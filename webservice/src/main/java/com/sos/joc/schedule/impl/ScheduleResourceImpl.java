@@ -22,6 +22,7 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("schedule")
 public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleResource {
+
     private static final String WHAT = "folders";
     private static final String SUBSYSTEMS = "folder schedule";
     private static final String XPATH_SCHEDULES = "//schedule[@path='%s']";
@@ -33,7 +34,8 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
     public JOCDefaultResponse postSchedule(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(scheduleFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, scheduleFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -48,15 +50,15 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowState);
             jocXmlCommand.executePost(xml);
 
-            Element scheduleElement  = jocXmlCommand.executeXPath(String.format(XPATH_SCHEDULES,scheduleIn));
+            Element scheduleElement = jocXmlCommand.executeXPath(String.format(XPATH_SCHEDULES, scheduleIn));
 
             ScheduleVolatile scheduleV = new ScheduleVolatile(jocXmlCommand, scheduleElement);
             scheduleV.setValues();
-            
+
             ScheduleV200 entity = new ScheduleV200();
             entity.setSchedule(scheduleV);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, scheduleFilter));

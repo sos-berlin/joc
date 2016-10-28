@@ -21,15 +21,17 @@ import com.sos.joc.order.resource.IOrderHistoryResource;
 
 @Path("order")
 public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderHistoryResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderHistoryResourceImpl.class);
     private static final String API_CALL = "./order/history";
-    
+
     @Override
     public JOCDefaultResponse postOrderHistory(String accessToken, OrderFilter orderFilter) throws Exception {
         LOGGER.debug(API_CALL);
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -70,11 +72,11 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             listOfSteps.add(step2);
 
             history.setSteps(listOfSteps);
-            
+
             OrdersStepHistory entity = new OrdersStepHistory();
             entity.setHistory(history);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, orderFilter));

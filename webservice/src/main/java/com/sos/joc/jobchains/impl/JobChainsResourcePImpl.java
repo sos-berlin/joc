@@ -29,29 +29,30 @@ import com.sos.joc.model.jobChain.JobChainsP;
 
 @Path("job_chains")
 public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChainsResourceP {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourcePImpl.class);  
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourcePImpl.class);
     private static final String API_CALL = "./job_chains/p";
     private Boolean compact;
     private List<Folder> folders;
     private List<JobChainPath> jobChainPaths;
     private String regex;
     private List<JobChainP> allNestedJobChains = new ArrayList<JobChainP>();
-     
+
     @Override
     public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
         LOGGER.debug(API_CALL);
-        JOCDefaultResponse jocDefaultResponse = init(jobChainsFilter.getJobschedulerId(),
-                getPermissons(accessToken).getJobChain().getView().isStatus());
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain()
+                .getView().isStatus());
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
         try {
-            //FILTER
+            // FILTER
             compact = jobChainsFilter.getCompact();
             folders = jobChainsFilter.getFolders();
             jobChainPaths = jobChainsFilter.getJobChains();
             regex = jobChainsFilter.getRegex();
-            
+
             Long instanceId = dbItemInventoryInstance.getId();
 
             JobChainsP entity = new JobChainsP();
@@ -68,14 +69,14 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventoryJobChain> jobChainsFromDb =
-                            dbLayer.getJobChainsByFolder(folder.getFolder(), folder.getRecursive(), instanceId);
-                    for(DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
+                    List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChainsByFolder(folder.getFolder(), folder.getRecursive(),
+                            instanceId);
+                    for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
                         JobChainP jobChain = null;
                         if (regex != null && !regex.isEmpty()) {
                             Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
                             if (regExMatcher.find()) {
-                                jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId); 
+                                jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                             }
                         } else {
                             jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
@@ -88,7 +89,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 }
             } else {
                 List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChains(instanceId);
-                for(DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
+                for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
                     JobChainP jobChain = null;
                     if (regex != null && !regex.isEmpty()) {
                         Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
@@ -104,10 +105,10 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                     }
                 }
             }
-            if(compact != null && !compact) {
-                if(allNestedJobChains != null && !allNestedJobChains.isEmpty()) {
+            if (compact != null && !compact) {
+                if (allNestedJobChains != null && !allNestedJobChains.isEmpty()) {
                     entity.setNestedJobChains(allNestedJobChains);
-                }else {
+                } else {
                     entity.setNestedJobChains(null);
                 }
             } else {
@@ -127,28 +128,27 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
     }
 
     private void initNestedJobChainsIfExists(InventoryJobChainsDBLayer dbLayer, JobChainP jobChain) throws Exception {
-        if(!JobChainPermanent.NESTED_JOB_CHAIN_NAMES.isEmpty()) {
+        if (!JobChainPermanent.NESTED_JOB_CHAIN_NAMES.isEmpty()) {
             List<JobChainP> nestedJobChains = new ArrayList<JobChainP>();
-            for(String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
+            for (String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
                 DBItemInventoryJobChain nestedJobChain = null;
-                if(nestedJobChainName.contains("/")) {
+                if (nestedJobChainName.contains("/")) {
                     nestedJobChain = dbLayer.getJobChainByPath(nestedJobChainName, dbItemInventoryInstance.getId());
                 } else {
                     nestedJobChain = dbLayer.getJobChainByName(nestedJobChainName, dbItemInventoryInstance.getId());
                 }
                 if (nestedJobChain != null) {
-                    JobChainP nestedJobChainP = 
-                            JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, compact, dbItemInventoryInstance.getId());
+                    JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, compact, dbItemInventoryInstance.getId());
                     if (nestedJobChainP != null) {
-                        nestedJobChains.add(nestedJobChainP); 
+                        nestedJobChains.add(nestedJobChainP);
                     }
                 }
             }
-            if(!nestedJobChains.isEmpty()) {
+            if (!nestedJobChains.isEmpty()) {
                 allNestedJobChains.addAll(nestedJobChains);
                 JobChainPermanent.NESTED_JOB_CHAIN_NAMES.clear();
             }
         }
     }
-    
+
 }

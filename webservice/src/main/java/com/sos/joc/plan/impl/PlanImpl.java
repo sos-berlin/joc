@@ -21,22 +21,24 @@ import com.sos.joc.plan.resource.IPlanResource;
 
 @Path("plan")
 public class PlanImpl extends JOCResourceImpl implements IPlanResource {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
     private static final String API_CALL = "./plan";
-    
+
     @Override
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(planFilter.getJobschedulerId(), getPermissons(accessToken).getDailyPlan().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, planFilter.getJobschedulerId(), getPermissons(accessToken).getDailyPlan()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             Globals.beginTransaction();
-            
+
             Plan entity = new Plan();
-            //TODO select items from database
+            // TODO select items from database
             entity.setPlanItems(new ArrayList<PlanItem>());
             entity.setDeliveryDate(Date.from(Instant.now()));
 

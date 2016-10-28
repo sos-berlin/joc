@@ -23,6 +23,7 @@ import com.sos.joc.model.job.JobP200;
 
 @Path("job")
 public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobResourcePImpl.class);
     private static final String API_CALL = "./job/p";
 
@@ -30,7 +31,8 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) throws Exception {
         LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -38,8 +40,8 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
             Long instanceId = dbItemInventoryInstance.getId();
             DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(jobFilter.getJob(), instanceId);
-            
-            JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId); 
+
+            JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId);
             JobP200 entity = new JobP200();
             entity.setJob(job);
             entity.setDeliveryDate(Date.from(Instant.now()));
