@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.tree.Tree;
 import com.sos.joc.model.tree.TreeFilter;
@@ -61,8 +62,20 @@ public class TreePermanent {
         }
         return types;
     }
+
+    public static List<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId) throws Exception {
+        List<String> folders = new ArrayList<String>();
+        InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(Globals.sosHibernateConnection);
+        for (Folder folder : treeBody.getFolders()) {
+            List<String> results = dbLayer.getFoldersByFolder(instanceId, folder.getFolder().substring(1), folder.getRecursive());
+            if(results != null && !results.isEmpty()) {
+                folders.addAll(results);
+            }
+        }
+        return folders;
+    }
     
-    public static List<String> initFoldersFromBody(TreeFilter treeBody, Long instanceId) throws Exception {
+    public static List<String> initFoldersByTypeFromBody(TreeFilter treeBody, Long instanceId) throws Exception {
         List<String> folders = new ArrayList<String>();
         InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(Globals.sosHibernateConnection);
         if(treeBody.getTypes().isEmpty()) {
