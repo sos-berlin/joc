@@ -46,8 +46,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     }
     
     public JobChainV getJobChain(String jobChain, Boolean compact) throws Exception {
-        executePost(createShowJobChainPostCommand(jobChain, compact));
-        throwJobSchedulerError();
+        executePostWithThrowBadRequest(createShowJobChainPostCommand(jobChain, compact));
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job_chain");
         JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this);
         jobChainV.setFields(compact);
@@ -140,8 +139,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     }
     
     private List<JobChainV> getJobChains(String command, JobChainsFilter jobChainsFilter, String xPath) throws Exception {
-        executePost(command);
-        throwJobSchedulerError();
+        executePostWithThrowBadRequest(command);
         StringBuilder x = new StringBuilder();
         x.append(xPath);
         NodeList jobChainNodes = getSosxml().selectNodeList(x.toString());

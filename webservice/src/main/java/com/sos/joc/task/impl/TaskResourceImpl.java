@@ -49,8 +49,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
 
             checkRequiredParameter("taskId", taskFilter.getTaskId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePost(createTaskPostCommand(taskFilter.getTaskId()));
-            jocXmlCommand.throwJobSchedulerError();
+            jocXmlCommand.executePostWithThrowBadRequest(createTaskPostCommand(taskFilter.getTaskId()));
             Element taskElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/task");
 
             Task task = new Task();

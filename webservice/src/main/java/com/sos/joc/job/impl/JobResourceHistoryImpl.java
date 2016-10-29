@@ -52,7 +52,7 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
                 taskHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
             String postCommand = createJobHistoryPostCommand(taskHistoryFilter);
-            jocXmlCommand.executePost(postCommand);
+            jocXmlCommand.executePostWithThrowBadRequest(postCommand);
 
             jocXmlCommand.createNodeList(XPATH_FOR_TASK_HISTORY);
 

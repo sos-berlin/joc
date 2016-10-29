@@ -14,7 +14,7 @@ public class JocError extends Err{
 
     @JsonIgnore
     public JocError() {
-        setCode("JOC-420");
+        setCode(WebserviceConstants.DEFAULT_ERROR_CODE);
     }
 
     @JsonIgnore

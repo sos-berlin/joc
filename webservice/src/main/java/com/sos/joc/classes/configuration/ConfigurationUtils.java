@@ -78,7 +78,7 @@ public class ConfigurationUtils {
     
     public static Configuration200 getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
             boolean responseInHtml) throws Exception {
-        jocXmlCommand.executePost(postCommand);
+        jocXmlCommand.executePostWithThrowBadRequest(postCommand);
         Configuration configuration = new Configuration();
         configuration.setSurveyDate(jocXmlCommand.getSurveyDate());
         Element objElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(xPathObjElement);

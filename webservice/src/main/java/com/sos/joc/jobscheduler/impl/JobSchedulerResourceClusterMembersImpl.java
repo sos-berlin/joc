@@ -49,7 +49,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePost(getXMLClusterCommand());
+            jocXmlCommand.executePostWithThrowBadRequest(getXMLClusterCommand());
             NodeList clusterMembers = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer/state/cluster/cluster_member");
 
             InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
