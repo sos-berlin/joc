@@ -1,6 +1,6 @@
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2016 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -30,8 +30,6 @@
 ** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 ** POSSIBILITY OF SUCH DAMAGE.
 ********************************************************** end of preamble*/
-
-// $Id: scheduler.js 28482 2014-12-03 16:47:06Z oh $
 
 //-----------------------------------------------------------------------------------------language  
 if( window['_sos_lang'] ) {
@@ -88,16 +86,16 @@ function Scheduler()
     this._debug_timer                                    = new Object();
     this._ftimer                                         = new Object();
     this._lang_file_exists                               = ( typeof window['_lang_file_exists'] == 'boolean' ) ? _lang_file_exists : false;
-    this._tree_view_enabled                              = false; //2.1.0.6101  (2010-04-06 11:53:57)
+    this._tree_view_enabled                              = true; //since 1.10.6 -> older 1.3.9 not supported
     this._activeRequestCount                             = 0;
     this._ie                                             = navigator.appVersion.match(/\bTrident\b/);
     this._chrome                                         = 0;
     this._safari                                         = 0;
     this._supported_tree_views                           = {'jobs':'Jobs','job_chains':'Job Chains','orders':'Orders','schedules':'Schedules'}; 
-    this._view                                           = {'jobs'             :'list',
-                                                            'job_chains'       :'list',
-                                                            'orders'           :'list',
-                                                            'schedules'        :'list',
+    this._view                                           = {'jobs'             :'tree',
+                                                            'job_chains'       :'tree',
+                                                            'orders'           :'tree',
+                                                            'schedules'        :'tree',
                                                             'process_classes'  :'list',
                                                             'locks'            :'list',
                                                             'cluster'          :'list',
@@ -1282,4 +1280,3 @@ SchedulerDate.prototype.getDuration = function( datetime )
    }
    return result;
 }
-
