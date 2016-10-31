@@ -159,6 +159,13 @@ public class JOCResourceImpl {
         if (schedulerId == null) {
             return JOCDefaultResponse.responseStatusJSError(new JocMissingRequiredParameterException("undefined 'jobschedulerId'"));
         }
+        
+        String checkConnectionResult = checkConnection(schedulerId);
+        if (!"".equals(checkConnectionResult)) {
+            JocError jocError = new JocError(String.format("Error with database connection: %s", checkConnectionResult), WebserviceConstants.DB_CONNECTION_ERROR);
+            throw new JocException(jocError);
+        }
+
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
             if (dbItemInventoryInstance == null) {
@@ -167,11 +174,6 @@ public class JOCResourceImpl {
             }
         }
         
-        String checkConnectionResult = checkConnection();
-        if (!"".equals(checkConnectionResult)) {
-            JocError jocError = new JocError(String.format("Error with database connection: %s", checkConnectionResult), WebserviceConstants.DB_CONNECTION_ERROR);
-            jocDefaultResponse = JOCDefaultResponse.responseStatusJSError(new JocException(jocError));
-        }
 
         return jocDefaultResponse;
     }
@@ -183,17 +185,16 @@ public class JOCResourceImpl {
         return null;
     }
     
-    private static String checkConnection(SOSHibernateConnection connection) {
+    private String checkConnection(SOSHibernateConnection connection) {
         try {
-            connection.createQuery(String.format("from %s where 1=0", DBITEM_INVENTORY_INSTANCES).toString()).list();
+            connection.beginTransaction();
+            connection.rollback();
             return "";
         } catch (Exception ex) {
 
             if (connection != null) {
                 connection.disconnect();
             }
-
-
             try {
                 connection.connect();
                 return "";
@@ -204,18 +205,18 @@ public class JOCResourceImpl {
         }
     }
 
-    private static String checkConnection() {
-       String s = checkConnection(Globals.sosHibernateConnection);
-       if (!"".equals(s)){
-           return s;
-       }
-       for (SOSHibernateConnection connection : Globals.sosSchedulerHibernateConnections.values()) {
-           s = checkConnection(connection);
-           if (!"".equals(s)){
-               return s;
-           }
-       }
-       return "";
-     }    
+    private String checkConnection(String schedulerId){
+        String s;
+        try {
+            s = checkConnection(Globals.sosHibernateConnection) + checkConnection(Globals.getConnection(schedulerId));
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+        if (!"".equals(s)){
+            return s;
+        }
+        return "";
+      }    
+ 
     
 }
