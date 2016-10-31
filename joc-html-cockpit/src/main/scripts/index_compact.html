@@ -6,7 +6,7 @@
 <!--
 /********************************************************* begin of preamble
 **
-** Copyright (C) 2003-2014 Software- und Organisations-Service GmbH. 
+** Copyright (C) 2003-2016 Software- und Organisations-Service GmbH. 
 ** All rights reserved.
 **
 ** This file may be used under the terms of either the 
@@ -61,20 +61,10 @@
           _scheduler.checkBrowser();
           
           try {
+            _scheduler._tree_view_enabled = true;
             _scheduler.loadXSLT( "scheduler.xsl" );
             _scheduler.readCustomSettings();
             _scheduler.readGuiVersion();
-            //try {
-              //solange die locks nicht in der Statistic enthalten sind, werden sie im show_state aufgerufen
-              _response = _scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster" subsystems="lock schedule process_class folder"/></commands>', false, false ); 
-              _scheduler._tree_view_enabled = true;
-            //} catch(x) {
-            //  _response = _scheduler.executeSynchron( '<show_state max_orders="'+_scheduler._runtime_settings.max_orders+'" max_task_history="0" what="job_chain_orders"/>', false, false ); 
-            //}
-            _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
-            document.title  = _scheduler._host + ":" + _scheduler._port;
-            document.title += ( _scheduler._id ) ? "/" + _scheduler._id : "";
-            document.title += " - " + getTranslation('JobScheduler');
             _scheduler.readCustomVersionedSettings();
             if( !_server_settings ) _scheduler.readCookies();
             
@@ -92,9 +82,18 @@
             for( var state in _scheduler._radio_states ) {                      
                 onload_settings.radio_states[state]    = _scheduler._radio_states[state];
             }
+            _response = _scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster" subsystems="lock schedule process_class folder"/></commands>', false, false ); 
+            _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
+            document.title  = _scheduler._host + ":" + _scheduler._port;
+            document.title += ( _scheduler._id ) ? "/" + _scheduler._id : "";
+            document.title += " - " + getTranslation('JobScheduler');
           }
           catch(E) {
-            alert(E.message);
+            try {
+              frames.top_frame.showError(E.message);
+            } catch(x) {
+              alert(E.message.replace(/^.*connect to JobScheduler(.*)$/,"No connection to JobScheduler$1"));
+            }
           }
           
           window.onunload = function() {
@@ -105,7 +104,7 @@
             try {
               frames.top_frame.showError(msg);
             } catch(x) {
-              alert(msg.replace(/^.*connect to JobScheduler\n(.*)$/,"No connection to JobScheduler\n$1"));
+              alert(msg.replace(/^.*connect to JobScheduler(.*)$/,"No connection to JobScheduler$1"));
             } finally {
               return true;
             }
