@@ -1,12 +1,11 @@
 package com.sos.joc.jobscheduler.impl;
 
-import java.util.Date;
-
 import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -34,7 +33,11 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
             }
             JOCPreferences jocPreferences = new JOCPreferences();
             jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, jobSchedulerId.getJobschedulerId());
-            return JOCDefaultResponse.responseStatusJSOk(new Date());
+            
+            SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+            jocDefaultResponse = sosServicePermissionShiro.getJocCockpitPermissions(accessToken,jobschedulerUser.getSosShiroCurrentUser().getUsername(),jobschedulerUser.getSosShiroCurrentUser().getPassword());
+            
+            return jocDefaultResponse;
 
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerId));

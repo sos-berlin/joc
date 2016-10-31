@@ -160,7 +160,8 @@ public class JOCResourceImpl {
             return JOCDefaultResponse.responseStatusJSError(new JocMissingRequiredParameterException("undefined 'jobschedulerId'"));
         }
         
-        String checkConnectionResult = checkConnection(schedulerId);
+        checkConnection(Globals.getConnection(schedulerId));
+        String checkConnectionResult = checkConnection(Globals.sosHibernateConnection);
         if (!"".equals(checkConnectionResult)) {
             JocError jocError = new JocError(String.format("Error with database connection: %s", checkConnectionResult), WebserviceConstants.DB_CONNECTION_ERROR);
             throw new JocException(jocError);
@@ -204,19 +205,7 @@ public class JOCResourceImpl {
 
         }
     }
-
-    private String checkConnection(String schedulerId){
-        String s;
-        try {
-            s = checkConnection(Globals.sosHibernateConnection) + checkConnection(Globals.getConnection(schedulerId));
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-        if (!"".equals(s)){
-            return s;
-        }
-        return "";
-      }    
+ 
  
     
 }
