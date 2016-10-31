@@ -51,7 +51,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             }
             // TODO nested job chains have to consider too
             String postCommand = createJobchainHistoryPostCommand(jobChainHistoryFilter);
-            jocXmlCommand.executePostWithThrowBadRequest(postCommand);
+            jocXmlCommand.executePostWithThrowBadRequest(postCommand, accessToken);
 
             jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
 

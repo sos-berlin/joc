@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -19,15 +20,14 @@ public class JOCXmlCommand extends SOSXmlCommand {
 
     public static final String XML_COMMAND_API_PATH = "/jobscheduler/master/api/command";
     private Date surveyDate;
-    private Map<String, NodeList> listOfNodeLists;
+    private Map<String, NodeList> listOfNodeLists = new HashMap<String, NodeList>();;
     private URI uriForJsonCommand;
     private String xmlCommand = null;
 
     public JOCXmlCommand(String url) {
         super(url + XML_COMMAND_API_PATH);
-        listOfNodeLists = new HashMap<String, NodeList>();
     }
-
+    
     public Date getSurveyDate() {
         if (surveyDate == null || "".equals(surveyDate)) {
             try {
@@ -122,16 +122,21 @@ public class JOCXmlCommand extends SOSXmlCommand {
     
     @Override
     public String executePost(String xmlCommand) throws JobSchedulerConnectionRefusedException {
+        return executePost(xmlCommand, UUID.randomUUID().toString());
+    }
+    
+    @Override
+    public String executePost(String xmlCommand, String accessToken) throws JobSchedulerConnectionRefusedException {
         this.xmlCommand = xmlCommand;
         try {
-            return super.executePost(xmlCommand);
+            return super.executePost(xmlCommand,accessToken);
         } catch (Exception e) {
             throw new JobSchedulerConnectionRefusedException(getUrl(), e);
         }
     }
     
-    public String executePostWithThrowBadRequest(String xmlCommand) throws Exception {
-        String s = executePost(xmlCommand);
+    public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws Exception {
+        String s = executePost(xmlCommand, accessToken);
         throwJobSchedulerError();
         return s;
     }

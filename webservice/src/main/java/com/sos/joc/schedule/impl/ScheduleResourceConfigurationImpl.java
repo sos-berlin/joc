@@ -40,7 +40,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
                 boolean responseInHtml = scheduleBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", normalizePath(scheduleBody.getSchedule()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(), xPath, "schedule",
-                        responseInHtml);
+                        responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

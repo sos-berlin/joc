@@ -107,7 +107,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 }
             }
             String xml = objOrder.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

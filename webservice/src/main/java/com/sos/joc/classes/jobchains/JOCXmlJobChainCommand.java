@@ -39,19 +39,21 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlJobChainCommand.class);
     private String jsonUrl = null;
     private Set<String> nestedJobChains = new HashSet<String>();
+    private String accessToken;
     
-    public JOCXmlJobChainCommand(String url) {
+    public JOCXmlJobChainCommand(String url, String accessToken) {
         super(url);
         this.jsonUrl = url;
+        this.accessToken = accessToken;
     }
     
     public JobChainV getJobChain(String jobChain, Boolean compact) throws Exception {
-        executePostWithThrowBadRequest(createShowJobChainPostCommand(jobChain, compact));
+        executePostWithThrowBadRequest(createShowJobChainPostCommand(jobChain, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job_chain");
         JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this);
         jobChainV.setFields(compact);
         nestedJobChains.addAll(jobChainV.getNestedJobChains());
-        jobChainV.setOrdersSummary(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand()).getOrdersSummary());
+        jobChainV.setOrdersSummary(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken).getOrdersSummary());
         return jobChainV;
     }
     
@@ -139,7 +141,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     }
     
     private List<JobChainV> getJobChains(String command, JobChainsFilter jobChainsFilter, String xPath) throws Exception {
-        executePostWithThrowBadRequest(command);
+        executePostWithThrowBadRequest(command, accessToken);
         StringBuilder x = new StringBuilder();
         x.append(xPath);
         NodeList jobChainNodes = getSosxml().selectNodeList(x.toString());
@@ -166,9 +168,9 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            }
            jobChainV.setFields(jobChainsFilter.getCompact());
            nestedJobChains.addAll(jobChainV.getNestedJobChains());
-           summaryTasks.add(new OrdersSummaryCallable(jobChainV, uriForJsonSummaryCommand));
+           summaryTasks.add(new OrdersSummaryCallable(jobChainV, uriForJsonSummaryCommand, accessToken));
            if (!jobChainsFilter.getCompact() && jobChainV.hasJobNodes()) {
-               orderTasks.add(new OrdersVCallable(jobChainV, false, uriForJsonOrdersCommand)); 
+               orderTasks.add(new OrdersVCallable(jobChainV, false, uriForJsonOrdersCommand, accessToken)); 
            }
         }
         

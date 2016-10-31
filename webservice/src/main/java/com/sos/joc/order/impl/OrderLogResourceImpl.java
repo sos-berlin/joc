@@ -41,7 +41,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             }
 
             LogContent200 entity = new LogContent200();
-            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance);
+            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
             // TODO surveyDate from database
             entity.setSurveyDate(Date.from(Instant.now()));
 

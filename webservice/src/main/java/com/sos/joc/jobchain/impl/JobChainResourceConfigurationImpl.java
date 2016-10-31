@@ -40,7 +40,7 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
             if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
                 boolean responseInHtml = jobChainBody.getMime() == ConfigurationMime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(jobChainBody),
-                        "/spooler/answer/job_chain", "job_chain", responseInHtml);
+                        "/spooler/answer/job_chain", "job_chain", responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

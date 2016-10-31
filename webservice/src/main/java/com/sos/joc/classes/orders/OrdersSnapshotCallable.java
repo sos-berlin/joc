@@ -13,28 +13,31 @@ import com.sos.joc.model.order.OrdersSummary;
 public class OrdersSnapshotCallable implements Callable<OrdersSummary> {
     private final String path;
     private final URI uri;
+    private final String accessToken;
     
-    public OrdersSnapshotCallable(URI uri) {
+    public OrdersSnapshotCallable(URI uri, String accessToken) {
         this.path = "/";
         this.uri = uri;
+        this.accessToken = accessToken;
     }
     
-    public OrdersSnapshotCallable(String path, URI uri) {
+    public OrdersSnapshotCallable(String path, URI uri, String accessToken) {
         this.path = path;
         this.uri = uri;
+        this.accessToken = accessToken;
     }
     
     @Override
     public OrdersSummary call() throws Exception {
-        return getOrdersSnapshot(path, uri); 
+        return getOrdersSnapshot(path, uri, accessToken); 
     }
     
     public OrdersSummary getOrdersSnapshot() throws Exception {
-        return getOrdersSnapshot(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(path)));
+        return getOrdersSnapshot(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(path), accessToken));
     }
     
-    public OrdersSummary getOrdersSnapshot(String path, URI uri) throws Exception {
-        JsonObject json = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(path));
+    public OrdersSummary getOrdersSnapshot(String path, URI uri, String accessToken) throws Exception {
+        JsonObject json = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(path), accessToken);
         return getOrdersSnapshot(json);
     }
     

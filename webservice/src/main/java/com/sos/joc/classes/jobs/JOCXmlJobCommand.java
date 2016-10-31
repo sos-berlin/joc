@@ -25,9 +25,11 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 public class JOCXmlJobCommand extends JOCXmlCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlJobCommand.class);
+    private String accessToken;
     
-    public JOCXmlJobCommand(String url) {
+    public JOCXmlJobCommand(String url, String accessToken) {
         super(url);
+        this.accessToken = accessToken;
     }
     
     public JobV getJob(String job, Boolean compact) throws Exception {
@@ -39,10 +41,10 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     }
     
     public JobV getJob(String job, Boolean compact, Boolean withOrderQueue) throws Exception {
-        executePostWithThrowBadRequest(createShowJobPostCommand(job, compact));
+        executePostWithThrowBadRequest(createShowJobPostCommand(job, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job");
         JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue);
-        jobV.setFields(compact);
+        jobV.setFields(compact, accessToken);
         return jobV;
     }
     
@@ -110,7 +112,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     }
     
     private List<JobV> getJobs(String command, JobsFilter jobsFilter, String xPath) throws Exception {
-        executePostWithThrowBadRequest(command);
+        executePostWithThrowBadRequest(command, accessToken);
         StringBuilder x = new StringBuilder();
         x.append(xPath);
         if (jobsFilter.getIsOrderJob() != null) {
@@ -137,7 +139,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
                LOGGER.debug(String.format("...processing skipped because job's state '%1$s' doesn't contain in state filter '%2$s'", jobV.getState().get_text().name(),jobsFilter.getStates().toString()));
                continue; 
            }
-           jobV.setFields(jobsFilter.getCompact());
+           jobV.setFields(jobsFilter.getCompact(), accessToken);
            jobMap.put(jobV.getPath(), jobV);
         }
         //LOGGER.debug("..." + jobMap.size() + " jobs processed");

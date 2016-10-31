@@ -37,26 +37,29 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
     private final OrdersFilter ordersBody;
     private final Boolean compact;
     private final URI uri;
+    private final String accessToken;
     
-    public OrdersVCallable(String job, Boolean compact, URI uri) {
+    public OrdersVCallable(String job, Boolean compact, URI uri, String accessToken) {
         this.orders = null;
         this.job = ("/"+job.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
         this.folder = null;
         this.ordersBody = null;
         this.compact = compact;
         this.uri = uri;
+        this.accessToken = accessToken;
     }
     
-    public OrdersVCallable(OrdersPerJobChain orders, Boolean compact, URI uri) {
+    public OrdersVCallable(OrdersPerJobChain orders, Boolean compact, URI uri, String accessToken) {
         this.orders = orders;
         this.job = null;
         this.folder = null;
         this.ordersBody = null;
         this.compact = compact;
         this.uri = uri;
+        this.accessToken = accessToken;
     }
     
-    public OrdersVCallable(JobChainV jobChain, Boolean compact, URI uri) {
+    public OrdersVCallable(JobChainV jobChain, Boolean compact, URI uri, String accessToken) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(jobChain.getPath());
         this.orders = o;
@@ -65,9 +68,10 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
         this.ordersBody = null;
         this.compact = compact;
         this.uri = uri;
+        this.accessToken = accessToken;
     }
     
-    public OrdersVCallable(OrderFilter order, URI uri) {
+    public OrdersVCallable(OrderFilter order, URI uri, String accessToken) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(order.getJobChain());
         o.addOrder(order.getOrderId());
@@ -77,30 +81,32 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
         this.ordersBody = null;
         this.compact = order.getCompact();
         this.uri = uri;
+        this.accessToken = accessToken;
     }
     
-    public OrdersVCallable(Folder folder, OrdersFilter ordersBody, URI uri) {
+    public OrdersVCallable(Folder folder, OrdersFilter ordersBody, URI uri, String accessToken) {
         this.orders = null;
         this.job = null;
         this.folder = folder;
         this.ordersBody = ordersBody;
         this.compact = ordersBody.getCompact();
         this.uri = uri;
+        this.accessToken = accessToken;
     }
     
     @Override
     public Map<String,OrderV> call() throws Exception {
         if(orders != null) {
-            return getOrders(orders, compact, uri);
+            return getOrders(orders, compact, uri, accessToken);
         } else if(job != null) { 
-            return getOrders(job, compact, uri);
+            return getOrders(job, compact, uri, accessToken);
         } else {
-            return getOrders(folder, ordersBody, uri);
+            return getOrders(folder, ordersBody, uri, accessToken);
         }
     }
     
     public OrderV getOrder() throws Exception {
-        Map<String,OrderV> orderMap = getOrders(orders, compact, uri);
+        Map<String,OrderV> orderMap = getOrders(orders, compact, uri, accessToken);
         if (orderMap == null || orderMap.isEmpty()) {
             throw new JobSchedulerInvalidResponseDataException(String.format("Order doesn't exist: %1$s,%2$s", orders.getJobChain(), orders.getOrders().get(0)));
         }
@@ -108,23 +114,23 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
     }
     
     public List<OrderV> getOrdersOfJob() throws Exception {
-        Map<String,OrderV> orderMap = getOrders(job, compact, uri);
+        Map<String,OrderV> orderMap = getOrders(job, compact, uri, accessToken);
         if (orderMap == null || orderMap.isEmpty()) {
             return null;
         }
         return new ArrayList<OrderV>(orderMap.values());
     }
     
-    private Map<String,OrderV> getOrders(OrdersPerJobChain orders, boolean compact, URI uri) throws Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(orders)), compact);
+    private Map<String,OrderV> getOrders(OrdersPerJobChain orders, boolean compact, URI uri, String accessToken) throws Exception {
+        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(orders), accessToken), compact);
     }
     
-    private Map<String,OrderV> getOrders(String job, boolean compact, URI uri) throws Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(job)), compact);
+    private Map<String,OrderV> getOrders(String job, boolean compact, URI uri, String accessToken) throws Exception {
+        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(job), accessToken), compact);
     }
     
-    private Map<String,OrderV> getOrders(Folder folder, OrdersFilter ordersBody, URI uri) throws Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(folder, ordersBody)), ordersBody.getCompact(), ordersBody.getRegex());
+    private Map<String,OrderV> getOrders(Folder folder, OrdersFilter ordersBody, URI uri, String accessToken) throws Exception {
+        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(folder, ordersBody), accessToken), ordersBody.getCompact(), ordersBody.getRegex());
     }
     
     private Map<String,OrderV> getOrders(JsonObject json, boolean compact) throws JobSchedulerInvalidResponseDataException {

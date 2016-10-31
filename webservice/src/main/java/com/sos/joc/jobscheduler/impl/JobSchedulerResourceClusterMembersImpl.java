@@ -49,7 +49,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(getXMLClusterCommand());
+            jocXmlCommand.executePostWithThrowBadRequest(getXMLClusterCommand(), accessToken);
             NodeList clusterMembers = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer/state/cluster/cluster_member");
 
             InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
@@ -60,7 +60,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
 
             if (clusterMembers.getLength() == 0) {
                 // standalone
-                JobSchedulerV jobscheduler = new JobSchedulerVolatile(schedulerInstances.get(0)).getJobScheduler();
+                JobSchedulerV jobscheduler = new JobSchedulerVolatile(schedulerInstances.get(0), accessToken).getJobScheduler();
                 masters.add(jobscheduler);
             } else {
                 Map<String, DBItemInventoryInstance> jobSchedulerClusterMemberUrls = new HashMap<String, DBItemInventoryInstance>();
@@ -82,7 +82,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                         DBItemInventoryInstance schedulerInstance = jobSchedulerClusterMemberUrls.get(clusterMember.getAttribute("host").toLowerCase()
                                 + ":" + clusterMember.getAttribute("tcp_port"));
                         if (schedulerInstance != null) {
-                            jobscheduler = new JobSchedulerVolatile(schedulerInstance).getJobScheduler();
+                            jobscheduler = new JobSchedulerVolatile(schedulerInstance, accessToken).getJobScheduler();
                         } else {
                             if ("yes".equals(jocXmlCommand.getAttribute("active"))) {
                                 state.setSeverity(0);

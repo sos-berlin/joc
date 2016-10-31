@@ -153,7 +153,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 }
             }
             String xml = jsCmdModifyJob.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

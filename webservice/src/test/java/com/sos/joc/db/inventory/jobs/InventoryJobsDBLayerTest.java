@@ -3,6 +3,7 @@ package com.sos.joc.db.inventory.jobs;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class InventoryJobsDBLayerTest {
     public void getJobSchedulerJobs() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current");
+        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
         
         List<DBItemInventoryJob>  listOfJobs = dbLayer.getInventoryJobs(instance.getId());
@@ -35,7 +36,7 @@ public class InventoryJobsDBLayerTest {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current");
+        DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
         
         DBItemInventoryJob job = dbLayer.getInventoryJobByName("batch_install_universal_agent/PerformInstall", instance.getId());
@@ -44,6 +45,8 @@ public class InventoryJobsDBLayerTest {
 
     }
 
-    
+    private String getAccessToken() {
+        return UUID.randomUUID().toString();
+    }
 
 }

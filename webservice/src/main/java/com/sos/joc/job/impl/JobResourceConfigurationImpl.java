@@ -42,7 +42,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
             if (checkRequiredParameter("job", jobBody.getJob())) {
                 boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job",
-                        "job", responseInHtml);
+                        "job", responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

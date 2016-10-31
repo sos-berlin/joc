@@ -38,7 +38,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(getXMLCommand());
+            jocXmlCommand.executePostWithThrowBadRequest(getXMLCommand(), accessToken);
             
             Cluster cluster = new Cluster();
             cluster.setJobschedulerId(jobSchedulerFilter.getJobschedulerId());

@@ -28,7 +28,7 @@ public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSch
                 return jocDefaultResponse;
             }
             JobSchedulerV200 entity = new JobSchedulerV200();
-            entity.setJobscheduler(new JobSchedulerVolatile(dbItemInventoryInstance).getJobScheduler());
+            entity.setJobscheduler(new JobSchedulerVolatile(dbItemInventoryInstance, accessToken).getJobScheduler());
             entity.setDeliveryDate(new Date());
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

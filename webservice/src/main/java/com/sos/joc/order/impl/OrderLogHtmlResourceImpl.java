@@ -40,7 +40,7 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance);
+            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
             String log = logOrderContent.getLog();
 
             return JOCDefaultResponse.responseHtmlStatus200(logOrderContent.htmlPageWithColouredLogContent(log, "Order " + orderHistoryFilter

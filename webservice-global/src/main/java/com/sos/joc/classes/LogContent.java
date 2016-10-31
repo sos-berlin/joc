@@ -10,6 +10,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
 public class LogContent {
     
+    private String accessToken;
     private static final String SPAN_LINE = "<div class=\"line %1$s\">%2$s</div>%n";
     private static final String HTML = "<!DOCTYPE html>%n<html>%n"
             + "<head>%n"
@@ -118,9 +119,14 @@ public class LogContent {
 
     protected DBItemInventoryInstance dbItemInventoryInstance; 
     
-    public LogContent(DBItemInventoryInstance dbItemInventoryInstance) {
+    public LogContent(DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
         super();
         this.dbItemInventoryInstance = dbItemInventoryInstance;
+        this.accessToken = accessToken;
+    }
+    
+    protected String getAccessToken() {
+        return accessToken;
     }
 
     private String addStyle(String line) {

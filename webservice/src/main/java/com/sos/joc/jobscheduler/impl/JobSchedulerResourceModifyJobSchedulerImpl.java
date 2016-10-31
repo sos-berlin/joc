@@ -167,7 +167,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         jsCmdModifySpooler.setTimeoutIfNotEmpty(urlTimeoutParamSchema.getTimeout());
 
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-        jocXmlCommand.executePostWithThrowBadRequest(jsCmdModifySpooler.toXMLString());
+        jocXmlCommand.executePostWithThrowBadRequest(jsCmdModifySpooler.toXMLString(), getAccessToken());
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 

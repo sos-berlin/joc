@@ -49,7 +49,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
 
             checkRequiredParameter("taskId", taskFilter.getTaskId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(createTaskPostCommand(taskFilter.getTaskId()));
+            jocXmlCommand.executePostWithThrowBadRequest(createTaskPostCommand(taskFilter.getTaskId()), accessToken);
             Element taskElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/task");
 
             Task task = new Task();
@@ -81,7 +81,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
                     orderBody.setJobChain(orderElem.getAttribute("job_chain"));
                     orderBody.setOrderId(orderElem.getAttribute("order"));
                     command.addOrderCompactQuery(orderBody.getCompact());
-                    OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI());
+                    OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI(), accessToken);
                     task.setOrder(o.getOrder());
                 } catch (JocMissingRequiredParameterException e) {
                     throw new JobSchedulerBadRequestException("missing attributes in order element", e);

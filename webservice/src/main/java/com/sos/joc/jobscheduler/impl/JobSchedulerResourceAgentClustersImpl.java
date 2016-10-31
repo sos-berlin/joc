@@ -61,7 +61,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                 for (AgentClusterPath agentCluster : agentClusters) {
                     checkRequiredParameter("agentCluster", agentCluster.getAgentCluster());
                     tasks.add(new AgentClusterVCallable(agentCluster.getAgentCluster(), jobSchedulerAgentClustersBody, uri, dbItemInventoryInstance
-                            .getUrl()));
+                            .getUrl(), accessToken));
                 }
                 ExecutorService executorService = Executors.newFixedThreadPool(10);
                 for (Future<AgentClusterV> result : executorService.invokeAll(tasks)) {
@@ -78,8 +78,9 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                 entity.setAgentClusters(listAgentClusters);
 
             } else {
-                AgentClusterVCallable callable = new AgentClusterVCallable(jobSchedulerAgentClustersBody, uri, dbItemInventoryInstance.getUrl());
-                entity.setAgentClusters(callable.getAgentCluster());
+                AgentClusterVCallable callable = new AgentClusterVCallable(jobSchedulerAgentClustersBody, uri, dbItemInventoryInstance.getUrl(),
+                        accessToken);
+                entity.setAgentClusters(callable.getAgentClusters());
             }
 
             entity.setDeliveryDate(Date.from(Instant.now()));

@@ -39,7 +39,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
                 boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(orderBody),
-                        "/spooler/answer/order", "order", responseInHtml);
+                        "/spooler/answer/order", "order", responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

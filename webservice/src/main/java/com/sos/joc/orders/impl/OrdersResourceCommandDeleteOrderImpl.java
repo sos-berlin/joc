@@ -69,7 +69,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
             objOrder.setJobChain(order.getJobChain());
             objOrder.setId(order.getOrderId());
             String xml = objOrder.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

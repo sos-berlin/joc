@@ -104,7 +104,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             break;
         }
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-        jocXmlCommand.executePostWithThrowBadRequest(jsCmdTerminate.toXMLString());
+        jocXmlCommand.executePostWithThrowBadRequest(jsCmdTerminate.toXMLString(), getAccessToken());
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 }

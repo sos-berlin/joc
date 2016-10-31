@@ -14,9 +14,9 @@ public class LogTaskContent extends LogContent {
     private static final String XPATH_TASK_LOG = "//spooler/answer/task/log";
     private static final String WHAT_LOG = "log";
     private TaskFilter taskFilter;
-
-    public LogTaskContent(TaskFilter taskFilter, DBItemInventoryInstance dbItemInventoryInstance) {
-        super(dbItemInventoryInstance);
+    
+    public LogTaskContent(TaskFilter taskFilter, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
+        super(dbItemInventoryInstance, accessToken);
         this.taskFilter = taskFilter;
     }
 
@@ -45,8 +45,7 @@ public class LogTaskContent extends LogContent {
         jsCmdShowTask.setWhat(WHAT_LOG);
         jsCmdShowTask.setId(new BigInteger(taskFilter.getTaskId()));
         String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowTask);
-        jocXmlCommand.executePost(xml);
-        jocXmlCommand.throwJobSchedulerError();
+        jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_TASK_LOG, null);
     }
 }

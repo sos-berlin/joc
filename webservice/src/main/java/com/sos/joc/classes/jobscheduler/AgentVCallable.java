@@ -19,27 +19,29 @@ public class AgentVCallable implements Callable<AgentV> {
     public static final String AGENT_API_PATH_FORMAT = "/jobscheduler/master/api/agent/%1$s/jobscheduler/agent/api";
     private final String masterUrl;
     private final String agentUrl;
+    private final String accessToken;
 
-    public AgentVCallable(String agentUrl, String masterUrl) {
+    public AgentVCallable(String agentUrl, String masterUrl, String accessToken) {
         this.agentUrl = agentUrl;
         this.masterUrl = masterUrl;
+        this.accessToken = accessToken;
     }
 
     @Override
     public AgentV call() throws Exception {
         // "/jobscheduler/master/api/agent/http://[agent-host]:{agent-port]/jobscheduler/agent/api"
         String jsonPath = String.format(AGENT_API_PATH_FORMAT, agentUrl);
-        return getAgentV(agentUrl, masterUrl, jsonPath);
+        return getAgentV(agentUrl, masterUrl, accessToken, jsonPath);
     }
 
-    public AgentV getAgentV(String agentUrl, String masterUrl, String jsonPath) throws Exception {
+    public AgentV getAgentV(String agentUrl, String masterUrl, String accessToken, String jsonPath) throws Exception {
         JOCJsonCommand jocJsonCommand = new JOCJsonCommand(masterUrl, jsonPath);
         AgentV agent = new AgentV();
         agent.setSurveyDate(Date.from(Instant.now()));
         agent.setUrl(agentUrl);
         JobSchedulerState state = new JobSchedulerState();
         try {
-            JsonObject json = jocJsonCommand.getJsonObjectFromGet();
+            JsonObject json = jocJsonCommand.getJsonObjectFromGet(accessToken);
             agent.setRunningTasks(json.getInt("currentTaskCount", 0));
             agent.setStartedAt(JobSchedulerDate.getDateFromISO8601String(json.getString("startedAt")));
             if (json.getBoolean("isTerminating", false)) {

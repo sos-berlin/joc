@@ -81,7 +81,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
                 jsCmdStartJob.setParams(getParams(startJob.getParams()));
             }
             String xml = jsCmdStartJob.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

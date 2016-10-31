@@ -122,7 +122,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
                 break;
             }
             String xml = jsCmdJobChainNodeModify.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

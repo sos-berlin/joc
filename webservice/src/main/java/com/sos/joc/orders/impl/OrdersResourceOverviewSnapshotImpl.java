@@ -59,14 +59,14 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 
             if (jobChains.size() > 0) {
                 for (String jobChain : jobChains) {
-                    tasks.add(new OrdersSnapshotCallable(jobChain, uri));
+                    tasks.add(new OrdersSnapshotCallable(jobChain, uri, accessToken));
                 }
             } else if (folders.size() > 0) {
                 for (String folder : folders) {
-                    tasks.add(new OrdersSnapshotCallable(folder, uri));
+                    tasks.add(new OrdersSnapshotCallable(folder, uri, accessToken));
                 }
             } else {
-                tasks.add(new OrdersSnapshotCallable("/", uri));
+                tasks.add(new OrdersSnapshotCallable("/", uri, accessToken));
             }
 
             OrdersSummary summary = new OrdersSummary();

@@ -48,7 +48,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(createLocksPostCommand(locksFilter));
+            jocXmlCommand.executePostWithThrowBadRequest(createLocksPostCommand(locksFilter), accessToken);
             NodeList locks = jocXmlCommand.selectNodelist("//locks/lock");
             boolean filteredByLocks = (locksFilter.getLocks() != null && locksFilter.getLocks().size() > 0);
 

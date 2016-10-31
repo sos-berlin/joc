@@ -70,7 +70,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             jsCmdShowState.setSubsystems(SUBSYSTEMS);
             jsCmdShowState.setWhat(WHAT);
             String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowState);
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, accessToken);
 
             jocXmlCommand.createNodeList(XPATH_PROCESS_CLASSES);
 

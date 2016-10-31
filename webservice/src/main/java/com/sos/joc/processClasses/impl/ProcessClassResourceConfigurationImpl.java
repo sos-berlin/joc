@@ -42,7 +42,7 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
                 String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", normalizePath(
                         processClassConfigurationFilter.getProcessClass()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createProcessClassConfigurationPostCommand(), xPath,
-                        "process_class", responseInHtml);
+                        "process_class", responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

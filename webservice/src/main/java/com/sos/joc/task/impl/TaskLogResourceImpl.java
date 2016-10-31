@@ -39,7 +39,7 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
             }
 
             LogContent200 entity = new LogContent200();
-            LogTaskContent logOrderContent = new LogTaskContent(taskFilter, dbItemInventoryInstance);
+            LogTaskContent logOrderContent = new LogTaskContent(taskFilter, dbItemInventoryInstance, accessToken);
             // TODO surveyDate from database
             entity.setSurveyDate(Date.from(Instant.now()));
 

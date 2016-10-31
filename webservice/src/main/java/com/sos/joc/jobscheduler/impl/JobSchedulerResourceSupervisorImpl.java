@@ -52,7 +52,7 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
                             .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
-                entity.setJobscheduler(new JobSchedulerVolatile(dbItemInventorySupervisorInstance).getJobScheduler());
+                entity.setJobscheduler(new JobSchedulerVolatile(dbItemInventorySupervisorInstance, accessToken).getJobScheduler());
             } else {
                 entity.setJobscheduler(new JobSchedulerV());
             }

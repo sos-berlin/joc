@@ -19,8 +19,8 @@ import com.sos.joc.model.common.RunTime200;
 
 public class RunTime {
 
-    public static RunTime200 set(JOCXmlCommand jocXmlCommand, String postCommand, String xPath) throws Exception {
-        jocXmlCommand.executePostWithThrowBadRequest(postCommand);
+    public static RunTime200 set(JOCXmlCommand jocXmlCommand, String postCommand, String xPath, String accessToken) throws Exception {
+        jocXmlCommand.executePostWithThrowBadRequest(postCommand, accessToken);
         RunTime200 runTimeAnswer = new RunTime200();
         Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode(xPath);
         com.sos.joc.model.common.RunTime runTime = new com.sos.joc.model.common.RunTime();

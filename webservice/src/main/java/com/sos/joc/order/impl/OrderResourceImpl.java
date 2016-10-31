@@ -40,7 +40,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             OrderV200 entity = new OrderV200();
 
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
-                OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI());
+                OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI(), accessToken);
                 entity.setOrder(o.getOrder());
                 entity.setDeliveryDate(Date.from(Instant.now()));
             }

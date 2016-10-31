@@ -37,7 +37,7 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
                 return jocDefaultResponse;
             }
 
-            LogTaskContent logTaskContent = new LogTaskContent(taskFilter, dbItemInventoryInstance);
+            LogTaskContent logTaskContent = new LogTaskContent(taskFilter, dbItemInventoryInstance, accessToken);
             String log = logTaskContent.getLog();
 
             return JOCDefaultResponse.responseHtmlStatus200(logTaskContent.htmlPageWithColouredLogContent(log, "Task " + taskFilter.getTaskId()));

@@ -32,7 +32,8 @@ public class JobVolatile extends JobV {
     private final Boolean orderJob;
     private final Boolean withOrderQueue;
     private final JOCXmlCommand jocXmlCommand;
-
+    private String accessToken = null;
+    
     public JobVolatile(Element job, JOCXmlCommand jocXmlCommand, Boolean withOrderQueue) {
         this.job = job;
         this.jocXmlCommand = jocXmlCommand;
@@ -89,7 +90,8 @@ public class JobVolatile extends JobV {
         }
     }
     
-    public void setFields(boolean compact) throws Exception {
+    public void setFields(boolean compact, String accessToken) throws Exception {
+        this.accessToken = accessToken;
         if (compact) {
             setCompactFields();
             cleanArrays();
@@ -127,7 +129,11 @@ public class JobVolatile extends JobV {
         setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(job));
         setSummary();
-        setOrderQueue();
+        if (isOrderJob() && withOrderQueue) {
+            setOrderQueue(new OrdersVCallable(getPath(), false, jocXmlCommand.getUriForJsonCommand(), accessToken).getOrdersOfJob());
+        } else {
+            setOrderQueue(null);
+        }
     }
     
     private String getAttributeValue(String attributeName, String default_) {
@@ -231,14 +237,6 @@ public class JobVolatile extends JobV {
             setRunningTasks(runningTasks);
         } else {
             setRunningTasks((List<RunningTask>) null);
-        }
-    }
-    
-    private void setOrderQueue() throws Exception {
-        if (isOrderJob() && withOrderQueue) {
-            setOrderQueue(new OrdersVCallable(getPath(), false, jocXmlCommand.getUriForJsonCommand()).getOrdersOfJob());
-        } else {
-            setOrderQueue(null);
         }
     }
     

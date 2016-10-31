@@ -39,7 +39,7 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
                 boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", normalizePath(lockBody.getLock()));
                 entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(), xPath, "lock",
-                        responseInHtml);
+                        responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

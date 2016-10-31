@@ -98,7 +98,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
                 break;
             }
             String xml = jsCmdJobChainModify.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

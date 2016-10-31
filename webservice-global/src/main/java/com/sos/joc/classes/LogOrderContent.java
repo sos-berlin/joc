@@ -12,8 +12,8 @@ public class LogOrderContent extends LogContent {
     private static final String WHAT_LOG = "log";
     private OrderHistoryFilter orderHistoryFilter;
 
-    public LogOrderContent(OrderHistoryFilter orderHistoryFilter, DBItemInventoryInstance dbItemInventoryInstance) {
-        super(dbItemInventoryInstance);
+    public LogOrderContent(OrderHistoryFilter orderHistoryFilter, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
+        super(dbItemInventoryInstance, accessToken);
         this.orderHistoryFilter = orderHistoryFilter;
     }
 
@@ -42,8 +42,7 @@ public class LogOrderContent extends LogContent {
         jsCmdShowOrder.setJobChain(orderHistoryFilter.getJobChain());
         jsCmdShowOrder.setOrder(orderHistoryFilter.getOrderId());
         String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowOrder);
-        jocXmlCommand.executePost(xml);
-        jocXmlCommand.throwJobSchedulerError();
+        jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_ORDER_LOG, null);
     }
 }

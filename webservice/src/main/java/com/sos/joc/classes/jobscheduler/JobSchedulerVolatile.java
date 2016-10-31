@@ -14,16 +14,18 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 
 
 public class JobSchedulerVolatile extends JobSchedulerV {
-   private DBItemInventoryInstance dbItemInventoryInstance;
+    private DBItemInventoryInstance dbItemInventoryInstance;
+    private String accessToken;
 
-    public JobSchedulerVolatile(DBItemInventoryInstance dbItemInventoryInstance) {
+    public JobSchedulerVolatile(DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
         this.dbItemInventoryInstance = dbItemInventoryInstance;
+        this.accessToken = accessToken;
     }
     
     public JobSchedulerV getJobScheduler() throws Exception {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
         try {
-            jocXmlCommand.executePost(getXMLCommand());
+            jocXmlCommand.executePost(getXMLCommand(), accessToken);
         } catch (Exception e) {
             return getUnreachableJobScheduler();
         }

@@ -8,7 +8,10 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.scheduler.model.commands.JSCmdParamGet;
+import com.sos.scheduler.model.commands.JSCmdShowState;
 
 /** @author Uwe Risse */
 public class InventoryInstancesDBLayer extends DBLayer {
@@ -20,7 +23,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId) throws Exception {
+    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken) throws Exception {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
@@ -28,7 +31,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             query.setParameter("schedulerId", schedulerId);
             List<DBItemInventoryInstance> result = query.list();
             if (result != null && !result.isEmpty()) {
-                return getRunningJobSchedulerClusterMember(result);
+                return getRunningJobSchedulerClusterMember(result, accessToken);
             }
             return null;
         } catch (Exception ex) {
@@ -93,13 +96,17 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
     }
     
-    private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList) {
+    private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList, String accessToken) {
         switch (schedulerInstancesDBList.get(0).getClusterType()) {
         case "passive":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
+                    JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
+                    jsCmdShowState.setWhat("folders no_subfolders");
+                    jsCmdShowState.setPath("/does/not/exist");
+                    jsCmdShowState.setSubsystems("folder");
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
-                    resourceImpl.executePost("<show_state subsystems=\"folder\" what=\"folders nosubfolders\" path=\"__unknown__\"/>");
+                    resourceImpl.executePost(jsCmdShowState.toXMLString(), accessToken);
                     String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
                     if (!"waiting_for_activation,dead".contains(state)) {
                         return schedulerInstancesDBItem; 
@@ -112,8 +119,10 @@ public class InventoryInstancesDBLayer extends DBLayer {
         case "active":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
+                    JSCmdParamGet jsCmdParamGet = Globals.schedulerObjectFactory.createParamGet();
+                    jsCmdParamGet.setName("");
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
-                    resourceImpl.executePost("<param.get name=\"\"/>");
+                    resourceImpl.executePost(jsCmdParamGet.toXMLString(), accessToken);
                     return schedulerInstancesDBItem;
                 } catch (Exception e) {
                     //unreachable

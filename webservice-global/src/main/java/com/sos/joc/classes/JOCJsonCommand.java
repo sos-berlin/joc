@@ -2,6 +2,7 @@ package com.sos.joc.classes;
 
 import java.io.StringReader;
 import java.net.URI;
+import java.util.UUID;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -71,19 +72,18 @@ public class JOCJsonCommand {
         uriBuilder.queryParam("return", returnQuery);
     }
     
-    public JsonObject getJsonObjectFromPost() throws Exception {
-        return getJsonObjectFromPost(uriBuilder.build(), null);
+    public JsonObject getJsonObjectFromPost(String postBody, String csrfToken) throws Exception {
+        return getJsonObjectFromPost(uriBuilder.build(), postBody, csrfToken);
     }
     
-    public JsonObject getJsonObjectFromPost(String postBody) throws Exception {
-        return getJsonObjectFromPost(uriBuilder.build(), postBody);
-    }
-    
-    public JsonObject getJsonObjectFromPost(URI uri, String postBody) throws Exception {
+    public JsonObject getJsonObjectFromPost(URI uri, String postBody, String csrfToken) throws Exception {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Content-Type", "application/json");
         client.addHeader("Accept", "application/json");
-        //client.addHeader("X-CSRF-Token", "4711");
+        client.addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
+        if (postBody == null) {
+            postBody = "";
+        }
         String[] metaInfo = {"JS-URL: " + uri, "JS-PostBody: " + postBody};
         String response;
         try {
@@ -94,14 +94,14 @@ public class JOCJsonCommand {
         return getJsonObjectFromResponse(response, client, metaInfo);
     }
     
-    public JsonObject getJsonObjectFromGet() throws Exception {
-        return getJsonObjectFromGet(uriBuilder.build());
+    public JsonObject getJsonObjectFromGet(String csrfToken) throws Exception {
+        return getJsonObjectFromGet(uriBuilder.build(), csrfToken);
     }
     
-    public JsonObject getJsonObjectFromGet(URI uri) throws Exception {
+    public JsonObject getJsonObjectFromGet(URI uri, String csrfToken) throws Exception {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Accept", "application/json");
-        //client.addHeader("X-CSRF-Token", "4711");
+        client.addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
         String[] metaInfo = {"JS-URL: " + uri};
         String response;
         try {
@@ -110,6 +110,13 @@ public class JOCJsonCommand {
             throw new JobSchedulerConnectionRefusedException(e);
         }
         return getJsonObjectFromResponse(response, client, metaInfo);
+    }
+    
+    private String getCsrfToken(String csrfToken) {
+        if (csrfToken == null || csrfToken.isEmpty()) {
+            return UUID.randomUUID().toString();
+        }
+        return csrfToken;
     }
     
     private JsonObject getJsonObjectFromResponse(String response, JobSchedulerRestApiClient client, String[] metaInfo) throws Exception {

@@ -54,14 +54,14 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
             if (agentFilter.getAgents() != null && agentFilter.getAgents().size() > 0) {
                 Set<AgentUrl> agentUris = new HashSet<AgentUrl>(agentFilter.getAgents());
                 for (AgentUrl agentUri : agentUris) {
-                    tasks.add(new AgentVCallable(agentUri.getAgent(), dbItemInventoryInstance.getUrl()));
+                    tasks.add(new AgentVCallable(agentUri.getAgent(), dbItemInventoryInstance.getUrl(), accessToken));
                 }
             } else {
                 JOCJsonCommand jocJsonCommand = new JOCJsonCommand(dbItemInventoryInstance.getUrl(), AGENTS_API_LIST_PATH);
-                JsonObject json = jocJsonCommand.getJsonObjectFromGet();
+                JsonObject json = jocJsonCommand.getJsonObjectFromGet(accessToken);
                 JsonArray agentUris = json.getJsonArray("elements");
                 for (JsonString agentUri : agentUris.getValuesAs(JsonString.class)) {
-                    tasks.add(new AgentVCallable(agentUri.getString(), dbItemInventoryInstance.getUrl()));
+                    tasks.add(new AgentVCallable(agentUri.getString(), dbItemInventoryInstance.getUrl(), accessToken));
                 }
             }
 

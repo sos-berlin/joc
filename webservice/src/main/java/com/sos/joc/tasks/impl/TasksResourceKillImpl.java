@@ -134,7 +134,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             jsCmdShowJob.setJobName(job.getJob());
             String xml = jsCmdShowJob.toXMLString();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             
             List<TaskId> taskIds = new ArrayList<TaskId>();
             NodeList tasks = jocXmlCommand.getSosxml().selectNodeList("//tasks/tasks/@id");
@@ -181,7 +181,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             }
 
             String xml = jsCmdKillTask.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, job, taskId));

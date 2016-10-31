@@ -211,7 +211,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 }
             }
             String xml = jsCmdModifyOrder.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml);
+            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, order));

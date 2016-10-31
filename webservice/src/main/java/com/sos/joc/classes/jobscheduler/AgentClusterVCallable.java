@@ -38,28 +38,31 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
     private final String agentCluster;
     private final AgentClusterFilter agentClusterBody;
     private final URI uri;
+    private final String accessToken;
 
-    public AgentClusterVCallable(String agentCluster, AgentClusterFilter agentClusterBody, URI uri, String masterUrl) {
+    public AgentClusterVCallable(String agentCluster, AgentClusterFilter agentClusterBody, URI uri, String masterUrl, String accessToken) {
         this.agentCluster = agentCluster;
         this.agentClusterBody = agentClusterBody;
         this.uri = uri;
         this.masterUrl = masterUrl;
+        this.accessToken = accessToken;
     }
     
-    public AgentClusterVCallable(AgentClusterFilter agentClusterBody, URI uri, String masterUrl) {
+    public AgentClusterVCallable(AgentClusterFilter agentClusterBody, URI uri, String masterUrl, String accessToken) {
         this.agentCluster = null;
         this.agentClusterBody = agentClusterBody;
         this.uri = uri;
         this.masterUrl = masterUrl;
+        this.accessToken = accessToken;
     }
 
     @Override
     public AgentClusterV call() throws Exception {
-        return getAgentClusters(agentCluster, agentClusterBody, uri);
+        return getAgentCluster(agentCluster, agentClusterBody, uri, accessToken);
     }
     
-    public List<AgentClusterV> getAgentCluster() throws Exception {
-        JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(agentCluster));
+    public List<AgentClusterV> getAgentClusters() throws Exception {
+        JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(agentCluster), accessToken);
         String regex = agentClusterBody.getRegex();
         Set<String> agentSet = new HashSet<String>();
         Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();
@@ -81,7 +84,7 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
         
         List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
         for (String agent : agentSet) {
-            tasks.add(new AgentVCallable(agent, masterUrl));
+            tasks.add(new AgentVCallable(agent, masterUrl, accessToken));
         }
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         Map<String,AgentV> mapOfAgents = new HashMap<String,AgentV>();
@@ -109,8 +112,8 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
         return listAgentClusterV;
     }
 
-    private AgentClusterV getAgentClusters(String agentCluster, AgentClusterFilter agentClusterBody, URI uri) throws Exception {
-        JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(agentCluster));
+    private AgentClusterV getAgentCluster(String agentCluster, AgentClusterFilter agentClusterBody, URI uri, String accessToken) throws Exception {
+        JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(agentCluster), accessToken);
         Date surveyDate = JobSchedulerDate.getDateFromEventId(jsonObjectFromPost.getJsonNumber("eventId").longValue());
         JsonArray agents = jsonObjectFromPost.getJsonArray("agents");
         if (agents == null || agents.isEmpty()) {
@@ -120,7 +123,7 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
         agentClusterV.setAgentClusterPath();
         List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
         for (String agent :  agentClusterV.getAgentSet()) {
-            tasks.add(new AgentVCallable(agent, masterUrl));
+            tasks.add(new AgentVCallable(agent, masterUrl, accessToken));
         }
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         Map<String,AgentV> mapOfAgents = new HashMap<String,AgentV>();
