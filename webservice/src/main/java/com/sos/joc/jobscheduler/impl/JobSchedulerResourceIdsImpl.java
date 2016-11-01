@@ -47,7 +47,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                     first = inventoryInstance.getSchedulerId();
                 }
             }
-            JOCPreferences jocPreferences = new JOCPreferences();
+            JOCPreferences jocPreferences = new JOCPreferences(jobschedulerUser.getSosShiroCurrentUser().getUsername());
             String selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first);
 
             JobSchedulerIds entity = new JobSchedulerIds();

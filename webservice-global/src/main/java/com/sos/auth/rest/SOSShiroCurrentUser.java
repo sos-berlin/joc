@@ -77,11 +77,15 @@ public class SOSShiroCurrentUser {
     
     private boolean getPermissionFromMaster(String permission){
         if (selectedInstance == null) {
-            JOCPreferences jocPreferences = new JOCPreferences();
+            JOCPreferences jocPreferences = new JOCPreferences(username);
             selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
         }
         String permissionMaster = selectedInstance + ":" + permission;
         return getPermissionFromSubject(permission,permissionMaster);
+    }
+
+    public void setSelectedInstance(String selectedInstance) {
+        this.selectedInstance = selectedInstance;
     }
 
     public boolean isPermitted(String permission) {

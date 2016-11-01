@@ -31,9 +31,11 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            JOCPreferences jocPreferences = new JOCPreferences();
-            jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, jobSchedulerId.getJobschedulerId());
-            
+            JOCPreferences jocPreferences = new JOCPreferences(jobschedulerUser.getSosShiroCurrentUser().getUsername());
+            String selectedInstance = jobSchedulerId.getJobschedulerId();
+            jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, selectedInstance);
+            jobschedulerUser.getSosShiroCurrentUser().setSelectedInstance(selectedInstance);
+
             SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
             jocDefaultResponse = sosServicePermissionShiro.getJocCockpitPermissions(accessToken,jobschedulerUser.getSosShiroCurrentUser().getUsername(),jobschedulerUser.getSosShiroCurrentUser().getPassword());
             
