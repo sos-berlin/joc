@@ -109,12 +109,12 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
     public String createJobchainHistoryPostCommand(final JobChainHistoryFilter jobChainHistoryFilterSchema) {
 
-        JSCmdShowJobChain showJob = Globals.schedulerObjectFactory.createShowJobChain();
-        showJob.setMaxOrders(BigInteger.valueOf(0));
-        showJob.setMaxOrderHistory(BigInteger.valueOf(jobChainHistoryFilterSchema.getMaxLastHistoryItems()));
-        showJob.setWhat(ORDER_HISTORY);
-        showJob.setJobChain(normalizePath(jobChainHistoryFilterSchema.getJobChain()));
-        return Globals.schedulerObjectFactory.toXMLString(showJob);
+        JSCmdShowJobChain showJobChain = Globals.schedulerObjectFactory.createShowJobChain();
+        showJobChain.setMaxOrders(BigInteger.valueOf(0));
+        showJobChain.setMaxOrderHistory(BigInteger.valueOf(jobChainHistoryFilterSchema.getMaxLastHistoryItems()));
+        showJobChain.setWhat(ORDER_HISTORY);
+        showJobChain.setJobChain(normalizePath(jobChainHistoryFilterSchema.getJobChain()));
+        return Globals.schedulerObjectFactory.toXMLString(showJobChain);
     }
 
 }

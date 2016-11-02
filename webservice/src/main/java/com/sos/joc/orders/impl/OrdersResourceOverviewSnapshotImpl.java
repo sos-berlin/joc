@@ -117,7 +117,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
         if (path == null) {
             throw new JocMissingRequiredParameterException("folder");
         } else {
-            path = ("/" + path.trim() + "/").replaceAll("//+", "/");
+            path = normalizePath(path) + "/";
             if (!folder.getRecursive()) {
                 path += "*";
             }
@@ -161,7 +161,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
             if (jobChain.getJobChain() == null || jobChain.getJobChain().isEmpty()) {
                 throw new JocMissingRequiredParameterException("jobChain");
             }
-            set.add(("/" + jobChain.getJobChain().trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
+            set.add(normalizePath(jobChain.getJobChain()));
         }
         return set;
     }
