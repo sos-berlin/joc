@@ -39,7 +39,7 @@ public class JocError extends Err{
     @JsonIgnore
     public void appendMetaInfo(String ...metaInfos) {
         for(String s : metaInfos) {
-            metaInfo.add(s + "\n");
+            metaInfo.add(s);
         }
     }
     
@@ -47,18 +47,41 @@ public class JocError extends Err{
     public void addMetaInfoOnTop(String ...metaInfos) {
         List<String> onTop = new ArrayList<String>();
         for(String s : metaInfos) {
-            onTop.add(s + "\n");
+            onTop.add(s);
         }
-        if (onTop.size() > 0) {
+        if (!onTop.isEmpty()) {
             metaInfo.addAll(0,onTop); 
         }
+    }
+    
+    @JsonIgnore
+    public void addMetaInfoOnTop(List<String> metaInfos) {
+        if (metaInfos != null && !metaInfos.isEmpty()) {
+            metaInfo.addAll(0,metaInfos); 
+        }
+    }
+    
+    @JsonIgnore
+    public List<String> getMetaInfo() {
+        return metaInfo;
     }
     
     @JsonIgnore
     public String printMetaInfo() {
         StringBuilder s = new StringBuilder();
         for (String str : metaInfo) {
-            s.append(str);
+            s.append(str).append("\n");
+        }
+        return s.toString().trim();
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append(getCode()).append(": ");
+        s.append(getMessage()).append("\n");
+        for (String str : metaInfo) {
+            s.append(str).append("\n");
         }
         return s.toString();
     }

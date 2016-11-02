@@ -60,6 +60,14 @@ public class JocException extends Exception {
         this.error.addMetaInfoOnTop(metaInfos);
     }
     
+    public void addErrorMetaInfo(JocError error) {
+        if (this.error == null) {
+            this.error = new JocError(); 
+        }
+        this.error.addMetaInfoOnTop(error.getMetaInfo());
+        error.getMetaInfo().clear();
+    }
+    
     public void appendErrorMetaInfo(String ...metaInfos) {
         if (this.error == null) {
             this.error = new JocError(); 

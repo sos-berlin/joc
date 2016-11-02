@@ -32,7 +32,8 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
             checkRequiredParameter("jobschedulerId", taskFilter.getJobschedulerId());
             checkRequiredParameter("taskId", taskFilter.getTaskId());
 
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissons(accessToken).getJob().getView().isTaskLog());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissons(accessToken).getJob().getView().isTaskLog(),
+                    true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

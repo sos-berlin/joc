@@ -36,7 +36,8 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
             checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
             checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
 
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissons(accessToken).getOrder().getView().isOrderLog());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissons(accessToken).getOrder().getView().isOrderLog(),
+                    true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

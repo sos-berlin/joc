@@ -16,7 +16,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.jobscheduler.BulkError;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceStartJob;
@@ -28,13 +27,13 @@ import com.sos.scheduler.model.commands.JSCmdStartJob;
 
 @Path("jobs")
 public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsResourceStartJob {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceStartJobsImpl.class);
+    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private static final String API_CALL = "./jobs/start";
     
     @Override
     public JOCDefaultResponse postJobsStart(String accessToken, StartJobs startJobs) throws Exception {
-        LOGGER.debug(API_CALL);
+        initLogging(API_CALL, startJobs);
         try {
             JOCDefaultResponse jocDefaultResponse = init(accessToken, startJobs.getJobschedulerId(), getPermissons(accessToken).getJob().getStart().isTask());
             if (jocDefaultResponse != null) {
@@ -48,24 +47,24 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
                 surveyDate = executeStartJobCommand(job);
             }
             if (listOfErrors.size() > 0) {
-                JocError err = new JocError();
-                err.addMetaInfoOnTop(getMetaInfo(API_CALL, startJobs));
-                return JOCDefaultResponse.responseStatus419(listOfErrors, err);
+                return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, startJobs));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, startJobs));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
     private Date executeStartJobCommand(StartJob startJob) {
 
         try {
+            try {
+                AUDIT_LOGGER.info(String.format("%1$s%n%2$s%n%3$s", (Object[]) getMetaInfo(API_CALL, startJob)));
+            } catch (Exception e) {}
+            
             checkRequiredParameter("job", startJob.getJob());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
@@ -85,9 +84,9 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
-            listOfErrors.add(new BulkError().get(e, startJob));
+            listOfErrors.add(new BulkError().get(e, getJocError(), startJob));
         } catch (Exception e) {
-            listOfErrors.add(new BulkError().get(e, startJob));
+            listOfErrors.add(new BulkError().get(e, getJocError(), startJob));
         }
         return null;
     }

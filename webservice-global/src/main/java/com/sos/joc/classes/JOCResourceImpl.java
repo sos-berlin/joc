@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -29,7 +31,7 @@ public class JOCResourceImpl {
     private String accessToken;
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
     private ObjectMapper mapper = new ObjectMapper();
-    private static final String DBITEM_INVENTORY_INSTANCES = DBItemInventoryInstance.class.getSimpleName();
+    private JocError jocError = new JocError();
 
 
     protected SOSPermissionJocCockpit getPermissons(String accessToken) throws JocException {
@@ -43,6 +45,7 @@ public class JOCResourceImpl {
             jocError.setMessage("No user logged in with accessToken: " + accessToken);
             throw new JocException(jocError);
         }
+        updateUserInMetaInfo();
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
     }
 
@@ -52,6 +55,10 @@ public class JOCResourceImpl {
 
     public JobSchedulerUser getJobschedulerUser() {
         return jobschedulerUser;
+    }
+
+    public JocError getJocError() {
+        return jocError;
     }
 
     public Date getDateFromString(String dateString) {
@@ -74,11 +81,15 @@ public class JOCResourceImpl {
     }
 
     public JOCDefaultResponse init(String accessToken, String schedulerId, boolean permission) throws Exception {
+        return init(accessToken, schedulerId, permission, false);
+    }
+    
+    public JOCDefaultResponse init(String accessToken, String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws Exception {
         this.accessToken = accessToken;
         if (jobschedulerUser == null) {
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
-        return init(schedulerId, permission);
+        return init(schedulerId, permission, withJobSchedulerDBCheck);
     }
 
     public JOCDefaultResponse init(String accessToken) throws Exception {
@@ -127,6 +138,11 @@ public class JOCResourceImpl {
             return true;
         }
     }
+    
+    public void initLogging(String apiCall, Object body) {
+        LOGGER.debug(apiCall);
+        jocError.addMetaInfoOnTop(getMetaInfo(apiCall, body));
+    }
 
     public String[] getMetaInfo(String apiCall, Object body) {
         String[] strings = new String[3];
@@ -150,29 +166,35 @@ public class JOCResourceImpl {
         }
         return strings;
     }
+    
+    public String getJsonString(Object body) {
+        try {
+            return mapper.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            return body.toString();
+        }
+    }
 
-    private JOCDefaultResponse init(String schedulerId, boolean permission) throws Exception {
+    private JOCDefaultResponse init(String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws Exception {
         JOCDefaultResponse jocDefaultResponse = init401And440();
         if (!permission) {
             return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, "Access denied"));
         }
         if (schedulerId == null) {
-            return JOCDefaultResponse.responseStatusJSError(new JocMissingRequiredParameterException("undefined 'jobschedulerId'"));
+            throw new JocMissingRequiredParameterException("undefined 'jobschedulerId'");
         }
         
-        checkConnection(Globals.getConnection(schedulerId));
-        String checkConnectionResult = checkConnection(Globals.sosHibernateConnection);
-        if (!"".equals(checkConnectionResult)) {
-            JocError jocError = new JocError(String.format("Error with database connection: %s", checkConnectionResult), WebserviceConstants.DB_CONNECTION_ERROR);
-            throw new JocException(jocError);
-        }
-
+        checkConnection(Globals.sosHibernateConnection);
+        
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
             if (dbItemInventoryInstance == null) {
                 String errMessage = String.format("jobschedulerId %s not found in table %s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES);
                 throw new DBInvalidDataException(errMessage);
             }
+            if (withJobSchedulerDBCheck) {
+                checkConnection(Globals.getConnection(schedulerId));
+            } 
         }
         
 
@@ -186,26 +208,32 @@ public class JOCResourceImpl {
         return null;
     }
     
-    private String checkConnection(SOSHibernateConnection connection) {
+    private void checkConnection(SOSHibernateConnection connection) throws DBConnectionRefusedException {
         try {
             connection.beginTransaction();
             connection.rollback();
-            return "";
         } catch (Exception ex) {
-
             if (connection != null) {
                 connection.disconnect();
             }
             try {
                 connection.connect();
-                return "";
             } catch (Exception e) {
-                return (e.getMessage());
+                throw new DBConnectionRefusedException(e);
             }
-
         }
     }
  
- 
+    private void updateUserInMetaInfo() {
+        try {
+            String userMetaInfo = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
+            List<String> metaInfo = getJocError().getMetaInfo();
+            if (metaInfo.size() > 2) {
+                metaInfo.remove(2);
+                metaInfo.add(2, userMetaInfo);
+            }
+        } catch (Exception e) {
+        }
+    }
     
 }

@@ -33,7 +33,7 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
             checkRequiredParameter("taskId", taskFilter.getTaskId());
 
             JOCDefaultResponse jocDefaultResponse = init(accessToken, taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
-                    .isTaskLog());
+                    .isTaskLog(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

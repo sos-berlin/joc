@@ -35,7 +35,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
             checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
 
             JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getOrder()
-                    .getView().isOrderLog());
+                    .getView().isOrderLog(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

@@ -228,12 +228,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (!"".equals(err.printMetaInfo())) {
             LOGGER.info(err.printMetaInfo());
         }
-        Errs errors = new Errs();
-        errors.setErrors(listOfErrors);
-
-        Response.ResponseBuilder responseBuilder = Response.status(419).header("Content-Type", MediaType.APPLICATION_JSON);
-        responseBuilder.entity(errors);
-        return new JOCDefaultResponse(responseBuilder.build());
+        return responseStatus419(listOfErrors);
     }
 
     public static JOCDefaultResponse responseStatus401(SOSShiroCurrentUserAnswer entity) {
