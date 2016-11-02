@@ -10,6 +10,8 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.JobSchedulerIdentifier;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.scheduler.model.commands.JSCmdParamGet;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
@@ -35,10 +37,38 @@ public class InventoryInstancesDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-    
+
+    @SuppressWarnings("unchecked")
+    public DBItemInventoryInstance getInventoryInstanceByHostPort(JobSchedulerIdentifier jobSchedulerIdentifier) throws Exception {
+        try {
+            String sql = String.format("from %s where hostname = :hostname and port = :port", DBITEM_INVENTORY_INSTANCES);
+            LOGGER.debug(sql);
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("hostname", jobSchedulerIdentifier.getHost());
+            query.setParameter("port", jobSchedulerIdentifier.getPort());
+
+            List<DBItemInventoryInstance> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                DBItemInventoryInstance dbItemInventoryInstance = result.get(0);
+                if (!dbItemInventoryInstance.getSchedulerId().equals(jobSchedulerIdentifier.getSchedulerId())) {
+                    String errMessage = String.format("jobschedulerId %s not assigned for %s:%s in table %s", jobSchedulerIdentifier.getSchedulerId(),
+                            jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(), DBLayer.TABLE_INVENTORY_INSTANCES);
+                    throw new DBInvalidDataException(errMessage);
+                } else {
+                    return result.get(0);
+                }
+            }
+            return null;
+        }catch (DBInvalidDataException e){
+            throw e;
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws Exception {
         try {
@@ -52,7 +82,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
@@ -63,10 +93,10 @@ public class InventoryInstancesDBLayer extends DBLayer {
             Query query = getConnection().createQuery(sql);
             return query.list();
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<DBItemInventoryInstance> getJobSchedulerIds() throws Exception {
         try {
@@ -75,10 +105,10 @@ public class InventoryInstancesDBLayer extends DBLayer {
 
             return query.list();
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws Exception {
         try {
@@ -92,10 +122,10 @@ public class InventoryInstancesDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-    
+
     private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList, String accessToken) {
         switch (schedulerInstancesDBList.get(0).getClusterType()) {
         case "passive":
@@ -109,10 +139,10 @@ public class InventoryInstancesDBLayer extends DBLayer {
                     resourceImpl.executePost(jsCmdShowState.toXMLString(), accessToken);
                     String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
                     if (!"waiting_for_activation,dead".contains(state)) {
-                        return schedulerInstancesDBItem; 
+                        return schedulerInstancesDBItem;
                     }
                 } catch (Exception e) {
-                    //unreachable
+                    // unreachable
                 }
             }
             break;
@@ -125,7 +155,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
                     resourceImpl.executePost(jsCmdParamGet.toXMLString(), accessToken);
                     return schedulerInstancesDBItem;
                 } catch (Exception e) {
-                    //unreachable
+                    // unreachable
                 }
             }
             break;
@@ -134,5 +164,5 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
         return schedulerInstancesDBList.get(0);
     }
-    
+
 }

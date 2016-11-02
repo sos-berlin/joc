@@ -5,11 +5,14 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerIdentifier;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
@@ -33,9 +36,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         API_CALL += TERMINATE;
         LOGGER.debug(API_CALL);
         try {
-            setJobSchedulerIdentifier(urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
-                    .getJobschedulerMaster().isTerminate());
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().isTerminate());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
             }
@@ -55,9 +56,8 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         API_CALL += RESTART;
         LOGGER.debug(API_CALL);
         try {
-            setJobSchedulerIdentifier(urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
-                    .getJobschedulerMaster().getRestart().isTerminate());
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getRestart()
+                    .isTerminate());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
             }
@@ -77,9 +77,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         API_CALL += ABORT;
         LOGGER.debug(API_CALL);
         try {
-            setJobSchedulerIdentifier(urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
-                    .getJobschedulerMaster().isAbort());
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().isAbort());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
             }
@@ -99,9 +97,8 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         API_CALL += ABORT_AND_RESTART;
         LOGGER.debug(API_CALL);
         try {
-            setJobSchedulerIdentifier(urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
-                    .getJobschedulerMaster().getRestart().isAbort());
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getRestart()
+                    .isAbort());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
             }
@@ -122,9 +119,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         API_CALL += PAUSE;
         LOGGER.debug(API_CALL);
         try {
-            setJobSchedulerIdentifier(urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
-                    .getJobschedulerMaster().isPause());
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().isPause());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
             }
@@ -144,9 +139,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         API_CALL += CONTINUE;
         LOGGER.debug(API_CALL);
         try {
-            setJobSchedulerIdentifier(urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
-                    .getJobschedulerMaster().isContinue());
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().isContinue());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
             }
@@ -162,6 +155,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     private JOCDefaultResponse executeModifyJobSchedulerCommand(String cmd, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
+        getJobSchedulerInstanceByHostPort(urlTimeoutParamSchema);
         JSCmdModifySpooler jsCmdModifySpooler = new JSCmdModifySpooler(Globals.schedulerObjectFactory);
         jsCmdModifySpooler.setCmd(cmd);
         jsCmdModifySpooler.setTimeoutIfNotEmpty(urlTimeoutParamSchema.getTimeout());
@@ -171,9 +165,18 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 
-    private void setJobSchedulerIdentifier(HostPortTimeOutParameter jobSchedulerTerminateBody) {
-        jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerTerminateBody.getJobschedulerId());
+    private void getJobSchedulerInstanceByHostPort(HostPortTimeOutParameter jobSchedulerTerminateBody) throws Exception {
+        JobSchedulerIdentifier jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerTerminateBody.getJobschedulerId());
         jobSchedulerIdentifier.setHost(jobSchedulerTerminateBody.getHost());
         jobSchedulerIdentifier.setPort(jobSchedulerTerminateBody.getPort());
+
+        InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+        dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(jobSchedulerIdentifier);
+
+        if (dbItemInventoryInstance == null) {
+            String errMessage = String.format("jobschedulerId for host:%s and port:%s not found in table %s", jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
+                    DBLayer.TABLE_INVENTORY_INSTANCES);
+            throw new DBInvalidDataException(errMessage);
+        }
     }
 }

@@ -27,7 +27,6 @@ public class JOCResourceImpl {
 
     protected DBItemInventoryInstance dbItemInventoryInstance;
     protected JobSchedulerUser jobschedulerUser;
-    protected JobSchedulerIdentifier jobSchedulerIdentifier;
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
     private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private String accessToken;
