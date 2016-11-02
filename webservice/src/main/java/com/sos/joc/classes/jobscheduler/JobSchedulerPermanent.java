@@ -1,9 +1,13 @@
 package com.sos.joc.classes.jobscheduler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -16,6 +20,8 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;
 
 public class JobSchedulerPermanent {
    
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerPermanent.class);
+    
     public static JobSchedulerP getJobScheduler(DBItemInventoryInstance dbItemInventoryInstance) throws Exception {
         JobSchedulerP  jobscheduler = new JobSchedulerP();
         jobscheduler.setHost(dbItemInventoryInstance.getHostname());
@@ -31,12 +37,23 @@ public class JobSchedulerPermanent {
         clusterMemberTypeSchema.set_type(ClusterType.fromValue(dbItemInventoryInstance.getClusterType()));
         jobscheduler.setClusterType(clusterMemberTypeSchema);
         
-        InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
-        DBItemInventoryOperatingSystem osItem = osLayer.getInventoryOperatingSystem(dbItemInventoryInstance.getOsId());
+        Long osId = dbItemInventoryInstance.getOsId();
+        DBItemInventoryOperatingSystem osItem = null;
         OperatingSystem os = new OperatingSystem();
-        os.setArchitecture(osItem.getArchitecture());
-        os.setDistribution(osItem.getDistribution());
-        os.setName(osItem.getName());
+        if (osId != DBLayer.DEFAULT_ID) {
+            InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
+            osItem = osLayer.getInventoryOperatingSystem(dbItemInventoryInstance.getOsId());
+        }
+        if (osItem != null) {
+            os.setArchitecture(osItem.getArchitecture());
+            os.setDistribution(osItem.getDistribution());
+            os.setName(osItem.getName());
+        } else {
+            os.setArchitecture("");
+            os.setDistribution("");
+            os.setName("");
+            LOGGER.error("The operating system could not determine");
+        }
         jobscheduler.setOs(os);
         
         Long supervisorId = dbItemInventoryInstance.getSupervisorId();
