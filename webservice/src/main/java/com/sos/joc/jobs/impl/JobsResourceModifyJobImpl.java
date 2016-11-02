@@ -6,15 +6,11 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.classes.jobscheduler.BulkError;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -34,10 +30,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private static final String STOP = "stop";
     private static final String SET_RUN_TIME = "set_run_time";
     private static final String UNSTOP = "unstop";
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
-    private List<Err419> listOfErrors = new ArrayList<Err419>();
     private static String API_CALL = "./jobs/";
-
+    private List<Err419> listOfErrors = new ArrayList<Err419>();
+    
     @Override
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
         initLogging(API_CALL + STOP, modifyJobs);
@@ -119,11 +114,14 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private Date executeModifyJobCommand(ModifyJob modifyJob, String command) {
 
         try {
+            logAuditMessage(modifyJob);
+
+            checkRequiredParameter("job", modifyJob.getJob());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
-            jsCmdModifyJob.setCmdIfNotEmpty(command);
-            jsCmdModifyJob.setJobIfNotEmpty(modifyJob.getJob());
+            jsCmdModifyJob.setCmd(command);
+            jsCmdModifyJob.setJob(modifyJob.getJob());
             if (SET_RUN_TIME.equals(command)) {
                 try {
                     // TODO order.getRunTime() should be checked against

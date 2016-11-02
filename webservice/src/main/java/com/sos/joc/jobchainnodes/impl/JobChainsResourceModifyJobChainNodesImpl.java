@@ -6,15 +6,11 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.classes.jobscheduler.BulkError;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobchainnodes.resources.IJobChainsResourceModifyJobChainNodes;
@@ -27,13 +23,12 @@ import com.sos.scheduler.model.objects.JobChainNodeAction;
 @Path("job_chain_nodes")
 public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl implements IJobChainsResourceModifyJobChainNodes {
 
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private static final String ACTIVATE = "activate";
     private static final String SKIP = "skip";
     private static final String STOP = "stop";
-    private List<Err419> listOfErrors = new ArrayList<Err419>();
     private static String API_CALL = "./job_chain_nodes/";
-
+    private List<Err419> listOfErrors = new ArrayList<Err419>();
+    
     @Override
     public JOCDefaultResponse postJobChainNodesStop(String accessToken, ModifyJobChainNodes modifyNodes) {
         initLogging(API_CALL + STOP, modifyNodes);
@@ -74,7 +69,8 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
         }
     }
 
-    private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission, ModifyJobChainNodes jobChainNodes) throws Exception {
+    private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission, ModifyJobChainNodes jobChainNodes)
+            throws Exception {
         JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainNodes.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
@@ -94,6 +90,8 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
 
     private Date executeModifyJobChainNodeCommand(ModifyJobChainNode jobChainNode, String cmd) {
         try {
+            logAuditMessage(jobChainNode);
+
             checkRequiredParameter("jobChain", jobChainNode.getJobChain());
             checkRequiredParameter("node", jobChainNode.getNode());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());

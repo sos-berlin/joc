@@ -9,15 +9,11 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.classes.jobscheduler.BulkError;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -32,7 +28,6 @@ import com.sos.scheduler.model.objects.JSObjRunTime;
 @Path("orders")
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
 
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private static String API_CALL = "./orders/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
@@ -130,6 +125,11 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private Date executeModifyOrderCommand(ModifyOrder order, String command) {
 
         try {
+            if (order.getParams() != null && order.getParams().isEmpty()) {
+                order.setParams(null);
+            }
+            logAuditMessage(order);
+            
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());

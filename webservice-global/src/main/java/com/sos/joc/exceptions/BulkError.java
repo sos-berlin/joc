@@ -1,4 +1,4 @@
-package com.sos.joc.classes.jobscheduler;
+package com.sos.joc.exceptions;
 
 import java.util.Date;
 
@@ -6,9 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
-import com.sos.joc.exceptions.JocError;
-import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.StartJob;

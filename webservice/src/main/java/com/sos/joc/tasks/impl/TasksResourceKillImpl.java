@@ -7,8 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.w3c.dom.NodeList;
 
 import com.sos.joc.Globals;
@@ -16,7 +15,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.classes.jobscheduler.BulkError;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyTasks;
@@ -33,7 +32,6 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     private static final String TERMINATE_WITHIN = "terminate_within";
     private static final String TERMINATE = "terminate";
     private static final String END = "end";
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private static String API_CALL = "./tasks/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
@@ -115,6 +113,8 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 
     private List<TaskId> getTaskIds(TasksFilter job) {
         try {
+            logAuditMessage(job);
+            
             checkRequiredParameter("job", job.getJob());
             JSCmdShowJob jsCmdShowJob = Globals.schedulerObjectFactory.createShowJob();
             jsCmdShowJob.setJobName(job.getJob());

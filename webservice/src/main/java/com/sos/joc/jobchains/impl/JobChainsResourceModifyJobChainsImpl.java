@@ -6,15 +6,11 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.classes.jobscheduler.BulkError;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobchains.resource.IJobChainsResourceModifyJobChains;
@@ -27,12 +23,11 @@ import com.sos.scheduler.model.commands.JSCmdJobChainModify.enu4State;
 @Path("job_chains")
 public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implements IJobChainsResourceModifyJobChains {
 
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private static final String UNSTOP = "unstop";
     private static final String STOP = "stop";
-    private List<Err419> listOfErrors = new ArrayList<Err419>();
     private static String API_CALL = "./job_chains/";
-
+    private List<Err419> listOfErrors = new ArrayList<Err419>();
+    
     @Override
     public JOCDefaultResponse postJobChainsStop(String accessToken, ModifyJobChains modifyJobChains) {
         initLogging(API_CALL + STOP, modifyJobChains);
@@ -80,6 +75,8 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 
     private Date executeModifyJobChainCommand(ModifyJobChain jobChain, String cmd) {
         try {
+            logAuditMessage(jobChain);
+
             checkRequiredParameter("jobChain", jobChain.getJobChain());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             JSCmdJobChainModify jsCmdJobChainModify = new JSCmdJobChainModify(Globals.schedulerObjectFactory);

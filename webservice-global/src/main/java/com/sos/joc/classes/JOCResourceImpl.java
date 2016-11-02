@@ -28,8 +28,9 @@ public class JOCResourceImpl {
     protected DBItemInventoryInstance dbItemInventoryInstance;
     protected JobSchedulerUser jobschedulerUser;
     protected JobSchedulerIdentifier jobSchedulerIdentifier;
-    private String accessToken;
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
+    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
+    private String accessToken;
     private ObjectMapper mapper = new ObjectMapper();
     private JocError jocError = new JocError();
 
@@ -150,15 +151,7 @@ public class JOCResourceImpl {
             apiCall = "-";
         }
         strings[0] = "\nREQUEST: " + apiCall;
-        if (body != null) {
-            try {
-                strings[1] = "PARAMS: " + mapper.writeValueAsString(body);
-            } catch (JsonProcessingException e) {
-                strings[1] = "PARAMS: " + body.toString();
-            }
-        } else {
-            strings[1] = "PARAMS: -";
-        }
+        strings[1] = "PARAMS: " + getJsonString(body);
         try {
             strings[2] = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
         } catch (Exception e) {
@@ -167,12 +160,23 @@ public class JOCResourceImpl {
         return strings;
     }
     
-    public String getJsonString(Object body) {
+    public void logAuditMessage(Object body) {
         try {
-            return mapper.writeValueAsString(body);
-        } catch (JsonProcessingException e) {
-            return body.toString();
+            List<String> metaInfo = jocError.getMetaInfo();
+            String params = (body == null) ? metaInfo.get(1) : "PARAMS: " +  getJsonString(body);
+            AUDIT_LOGGER.info(String.format("%1$s%n%2$s%n%3$s", metaInfo.get(3), metaInfo.get(0), params));
+        } catch (Exception e) {}
+    }
+    
+    public String getJsonString(Object body) {
+        if (body != null) {
+            try {
+                return mapper.writeValueAsString(body);
+            } catch (JsonProcessingException e) {
+                return body.toString();
+            }
         }
+        return "-";
     }
 
     private JOCDefaultResponse init(String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws Exception {
