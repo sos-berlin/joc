@@ -22,7 +22,7 @@ public class JobSchedulerPermanent {
    
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerPermanent.class);
     
-    public static JobSchedulerP getJobScheduler(DBItemInventoryInstance dbItemInventoryInstance) throws Exception {
+    public static JobSchedulerP getJobScheduler(DBItemInventoryInstance dbItemInventoryInstance, boolean isSupervisorCall) throws Exception {
         JobSchedulerP  jobscheduler = new JobSchedulerP();
         jobscheduler.setHost(dbItemInventoryInstance.getHostname());
         jobscheduler.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
@@ -56,19 +56,21 @@ public class JobSchedulerPermanent {
         }
         jobscheduler.setOs(os);
         
-        Long supervisorId = dbItemInventoryInstance.getSupervisorId();
-        if (supervisorId != DBLayer.DEFAULT_ID) {
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstancesByKey(supervisorId);
-            if (schedulerSupervisorInstancesDBItem == null) {
-                throw new DBInvalidDataException(String.format("supervisor with Id = %s not found in table INVENTORY_INSTANCES", 
-                        dbItemInventoryInstance.getSupervisorId()));
-            } else {
-                HostPortParameter supervisor = new HostPortParameter();
-                supervisor.setHost(schedulerSupervisorInstancesDBItem.getHostname());
-                supervisor.setPort(schedulerSupervisorInstancesDBItem.getPort());
-                supervisor.setJobschedulerId(schedulerSupervisorInstancesDBItem.getSchedulerId());
-                jobscheduler.setSupervisor(supervisor);
+        if (!isSupervisorCall) {
+            Long supervisorId = dbItemInventoryInstance.getSupervisorId();
+            if (supervisorId != DBLayer.DEFAULT_ID) {
+                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+                DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstancesByKey(supervisorId);
+                if (schedulerSupervisorInstancesDBItem == null) {
+                    throw new DBInvalidDataException(String.format("supervisor with Id = %s not found in table INVENTORY_INSTANCES",
+                            dbItemInventoryInstance.getSupervisorId()));
+                } else {
+                    HostPortParameter supervisor = new HostPortParameter();
+                    supervisor.setHost(schedulerSupervisorInstancesDBItem.getHostname());
+                    supervisor.setPort(schedulerSupervisorInstancesDBItem.getPort());
+                    supervisor.setJobschedulerId(schedulerSupervisorInstancesDBItem.getSchedulerId());
+                    jobscheduler.setSupervisor(supervisor);
+                }
             }
         }
         return jobscheduler;

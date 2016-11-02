@@ -47,7 +47,7 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
                             .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
-                entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventorySupervisorInstance));
+                entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventorySupervisorInstance, true));
             } else {
                 entity.setJobscheduler(new JobSchedulerP());
             }

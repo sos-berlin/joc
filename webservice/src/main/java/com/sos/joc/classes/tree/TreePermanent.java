@@ -128,7 +128,6 @@ public class TreePermanent {
  
     public static void getTree(Tree rootTree, Set<String> folders) {
         for(String folder : folders) {
-            LOGGER.debug("*** getTree() processing folder: " + folder);
             Tree childTree = initTreeNode(rootTree, folder, null);
             if(childTree != null) {
                 if(folder.contains("/")) {
@@ -148,14 +147,11 @@ public class TreePermanent {
         if(folder.startsWith(tree.getPath())){
            return null; 
         } else {
-            LOGGER.debug("*** initTreeNode() processing folder: " + folder);
             Tree childTree = new Tree();
             if(folder.contains("/")) {
                 childTree.setName(folder.substring(0, folder.indexOf("/")));
-                LOGGER.debug("*** initTreeNode() processing name: " + childTree.getName());
             } else {
                 childTree.setName(folder);
-                LOGGER.debug("*** initTreeNode() processing name: " + childTree.getName());
             }
             String newPath = null;
             if(parentFolder != null) {
@@ -164,16 +160,13 @@ public class TreePermanent {
                     if(splits.length > 1){
                         newPath = parentFolder.substring(0, parentFolder.indexOf("/" + childTree.getName()) + ("/" + childTree.getName()).length());
                         childTree.setPath(newPath);
-                        LOGGER.debug("*** initTreeNode() processing path: " + newPath);
                     } else {
                         childTree.setPath(parentFolder);
-                        LOGGER.debug("*** initTreeNode() processing path: " + parentFolder);
                     }
                 }
             } else {
                 newPath = "/" + folder;
                 childTree.setPath(newPath);
-                LOGGER.debug("*** initTreeNode() processing path: " + newPath);
                 parentFolder = newPath;
             }
             if(folder != null && folder.contains("/")) {

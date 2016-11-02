@@ -5,6 +5,9 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import org.hibernate.HibernateException;
+
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.JobSchedulerPermanent;
@@ -27,8 +30,9 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            Globals.beginTransaction();
             JobSchedulerP200 entity = new JobSchedulerP200();
-            entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventoryInstance));
+            entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventoryInstance, false));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -38,6 +42,9 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerId));
             return JOCDefaultResponse.responseStatusJSError(e, err);
+        } finally {
+            Globals.rollback();
         }
     }
+    
 }
