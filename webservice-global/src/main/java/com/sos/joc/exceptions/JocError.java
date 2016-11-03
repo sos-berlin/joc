@@ -72,7 +72,7 @@ public class JocError extends Err{
         for (String str : metaInfo) {
             s.append(str).append("\n");
         }
-        return s.toString().trim();
+        return s.toString().replaceFirst("\\s+$", "");
     }
     
     @Override
@@ -83,6 +83,6 @@ public class JocError extends Err{
         for (String str : metaInfo) {
             s.append(str).append("\n");
         }
-        return s.toString();
+        return s.toString().replaceFirst("\\s+$", "");
     }
 }

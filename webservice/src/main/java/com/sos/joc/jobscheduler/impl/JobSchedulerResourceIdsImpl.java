@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -17,26 +18,24 @@ import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceIds;
 import com.sos.joc.model.jobscheduler.JobSchedulerIds;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJobSchedulerResourceIds {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceIdsImpl.class);
+
     private static final String API_CALL = "./jobscheduler/ids";
 
     @Override
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, null);
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissons(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
             Set<String> jobSchedulerIds = new HashSet<String>();
@@ -58,13 +57,11 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, null));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, null));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
-        } finally{
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
             Globals.rollback();
         }
 

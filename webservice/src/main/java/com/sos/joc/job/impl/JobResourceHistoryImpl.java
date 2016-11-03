@@ -29,7 +29,6 @@ import com.sos.scheduler.model.commands.JSCmdShowJob;
 public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResourceHistory {
 
     private static final String TASK_HISTORY = "task_history";
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobResourceHistoryImpl.class);
     private static final Integer DEFAULT_MAX_HISTORY_ITEMS = 25;
     private static final String XPATH_FOR_TASK_HISTORY = "/spooler/answer/job/history/history.entry";
     private static final String API_CALL = "./job/configuration";
@@ -37,9 +36,8 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
     @Override
     public JOCDefaultResponse postJobHistory(String accessToken, TaskHistoryFilter taskHistoryFilter) throws Exception {
 
-        LOGGER.debug(API_CALL);
-
         try {
+            initLogging(API_CALL, taskHistoryFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, taskHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getJob()
                     .getView().isHistory());
             if (jocDefaultResponse != null) {
@@ -100,12 +98,10 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, taskHistoryFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, taskHistoryFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
 
         }
     }
@@ -115,7 +111,7 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
         showJob.setMaxTaskHistory(BigInteger.valueOf(jobHistoryFilterSchema.getMaxLastHistoryItems()));
         showJob.setWhat(TASK_HISTORY);
         showJob.setJob(normalizePath(jobHistoryFilterSchema.getJob()));
-        return Globals.schedulerObjectFactory.toXMLString(showJob);
+        return showJob.toXMLString();
     }
 
 }

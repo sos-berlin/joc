@@ -28,54 +28,6 @@ import com.sos.joc.model.common.JobSchedulerObjectType;
 
 public class ConfigurationUtils {
 
-    public static Configuration200 getEntity(){
-        //only for dummy values
-        Configuration200 entity = new Configuration200();
-
-        entity.setDeliveryDate(new Date());
-        Configuration configuration = new Configuration();
-        configuration.setConfigurationDate(new Date());
-        ConfigurationContent content = new ConfigurationContent();
-        //content.setHtml("<html></html>");
-        content.setXml("<order><myXml/></order>");
-        configuration.setContent(content);
-        configuration.setPath("myPath");
-        configuration.setSurveyDate(new Date());
-        configuration.setType(JobSchedulerObjectType.ORDER);
-        entity.setConfiguration(configuration);
-        return entity;
-    }
-
-    public static String getSourceXmlString(Node sourceNode) throws Exception {
-        Source source = new DOMSource(sourceNode);
-        StringWriter writer = new StringWriter();
-        Result result = new StreamResult(writer);
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
-        transformer.transform(source, result);
-        return writer.toString();
-    }
-
-    public static String transformXmlToHtml(String xml, InputStream inputStream) throws Exception {
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        SOSXMLTransformer.transform(xml, new StreamSource(inputStream), result);
-        return writer.toString();
-    }
-    
-    public static ConfigurationContent getContent(boolean responseInHtml, String configurationXml) throws Exception {
-        ConfigurationContent content = new ConfigurationContent();
-        if(responseInHtml) {
-            InputStream inputStream = JOCResourceImpl.class.getResourceAsStream("/show_configuration.xsl");
-            content.setHtml(transformXmlToHtml("<source>" + configurationXml + "</source>", inputStream));
-        } else {
-            content.setXml(configurationXml);
-        }
-        return content;
-    }
-    
     public static Configuration200 getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
             boolean responseInHtml, String accessToken) throws Exception {
         jocXmlCommand.executePostWithThrowBadRequest(postCommand, accessToken);
@@ -94,5 +46,44 @@ public class ConfigurationUtils {
         entity.setConfiguration(configuration);
         entity.setDeliveryDate(new Date());
         return entity;
+    }
+    
+    public static String transformXmlToHtml(String xml, InputStream inputStream) throws Exception {
+        StringWriter writer = new StringWriter();
+        try {
+            StreamResult result = new StreamResult(writer);
+            SOSXMLTransformer.transform(xml, new StreamSource(inputStream), result);
+            return writer.toString();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+    
+    private static String getSourceXmlString(Node sourceNode) throws Exception {
+        Source source = new DOMSource(sourceNode);
+        StringWriter writer = new StringWriter();
+        Result result = new StreamResult(writer);
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
+        transformer.transform(source, result);
+        return writer.toString();
+    }
+
+    private static ConfigurationContent getContent(boolean responseInHtml, String configurationXml) throws Exception {
+        ConfigurationContent content = new ConfigurationContent();
+        if(responseInHtml) {
+            InputStream inputStream = JOCResourceImpl.class.getResourceAsStream("/show_configuration.xsl");
+            content.setHtml(transformXmlToHtml("<source>" + configurationXml + "</source>", inputStream));
+        } else {
+            content.setXml(configurationXml);
+        }
+        return content;
     }
 }
