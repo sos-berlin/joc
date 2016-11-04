@@ -9,9 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.joc.Globals;
@@ -19,7 +16,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.schedule.ScheduleP;
@@ -31,7 +27,6 @@ import com.sos.joc.schedules.resource.ISchedulesResourceP;
 @Path("schedules")
 public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedulesResourceP {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulesResourcePImpl.class);
     private static final String API_CALL = "./schedules/p";
     private String regex;
     private List<Folder> folders;
@@ -39,8 +34,8 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 
     @Override
     public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, schedulesFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule()
                     .getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -51,6 +46,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             schedules = schedulesFilter.getSchedules();
             regex = schedulesFilter.getRegex();
 
+            Globals.beginTransaction();
             InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(Globals.sosHibernateConnection);
             List<ScheduleP> listOfSchedules = new ArrayList<ScheduleP>();
 
@@ -87,12 +83,12 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, schedulesFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, schedulesFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.rollback();
         }
     }
 

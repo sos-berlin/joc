@@ -2072,12 +2072,12 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 		<xsl:param name="label_de"/>
 		<xsl:param name="label_en"/>
 		<xsl:choose>
-			<xsl:when test="$key and $lang_file and document($lang_file)">
+			<!--xsl:when test="$key and $lang_file and boolean(document($lang_file))">
 				<xsl:call-template name="i18n">
 					<xsl:with-param name="key" select="$key"/>
 					<xsl:with-param name="lang" select="$lang"/>
 				</xsl:call-template>
-			</xsl:when>
+			</xsl:when-->
 			<xsl:when test="$lang='de'">
 				<xsl:value-of select="$label_de"/>
 			</xsl:when>
@@ -2087,7 +2087,7 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 		</xsl:choose>
 	</xsl:template>
 
-	<xsl:template name="i18n">
+	<!--xsl:template name="i18n">
 	   <xsl:param name="lang"/>
 	   <xsl:param name="key"/>
 	   <xsl:variable name="tooltip" select="contains($key,'.tooltip')"/>
@@ -2116,7 +2116,7 @@ xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 	   			<xsl:copy-of select="$i18n_item/language[@id='en']/tooltip/node()"/>
 	   		</xsl:when>
 		</xsl:choose>
-	</xsl:template>
+	</xsl:template-->
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Template get_css -->
 	<xsl:template name="get_css">
 		<style type="text/css"><![CDATA[

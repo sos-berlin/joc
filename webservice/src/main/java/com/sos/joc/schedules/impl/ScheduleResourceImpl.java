@@ -9,8 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.sos.joc.Globals;
@@ -18,17 +16,16 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.schedule.ScheduleVolatile;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.schedules.resource.ISchedulesResource;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.schedule.SchedulePath;
 import com.sos.joc.model.schedule.ScheduleStateText;
 import com.sos.joc.model.schedule.ScheduleV;
 import com.sos.joc.model.schedule.SchedulesFilter;
 import com.sos.joc.model.schedule.SchedulesV;
+import com.sos.joc.schedules.resource.ISchedulesResource;
+import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("schedules")
 public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesResource {
@@ -38,16 +35,14 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
     private static final String WHAT = "folders";
     private static final String SUBSYSTEMS = "folder schedule";
     private static final String XPATH_SCHEDULES = "//schedule";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleResourceImpl.class);
     private static final String API_CALL = "./schedules";
     private SchedulesFilter schedulesFilter;
     private HashMap<String, String> mapOfSchedules;
 
     @Override
     public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, schedulesFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulesFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule()
                     .getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -104,12 +99,10 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, schedulesFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, schedulesFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 

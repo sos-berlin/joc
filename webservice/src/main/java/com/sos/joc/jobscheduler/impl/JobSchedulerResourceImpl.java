@@ -7,7 +7,6 @@ import javax.ws.rs.Path;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.JobSchedulerVolatile;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResource;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -22,6 +21,7 @@ public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSch
     public JOCDefaultResponse postJobscheduler(String accessToken, JobSchedulerId jobSchedulerBody) throws Exception {
 
         try {
+            initLogging(API_CALL, jobSchedulerBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerBody.getJobschedulerId(), getPermissons(accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -32,12 +32,10 @@ public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSch
             entity.setDeliveryDate(new Date());
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerBody));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerBody));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 

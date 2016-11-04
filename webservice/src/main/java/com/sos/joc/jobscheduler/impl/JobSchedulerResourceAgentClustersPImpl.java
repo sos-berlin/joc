@@ -9,29 +9,23 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.jitl.reporting.db.DBItemInventoryAgentCluster;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
-import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.agents.InventoryAgentsDBLayer;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
+import com.sos.joc.model.jobscheduler.AgentClusterFilter;
+import com.sos.joc.model.jobscheduler.AgentClusterP;
 import com.sos.joc.model.jobscheduler.AgentClusterPath;
 import com.sos.joc.model.jobscheduler.AgentClusterState;
 import com.sos.joc.model.jobscheduler.AgentClusterStateText;
 import com.sos.joc.model.jobscheduler.AgentClusterType;
-import com.sos.joc.model.jobscheduler.AgentClusterFilter;
-import com.sos.joc.model.jobscheduler.AgentClusterP;
 import com.sos.joc.model.jobscheduler.AgentClustersP;
 import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
@@ -39,12 +33,9 @@ import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
 import com.sos.joc.model.jobscheduler.OperatingSystem;
 
-;
-
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentClustersPImpl.class);
     private static final String API_CALL = "./jobscheduler/agent_clusters/p";
     private Boolean compact;
     private List<AgentClusterPath> agentClusters;
@@ -53,8 +44,8 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, jobSchedulerAgentClustersBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentClustersBody.getJobschedulerId(), getPermissons(accessToken)
                     .getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -108,12 +99,10 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerAgentClustersBody));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerAgentClustersBody));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 

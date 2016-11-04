@@ -9,16 +9,12 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JobChainPermanent;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchains.resource.IJobChainsResourceP;
 import com.sos.joc.model.common.Folder;
@@ -30,7 +26,6 @@ import com.sos.joc.model.jobChain.JobChainsP;
 @Path("job_chains")
 public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChainsResourceP {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainsResourcePImpl.class);
     private static final String API_CALL = "./job_chains/p";
     private Boolean compact;
     private List<Folder> folders;
@@ -40,14 +35,14 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
 
     @Override
     public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        LOGGER.debug(API_CALL);
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain()
-                .getView().isStatus());
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
+        
         try {
-            // FILTER
+            initLogging(API_CALL, jobChainsFilter);
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain()
+                    .getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
             compact = jobChainsFilter.getCompact();
             folders = jobChainsFilter.getFolders();
             jobChainPaths = jobChainsFilter.getJobChains();
@@ -118,12 +113,10 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobChainsFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobChainsFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 

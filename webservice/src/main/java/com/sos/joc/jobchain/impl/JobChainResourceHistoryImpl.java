@@ -6,14 +6,11 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceHistory;
 import com.sos.joc.model.jobChain.JobChainHistoryFilter;
@@ -31,14 +28,13 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     private static final String KEY_FOR_ERROR_NODE_LIST = "nodes";
     private static final String XPATH_FOR_ERROR_NODES = "//job_chain_node[@error_state='%s']";
     private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobChainResourceHistoryImpl.class);
     private static final String API_CALL = "./job_chain/history";
 
     @Override
     public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
 
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, jobChainHistoryFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainHistoryFilter.getJobschedulerId(), getPermissons(accessToken)
                     .getJobChain().getView().isHistory());
             if (jocDefaultResponse != null) {
@@ -97,12 +93,10 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobChainHistoryFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobChainHistoryFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
 
         }
     }

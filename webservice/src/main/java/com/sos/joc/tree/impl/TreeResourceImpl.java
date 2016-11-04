@@ -2,16 +2,12 @@ package com.sos.joc.tree.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Path;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
@@ -36,7 +32,6 @@ import com.sos.joc.db.inventory.locks.InventoryLocksDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -54,14 +49,12 @@ import com.sos.joc.tree.resource.ITreeResource;
 @Path("tree")
 public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TreeResourceImpl.class);
     private static final String API_CALL = "./tree";
 
     @Override
     public JOCDefaultResponse postTree(String accessToken, TreeFilter treeBody) throws Exception {
-        LOGGER.debug(API_CALL);
-
         try {
+            initLogging(API_CALL, treeBody);
             List<JobSchedulerObjectType> types = null;
             boolean permission = false;
             SOSPermissionJocCockpit sosPermission = getPermissons(accessToken);
@@ -109,16 +102,14 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, treeBody));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, treeBody));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
-    private void initJobSchedulerObjects (TreeView entity, List<JobSchedulerObjectType> types, Set<String> folderSet, Boolean compact)
+    private void initJobSchedulerObjects(TreeView entity, List<JobSchedulerObjectType> types, Set<String> folderSet, Boolean compact)
             throws Exception {
         List<JobP> outputJobs = new ArrayList<JobP>();
         List<JobChainP> outputJobChains = new ArrayList<JobChainP>();
@@ -131,8 +122,8 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventoryJobsDBLayer jobsLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventoryJob> jobsFromDb = new ArrayList<DBItemInventoryJob>();
                 for (String folder : folderSet) {
-                    List<DBItemInventoryJob> jobResults = jobsLayer.getInventoryJobsFilteredByFolder(folder, null, true,
-                            dbItemInventoryInstance.getId());
+                    List<DBItemInventoryJob> jobResults = jobsLayer.getInventoryJobsFilteredByFolder(folder, null, true, dbItemInventoryInstance
+                            .getId());
                     if (jobResults != null && !jobResults.isEmpty()) {
                         jobsFromDb.addAll(jobResults);
                     }
@@ -154,8 +145,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                     }
                 }
                 for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
-                    JobChainP jobChain = JobChainPermanent.initJobChainP(jobChainsLayer, jobChainFromDb, compact, dbItemInventoryInstance
-                            .getId());
+                    JobChainP jobChain = JobChainPermanent.initJobChainP(jobChainsLayer, jobChainFromDb, compact, dbItemInventoryInstance.getId());
                     if (jobChain != null) {
                         outputJobChains.add(jobChain);
                     }
@@ -164,8 +154,8 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventoryOrdersDBLayer ordersLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventoryOrder> ordersFromDb = new ArrayList<DBItemInventoryOrder>();
                 for (String folder : folderSet) {
-                    List<DBItemInventoryOrder> orderResults = ordersLayer.getInventoryOrdersFilteredByFolders(folder, true,
-                            dbItemInventoryInstance.getId());
+                    List<DBItemInventoryOrder> orderResults = ordersLayer.getInventoryOrdersFilteredByFolders(folder, true, dbItemInventoryInstance
+                            .getId());
                     if (orderResults != null && !orderResults.isEmpty()) {
                         ordersFromDb.addAll(orderResults);
                     }
@@ -175,8 +165,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventoryProcessClassesDBLayer pcLayer = new InventoryProcessClassesDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventoryProcessClass> pcsFromDb = new ArrayList<DBItemInventoryProcessClass>();
                 for (String folder : folderSet) {
-                    List<DBItemInventoryProcessClass> pcResults = pcLayer.getProcessClassesByFolders(folder, dbItemInventoryInstance.getId(),
-                            true);
+                    List<DBItemInventoryProcessClass> pcResults = pcLayer.getProcessClassesByFolders(folder, dbItemInventoryInstance.getId(), true);
                     if (pcResults != null && !pcResults.isEmpty()) {
                         pcsFromDb.addAll(pcResults);
                     }
@@ -186,8 +175,8 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventorySchedulesDBLayer schedulesLayer = new InventorySchedulesDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventorySchedule> schedulesFromDb = new ArrayList<DBItemInventorySchedule>();
                 for (String folder : folderSet) {
-                    List<DBItemInventorySchedule> scheduleResults = schedulesLayer.getSchedulesByFolders(folder, dbItemInventoryInstance
-                            .getId(), true);
+                    List<DBItemInventorySchedule> scheduleResults = schedulesLayer.getSchedulesByFolders(folder, dbItemInventoryInstance.getId(),
+                            true);
                     if (scheduleResults != null && !scheduleResults.isEmpty()) {
                         schedulesFromDb.addAll(scheduleResults);
                     }
@@ -243,11 +232,11 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
     }
 
     private void checkFoldersFilterParam(List<Folder> folders) throws Exception {
-        if(folders != null && !folders.isEmpty()) {
+        if (folders != null && !folders.isEmpty()) {
             for (Folder folder : folders) {
                 checkRequiredParameter("folder", folder.getFolder());
             }
         }
-        
+
     }
 }

@@ -32,8 +32,8 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     
     @Override
     public JOCDefaultResponse postJobsStart(String accessToken, StartJobs startJobs) throws Exception {
-        initLogging(API_CALL, startJobs);
         try {
+            initLogging(API_CALL, startJobs);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, startJobs.getJobschedulerId(), getPermissons(accessToken).getJob().getStart()
                     .isTask());
             if (jocDefaultResponse != null) {
