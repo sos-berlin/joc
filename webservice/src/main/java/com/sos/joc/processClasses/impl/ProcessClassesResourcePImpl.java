@@ -4,13 +4,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.joc.Globals;
@@ -18,7 +13,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.processclasses.ProcessClassPermanent;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.processClass.ProcessClassP;
@@ -30,7 +24,6 @@ import com.sos.joc.processClasses.resource.IProcessClassesResourceP;
 @Path("process_classes")
 public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IProcessClassesResourceP {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassesResourcePImpl.class);
     private static final String API_CALL = "./process_classes/p";
     private String regex;
     private List<Folder> folders;
@@ -38,13 +31,14 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
 
     @Override
     public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, processClassFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassFilter.getJobschedulerId(), getPermissons(accessToken).getLock()
                     .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            Globals.beginTransaction();
             processClasses = processClassFilter.getProcessClasses();
             folders = processClassFilter.getFolders();
             regex = processClassFilter.getRegex();
@@ -84,12 +78,12 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, processClassFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, processClassFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.rollback();
         }
     }
 

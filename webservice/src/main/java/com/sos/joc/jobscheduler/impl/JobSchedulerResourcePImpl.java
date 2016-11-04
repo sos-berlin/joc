@@ -5,13 +5,10 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import org.hibernate.HibernateException;
-
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.JobSchedulerPermanent;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceP;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -25,6 +22,7 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
     @Override
     public JOCDefaultResponse postJobschedulerP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
         try {
+            initLogging(API_CALL, jobSchedulerId);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -36,12 +34,10 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerId));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerId));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.rollback();
         }

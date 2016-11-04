@@ -5,29 +5,24 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrdersVCallable;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.order.OrderV200;
 import com.sos.joc.model.order.OrderFilter;
+import com.sos.joc.model.order.OrderV200;
 import com.sos.joc.order.resource.IOrderResource;
 
 @Path("order")
 public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderResourceImpl.class);
     private static final String API_CALL = "./order";
 
     @Override
     public JOCDefaultResponse postOrder(String accessToken, OrderFilter orderBody) throws Exception {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, orderBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
@@ -47,12 +42,10 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, orderBody));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, orderBody));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
 
     }

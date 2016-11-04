@@ -1,55 +1,81 @@
 package com.sos.joc.job.impl;
 
+import java.math.BigInteger;
+import java.util.regex.Pattern;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.exceptions.JocError;
+import com.sos.joc.classes.configuration.ConfigurationUtils;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobDescriptionResource;
 import com.sos.joc.model.job.JobFilter;
+import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobDescriptionResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobDescriptionResourceImpl.class);
     private static final String API_CALL = "./job/description";
+    private static final String XSL_FILE = "scheduler_job_documentation_v1.1.xsl";
 
     @Override
-    public JOCDefaultResponse getJobDescription(String accessToken, String jobschedulerId, String job) throws Exception {
-        LOGGER.debug(API_CALL);
+    public JOCDefaultResponse getJobDescription(String accessToken, String queryAccessToken, String jobschedulerId, String job) throws Exception {
         JobFilter jobFilter = new JobFilter();
 
         try {
             jobFilter.setJob(job);
             jobFilter.setJobschedulerId(jobschedulerId);
+            jobFilter.setCompact(null);
+            initLogging(API_CALL, jobFilter);
 
-            checkRequiredParameter("jobschedulerId", jobFilter.getJobschedulerId());
-            checkRequiredParameter("job", jobFilter.getJob());
+            if (accessToken == null) {
+                accessToken = queryAccessToken;
+            }
 
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissons(accessToken).getJob().getView()
                     .isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            // TODO
-            JocError err = new JocError();
-            err.setCode("JOC-404");
-            err.setMessage("The response of '" + API_CALL + "' is not yet implemented.");
-            throw new JocException(err);
-            // return JOCDefaultResponse.responseHtmlStatus200("TODO");
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobFilter));
-            return JOCDefaultResponse.responseHTMLStatusJSError(e);
 
+            checkRequiredParameter("jobschedulerId", jobFilter.getJobschedulerId());
+            checkRequiredParameter("job", jobFilter.getJob());
+
+            JOCJsonCommand jocJsonCommand = new JOCJsonCommand();
+            jocJsonCommand.setUriBuilderForJobs(dbItemInventoryInstance.getUrl());
+            jocJsonCommand.addJobDescriptionQuery();
+            JsonObjectBuilder builder = Json.createObjectBuilder();
+            builder.add("path", normalizePath(jobFilter.getJob()));
+            JsonObject json = jocJsonCommand.getJsonObjectFromPost(builder.build().toString(), accessToken);
+            String description = json.getString("description", "").trim();
+            if (description.isEmpty()) {
+                throw new JobSchedulerBadRequestException(String.format("%1$s doesn't have a description", jobFilter.getJob()));
+            }
+            if (Pattern.compile("<\\?xml-stylesheet [^\\?]* href\\s*=\\s*\"" + Pattern.quote(XSL_FILE) + "\"[^\\?]*\\?>").matcher(description).find()) {
+                // JITL-Job description
+                description = ConfigurationUtils.transformXmlToHtml(description, getClass().getResourceAsStream("/" + XSL_FILE));
+            }
+            return JOCDefaultResponse.responseHtmlStatus200(description);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseHTMLStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobFilter));
-            return JOCDefaultResponse.responseHTMLStatusJSError(e, err);
+            return JOCDefaultResponse.responseHTMLStatusJSError(e, getJocError());
         }
+    }
+
+    public String createJobDescriptionCommand(String job) {
+        JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
+        showJob.setMaxTaskHistory(BigInteger.valueOf(0));
+        showJob.setJob(normalizePath(job));
+        return showJob.toXMLString();
     }
 
 }

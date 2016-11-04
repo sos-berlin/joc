@@ -13,7 +13,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.JobSchedulerPermanent;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourcePSupervisor;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -28,6 +27,7 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
     @Override
     public JOCDefaultResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
         try {
+            initLogging(API_CALL, jobSchedulerId);
             Globals.beginTransaction();
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
                     .getJobschedulerMaster().getView().isStatus());
@@ -55,12 +55,10 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerId));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerId));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.rollback();
         }

@@ -66,6 +66,13 @@
             _scheduler.readCustomSettings();
             _scheduler.readGuiVersion();
             _scheduler.readCustomVersionedSettings();
+            _response = _scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster" subsystems="lock schedule process_class folder"/></commands>', false, false ); 
+            
+            _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
+            document.title  = _scheduler._host + ":" + _scheduler._port;
+            document.title += ( _scheduler._id ) ? "/" + _scheduler._id : "";
+            document.title += " - " + getTranslation('JobScheduler');
+            
             if( !_server_settings ) _scheduler.readCookies();
             
             onload_settings.update_seconds               = _scheduler._update_seconds;
@@ -82,11 +89,9 @@
             for( var state in _scheduler._radio_states ) {                      
                 onload_settings.radio_states[state]    = _scheduler._radio_states[state];
             }
-            _response = _scheduler.executeSynchron( '<commands><subsystem.show what="statistics"/><show_state what="folders cluster" subsystems="lock schedule process_class folder"/></commands>', false, false ); 
-            _scheduler.setState( _response.selectSingleNode( "/spooler/answer/state" ) );
-            document.title  = _scheduler._host + ":" + _scheduler._port;
-            document.title += ( _scheduler._id ) ? "/" + _scheduler._id : "";
-            document.title += " - " + getTranslation('JobScheduler');
+            for( var card in _scheduler._view ) {                      
+                onload_settings.view[card]             = _scheduler._view[card];
+            }
           }
           catch(E) {
             try {

@@ -9,16 +9,12 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.Folder;
@@ -30,7 +26,6 @@ import com.sos.joc.model.job.JobsP;
 @Path("jobs")
 public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourcePImpl.class);
     private static final String API_CALL = "./jobs/p";
     private String regex;
     private List<Folder> folders;
@@ -38,20 +33,20 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
     private Boolean isOrderJob;
 
     @Override
-    public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilterSchema) throws Exception {
-        LOGGER.debug(API_CALL);
+    public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter) throws Exception {
         try {
+            initLogging(API_CALL, jobsFilter);
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilterSchema.getJobschedulerId(), getPermissons(accessToken).getOrder()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissons(accessToken).getJob()
                     .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            Boolean compact = jobsFilterSchema.getCompact();
-            regex = jobsFilterSchema.getRegex();
-            folders = jobsFilterSchema.getFolders();
-            jobs = jobsFilterSchema.getJobs();
-            isOrderJob = jobsFilterSchema.getIsOrderJob();
+            Boolean compact = jobsFilter.getCompact();
+            regex = jobsFilter.getRegex();
+            folders = jobsFilter.getFolders();
+            jobs = jobsFilter.getJobs();
+            isOrderJob = jobsFilter.getIsOrderJob();
             List<JobP> listJobs = new ArrayList<JobP>();
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
             Long instanceId = dbItemInventoryInstance.getId();
@@ -67,12 +62,10 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobsFilterSchema));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobsFilterSchema));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.rollback();
         }

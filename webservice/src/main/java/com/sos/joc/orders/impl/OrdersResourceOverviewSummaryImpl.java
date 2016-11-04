@@ -2,14 +2,11 @@ package com.sos.joc.orders.impl;
 
 import java.time.Instant;
 import java.util.Date;
-import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersHistoricSummary;
@@ -19,13 +16,12 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSummary;
 @Path("orders")
 public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implements IOrdersResourceOverviewSummary {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceOverviewSummaryImpl.class);
     private static final String API_CALL = "./orders/overview/summary";
 
     @Override
     public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, ordersFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissons(accessToken).getOrder()
                     .getView().isStatus());
 
@@ -55,12 +51,10 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, ordersFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, ordersFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
 
     }

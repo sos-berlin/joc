@@ -6,15 +6,11 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.jobscheduler.BulkError;
-import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Err419;
@@ -25,15 +21,16 @@ import com.sos.scheduler.model.commands.JSCmdAddOrder;
 
 @Path("orders")
 public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandDeleteOrder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrdersResourceCommandDeleteOrderImpl.class);
-    private List<Err419> listOfErrors = new ArrayList<Err419>();
+
     private static final String API_CALL = "./orders/delete";
+    private List<Err419> listOfErrors = new ArrayList<Err419>();
     
     @Override
     public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrders modifyOrders) {
-        LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), getPermissons(accessToken).getOrder().getDelete().isTemporary());
+            initLogging(API_CALL, modifyOrders);
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), getPermissons(accessToken).getOrder()
+                    .getDelete().isTemporary());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -45,23 +42,24 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
                 surveyDate = executeDeleteOrderCommand(order);
             }
             if (listOfErrors.size() > 0) {
-                JocError err = new JocError();
-                err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-                return JOCDefaultResponse.responseStatus419(listOfErrors, err);
+                return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyOrders));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyOrders));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-    
+
     private Date executeDeleteOrderCommand(ModifyOrder order) {
         try {
+            if (order.getParams() != null && order.getParams().isEmpty()) {
+                order.setParams(null);
+            }
+            logAuditMessage(order);
+            
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
@@ -70,12 +68,12 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
             objOrder.setId(order.getOrderId());
             String xml = objOrder.toXMLString();
             jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
-            
+
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
-            listOfErrors.add(new BulkError().get(e, order));
+            listOfErrors.add(new BulkError().get(e, getJocError(), order));
         } catch (Exception e) {
-            listOfErrors.add(new BulkError().get(e, order));
+            listOfErrors.add(new BulkError().get(e, getJocError(), order));
         }
         return null;
     }

@@ -9,8 +9,6 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -22,7 +20,6 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.jobscheduler.JobSchedulerVolatile;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceClusterMembers;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -35,13 +32,12 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceClusterMembersImpl.class);
     private static final String API_CALL = "./jobscheduler/cluster/members";
 
     @Override
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, jobSchedulerFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissons(accessToken)
                     .getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
@@ -107,12 +103,10 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, jobSchedulerFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, jobSchedulerFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.rollback();
         }

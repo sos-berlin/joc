@@ -6,16 +6,12 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.jobscheduler.BulkError;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
@@ -34,114 +30,98 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private static final String STOP = "stop";
     private static final String SET_RUN_TIME = "set_run_time";
     private static final String UNSTOP = "unstop";
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobsResourceModifyJobImpl.class);
-    private List<Err419> listOfErrors = new ArrayList<Err419>();
     private static String API_CALL = "./jobs/";
-
+    private List<Err419> listOfErrors = new ArrayList<Err419>();
+    
     @Override
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
-        API_CALL += STOP;
-        LOGGER.debug(API_CALL);
+        initLogging(API_CALL + STOP, modifyJobs);
         try {
             return postJobsCommand(accessToken, STOP, getPermissons(accessToken).getJob().isStop(), modifyJobs);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
-        API_CALL += UNSTOP;
-        LOGGER.debug(API_CALL);
+        initLogging(API_CALL + UNSTOP, modifyJobs);
         try {
             return postJobsCommand(accessToken, UNSTOP, getPermissons(accessToken).getJob().isUnstop(), modifyJobs);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
-        API_CALL += SET_RUN_TIME;
-        LOGGER.debug(API_CALL);
+        initLogging(API_CALL + SET_RUN_TIME, modifyJobs);
         try {
             return postJobsCommand(accessToken, SET_RUN_TIME, getPermissons(accessToken).getJob().isSetRunTime(), modifyJobs);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        API_CALL += END;
-        LOGGER.debug(API_CALL);
+        initLogging(API_CALL + END, modifyJobs);
         try {
             return postJobsCommand(accessToken, END, getPermissons(accessToken).getJob().isEndAllTasks(), modifyJobs);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        API_CALL += SUSPEND;
-        LOGGER.debug(API_CALL);
+        initLogging(API_CALL + SUSPEND, modifyJobs);
         try {
             return postJobsCommand(accessToken, SUSPEND, getPermissons(accessToken).getJob().isSuspendAllTasks(), modifyJobs);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
     @Override
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        API_CALL += CONTINUE;
-        LOGGER.debug(API_CALL);
+        initLogging(API_CALL + CONTINUE, modifyJobs);
         try {
             return postJobsCommand(accessToken, CONTINUE, getPermissons(accessToken).getJob().isContinueAllTasks(), modifyJobs);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, modifyJobs));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
     private Date executeModifyJobCommand(ModifyJob modifyJob, String command) {
 
         try {
+            logAuditMessage(modifyJob);
+
+            checkRequiredParameter("job", modifyJob.getJob());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
-            jsCmdModifyJob.setCmdIfNotEmpty(command);
-            jsCmdModifyJob.setJobIfNotEmpty(modifyJob.getJob());
+            jsCmdModifyJob.setCmd(command);
+            jsCmdModifyJob.setJob(modifyJob.getJob());
             if (SET_RUN_TIME.equals(command)) {
                 try {
                     // TODO order.getRunTime() should be checked against
@@ -157,9 +137,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
-            listOfErrors.add(new BulkError().get(e, modifyJob));
+            listOfErrors.add(new BulkError().get(e, getJocError(), modifyJob));
         } catch (Exception e) {
-            listOfErrors.add(new BulkError().get(e, modifyJob));
+            listOfErrors.add(new BulkError().get(e, getJocError(), modifyJob));
         }
         return null;
     }
@@ -177,9 +157,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             surveyDate = executeModifyJobCommand(job, command);
         }
         if (listOfErrors.size() > 0) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, modifyJobs));
-            return JOCDefaultResponse.responseStatus419(listOfErrors, err);
+            return JOCDefaultResponse.responseStatus419(listOfErrors);
         }
         return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }

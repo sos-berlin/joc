@@ -1,12 +1,11 @@
-package com.sos.joc.classes.jobscheduler;
+package com.sos.joc.exceptions;
 
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
-import com.sos.joc.exceptions.JocException;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.StartJob;
@@ -19,98 +18,105 @@ import com.sos.joc.model.order.ModifyOrder;
 
 public class BulkError extends Err419 {
     private static final Logger LOGGER = LoggerFactory.getLogger(BulkError.class);
+    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private static final String ERROR_CODE = "JOC-419";
 
     public BulkError() {
         setSurveyDate(new Date());
     }
     
-    public Err419 get(JocException e, ModifyOrder order) {
-        setCodeAndMessage(e);
+    public Err419 get(JocException e, JocError jocError, ModifyOrder order) {
+        setCodeAndMessage(e, jocError);
         setPath(order);
         return this;
     }
     
-    public Err419 get(Throwable e, ModifyOrder order) {
-        setCodeAndMessage(e);
+    public Err419 get(Throwable e, JocError jocError, ModifyOrder order) {
+        setCodeAndMessage(e, jocError);
         setPath(order);
         return this;
     }
     
-    public Err419 get(JocException e, ModifyJob job) {
-        setCodeAndMessage(e);
+    public Err419 get(JocException e, JocError jocError, ModifyJob job) {
+        setCodeAndMessage(e, jocError);
         setPath(job.getJob());
         return this;
     }
     
-    public Err419 get(Throwable e, ModifyJob job) {
-        setCodeAndMessage(e);
+    public Err419 get(Throwable e, JocError jocError, ModifyJob job) {
+        setCodeAndMessage(e, jocError);
         setPath(job.getJob());
         return this;
     }
     
-    public Err419 get(JocException e, StartJob job) {
-        setCodeAndMessage(e);
+    public Err419 get(JocException e, JocError jocError, StartJob job) {
+        setCodeAndMessage(e, jocError);
         setPath(job.getJob());
         return this;
     }
     
-    public Err419 get(Throwable e, StartJob job) {
-        setCodeAndMessage(e);
+    public Err419 get(Throwable e, JocError jocError, StartJob job) {
+        setCodeAndMessage(e, jocError);
         setPath(job.getJob());
         return this;
     }
     
-    public Err419 get(JocException e, ModifyJobChain jobChain) {
-        setCodeAndMessage(e);
+    public Err419 get(JocException e, JocError jocError, ModifyJobChain jobChain) {
+        setCodeAndMessage(e, jocError);
         setPath(jobChain.getJobChain());
         return this;
     }
     
-    public Err419 get(Throwable e, ModifyJobChain jobChain) {
-        setCodeAndMessage(e);
+    public Err419 get(Throwable e, JocError jocError, ModifyJobChain jobChain) {
+        setCodeAndMessage(e, jocError);
         setPath(jobChain.getJobChain());
         return this;
     }
     
-    public Err419 get(JocException e, ModifyJobChainNode node) {
-        setCodeAndMessage(e);
+    public Err419 get(JocException e, JocError jocError, ModifyJobChainNode node) {
+        setCodeAndMessage(e, jocError);
         setPath(node);
         return this;
     }
     
-    public Err419 get(Throwable e, ModifyJobChainNode node) {
-        setCodeAndMessage(e);
+    public Err419 get(Throwable e, JocError jocError, ModifyJobChainNode node) {
+        setCodeAndMessage(e, jocError);
         setPath(node);
         return this;
     }
     
-    public Err419 get(JocException e, TasksFilter job, TaskId taskId) {
-        setCodeAndMessage(e);
+    public Err419 get(JocException e, JocError jocError, TasksFilter job, TaskId taskId) {
+        setCodeAndMessage(e, jocError);
         setPath(job, taskId);
         return this;
     }
     
-    public Err419 get(Throwable e, TasksFilter job, TaskId taskId) {
-        setCodeAndMessage(e);
+    public Err419 get(Throwable e, JocError jocError, TasksFilter job, TaskId taskId) {
+        setCodeAndMessage(e, jocError);
         setPath(job, taskId);
         return this;
     }
     
-    private void setCodeAndMessage(JocException e) {
+    private void setCodeAndMessage(JocException e, JocError jocError) {
         if (e instanceof JobSchedulerBadRequestException) {
             setSurveyDate(((JobSchedulerBadRequestException) e).getSurveyDate());
         }
-        setCode(e.getError().getCode());
-        setMessage(e.getError().getMessage());
+        JocError err = e.getError();
+        setCode(err.getCode());
+        setMessage(err.getMessage());
+        printMetaInfo(jocError);
+        printMetaInfo(err);
         LOGGER.error(getMessage(),e);
+        AUDIT_LOGGER.error(err.getMessage());
     }
     
-    private void setCodeAndMessage(Throwable e) {
+    private void setCodeAndMessage(Throwable e, JocError jocError) {
         setCode(ERROR_CODE);
         String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
         setMessage(errorMsg);
-        LOGGER.error(getMessage(),e);
+        printMetaInfo(jocError);
+        LOGGER.error(e.getMessage(),e);
+        AUDIT_LOGGER.error(errorMsg);
     }
     
     private void setPath(ModifyOrder order) {
@@ -119,6 +125,14 @@ public class BulkError extends Err419 {
             path.append(",").append(order.getOrderId());
         }
         setPath(path.toString());
+    }
+    
+    private void printMetaInfo(JocError jocError) {
+        String metaInfo = jocError.printMetaInfo();
+        if (!metaInfo.isEmpty()) {
+            LOGGER.info(metaInfo);
+            jocError.getMetaInfo().clear();
+        }
     }
     
     private void setPath(ModifyJobChainNode node) {

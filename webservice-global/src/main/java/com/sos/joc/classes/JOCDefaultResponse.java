@@ -98,7 +98,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
             LOGGER.info(e.getError().printMetaInfo());
         }
         
-        String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getError().getMessage();
+        String errorMsg = getErrorMessage(e);
         e.getError().setMessage(errorMsg);
         Err420 entity = new Err420();
         entity.setError(e.getError());
@@ -146,7 +146,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
             return responseStatusJSError((JocException) e.getCause());
         }
         Err420 entity = new Err420();
-        String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
+        String errorMsg = getErrorMessage(e);
         entity.setError(new JocError(errorMsg));
         entity.setSurveyDate(new Date());
         entity.setDeliveryDate(new Date());
@@ -173,7 +173,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
             return responseStatusJSError((JocException) e.getCause());
         }
         Err420 entity = new Err420();
-        String errorMsg = ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
+        String errorMsg = getErrorMessage(e);
         entity.setError(new JocError(errorMsg));
         entity.setSurveyDate(new Date());
         entity.setDeliveryDate(new Date());
@@ -228,12 +228,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (!"".equals(err.printMetaInfo())) {
             LOGGER.info(err.printMetaInfo());
         }
-        Errs errors = new Errs();
-        errors.setErrors(listOfErrors);
-
-        Response.ResponseBuilder responseBuilder = Response.status(419).header("Content-Type", MediaType.APPLICATION_JSON);
-        responseBuilder.entity(errors);
-        return new JOCDefaultResponse(responseBuilder.build());
+        return responseStatus419(listOfErrors);
     }
 
     public static JOCDefaultResponse responseStatus401(SOSShiroCurrentUserAnswer entity) {
@@ -291,6 +286,10 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         LOGGER.error(message);
         entity.setMessage(message);
         return entity;
+    }
+    
+    public static String getErrorMessage(Throwable e) {
+        return ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
     }
 
 }

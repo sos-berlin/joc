@@ -9,8 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.sos.joc.Globals;
@@ -18,7 +16,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -46,7 +43,6 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     private static final String WHAT = "folders";
     private static final String SUBSYSTEMS = "folder process_class";
     private static final String XPATH_PROCESS_CLASSES = "//process_class";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessClassesResourceImpl.class);
     private static final String API_CALL = "./process_classes";
 
     private ProcessClassesFilter processClassFilter;
@@ -54,8 +50,8 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
     @Override
     public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, processClassFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassFilter.getJobschedulerId(), getPermissons(accessToken)
                     .getProcessClass().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -127,12 +123,10 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             return JOCDefaultResponse.responseStatus200(entity);
 
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, processClassFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, processClassFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 

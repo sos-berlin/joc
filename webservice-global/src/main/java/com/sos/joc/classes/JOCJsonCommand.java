@@ -40,6 +40,10 @@ public class JOCJsonCommand {
         setUriBuilder(url, MASTER_API_PATH + "processClass");
     }
     
+    public void setUriBuilderForJobs(String url) {
+        setUriBuilder(url, MASTER_API_PATH + "job");
+    }
+    
     public void setUriBuilder(String url, String path) {
         StringBuilder s = new StringBuilder();
         s.append(url).append(path);
@@ -70,6 +74,10 @@ public class JOCJsonCommand {
     public void addProcessClassCompactQuery(boolean compact) {
         String returnQuery = (compact) ? "ProcessClassOverview" : "ProcessClassDetailed";
         uriBuilder.queryParam("return", returnQuery);
+    }
+    
+    public void addJobDescriptionQuery() {
+        uriBuilder.queryParam("return", "JobDescription");
     }
     
     public JsonObject getJsonObjectFromPost(String postBody, String csrfToken) throws Exception {

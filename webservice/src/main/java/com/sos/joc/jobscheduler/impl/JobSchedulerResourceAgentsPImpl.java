@@ -7,9 +7,6 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.joc.Globals;
@@ -17,7 +14,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.inventory.agents.InventoryAgentsDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentsP;
 import com.sos.joc.model.jobscheduler.AgentFilter;
@@ -31,13 +27,12 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;
 @Path("jobscheduler")
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceAgentsPImpl.class);
     private static final String API_CALL = "./jobscheduler/agents/p";
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {
-        LOGGER.debug(API_CALL);
         try {
+            initLogging(API_CALL, agentFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, agentFilter.getJobschedulerId(), getPermissons(accessToken)
                     .getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -65,12 +60,10 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, agentFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, agentFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 
