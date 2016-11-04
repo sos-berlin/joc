@@ -25,7 +25,6 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
 
         try {
             initLogging(API_CALL, taskFilter);
-
             JOCDefaultResponse jocDefaultResponse = init(accessToken, taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
                     .isTaskLog(), true);
             if (jocDefaultResponse != null) {

@@ -16,6 +16,9 @@ import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.xml.SOSXmlCommand;
 
+import sos.xml.exceptions.ConnectionRefusedException;
+import sos.xml.exceptions.NoResponseException;
+
 public class JOCXmlCommand extends SOSXmlCommand {
 
     public static final String XML_COMMAND_API_PATH = "/jobscheduler/master/api/command";
@@ -121,22 +124,23 @@ public class JOCXmlCommand extends SOSXmlCommand {
     }
     
     @Override
-    public String executePost(String xmlCommand) throws JobSchedulerConnectionRefusedException {
+    public String executePost(String xmlCommand) throws ConnectionRefusedException, NoResponseException {
         return executePost(xmlCommand, UUID.randomUUID().toString());
     }
     
     @Override
-    public String executePost(String xmlCommand, String accessToken) throws JobSchedulerConnectionRefusedException {
+    public String executePost(String xmlCommand, String accessToken) throws ConnectionRefusedException, NoResponseException {
         this.xmlCommand = xmlCommand;
-        try {
-            return super.executePost(xmlCommand,accessToken);
-        } catch (Exception e) {
-            throw new JobSchedulerConnectionRefusedException(getUrl(), e);
-        }
+        return super.executePost(xmlCommand,accessToken);
     }
     
     public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws Exception {
-        String s = executePost(xmlCommand, accessToken);
+        String s = null;
+        try {
+            s = executePost(xmlCommand, accessToken);
+        } catch (Exception e) {
+            throw new JobSchedulerConnectionRefusedException(e.getCause());
+        }
         throwJobSchedulerError();
         return s;
     }
