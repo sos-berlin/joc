@@ -57,6 +57,7 @@ public class ReportDBLayer extends DBLayer {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Long getTaskEstimatedDuration(String jobName) throws Exception {
         // from Table REPORT_EXECUTIONS
         try {
