@@ -76,7 +76,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                         jobscheduler = getJobScheduler(clusterMember, state, surveyDate);
                     } else {
                         DBItemInventoryInstance schedulerInstance = jobSchedulerClusterMemberUrls.get(clusterMember.getAttribute("host").toLowerCase()
-                                + ":" + clusterMember.getAttribute("tcp_port"));
+                                + ":" + clusterMember.getAttribute("http_port"));
                         if (schedulerInstance != null) {
                             jobscheduler = new JobSchedulerVolatile(schedulerInstance, accessToken).getJobScheduler();
                         } else {
@@ -124,7 +124,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         JobSchedulerV jobscheduler = new JobSchedulerV();
         jobscheduler.setHost(clusterMember.getAttribute("host"));
         jobscheduler.setJobschedulerId(clusterMember.getAttribute("cluster_member_id").replaceFirst("/[^/]+$", ""));
-        jobscheduler.setPort(Integer.parseInt(clusterMember.getAttribute("tcp_port")));
+        jobscheduler.setPort(Integer.parseInt(clusterMember.getAttribute("http_port")));
         jobscheduler.setStartedAt(JobSchedulerDate.getDateFromISO8601String(clusterMember.getAttribute("running_since")));
         jobscheduler.setState(state);
         jobscheduler.setSurveyDate(surveyDate);

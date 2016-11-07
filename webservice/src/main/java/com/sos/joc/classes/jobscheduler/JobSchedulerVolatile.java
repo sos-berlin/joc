@@ -58,7 +58,7 @@ public class JobSchedulerVolatile extends JobSchedulerV {
         Element stateElem = jocXmlCommand.executeXPath("/spooler/answer/state");
         setHost(stateElem.getAttribute("host"));
         setJobschedulerId(stateElem.getAttribute("id"));
-        setPort(Integer.parseInt(jocXmlCommand.getAttributeValue(stateElem, "tcp_port", "0")));
+        setPort(Integer.parseInt(jocXmlCommand.getAttributeValue(stateElem, "http_port", "0")));
         setStartedAt(JobSchedulerDate.getDateFromISO8601String(stateElem.getAttribute("running_since")));
         setState(getJobSchedulerState(stateElem));
         if (stateElem.hasAttribute("waiting_errno_text")) {
