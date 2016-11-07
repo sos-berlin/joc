@@ -47,7 +47,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             if (processClassPaths != null && !processClassPaths.isEmpty()) {
                 for (ProcessClassPath processClassPath : processClassPaths) {
                     checkRequiredParameter("processClass", processClassPath.getProcessClass());
-                    DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(processClassPath.getProcessClass(),
+                    DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePathForDB(processClassPath.getProcessClass()),
                             dbItemInventoryInstance.getId());
                     if (processClassFromDb == null) {
                         //LOGGER.warn(String.format("process class '%1$s' doesn't exist in table %2$s", processClassPath.getProcessClass(), DBLayer.DBITEM_INVENTORY_PROCESS_CLASSES));
@@ -58,9 +58,10 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             } else if (folders != null && !folders.isEmpty()) {
                 Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
                 for (Folder folder : folders) {
-                    List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(folder.getFolder(),
+                    List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(normalizePathForDB(folder.getFolder()),
                             dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-                    Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, processClassesFromDb, processClassFilter.getRegex());
+                    Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, processClassesFromDb,
+                            processClassFilter.getRegex());
                     mapOfProcessClasses.putAll(processClassesToAdd);
                 }
                 listOfProcessClasses = new ArrayList<ProcessClassP>(mapOfProcessClasses.values());

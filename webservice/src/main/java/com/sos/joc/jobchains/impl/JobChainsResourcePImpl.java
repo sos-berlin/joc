@@ -55,7 +55,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             List<JobChainP> jobChains = new ArrayList<JobChainP>();
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 for (JobChainPath jobChainPath : jobChainPaths) {
-                    DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(jobChainPath.getJobChain(), instanceId);
+                    DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(normalizePathForDB(jobChainPath.getJobChain()), instanceId);
                     JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                     if (jobChain != null) {
                         jobChains.add(jobChain);
@@ -64,21 +64,23 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChainsByFolder(folder.getFolder(), folder.getRecursive(),
-                            instanceId);
-                    for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
-                        JobChainP jobChain = null;
-                        if (regex != null && !regex.isEmpty()) {
-                            Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
-                            if (regExMatcher.find()) {
+                    List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChainsByFolder(normalizePathForDB(folder.getFolder()),
+                            folder.getRecursive(), instanceId);
+                    if (jobChainsFromDb != null) {
+                        for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
+                            JobChainP jobChain = null;
+                            if (regex != null && !regex.isEmpty()) {
+                                Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
+                                if (regExMatcher.find()) {
+                                    jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
+                                }
+                            } else {
                                 jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                             }
-                        } else {
-                            jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
-                        }
-                        if (jobChain != null) {
-                            jobChains.add(jobChain);
-                            initNestedJobChainsIfExists(dbLayer, jobChain);
+                            if (jobChain != null) {
+                                jobChains.add(jobChain);
+                                initNestedJobChainsIfExists(dbLayer, jobChain);
+                            }
                         }
                     }
                 }

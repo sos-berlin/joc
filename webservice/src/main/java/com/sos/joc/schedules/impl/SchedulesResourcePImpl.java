@@ -53,7 +53,8 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             if (schedules != null && !schedules.isEmpty()) {
                 List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
                 for (SchedulePath schedulePath : schedules) {
-                    DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(schedulePath.getSchedule(), dbItemInventoryInstance.getId());
+                    DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePathForDB(schedulePath.getSchedule()),
+                            dbItemInventoryInstance.getId());
                     ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
                     if (scheduleP != null) {
                         schedulesToAdd.add(scheduleP);
@@ -64,8 +65,8 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventorySchedule> schedulesFromDb = dbLayer.getSchedulesByFolders(folder.getFolder(), dbItemInventoryInstance.getId(),
-                            folder.getRecursive().booleanValue());
+                    List<DBItemInventorySchedule> schedulesFromDb = dbLayer.getSchedulesByFolders(normalizePathForDB(folder.getFolder()),
+                            dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
                     List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, schedulesFromDb, dbItemInventoryInstance);
                     if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                         listOfSchedules.addAll(schedulesToAdd);

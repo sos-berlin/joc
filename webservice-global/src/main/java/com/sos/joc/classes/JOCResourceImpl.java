@@ -106,6 +106,10 @@ public class JOCResourceImpl {
         return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
 
+    public String normalizePathForDB(String path) {
+        return normalizePath(path).replaceFirst("^/", "");
+    }
+
     public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null || paramVal.isEmpty()) {
             throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));

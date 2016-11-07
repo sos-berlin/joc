@@ -115,7 +115,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" and instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             if (recursive) {
-                query.setParameter("name", "%" + folderPath + "%");
+                query.setParameter("name", folderPath + "%");
             } else {
                 query.setParameter("name", folderPath);
             }

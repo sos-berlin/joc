@@ -50,16 +50,16 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (orderPaths != null && !orderPaths.isEmpty()) {
                 for (OrderPath order : orderPaths) {
-                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(order.getJobChain(), order.getOrderId(),
-                            instanceId);
+                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByOrders(normalizePathForDB(order.getJobChain()),
+                            order.getOrderId(), instanceId);
                     if (filteredOrders != null && !filteredOrders.isEmpty()) {
                         ordersFromDB.addAll(filteredOrders);
                     }
                 }
             } else if (foldersFilter != null && !foldersFilter.isEmpty()) {
                 for (Folder folder : foldersFilter) {
-                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(folder.getFolder(), folder.getRecursive(),
-                            instanceId);
+                    List<DBItemInventoryOrder> filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(normalizePathForDB(folder.getFolder()),
+                            folder.getRecursive(), instanceId);
                     if (filteredOrders != null && !filteredOrders.isEmpty()) {
                         ordersFromDB.addAll(filteredOrders);
                     }

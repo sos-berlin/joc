@@ -36,8 +36,8 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             Boolean compact = orderFilter.getCompact();
             OrderP200 entity = new OrderP200();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(orderFilter.getJobChain(), orderFilter.getOrderId(),
-                    instanceId);
+            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePathForDB(orderFilter.getJobChain()),
+                    orderFilter.getOrderId(), instanceId);
             OrderP order = new OrderP();
             order.setSurveyDate(dbItemInventoryOrder.getModified());
             order.setPath(dbItemInventoryOrder.getName());
