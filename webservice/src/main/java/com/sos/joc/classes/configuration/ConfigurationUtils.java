@@ -5,10 +5,9 @@ import java.io.StringWriter;
 import java.util.Date;
 
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -16,15 +15,14 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import sos.xml.SOSXMLTransformer;
-
-import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationContent;
 import com.sos.joc.model.common.JobSchedulerObjectType;
+
+import sos.xml.SOSXMLTransformer;
 
 public class ConfigurationUtils {
 
@@ -51,8 +49,7 @@ public class ConfigurationUtils {
     public static String transformXmlToHtml(String xml, InputStream inputStream) throws Exception {
         StringWriter writer = new StringWriter();
         try {
-            StreamResult result = new StreamResult(writer);
-            SOSXMLTransformer.transform(xml, new StreamSource(inputStream), result);
+            SOSXMLTransformer.transform(xml, new StreamSource(inputStream), new StreamResult(writer));
             return writer.toString();
         } catch (Exception e) {
             throw e;
@@ -65,21 +62,28 @@ public class ConfigurationUtils {
     }
     
     private static String getSourceXmlString(Node sourceNode) throws Exception {
-        Source source = new DOMSource(sourceNode);
         StringWriter writer = new StringWriter();
-        Result result = new StreamResult(writer);
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
-        transformer.transform(source, result);
-        return writer.toString();
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
+            transformer.transform(new DOMSource(sourceNode), new StreamResult(writer));
+            return writer.toString();
+        } catch (TransformerFactoryConfigurationError e) {
+            throw e;
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e) {
+            }
+        }
     }
 
     private static ConfigurationContent getContent(boolean responseInHtml, String configurationXml) throws Exception {
         ConfigurationContent content = new ConfigurationContent();
         if(responseInHtml) {
-            InputStream inputStream = JOCResourceImpl.class.getResourceAsStream("/show_configuration.xsl");
+            InputStream inputStream = ConfigurationUtils.class.getResourceAsStream("/show_configuration.xsl");
             content.setHtml(transformXmlToHtml("<source>" + configurationXml + "</source>", inputStream));
         } else {
             content.setXml(configurationXml);

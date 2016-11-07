@@ -6,6 +6,7 @@ import com.sos.auth.rest.SOSShiroCurrentUsersList;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JocCockpitProperties;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.scheduler.model.SchedulerObjectFactory;
@@ -17,18 +18,24 @@ public class Globals {
     public static SchedulerObjectFactory schedulerObjectFactory;
     public static HashMap<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
 
-    public static SOSHibernateConnection getConnection(String schedulerId) throws Exception {
+    public static SOSHibernateConnection getConnection(String schedulerId) throws JocException {
         if (sosSchedulerHibernateConnections == null) {
             sosSchedulerHibernateConnections = new HashMap<String, SOSHibernateConnection>();
         }
         SOSHibernateConnection sosHibernateConnection = sosSchedulerHibernateConnections.get(schedulerId);
         
         if (sosHibernateConnection == null) {
-            String confFile = getConfFile(schedulerId);
-            sosHibernateConnection = new SOSHibernateConnection(confFile);
-            sosHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
-            sosHibernateConnection.connect();
-            sosSchedulerHibernateConnections.put(schedulerId, sosHibernateConnection);
+            try {
+                String confFile = getConfFile(schedulerId);
+                sosHibernateConnection = new SOSHibernateConnection(confFile);
+                sosHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
+                sosHibernateConnection.connect();
+                sosSchedulerHibernateConnections.put(schedulerId, sosHibernateConnection);
+            } catch (JocException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new DBConnectionRefusedException(e);
+            }
         }
 
         return sosHibernateConnection;

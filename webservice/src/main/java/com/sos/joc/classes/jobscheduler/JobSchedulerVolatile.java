@@ -6,6 +6,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
@@ -26,7 +27,7 @@ public class JobSchedulerVolatile extends JobSchedulerV {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
         try {
             jocXmlCommand.executePost(getXMLCommand(), accessToken);
-        } catch (Exception e) {
+        } catch (JocException e) {
             return getUnreachableJobScheduler();
         }
         jocXmlCommand.throwJobSchedulerError();

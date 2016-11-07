@@ -1,33 +1,35 @@
 package com.sos.joc.classes.processclasses;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
+import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.model.processClass.ProcessClassP;
 
 
 public class ProcessClassPermanent {
 
-    public static List<ProcessClassP> getProcessClassesToAdd(InventoryProcessClassesDBLayer dbLayer,
+    public static Map<String, ProcessClassP> getProcessClassesMap(InventoryProcessClassesDBLayer dbLayer,
             List<DBItemInventoryProcessClass> processClassesFromDb, String regex) throws Exception {
-        List<ProcessClassP> processClassesToAdd = new ArrayList<ProcessClassP>();
+        Map<String, ProcessClassP> processClassesToAdd = new HashMap<String, ProcessClassP>();
         if (processClassesFromDb != null) {
             for (DBItemInventoryProcessClass processClassFromDb : processClassesFromDb) {
-                if (regex != null && !regex.isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(regex).matcher(processClassFromDb.getName());
-                    if (regExMatcher.find()) {
-                        processClassesToAdd.add(getProcessClassP(dbLayer, processClassFromDb));
-                    }
-                } else {
-                    processClassesToAdd.add(getProcessClassP(dbLayer, processClassFromDb));
+                if (!FilterAfterResponse.matchRegex(regex, processClassFromDb.getName())) {
+                    continue;
                 }
+                processClassesToAdd.put(processClassFromDb.getName(), getProcessClassP(dbLayer, processClassFromDb));
             }
         }
         return processClassesToAdd;
+    }
+    
+    public static List<ProcessClassP> getProcessClassesList(InventoryProcessClassesDBLayer dbLayer,
+            List<DBItemInventoryProcessClass> processClassesFromDb, String regex) throws Exception {
+        return new ArrayList<ProcessClassP>(getProcessClassesMap(dbLayer, processClassesFromDb, regex).values());
     }
 
     public static ProcessClassP getProcessClassP(InventoryProcessClassesDBLayer dbLayer, DBItemInventoryProcessClass processClassFromDb)

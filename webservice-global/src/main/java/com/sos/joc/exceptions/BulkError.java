@@ -105,7 +105,6 @@ public class BulkError extends Err419 {
         setCode(err.getCode());
         setMessage(err.getMessage());
         printMetaInfo(jocError);
-        printMetaInfo(err);
         LOGGER.error(getMessage(),e);
         AUDIT_LOGGER.error(err.getMessage());
     }

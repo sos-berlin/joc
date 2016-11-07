@@ -1,6 +1,7 @@
 package com.sos.joc.db.inventory.instances;
 
 import java.util.List;
+
 import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.scheduler.model.commands.JSCmdParamGet;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
@@ -25,7 +27,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken) throws Exception {
+    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken) throws DBInvalidDataException, DBMissingDataException {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
@@ -34,15 +36,19 @@ public class InventoryInstancesDBLayer extends DBLayer {
             List<DBItemInventoryInstance> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return getRunningJobSchedulerClusterMember(result, accessToken);
+            } else {
+                String errMessage = String.format("jobschedulerId %1$s not found in table %2$s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES);
+                throw new DBMissingDataException(errMessage);
             }
-            return null;
+        } catch (DBMissingDataException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryInstance getInventoryInstanceByHostPort(JobSchedulerIdentifier jobSchedulerIdentifier) throws Exception {
+    public DBItemInventoryInstance getInventoryInstanceByHostPort(JobSchedulerIdentifier jobSchedulerIdentifier) throws DBMissingDataException, DBInvalidDataException {
         try {
             String sql = String.format("from %s where hostname = :hostname and port = :port", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
@@ -60,8 +66,14 @@ public class InventoryInstancesDBLayer extends DBLayer {
                 } else {
                     return result.get(0);
                 }
+            } else {
+                String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
+                        jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
+                        DBLayer.TABLE_INVENTORY_INSTANCES);
+                throw new DBMissingDataException(errMessage);
             }
-            return null;
+        }catch (DBMissingDataException e){
+            throw e;
         }catch (DBInvalidDataException e){
             throw e;
         } catch (Exception ex) {
@@ -70,7 +82,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws Exception {
+    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws DBInvalidDataException   {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
@@ -87,7 +99,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryInstance> getInventoryInstances() throws Exception {
+    public List<DBItemInventoryInstance> getInventoryInstances() throws DBInvalidDataException {
         try {
             String sql = "from " + DBITEM_INVENTORY_INSTANCES;
             Query query = getConnection().createQuery(sql);
@@ -98,7 +110,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryInstance> getJobSchedulerIds() throws Exception {
+    public List<DBItemInventoryInstance> getJobSchedulerIds() throws DBInvalidDataException {
         try {
             String sql = String.format("from %1$s order by created desc", DBITEM_INVENTORY_INSTANCES);
             Query query = getConnection().createQuery(sql);
@@ -110,7 +122,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws Exception {
+    public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws DBInvalidDataException {
         try {
             String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);

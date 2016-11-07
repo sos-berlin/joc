@@ -170,7 +170,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                         pcsFromDb.addAll(pcResults);
                     }
                 }
-                outputProcessClasses.addAll(ProcessClassPermanent.getProcessClassesToAdd(pcLayer, pcsFromDb, null));
+                outputProcessClasses = ProcessClassPermanent.getProcessClassesList(pcLayer, pcsFromDb, null);
             } else if (type.equals(JobSchedulerObjectType.SCHEDULE)) {
                 InventorySchedulesDBLayer schedulesLayer = new InventorySchedulesDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventorySchedule> schedulesFromDb = new ArrayList<DBItemInventorySchedule>();

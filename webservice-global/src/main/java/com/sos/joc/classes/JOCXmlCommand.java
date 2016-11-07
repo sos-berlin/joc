@@ -11,13 +11,14 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.sos.exception.ConnectionRefusedException;
+import com.sos.exception.NoResponseException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
+import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.JocException;
 import com.sos.xml.SOSXmlCommand;
-
-import sos.xml.exceptions.ConnectionRefusedException;
-import sos.xml.exceptions.NoResponseException;
 
 public class JOCXmlCommand extends SOSXmlCommand {
 
@@ -123,24 +124,25 @@ public class JOCXmlCommand extends SOSXmlCommand {
         }
     }
     
-    @Override
-    public String executePost(String xmlCommand) throws ConnectionRefusedException, NoResponseException {
+    public String executePost(String xmlCommand) throws JobSchedulerNoResponseException, JobSchedulerConnectionRefusedException {
         return executePost(xmlCommand, UUID.randomUUID().toString());
     }
     
-    @Override
-    public String executePost(String xmlCommand, String accessToken) throws ConnectionRefusedException, NoResponseException {
+    public String executePost(String xmlCommand, String accessToken) throws JobSchedulerNoResponseException, JobSchedulerConnectionRefusedException {
         this.xmlCommand = xmlCommand;
-        return super.executePost(xmlCommand,accessToken);
-    }
-    
-    public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws Exception {
         String s = null;
         try {
-            s = executePost(xmlCommand, accessToken);
+            s = executeXMLPost(xmlCommand, accessToken);
+        } catch (NoResponseException e) {
+            throw new JobSchedulerNoResponseException(e.getCause());
         } catch (Exception e) {
             throw new JobSchedulerConnectionRefusedException(e.getCause());
         }
+        return s;
+    }
+    
+    public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws Exception {
+        String s = executePost(xmlCommand, accessToken);
         throwJobSchedulerError();
         return s;
     }

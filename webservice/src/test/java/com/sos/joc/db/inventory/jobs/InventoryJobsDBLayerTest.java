@@ -19,7 +19,6 @@ public class InventoryJobsDBLayerTest {
 
     @Test
     public void getJobSchedulerJobs() throws Exception {
-        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
         InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);

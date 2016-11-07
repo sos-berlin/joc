@@ -2,6 +2,8 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
+import com.sos.exception.ConnectionRefusedException;
+import com.sos.exception.NoResponseException;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -10,22 +12,21 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
+import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 import com.sos.scheduler.model.commands.JSCmdModifySpooler;
 
-import sos.xml.exceptions.ConnectionRefusedException;
-import sos.xml.exceptions.NoResponseException;
-
 @Path("jobscheduler")
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobScheduler {
 
     private static final String TERMINATE = "terminate";
-    private static final String[] RESTART = {"restart","terminate_and_restart"};
-    private static final String[] ABORT = {"abort", "abort_immediately"};
-    private static final String[] ABORT_AND_RESTART = {"abort_and_restart", "abort_immediately_and_restart"};
+    private static final String[] RESTART = { "restart", "terminate_and_restart" };
+    private static final String[] ABORT = { "abort", "abort_immediately" };
+    private static final String[] ABORT_AND_RESTART = { "abort_and_restart", "abort_immediately_and_restart" };
     private static final String PAUSE = "pause";
     private static final String CONTINUE = "continue";
     private static String API_CALL = "./jobscheduler/";
@@ -149,10 +150,10 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         if (cmd.contains(ABORT[0])) {
             try {
                 jocXmlCommand.executePost(jsCmdModifySpooler.toXMLString(), getAccessToken());
-            } catch (NoResponseException e) {
-                //JobScheduler sends always no response if "abort" is called
-            } catch (ConnectionRefusedException e) {
-                throw new JobSchedulerConnectionRefusedException(e.getCause());
+            } catch (JobSchedulerNoResponseException e) {
+                // JobScheduler sends always no response if "abort" is called
+            } catch (JobSchedulerConnectionRefusedException e) {
+                throw e;
             }
         } else {
             jocXmlCommand.executePostWithThrowBadRequest(jsCmdModifySpooler.toXMLString(), getAccessToken());
@@ -160,7 +161,8 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 
-    private void getJobSchedulerInstanceByHostPort(HostPortTimeOutParameter jobSchedulerTerminateBody) throws Exception {
+    private void getJobSchedulerInstanceByHostPort(HostPortTimeOutParameter jobSchedulerTerminateBody) throws DBInvalidDataException,
+            DBMissingDataException {
         JobSchedulerIdentifier jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerTerminateBody.getJobschedulerId());
         jobSchedulerIdentifier.setHost(jobSchedulerTerminateBody.getHost());
         jobSchedulerIdentifier.setPort(jobSchedulerTerminateBody.getPort());
@@ -169,8 +171,9 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(jobSchedulerIdentifier);
 
         if (dbItemInventoryInstance == null) {
-            String errMessage = String.format("jobschedulerId for host:%s and port:%s not found in table %s", jobSchedulerIdentifier.getHost(),
-                    jobSchedulerIdentifier.getPort(), DBLayer.TABLE_INVENTORY_INSTANCES);
+            String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
+                    jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
+                    DBLayer.TABLE_INVENTORY_INSTANCES);
             throw new DBInvalidDataException(errMessage);
         }
     }

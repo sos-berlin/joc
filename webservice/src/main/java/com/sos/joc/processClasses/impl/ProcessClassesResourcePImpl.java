@@ -3,7 +3,9 @@ package com.sos.joc.processClasses.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 
@@ -25,9 +27,6 @@ import com.sos.joc.processClasses.resource.IProcessClassesResourceP;
 public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IProcessClassesResourceP {
 
     private static final String API_CALL = "./process_classes/p";
-    private String regex;
-    private List<Folder> folders;
-    private List<ProcessClassPath> processClasses;
 
     @Override
     public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
@@ -39,40 +38,35 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 return jocDefaultResponse;
             }
             Globals.beginTransaction();
-            processClasses = processClassFilter.getProcessClasses();
-            folders = processClassFilter.getFolders();
-            regex = processClassFilter.getRegex();
             ProcessClassesP entity = new ProcessClassesP();
             InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(Globals.sosHibernateConnection);
             List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
-            if (processClasses != null && !processClasses.isEmpty()) {
-                List<ProcessClassP> processClassesToAdd = new ArrayList<ProcessClassP>();
-                for (ProcessClassPath processClassPath : processClasses) {
+            List<ProcessClassPath> processClassPaths = processClassFilter.getProcessClasses();
+            List<Folder> folders = processClassFilter.getFolders();
+            
+            if (processClassPaths != null && !processClassPaths.isEmpty()) {
+                for (ProcessClassPath processClassPath : processClassPaths) {
+                    checkRequiredParameter("processClass", processClassPath.getProcessClass());
                     DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(processClassPath.getProcessClass(),
                             dbItemInventoryInstance.getId());
-                    ProcessClassP processClass = ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb);
-                    if (processClass != null) {
-                        processClassesToAdd.add(processClass);
+                    if (processClassFromDb == null) {
+                        //LOGGER.warn(String.format("process class '%1$s' doesn't exist in table %2$s", processClassPath.getProcessClass(), DBLayer.DBITEM_INVENTORY_PROCESS_CLASSES));
+                        continue;
                     }
-                }
-                if (processClassesToAdd != null && !processClassesToAdd.isEmpty()) {
-                    listOfProcessClasses.addAll(processClassesToAdd);
+                    listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));
                 }
             } else if (folders != null && !folders.isEmpty()) {
+                Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
                 for (Folder folder : folders) {
                     List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(folder.getFolder(),
                             dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-                    List<ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesToAdd(dbLayer, processClassesFromDb, regex);
-                    if (processClassesToAdd != null && !processClassesToAdd.isEmpty()) {
-                        listOfProcessClasses.addAll(processClassesToAdd);
-                    }
+                    Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, processClassesFromDb, processClassFilter.getRegex());
+                    mapOfProcessClasses.putAll(processClassesToAdd);
                 }
+                listOfProcessClasses = new ArrayList<ProcessClassP>(mapOfProcessClasses.values());
             } else {
                 List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClasses(dbItemInventoryInstance.getId());
-                List<ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesToAdd(dbLayer, processClassesFromDb, regex);
-                if (processClassesToAdd != null && !processClassesToAdd.isEmpty()) {
-                    listOfProcessClasses.addAll(processClassesToAdd);
-                }
+                listOfProcessClasses = ProcessClassPermanent.getProcessClassesList(dbLayer, processClassesFromDb, processClassFilter.getRegex());
             }
             entity.setProcessClasses(listOfProcessClasses);
             entity.setDeliveryDate(Date.from(Instant.now()));

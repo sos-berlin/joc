@@ -13,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
@@ -132,7 +133,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            
             JSCmdModifyOrder jsCmdModifyOrder = Globals.schedulerObjectFactory.createModifyOrder();
             jsCmdModifyOrder.setJobChain(order.getJobChain());
             jsCmdModifyOrder.setOrder(order.getOrderId());
@@ -182,16 +183,19 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             case "set_run_time":
                 if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
                     try {
-                        // TODO order.getRunTime() is checked against
-                        // scheduler.xsd
+                        ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
                         JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, order.getRunTime());
                         jsCmdModifyOrder.setRunTime(objRuntime);
+                    } catch (JocException e) {
+                        throw e;
                     } catch (Exception e) {
                         throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
                     }
                 }
             }
             String xml = jsCmdModifyOrder.toXMLString();
+            
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

@@ -1,6 +1,5 @@
 package com.sos.joc.exceptions;
 
-
 public class JocException extends Exception {
 
     private static final long serialVersionUID = 1L;

@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.common.JobSchedulerId;
+import com.sos.joc.model.jobscheduler.HostPortParameter;
 
  
 public interface IJobSchedulerResource {
@@ -17,12 +17,5 @@ public interface IJobSchedulerResource {
     @Consumes(MediaType.APPLICATION_JSON )
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobscheduler(            
-            @HeaderParam("access_token") String accessToken, JobSchedulerId jobSchedulerFilterSchema) throws Exception;
-
-
- 
-   
-
-  
-    
+            @HeaderParam("access_token") String accessToken, HostPortParameter jobSchedulerFilter) throws Exception;
 }
