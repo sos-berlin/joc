@@ -92,7 +92,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         if (folder != null) {
             showState.setPath(("/"+folder).replaceAll("//+", "/"));
         }
-        return showState.toXMLString();
+        return showState.toXMLString().replaceFirst("<\\?xml[^>\\?]*\\?>", "");
     }
 
     private String createShowJobPostCommand(String job, boolean compact) {
@@ -104,7 +104,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         showJob.setJobName(job);
         // showJob.setMaxOrders(BigInteger.valueOf(0));
         showJob.setMaxTaskHistory(BigInteger.valueOf(0));
-        return showJob.toXMLString();
+        return showJob.toXMLString().replaceFirst("<\\?xml[^>\\?]*\\?>", "");
     }
     
     private List<JobV> getJobs(String command, JobsFilter jobsFilter) throws Exception {

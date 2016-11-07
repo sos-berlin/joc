@@ -134,9 +134,13 @@ public class JOCXmlCommand extends SOSXmlCommand {
         try {
             s = executeXMLPost(xmlCommand, accessToken);
         } catch (NoResponseException e) {
-            throw new JobSchedulerNoResponseException(e.getCause());
+            JobSchedulerNoResponseException ee = new JobSchedulerNoResponseException(e.getCause());
+            ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
+            throw ee;
         } catch (Exception e) {
-            throw new JobSchedulerConnectionRefusedException(e.getCause());
+            JobSchedulerConnectionRefusedException ee = new JobSchedulerConnectionRefusedException(e.getCause());
+            ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
+            throw ee;
         }
         return s;
     }

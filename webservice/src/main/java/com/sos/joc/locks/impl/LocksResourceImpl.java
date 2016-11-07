@@ -126,6 +126,6 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
         if (folder != null) {
             showState.setPath(("/" + folder).replaceAll("//+", "/"));
         }
-        return showState.toXMLString();
+        return showState.toXMLString().replaceFirst("<\\?xml[^>\\?]*\\?>", "");
     }
 }

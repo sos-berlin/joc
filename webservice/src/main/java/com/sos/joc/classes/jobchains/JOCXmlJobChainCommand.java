@@ -120,7 +120,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
             showState.setPath(("/"+folder).replaceAll("//+", "/"));
         }
         showState.setMaxOrderHistory(BigInteger.valueOf(0));
-        return showState.toXMLString();
+        return showState.toXMLString().replaceFirst("<\\?xml[^>\\?]*\\?>", "");
     }
 
     private String createShowJobChainPostCommand(String jobChain, boolean compact) {
@@ -133,7 +133,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         }
         showJobChain.setJobChain(jobChain);
         showJobChain.setMaxOrderHistory(BigInteger.valueOf(0));
-        return showJobChain.toXMLString();
+        return showJobChain.toXMLString().replaceFirst("<\\?xml[^>\\?]*\\?>", "");
     }
     
     private List<JobChainV> getJobChains(String command, JobChainsFilter jobChainsFilter) throws Exception {
