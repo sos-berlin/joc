@@ -70,6 +70,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS);
             sql.append(" where agentInstanceId = :agentInstanceId");
             sql.append(" and instanceId = :instanceId");
+            sql.append(" order by ordering");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("agentInstanceId", agentInstanceId);
@@ -92,6 +93,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS);
             sql.append(" where agentClusterId = :agentClusterId");
             sql.append(" and instanceId = :instanceId");
+            sql.append(" order by ordering");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("agentClusterId", agentClusterId);

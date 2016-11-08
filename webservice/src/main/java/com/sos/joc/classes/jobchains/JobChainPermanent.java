@@ -49,68 +49,70 @@ public class JobChainPermanent {
             List<JobChainNodeP> jobChainNodes = new ArrayList<JobChainNodeP>();
             List<EndNode> jobChainEndNodes = new ArrayList<EndNode>();
             List<FileWatchingNodeP> jobChainFileOrderSources = new ArrayList<FileWatchingNodeP>();
-            for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
-                switch(node.getNodeType()) {
-                case 1:
-                    // JobNode -> Nodes
-                case 2:
-                    // JobChainNode -> Nodes
-                    JobChainNodeP jobChainNode = new JobChainNodeP();
-                    jobChainNode.setDelay(node.getDelay());
-                    jobChainNode.setErrorNode(node.getErrorState());
-                    JobChainNodeJobP job = new JobChainNodeJobP();
-                    if(node.getJob() != null && !"".equalsIgnoreCase(node.getJob())) {
-                        job.setPath(node.getJobName());
-                        jobChainNode.setJob(job);
-                    } else {
-                        jobChainNode.setJob(null);
+            if (jobChainNodesFromDb != null) {
+                for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
+                    switch (node.getNodeType()) {
+                    case 1:
+                        // JobNode -> Nodes
+                    case 2:
+                        // JobChainNode -> Nodes
+                        JobChainNodeP jobChainNode = new JobChainNodeP();
+                        jobChainNode.setDelay(node.getDelay());
+                        jobChainNode.setErrorNode(node.getErrorState());
+                        JobChainNodeJobP job = new JobChainNodeJobP();
+                        if (node.getJob() != null && !"".equalsIgnoreCase(node.getJob())) {
+                            job.setPath(node.getJobName());
+                            jobChainNode.setJob(job);
+                        } else {
+                            jobChainNode.setJob(null);
+                        }
+                        JobChainNodeJobChainP nodeJobChain = new JobChainNodeJobChainP();
+                        if (node.getNestedJobChainName() != null && !DBLayer.DEFAULT_NAME.equalsIgnoreCase(node.getNestedJobChainName())) {
+                            nodeJobChain.setPath(node.getNestedJobChainName());
+                            jobChainNode.setJobChain(nodeJobChain);
+                        } else {
+                            jobChainNode.setJobChain(null);
+                        }
+                        //                    jobChainNode.setLevel(???);
+                        jobChainNode.setName(node.getState());
+                        jobChainNode.setNextNode(node.getNextState());
+                        jobChainNode.setOnError(node.getOnError());
+                        jobChainNodes.add(jobChainNode);
+                        if (node.getNestedJobChainName() != null && !node.getNestedJobChainName().equalsIgnoreCase(DBLayer.DEFAULT_NAME)) {
+                            NESTED_JOB_CHAIN_NAMES.add(node.getNestedJobChainName());
+                        } else if (node.getNestedJobChain() != null) {
+                            NESTED_JOB_CHAIN_NAMES.add(node.getNestedJobChain());
+                        }
+                        break;
+                    case 3:
+                        // FileOrderSource -> FileOrderSource
+                        FileWatchingNodeP fileOrderSource = new FileWatchingNodeP();
+                        fileOrderSource.setDirectory(node.getDirectory());
+                        fileOrderSource.setNextNode(node.getNextState());
+                        fileOrderSource.setRegex(node.getRegex());
+                        jobChainFileOrderSources.add(fileOrderSource);
+                        break;
+                    case 4:
+                        // FileOrderSink -> EndNode
+                        EndNode fileOrderSink = new EndNode();
+                        fileOrderSink.setName(node.getState());
+                        if (node.getFileSinkOp() == 1) {
+                            fileOrderSink.setMove(node.getMovePath());
+                            fileOrderSink.setRemove(false);
+                        } else if (node.getFileSinkOp() == 2) {
+                            fileOrderSink.setRemove(true);
+                        }
+                        jobChainEndNodes.add(fileOrderSink);
+                        break;
+                    case 5:
+                        // EndNode -> EndNode
+                        EndNode endNode = new EndNode();
+                        endNode.setName(node.getState());
+                        jobChainEndNodes.add(endNode);
+                        break;
                     }
-                    JobChainNodeJobChainP nodeJobChain = new JobChainNodeJobChainP();
-                    if(node.getNestedJobChainName() != null && !DBLayer.DEFAULT_NAME.equalsIgnoreCase(node.getNestedJobChainName())) {
-                        nodeJobChain.setPath(node.getNestedJobChainName());
-                        jobChainNode.setJobChain(nodeJobChain);
-                    } else {
-                        jobChainNode.setJobChain(null);
-                    }
-//                    jobChainNode.setLevel(???);
-                    jobChainNode.setName(node.getState());
-                    jobChainNode.setNextNode(node.getNextState());
-                    jobChainNode.setOnError(node.getOnError());
-                    jobChainNodes.add(jobChainNode);
-                    if(node.getNestedJobChainName() != null && !node.getNestedJobChainName().equalsIgnoreCase(DBLayer.DEFAULT_NAME)) {
-                        NESTED_JOB_CHAIN_NAMES.add(node.getNestedJobChainName());
-                    } else if (node.getNestedJobChain() != null) {
-                        NESTED_JOB_CHAIN_NAMES.add(node.getNestedJobChain());
-                    }
-                    break;
-                case 3:
-                    // FileOrderSource -> FileOrderSource
-                    FileWatchingNodeP fileOrderSource = new FileWatchingNodeP();
-                    fileOrderSource.setDirectory(node.getDirectory());
-                    fileOrderSource.setNextNode(node.getNextState());
-                    fileOrderSource.setRegex(node.getRegex());
-                    jobChainFileOrderSources.add(fileOrderSource);
-                    break;
-                case 4:
-                    // FileOrderSink -> EndNode
-                    EndNode fileOrderSink = new EndNode();
-                    fileOrderSink.setName(node.getState());
-                    if (node.getFileSinkOp() == 1) {
-                        fileOrderSink.setMove(node.getMovePath());
-                        fileOrderSink.setRemove(false);
-                    } else if (node.getFileSinkOp() == 2) {
-                        fileOrderSink.setRemove(true);
-                    }
-                    jobChainEndNodes.add(fileOrderSink);
-                    break;
-                case 5:
-                    // EndNode -> EndNode
-                    EndNode endNode = new EndNode();
-                    endNode.setName(node.getState());
-                    jobChainEndNodes.add(endNode);
-                    break;
                 }
-            }                
+            }
             if (!jobChainNodes.isEmpty()) {
                 jobChain.setNodes(jobChainNodes);
             } else {
