@@ -181,8 +181,8 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         }
         NumOfAgentsInCluster numOfAgents = new NumOfAgentsInCluster();
         numOfAgents.setAny(agentCluster.getNumberOfAgents());
-        List<DBItemInventoryAgentInstance> agents = agentLayer.getInventoryAgentInstancesByClusterId(agentCluster.getId(), dbItemInventoryInstance
-                .getId());
+        List<DBItemInventoryAgentInstance> agents = agentLayer.getInventoryAgentInstancesByClusterId(agentCluster.getId(),
+                dbItemInventoryInstance .getId());
         int countRunning = 0;
         for (DBItemInventoryAgentInstance agent : agents) {
             if (agent.getState() == 0) {
