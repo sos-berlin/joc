@@ -19,6 +19,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 
@@ -99,21 +100,18 @@ public class JOCJsonCommand {
         if (postBody == null) {
             postBody = "";
         }
-        String[] metaInfo = { "JS-URL: " + uri, "JS-PostBody: " + postBody };
-        String response;
+        JocError jocError = new JocError();
+        jocError.appendMetaInfo("JS-URL: " + uri, "JS-PostBody: " + postBody);
         try {
-            response = client.postRestService(uri, postBody);
+            String response = client.postRestService(uri, postBody);
+            return getJsonObjectFromResponse(response, client, jocError);
         } catch (ConnectionRefusedException e) {
-            // Throwable t = (e.getCause() != null) ? e.getCause() : e;
-            throw new JobSchedulerConnectionRefusedException(e);
+            throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
-            // Throwable t = (e.getCause() != null) ? e.getCause() : e;
-            throw new JobSchedulerNoResponseException(e);
+            throw new JobSchedulerNoResponseException(jocError, e);
         } catch (Exception e) {
-            // Throwable t = (e.getCause() != null) ? e.getCause() : e;
-            throw new JobSchedulerBadRequestException(e);
+            throw new JobSchedulerBadRequestException(jocError, e);
         }
-        return getJsonObjectFromResponse(response, client, metaInfo);
     }
 
     public JsonObject getJsonObjectFromGet(String csrfToken) throws JocException {
@@ -128,21 +126,18 @@ public class JOCJsonCommand {
         JobSchedulerRestApiClient client = new JobSchedulerRestApiClient();
         client.addHeader("Accept", "application/json");
         client.addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
-        String[] metaInfo = { "JS-URL: " + uri };
-        String response;
+        JocError jocError = new JocError();
+        jocError.appendMetaInfo("JS-URL: " + uri);
         try {
-            response = client.getRestService(uri);
+            String response = client.getRestService(uri);
+            return getJsonObjectFromResponse(response, client, jocError);
         } catch (ConnectionRefusedException e) {
-            // Throwable t = (e.getCause() != null) ? e.getCause() : e;
-            throw new JobSchedulerConnectionRefusedException(e);
+            throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
-            // Throwable t = (e.getCause() != null) ? e.getCause() : e;
-            throw new JobSchedulerNoResponseException(e);
+            throw new JobSchedulerNoResponseException(jocError, e);
         } catch (Exception e) {
-            // Throwable t = (e.getCause() != null) ? e.getCause() : e;
-            throw new JobSchedulerBadRequestException(e);
+            throw new JobSchedulerBadRequestException(jocError, e);
         }
-        return getJsonObjectFromResponse(response, client, metaInfo);
     }
 
     private String getCsrfToken(String csrfToken) {
@@ -152,7 +147,7 @@ public class JOCJsonCommand {
         return csrfToken;
     }
 
-    private JsonObject getJsonObjectFromResponse(String response, JobSchedulerRestApiClient client, String[] metaInfo) throws JocException {
+    private JsonObject getJsonObjectFromResponse(String response, JobSchedulerRestApiClient client, JocError jocError) throws JocException {
         int httpReplyCode = client.statusCode();
         String contentType = client.getResponseHeader("Content-Type");
         if (response == null) {
@@ -189,7 +184,7 @@ public class JOCJsonCommand {
                 throw new JobSchedulerBadRequestException(httpReplyCode + " " + client.getHttpResponse().getStatusLine().getReasonPhrase());
             }
         } catch (JocException e) {
-            e.addErrorMetaInfo(metaInfo);
+            e.addErrorMetaInfo(jocError);
             throw e;
         }
     }

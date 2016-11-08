@@ -36,7 +36,7 @@ public class JobSchedulerBadRequestException extends JocException {
     }
 
     public JobSchedulerBadRequestException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public JobSchedulerBadRequestException(String message, Throwable cause, boolean enableSuppression,

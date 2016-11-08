@@ -26,7 +26,7 @@ public class DBInvalidDataException extends JocException {
     }
 
     public DBInvalidDataException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public DBInvalidDataException(String message, Throwable cause, boolean enableSuppression,

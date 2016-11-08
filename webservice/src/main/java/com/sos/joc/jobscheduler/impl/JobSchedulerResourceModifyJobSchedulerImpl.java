@@ -2,8 +2,6 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.exception.ConnectionRefusedException;
-import com.sos.exception.NoResponseException;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;

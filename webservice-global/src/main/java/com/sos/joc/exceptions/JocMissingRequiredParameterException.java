@@ -26,7 +26,7 @@ public class JocMissingRequiredParameterException extends JocException {
     }
 
     public JocMissingRequiredParameterException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public JocMissingRequiredParameterException(String message, Throwable cause, boolean enableSuppression,

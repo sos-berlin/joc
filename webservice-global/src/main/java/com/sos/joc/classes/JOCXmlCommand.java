@@ -11,13 +11,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sos.exception.ConnectionRefusedException;
 import com.sos.exception.NoResponseException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocError;
-import com.sos.joc.exceptions.JocException;
 import com.sos.xml.SOSXmlCommand;
 
 public class JOCXmlCommand extends SOSXmlCommand {
@@ -130,9 +128,8 @@ public class JOCXmlCommand extends SOSXmlCommand {
     
     public String executePost(String xmlCommand, String accessToken) throws JobSchedulerNoResponseException, JobSchedulerConnectionRefusedException {
         this.xmlCommand = xmlCommand;
-        String s = null;
         try {
-            s = executeXMLPost(xmlCommand, accessToken);
+            return executeXMLPost(xmlCommand, accessToken);
         } catch (NoResponseException e) {
             JobSchedulerNoResponseException ee = new JobSchedulerNoResponseException(e.getCause());
             ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
@@ -142,7 +139,6 @@ public class JOCXmlCommand extends SOSXmlCommand {
             ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
             throw ee;
         }
-        return s;
     }
     
     public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws Exception {

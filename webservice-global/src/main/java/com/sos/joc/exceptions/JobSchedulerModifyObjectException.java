@@ -26,7 +26,7 @@ public class JobSchedulerModifyObjectException extends JocException {
     }
 
     public JobSchedulerModifyObjectException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public JobSchedulerModifyObjectException(String message, Throwable cause, boolean enableSuppression,

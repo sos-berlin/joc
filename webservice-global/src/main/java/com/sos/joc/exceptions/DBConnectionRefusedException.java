@@ -26,7 +26,7 @@ public class DBConnectionRefusedException extends JocException {
     }
 
     public DBConnectionRefusedException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public DBConnectionRefusedException(String message, Throwable cause, boolean enableSuppression,

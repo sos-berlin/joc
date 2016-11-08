@@ -36,7 +36,7 @@ public class JobSchedulerNoResponseException extends JocException {
     }
 
     public JobSchedulerNoResponseException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public JobSchedulerNoResponseException(String message, Throwable cause, boolean enableSuppression,

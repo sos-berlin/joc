@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.jitl.reporting.db.DBLayer;
 
@@ -97,6 +98,7 @@ public class InventorySchedulesDBLayer extends DBLayer {
         }
     }
     
+    @SuppressWarnings("rawtypes")
     public List getUsedIn(Long id, Long instanceId, String tableName) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();

@@ -26,7 +26,7 @@ public class JobSchedulerConnectionRefusedException extends JocException {
     }
 
     public JobSchedulerConnectionRefusedException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public JobSchedulerConnectionRefusedException(String message, Throwable cause, boolean enableSuppression,

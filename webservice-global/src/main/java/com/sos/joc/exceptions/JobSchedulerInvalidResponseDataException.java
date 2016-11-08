@@ -26,7 +26,7 @@ public class JobSchedulerInvalidResponseDataException extends JocException {
     }
 
     public JobSchedulerInvalidResponseDataException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public JobSchedulerInvalidResponseDataException(String message, Throwable cause, boolean enableSuppression,

@@ -26,7 +26,7 @@ public class UnknownJobSchedulerAgentException extends JocException {
     }
 
     public UnknownJobSchedulerAgentException(JocError error, Throwable cause) {
-        super(error, cause);
+        super(updateJocErrorCode(error, ERROR_CODE), cause);
     }
 
     public UnknownJobSchedulerAgentException(String message, Throwable cause, boolean enableSuppression,

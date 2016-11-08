@@ -5,9 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
@@ -19,8 +16,6 @@ import com.sos.joc.model.tree.TreeFilter;
 
 public class TreePermanent {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TreePermanent.class);
-    
     public static List<JobSchedulerObjectType> getAllowedTypes(TreeFilter treeBody, SOSPermissionJocCockpit sosPermission) {
         List<JobSchedulerObjectType> types = new ArrayList<JobSchedulerObjectType>();
         for (JobSchedulerObjectType type : treeBody.getTypes()) {
@@ -119,6 +114,10 @@ public class TreePermanent {
                     if(fromDb != null && !fromDb.isEmpty()) {
                         folders.addAll(fromDb);
                     }
+                    break;
+                case OTHER:
+                    break;
+                default:
                     break;
                 }
             }
