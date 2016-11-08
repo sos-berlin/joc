@@ -29,6 +29,7 @@ import com.sos.joc.model.lock.LockPath;
 import com.sos.joc.model.lock.LockV;
 import com.sos.joc.model.lock.LocksFilter;
 import com.sos.joc.model.lock.LocksV;
+import com.sos.scheduler.model.commands.JSCmdCommands;
 import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("locks")
@@ -91,7 +92,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             Set<Folder> folders = new HashSet<Folder>();
             for (LockPath lockPath : locks) {
                 Folder folder = new Folder();
-                folder.setFolder(("/" + lockPath.getLock()).replaceAll("//+", "/").replaceFirst("/[^/]+$", ""));
+                folder.setFolder(getParent(normalizePath(lockPath.getLock())));
                 folder.setRecursive(false);
                 folders.add(folder);
             }
@@ -101,22 +102,22 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
 
     private String createLocksPostCommand(Set<Folder> folders) throws JocMissingRequiredParameterException {
         if (folders == null || folders.size() == 0) {
-            return createShowStatePostCommand(null, true);
+            JSCmdShowState s = createShowStatePostCommand(null, true);
+            return s.toXMLString();
         } else {
-            StringBuilder s = new StringBuilder();
-            s.append("<commands>");
+            JSCmdCommands commands = Globals.schedulerObjectFactory.createCmdCommands();
             for (Folder folder : folders) {
                 if (folder.getFolder() == null || folder.getFolder().isEmpty()) {
                     throw new JocMissingRequiredParameterException("undefined folder");
                 }
-                s.append(createShowStatePostCommand(folder.getFolder(), folder.getRecursive()));
+                JSCmdShowState s = createShowStatePostCommand(folder.getFolder(), folder.getRecursive());
+                commands.getAddJobsOrAddOrderOrCheckFolders().add(s);
             }
-            s.append("</commands>");
-            return s.toString();
+            return commands.toXMLString();
         }
     }
 
-    private String createShowStatePostCommand(String folder, Boolean recursive) {
+    private JSCmdShowState createShowStatePostCommand(String folder, Boolean recursive) {
         JSCmdShowState showState = Globals.schedulerObjectFactory.createShowState();
         showState.setSubsystems("folder lock");
         showState.setWhat("folders");
@@ -124,8 +125,8 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             showState.setWhat("no_subfolders " + showState.getWhat());
         }
         if (folder != null) {
-            showState.setPath(("/" + folder).replaceAll("//+", "/"));
+            showState.setPath(normalizePath(folder));
         }
-        return showState.toXMLString().replaceFirst("<\\?xml[^>\\?]*\\?>", "");
+        return showState;
     }
 }
