@@ -57,24 +57,26 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             URI uri = command.getURI();
 
             Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
-            for (OrderPath order : orders) {
-                if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
-                    throw new JocMissingRequiredParameterException("jobChain");
-                }
-                OrdersPerJobChain opj;
-                if (ordersLists.containsKey(order.getJobChain())) {
-                    opj = ordersLists.get(order.getJobChain());
-                    if (opj.containsOrder(order.getOrderId())) {
-                        continue;
+            if (orders != null && !orders.isEmpty()) {
+                for (OrderPath order : orders) {
+                    if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
+                        throw new JocMissingRequiredParameterException("jobChain");
+                    }
+                    OrdersPerJobChain opj;
+                    if (ordersLists.containsKey(order.getJobChain())) {
+                        opj = ordersLists.get(order.getJobChain());
+                        if (opj.containsOrder(order.getOrderId())) {
+                            continue;
+                        } else {
+                            opj.addOrder(order.getOrderId());
+                        }
                     } else {
+                        opj = new OrdersPerJobChain();
+                        opj.setJobChain(order.getJobChain());
                         opj.addOrder(order.getOrderId());
                     }
-                } else {
-                    opj = new OrdersPerJobChain();
-                    opj.setJobChain(order.getJobChain());
-                    opj.addOrder(order.getOrderId());
+                    ordersLists.put(order.getJobChain(), opj);
                 }
-                ordersLists.put(order.getJobChain(), opj);
             }
 
             if (!ordersLists.isEmpty()) {

@@ -87,6 +87,8 @@ public class JOCJsonCommand {
     public JsonObject getJsonObjectFromPost(String postBody, String csrfToken) throws JocException {
         try {
             return getJsonObjectFromPost(getURI(), postBody, csrfToken);
+        } catch (JocException e) {
+            throw e;
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(e);
         }
@@ -109,6 +111,8 @@ public class JOCJsonCommand {
             throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
             throw new JobSchedulerNoResponseException(jocError, e);
+        } catch (JocException e) {
+            throw e;
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(jocError, e);
         }
@@ -117,6 +121,8 @@ public class JOCJsonCommand {
     public JsonObject getJsonObjectFromGet(String csrfToken) throws JocException {
         try {
             return getJsonObjectFromGet(getURI(), csrfToken);
+        } catch (JocException e) {
+            throw e;
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(e);
         }
@@ -135,6 +141,8 @@ public class JOCJsonCommand {
             throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
             throw new JobSchedulerNoResponseException(jocError, e);
+        } catch (JocException e) {
+            throw e;
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(jocError, e);
         }
