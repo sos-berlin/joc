@@ -145,7 +145,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 } else {
                     jsCmdModifyOrder.setAt(order.getAt());
                 }
-                if (order.getParams() != null || order.getParams().size() > 0) {
+                if (order.getParams() != null && !order.getParams().isEmpty()) {
                     jsCmdModifyOrder.setParams(getParams(order.getParams()));
                 }
                 break;
@@ -170,7 +170,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 break;
             case "resume":
                 jsCmdModifyOrder.setSuspended("no");
-                if (order.getParams() != null || order.getParams().size() > 0) {
+                if (order.getParams() != null && !order.getParams().isEmpty()) {
                     jsCmdModifyOrder.setParams(getParams(order.getParams()));
                 }
                 break;
