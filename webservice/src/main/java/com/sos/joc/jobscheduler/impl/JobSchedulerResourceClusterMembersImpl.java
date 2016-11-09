@@ -80,11 +80,11 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                         if (schedulerInstance != null) {
                             jobscheduler = new JobSchedulerVolatile(schedulerInstance, accessToken).getJobScheduler();
                         } else {
-                            if ("yes".equals(jocXmlCommand.getAttribute("active"))) {
+                            if ("yes".equals(clusterMember.getAttribute("active"))) {
                                 state.setSeverity(0);
                                 state.set_text(JobSchedulerStateText.RUNNING);
                                 // TODO Running is not necessarily right
-                            } else if ("yes".equals(jocXmlCommand.getAttribute("backup"))) {
+                            } else if ("yes".equals(clusterMember.getAttribute("backup"))) {
                                 state.setSeverity(3);
                                 state.set_text(JobSchedulerStateText.WAITING_FOR_ACTIVATION);
                             }
