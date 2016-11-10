@@ -1,11 +1,20 @@
 package com.sos.joc.classes;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 
 
 public class JobSchedulerDate {
@@ -22,7 +31,10 @@ public class JobSchedulerDate {
         if (dateString != null && !dateString.isEmpty()) {
             try {
                 dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
+                //dateString must have 'Z' as offset
                 fromString = Instant.parse(dateString);
+                //better: dateString can have arbitrary offsets
+                //fromString = Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateString).getTimeInMillis());
                 // JobScheduler responses max or min time but means 'never'
                 if (fromString == null || fromString.getEpochSecond() == 0 || fromString.getEpochSecond() == Long.MAX_VALUE) {
                     fromString = null;
@@ -39,4 +51,148 @@ public class JobSchedulerDate {
         Instant fromEpochMilli = Instant.ofEpochMilli(eventId/1000);
         return Date.from(fromEpochMilli);
     }
+    
+    public static Date getDateFromDateTo(String dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
+        try {
+            return Date.from(getInstantFromDateTo(dateTo, timeZone));
+        } catch (JobSchedulerInvalidResponseDataException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerInvalidResponseDataException(e);
+        }
+    }
+    
+    public static Date getDateFromDateFrom(String dateFrom, String timeZone) throws JobSchedulerInvalidResponseDataException {
+        try {
+            return Date.from(getInstantFromDateTo(dateFrom, timeZone));
+        } catch (JobSchedulerInvalidResponseDataException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerInvalidResponseDataException(e);
+        }
+    }
+    
+    public static Instant getInstantFromDateTo(String dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
+        Pattern offsetPattern = Pattern.compile("([\\ssmhdwMyT:\\d-]+)([+-][0-9:]+|Z)?$");
+        Pattern dateTimePattern = Pattern.compile("(?:(\\d+)([smhdwMy])\\s*)");
+        Matcher m = offsetPattern.matcher(dateTo);
+        ZonedDateTime zdt = null;
+        ZoneId zoneId = null;
+        boolean dateTimeIsRelative = false;
+        try {
+            if (timeZone != null && !timeZone.isEmpty()) {
+                zoneId = ZoneId.of(timeZone);
+            }
+            if (m.find()) {
+                if (zoneId == null) {
+                    zoneId = (m.group(2) != null) ? ZoneOffset.of(m.group(2)) : ZoneOffset.UTC;
+                }
+                dateTo = m.group(1);
+            } else if (zoneId == null) {
+                zoneId = ZoneOffset.UTC;
+            }
+            m = dateTimePattern.matcher(dateTo.replaceAll("([smhdwMy])", "$1\\s"));
+            while (m.find()) {
+                dateTimeIsRelative = true;
+                if (zdt == null) {
+                    zdt = ZonedDateTime.ofInstant(Instant.now(), zoneId);
+                }
+                Long number = Long.valueOf(m.group(1));
+                switch (m.group(2)) {
+                case "s":
+                    zdt = zdt.plusSeconds(number);
+                    break;
+                case "m":
+                    zdt = zdt.plusMinutes(number);
+                    break;
+                case "h":
+                    zdt = zdt.plusHours(number);
+                    break;
+                case "d":
+                    zdt = zdt.plusDays(number);
+                    break;
+                case "w":
+                    zdt = zdt.plusWeeks(number);
+                    break;
+                case "M":
+                    zdt = zdt.plusMonths(number);
+                    break;
+                case "y":
+                    zdt = zdt.plusYears(number);
+                    break;
+                }
+            }
+            if (!dateTimeIsRelative) {
+                zdt = ZonedDateTime.ofInstant(Instant.parse(dateTo+"Z"), zoneId);
+                return Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateTo+zdt.getOffset().toString()).getTimeInMillis());
+            } else {
+                return zdt.toInstant();
+            }
+        } catch (Exception e) {
+            throw new JobSchedulerInvalidResponseDataException(e);
+        }
+    }
+    
+    public static Instant getInstantFromDateFrom(String dateFrom, String timeZone) throws Exception {
+        Pattern offsetPattern = Pattern.compile("([\\ssmhdwMyT:\\d-]+)([+-][0-9:]+|Z)?$");
+        Pattern dateTimePattern = Pattern.compile("(?:(\\d+)([smhdwMy])\\s*)");
+        Matcher m = offsetPattern.matcher(dateFrom);
+        ZonedDateTime zdt = null;
+        ZoneId zoneId = null;
+        boolean dateTimeIsRelative = false;
+        try {
+            if (timeZone != null && !timeZone.isEmpty()) {
+                zoneId = ZoneId.of(timeZone);
+            }
+            if (m.find()) {
+                if (zoneId == null) {
+                    zoneId = (m.group(2) != null) ? ZoneOffset.of(m.group(2)) : ZoneOffset.UTC;
+                }
+                dateFrom = m.group(1);
+            } else if (zoneId == null) {
+                zoneId = ZoneOffset.UTC;
+            }
+            m = dateTimePattern.matcher(dateFrom.replaceAll("([smhdwMy])", "$1\\s"));
+            while (m.find()) {
+                dateTimeIsRelative = true;
+                if (zdt == null) {
+                    zdt = ZonedDateTime.ofInstant(Instant.now(), zoneId);
+                }
+                Long number = Long.valueOf(m.group(1));
+                switch (m.group(2)) {
+                case "s":
+                    zdt = zdt.minusSeconds(number);
+                    break;
+                case "m":
+                    zdt = zdt.minusMinutes(number);
+                    break;
+                case "h":
+                    zdt = zdt.minusHours(number);
+                    break;
+                case "d":
+                    zdt = zdt.minusDays(number);
+                    break;
+                case "w":
+                    zdt = zdt.minusWeeks(number);
+                    break;
+                case "M":
+                    zdt = zdt.minusMonths(number);
+                    break;
+                case "y":
+                    zdt = zdt.minusYears(number);
+                    break;
+                }
+            }
+            if (!dateTimeIsRelative) {
+                zdt = ZonedDateTime.ofInstant(Instant.parse(dateFrom+"Z"), zoneId);
+                return Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateFrom+zdt.getOffset().toString()).getTimeInMillis());
+            } else {
+                return zdt.toInstant();
+            }
+        } catch (Exception e) {
+            throw new JobSchedulerInvalidResponseDataException(e);
+        }
+    }
+    
+    
 }
