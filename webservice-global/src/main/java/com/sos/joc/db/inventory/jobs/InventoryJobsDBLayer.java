@@ -183,10 +183,35 @@ public class InventoryJobsDBLayer extends DBLayer {
             }
             Query query = getConnection().createQuery(sql.toString());
             if (recursive) {
-                query.setParameter("folderName", "%" + folderName + "%");
+                query.setParameter("folderName", folderName + "%");
             } else {
                 query.setParameter("folderName", folderName);
             }
+            query.setParameter("instanceId", instanceId);
+            if (isOrderJob != null) {
+                query.setParameter("isOrderJob", isOrderJob);
+            }
+            List<DBItemInventoryJob> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryJob> getInventoryJobsFromRootFolder(Boolean isOrderJob, Long instanceId) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where name = baseName ");
+            sql.append(" and instanceId = :instanceId");
+            if (isOrderJob != null) {
+                sql.append(" and isOrderJob = :isOrderJob");
+            }
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);

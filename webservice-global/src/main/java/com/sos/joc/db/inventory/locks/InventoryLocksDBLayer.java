@@ -67,6 +67,25 @@ public class InventoryLocksDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
+    public List<DBItemInventoryLock> getLocksFromRootFolder(Long instanceId) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and name = basename");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<DBItemInventoryLock> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }        
+    }
+    
+    @SuppressWarnings("unchecked")
     public DBItemInventoryLock getLock(String lockPath, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();

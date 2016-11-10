@@ -147,4 +147,23 @@ public class InventorySchedulesDBLayer extends DBLayer {
         }        
     }
     
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventorySchedule> getSchedulesFromRootFolder(Long instanceId) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and name = basename");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<DBItemInventorySchedule> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }        
+    }
+    
 }

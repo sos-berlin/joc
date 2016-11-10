@@ -133,11 +133,12 @@ public class TreePermanent {
                     String[] splitFolders = folder.split("/");
                     childTree.setName(splitFolders[0]);
                     childTree.setPath("/" + splitFolders[0]);
-                } else {
+                    rootTree.getFolders().add(childTree);
+                } else if (!".".equalsIgnoreCase(folder)) {
                     childTree.setName(folder);
                     childTree.setPath("/" + folder);
+                    rootTree.getFolders().add(childTree);
                 }            
-                rootTree.getFolders().add(childTree);
             }
         }
     }

@@ -132,4 +132,23 @@ public class InventoryOrdersDBLayer extends DBLayer {
         }
     }
     
+    @SuppressWarnings("unchecked")
+    public List<DBItemInventoryOrder> getInventoryOrdersFromRootFolder(Long instanceId) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_ORDERS);
+            sql.append(" where name = baseName ");
+            sql.append(" and instanceId = :instanceId");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<DBItemInventoryOrder> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
 }

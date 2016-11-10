@@ -122,8 +122,12 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventoryJobsDBLayer jobsLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventoryJob> jobsFromDb = new ArrayList<DBItemInventoryJob>();
                 for (String folder : folderSet) {
-                    List<DBItemInventoryJob> jobResults = jobsLayer.getInventoryJobsFilteredByFolder(folder, null, true, dbItemInventoryInstance
-                            .getId());
+                    List<DBItemInventoryJob> jobResults = null;
+                    if (".".equalsIgnoreCase(folder)) {
+                        jobResults = jobsLayer.getInventoryJobsFromRootFolder(null, dbItemInventoryInstance.getId());
+                    } else {
+                        jobResults = jobsLayer.getInventoryJobsFilteredByFolder(folder, null, true, dbItemInventoryInstance .getId());
+                    }
                     if (jobResults != null && !jobResults.isEmpty()) {
                         jobsFromDb.addAll(jobResults);
                     }
@@ -138,8 +142,12 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventoryJobChainsDBLayer jobChainsLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventoryJobChain> jobChainsFromDb = new ArrayList<DBItemInventoryJobChain>();
                 for (String folder : folderSet) {
-                    List<DBItemInventoryJobChain> jobChainResults = jobChainsLayer.getJobChainsByFolder(folder, true, dbItemInventoryInstance
-                            .getId());
+                    List<DBItemInventoryJobChain> jobChainResults = null;
+                    if(".".equalsIgnoreCase(folder)) {
+                        jobChainResults = jobChainsLayer.getJobChainsFromRootFolder(dbItemInventoryInstance.getId());
+                    } else {
+                        jobChainResults = jobChainsLayer.getJobChainsByFolder(folder, true, dbItemInventoryInstance.getId());
+                    }
                     if (jobChainResults != null && !jobChainResults.isEmpty()) {
                         jobChainsFromDb.addAll(jobChainResults);
                     }
@@ -154,8 +162,12 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventoryOrdersDBLayer ordersLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventoryOrder> ordersFromDb = new ArrayList<DBItemInventoryOrder>();
                 for (String folder : folderSet) {
-                    List<DBItemInventoryOrder> orderResults = ordersLayer.getInventoryOrdersFilteredByFolders(folder, true, dbItemInventoryInstance
-                            .getId());
+                    List<DBItemInventoryOrder> orderResults = null;
+                    if (".".equalsIgnoreCase(folder)) {
+                        orderResults = ordersLayer.getInventoryOrdersFromRootFolder(dbItemInventoryInstance.getId());
+                    } else {
+                        orderResults = ordersLayer.getInventoryOrdersFilteredByFolders(folder, true, dbItemInventoryInstance.getId());
+                    }
                     if (orderResults != null && !orderResults.isEmpty()) {
                         ordersFromDb.addAll(orderResults);
                     }
@@ -165,7 +177,12 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventoryProcessClassesDBLayer pcLayer = new InventoryProcessClassesDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventoryProcessClass> pcsFromDb = new ArrayList<DBItemInventoryProcessClass>();
                 for (String folder : folderSet) {
-                    List<DBItemInventoryProcessClass> pcResults = pcLayer.getProcessClassesByFolders(folder, dbItemInventoryInstance.getId(), true);
+                    List<DBItemInventoryProcessClass> pcResults = null;
+                    if (".".equalsIgnoreCase(folder)) {
+                        pcResults = pcLayer.getProcessClassesFromRootFolder(dbItemInventoryInstance.getId());
+                    } else {
+                        pcResults = pcLayer.getProcessClassesByFolders(folder, dbItemInventoryInstance.getId(), true);
+                    }
                     if (pcResults != null && !pcResults.isEmpty()) {
                         pcsFromDb.addAll(pcResults);
                     }
@@ -175,8 +192,12 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventorySchedulesDBLayer schedulesLayer = new InventorySchedulesDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventorySchedule> schedulesFromDb = new ArrayList<DBItemInventorySchedule>();
                 for (String folder : folderSet) {
-                    List<DBItemInventorySchedule> scheduleResults = schedulesLayer.getSchedulesByFolders(folder, dbItemInventoryInstance.getId(),
-                            true);
+                    List<DBItemInventorySchedule> scheduleResults = null;
+                    if (".".equalsIgnoreCase(folder)) {
+                        scheduleResults = schedulesLayer.getSchedulesFromRootFolder(dbItemInventoryInstance.getId());
+                    } else {
+                        scheduleResults = schedulesLayer.getSchedulesByFolders(folder, dbItemInventoryInstance.getId(), true);
+                    }
                     if (scheduleResults != null && !scheduleResults.isEmpty()) {
                         schedulesFromDb.addAll(scheduleResults);
                     }
@@ -191,7 +212,12 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 InventoryLocksDBLayer locksLayer = new InventoryLocksDBLayer(Globals.sosHibernateConnection);
                 List<DBItemInventoryLock> locksFromDb = new ArrayList<DBItemInventoryLock>();
                 for (String folder : folderSet) {
-                    List<DBItemInventoryLock> lockResults = locksLayer.getLocksByFolders(folder, dbItemInventoryInstance.getId(), true);
+                    List<DBItemInventoryLock> lockResults = null;
+                    if (".".equalsIgnoreCase(folder)) {
+                        lockResults = locksLayer.getLocksFromRootFolder(dbItemInventoryInstance.getId());
+                    } else {
+                        lockResults = locksLayer.getLocksByFolders(folder, dbItemInventoryInstance.getId(), true);
+                    }
                     if (lockResults != null && !lockResults.isEmpty()) {
                         locksFromDb.addAll(lockResults);
                     }

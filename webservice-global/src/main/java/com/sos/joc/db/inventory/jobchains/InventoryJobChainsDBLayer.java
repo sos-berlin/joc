@@ -131,6 +131,25 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
+    public List<DBItemInventoryJobChain> getJobChainsFromRootFolder(Long instanceId) throws Exception {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
+            sql.append(" where name = baseName");
+            sql.append(" and instanceId = :instanceId");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<DBItemInventoryJobChain> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return null;
+        } catch (Exception ex) {
+            throw new Exception(SOSHibernateConnection.getException(ex));
+        }        
+    }
+    
+    @SuppressWarnings("unchecked")
     public List<DBItemInventoryJobChain> getJobChains(Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
