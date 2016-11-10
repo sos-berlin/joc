@@ -13,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
@@ -97,7 +98,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             }
             if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
                 try {
-                    // TODO order.getRunTime() is checked against scheduler.xsd
+                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
                     JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, order.getRunTime());
                     objOrder.setRunTime(objRuntime);
                 } catch (Exception e) {
