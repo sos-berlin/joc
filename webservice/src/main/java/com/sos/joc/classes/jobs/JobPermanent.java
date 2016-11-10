@@ -8,17 +8,18 @@ import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
-import com.sos.joc.db.reporting.ReportDBLayer;
 import com.sos.joc.model.job.JobP;
 import com.sos.joc.model.job.LockUseP;
 
 public class JobPermanent {
     
     public static Integer getEstimatedDurationInSeconds(DBItemInventoryJob job) throws Exception {
-        ReportDBLayer dbLayer = new ReportDBLayer(Globals.sosHibernateConnection);
-        Long estimatedDurationInMillis = dbLayer.getTaskEstimatedDuration(job.getName());
+        DBLayerReporting dbLayer = new DBLayerReporting(Globals.sosHibernateConnection);
+        Long estimatedDurationInMillis = dbLayer.getTaskEstimatedDuration(job.getName(),Globals.sosShiroProperties.getProperty("limit_for_average_calculation",WebserviceConstants.DEFAULT_LIMIT));
         if (estimatedDurationInMillis != null) {
             return estimatedDurationInMillis.intValue()/1000;
         }

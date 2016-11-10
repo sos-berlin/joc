@@ -6,17 +6,19 @@ import java.util.Date;
 import javax.ws.rs.Path;
 
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
-import com.sos.joc.db.reporting.ReportDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderP;
 import com.sos.joc.model.order.OrderP200;
 import com.sos.joc.model.order.OrderType;
 import com.sos.joc.order.resource.IOrderPResource;
+import com.sos.scheduler.model.answers.Order;
 
 @Path("order")
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
@@ -73,8 +75,9 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
     }
 
     private Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
-        ReportDBLayer dbLayer = new ReportDBLayer(Globals.sosHibernateConnection);
-        Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order.getOrderId());
+        DBLayerReporting dbLayer = new DBLayerReporting(Globals.sosHibernateConnection);
+         
+        Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order,Globals.sosShiroProperties.getProperty("limit_for_average_calculation",WebserviceConstants.DEFAULT_LIMIT));
         if (estimatedDurationInMillis != null) {
             return estimatedDurationInMillis.intValue() / 1000;
         }

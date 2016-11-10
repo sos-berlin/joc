@@ -72,5 +72,18 @@ public class JocCockpitProperties {
         }
     }
 
+    public int getProperty(String property, int defaultValue) {
+        String s = getProperty(property);
+        if (s == null){
+            return defaultValue;
+        }else{
+            try{
+            return Integer.parseInt(s);
+            }catch (NumberFormatException e){
+                LOGGER.warn(String.format("Property Value for %s is not an Integer. Returning 0 %s",property,e.getMessage()));
+                return 0;
+            }
+        }
+    }
 
 }

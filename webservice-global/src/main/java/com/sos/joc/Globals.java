@@ -17,7 +17,7 @@ public class Globals {
     public static SOSHibernateConnection sosHibernateConnection;
     public static SchedulerObjectFactory schedulerObjectFactory;
     public static HashMap<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
-
+    public static JocCockpitProperties sosShiroProperties;
     public static SOSHibernateConnection getConnection(String schedulerId) throws JocException {
         if (sosSchedulerHibernateConnections == null) {
             sosSchedulerHibernateConnections = new HashMap<String, SOSHibernateConnection>();
@@ -43,7 +43,6 @@ public class Globals {
 
     private static String getConfFile(String schedulerId) throws JocException {
         String propertieKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
-        JocCockpitProperties sosShiroProperties = new JocCockpitProperties();
         String confFile = sosShiroProperties.getProperty(propertieKey);
         if (confFile == null) {
             confFile = sosShiroProperties.getProperty(HIBERNATE_CONFIGURATION_FILE);
