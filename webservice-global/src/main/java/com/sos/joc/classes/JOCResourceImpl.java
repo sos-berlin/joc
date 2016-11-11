@@ -173,7 +173,7 @@ public class JOCResourceImpl {
         try {
             List<String> metaInfo = jocError.getMetaInfo();
             String params = (body == null) ? metaInfo.get(1) : "PARAMS: " + getJsonString(body);
-            AUDIT_LOGGER.info(String.format("%1$s%n%2$s%n%3$s", metaInfo.get(3), metaInfo.get(0).trim(), params));
+            AUDIT_LOGGER.info(String.format("%1$s%n%2$s%n%3$s", metaInfo.get(2), metaInfo.get(0).trim(), params));
         } catch (Exception e) {
             LOGGER.error("Cannot write to audit log file", e);
         }
