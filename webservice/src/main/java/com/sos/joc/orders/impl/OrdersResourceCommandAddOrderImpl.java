@@ -15,6 +15,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.BulkError;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -102,7 +103,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                     JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, order.getRunTime());
                     objOrder.setRunTime(objRuntime);
                 } catch (Exception e) {
-                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
+                    throw new JobSchedulerBadRequestException(order.getRunTime());
                 }
             }
             String xml = objOrder.toXMLString();

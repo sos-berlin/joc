@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -275,11 +276,17 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
     public static SOSShiroCurrentUserAnswer getError401Schema(JobSchedulerUser sosJobschedulerUser,String message) {
         SOSShiroCurrentUserAnswer entity = new SOSShiroCurrentUserAnswer();
-        entity.setAccessToken(sosJobschedulerUser.getSosShiroCurrentUser().getAccessToken());
+        SOSShiroCurrentUser sosShiroCurrentUser = sosJobschedulerUser.getSosShiroCurrentUser();
+        if (sosShiroCurrentUser != null) {
+            entity.setAccessToken(sosShiroCurrentUser.getAccessToken());
+            entity.setUser(sosShiroCurrentUser.getUsername());
+        } else {
+            entity.setAccessToken("");
+            entity.setUser("");
+        }
         entity.setHasRole(false);
         entity.setIsPermitted(false);
         entity.setIsAuthenticated(false);
-        entity.setUser(sosJobschedulerUser.getSosShiroCurrentUser().getUsername());
         if ("".equals(message)){
             message = "Authentication failure";
         }
