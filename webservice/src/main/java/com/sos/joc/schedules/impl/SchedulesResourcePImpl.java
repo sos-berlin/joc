@@ -65,8 +65,13 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventorySchedule> schedulesFromDb = dbLayer.getSchedulesByFolders(normalizePathForDB(folder.getFolder()),
-                            dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
+                    List<DBItemInventorySchedule> schedulesFromDb = null;
+                    if ("/".equalsIgnoreCase(folder.getFolder()) && !folder.getRecursive()) {
+                        schedulesFromDb = dbLayer.getSchedulesFromRootFolder(dbItemInventoryInstance.getId());
+                    } else {
+                        schedulesFromDb = dbLayer.getSchedulesByFolders(normalizePathForDB(folder.getFolder()),
+                                dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
+                    }
                     List<ScheduleP> schedulesToAdd = getSchedulesToAdd(dbLayer, schedulesFromDb, dbItemInventoryInstance);
                     if (schedulesToAdd != null && !schedulesToAdd.isEmpty()) {
                         listOfSchedules.addAll(schedulesToAdd);
