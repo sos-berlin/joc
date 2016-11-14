@@ -71,7 +71,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             checkRequiredParameter("jobChain", order.getJobChain());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             JSCmdAddOrder objOrder = Globals.schedulerObjectFactory.createAddOrder();
-            objOrder.setJobChain(order.getJobChain());
+            objOrder.setJobChain(normalizePath(order.getJobChain()));
             if (order.getOrderId() != null && !order.getOrderId().isEmpty()) {
                 objOrder.setId(order.getOrderId());
             }

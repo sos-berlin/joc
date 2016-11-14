@@ -103,6 +103,9 @@ public class JOCResourceImpl {
     }
 
     public String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
         return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
 

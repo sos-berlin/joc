@@ -35,7 +35,7 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            String scheduleIn = scheduleFilter.getSchedule();
+            String scheduleIn = normalizePath(scheduleFilter.getSchedule());
             this.checkRequiredParameter("schedule", scheduleIn);
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());

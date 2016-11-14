@@ -135,7 +135,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             checkRequiredParameter("orderId", order.getOrderId());
             
             JSCmdModifyOrder jsCmdModifyOrder = Globals.schedulerObjectFactory.createModifyOrder();
-            jsCmdModifyOrder.setJobChain(order.getJobChain());
+            jsCmdModifyOrder.setJobChain(normalizePath(order.getJobChain()));
             jsCmdModifyOrder.setOrder(order.getOrderId());
 
             switch (command) {

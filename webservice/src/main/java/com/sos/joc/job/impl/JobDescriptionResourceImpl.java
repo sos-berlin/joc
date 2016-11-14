@@ -30,7 +30,7 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
         JobFilter jobFilter = new JobFilter();
 
         try {
-            jobFilter.setJob(job);
+            jobFilter.setJob(normalizePath(job));
             jobFilter.setJobschedulerId(jobschedulerId);
             jobFilter.setCompact(null);
             initLogging(API_CALL, jobFilter);

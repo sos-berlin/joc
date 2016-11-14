@@ -56,11 +56,12 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             if (processClasses != null && !processClasses.isEmpty()) {
                 for (ProcessClassPath processClass : processClasses) {
                     checkRequiredParameter("processClass", processClass.getProcessClass());
-                    tasks.add(new ProcessClassesVCallable(processClass.getProcessClass(), uri, accessToken));
+                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), uri, accessToken));
                 }
                 entity.setProcessClasses(listProcessClasses);
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
+                    folder.setFolder(normalizePath(folder.getFolder()));
                     tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(), uri, accessToken));
                 }
             } else {
