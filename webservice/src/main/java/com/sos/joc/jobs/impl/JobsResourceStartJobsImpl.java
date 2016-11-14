@@ -73,7 +73,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdStartJob jsCmdStartJob = new JSCmdStartJob(Globals.schedulerObjectFactory);
-            jsCmdStartJob.setJob(startJob.getJob());
+            jsCmdStartJob.setJob(normalizePath(startJob.getJob()));
             jsCmdStartJob.setForce(WebserviceConstants.YES);
             if (startJob.getAt() == null || "".equals(startJob.getAt())) {
                 jsCmdStartJob.setAt("now");

@@ -90,7 +90,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
             showState.setWhat("no_subfolders " + showState.getWhat());
         }
         if (folder != null) {
-            showState.setPath(("/"+folder).replaceAll("//+", "/"));
+            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
         }
         return showState;
     }
@@ -101,7 +101,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         if (!compact) {
             showJob.setWhat("job_params " + showJob.getWhat());
         }
-        showJob.setJobName(job);
+        showJob.setJobName(("/" + job.trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
         // showJob.setMaxOrders(BigInteger.valueOf(0));
         showJob.setMaxTaskHistory(BigInteger.valueOf(0));
         return showJob;

@@ -121,7 +121,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             
             JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
             jsCmdModifyJob.setCmd(command);
-            jsCmdModifyJob.setJob(modifyJob.getJob());
+            jsCmdModifyJob.setJob(normalizePath(modifyJob.getJob()));
             if (SET_RUN_TIME.equals(command)) {
                 try {
                     ValidateXML.validateRunTimeAgainstJobSchedulerSchema(modifyJob.getRunTime());

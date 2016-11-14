@@ -31,7 +31,7 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
                 return jocDefaultResponse;
             }
             checkRequiredParameter("jobschedulerId", orderHistoryFilter.getJobschedulerId());
-            checkRequiredParameter("jobChain", orderHistoryFilter.getJobChain());
+            checkRequiredParameter("jobChain", normalizePath(orderHistoryFilter.getJobChain()));
             checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
             checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
 
