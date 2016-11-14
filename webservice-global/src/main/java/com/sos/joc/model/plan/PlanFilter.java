@@ -25,7 +25,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "late",
     "dateFrom",
     "dateTo",
-    "timeZone"
+    "timeZone",
+    "job",
+    "jobChain",
+    "orderId"
 })
 public class PlanFilter {
 
@@ -64,6 +67,24 @@ public class PlanFilter {
      */
     @JsonProperty("timeZone")
     private String timeZone;
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     */
+    @JsonProperty("job")
+    private String job;
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     */
+    @JsonProperty("jobChain")
+    private String jobChain;
+    @JsonProperty("orderId")
+    private String orderId;
 
     /**
      * 
@@ -223,6 +244,78 @@ public class PlanFilter {
         this.timeZone = timeZone;
     }
 
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     * @return
+     *     The job
+     */
+    @JsonProperty("job")
+    public String getJob() {
+        return job;
+    }
+
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     * @param job
+     *     The job
+     */
+    @JsonProperty("job")
+    public void setJob(String job) {
+        this.job = job;
+    }
+
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     * @return
+     *     The jobChain
+     */
+    @JsonProperty("jobChain")
+    public String getJobChain() {
+        return jobChain;
+    }
+
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     * @param jobChain
+     *     The jobChain
+     */
+    @JsonProperty("jobChain")
+    public void setJobChain(String jobChain) {
+        this.jobChain = jobChain;
+    }
+
+    /**
+     * 
+     * @return
+     *     The orderId
+     */
+    @JsonProperty("orderId")
+    public String getOrderId() {
+        return orderId;
+    }
+
+    /**
+     * 
+     * @param orderId
+     *     The orderId
+     */
+    @JsonProperty("orderId")
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -230,7 +323,7 @@ public class PlanFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(regex).append(state).append(late).append(dateFrom).append(dateTo).append(timeZone).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(regex).append(state).append(late).append(dateFrom).append(dateTo).append(timeZone).append(job).append(jobChain).append(orderId).toHashCode();
     }
 
     @Override
@@ -242,7 +335,7 @@ public class PlanFilter {
             return false;
         }
         PlanFilter rhs = ((PlanFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(regex, rhs.regex).append(state, rhs.state).append(late, rhs.late).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(regex, rhs.regex).append(state, rhs.state).append(late, rhs.late).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).isEquals();
     }
 
 }

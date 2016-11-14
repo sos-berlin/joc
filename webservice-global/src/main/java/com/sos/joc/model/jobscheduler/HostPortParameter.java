@@ -11,7 +11,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * clusterMember
+ * hostPortParam
  * <p>
  * 
  * 
