@@ -90,7 +90,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
             showState.setWhat("no_subfolders " + showState.getWhat());
         }
         if (folder != null) {
-            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
+            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/"));
         }
         return showState;
     }

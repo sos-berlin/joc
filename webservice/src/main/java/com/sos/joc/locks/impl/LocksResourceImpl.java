@@ -131,7 +131,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             showState.setWhat("no_subfolders " + showState.getWhat());
         }
         if (folder != null) {
-            showState.setPath(normalizePath(folder));
+            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/"));
         }
         return showState;
     }

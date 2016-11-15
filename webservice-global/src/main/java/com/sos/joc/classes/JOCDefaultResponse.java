@@ -14,6 +14,7 @@ import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.NoUserWithAccessTokenException;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.Err420;
 import com.sos.joc.model.common.Errs;
@@ -86,37 +87,26 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
 
     public static JOCDefaultResponse responseStatusJSError(String message) {
-        Err420 entity = new Err420();
-        entity.setError(new JocError(message));
-        entity.setSurveyDate(new Date());
-        entity.setDeliveryDate(new Date());
-        LOGGER.error(message);
-        return responseStatus420(entity);
+        return responseStatus420(getErr420(new JocError(message)));
+    }
+    
+    public static JOCDefaultResponse responseStatusJSError(NoUserWithAccessTokenException e, String mediaType) {
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
+        sosShiroCurrentUserAnswer.setHasRole(false); 
+        sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+        sosShiroCurrentUserAnswer.setIsPermitted(false);
+        sosShiroCurrentUserAnswer.setMessage(getErrorMessage(e));
+        return responseStatus440(sosShiroCurrentUserAnswer, mediaType);
     }
     
     public static JOCDefaultResponse responseStatusJSError(JocException e, String mediaType) {
         if (!"".equals(e.getError().printMetaInfo())) {
             LOGGER.info(e.getError().printMetaInfo());
         }
-        
         String errorMsg = getErrorMessage(e);
         e.getError().setMessage(errorMsg);
-        Err420 entity = new Err420();
-        entity.setError(e.getError());
-        entity.setSurveyDate(new Date());
-        entity.setDeliveryDate(new Date());
-        
-        if (WebserviceConstants.NO_USER_WITH_ACCESS_TOKEN.equals(e.getError().getCode())){
-            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
-            sosShiroCurrentUserAnswer.setHasRole(false); 
-            sosShiroCurrentUserAnswer.setIsAuthenticated(false);
-            sosShiroCurrentUserAnswer.setIsPermitted(false);
-            sosShiroCurrentUserAnswer.setMessage(entity.getError().getMessage());
-            return responseStatus440(sosShiroCurrentUserAnswer, mediaType);
-        } else {
-            LOGGER.error(errorMsg, e);
-            return responseStatus420(entity, mediaType);
-        }
+        return responseStatus420(getErr420(e.getError()), mediaType);
+
     }
     
     public static JOCDefaultResponse responseStatusJSError(JocException e) {
@@ -131,28 +121,17 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (!"".equals(e.printMetaInfo())) {
             LOGGER.info(e.printMetaInfo());
         }
-        Err420 entity = new Err420();
-        entity.setError(e);
-        entity.setSurveyDate(new Date());
-        entity.setDeliveryDate(new Date());
-        LOGGER.error(e.getMessage());
-        return responseStatus420(entity);
+        return responseStatus420(getErr420(e));
     }
     
     public static JOCDefaultResponse responseStatusJSError(Exception e, String mediaType) {
         if (e instanceof JocException) {
-            return responseStatusJSError((JocException) e);
+            return responseStatusJSError((JocException) e, mediaType);
         }
         if (e.getCause() != null && e.getCause() instanceof JocException) {
-            return responseStatusJSError((JocException) e.getCause());
+            return responseStatusJSError((JocException) e.getCause(), mediaType);
         }
-        Err420 entity = new Err420();
-        String errorMsg = getErrorMessage(e);
-        entity.setError(new JocError(errorMsg));
-        entity.setSurveyDate(new Date());
-        entity.setDeliveryDate(new Date());
-        LOGGER.error(errorMsg, e);
-        return responseStatus420(entity, mediaType);
+        return responseStatus420(getErr420(new JocError(getErrorMessage(e))), mediaType);
     }
     
     public static JOCDefaultResponse responseStatusJSError(Exception e) {
@@ -164,22 +143,20 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static JOCDefaultResponse responseStatusJSError(Exception e, JocError err, String mediaType) {
+        if (e instanceof JocException) {
+            JocException ee = (JocException) e;
+            ee.addErrorMetaInfo(err);
+            return responseStatusJSError(ee, mediaType);
+        }
+        if (e.getCause() != null && e.getCause() instanceof JocException) {
+            JocException ee = (JocException) e.getCause();
+            ee.addErrorMetaInfo(err);
+            return responseStatusJSError(ee, mediaType);
+        }
         if (!"".equals(err.printMetaInfo())) {
             LOGGER.info(err.printMetaInfo());
         }
-        if (e instanceof JocException) {
-            return responseStatusJSError((JocException) e);
-        }
-        if (e.getCause() != null && e.getCause() instanceof JocException) {
-            return responseStatusJSError((JocException) e.getCause());
-        }
-        Err420 entity = new Err420();
-        String errorMsg = getErrorMessage(e);
-        entity.setError(new JocError(errorMsg));
-        entity.setSurveyDate(new Date());
-        entity.setDeliveryDate(new Date());
-        LOGGER.error(errorMsg, e);
-        return responseStatus420(entity, mediaType);
+        return responseStatus420(getErr420(new JocError(getErrorMessage(e))), mediaType);
     }
     
     public static JOCDefaultResponse responseStatusJSError(Exception e, JocError err) {
@@ -297,6 +274,15 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     
     public static String getErrorMessage(Throwable e) {
         return ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
+    }
+    
+    private static Err420 getErr420(JocError e) {
+        Err420 entity = new Err420();
+        entity.setError(e);
+        entity.setSurveyDate(new Date());
+        entity.setDeliveryDate(new Date());
+        LOGGER.error(e.getMessage());
+        return entity;
     }
 
 }

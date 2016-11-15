@@ -116,7 +116,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
             showState.setWhat("no_subfolders " + showState.getWhat());
         }
         if (folder != null) {
-            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
+            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/"));
         }
         showState.setMaxOrderHistory(BigInteger.valueOf(0));
         return showState;

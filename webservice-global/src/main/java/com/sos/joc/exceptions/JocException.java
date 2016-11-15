@@ -39,7 +39,7 @@ public class JocException extends Exception {
     }
     
     public static JocError updateJocErrorCode(JocError jocError, String code) {
-        if (jocError.getCode() == null) {
+        if (code != null) {
             jocError.setCode(code);
         }
         return jocError;
