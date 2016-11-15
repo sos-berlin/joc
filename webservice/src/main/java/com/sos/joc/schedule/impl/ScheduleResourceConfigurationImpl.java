@@ -33,9 +33,11 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("schedule", scheduleBody.getSchedule())) {
+                String schedulePath = normalizePath(scheduleBody.getSchedule());
+                String scheduleParent = getParent(schedulePath);
                 boolean responseInHtml = scheduleBody.getMime() == ConfigurationMime.HTML;
-                String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", normalizePath(scheduleBody.getSchedule()));
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(), xPath, "schedule",
+                String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", schedulePath);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(scheduleParent), xPath, "schedule",
                         responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
@@ -47,10 +49,11 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
         }
     }
 
-    private String createScheduleConfigurationPostCommand() {
+    private String createScheduleConfigurationPostCommand(String dir) {
         JSCmdShowState showSchedules = new JSCmdShowState(Globals.schedulerObjectFactory);
         showSchedules.setSubsystems("folder schedule");
-        showSchedules.setWhat("folders source");
+        showSchedules.setWhat("folders no_subfolders source");
+        showSchedules.setPath(dir);
         return showSchedules.toXMLString();
     }
 
