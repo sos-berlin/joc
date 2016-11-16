@@ -23,7 +23,7 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
         try {
 
             orderHistoryFilter.setHistoryId(historyId);
-            orderHistoryFilter.setJobChain(jobChain);
+            orderHistoryFilter.setJobChain(normalizePath(jobChain));
             orderHistoryFilter.setOrderId(orderId);
             orderHistoryFilter.setJobschedulerId(jobschedulerId);
             orderHistoryFilter.setMime(LogMime.HTML);

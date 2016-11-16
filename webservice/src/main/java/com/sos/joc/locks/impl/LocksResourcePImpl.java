@@ -64,8 +64,13 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksByFolders(normalizePathForDB(folder.getFolder()),
-                            dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
+                    List<DBItemInventoryLock> locksFromDb = null;
+                    if ("/".equalsIgnoreCase(folder.getFolder()) && !folder.getRecursive()) {
+                        locksFromDb = dbLayer.getLocksFromRootFolder(dbItemInventoryInstance.getId());
+                    } else {
+                        locksFromDb = dbLayer.getLocksByFolders(normalizePathForDB(folder.getFolder()),
+                                dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
+                    }
                     List<LockP> locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
                     if (locksToAdd != null && !locksToAdd.isEmpty()) {
                         listOfLocks.addAll(locksToAdd);

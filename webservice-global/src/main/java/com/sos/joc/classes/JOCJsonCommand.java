@@ -103,10 +103,10 @@ public class JOCJsonCommand {
             postBody = "";
         }
         JocError jocError = new JocError();
-        jocError.appendMetaInfo("JS-URL: " + uri, "JS-PostBody: " + postBody);
+        jocError.appendMetaInfo("JS-URL: " + uri.toString(), "JS-PostBody: " + postBody);
         try {
             String response = client.postRestService(uri, postBody);
-            return getJsonObjectFromResponse(response, client, jocError);
+            return getJsonObjectFromResponse(response, client, uri, jocError);
         } catch (ConnectionRefusedException e) {
             throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
@@ -133,10 +133,10 @@ public class JOCJsonCommand {
         client.addHeader("Accept", "application/json");
         client.addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
         JocError jocError = new JocError();
-        jocError.appendMetaInfo("JS-URL: " + uri);
+        jocError.appendMetaInfo("JS-URL: " + uri.toString());
         try {
             String response = client.getRestService(uri);
-            return getJsonObjectFromResponse(response, client, jocError);
+            return getJsonObjectFromResponse(response, client, uri, jocError);
         } catch (ConnectionRefusedException e) {
             throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
@@ -155,7 +155,7 @@ public class JOCJsonCommand {
         return csrfToken;
     }
 
-    private JsonObject getJsonObjectFromResponse(String response, JobSchedulerRestApiClient client, JocError jocError) throws JocException {
+    private JsonObject getJsonObjectFromResponse(String response, JobSchedulerRestApiClient client, URI uri, JocError jocError) throws JocException {
         int httpReplyCode = client.statusCode();
         String contentType = client.getResponseHeader("Content-Type");
         if (response == null) {
@@ -179,7 +179,7 @@ public class JOCJsonCommand {
                 }
             case 400:
                 if ("Unknown Agent".equalsIgnoreCase(response)) {
-                    throw new UnknownJobSchedulerAgentException();
+                    throw new UnknownJobSchedulerAgentException(uri.toString().replaceFirst(".*/(https?://.*)$", "$1"));
                 }
                 if (contentType.contains("application/json") && !response.isEmpty()) {
                     JsonReader rdr = Json.createReader(new StringReader(response));

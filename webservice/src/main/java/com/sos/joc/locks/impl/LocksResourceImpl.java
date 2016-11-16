@@ -52,12 +52,18 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             jocXmlCommand.executePostWithThrowBadRequest(createLocksPostCommand(locksFilter), accessToken);
             NodeList locks = jocXmlCommand.selectNodelist("//locks/lock");
             boolean filteredByLocks = (locksFilter.getLocks() != null && locksFilter.getLocks().size() > 0);
+            Set<String> lockPathFilter = new HashSet<String>();
+            if (filteredByLocks) {
+                for (LockPath lockPath : locksFilter.getLocks()) {
+                    lockPathFilter.add(normalizePath(lockPath.getLock()));
+                }
+            }
 
             List<LockV> locksV = new ArrayList<LockV>();
             for (int i = 0; i < locks.getLength(); i++) {
                 Element lock = (Element) locks.item(i);
 
-                if (filteredByLocks && !locksFilter.getLocks().contains(lock.getAttribute("path"))) {
+                if (filteredByLocks && !lockPathFilter.contains(lock.getAttribute("path"))) {
                     continue;
                 }
                 if (!FilterAfterResponse.matchRegex(locksFilter.getRegex(), lock.getAttribute("path"))) {
@@ -125,7 +131,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
             showState.setWhat("no_subfolders " + showState.getWhat());
         }
         if (folder != null) {
-            showState.setPath(normalizePath(folder));
+            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/"));
         }
         return showState;
     }

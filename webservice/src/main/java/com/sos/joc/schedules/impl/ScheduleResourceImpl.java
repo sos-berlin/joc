@@ -113,7 +113,7 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
     private void createSchedulesMap() throws JocMissingRequiredParameterException {
         mapOfSchedules = new HashMap<String, String>();
         for (SchedulePath schedule : schedulesFilter.getSchedules()) {
-            String scheduleName = schedule.getSchedule();
+            String scheduleName = normalizePath(schedule.getSchedule());
             checkRequiredParameter("schedules.schedule", scheduleName);
             mapOfSchedules.put(scheduleName, scheduleName);
         }

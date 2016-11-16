@@ -58,8 +58,13 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             } else if (folders != null && !folders.isEmpty()) {
                 Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
                 for (Folder folder : folders) {
-                    List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClassesByFolders(normalizePathForDB(folder.getFolder()),
-                            dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
+                    List<DBItemInventoryProcessClass> processClassesFromDb = null;
+                    if ("/".equalsIgnoreCase(folder.getFolder()) && !folder.getRecursive()) {
+                        processClassesFromDb = dbLayer.getProcessClassesFromRootFolder(dbItemInventoryInstance.getId());
+                    } else {
+                        processClassesFromDb = dbLayer.getProcessClassesByFolders(normalizePathForDB(folder.getFolder()),
+                                dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
+                    }
                     Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, processClassesFromDb,
                             processClassFilter.getRegex());
                     mapOfProcessClasses.putAll(processClassesToAdd);

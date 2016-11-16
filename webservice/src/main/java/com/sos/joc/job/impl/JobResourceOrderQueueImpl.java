@@ -36,7 +36,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
             jocJsonCommand.addOrderCompactQuery(jobFilter.getCompact());
             jocXmlCommand.setUriForJsonCommand(jocJsonCommand.getURI());
             if (checkRequiredParameter("job", jobFilter.getJob())) {
-                entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobFilter.getJob(), jobFilter.getCompact()));
+                entity.setJob(jocXmlCommand.getJobWithOrderQueue(normalizePath(jobFilter.getJob()), jobFilter.getCompact()));
                 entity.setDeliveryDate(new Date());
             }
             return JOCDefaultResponse.responseStatus200(entity);

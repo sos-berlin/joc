@@ -108,17 +108,23 @@ public class JOCXmlCommand extends SOSXmlCommand {
         return default_;
     }
     
-    public void throwJobSchedulerError() throws Exception {
+    public void throwJobSchedulerError() throws JobSchedulerBadRequestException {
         String xPath = "/spooler/answer/ERROR";
-        Element errorElem = (Element) getSosxml().selectSingleNode(xPath);
-        if (errorElem != null) {
-            JocError err = new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text"));
-            if (xmlCommand != null) {
-                err.appendMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand); 
+        try {
+            Element errorElem = (Element) getSosxml().selectSingleNode(xPath);
+            if (errorElem != null) {
+                JocError err = new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text"));
+                if (xmlCommand != null) {
+                    err.appendMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand); 
+                }
+                JobSchedulerBadRequestException badRequestException = new JobSchedulerBadRequestException(err);
+                badRequestException.setSurveyDate(getSurveyDate());
+                throw badRequestException;
             }
-            JobSchedulerBadRequestException badRequestException = new JobSchedulerBadRequestException(err);
-            badRequestException.setSurveyDate(getSurveyDate());
-            throw badRequestException;
+        } catch (JobSchedulerBadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(e);
         }
     }
     
@@ -141,7 +147,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
         }
     }
     
-    public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws Exception {
+    public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws JobSchedulerBadRequestException, JobSchedulerNoResponseException, JobSchedulerConnectionRefusedException {
         String s = executePost(xmlCommand, accessToken);
         throwJobSchedulerError();
         return s;

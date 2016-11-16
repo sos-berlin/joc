@@ -77,7 +77,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     planState.setSeverity(FAILED);
                 }
 
-                if (!dailyPlanDBItem.getIsIsAssigned()) {
+                if (!dailyPlanDBItem.getIsAssigned()) {
                     planState.set_text(PlanStateText.PLANNED);
                     planState.setSeverity(PLANNED);
                 }
@@ -90,22 +90,22 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setSurveyDate(dailyPlanDBItem.getCreated());
 
                 if (dailyPlanDBItem.isStandalone()) {
-                    if (dailyPlanDBItem.getSchedulerTaskHistoryDBItem() != null) {
-                        p.setEndTime(dailyPlanDBItem.getSchedulerTaskHistoryDBItem().getEndTime());
-                        p.setHistoryId(dailyPlanDBItem.getSchedulerTaskHistoryDBItem().getId());
-                        p.setStartTime(dailyPlanDBItem.getSchedulerTaskHistoryDBItem().getStartTime());
-                        err.setCode(dailyPlanDBItem.getSchedulerTaskHistoryDBItem().getErrorCode());
-                        err.setMessage(dailyPlanDBItem.getSchedulerTaskHistoryDBItem().getErrorText());
+                    if (dailyPlanDBItem.getDbItemReportExecution() != null) {
+                        p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId());
+                        p.setStartTime(dailyPlanDBItem.getDbItemReportExecution().getStartTime());
+                        err.setCode(dailyPlanDBItem.getDbItemReportExecution().getErrorCode());
+                        err.setMessage(dailyPlanDBItem.getDbItemReportExecution().getErrorText());
                         p.setError(err);
                     }
                 } else {
-                    if (dailyPlanDBItem.getSchedulerOrderHistoryDBItem() != null) {
-                        p.setEndTime(dailyPlanDBItem.getSchedulerOrderHistoryDBItem().getEndTime());
-                        p.setHistoryId(dailyPlanDBItem.getSchedulerOrderHistoryDBItem().getHistoryId());
-                        p.setStartTime(dailyPlanDBItem.getSchedulerOrderHistoryDBItem().getStartTime());
-                        p.setExitCode(String.valueOf(dailyPlanDBItem.getSchedulerOrderHistoryDBItem().getState()));
-                        p.setNode(dailyPlanDBItem.getSchedulerOrderHistoryDBItem().getState());
-                        p.setOrderId(dailyPlanDBItem.getSchedulerOrderHistoryDBItem().getOrderId());
+                    if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
+                        p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId());
+                        p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
+                        p.setExitCode(dailyPlanDBItem.getDbItemReportTrigger().getState());
+                        p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
+                        p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getOrderId());
                     }
 
                 }

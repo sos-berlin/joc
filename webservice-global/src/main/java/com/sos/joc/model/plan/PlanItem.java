@@ -98,7 +98,7 @@ public class PlanItem {
      */
     @JsonProperty("endTime")
     private Date endTime;
-    @JsonProperty("historyId")
+    /**     * non negative integer     * <p>     *      *      */    @JsonProperty("historyId")
     private Long historyId;
     /**
      * only for orders
@@ -107,12 +107,10 @@ public class PlanItem {
     @JsonProperty("node")
     private String node;
     /**
-     * only for standalone jobs
-     * 
-     */
+     * non negative integer     * <p>     * 
+     *      */
     @JsonProperty("exitCode")
-    private String exitCode;
-    /**
+    private String exitCode;    /**
      * error
      * <p>
      * 
@@ -346,8 +344,8 @@ public class PlanItem {
     }
 
     /**
-     * 
-     * @return
+     * non negative integer     * <p>     * 
+     *      * @return
      *     The historyId
      */
     @JsonProperty("historyId")
@@ -356,8 +354,8 @@ public class PlanItem {
     }
 
     /**
-     * 
-     * @param historyId
+     * non negative integer     * <p>     * 
+     *      * @param historyId
      *     The historyId
      */
     @JsonProperty("historyId")
@@ -388,25 +386,21 @@ public class PlanItem {
     }
 
     /**
-     * only for standalone jobs
-     * 
-     * @return
+     * non negative integer     * <p>     * 
+     *      * @return
      *     The exitCode
      */
     @JsonProperty("exitCode")
-    public String getExitCode() {
-        return exitCode;
+    public String getExitCode() {        return exitCode;
     }
 
     /**
-     * only for standalone jobs
-     * 
-     * @param exitCode
+     * non negative integer     * <p>     * 
+     *      * @param exitCode
      *     The exitCode
      */
     @JsonProperty("exitCode")
-    public void setExitCode(String exitCode) {
-        this.exitCode = exitCode;
+    public void setExitCode(String exitCode) {        this.exitCode = exitCode;
     }
 
     /**

@@ -218,7 +218,7 @@ public class JobVolatile extends JobV {
                 task.setEnqueued(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(taskElement, WebserviceConstants.ENQUEUED, null)));
                 task.setIdleSince(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(taskElement, WebserviceConstants.IDLE_SINCE, null)));
                 task.setPid(Integer.parseInt(jocXmlCommand.getAttributeValue(taskElement,WebserviceConstants.PID,"0")));
-                task.setStartedAt(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(taskElement, WebserviceConstants.START_AT, null)));
+                task.setStartedAt(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(taskElement, "running_since", null)));
                 task.setSteps(Integer.parseInt(jocXmlCommand.getAttributeValue(taskElement,WebserviceConstants.STEPS,"1")));
                 task.setTaskId(jocXmlCommand.getAttributeValue(taskElement,WebserviceConstants.ID,"0"));
                 Element orderElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(taskElement, WebserviceConstants.ORDER);

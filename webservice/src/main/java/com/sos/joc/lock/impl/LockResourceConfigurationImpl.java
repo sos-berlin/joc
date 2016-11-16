@@ -32,9 +32,11 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
             Configuration200 entity = new Configuration200();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("lock", lockBody.getLock())) {
+                String lockPath = normalizePath(lockBody.getLock());
+                String lockParent = getParent(lockPath);
                 boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
-                String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", normalizePath(lockBody.getLock()));
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(), xPath, "lock", responseInHtml,
+                String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", lockPath);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(lockParent), xPath, "lock", responseInHtml,
                         accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
@@ -46,11 +48,12 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
         }
     }
 
-    private String createLockConfigurationPostCommand() {
+    private String createLockConfigurationPostCommand(String dir) {
         JSCmdShowState showLocks = new JSCmdShowState(Globals.schedulerObjectFactory);
         showLocks.setSubsystems("folder lock");
-        showLocks.setWhat("folders source");
-        return Globals.schedulerObjectFactory.toXMLString(showLocks);
+        showLocks.setWhat("folders no_subfolders source");
+        showLocks.setPath(dir);
+        return showLocks.toXMLString();
     }
 
 }

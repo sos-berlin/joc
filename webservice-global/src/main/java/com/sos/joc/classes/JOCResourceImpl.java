@@ -20,6 +20,7 @@ import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.NoUserWithAccessTokenException;
 
 public class JOCResourceImpl {
 
@@ -38,10 +39,7 @@ public class JOCResourceImpl {
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
         if (jobschedulerUser.getSosShiroCurrentUser() == null) {
-            JocError jocError = new JocError();
-            jocError.setCode(WebserviceConstants.NO_USER_WITH_ACCESS_TOKEN);
-            jocError.setMessage("No user logged in with accessToken: " + accessToken);
-            throw new JocException(jocError);
+            throw new NoUserWithAccessTokenException("No user logged in with accessToken: " + accessToken);
         }
         updateUserInMetaInfo();
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
@@ -103,6 +101,9 @@ public class JOCResourceImpl {
     }
 
     public String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
         return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
 
@@ -173,7 +174,7 @@ public class JOCResourceImpl {
         try {
             List<String> metaInfo = jocError.getMetaInfo();
             String params = (body == null) ? metaInfo.get(1) : "PARAMS: " + getJsonString(body);
-            AUDIT_LOGGER.info(String.format("%1$s%n%2$s%n%3$s", metaInfo.get(2), metaInfo.get(0).trim(), params));
+            AUDIT_LOGGER.info(String.format("%1$s - %2$s - %3$s", metaInfo.get(2), metaInfo.get(0).trim(), params));
         } catch (Exception e) {
             LOGGER.error("Cannot write to audit log file", e);
         }

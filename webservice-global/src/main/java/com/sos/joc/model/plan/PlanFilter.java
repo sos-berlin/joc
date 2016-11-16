@@ -1,6 +1,8 @@
 
 package com.sos.joc.model.plan;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,7 +23,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "regex",
-    "state",
+    "states",
     "late",
     "dateFrom",
     "dateTo",
@@ -47,14 +49,8 @@ public class PlanFilter {
      */
     @JsonProperty("regex")
     private String regex;
-    /**
-     * plan state text
-     * <p>
-     * 
-     * 
-     */
-    @JsonProperty("state")
-    private PlanStateText state;
+    @JsonProperty("states")
+    private List<PlanStateText> states = new ArrayList<PlanStateText>();
     @JsonProperty("late")
     private Boolean late;
     @JsonProperty("dateFrom")
@@ -137,29 +133,23 @@ public class PlanFilter {
     }
 
     /**
-     * plan state text
-     * <p>
-     * 
      * 
      * @return
-     *     The state
+     *     The states
      */
-    @JsonProperty("state")
-    public PlanStateText getState() {
-        return state;
+    @JsonProperty("states")
+    public List<PlanStateText> getStates() {
+        return states;
     }
 
     /**
-     * plan state text
-     * <p>
      * 
-     * 
-     * @param state
-     *     The state
+     * @param states
+     *     The states
      */
-    @JsonProperty("state")
-    public void setState(PlanStateText state) {
-        this.state = state;
+    @JsonProperty("states")
+    public void setStates(List<PlanStateText> states) {
+        this.states = states;
     }
 
     /**
@@ -323,7 +313,7 @@ public class PlanFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(regex).append(state).append(late).append(dateFrom).append(dateTo).append(timeZone).append(job).append(jobChain).append(orderId).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(regex).append(states).append(late).append(dateFrom).append(dateTo).append(timeZone).append(job).append(jobChain).append(orderId).toHashCode();
     }
 
     @Override
@@ -335,7 +325,7 @@ public class PlanFilter {
             return false;
         }
         PlanFilter rhs = ((PlanFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(regex, rhs.regex).append(state, rhs.state).append(late, rhs.late).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(regex, rhs.regex).append(states, rhs.states).append(late, rhs.late).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).isEquals();
     }
 
 }

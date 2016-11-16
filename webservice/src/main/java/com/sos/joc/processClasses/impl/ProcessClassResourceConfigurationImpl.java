@@ -8,6 +8,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.processClass.ProcessClassConfigurationFilter;
@@ -35,10 +36,18 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("processClass", processClassConfigurationFilter.getProcessClass())) {
                 boolean responseInHtml = processClassConfigurationFilter.getMime() == ConfigurationMime.HTML;
-                String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", normalizePath(
-                        processClassConfigurationFilter.getProcessClass()));
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createProcessClassConfigurationPostCommand(), xPath,
-                        "process_class", responseInHtml, accessToken);
+                String processClassPath = normalizePath(processClassConfigurationFilter.getProcessClass());
+                String processClassParent = getParent(processClassPath);
+                if ("/(default)".equals(processClassPath)) {
+                    String xPath = "/spooler/answer//process_classes/process_class[@path='']";
+                    entity = ConfigurationUtils.getConfigurationSchemaOfDefaultProcessClass(jocXmlCommand, createProcessClassConfigurationPostCommand(
+                            processClassParent), xPath, responseInHtml, accessToken);
+                } else {
+                    String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", processClassPath);
+                    entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createProcessClassConfigurationPostCommand(processClassParent),
+                            xPath, "process_class", responseInHtml, accessToken);
+                }
+
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -49,11 +58,12 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
         }
     }
 
-    private String createProcessClassConfigurationPostCommand() {
+    private String createProcessClassConfigurationPostCommand(String dir) {
         JSCmdShowState showProcessClasss = new JSCmdShowState(Globals.schedulerObjectFactory);
-        showProcessClasss.setSubsystems("folder schedule");
-        showProcessClasss.setWhat("folders source");
-        return Globals.schedulerObjectFactory.toXMLString(showProcessClasss);
+        showProcessClasss.setSubsystems("folder process_class");
+        showProcessClasss.setWhat("folders no_subfolders source");
+        showProcessClasss.setPath(dir);
+        return showProcessClasss.toXMLString();
     }
 
 }

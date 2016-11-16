@@ -61,6 +61,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 for (OrderPath order : orders) {
                     if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
                         throw new JocMissingRequiredParameterException("jobChain");
+                    } else {
+                        order.setJobChain(normalizePath(order.getJobChain()));
                     }
                     OrdersPerJobChain opj;
                     if (ordersLists.containsKey(order.getJobChain())) {
@@ -85,24 +87,28 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
+                    folder.setFolder(normalizePath(folder.getFolder()));
                     tasks.add(new OrdersVCallable(folder, ordersBody, uri, accessToken));
                 }
             } else {
                 Folder rootFolder = new Folder();
                 rootFolder.setFolder("/");
                 rootFolder.setRecursive(true);
-                tasks.add(new OrdersVCallable(rootFolder, ordersBody, uri, accessToken));
+                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, uri, accessToken);
+                listOrders.putAll(callable.call());
             }
-
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
-            for (Future<Map<String, OrderV>> result : executorService.invokeAll(tasks)) {
-                try {
-                    listOrders.putAll(result.get());
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof JocException) {
-                        throw (JocException) e.getCause();
-                    } else {
-                        throw (Exception) e.getCause();
+            
+            if(tasks != null && !tasks.isEmpty()) {
+                ExecutorService executorService = Executors.newFixedThreadPool(10);
+                for (Future<Map<String, OrderV>> result : executorService.invokeAll(tasks)) {
+                    try {
+                        listOrders.putAll(result.get());
+                    } catch (ExecutionException e) {
+                        if (e.getCause() instanceof JocException) {
+                            throw (JocException) e.getCause();
+                        } else {
+                            throw (Exception) e.getCause();
+                        }
                     }
                 }
             }

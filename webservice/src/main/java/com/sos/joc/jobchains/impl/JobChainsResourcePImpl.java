@@ -64,8 +64,12 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChainsByFolder(normalizePathForDB(folder.getFolder()),
-                            folder.getRecursive(), instanceId);
+                    List<DBItemInventoryJobChain> jobChainsFromDb = null;
+                    if ("/".equalsIgnoreCase(folder.getFolder()) && !folder.getRecursive()) {
+                        jobChainsFromDb = dbLayer.getJobChainsFromRootFolder(instanceId);
+                    } else {
+                        jobChainsFromDb = dbLayer.getJobChainsByFolder(normalizePathForDB(folder.getFolder()), folder.getRecursive(), instanceId);
+                    }
                     if (jobChainsFromDb != null) {
                         for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
                             JobChainP jobChain = null;

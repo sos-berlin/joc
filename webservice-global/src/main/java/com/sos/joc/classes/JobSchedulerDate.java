@@ -72,10 +72,22 @@ public class JobSchedulerDate {
         }
     }
     
+    public static Instant getInstantFromDateFrom(String dateFrom, String timeZone) throws JobSchedulerInvalidResponseDataException {
+        return getInstantFromDateStr(dateFrom, timeZone, -1);
+    }
+    
     public static Instant getInstantFromDateTo(String dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
+        return getInstantFromDateStr(dateTo, timeZone);
+    }
+    
+    private static Instant getInstantFromDateStr(String dateStr, String timeZone) throws JobSchedulerInvalidResponseDataException {
+        return getInstantFromDateStr(dateStr, timeZone, null);
+    }
+    
+    private static Instant getInstantFromDateStr(String dateStr, String timeZone, Integer multiplicator) throws JobSchedulerInvalidResponseDataException {
         Pattern offsetPattern = Pattern.compile("([\\ssmhdwMyT:\\d-]+)([+-][0-9:]+|Z)?$");
         Pattern dateTimePattern = Pattern.compile("(?:(\\d+)([smhdwMy])\\s*)");
-        Matcher m = offsetPattern.matcher(dateTo);
+        Matcher m = offsetPattern.matcher(dateStr);
         ZonedDateTime zdt = null;
         ZoneId zoneId = null;
         boolean dateTimeIsRelative = false;
@@ -87,17 +99,20 @@ public class JobSchedulerDate {
                 if (zoneId == null) {
                     zoneId = (m.group(2) != null) ? ZoneOffset.of(m.group(2)) : ZoneOffset.UTC;
                 }
-                dateTo = m.group(1);
+                dateStr = m.group(1);
             } else if (zoneId == null) {
                 zoneId = ZoneOffset.UTC;
             }
-            m = dateTimePattern.matcher(dateTo.replaceAll("([smhdwMy])", "$1\\s"));
+            m = dateTimePattern.matcher(dateStr.replaceAll("([smhdwMy])", "$1\\s"));
             while (m.find()) {
                 dateTimeIsRelative = true;
                 if (zdt == null) {
                     zdt = ZonedDateTime.ofInstant(Instant.now(), zoneId);
                 }
                 Long number = Long.valueOf(m.group(1));
+                if (multiplicator != null) {
+                    number = multiplicator * number;
+                }
                 switch (m.group(2)) {
                 case "s":
                     zdt = zdt.plusSeconds(number);
@@ -123,8 +138,8 @@ public class JobSchedulerDate {
                 }
             }
             if (!dateTimeIsRelative) {
-                zdt = ZonedDateTime.ofInstant(Instant.parse(dateTo+"Z"), zoneId);
-                return Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateTo+zdt.getOffset().toString()).getTimeInMillis());
+                zdt = ZonedDateTime.ofInstant(Instant.parse(dateStr+"Z"), zoneId);
+                return Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateStr+zdt.getOffset().toString()).getTimeInMillis());
             } else {
                 return zdt.toInstant();
             }
@@ -132,67 +147,4 @@ public class JobSchedulerDate {
             throw new JobSchedulerInvalidResponseDataException(e);
         }
     }
-    
-    public static Instant getInstantFromDateFrom(String dateFrom, String timeZone) throws Exception {
-        Pattern offsetPattern = Pattern.compile("([\\ssmhdwMyT:\\d-]+)([+-][0-9:]+|Z)?$");
-        Pattern dateTimePattern = Pattern.compile("(?:(\\d+)([smhdwMy])\\s*)");
-        Matcher m = offsetPattern.matcher(dateFrom);
-        ZonedDateTime zdt = null;
-        ZoneId zoneId = null;
-        boolean dateTimeIsRelative = false;
-        try {
-            if (timeZone != null && !timeZone.isEmpty()) {
-                zoneId = ZoneId.of(timeZone);
-            }
-            if (m.find()) {
-                if (zoneId == null) {
-                    zoneId = (m.group(2) != null) ? ZoneOffset.of(m.group(2)) : ZoneOffset.UTC;
-                }
-                dateFrom = m.group(1);
-            } else if (zoneId == null) {
-                zoneId = ZoneOffset.UTC;
-            }
-            m = dateTimePattern.matcher(dateFrom.replaceAll("([smhdwMy])", "$1\\s"));
-            while (m.find()) {
-                dateTimeIsRelative = true;
-                if (zdt == null) {
-                    zdt = ZonedDateTime.ofInstant(Instant.now(), zoneId);
-                }
-                Long number = Long.valueOf(m.group(1));
-                switch (m.group(2)) {
-                case "s":
-                    zdt = zdt.minusSeconds(number);
-                    break;
-                case "m":
-                    zdt = zdt.minusMinutes(number);
-                    break;
-                case "h":
-                    zdt = zdt.minusHours(number);
-                    break;
-                case "d":
-                    zdt = zdt.minusDays(number);
-                    break;
-                case "w":
-                    zdt = zdt.minusWeeks(number);
-                    break;
-                case "M":
-                    zdt = zdt.minusMonths(number);
-                    break;
-                case "y":
-                    zdt = zdt.minusYears(number);
-                    break;
-                }
-            }
-            if (!dateTimeIsRelative) {
-                zdt = ZonedDateTime.ofInstant(Instant.parse(dateFrom+"Z"), zoneId);
-                return Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateFrom+zdt.getOffset().toString()).getTimeInMillis());
-            } else {
-                return zdt.toInstant();
-            }
-        } catch (Exception e) {
-            throw new JobSchedulerInvalidResponseDataException(e);
-        }
-    }
-    
-    
 }

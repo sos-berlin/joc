@@ -96,7 +96,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
             checkRequiredParameter("node", jobChainNode.getNode());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             JSCmdJobChainNodeModify jsCmdJobChainNodeModify = Globals.schedulerObjectFactory.createJobChainNodeModify();
-            jsCmdJobChainNodeModify.setJobChain(jobChainNode.getJobChain());
+            jsCmdJobChainNodeModify.setJobChain(normalizePath(jobChainNode.getJobChain()));
             jsCmdJobChainNodeModify.setState(jobChainNode.getNode());
             switch (cmd) {
             case STOP:

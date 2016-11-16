@@ -38,7 +38,8 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
         try {
             initLogging(API_CALL, jobSchedulerFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissons(accessToken)
+            String jobSchedulerId = jobSchedulerFilter.getJobschedulerId();
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId, getPermissons(accessToken)
                     .getJobschedulerMasterCluster().getView().isClusterStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -50,8 +51,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
 
             InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
             Globals.beginTransaction();
-            List<DBItemInventoryInstance> schedulerInstances = instancesDbLayer.getInventoryInstancesBySchedulerId(jobSchedulerFilter
-                    .getJobschedulerId());
+            List<DBItemInventoryInstance> schedulerInstances = instancesDbLayer.getInventoryInstancesBySchedulerId(jobSchedulerId);
             List<JobSchedulerV> masters = new ArrayList<JobSchedulerV>();
 
             if (clusterMembers.getLength() == 0) {
@@ -70,13 +70,15 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                     Element clusterMember = (Element) clusterMembers.item(i);
                     JobSchedulerState state = new JobSchedulerState();
                     JobSchedulerV jobscheduler = null;
+                    String port = jocXmlCommand.getAttributeValue(clusterMember, "tcp_port", "0");
+                    port = jocXmlCommand.getAttributeValue(clusterMember, "http_port", port);
                     if ("yes".equals(clusterMember.getAttribute("dead"))) {
                         state.setSeverity(2);
                         state.set_text(JobSchedulerStateText.DEAD);
-                        jobscheduler = getJobScheduler(clusterMember, state, surveyDate);
+                        jobscheduler = getJobScheduler(clusterMember, state, jobSchedulerId, port, surveyDate);
                     } else {
                         DBItemInventoryInstance schedulerInstance = jobSchedulerClusterMemberUrls.get(clusterMember.getAttribute("host").toLowerCase()
-                                + ":" + clusterMember.getAttribute("http_port"));
+                                + ":" + port);
                         if (schedulerInstance != null) {
                             jobscheduler = new JobSchedulerVolatile(schedulerInstance, accessToken).getJobScheduler();
                         } else {
@@ -88,7 +90,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                                 state.setSeverity(3);
                                 state.set_text(JobSchedulerStateText.WAITING_FOR_ACTIVATION);
                             }
-                            jobscheduler = getJobScheduler(clusterMember, state, surveyDate);
+                            jobscheduler = getJobScheduler(clusterMember, state, jobSchedulerId, port, surveyDate);
                         }
                     }
                     if (jobscheduler != null) {
@@ -120,11 +122,11 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         return jsCmdShowState.toXMLString();
     }
 
-    private JobSchedulerV getJobScheduler(Element clusterMember, JobSchedulerState state, Date surveyDate) {
+    private JobSchedulerV getJobScheduler(Element clusterMember, JobSchedulerState state, String id, String port, Date surveyDate) {
         JobSchedulerV jobscheduler = new JobSchedulerV();
         jobscheduler.setHost(clusterMember.getAttribute("host"));
-        jobscheduler.setJobschedulerId(clusterMember.getAttribute("cluster_member_id").replaceFirst("/[^/]+$", ""));
-        jobscheduler.setPort(Integer.parseInt(clusterMember.getAttribute("http_port")));
+        jobscheduler.setJobschedulerId(id);
+        jobscheduler.setPort(Integer.parseInt(port));
         jobscheduler.setStartedAt(JobSchedulerDate.getDateFromISO8601String(clusterMember.getAttribute("running_since")));
         jobscheduler.setState(state);
         jobscheduler.setSurveyDate(surveyDate);

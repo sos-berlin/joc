@@ -21,9 +21,6 @@ import com.sos.scheduler.model.commands.JSCmdShowState;
 @Path("schedule")
 public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleResource {
 
-    private static final String WHAT = "folders";
-    private static final String SUBSYSTEMS = "folder schedule";
-    private static final String XPATH_SCHEDULES = "//schedule[@path='%s']";
     private static final String API_CALL = "./schedule";
 
     @Override
@@ -35,18 +32,22 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            String scheduleIn = scheduleFilter.getSchedule();
-            this.checkRequiredParameter("schedule", scheduleIn);
+            this.checkRequiredParameter("schedule", scheduleFilter.getSchedule());
 
+            String schedulePath = normalizePath(scheduleFilter.getSchedule());
+            String scheduleParent = getParent(schedulePath);
+            
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
             JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-            jsCmdShowState.setSubsystems(SUBSYSTEMS);
-            jsCmdShowState.setWhat(WHAT);
-            String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowState);
+            jsCmdShowState.setSubsystems("folder schedule");
+            jsCmdShowState.setWhat("folders no_subfolders");
+            jsCmdShowState.setPath(scheduleParent);
+            String xml = jsCmdShowState.toXMLString();
             jocXmlCommand.executePostWithThrowBadRequest(xml, accessToken);
-
-            Element scheduleElement = jocXmlCommand.executeXPath(String.format(XPATH_SCHEDULES, scheduleIn));
+            
+            String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", schedulePath);
+            Element scheduleElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(xPath);
 
             ScheduleVolatile scheduleV = new ScheduleVolatile(jocXmlCommand, scheduleElement);
             scheduleV.setValues();

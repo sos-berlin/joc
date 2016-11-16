@@ -9,6 +9,7 @@ import javax.json.JsonObject;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
@@ -34,7 +35,7 @@ public class AgentVCallable implements Callable<AgentV> {
         return getAgentV(agentUrl, masterUrl, accessToken, jsonPath);
     }
 
-    public AgentV getAgentV(String agentUrl, String masterUrl, String accessToken, String jsonPath) throws Exception {
+    public AgentV getAgentV(String agentUrl, String masterUrl, String accessToken, String jsonPath) throws JocException {
         JOCJsonCommand jocJsonCommand = new JOCJsonCommand(masterUrl, jsonPath);
         AgentV agent = new AgentV();
         agent.setSurveyDate(Date.from(Instant.now()));
@@ -51,12 +52,15 @@ public class AgentVCallable implements Callable<AgentV> {
                 state.set_text(JobSchedulerStateText.RUNNING);
                 state.setSeverity(0);
             }
-        } catch (JobSchedulerBadRequestException e) {
+//        } catch (JobSchedulerBadRequestException e) {
+//            state.set_text(JobSchedulerStateText.UNREACHABLE);
+//            state.setSeverity(2);
+//        } catch (UnknownJobSchedulerAgentException e) {
+//            e.setErrorMessage(agentUrl);
+//            throw e;
+        } catch (JocException e) {
             state.set_text(JobSchedulerStateText.UNREACHABLE);
             state.setSeverity(2);
-        } catch (UnknownJobSchedulerAgentException e) {
-            e.setErrorMessage(agentUrl);
-            throw e;
         }
         agent.setState(state);
         return agent;
