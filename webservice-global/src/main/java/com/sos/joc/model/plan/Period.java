@@ -50,7 +50,7 @@ public class Period {
      * 
      */
     @JsonProperty("repeat")
-    private Integer repeat;
+    private Long repeat;
 
     /**
      * timestamp
@@ -118,7 +118,7 @@ public class Period {
      *     The repeat
      */
     @JsonProperty("repeat")
-    public Integer getRepeat() {
+    public Long getRepeat() {
         return repeat;
     }
 
@@ -132,7 +132,7 @@ public class Period {
      *     The repeat
      */
     @JsonProperty("repeat")
-    public void setRepeat(Integer repeat) {
+    public void setRepeat(Long repeat) {
         this.repeat = repeat;
     }
 

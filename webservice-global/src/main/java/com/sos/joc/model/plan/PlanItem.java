@@ -99,7 +99,7 @@ public class PlanItem {
     @JsonProperty("endTime")
     private Date endTime;
     @JsonProperty("historyId")
-    private String historyId;
+    private Long historyId;
     /**
      * only for orders
      * 
@@ -351,7 +351,7 @@ public class PlanItem {
      *     The historyId
      */
     @JsonProperty("historyId")
-    public String getHistoryId() {
+    public Long getHistoryId() {
         return historyId;
     }
 
@@ -361,7 +361,7 @@ public class PlanItem {
      *     The historyId
      */
     @JsonProperty("historyId")
-    public void setHistoryId(String historyId) {
+    public void setHistoryId(Long historyId) {
         this.historyId = historyId;
     }
 
