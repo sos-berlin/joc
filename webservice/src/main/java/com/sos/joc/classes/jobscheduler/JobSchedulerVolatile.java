@@ -56,9 +56,12 @@ public class JobSchedulerVolatile extends JobSchedulerV {
     private JobSchedulerV getReachableJobScheduler(JOCXmlCommand jocXmlCommand) throws Exception {
         setSurveyDate(jocXmlCommand.getSurveyDate());
         Element stateElem = jocXmlCommand.executeXPath("/spooler/answer/state");
-        setHost(stateElem.getAttribute("host"));
-        setJobschedulerId(stateElem.getAttribute("id"));
-        setPort(Integer.parseInt(jocXmlCommand.getAttributeValue(stateElem, "http_port", "0")));
+//        setHost(stateElem.getAttribute("host"));
+//        setJobschedulerId(stateElem.getAttribute("id"));
+//        setPort(Integer.parseInt(jocXmlCommand.getAttributeValue(stateElem, "http_port", "0")));
+        setHost(dbItemInventoryInstance.getHostname());
+        setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
+        setPort(dbItemInventoryInstance.getPort());
         setStartedAt(JobSchedulerDate.getDateFromISO8601String(stateElem.getAttribute("running_since")));
         setState(getJobSchedulerState(stateElem));
         if (stateElem.hasAttribute("waiting_errno_text")) {
