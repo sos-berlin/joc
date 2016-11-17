@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import org.omg.PortableInterceptor.SUCCESSFUL;
+
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.joc.Globals;
@@ -25,6 +27,7 @@ import com.sos.joc.plan.resource.IPlanResource;
 @Path("plan")
 public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
+    private static final int SUCCESSFUL = 0;
     private static final int INCOMPLETE = 1;
     private static final int FAILED = 2;
     private static final Integer PLANNED = 4;
@@ -47,19 +50,24 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             dailyPlanDBLayer.getFilter().setPlannedStartFrom(planFilter.getDateFrom());
             dailyPlanDBLayer.getFilter().setPlannedStartTo(planFilter.getDateTo());
             dailyPlanDBLayer.getFilter().setTimeZone(planFilter.getTimeZone());
+            if (planFilter.getLate() != null) {
+                dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
+            }
+
+            for (PlanStateText state : planFilter.getStates()) {
+                dailyPlanDBLayer.getFilter().addState(state.name());
+            }
 
             List<DailyPlanDBItem> listOfDailyPlanDBItems = dailyPlanDBLayer.getDailyPlanList(0);
             ArrayList<PlanItem> result = new ArrayList<PlanItem>();
 
             Plan entity = new Plan();
             for (DailyPlanDBItem dailyPlanDBItem : listOfDailyPlanDBItems) {
-                boolean add = true;
                 PlanItem p = new PlanItem();
                 Err err = new Err();
                 p.setJob(dailyPlanDBItem.getJob());
                 p.setJobChain(dailyPlanDBItem.getJobChain());
-                p.setLate(dailyPlanDBItem.getExecutionState().isLate());
-                add = (p.getLate() || planFilter.getLate() == null || !planFilter.getLate());
+                p.setLate(dailyPlanDBItem.getIsLate());
 
                 Period period = new Period();
                 period.setBegin(dailyPlanDBItem.getPeriodBegin());
@@ -72,19 +80,24 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setExpectedEndTime(dailyPlanDBItem.getExpectedEnd());
 
                 PlanState planState = new PlanState();
-                if (dailyPlanDBItem.haveError()) {
+
+                if (PlanStateText.FAILED.name().equals(dailyPlanDBItem.getState())) {
                     planState.set_text(PlanStateText.FAILED);
                     planState.setSeverity(FAILED);
                 }
 
-                if (!dailyPlanDBItem.getIsAssigned()) {
+                if (PlanStateText.PLANNED.name().equals(dailyPlanDBItem.getState())) {
                     planState.set_text(PlanStateText.PLANNED);
                     planState.setSeverity(PLANNED);
                 }
 
-                if (!dailyPlanDBItem.isCompleted()) {
+                if (PlanStateText.INCOMPLETE.name().equals(dailyPlanDBItem.getState())) {
                     planState.set_text(PlanStateText.INCOMPLETE);
                     planState.setSeverity(INCOMPLETE);
+                }
+                if (PlanStateText.SUCCESSFUL.name().equals(dailyPlanDBItem.getState())) {
+                    planState.set_text(PlanStateText.SUCCESSFUL);
+                    planState.setSeverity(SUCCESSFUL);
                 }
                 p.setState(planState);
                 p.setSurveyDate(dailyPlanDBItem.getCreated());
@@ -109,9 +122,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     }
 
                 }
-                if (add) {
-                    result.add(p);
-                }
+                result.add(p);
             }
             entity.setPlanItems(result);
             entity.setDeliveryDate(Date.from(Instant.now()));
