@@ -30,7 +30,7 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
         try {
             initLogging(API_CALL, jobSchedulerFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissons(accessToken)
-                    .getJobschedulerMasterCluster().getView().isClusterStatus());
+                    .getJobschedulerMasterCluster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

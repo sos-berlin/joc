@@ -40,7 +40,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             initLogging(API_CALL, jobSchedulerFilter);
             String jobSchedulerId = jobSchedulerFilter.getJobschedulerId();
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId, getPermissons(accessToken)
-                    .getJobschedulerMasterCluster().getView().isClusterStatus());
+                    .getJobschedulerMasterCluster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
