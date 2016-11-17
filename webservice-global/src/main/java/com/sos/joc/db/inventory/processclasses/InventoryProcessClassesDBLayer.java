@@ -39,42 +39,28 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryProcessClass> getProcessClassesByFolders(String folderPath, Long instanceId, boolean recursive) throws Exception {
+    public List<DBItemInventoryProcessClass> getProcessClassesByFolders(String folderName, Long instanceId, boolean recursive) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
-            sql.append(" where instanceId = :instanceId");
             if (recursive) {
-                sql.append(" and name like :folderPath");
+                sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
+                sql.append(" where name like :folderName");
+                sql.append(" and instanceId = :instanceId");
             } else {
-                sql.append(" and name = :folderPath");
+                sql.append("select ipc from ");
+                sql.append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, ");
+                sql.append(DBITEM_INVENTORY_FILES).append(" ifile ");
+                sql.append(" where ipc.fileId = ifile.id");
+                sql.append(" and ifile.fileDirectory = :folderName");
+                sql.append(" and ipc.instanceId = :instanceId");
             }
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (recursive) {
-                query.setParameter("folderPath", "%" + folderPath + "%");
+                query.setParameter("folderName", folderName + "%");
             } else {
-                query.setParameter("folderPath", folderPath);
+                query.setParameter("folderName", folderName);
             }
-            List<DBItemInventoryProcessClass> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryProcessClass> getProcessClassesFromRootFolder(Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
-            sql.append(" where instanceId = :instanceId");
-            sql.append(" and name = basename");
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryProcessClass> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;

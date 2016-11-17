@@ -33,7 +33,7 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
             }
             Globals.beginTransaction();
             InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(Globals.sosHibernateConnection);
-            DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePathForDB(scheduleFilter.getSchedule()),
+            DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePath(scheduleFilter.getSchedule()),
                     dbItemInventoryInstance.getId());
             ScheduleP schedule = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
 

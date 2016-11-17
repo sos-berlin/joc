@@ -106,38 +106,24 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath, boolean recursive, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             if (recursive) {
+                sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
                 sql.append(" where name like :name");
+                sql.append(" and instanceId = :instanceId");
             } else {
-                sql.append(" where name = :name");
+                sql.append("select ijc from ");
+                sql.append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
+                sql.append(DBITEM_INVENTORY_FILES).append(" ifile ");
+                sql.append(" where ijc.fileId = ifile.id");
+                sql.append(" and ifile.fileDirectory = :name");
+                sql.append(" and ijc.instanceId = :instanceId");
             }
-            sql.append(" and instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             if (recursive) {
                 query.setParameter("name", folderPath + "%");
             } else {
                 query.setParameter("name", folderPath);
             }
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryJobChain> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChainsFromRootFolder(Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
-            sql.append(" where name = baseName");
-            sql.append(" and instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null && !result.isEmpty()) {

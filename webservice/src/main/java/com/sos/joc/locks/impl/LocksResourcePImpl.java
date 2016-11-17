@@ -53,7 +53,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             if (locks != null && !locks.isEmpty()) {
                 List<LockP> locksToAdd = new ArrayList<LockP>();
                 for (LockPath lockPath : locks) {
-                    DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePathForDB(lockPath.getLock()), dbItemInventoryInstance.getId());
+                    DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()), dbItemInventoryInstance.getId());
                     LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
                     if (lock != null) {
                         locksToAdd.add(lock);
@@ -65,12 +65,8 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     List<DBItemInventoryLock> locksFromDb = null;
-                    if ("/".equalsIgnoreCase(folder.getFolder()) && !folder.getRecursive()) {
-                        locksFromDb = dbLayer.getLocksFromRootFolder(dbItemInventoryInstance.getId());
-                    } else {
-                        locksFromDb = dbLayer.getLocksByFolders(normalizePathForDB(folder.getFolder()),
-                                dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-                    }
+                    locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance.getId(), folder
+                            .getRecursive().booleanValue());
                     List<LockP> locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
                     if (locksToAdd != null && !locksToAdd.isEmpty()) {
                         listOfLocks.addAll(locksToAdd);

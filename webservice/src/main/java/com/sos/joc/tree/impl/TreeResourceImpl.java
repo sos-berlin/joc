@@ -2,10 +2,12 @@ package com.sos.joc.tree.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.ws.rs.Path;
 
@@ -70,22 +72,18 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 return jocDefaultResponse;
             }
             Boolean compact = treeBody.getCompact();
-            List<String> folders = null;
             if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
                 checkFoldersFilterParam(treeBody.getFolders());
-                folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId());
-            } else {
-                folders = TreePermanent.initFoldersByTypeFromBody(treeBody, dbItemInventoryInstance.getId());
             }
-            Set<String> folderSet = new HashSet<String>();
-            if (folders != null && !folders.isEmpty()) {
-                folderSet.addAll(folders);
-            }
-            Tree root = new Tree();
-            root.setPath("/");
-            root.setName("");
-            TreePermanent.getTree(root, folderSet);
-            TreePermanent.mergeTreeDuplications(root);
+            Globals.beginTransaction();
+            List<String> folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId());
+            SortedSet<String> folderSet = new TreeSet<String>(new Comparator<String>(){
+                public int compare(String a, String b){
+                    return b.compareTo(a);
+                }
+            });
+            folderSet.addAll(folders);
+            Tree root = TreePermanent.getTree(folderSet);
 
             TreeView entity = new TreeView();
             entity.getFolders().add(root);
@@ -106,6 +104,8 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.rollback();
         }
     }
 
@@ -123,11 +123,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 List<DBItemInventoryJob> jobsFromDb = new ArrayList<DBItemInventoryJob>();
                 for (String folder : folderSet) {
                     List<DBItemInventoryJob> jobResults = null;
-                    if (".".equalsIgnoreCase(folder)) {
-                        jobResults = jobsLayer.getInventoryJobsFromRootFolder(null, dbItemInventoryInstance.getId());
-                    } else {
-                        jobResults = jobsLayer.getInventoryJobsFilteredByFolder(folder, null, true, dbItemInventoryInstance .getId());
-                    }
+                    jobResults = jobsLayer.getInventoryJobsFilteredByFolder(folder, null, true, dbItemInventoryInstance .getId());
                     if (jobResults != null && !jobResults.isEmpty()) {
                         jobsFromDb.addAll(jobResults);
                     }
@@ -143,11 +139,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 List<DBItemInventoryJobChain> jobChainsFromDb = new ArrayList<DBItemInventoryJobChain>();
                 for (String folder : folderSet) {
                     List<DBItemInventoryJobChain> jobChainResults = null;
-                    if(".".equalsIgnoreCase(folder)) {
-                        jobChainResults = jobChainsLayer.getJobChainsFromRootFolder(dbItemInventoryInstance.getId());
-                    } else {
-                        jobChainResults = jobChainsLayer.getJobChainsByFolder(folder, true, dbItemInventoryInstance.getId());
-                    }
+                    jobChainResults = jobChainsLayer.getJobChainsByFolder(folder, true, dbItemInventoryInstance.getId());
                     if (jobChainResults != null && !jobChainResults.isEmpty()) {
                         jobChainsFromDb.addAll(jobChainResults);
                     }
@@ -163,11 +155,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 List<DBItemInventoryOrder> ordersFromDb = new ArrayList<DBItemInventoryOrder>();
                 for (String folder : folderSet) {
                     List<DBItemInventoryOrder> orderResults = null;
-                    if (".".equalsIgnoreCase(folder)) {
-                        orderResults = ordersLayer.getInventoryOrdersFromRootFolder(dbItemInventoryInstance.getId());
-                    } else {
-                        orderResults = ordersLayer.getInventoryOrdersFilteredByFolders(folder, true, dbItemInventoryInstance.getId());
-                    }
+                    orderResults = ordersLayer.getInventoryOrdersFilteredByFolders(folder, true, dbItemInventoryInstance.getId());
                     if (orderResults != null && !orderResults.isEmpty()) {
                         ordersFromDb.addAll(orderResults);
                     }
@@ -178,11 +166,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 List<DBItemInventoryProcessClass> pcsFromDb = new ArrayList<DBItemInventoryProcessClass>();
                 for (String folder : folderSet) {
                     List<DBItemInventoryProcessClass> pcResults = null;
-                    if (".".equalsIgnoreCase(folder)) {
-                        pcResults = pcLayer.getProcessClassesFromRootFolder(dbItemInventoryInstance.getId());
-                    } else {
-                        pcResults = pcLayer.getProcessClassesByFolders(folder, dbItemInventoryInstance.getId(), true);
-                    }
+                    pcResults = pcLayer.getProcessClassesByFolders(folder, dbItemInventoryInstance.getId(), true);
                     if (pcResults != null && !pcResults.isEmpty()) {
                         pcsFromDb.addAll(pcResults);
                     }
@@ -193,11 +177,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 List<DBItemInventorySchedule> schedulesFromDb = new ArrayList<DBItemInventorySchedule>();
                 for (String folder : folderSet) {
                     List<DBItemInventorySchedule> scheduleResults = null;
-                    if (".".equalsIgnoreCase(folder)) {
-                        scheduleResults = schedulesLayer.getSchedulesFromRootFolder(dbItemInventoryInstance.getId());
-                    } else {
-                        scheduleResults = schedulesLayer.getSchedulesByFolders(folder, dbItemInventoryInstance.getId(), true);
-                    }
+                    scheduleResults = schedulesLayer.getSchedulesByFolders(folder, dbItemInventoryInstance.getId(), true);
                     if (scheduleResults != null && !scheduleResults.isEmpty()) {
                         schedulesFromDb.addAll(scheduleResults);
                     }
@@ -213,11 +193,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 List<DBItemInventoryLock> locksFromDb = new ArrayList<DBItemInventoryLock>();
                 for (String folder : folderSet) {
                     List<DBItemInventoryLock> lockResults = null;
-                    if (".".equalsIgnoreCase(folder)) {
-                        lockResults = locksLayer.getLocksFromRootFolder(dbItemInventoryInstance.getId());
-                    } else {
-                        lockResults = locksLayer.getLocksByFolders(folder, dbItemInventoryInstance.getId(), true);
-                    }
+                    lockResults = locksLayer.getLocksByFolders(folder, dbItemInventoryInstance.getId(), true);
                     if (lockResults != null && !lockResults.isEmpty()) {
                         locksFromDb.addAll(lockResults);
                     }

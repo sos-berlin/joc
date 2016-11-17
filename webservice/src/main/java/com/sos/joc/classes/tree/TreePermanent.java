@@ -1,9 +1,12 @@
 package com.sos.joc.classes.tree;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.SortedSet;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.joc.Globals;
@@ -60,152 +63,74 @@ public class TreePermanent {
 
     public static List<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId) throws Exception {
         List<String> folders = new ArrayList<String>();
-        InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(Globals.sosHibernateConnection);
-        for (Folder folder : treeBody.getFolders()) {
-            List<String> results = dbLayer.getFoldersByFolder(instanceId, folder.getFolder().substring(1), folder.getRecursive());
-            if(results != null && !results.isEmpty()) {
-                folders.addAll(results);
-            }
-        }
-        return folders;
-    }
-    
-    public static List<String> initFoldersByTypeFromBody(TreeFilter treeBody, Long instanceId) throws Exception {
-        List<String> folders = new ArrayList<String>();
-        InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(Globals.sosHibernateConnection);
-        if(treeBody.getTypes().isEmpty()) {
-            folders = dbLayer.getFolders(instanceId);
-        } else {
+        List<String> bodyTypes = new ArrayList<String>();
+        if(treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
             for(JobSchedulerObjectType type : treeBody.getTypes()) {
-                List<String> fromDb = null;
-                switch (type) {
-                case JOB:
-                    fromDb = dbLayer.getFoldersByFileType(instanceId, "job");
-                    if(fromDb != null && !fromDb.isEmpty()) {
-                        folders.addAll(fromDb);
-                    }
-                    break;
-                case JOBCHAIN: 
-                    fromDb = dbLayer.getFoldersByFileType(instanceId, "job_chain");
-                    if(fromDb != null && !fromDb.isEmpty()) {
-                        folders.addAll(fromDb);
-                    }
-                    break;
-                case ORDER: 
-                    fromDb = dbLayer.getFoldersByFileType(instanceId, "order");
-                    if(fromDb != null && !fromDb.isEmpty()) {
-                        folders.addAll(fromDb);
-                    }
-                    break;
-                case PROCESSCLASS: 
-                    fromDb = dbLayer.getFoldersByFileType(instanceId, "process_class");
-                    if(fromDb != null && !fromDb.isEmpty()) {
-                        folders.addAll(fromDb);
-                    }
-                    break;
-                case LOCK: 
-                    fromDb = dbLayer.getFoldersByFileType(instanceId, "lock");
-                    if(fromDb != null && !fromDb.isEmpty()) {
-                        folders.addAll(fromDb);
-                    }
-                    break;
-                case SCHEDULE: 
-                    fromDb = dbLayer.getFoldersByFileType(instanceId, "schedule");
-                    if(fromDb != null && !fromDb.isEmpty()) {
-                        folders.addAll(fromDb);
-                    }
-                    break;
-                case OTHER:
-                    break;
-                default:
-                    break;
-                }
+                bodyTypes.add(type.name().toLowerCase().replaceFirst("([bs])c", "$1_c"));
             }
         }
+        InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(Globals.sosHibernateConnection);
+        List<String> results = null;
+        if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
+            for (Folder folder : treeBody.getFolders()) {
+                results = dbLayer.getFoldersByFolderAndType(instanceId, ("/"+folder.getFolder()).replaceAll("//+", "/"), folder.getRecursive(), bodyTypes);
+            }
+        } else {
+            results = dbLayer.getFoldersByFolderAndType(instanceId, "/", true, bodyTypes);
+        }
+        if(results != null && !results.isEmpty()) {
+            folders.addAll(results);
+        }
+    
         return folders;
     }
- 
-    public static void getTree(Tree rootTree, Set<String> folders) {
+    
+    public static Tree getTree(SortedSet<String> folders) {
+        Map<Path, Tree> treeMap = new HashMap<Path, Tree>();
         for(String folder : folders) {
-            Tree childTree = initTreeNode(rootTree, folder, null);
-            if(childTree != null) {
-                if(folder.contains("/")) {
-                    String[] splitFolders = folder.split("/");
-                    childTree.setName(splitFolders[0]);
-                    childTree.setPath("/" + splitFolders[0]);
-                    rootTree.getFolders().add(childTree);
-                } else if (!".".equalsIgnoreCase(folder)) {
-                    childTree.setName(folder);
-                    childTree.setPath("/" + folder);
-                    rootTree.getFolders().add(childTree);
-                }            
-            }
-        }
-    }
-
-    private static Tree initTreeNode(Tree tree, String folder, String parentFolder) {
-        if(folder.startsWith(tree.getPath())){
-           return null; 
-        } else {
-            Tree childTree = new Tree();
-            if(folder.contains("/")) {
-                childTree.setName(folder.substring(0, folder.indexOf("/")));
+            Path pFolder = Paths.get(folder);
+            Tree tree = new Tree();
+            if (treeMap.containsKey(pFolder)) {
+                tree = treeMap.get(pFolder);
             } else {
-                childTree.setName(folder);
+                tree.setPath(folder);
+                Path fileName = pFolder.getFileName();
+                tree.setName(fileName == null ? "" : fileName.toString());
+                tree.setFolders(null);
+                treeMap.put(pFolder, tree);
             }
-            String newPath = null;
-            if(parentFolder != null) {
-                if(parentFolder.contains("/")) {
-                    String[] splits = parentFolder.split("/");
-                    if(splits.length > 1){
-                        newPath = parentFolder.substring(0, parentFolder.indexOf("/" + childTree.getName()) + ("/" + childTree.getName()).length());
-                        childTree.setPath(newPath);
-                    } else {
-                        childTree.setPath(parentFolder);
-                    }
-                }
-            } else {
-                newPath = "/" + folder;
-                childTree.setPath(newPath);
-                parentFolder = newPath;
-            }
-            if(folder != null && folder.contains("/")) {
-                String subfolder = folder.substring(folder.indexOf("/") + 1);
-                if(subfolder == null || subfolder.isEmpty()) {
-                    childTree.setFolders(null);
-                    return childTree;
-                } else {
-                    Tree newChild = initTreeNode(childTree, subfolder, parentFolder);
-                    if (newChild != null) {
-                        childTree.getFolders().add(newChild);
-                    }
-                    return childTree;
-                }
-            } else {
-                childTree.setFolders(null);
-                return childTree;
-            }
+            fillTreeMap(treeMap, pFolder, tree);
         }
-    }
-
-    public static Tree mergeTreeDuplications(Tree tree) {
-        Set<Tree> foldersToRemove = new HashSet<Tree>();
-        int i = 1;
-        for (Tree treeItem : tree.getFolders()) {
-            for (int counter = i ; counter < tree.getFolders().size(); counter++) {
-                if (tree.getFolders().get(counter).getName().equals(treeItem.getName())) {
-                    for(Tree folder : treeItem.getFolders()) {
-                        if(!tree.getFolders().get(counter).getFolders().contains(folder)) {
-                            tree.getFolders().get(counter).getFolders().add(folder);
-                        }
-                    }
-                    foldersToRemove.add(treeItem);
-                }
-            }
-            i++;
-        }
-        tree.getFolders().removeAll(foldersToRemove);
-        return tree;
+        return treeMap.get(Paths.get("/"));
     }
     
+    private static void fillTreeMap(Map<Path, Tree> treeMap, Path folder, Tree tree) {
+        Path parent = folder.getParent();
+        if (parent != null) {
+            Tree parentTree = new Tree();
+            if (treeMap.containsKey(parent)) {
+                parentTree = treeMap.get(parent);
+                List<Tree> treeList = parentTree.getFolders();
+                if (treeList == null) {
+                    treeList = new ArrayList<Tree>();
+                    treeList.add(tree);
+                    parentTree.setFolders(treeList);
+                } else {
+                    if (treeList.contains(tree)) {
+                        treeList.remove(tree);
+                    }
+                    treeList.add(tree);
+                }
+            } else {
+                parentTree.setPath(parent.toString().replace('\\', '/'));
+                Path fileName = parent.getFileName();
+                parentTree.setName(fileName == null ? "" : fileName.toString());
+                List<Tree> treeList = new ArrayList<Tree>();
+                treeList.add(tree);
+                parentTree.setFolders(treeList);
+                treeMap.put(parent, parentTree);
+            }
+            fillTreeMap(treeMap, parent, parentTree); 
+        }
+    }
 }

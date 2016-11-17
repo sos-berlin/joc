@@ -1,6 +1,7 @@
 package com.sos.joc.classes.runtime;
 
 import java.io.StringWriter;
+import java.time.Instant;
 import java.util.Date;
 
 import javax.xml.transform.OutputKeys;
@@ -26,7 +27,7 @@ public class RunTime {
         com.sos.joc.model.common.RunTime runTime = new com.sos.joc.model.common.RunTime();
         runTime.setRunTime(getRuntimeXmlString(runtimeNode));
         runTimeAnswer.setRunTime(runTime);
-        runTimeAnswer.setDeliveryDate(new Date());
+        runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));
         return runTimeAnswer;
     }
     

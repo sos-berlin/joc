@@ -18,7 +18,6 @@ import com.sos.joc.model.order.OrderP;
 import com.sos.joc.model.order.OrderP200;
 import com.sos.joc.model.order.OrderType;
 import com.sos.joc.order.resource.IOrderPResource;
-import com.sos.scheduler.model.answers.Order;
 
 @Path("order")
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
@@ -38,7 +37,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             Boolean compact = orderFilter.getCompact();
             OrderP200 entity = new OrderP200();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
-            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePathForDB(orderFilter.getJobChain()),
+            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePath(orderFilter.getJobChain()),
                     orderFilter.getOrderId(), instanceId);
             OrderP order = new OrderP();
             order.setSurveyDate(dbItemInventoryOrder.getModified());

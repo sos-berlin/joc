@@ -37,8 +37,8 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         try {
             initLogging(API_CALL, jobsFilter);
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissons(accessToken).getJob()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -92,13 +92,8 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
             for (JobPath jobPathFilter : jobs) {
-                if (isOrderJob != null) {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePathForDB(jobPathFilter.getJob()), isOrderJob,
-                            dbItemInventoryInstance.getId());
-                } else {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePathForDB(jobPathFilter.getJob()), null,
-                            dbItemInventoryInstance.getId());
-                }
+                filteredJobs = dbLayer.getInventoryJobsFilteredByJobPath(normalizePath(jobPathFilter.getJob()), isOrderJob, dbItemInventoryInstance
+                        .getId());
                 if (filteredJobs != null) {
                     listOfJobs.addAll(filteredJobs);
                 }
@@ -107,12 +102,8 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> filteredJobs = null;
             for (Folder folderFilter : folders) {
-                if ("/".equalsIgnoreCase(folderFilter.getFolder()) && !folderFilter.getRecursive()) {
-                    filteredJobs = dbLayer.getInventoryJobsFromRootFolder(isOrderJob, dbItemInventoryInstance.getId());
-                } else {
-                    filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(normalizePathForDB(folderFilter.getFolder()), isOrderJob,
-                            folderFilter.getRecursive(), dbItemInventoryInstance.getId());
-                }
+                filteredJobs = dbLayer.getInventoryJobsFilteredByFolder(normalizeFolder(folderFilter.getFolder()), isOrderJob, folderFilter
+                        .getRecursive(), dbItemInventoryInstance.getId());
                 if (filteredJobs != null && !filteredJobs.isEmpty()) {
                     if (regex != null && !regex.isEmpty()) {
                         List<DBItemInventoryJob> jobsFilteredByRegex = filterByRegex(filteredJobs, regex);
@@ -127,11 +118,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         } else {
             listOfJobs = new ArrayList<DBItemInventoryJob>();
             List<DBItemInventoryJob> unfilteredJobs = null;
-            if (isOrderJob != null) {
-                unfilteredJobs = dbLayer.getInventoryJobs(isOrderJob, dbItemInventoryInstance.getId());
-            } else {
-                unfilteredJobs = dbLayer.getInventoryJobs(dbItemInventoryInstance.getId());
-            }
+            unfilteredJobs = dbLayer.getInventoryJobs(isOrderJob, dbItemInventoryInstance.getId());
             if (unfilteredJobs != null && !unfilteredJobs.isEmpty()) {
                 if (regex != null && !regex.isEmpty()) {
                     List<DBItemInventoryJob> jobsFilteredByRegex = filterByRegex(unfilteredJobs, regex);

@@ -108,16 +108,21 @@ public class InventoryOrdersDBLayer extends DBLayer {
     public List<DBItemInventoryOrder> getInventoryOrdersFilteredByFolders(String folderName, boolean recursive, Long instanceId) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_ORDERS);
-            if(recursive) {
-                sql.append(" where name like :folderName ");
+            if (recursive) {
+                sql.append("from ").append(DBITEM_INVENTORY_ORDERS);
+                sql.append(" where name like :folderName");
+                sql.append(" and instanceId = :instanceId");
             } else {
-                sql.append(" where name = :folderName ");
+                sql.append("select io from ");
+                sql.append(DBITEM_INVENTORY_ORDERS).append(" io, ");
+                sql.append(DBITEM_INVENTORY_FILES).append(" ifile ");
+                sql.append(" where io.fileId = ifile.id");
+                sql.append(" and ifile.fileDirectory = :folderName");
+                sql.append(" and io.instanceId = :instanceId");
             }
-            sql.append(" and instanceId = :instanceId");
             Query query = getConnection().createQuery(sql.toString());
             if(recursive) {
-                query.setParameter("folderName", "%" + folderName + "%");
+                query.setParameter("folderName", folderName + "%");
             } else {
                 query.setParameter("folderName", folderName);
             }
@@ -131,24 +136,4 @@ public class InventoryOrdersDBLayer extends DBLayer {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }
     }
-    
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryOrder> getInventoryOrdersFromRootFolder(Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_ORDERS);
-            sql.append(" where name = baseName ");
-            sql.append(" and instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryOrder> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-    
 }

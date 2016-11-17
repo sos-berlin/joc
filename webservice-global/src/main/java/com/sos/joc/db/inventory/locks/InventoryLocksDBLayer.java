@@ -42,39 +42,25 @@ public class InventoryLocksDBLayer extends DBLayer {
     public List<DBItemInventoryLock> getLocksByFolders(String folderPath, Long instanceId, boolean recursive) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
-            sql.append(" where instanceId = :instanceId");
             if (recursive) {
-                sql.append(" and name like :folderPath");
+                sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
+                sql.append(" where name like :folderName");
+                sql.append(" and instanceId = :instanceId");
             } else {
-                sql.append(" and name = :folderPath");
+                sql.append("select il from ");
+                sql.append(DBITEM_INVENTORY_LOCKS).append(" il, ");
+                sql.append(DBITEM_INVENTORY_FILES).append(" ifile ");
+                sql.append(" where il.fileId = ifile.id");
+                sql.append(" and ifile.fileDirectory = :folderName");
+                sql.append(" and il.instanceId = :instanceId");
             }
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (recursive) {
-                query.setParameter("folderPath", "%" + folderPath + "%");
+                query.setParameter("folderName", folderPath + "%");
             } else {
-                query.setParameter("folderPath", folderPath);
+                query.setParameter("folderName", folderPath);
             }
-            List<DBItemInventoryLock> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryLock> getLocksFromRootFolder(Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
-            sql.append(" where instanceId = :instanceId");
-            sql.append(" and name = basename");
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
             List<DBItemInventoryLock> result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;

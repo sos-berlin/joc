@@ -34,7 +34,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             checkRequiredParameter("job", jobFilter.getJob());
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
             Long instanceId = dbItemInventoryInstance.getId();
-            DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(normalizePathForDB(jobFilter.getJob()), instanceId);
+            DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(normalizePath(jobFilter.getJob()), instanceId);
 
             JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId);
             JobP200 entity = new JobP200();

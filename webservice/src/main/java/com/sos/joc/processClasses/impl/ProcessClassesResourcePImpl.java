@@ -43,14 +43,17 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
             List<ProcessClassPath> processClassPaths = processClassFilter.getProcessClasses();
             List<Folder> folders = processClassFilter.getFolders();
-            
+
             if (processClassPaths != null && !processClassPaths.isEmpty()) {
                 for (ProcessClassPath processClassPath : processClassPaths) {
                     checkRequiredParameter("processClass", processClassPath.getProcessClass());
-                    DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePathForDB(processClassPath.getProcessClass()),
+                    DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePath(processClassPath.getProcessClass()),
                             dbItemInventoryInstance.getId());
                     if (processClassFromDb == null) {
-                        //LOGGER.warn(String.format("process class '%1$s' doesn't exist in table %2$s", processClassPath.getProcessClass(), DBLayer.DBITEM_INVENTORY_PROCESS_CLASSES));
+                        // LOGGER.warn(String.format("process class '%1$s'
+                        // doesn't exist in table %2$s",
+                        // processClassPath.getProcessClass(),
+                        // DBLayer.DBITEM_INVENTORY_PROCESS_CLASSES));
                         continue;
                     }
                     listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));
@@ -59,12 +62,8 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
                 for (Folder folder : folders) {
                     List<DBItemInventoryProcessClass> processClassesFromDb = null;
-                    if ("/".equalsIgnoreCase(folder.getFolder()) && !folder.getRecursive()) {
-                        processClassesFromDb = dbLayer.getProcessClassesFromRootFolder(dbItemInventoryInstance.getId());
-                    } else {
-                        processClassesFromDb = dbLayer.getProcessClassesByFolders(normalizePathForDB(folder.getFolder()),
-                                dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-                    }
+                    processClassesFromDb = dbLayer.getProcessClassesByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance.getId(),
+                            folder.getRecursive().booleanValue());
                     Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, processClassesFromDb,
                             processClassFilter.getRegex());
                     mapOfProcessClasses.putAll(processClassesToAdd);

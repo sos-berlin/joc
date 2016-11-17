@@ -35,7 +35,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
 
     @Override
     public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        
+
         try {
             initLogging(API_CALL, jobChainsFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissons(accessToken).getJobChain()
@@ -55,7 +55,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             List<JobChainP> jobChains = new ArrayList<JobChainP>();
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 for (JobChainPath jobChainPath : jobChainPaths) {
-                    DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(normalizePathForDB(jobChainPath.getJobChain()), instanceId);
+                    DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(normalizePath(jobChainPath.getJobChain()), instanceId);
                     JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                     if (jobChain != null) {
                         jobChains.add(jobChain);
@@ -64,12 +64,8 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    List<DBItemInventoryJobChain> jobChainsFromDb = null;
-                    if ("/".equalsIgnoreCase(folder.getFolder()) && !folder.getRecursive()) {
-                        jobChainsFromDb = dbLayer.getJobChainsFromRootFolder(instanceId);
-                    } else {
-                        jobChainsFromDb = dbLayer.getJobChainsByFolder(normalizePathForDB(folder.getFolder()), folder.getRecursive(), instanceId);
-                    }
+                    List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChainsByFolder(normalizeFolder(folder.getFolder()), folder
+                            .getRecursive(), instanceId);
                     if (jobChainsFromDb != null) {
                         for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
                             JobChainP jobChain = null;

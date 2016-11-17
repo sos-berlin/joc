@@ -38,7 +38,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
             JobChainP200 entity = new JobChainP200();
             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
             Long instanceId = dbItemInventoryInstance.getId();
-            DBItemInventoryJobChain inventoryJobChain = dbLayer.getJobChainByPath(normalizePathForDB(jobChainFilter.getJobChain()), instanceId);
+            DBItemInventoryJobChain inventoryJobChain = dbLayer.getJobChainByPath(normalizePath(jobChainFilter.getJobChain()), instanceId);
             JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, inventoryJobChain, jobChainFilter.getCompact(), instanceId);
             if (jobChain != null) {
                 entity.setJobChain(jobChain);
@@ -47,9 +47,9 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
                     for (String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
                         DBItemInventoryJobChain nestedJobChain = null;
                         if (nestedJobChainName.contains("/")) {
-                            nestedJobChain = dbLayer.getJobChainByPath(normalizePathForDB(nestedJobChainName), instanceId);
+                            nestedJobChain = dbLayer.getJobChainByPath(normalizePath(nestedJobChainName), instanceId);
                         } else {
-                            nestedJobChain = dbLayer.getJobChainByName(normalizePathForDB(nestedJobChainName), instanceId);
+                            nestedJobChain = dbLayer.getJobChainByName(normalizePath(nestedJobChainName), instanceId);
                         }
                         if (nestedJobChain != null) {
                             JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, jobChainFilter.getCompact(),

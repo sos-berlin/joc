@@ -65,9 +65,13 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append("from ");
             sql.append(DBITEM_INVENTORY_JOBS);
             sql.append(" where instanceId = :instanceId");
-            sql.append(" and isOrderJob = :isOrderJob");
+            if (isOrderJob != null) {
+                sql.append(" and isOrderJob = :isOrderJob");
+            }
             Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("isOrderJob", isOrderJob);
+            if (isOrderJob != null) {
+                query.setParameter("isOrderJob", isOrderJob);
+            }
             query.setParameter("instanceId", instanceId);
             return query.list();
         } catch (Exception ex) {
@@ -171,13 +175,18 @@ public class InventoryJobsDBLayer extends DBLayer {
             throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_JOBS);
             if (recursive) {
-                sql.append(" where name like :folderName ");
+                sql.append("from ").append(DBITEM_INVENTORY_JOBS);
+                sql.append(" where name like :folderName");
+                sql.append(" and instanceId = :instanceId");
             } else {
-                sql.append(" where name = :folderName ");
+                sql.append("select ij from ");
+                sql.append(DBITEM_INVENTORY_JOBS).append(" ij, ");
+                sql.append(DBITEM_INVENTORY_FILES).append(" ifile ");
+                sql.append(" where ij.fileId = ifile.id");
+                sql.append(" and ifile.fileDirectory = :folderName");
+                sql.append(" and ij.instanceId = :instanceId");
             }
-            sql.append(" and instanceId = :instanceId");
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
@@ -200,30 +209,4 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }
     }
-    
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobsFromRootFolder(Boolean isOrderJob, Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_JOBS);
-            sql.append(" where name = baseName ");
-            sql.append(" and instanceId = :instanceId");
-            if (isOrderJob != null) {
-                sql.append(" and isOrderJob = :isOrderJob");
-            }
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
-            if (isOrderJob != null) {
-                query.setParameter("isOrderJob", isOrderJob);
-            }
-            List<DBItemInventoryJob> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-    
 }

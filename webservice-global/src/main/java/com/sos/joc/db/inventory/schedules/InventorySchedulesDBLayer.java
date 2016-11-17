@@ -120,22 +120,27 @@ public class InventorySchedulesDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventorySchedule> getSchedulesByFolders(String folderPath, Long instanceId, boolean recursive) throws Exception {
+    public List<DBItemInventorySchedule> getSchedulesByFolders(String folderName, Long instanceId, boolean recursive) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
-            sql.append(" where instanceId = :instanceId");
             if (recursive) {
-                sql.append(" and name like :folderPath");
+                sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
+                sql.append(" where name like :folderName");
+                sql.append(" and instanceId = :instanceId");
             } else {
-                sql.append(" and name = :folderPath");
+                sql.append("select is from ");
+                sql.append(DBITEM_INVENTORY_SCHEDULES).append(" is, ");
+                sql.append(DBITEM_INVENTORY_FILES).append(" ifile ");
+                sql.append(" where is.fileId = ifile.id");
+                sql.append(" and ifile.fileDirectory = :folderName");
+                sql.append(" and is.instanceId = :instanceId");
             }
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (recursive) {
-                query.setParameter("folderPath", "%" + folderPath + "%");
+                query.setParameter("folderName", folderName + "%");
             } else {
-                query.setParameter("folderPath", folderPath);
+                query.setParameter("folderName", folderName);
             }
             List<DBItemInventorySchedule> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -146,24 +151,4 @@ public class InventorySchedulesDBLayer extends DBLayer {
             throw new Exception(SOSHibernateConnection.getException(ex));
         }        
     }
-    
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventorySchedule> getSchedulesFromRootFolder(Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
-            sql.append(" where instanceId = :instanceId");
-            sql.append(" and name = basename");
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventorySchedule> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
-    }
-    
 }
