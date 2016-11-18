@@ -71,7 +71,7 @@ public class JobSchedulerDate {
             if (dateFrom == null){
                 return new Date();
             }
-            return Date.from(getInstantFromDateTo(dateFrom, timeZone));
+            return Date.from(getInstantFromDateFrom(dateFrom, timeZone));
         } catch (JobSchedulerInvalidResponseDataException e) {
             throw e;
         } catch (Exception e) {
