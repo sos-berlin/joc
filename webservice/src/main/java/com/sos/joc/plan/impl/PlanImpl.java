@@ -14,6 +14,7 @@ import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.plan.Period;
@@ -47,12 +48,10 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             dailyPlanDBLayer.getFilter().setJob(planFilter.getJob());
             dailyPlanDBLayer.getFilter().setJobChain(planFilter.getJobChain());
             dailyPlanDBLayer.getFilter().setOrderId(planFilter.getOrderId());
-            dailyPlanDBLayer.getFilter().setPlannedStartFrom(planFilter.getDateFrom());
-            dailyPlanDBLayer.getFilter().setPlannedStartTo(planFilter.getDateTo());
+            dailyPlanDBLayer.getFilter().setPlannedStartFrom(JobSchedulerDate.getDateFromDateFrom(planFilter.getDateFrom(), planFilter.getTimeZone()));
+            dailyPlanDBLayer.getFilter().setPlannedStartTo(JobSchedulerDate.getDateFromDateTo(planFilter.getDateTo(), planFilter.getTimeZone()));
             dailyPlanDBLayer.getFilter().setTimeZone(planFilter.getTimeZone());
-            if (planFilter.getLate() != null) {
-                dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
-            }
+            dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
 
             for (PlanStateText state : planFilter.getStates()) {
                 dailyPlanDBLayer.getFilter().addState(state.name());
