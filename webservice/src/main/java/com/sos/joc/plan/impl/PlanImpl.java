@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
@@ -15,6 +17,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.classes.jobchains.JobChainPermanent;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.plan.Period;
@@ -62,10 +65,11 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             Plan entity = new Plan();
             for (DailyPlanDBItem dailyPlanDBItem : listOfDailyPlanDBItems) {
+
+                boolean add = true;
+
                 PlanItem p = new PlanItem();
                 Err err = new Err();
-                p.setJob(dailyPlanDBItem.getJob());
-                p.setJobChain(dailyPlanDBItem.getJobChain());
                 p.setLate(dailyPlanDBItem.getIsLate());
 
                 Period period = new Period();
@@ -102,6 +106,12 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setSurveyDate(dailyPlanDBItem.getCreated());
 
                 if (dailyPlanDBItem.isStandalone()) {
+                    if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                        Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getJob());
+                        add = regExMatcher.find();
+                    }
+                    p.setJob(dailyPlanDBItem.getJob());
+
                     if (dailyPlanDBItem.getDbItemReportExecution() != null) {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
                         p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId());
@@ -111,6 +121,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         p.setError(err);
                     }
                 } else {
+                    if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                        Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
+                        add = regExMatcher.find();
+                    }
+                    p.setJobChain(dailyPlanDBItem.getJobChain());
+                    p.setOrderId(dailyPlanDBItem.getOrderId());
+
                     if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
                         p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId());
@@ -121,7 +138,9 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     }
 
                 }
-                result.add(p);
+                if (add) {
+                    result.add(p);
+                }
             }
             entity.setPlanItems(result);
             entity.setDeliveryDate(Date.from(Instant.now()));
