@@ -47,7 +47,10 @@ public class JobSchedulerDate {
         return fromString;
     }
     
-    public static Date getDateFromEventId(long eventId) {
+    public static Date getDateFromEventId(Long eventId) {
+        if (eventId == null) {
+            return null;
+        }
         Instant fromEpochMilli = Instant.ofEpochMilli(eventId/1000);
         return Date.from(fromEpochMilli);
     }
