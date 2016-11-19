@@ -174,7 +174,7 @@ public class JobChainVolatile extends JobChainV {
         setName(jobChain.getAttribute(WebserviceConstants.NAME));
         jobNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job]");
         jobChainNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job_chain] | job_chain_node.job_chain[@job_chain]");
-        blacklist = jocXmlCommand.getSosxml().selectNodeList(jobChain, "blacklist");
+        blacklist = jocXmlCommand.getSosxml().selectNodeList(jobChain, "blacklist/orders");
         setNumOfNodes(jobNodes.getLength() + jobChainNodes.getLength());
         //Integer numOfFileOrders = Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(jobChain, "file_order_source/files/@count", "0"));
         setNumOfOrders(Integer.parseInt(jobChain.getAttribute("orders")) + blacklist.getLength());
