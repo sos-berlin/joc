@@ -78,8 +78,10 @@ public class JocError extends Err{
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append(getCode()).append(": ");
-        s.append(getMessage()).append("\n");
+        String m = getMessage();
+        if (m != null && !m.isEmpty()) {
+            s.append(getMessage()).append("\n");
+        }
         for (String str : metaInfo) {
             s.append(str).append("\n");
         }
