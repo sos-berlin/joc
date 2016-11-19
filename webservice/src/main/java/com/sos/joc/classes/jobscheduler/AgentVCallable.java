@@ -8,9 +8,7 @@ import javax.json.JsonObject;
 
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
@@ -37,6 +35,7 @@ public class AgentVCallable implements Callable<AgentV> {
 
     public AgentV getAgentV(String agentUrl, String masterUrl, String accessToken, String jsonPath) throws JocException {
         JOCJsonCommand jocJsonCommand = new JOCJsonCommand(masterUrl, jsonPath);
+        jocJsonCommand.setSocketTimeout(1000);
         AgentV agent = new AgentV();
         agent.setSurveyDate(Date.from(Instant.now()));
         agent.setUrl(agentUrl);
