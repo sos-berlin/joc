@@ -122,7 +122,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
             postBody = "";
         }
         JocError jocError = new JocError();
-        jocError.appendMetaInfo("JS-URL: " + uri.toString(), "JS-PostBody: " + postBody);
+        jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()), "JS-PostBody: " + postBody);
         try {
             String response = postRestService(uri, postBody);
             return getJsonObjectFromResponse(response, uri, jocError);
@@ -151,7 +151,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         addHeader("Accept", "application/json");
         addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
         JocError jocError = new JocError();
-        jocError.appendMetaInfo("JS-URL: " + uri.toString());
+        jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         try {
             String response = getRestService(uri);
             return getJsonObjectFromResponse(response, uri, jocError);
