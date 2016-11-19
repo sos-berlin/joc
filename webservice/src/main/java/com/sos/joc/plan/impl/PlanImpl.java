@@ -9,15 +9,12 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.omg.PortableInterceptor.SUCCESSFUL;
-
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.classes.jobchains.JobChainPermanent;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.plan.Period;
@@ -114,7 +111,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
                     if (dailyPlanDBItem.getDbItemReportExecution() != null) {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
-                        p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId().toString());
                         p.setStartTime(dailyPlanDBItem.getDbItemReportExecution().getStartTime());
                         err.setCode(dailyPlanDBItem.getDbItemReportExecution().getErrorCode());
                         err.setMessage(dailyPlanDBItem.getDbItemReportExecution().getErrorText());
@@ -130,9 +127,9 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
                     if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
-                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId().toString());
                         p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
-                        p.setExitCode(dailyPlanDBItem.getDbItemReportTrigger().getState());
+                        p.setExitCode(Integer.valueOf(dailyPlanDBItem.getDbItemReportTrigger().getState()));
                         p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
                         p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getOrderId());
                     }
