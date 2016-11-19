@@ -9,13 +9,10 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
-import com.sos.scheduler.model.commands.JSCmdParamGet;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 /** @author Uwe Risse */
 public class InventoryInstancesDBLayer extends DBLayer {
@@ -143,12 +140,9 @@ public class InventoryInstancesDBLayer extends DBLayer {
         case "passive":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
-                    JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-                    jsCmdShowState.setWhat("folders no_subfolders");
-                    jsCmdShowState.setPath("/does/not/exist");
-                    jsCmdShowState.setSubsystems("folder");
+                    String xml = "<show_state subsystems=\"folder\" what=\"folders no_subfolders\" path=\"/does/not/exist\" />";
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
-                    resourceImpl.executePost(jsCmdShowState.toXMLString(), accessToken);
+                    resourceImpl.executePost(xml, accessToken);
                     String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
                     if (!"waiting_for_activation,dead".contains(state)) {
                         return schedulerInstancesDBItem;
@@ -161,10 +155,9 @@ public class InventoryInstancesDBLayer extends DBLayer {
         case "active":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
-                    JSCmdParamGet jsCmdParamGet = Globals.schedulerObjectFactory.createParamGet();
-                    jsCmdParamGet.setName("");
+                    String xml = "<param.get name=\"\" />";
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
-                    resourceImpl.executePost(jsCmdParamGet.toXMLString(), accessToken);
+                    resourceImpl.executePost(xml, accessToken);
                     return schedulerInstancesDBItem;
                 } catch (Exception e) {
                     // unreachable

@@ -1,18 +1,14 @@
 package com.sos.joc.classes;
 
-import java.math.BigInteger;
-
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.task.JobSchedulerTaskHistoryDBLayer;
 import com.sos.joc.model.job.TaskFilter;
-import com.sos.scheduler.model.commands.JSCmdShowTask;
 
 public class LogTaskContent extends LogContent {
 
-    private static final String XPATH_TASK_LOG = "//spooler/answer/task/log";
-    private static final String WHAT_LOG = "log";
+    private static final String XPATH_TASK_LOG = "/spooler/answer/task/log";
     private TaskFilter taskFilter;
     
     public LogTaskContent(TaskFilter taskFilter, DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
@@ -39,12 +35,8 @@ public class LogTaskContent extends LogContent {
 
     private String getTaskLogFromXmlCommand() throws Exception {
 
+        String xml = String.format("<show_task id=\"%1$s\" what=\"log\" />", taskFilter.getTaskId());
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-
-        JSCmdShowTask jsCmdShowTask = Globals.schedulerObjectFactory.createShowTask();
-        jsCmdShowTask.setWhat(WHAT_LOG);
-        jsCmdShowTask.setId(new BigInteger(taskFilter.getTaskId()));
-        String xml = Globals.schedulerObjectFactory.toXMLString(jsCmdShowTask);
         jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_TASK_LOG, null);
     }

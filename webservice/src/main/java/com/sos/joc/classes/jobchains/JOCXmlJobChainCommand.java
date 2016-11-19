@@ -1,6 +1,5 @@
 package com.sos.joc.classes.jobchains;
 
-import java.math.BigInteger;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
@@ -31,9 +29,6 @@ import com.sos.joc.model.jobChain.JobChainPath;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.order.OrderV;
-import com.sos.scheduler.model.commands.JSCmdCommands;
-import com.sos.scheduler.model.commands.JSCmdShowJobChain;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 
 public class JOCXmlJobChainCommand extends JOCXmlCommand {
@@ -49,8 +44,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     }
     
     public JobChainV getJobChain(String jobChain, Boolean compact) throws Exception {
-        JSCmdShowJobChain j = createShowJobChainPostCommand(jobChain, compact);
-        executePostWithThrowBadRequest(j.toXMLString(), accessToken);
+        executePostWithThrowBadRequest(createShowJobChainPostCommand(jobChain, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job_chain");
         JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this);
         jobChainV.setFields(compact);
@@ -64,75 +58,77 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
             return null;
         }
         JobChainsFilter jobChainsFilter = new JobChainsFilter();
-        JSCmdCommands commands = Globals.schedulerObjectFactory.createCmdCommands();
+        StringBuilder xml = new StringBuilder();
+        xml.append("<commands>");
         for (String jobChainPath : nestedJobChains) {
             if (jobChainPath != null) {
-                JSCmdShowJobChain j = createShowJobChainPostCommand(jobChainPath,jobChainsFilter.getCompact());
-                commands.getAddJobsOrAddOrderOrCheckFolders().add(j);
+                xml.append(createShowJobChainPostCommand(jobChainPath,jobChainsFilter.getCompact()));
             }
         }
-        return getJobChains(commands.toXMLString(), jobChainsFilter, "/spooler/answer/job_chain");
+        xml.append("</commands>");
+        return getJobChains(xml.toString(), jobChainsFilter, "/spooler/answer/job_chain");
     }
     
     public List<JobChainV> getJobChainsFromShowJobChain(List<JobChainPath> jobChains, JobChainsFilter jobChainsFilter) throws Exception {
-        JSCmdCommands commands = Globals.schedulerObjectFactory.createCmdCommands();
+        StringBuilder xml = new StringBuilder();
+        xml.append("<commands>");
         for (JobChainPath jobChain : jobChains) {
             if (jobChain.getJobChain() == null || jobChain.getJobChain().isEmpty()) {
                 throw new JocMissingRequiredParameterException("undefined jobChain");
             }
-            JSCmdShowJobChain j = createShowJobChainPostCommand(jobChain.getJobChain(),jobChainsFilter.getCompact());
-            commands.getAddJobsOrAddOrderOrCheckFolders().add(j);
+            xml.append(createShowJobChainPostCommand(jobChain.getJobChain(),jobChainsFilter.getCompact()));
         }
-        return getJobChains(commands.toXMLString(), jobChainsFilter, "/spooler/answer/job_chain");
+        xml.append("</commands>");
+        return getJobChains(xml.toString(), jobChainsFilter, "/spooler/answer/job_chain");
     }
     
     public List<JobChainV> getJobChainsFromShowState(List<Folder> folders, JobChainsFilter jobChainsFilter) throws Exception {
-        JSCmdCommands commands = Globals.schedulerObjectFactory.createCmdCommands();
+        StringBuilder xml = new StringBuilder();
+        xml.append("<commands>");
         for (Folder folder : folders) {
             if (folder.getFolder() == null || folder.getFolder().isEmpty()) {
                 throw new JocMissingRequiredParameterException("undefined folder");
             }
-            JSCmdShowState s = createShowStatePostCommand(folder.getFolder(), folder.getRecursive(), jobChainsFilter.getCompact());
-            commands.getAddJobsOrAddOrderOrCheckFolders().add(s);
+            xml.append(createShowStatePostCommand(folder.getFolder(), folder.getRecursive(), jobChainsFilter.getCompact()));
         }
-        return getJobChains(commands.toXMLString(), jobChainsFilter);
+        xml.append("</commands>");
+        return getJobChains(xml.toString(), jobChainsFilter);
     }
     
     public List<JobChainV> getJobChainsFromShowState(JobChainsFilter jobChainsFilter) throws Exception {
-        JSCmdShowState s = createShowStatePostCommand("/", true, jobChainsFilter.getCompact()); 
-        return getJobChains(s.toXMLString(), jobChainsFilter);
+        return getJobChains(createShowStatePostCommand("/", true, jobChainsFilter.getCompact()), jobChainsFilter);
     }
 
-    private JSCmdShowState createShowStatePostCommand(String folder, Boolean recursive, Boolean compact) {
-        JSCmdShowState showState = Globals.schedulerObjectFactory.createShowState();
-        showState.setSubsystems("folder order");
-        showState.setWhat("job_chains folders order_source_files blacklist");
+    private String createShowStatePostCommand(String folder, Boolean recursive, Boolean compact) {
+        String subsystems = "folder order";
+        String what = "job_chains folders order_source_files blacklist";
+        String path = null;
+        Integer maxOrders = null;
+        Integer maxOrderHistory = 0;
         if (compact) {
-            showState.setMaxOrders(BigInteger.valueOf(0));
+            maxOrders = 0;
         } else {
-            showState.setWhat("job_chain_jobs " + showState.getWhat());
+            what += " job_chain_jobs";
         }
         if (!recursive) {
-            showState.setWhat("no_subfolders " + showState.getWhat());
+            what += " no_subfolders";
         }
         if (folder != null) {
-            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/"));
+            path = ("/" + folder.trim()).replaceAll("//+", "/");
         }
-        showState.setMaxOrderHistory(BigInteger.valueOf(0));
-        return showState;
+        return getShowStateCommand(subsystems, what, path, maxOrders, maxOrderHistory);
     }
 
-    private JSCmdShowJobChain createShowJobChainPostCommand(String jobChain, boolean compact) {
-        JSCmdShowJobChain showJobChain = Globals.schedulerObjectFactory.createShowJobChain();
-        showJobChain.setWhat("order_source_files blacklist"); //blacklisted orders are not counted in <order_queue length="..."/>
+    private String createShowJobChainPostCommand(String jobChain, boolean compact) {
+        jobChain = ("/" + jobChain.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
+        String what = "order_source_files blacklist"; // blacklisted orders are not counted in <order_queue length="..."/>
+        Integer maxOrders = null;
         if (compact) {
-            showJobChain.setMaxOrders(BigInteger.valueOf(0));
+            maxOrders = 0;
         } else {
-            showJobChain.setWhat("job_chain_jobs " + showJobChain.getWhat());
+            what += " job_chain_jobs";
         }
-        showJobChain.setJobChain(("/" + jobChain.trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
-        showJobChain.setMaxOrderHistory(BigInteger.valueOf(0));
-        return showJobChain;
+        return getShowJobChainCommand(jobChain, what, maxOrders);
     }
     
     private List<JobChainV> getJobChains(String command, JobChainsFilter jobChainsFilter) throws Exception {
