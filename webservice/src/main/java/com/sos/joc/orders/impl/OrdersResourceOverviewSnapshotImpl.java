@@ -26,7 +26,8 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 return jocDefaultResponse;
             }
             
-            OrdersSnapshot entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, EVENT_ID_PROPKEY, jobChainsFilter);
+            String eventIdPropKey = accessToken + ":" + EVENT_ID_PROPKEY + ":" + getJsonString(jobChainsFilter);
+            OrdersSnapshot entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, eventIdPropKey, jobChainsFilter);
             
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

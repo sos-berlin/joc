@@ -183,7 +183,7 @@ public class JOCResourceImpl {
         }
     }
 
-    private String getJsonString(Object body) {
+    public String getJsonString(Object body) {
         if (body != null) {
             try {
                 return mapper.writeValueAsString(body);

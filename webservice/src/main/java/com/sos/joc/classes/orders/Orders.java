@@ -25,7 +25,7 @@ import com.sos.joc.model.order.OrdersSummary;
 
 public class Orders {
     
-    public static OrdersSnapshot getSnapshot(String url, String accessToken, String eventKey, JobChainsFilter jobChainsFilter) throws Exception {
+    public static OrdersSnapshot getSnapshot(String url, String accessToken, String eventIdPropKey, JobChainsFilter jobChainsFilter) throws Exception {
         JOCJsonCommand command = new JOCJsonCommand();
         command.setUriBuilderForOrders(url);
         command.addOrderStatisticsQuery();
@@ -79,7 +79,7 @@ public class Orders {
             }
         }
         
-        System.setProperty(accessToken + ":" + eventKey, eventId.toString());
+        System.setProperty(eventIdPropKey, eventId.toString());
         
         OrdersSnapshot entity = new OrdersSnapshot();
         entity.setSurveyDate(JobSchedulerDate.getDateFromEventId(eventId));
@@ -88,12 +88,12 @@ public class Orders {
         return entity;
     }
     
-    private static String getPath(Folder folder) throws JocMissingRequiredParameterException {
+    private static String getPostBody(Folder folder) throws JocMissingRequiredParameterException {
         String path = folder.getFolder();
         if (path == null) {
             throw new JocMissingRequiredParameterException("folder");
         } else {
-            path = ("/"+path).replaceAll("//+","/");
+            path = ("/"+path.trim()+"/").replaceAll("//+","/");
             if (!folder.getRecursive()) {
                 path += "*";
             }
@@ -108,7 +108,7 @@ public class Orders {
         }
         SortedSet<String> sortedSet = new TreeSet<String>();
         for (Folder folder : folders) {
-            sortedSet.add(getPath(folder));
+            sortedSet.add(getPostBody(folder));
         }
         String[] strA = new String[sortedSet.size()];
         int index = 0;

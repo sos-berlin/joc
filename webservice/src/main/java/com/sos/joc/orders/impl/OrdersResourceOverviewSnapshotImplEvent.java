@@ -23,7 +23,7 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
 
     private static final String API_CALL = "./orders/overview/snapshot/event";
     private static final String EVENT_ID_PROPKEY = "orders/overview/snapshot/eventId";
-    private static final Integer EVENT_TIMEOUT = 0;
+    private static final Integer EVENT_TIMEOUT = 60;
 
     @Override
     public JOCDefaultResponse postOrdersOverviewSnapshotEvent(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
@@ -34,8 +34,9 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
-            String eventIdStr = System.getProperty(accessToken + ":" + EVENT_ID_PROPKEY);
+            
+            String eventIdPropKey = accessToken + ":" + EVENT_ID_PROPKEY + ":" + getJsonString(jobChainsFilter);
+            String eventIdStr = System.getProperty(eventIdPropKey);
             OrdersSnapshot entity = new OrdersSnapshot();
             if (eventIdStr != null) {
                 JsonObject json = getJsonObject(eventIdStr, accessToken);
@@ -43,7 +44,7 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
                 String type = json.getString("TYPE", "Empty");
                 switch (type) {
                 case "Empty":
-                    System.setProperty(accessToken + ":" + EVENT_ID_PROPKEY, newEventId.toString());
+                    System.setProperty(eventIdPropKey, newEventId.toString());
                     entity.setOrders(null);
                     entity.setSurveyDate(JobSchedulerDate.getDateFromEventId(newEventId));
                     entity.setDeliveryDate(Date.from(Instant.now()));
@@ -59,12 +60,14 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
                     if (isOrderStarted) {
                         getJsonObject(newEventId.toString(), accessToken);
                     }
-                    entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, EVENT_ID_PROPKEY, jobChainsFilter);
+                    entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, eventIdPropKey, jobChainsFilter);
                     break;
                 case "Torn":
-                    entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, EVENT_ID_PROPKEY, jobChainsFilter);
+                    entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, eventIdPropKey, jobChainsFilter);
                     break;
                 }
+            } else {
+                entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, eventIdPropKey, jobChainsFilter);
             }
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -82,7 +85,7 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
         JOCJsonCommand command = new JOCJsonCommand();
         command.setUriBuilderForEvents(dbItemInventoryInstance.getUrl());
         command.addOrderEventQuery(eventIdStr, EVENT_TIMEOUT);
-        command.setSocketTimeout((EVENT_TIMEOUT + 2) * 1000);
-        return new JOCJsonCommand().getJsonObjectFromPost(builder.build().toString(), accessToken);
+        command.setSocketTimeout((EVENT_TIMEOUT + 10) * 1000);
+        return command.getJsonObjectFromPost(builder.build().toString(), accessToken);
     }
 }
