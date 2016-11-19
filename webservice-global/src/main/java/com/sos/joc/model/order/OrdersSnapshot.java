@@ -48,7 +48,6 @@ public class OrdersSnapshot {
      * job chain order summary
      * <p>
      * only relevant for order jobs and is empty if job's order queue is empty
-     * (Required)
      * 
      */
     @JsonProperty("orders")
@@ -114,7 +113,6 @@ public class OrdersSnapshot {
      * job chain order summary
      * <p>
      * only relevant for order jobs and is empty if job's order queue is empty
-     * (Required)
      * 
      * @return
      *     The orders
@@ -128,7 +126,6 @@ public class OrdersSnapshot {
      * job chain order summary
      * <p>
      * only relevant for order jobs and is empty if job's order queue is empty
-     * (Required)
      * 
      * @param orders
      *     The orders
