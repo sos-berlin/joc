@@ -11,7 +11,6 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -25,16 +24,10 @@ import com.sos.joc.model.schedule.ScheduleV;
 import com.sos.joc.model.schedule.SchedulesFilter;
 import com.sos.joc.model.schedule.SchedulesV;
 import com.sos.joc.schedules.resource.ISchedulesResource;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("schedules")
 public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesResource {
 
-    private static final String ATTRIBUTE_ACTIVE = "active";
-    private static final String ATTRIBUTE_PATH = "path";
-    private static final String WHAT = "folders";
-    private static final String SUBSYSTEMS = "folder schedule";
-    private static final String XPATH_SCHEDULES = "//schedule";
     private static final String API_CALL = "./schedules";
     private SchedulesFilter schedulesFilter;
     private HashMap<String, String> mapOfSchedules;
@@ -52,14 +45,10 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             this.schedulesFilter = schedulesFilter;
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders", null);
+            jocXmlCommand.executePostWithThrowBadRequest(command, accessToken);
 
-            JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-            jsCmdShowState.setSubsystems(SUBSYSTEMS);
-            jsCmdShowState.setWhat(WHAT);
-            String xml = jsCmdShowState.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml, accessToken);
-
-            jocXmlCommand.createNodeList(XPATH_SCHEDULES);
+            jocXmlCommand.createNodeList("//schedule");
 
             int count = jocXmlCommand.getNodeList().getLength();
 
@@ -75,8 +64,8 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
             for (int i = 0; i < count; i++) {
                 Element scheduleElement = jocXmlCommand.getElementFromList(i);
 
-                String path = jocXmlCommand.getAttribute(ATTRIBUTE_PATH);
-                String activeValue = jocXmlCommand.getAttribute(ATTRIBUTE_ACTIVE);
+                String path = jocXmlCommand.getAttribute("path");
+                String activeValue = jocXmlCommand.getAttribute("active");
                 ScheduleStateText stateText;
                 if ("yes".equals(activeValue)) {
                     stateText = ScheduleStateText.ACTIVE;

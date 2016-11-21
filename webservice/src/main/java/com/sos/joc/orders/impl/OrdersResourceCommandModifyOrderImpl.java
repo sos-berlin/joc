@@ -3,16 +3,16 @@ package com.sos.joc.orders.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
+import org.dom4j.Element;
+
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
@@ -23,8 +23,6 @@ import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
-import com.sos.scheduler.model.commands.JSCmdModifyOrder;
-import com.sos.scheduler.model.objects.JSObjRunTime;
 
 @Path("orders")
 public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandModifyOrder {
@@ -134,58 +132,55 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
             
-            JSCmdModifyOrder jsCmdModifyOrder = Globals.schedulerObjectFactory.createModifyOrder();
-            jsCmdModifyOrder.setJobChain(normalizePath(order.getJobChain()));
-            jsCmdModifyOrder.setOrder(order.getOrderId());
-
+            XMLBuilder xml = new XMLBuilder("modify_order");
+            xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", normalizePath(order.getJobChain()));
             switch (command) {
             case "start":
                 if (order.getAt() == null || "".equals(order.getAt())) {
-                    jsCmdModifyOrder.setAt("now");
+                    xml.addAttribute("at", "now");
                 } else {
-                    jsCmdModifyOrder.setAt(order.getAt());
+                    xml.addAttribute("at", order.getAt());
                 }
                 if (order.getParams() != null && !order.getParams().isEmpty()) {
-                    jsCmdModifyOrder.setParams(getParams(order.getParams()));
+                    xml.add(getParams(order.getParams()));
                 }
                 break;
             case "set_state":
                 if (order.getEndState() != null && !"".equals(order.getEndState())) {
-                    jsCmdModifyOrder.setEndState(order.getEndState());
+                    xml.addAttribute("end_state", order.getEndState());
                 }
                 if (order.getState() != null && !"".equals(order.getState())) {
-                    jsCmdModifyOrder.setState(order.getState());
+                    xml.addAttribute("state", order.getState());
                 }
                 if (order.getRemoveSetback() != null && !"".equals(order.getRemoveSetback())) {
-                    jsCmdModifyOrder.setSetback("no");
+                    xml.addAttribute("setback", "no");
                 }
                 // TODO resume order implicitly if new state is an end state
                 // Here, asks database.
                 if (order.getResume() != null && !"".equals(order.getResume())) {
-                    jsCmdModifyOrder.setSuspended("no");
+                    xml.addAttribute("suspended", "no");
                 }
                 break;
             case "suspend":
-                jsCmdModifyOrder.setSuspended("yes");
+                xml.addAttribute("suspended", "yes");
                 break;
             case "resume":
-                jsCmdModifyOrder.setSuspended("no");
+                xml.addAttribute("suspended", "no");
                 if (order.getParams() != null && !order.getParams().isEmpty()) {
-                    jsCmdModifyOrder.setParams(getParams(order.getParams()));
+                    xml.add(getParams(order.getParams()));
                 }
                 break;
             case "reset":
-                jsCmdModifyOrder.setAction("reset");
+                xml.addAttribute("action", "reset");
                 break;
             case "remove_setback":
-                jsCmdModifyOrder.setSetback("no");
+                xml.addAttribute("setback", "no");
                 break;
             case "set_run_time":
                 if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
                     try {
                         ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
-                        JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, order.getRunTime());
-                        jsCmdModifyOrder.setRunTime(objRuntime);
+                        xml.add(XMLBuilder.parse(order.getRunTime()));
                     } catch (JocException e) {
                         throw e;
                     } catch (Exception e) {
@@ -193,10 +188,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     }
                 }
             }
-            String xml = jsCmdModifyOrder.toXMLString();
-            
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), order));
@@ -224,11 +217,11 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
 
-    private Map<String, String> getParams(List<NameValuePair> params) {
-        Map<String, String> orderParams = new HashMap<String, String>();
+    private Element getParams(List<NameValuePair> params) {
+        Element paramsElem = XMLBuilder.create("params");
         for (NameValuePair param : params) {
-            orderParams.put(param.getName(), param.getValue());
+            paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
         }
-        return orderParams;
+        return paramsElem;
     }
 }

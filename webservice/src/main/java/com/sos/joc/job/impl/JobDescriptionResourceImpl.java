@@ -1,6 +1,5 @@
 package com.sos.joc.job.impl;
 
-import java.math.BigInteger;
 import java.util.regex.Pattern;
 
 import javax.json.Json;
@@ -8,7 +7,6 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -17,7 +15,6 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobDescriptionResource;
 import com.sos.joc.model.job.JobFilter;
-import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobDescriptionResource {
@@ -70,12 +67,4 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
             return JOCDefaultResponse.responseHTMLStatusJSError(e, getJocError());
         }
     }
-
-    public String createJobDescriptionCommand(String job) {
-        JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
-        showJob.setMaxTaskHistory(BigInteger.valueOf(0));
-        showJob.setJob(normalizePath(job));
-        return showJob.toXMLString();
-    }
-
 }

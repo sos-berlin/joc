@@ -1,6 +1,5 @@
 package com.sos.joc.task.impl;
 
-import java.math.BigInteger;
 import java.time.Instant;
 import java.util.Date;
 
@@ -8,7 +7,6 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -26,7 +24,6 @@ import com.sos.joc.model.job.TaskState;
 import com.sos.joc.model.job.TaskStateText;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.task.resource.ITaskResource;
-import com.sos.scheduler.model.commands.JSCmdShowTask;
 
 @Path("task")
 public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
@@ -99,10 +96,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
     }
 
     private String createTaskPostCommand(String taskId) {
-        JSCmdShowTask showTask = Globals.schedulerObjectFactory.createShowTask();
-        showTask.setId(new BigInteger(taskId));
-        showTask.setWhat("all");
-        return showTask.toXMLString();
+        return "<show_task id=\"" + taskId + "\" what=\"all\" />";
     }
 
     private TaskState getState(Element taskElem) {

@@ -6,10 +6,10 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
@@ -19,8 +19,6 @@ import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
-import com.sos.scheduler.model.commands.JSCmdModifyJob;
-import com.sos.scheduler.model.objects.JSObjRunTime;
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
@@ -119,24 +117,20 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
             checkRequiredParameter("job", modifyJob.getJob());
             
-            JSCmdModifyJob jsCmdModifyJob = Globals.schedulerObjectFactory.createModifyJob();
-            jsCmdModifyJob.setCmd(command);
-            jsCmdModifyJob.setJob(normalizePath(modifyJob.getJob()));
+            XMLBuilder xml = new XMLBuilder("modify_job");
+            xml.addAttribute("job", normalizePath(modifyJob.getJob())).addAttribute("cmd", command);
             if (SET_RUN_TIME.equals(command)) {
                 try {
                     ValidateXML.validateRunTimeAgainstJobSchedulerSchema(modifyJob.getRunTime());
-                    JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, modifyJob.getRunTime());
-                    jsCmdModifyJob.setRunTime(objRuntime);
+                    xml.add(XMLBuilder.parse(modifyJob.getRunTime()));
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
                     throw new JobSchedulerInvalidResponseDataException(modifyJob.getRunTime());
                 }
-            }
-            String xml = jsCmdModifyJob.toXMLString();
-            
+            } 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

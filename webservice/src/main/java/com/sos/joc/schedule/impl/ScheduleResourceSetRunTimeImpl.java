@@ -9,17 +9,15 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
-import com.sos.scheduler.model.commands.JSCmdModifyHotFolder;
-import com.sos.scheduler.model.objects.JSObjRunTime;
 
 @Path("schedule")
 public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements IScheduleResourceSetRunTime {
@@ -39,17 +37,14 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             logAuditMessage(modifyRuntime);
             checkRequiredParameter("schedule", modifyRuntime.getSchedule());
             ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTime());
-            
+
             String schedule = normalizePath(modifyRuntime.getSchedule());
-            JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, modifyRuntime.getRunTime());
-            objRuntime.setName(Paths.get(schedule).getFileName().toString());
-            JSCmdModifyHotFolder jsCmdModifySchedule = Globals.schedulerObjectFactory.createModifyHotFolder();
-            jsCmdModifySchedule.setFolder(getParent(schedule));
-            jsCmdModifySchedule.setSchedule(objRuntime);
-            String xml = jsCmdModifySchedule.toXMLString();
+            XMLBuilder command = new XMLBuilder("modify_hot_folder");
+            command.addAttribute("folder", getParent(schedule)).addElement("schedule").addAttribute("name", Paths.get(schedule).getFileName()
+                    .toString()).add(XMLBuilder.parse(modifyRuntime.getRunTime()));
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             AUDIT_LOGGER.error(e.getMessage());

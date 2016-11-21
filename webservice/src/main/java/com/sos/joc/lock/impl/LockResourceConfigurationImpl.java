@@ -2,7 +2,6 @@ package com.sos.joc.lock.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -12,7 +11,6 @@ import com.sos.joc.lock.resource.ILockResourceConfiguration;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.lock.LockConfigurationFilter;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("lock")
 public class LockResourceConfigurationImpl extends JOCResourceImpl implements ILockResourceConfiguration {
@@ -33,10 +31,10 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("lock", lockBody.getLock())) {
                 String lockPath = normalizePath(lockBody.getLock());
-                String lockParent = getParent(lockPath);
                 boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", lockPath);
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createLockConfigurationPostCommand(lockParent), xPath, "lock", responseInHtml,
+                String lockCommand = jocXmlCommand.getShowStateCommand("folder lock", "folders no_subfolders source", getParent(lockPath));
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, lockCommand, xPath, "lock", responseInHtml,
                         accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
@@ -47,13 +45,4 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-
-    private String createLockConfigurationPostCommand(String dir) {
-        JSCmdShowState showLocks = new JSCmdShowState(Globals.schedulerObjectFactory);
-        showLocks.setSubsystems("folder lock");
-        showLocks.setWhat("folders no_subfolders source");
-        showLocks.setPath(dir);
-        return showLocks.toXMLString();
-    }
-
 }

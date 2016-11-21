@@ -2,15 +2,13 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
 import com.sos.joc.model.jobscheduler.TimeoutParameter;
-import com.sos.scheduler.model.commands.JSCmdTerminate;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobSchedulerCluster {
@@ -76,22 +74,23 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
 
     private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String command, TimeoutParameter timeoutParameter) throws Exception {
         logAuditMessage();
-        JSCmdTerminate jsCmdTerminate = new JSCmdTerminate(Globals.schedulerObjectFactory);
-        jsCmdTerminate.setTimeoutIfNotEmpty(timeoutParameter.getTimeout());
+        XMLBuilder xml = new XMLBuilder("terminate");
+        if (timeoutParameter.getTimeout() != null) {
+            xml.addAttribute("timeout", timeoutParameter.getTimeout().toString());
+        }
         switch (command) {
         case TERMINATE:
-            jsCmdTerminate.setAllSchedulers(WebserviceConstants.YES);
+            xml.addAttribute("all_schedulers", "yes");
             break;
         case RESTART:
-            jsCmdTerminate.setAllSchedulers(WebserviceConstants.YES);
-            jsCmdTerminate.setRestart(WebserviceConstants.YES);
+            xml.addAttribute("all_schedulers", "yes").addAttribute("restart", "yes");
             break;
         case TERMINATE_FAILSAFE:
-            jsCmdTerminate.setContinueExclusiveOperation(WebserviceConstants.YES);
+            xml.addAttribute("continue_exclusive_operation", "yes");
             break;
         }
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-        jocXmlCommand.executePostWithThrowBadRequest(jsCmdTerminate.toXMLString(), getAccessToken());
+        jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 }

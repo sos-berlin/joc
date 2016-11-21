@@ -1,10 +1,7 @@
 package com.sos.joc.jobchain.impl;
 
-import java.math.BigInteger;
-
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -14,7 +11,6 @@ import com.sos.joc.jobchain.resource.IJobChainResourceConfiguration;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.jobChain.JobChainConfigurationFilter;
-import com.sos.scheduler.model.commands.JSCmdShowJobChain;
 
 @Path("job_chain")
 public class JobChainResourceConfigurationImpl extends JOCResourceImpl implements IJobChainResourceConfiguration {
@@ -35,8 +31,9 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
                 boolean responseInHtml = jobChainBody.getMime() == ConfigurationMime.HTML;
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(jobChainBody),
-                        "/spooler/answer/job_chain", "job_chain", responseInHtml, accessToken);
+                String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainBody.getJobChain()), "source", 0, 0);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobChainCommand, "/spooler/answer/job_chain", "job_chain",
+                        responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -46,14 +43,4 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-
-    private String createOrderConfigurationPostCommand(JobChainConfigurationFilter body) {
-        JSCmdShowJobChain showJobChain = new JSCmdShowJobChain(Globals.schedulerObjectFactory);
-        showJobChain.setJobChain(normalizePath(body.getJobChain()));
-        showJobChain.setWhat("source");
-        showJobChain.setMaxOrderHistory(BigInteger.valueOf(0));
-        showJobChain.setMaxOrders(BigInteger.valueOf(0));
-        return Globals.schedulerObjectFactory.toXMLString(showJobChain);
-    }
-
 }

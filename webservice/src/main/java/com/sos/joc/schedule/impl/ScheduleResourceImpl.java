@@ -7,7 +7,6 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -16,7 +15,6 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ScheduleFilter;
 import com.sos.joc.model.schedule.ScheduleV200;
 import com.sos.joc.schedule.resource.IScheduleResource;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("schedule")
 public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleResource {
@@ -36,16 +34,11 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
 
             String schedulePath = normalizePath(scheduleFilter.getSchedule());
             String scheduleParent = getParent(schedulePath);
-            
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
-            JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-            jsCmdShowState.setSubsystems("folder schedule");
-            jsCmdShowState.setWhat("folders no_subfolders");
-            jsCmdShowState.setPath(scheduleParent);
-            String xml = jsCmdShowState.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml, accessToken);
-            
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders no_subfolders", scheduleParent);
+            jocXmlCommand.executePostWithThrowBadRequest(command, accessToken);
+
             String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", schedulePath);
             Element scheduleElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(xPath);
 
@@ -64,5 +57,4 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-
 }

@@ -6,10 +6,10 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -17,8 +17,6 @@ import com.sos.joc.jobchainnodes.resources.IJobChainsResourceModifyJobChainNodes
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.jobChain.ModifyJobChainNode;
 import com.sos.joc.model.jobChain.ModifyJobChainNodes;
-import com.sos.scheduler.model.commands.JSCmdJobChainNodeModify;
-import com.sos.scheduler.model.objects.JobChainNodeAction;
 
 @Path("job_chain_nodes")
 public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl implements IJobChainsResourceModifyJobChainNodes {
@@ -95,22 +93,20 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
             checkRequiredParameter("jobChain", jobChainNode.getJobChain());
             checkRequiredParameter("node", jobChainNode.getNode());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            JSCmdJobChainNodeModify jsCmdJobChainNodeModify = Globals.schedulerObjectFactory.createJobChainNodeModify();
-            jsCmdJobChainNodeModify.setJobChain(normalizePath(jobChainNode.getJobChain()));
-            jsCmdJobChainNodeModify.setState(jobChainNode.getNode());
+            XMLBuilder xml = new XMLBuilder("job_chain_node.modify");
+            xml.addAttribute("job_chain", normalizePath(jobChainNode.getJobChain())).addAttribute("state", jobChainNode.getNode());
             switch (cmd) {
             case STOP:
-                jsCmdJobChainNodeModify.setAction(JobChainNodeAction.STOP);
+                xml.addAttribute("action", "stop");
                 break;
             case SKIP:
-                jsCmdJobChainNodeModify.setAction(JobChainNodeAction.NEXT_STATE);
+                xml.addAttribute("action", "next_start");
                 break;
             case ACTIVATE:
-                jsCmdJobChainNodeModify.setAction(JobChainNodeAction.PROCESS);
+                xml.addAttribute("action", "process");
                 break;
             }
-            String xml = jsCmdJobChainNodeModify.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

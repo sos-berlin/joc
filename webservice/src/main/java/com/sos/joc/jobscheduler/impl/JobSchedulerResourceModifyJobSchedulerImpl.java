@@ -8,6 +8,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerIdentifier;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
@@ -16,7 +17,6 @@ import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
-import com.sos.scheduler.model.commands.JSCmdModifySpooler;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl implements IJobSchedulerResourceModifyJobScheduler {
@@ -140,21 +140,22 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
     private JOCDefaultResponse executeModifyJobSchedulerCommand(String cmd, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         getJobSchedulerInstanceByHostPort(urlTimeoutParamSchema);
-        JSCmdModifySpooler jsCmdModifySpooler = new JSCmdModifySpooler(Globals.schedulerObjectFactory);
-        jsCmdModifySpooler.setCmd(cmd);
-        jsCmdModifySpooler.setTimeoutIfNotEmpty(urlTimeoutParamSchema.getTimeout());
-
+        XMLBuilder xml = new XMLBuilder("modify_spooler");
+        xml.addAttribute("cmd", cmd);
+        if (urlTimeoutParamSchema.getTimeout() != null) {
+            xml.addAttribute("timeout", urlTimeoutParamSchema.getTimeout().toString());
+        }
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
         if (cmd.contains(ABORT[0])) {
             try {
-                jocXmlCommand.executePost(jsCmdModifySpooler.toXMLString(), getAccessToken());
+                jocXmlCommand.executePost(xml.asXML(), getAccessToken());
             } catch (JobSchedulerNoResponseException e) {
                 // JobScheduler sends always no response if "abort" is called
             } catch (JobSchedulerConnectionRefusedException e) {
                 throw e;
             }
         } else {
-            jocXmlCommand.executePostWithThrowBadRequest(jsCmdModifySpooler.toXMLString(), getAccessToken());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
         }
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }

@@ -1,13 +1,11 @@
 package com.sos.joc.jobchain.impl;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -18,13 +16,11 @@ import com.sos.joc.model.order.OrderHistory;
 import com.sos.joc.model.order.OrderHistoryItem;
 import com.sos.joc.model.order.OrderHistoryState;
 import com.sos.joc.model.order.OrderHistoryStateText;
-import com.sos.scheduler.model.commands.JSCmdShowJobChain;
 
 @Path("job_chain")
 public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJobChainResourceHistory {
 
     private static final int DEFAULT_MAX_HISTORY_ITEMS = 25;
-    private static final String ORDER_HISTORY = "order_history";
     private static final String KEY_FOR_ERROR_NODE_LIST = "nodes";
     private static final String XPATH_FOR_ERROR_NODES = "//job_chain_node[@error_state='%s']";
     private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
@@ -46,8 +42,9 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
             // TODO nested job chains have to consider too
-            String postCommand = createJobchainHistoryPostCommand(jobChainHistoryFilter);
-            jocXmlCommand.executePostWithThrowBadRequest(postCommand, accessToken);
+            String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
+                    jobChainHistoryFilter.getMaxLastHistoryItems());
+            jocXmlCommand.executePostWithThrowBadRequest(jobChainCommand, accessToken);
 
             jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
 
@@ -97,18 +94,6 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-
         }
     }
-
-    public String createJobchainHistoryPostCommand(final JobChainHistoryFilter jobChainHistoryFilterSchema) {
-
-        JSCmdShowJobChain showJobChain = Globals.schedulerObjectFactory.createShowJobChain();
-        showJobChain.setMaxOrders(BigInteger.valueOf(0));
-        showJobChain.setMaxOrderHistory(BigInteger.valueOf(jobChainHistoryFilterSchema.getMaxLastHistoryItems()));
-        showJobChain.setWhat(ORDER_HISTORY);
-        showJobChain.setJobChain(normalizePath(jobChainHistoryFilterSchema.getJobChain()));
-        return Globals.schedulerObjectFactory.toXMLString(showJobChain);
-    }
-
 }

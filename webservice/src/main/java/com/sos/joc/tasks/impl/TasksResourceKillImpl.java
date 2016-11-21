@@ -1,6 +1,5 @@
 package com.sos.joc.tasks.impl;
 
-import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,11 +9,10 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err419;
@@ -22,8 +20,6 @@ import com.sos.joc.model.job.ModifyTasks;
 import com.sos.joc.model.job.TaskId;
 import com.sos.joc.model.job.TasksFilter;
 import com.sos.joc.tasks.resource.ITasksResourceKill;
-import com.sos.scheduler.model.commands.JSCmdKillTask;
-import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("tasks")
 public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksResourceKill {
@@ -116,11 +112,9 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             logAuditMessage(job);
             
             checkRequiredParameter("job", job.getJob());
-            JSCmdShowJob jsCmdShowJob = Globals.schedulerObjectFactory.createShowJob();
-            jsCmdShowJob.setJobName(job.getJob());
-            String xml = jsCmdShowJob.toXMLString();
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            String command = jocXmlCommand.getShowJobCommand(normalizePath(job.getJob()), null);
+            jocXmlCommand.executePostWithThrowBadRequest(command, getAccessToken());
 
             List<TaskId> taskIds = new ArrayList<TaskId>();
             NodeList tasks = jocXmlCommand.getSosxml().selectNodeList("//tasks/tasks/@id");
@@ -144,30 +138,25 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             checkRequiredParameter("taskId", taskId.getTaskId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
-            JSCmdKillTask jsCmdKillTask = Globals.schedulerObjectFactory.createKillTask();
-            jsCmdKillTask.setId(new BigInteger(taskId.getTaskId()));
-            jsCmdKillTask.setJob(job.getJob());
+            XMLBuilder xml = new XMLBuilder("kill_task");
+            xml.addAttribute("id", taskId.getTaskId()).addAttribute("job", normalizePath(job.getJob()));
 
             switch (command) {
             case KILL:
-                jsCmdKillTask.setImmediately(WebserviceConstants.YES);
+                xml.addAttribute("immediately", "yes");
                 break;
             case TERMINATE:
-                jsCmdKillTask.setImmediately(WebserviceConstants.YES);
-                jsCmdKillTask.setTimeout(WebserviceConstants.NEVER);
+                xml.addAttribute("immediately", "yes").addAttribute("timeout", "never");
                 break;
             case TERMINATE_WITHIN:
-                jsCmdKillTask.setImmediately(WebserviceConstants.YES);
                 Integer timeout = modifyTasks.getTimeout();
                 if (timeout == null) {
                     timeout = 0;
                 }
-                jsCmdKillTask.setTimeout(timeout);
+                xml.addAttribute("immediately", "yes").addAttribute("timeout", timeout.toString());
                 break;
             }
-
-            String xml = jsCmdKillTask.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), job, taskId));

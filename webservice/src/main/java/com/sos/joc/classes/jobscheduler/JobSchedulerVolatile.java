@@ -3,7 +3,6 @@ package com.sos.joc.classes.jobscheduler;
 import org.w3c.dom.Element;
 
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
@@ -11,7 +10,6 @@ import com.sos.joc.model.common.Err;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.JobSchedulerV;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 
 public class JobSchedulerVolatile extends JobSchedulerV {
@@ -26,20 +24,13 @@ public class JobSchedulerVolatile extends JobSchedulerV {
     public JobSchedulerV getJobScheduler() throws Exception {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
         try {
-            jocXmlCommand.executePost(getXMLCommand(), accessToken);
+            String xmlCommand = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders", "/does/not/exist");
+            jocXmlCommand.executePost(xmlCommand, accessToken);
         } catch (JocException e) {
             return getUnreachableJobScheduler();
         }
         jocXmlCommand.throwJobSchedulerError();
         return getReachableJobScheduler(jocXmlCommand);
-    }
-    
-    private String getXMLCommand() {
-        JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-        jsCmdShowState.setWhat("folders no_subfolders");
-        jsCmdShowState.setPath("/does/not/exist");
-        jsCmdShowState.setSubsystems("folder");
-        return jsCmdShowState.toXMLString();
     }
     
     private JobSchedulerV getUnreachableJobScheduler() {

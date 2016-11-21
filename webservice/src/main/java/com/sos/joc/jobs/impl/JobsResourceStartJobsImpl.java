@@ -2,17 +2,16 @@ package com.sos.joc.jobs.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
+import org.dom4j.Element;
+
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -21,15 +20,13 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
-import com.sos.scheduler.model.commands.JSCmdStartJob;
-import com.sos.scheduler.model.objects.Environment;
 
 @Path("jobs")
 public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsResourceStartJob {
 
     private static final String API_CALL = "./jobs/start";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
-    
+
     @Override
     public JOCDefaultResponse postJobsStart(String accessToken, StartJobs startJobs) throws Exception {
         try {
@@ -72,22 +69,28 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             checkRequiredParameter("job", startJob.getJob());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
-            JSCmdStartJob jsCmdStartJob = new JSCmdStartJob(Globals.schedulerObjectFactory);
-            jsCmdStartJob.setJob(normalizePath(startJob.getJob()));
-            jsCmdStartJob.setForce(WebserviceConstants.YES);
+            XMLBuilder xml = new XMLBuilder("modify_job");
+            xml.addAttribute("job", normalizePath(startJob.getJob())).addAttribute("force", "yes");
             if (startJob.getAt() == null || "".equals(startJob.getAt())) {
-                jsCmdStartJob.setAt("now");
+                xml.addAttribute("at", "now");
             } else {
-                jsCmdStartJob.setAt(startJob.getAt());
+                xml.addAttribute("at", startJob.getAt());
             }
-            if (startJob.getParams() != null) {
-                jsCmdStartJob.setParams(getParams(startJob.getParams()));
+            if (startJob.getParams() != null && !startJob.getParams().isEmpty()) {
+                Element params = XMLBuilder.create("params");
+                for (NameValuePair param : startJob.getParams()) {
+                    params.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+                }
+                xml.add(params);
             }
-            if (startJob.getEnvironment() != null) {
-                jsCmdStartJob.setEnvironment(getEnvironments(startJob.getEnvironment()));
+            if (startJob.getEnvironment() != null && !startJob.getEnvironment().isEmpty()) {
+                Element envs = XMLBuilder.create("environment");
+                for (NameValuePair param : startJob.getEnvironment()) {
+                    envs.addElement("variable").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+                }
+                xml.add(envs);
             }
-            String xml = jsCmdStartJob.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
@@ -96,24 +99,5 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             listOfErrors.add(new BulkError().get(e, getJocError(), startJob));
         }
         return null;
-    }
-
-    private Map<String, String> getParams(List<NameValuePair> params) {
-        Map<String, String> jobParams = new HashMap<String, String>();
-        for (NameValuePair param : params) {
-            jobParams.put(param.getName(), param.getValue());
-        }
-        return jobParams;
-    }
-
-    private Environment getEnvironments(List<NameValuePair> envs) {
-        Environment jobEnv = new Environment();
-        for (NameValuePair env : envs) {
-            Environment.Variable var = new Environment.Variable();
-            var.setName(env.getName());
-            var.setValue(env.getValue());
-            jobEnv.getVariable().add(var);
-        }
-        return jobEnv;
     }
 }

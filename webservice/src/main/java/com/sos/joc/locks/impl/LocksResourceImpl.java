@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -29,14 +28,13 @@ import com.sos.joc.model.lock.LockPath;
 import com.sos.joc.model.lock.LockV;
 import com.sos.joc.model.lock.LocksFilter;
 import com.sos.joc.model.lock.LocksV;
-import com.sos.scheduler.model.commands.JSCmdCommands;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("locks")
 public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourceImpl.class);
     private static final String API_CALL = "./locks";
+    private JOCXmlCommand jocXmlCommand;
 
     @Override
     public JOCDefaultResponse postLocks(String accessToken, LocksFilter locksFilter) throws Exception {
@@ -48,7 +46,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
                 return jocDefaultResponse;
             }
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.executePostWithThrowBadRequest(createLocksPostCommand(locksFilter), accessToken);
             NodeList locks = jocXmlCommand.selectNodelist("//locks/lock");
             boolean filteredByLocks = (locksFilter.getLocks() != null && locksFilter.getLocks().size() > 0);
@@ -108,31 +106,30 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
 
     private String createLocksPostCommand(Set<Folder> folders) throws JocMissingRequiredParameterException {
         if (folders == null || folders.size() == 0) {
-            JSCmdShowState s = createShowStatePostCommand(null, true);
-            return s.toXMLString();
+            return createShowStatePostCommand(null, true);
         } else {
-            JSCmdCommands commands = Globals.schedulerObjectFactory.createCmdCommands();
+            StringBuilder commands = new StringBuilder();
+            commands.append("<commands>");
             for (Folder folder : folders) {
                 if (folder.getFolder() == null || folder.getFolder().isEmpty()) {
                     throw new JocMissingRequiredParameterException("undefined folder");
                 }
-                JSCmdShowState s = createShowStatePostCommand(folder.getFolder(), folder.getRecursive());
-                commands.getAddJobsOrAddOrderOrCheckFolders().add(s);
+                commands.append(createShowStatePostCommand(folder.getFolder(), folder.getRecursive()));
             }
-            return commands.toXMLString();
+            commands.append("</commands>");
+            return commands.toString();
         }
     }
 
-    private JSCmdShowState createShowStatePostCommand(String folder, Boolean recursive) {
-        JSCmdShowState showState = Globals.schedulerObjectFactory.createShowState();
-        showState.setSubsystems("folder lock");
-        showState.setWhat("folders");
+    private String createShowStatePostCommand(String folder, Boolean recursive) {
+        String what = "folders";
+        String path = null;
         if (!recursive) {
-            showState.setWhat("no_subfolders " + showState.getWhat());
+            what += " no_subfolders";
         }
         if (folder != null) {
-            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/"));
+            path = ("/" + folder.trim()).replaceAll("//+", "/");
         }
-        return showState;
+        return jocXmlCommand.getShowStateCommand("folder lock", what, path);
     }
 }

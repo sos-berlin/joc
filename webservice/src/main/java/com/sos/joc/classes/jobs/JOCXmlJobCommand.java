@@ -1,6 +1,5 @@
 package com.sos.joc.classes.jobs;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -19,9 +17,6 @@ import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.job.JobsFilter;
-import com.sos.scheduler.model.commands.JSCmdCommands;
-import com.sos.scheduler.model.commands.JSCmdShowJob;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 
 public class JOCXmlJobCommand extends JOCXmlCommand {
@@ -42,8 +37,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     }
     
     public JobV getJob(String job, Boolean compact, Boolean withOrderQueue) throws Exception {
-        JSCmdShowJob j = createShowJobPostCommand(job, compact);
-        executePostWithThrowBadRequest(j.toXMLString(), accessToken);
+        executePostWithThrowBadRequest(createShowJobPostCommand(job, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job");
         JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue);
         jobV.setFields(compact, accessToken);
@@ -51,60 +45,60 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     }
     
     public List<JobV> getJobsFromShowJob(List<JobPath> jobs, JobsFilter jobsFilter) throws Exception {
-        JSCmdCommands commands = Globals.schedulerObjectFactory.createCmdCommands();
+        StringBuilder xml = new StringBuilder();
+        xml.append("<commands>");
         for (JobPath job : jobs) {
             if (job.getJob() == null || job.getJob().isEmpty()) {
                 throw new JocMissingRequiredParameterException("undefined job");
             }
-            JSCmdShowJob j = createShowJobPostCommand(job.getJob(),jobsFilter.getCompact());
-            commands.getAddJobsOrAddOrderOrCheckFolders().add(j);
+            xml.append(createShowJobPostCommand(job.getJob(),jobsFilter.getCompact()));
         }
-        return getJobs(commands.toXMLString(), jobsFilter, "/spooler/answer/job");
+        xml.append("</commands>");
+        return getJobs(xml.toString(), jobsFilter, "/spooler/answer/job");
     }
     
     public List<JobV> getJobsFromShowState(List<Folder> folders, JobsFilter jobsFilter) throws Exception {
-        JSCmdCommands commands = Globals.schedulerObjectFactory.createCmdCommands();
+        StringBuilder xml = new StringBuilder();
+        xml.append("<commands>");
         for (Folder folder : folders) {
             if (folder.getFolder() == null || folder.getFolder().isEmpty()) {
                 throw new JocMissingRequiredParameterException("undefined folder");
             }
-            JSCmdShowState s = createShowStatePostCommand(folder.getFolder(),folder.getRecursive(), jobsFilter.getCompact());
-            commands.getAddJobsOrAddOrderOrCheckFolders().add(s);
+            xml.append(createShowStatePostCommand(folder.getFolder(),folder.getRecursive(), jobsFilter.getCompact()));
         }
-        return getJobs(commands.toXMLString(), jobsFilter);
+        xml.append("</commands>");
+        return getJobs(xml.toString(), jobsFilter);
     }
     
     public List<JobV> getJobsFromShowState(JobsFilter jobsFilter) throws Exception {
-        JSCmdShowState s = createShowStatePostCommand("/",true, jobsFilter.getCompact()); 
-        return getJobs(s.toXMLString(), jobsFilter);
+        return getJobs(createShowStatePostCommand("/",true, jobsFilter.getCompact()), jobsFilter);
     }
 
-    private JSCmdShowState createShowStatePostCommand(String folder, Boolean recursive, Boolean compact) {
-        JSCmdShowState showState = Globals.schedulerObjectFactory.createShowState();
-        showState.setSubsystems("folder job");
-        showState.setWhat("folders task_queue job_orders");
+    private String createShowStatePostCommand(String folder, Boolean recursive, Boolean compact) {
+        String subsystems = "folder job";
+        String what = "folders task_queue job_orders";
+        String path = null;
         if (!compact) {
-            showState.setWhat("job_params " + showState.getWhat());
+            what += " job_params";
         }
         if (!recursive) {
-            showState.setWhat("no_subfolders " + showState.getWhat());
+            what += " no_subfolders";
         }
         if (folder != null) {
-            showState.setPath(("/" + folder.trim()).replaceAll("//+", "/"));
+            path = ("/" + folder.trim()).replaceAll("//+", "/");
         }
-        return showState;
+        return getShowStateCommand(subsystems, what, path);
     }
 
-    private JSCmdShowJob createShowJobPostCommand(String job, boolean compact) {
-        JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
-        showJob.setWhat("task_queue job_orders");
+    private String createShowJobPostCommand(String job, boolean compact) {
+        job = ("/" + job.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
+        String what = "task_queue job_orders";
+        //Integer maxOrders = 0;
+        //Integer maxTaskHistory = 0;
         if (!compact) {
-            showJob.setWhat("job_params " + showJob.getWhat());
+            what += " job_params";
         }
-        showJob.setJobName(("/" + job.trim()).replaceAll("//+", "/").replaceFirst("/$", ""));
-        // showJob.setMaxOrders(BigInteger.valueOf(0));
-        showJob.setMaxTaskHistory(BigInteger.valueOf(0));
-        return showJob;
+        return getShowJobCommand(job, what);
     }
     
     private List<JobV> getJobs(String command, JobsFilter jobsFilter) throws Exception {

@@ -153,46 +153,50 @@ public class JOCXmlCommand extends SOSXmlCommand {
         return s;
     }
     
+    public String getShowStateCommand(String subsystems, String what, String path) {
+        return getShowStateCommand(subsystems, what, path, null, null);
+    }
+    
     public String getShowStateCommand(String subsystems, String what, String path, Integer maxOrders, Integer maxOrderHistory) {
-        StringBuilder s = new StringBuilder();
-        s.append("<show_state");
+        XMLBuilder showState = new XMLBuilder("show_state");
         if (subsystems != null && !subsystems.isEmpty()) {
-            s.append(" subsystems=\"" + subsystems + "\"");
+            showState.addAttribute("subsystems", subsystems);
         }
         if (what != null && !what.isEmpty()) {
-            s.append(" what=\"" + what + "\"");
+            showState.addAttribute("what", what);
         }
         if (path != null && !path.isEmpty()) {
-            s.append(" path=\"" + path + "\"");
+            showState.addAttribute("path", path);
         }
         if (maxOrders != null) {
-            s.append(" max_orders=\"" + maxOrders + "\"");
+            showState.addAttribute("max_orders", maxOrders.toString());
         }
         if (maxOrderHistory != null) {
-            s.append(" max_order_history=\"" + maxOrderHistory + "\"");
+            showState.addAttribute("max_order_history", maxOrderHistory.toString());
         }
-        s.append(" />");
-        return s.toString();
+        return showState.asXML();
+    }
+    
+    public String getShowJobCommand(String job, String what) {
+        return getShowJobCommand(job, what, null, null);
     }
     
     public String getShowJobCommand(String job, String what, Integer maxOrders, Integer maxTaskHistory) {
-        StringBuilder s = new StringBuilder();
-        s.append("<show_job");
-        s.append(" job=\"" + job + "\"");
+        XMLBuilder showjob = new XMLBuilder("show_job");
+        showjob.addAttribute("job", job);
         if (what != null && !what.isEmpty()) {
-            s.append(" what=\"" + what + "\"");
+            showjob.addAttribute("what", what);
         }
         if (maxTaskHistory == null) {
             maxTaskHistory = 0; 
         }
         if (maxTaskHistory != null) {
-            s.append(" max_task_history=\"" + maxTaskHistory + "\"");
+            showjob.addAttribute("max_task_history", maxTaskHistory.toString());
         }
         if (maxOrders != null) {
-            s.append(" max_orders=\"" + maxOrders + "\"");
+            showjob.addAttribute("max_orders", maxOrders.toString());
         }
-        s.append(" />");
-        return s.toString();
+        return showjob.asXML();
     }
     
     public String getShowJobChainCommand(String jobChain, String what) {
@@ -204,22 +208,30 @@ public class JOCXmlCommand extends SOSXmlCommand {
     }
     
     public String getShowJobChainCommand(String jobChain, String what, Integer maxOrders, Integer maxOrderHistory) {
-        StringBuilder s = new StringBuilder();
-        s.append("<show_job_chain");
-        s.append(" job_chain=\"" + jobChain + "\"");
+        XMLBuilder showjobChain = new XMLBuilder("show_job_chain");
+        showjobChain.addAttribute("job_chain", jobChain);
         if (what != null && !what.isEmpty()) {
-            s.append(" what=\"" + what + "\"");
+            showjobChain.addAttribute("what", what);
         }
         if (maxOrders != null) {
-            s.append(" max_orders=\"" + maxOrders + "\"");
+            showjobChain.addAttribute("max_orders", maxOrders.toString());
         }
         if (maxOrderHistory == null) {
             maxOrderHistory = 0; 
         }
         if (maxOrderHistory != null) {
-            s.append(" max_order_history=\"" + maxOrderHistory + "\"");
+            showjobChain.addAttribute("max_order_history", maxOrderHistory.toString());
         }
-        s.append(" />");
-        return s.toString();
+        return showjobChain.asXML();
+    }
+    
+    public String getShowOrderCommand(String jobChain, String orderId, String what) {
+        XMLBuilder showOrder = new XMLBuilder("show_order");
+        showOrder.addAttribute("job_chain", jobChain);
+        showOrder.addAttribute("order", orderId);
+        if (what != null && !what.isEmpty()) {
+            showOrder.addAttribute("what", what);
+        }
+        return showOrder.asXML();
     }
 }

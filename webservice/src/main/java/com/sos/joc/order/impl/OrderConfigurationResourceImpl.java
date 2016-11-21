@@ -2,7 +2,6 @@ package com.sos.joc.order.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -12,7 +11,6 @@ import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.order.OrderConfigurationFilter;
 import com.sos.joc.order.resource.IOrderConfigurationResource;
-import com.sos.scheduler.model.commands.JSCmdShowOrder;
 
 @Path("order")
 public class OrderConfigurationResourceImpl extends JOCResourceImpl implements IOrderConfigurationResource {
@@ -33,8 +31,9 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
                 boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createOrderConfigurationPostCommand(orderBody),
-                        "/spooler/answer/order", "order", responseInHtml, accessToken);
+                String orderCommand = jocXmlCommand.getShowOrderCommand(normalizePath(orderBody.getJobChain()), orderBody.getOrderId(), "source");
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order", responseInHtml,
+                        accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -44,13 +43,4 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-
-    private String createOrderConfigurationPostCommand(OrderConfigurationFilter body) {
-        JSCmdShowOrder showOrder = new JSCmdShowOrder(Globals.schedulerObjectFactory);
-        showOrder.setJobChain((normalizePath(body.getJobChain())));
-        showOrder.setOrder(body.getOrderId());
-        showOrder.setWhat("source");
-        return showOrder.toXMLString();
-    }
-
 }

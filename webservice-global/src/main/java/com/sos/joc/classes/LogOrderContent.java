@@ -35,9 +35,8 @@ public class LogOrderContent extends LogContent {
 
     private String getOrderLogFromXmlCommand() throws Exception {
 
-        String xml = String.format("<show_order order=\"%1$s\" job_chain=\"%2$s\" what=\"log\" />", orderHistoryFilter.getOrderId(),
-                orderHistoryFilter.getJobChain());
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+        String xml = jocXmlCommand.getShowOrderCommand(orderHistoryFilter.getJobChain(), orderHistoryFilter.getOrderId(), "log");
         jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_ORDER_LOG, null);
     }

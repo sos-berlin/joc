@@ -2,7 +2,6 @@ package com.sos.joc.schedule.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -12,7 +11,6 @@ import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.schedule.ScheduleConfigurationFilter;
 import com.sos.joc.schedule.resource.IScheduleResourceConfiguration;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("schedule")
 public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implements IScheduleResourceConfiguration {
@@ -37,8 +35,8 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
                 String scheduleParent = getParent(schedulePath);
                 boolean responseInHtml = scheduleBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", schedulePath);
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createScheduleConfigurationPostCommand(scheduleParent), xPath, "schedule",
-                        responseInHtml, accessToken);
+                String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders no_subfolders source", scheduleParent);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, command, xPath, "schedule", responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -48,13 +46,4 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-
-    private String createScheduleConfigurationPostCommand(String dir) {
-        JSCmdShowState showSchedules = new JSCmdShowState(Globals.schedulerObjectFactory);
-        showSchedules.setSubsystems("folder schedule");
-        showSchedules.setWhat("folders no_subfolders source");
-        showSchedules.setPath(dir);
-        return showSchedules.toXMLString();
-    }
-
 }

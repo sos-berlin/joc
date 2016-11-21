@@ -1,21 +1,20 @@
 package com.sos.joc.orders.impl;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
+import org.dom4j.Element;
+
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.BulkError;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
+import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Err419;
@@ -23,8 +22,6 @@ import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
-import com.sos.scheduler.model.commands.JSCmdAddOrder;
-import com.sos.scheduler.model.objects.JSObjRunTime;
 
 @Path("orders")
 public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implements IOrdersResourceCommandAddOrder {
@@ -69,44 +66,49 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             logAuditMessage(order);
             
             checkRequiredParameter("jobChain", order.getJobChain());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            JSCmdAddOrder objOrder = Globals.schedulerObjectFactory.createAddOrder();
-            objOrder.setJobChain(normalizePath(order.getJobChain()));
+            XMLBuilder xml = new XMLBuilder("add_order");
+            xml.addAttribute("job_chain", normalizePath(order.getJobChain()));
+            
             if (order.getOrderId() != null && !order.getOrderId().isEmpty()) {
-                objOrder.setId(order.getOrderId());
+                xml.addAttribute("id", normalizePath(order.getOrderId()));
             }
             if ((order.getAt() == null || "".equals(order.getAt())) && (order.getRunTime() == null || "".equals(order.getRunTime()))) {
-                objOrder.setAt("now");
+                xml.addAttribute("at", "now");
             }
             if (order.getAt() != null && !"".equals(order.getAt())) {
-                objOrder.setAt(order.getAt());
+                xml.addAttribute("at", order.getAt());
             }
             if (order.getEndState() != null && !"".equals(order.getEndState())) {
-                objOrder.setEndState(order.getEndState());
+                xml.addAttribute("end_state", order.getEndState());
             }
             if (order.getState() != null && !"".equals(order.getState())) {
-                objOrder.setState(order.getState());
+                xml.addAttribute("end_state", order.getState());
             }
             if (order.getTitle() != null) {
-                objOrder.setTitle(order.getTitle());
+                xml.addAttribute("title", order.getTitle());
             }
             if (order.getPriority() != null && order.getPriority() >= 0) {
-                objOrder.setPriority(BigInteger.valueOf(order.getPriority()));
+                xml.addAttribute("priority", order.getPriority().toString());
             }
-            if (order.getParams() != null) {
-                objOrder.setParams(getParams(order.getParams()));
+            if (order.getParams() != null && !order.getParams().isEmpty()) {
+                Element params = XMLBuilder.create("params");
+                for (NameValuePair param : order.getParams()) {
+                    params.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+                }
+                xml.add(params);
             }
             if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
                 try {
                     ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
-                    JSObjRunTime objRuntime = new JSObjRunTime(Globals.schedulerObjectFactory, order.getRunTime());
-                    objOrder.setRunTime(objRuntime);
+                    xml.add(XMLBuilder.parse(order.getRunTime()));
+                } catch (JocException e) {
+                    throw e;
                 } catch (Exception e) {
-                    throw new JobSchedulerBadRequestException(order.getRunTime());
+                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
                 }
             }
-            String xml = objOrder.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
@@ -115,13 +117,5 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             listOfErrors.add(new BulkError().get(e, getJocError(), order));
         }
         return null;
-    }
-
-    private Map<String, String> getParams(List<NameValuePair> params) {
-        Map<String, String> orderParams = new HashMap<String, String>();
-        for (NameValuePair param : params) {
-            orderParams.put(param.getName(), param.getValue());
-        }
-        return orderParams;
     }
 }

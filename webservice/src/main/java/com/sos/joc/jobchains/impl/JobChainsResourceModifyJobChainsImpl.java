@@ -6,10 +6,10 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -17,8 +17,6 @@ import com.sos.joc.jobchains.resource.IJobChainsResourceModifyJobChains;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.jobChain.ModifyJobChain;
 import com.sos.joc.model.jobChain.ModifyJobChains;
-import com.sos.scheduler.model.commands.JSCmdJobChainModify;
-import com.sos.scheduler.model.commands.JSCmdJobChainModify.enu4State;
 
 @Path("job_chains")
 public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implements IJobChainsResourceModifyJobChains {
@@ -79,18 +77,17 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 
             checkRequiredParameter("jobChain", jobChain.getJobChain());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            JSCmdJobChainModify jsCmdJobChainModify = new JSCmdJobChainModify(Globals.schedulerObjectFactory);
-            jsCmdJobChainModify.setJobChain(normalizePath(jobChain.getJobChain()));
+            XMLBuilder xml = new XMLBuilder("job_chain.modify");
+            xml.addAttribute("job_chain", normalizePath(jobChain.getJobChain()));
             switch (cmd) {
             case STOP:
-                jsCmdJobChainModify.setState(enu4State.STOPPED);
+                xml.addAttribute("state", "stopped");
                 break;
             case UNSTOP:
-                jsCmdJobChainModify.setState(enu4State.RUNNING);
+                xml.addAttribute("state", "running");
                 break;
             }
-            String xml = jsCmdJobChainModify.toXMLString();
-            jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

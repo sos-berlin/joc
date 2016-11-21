@@ -8,7 +8,6 @@ import javax.ws.rs.Path;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -18,7 +17,6 @@ import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.jobscheduler.Cluster;
 import com.sos.joc.model.jobscheduler.ClusterType;
 import com.sos.joc.model.jobscheduler.Clusters;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceCluster {
@@ -36,7 +34,8 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(getXMLCommand(), accessToken);
+            String command = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders cluster", "/does/not/exist");
+            jocXmlCommand.executePostWithThrowBadRequest(command, accessToken);
 
             Cluster cluster = new Cluster();
             cluster.setJobschedulerId(jobSchedulerFilter.getJobschedulerId());
@@ -64,13 +63,5 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
 
-    }
-
-    private String getXMLCommand() {
-        JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-        jsCmdShowState.setWhat("folders no_subfolders cluster");
-        jsCmdShowState.setPath("/does/not/exist");
-        jsCmdShowState.setSubsystems("folder");
-        return jsCmdShowState.toXMLString();
     }
 }

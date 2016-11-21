@@ -27,7 +27,6 @@ import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.JobSchedulerV;
 import com.sos.joc.model.jobscheduler.MastersV;
-import com.sos.scheduler.model.commands.JSCmdShowState;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
@@ -46,7 +45,8 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-            jocXmlCommand.executePostWithThrowBadRequest(getXMLClusterCommand(), accessToken);
+            String clusterCommand = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders cluster", "/does/not/exist");
+            jocXmlCommand.executePostWithThrowBadRequest(clusterCommand, accessToken);
             NodeList clusterMembers = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer/state/cluster/cluster_member");
 
             InventoryInstancesDBLayer instancesDbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
@@ -112,14 +112,6 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         } finally {
             Globals.rollback();
         }
-    }
-
-    private String getXMLClusterCommand() {
-        JSCmdShowState jsCmdShowState = Globals.schedulerObjectFactory.createShowState();
-        jsCmdShowState.setWhat("folders no_subfolders cluster");
-        jsCmdShowState.setPath("/does/not/exist");
-        jsCmdShowState.setSubsystems("folder");
-        return jsCmdShowState.toXMLString();
     }
 
     private JobSchedulerV getJobScheduler(Element clusterMember, JobSchedulerState state, String id, String port, Date surveyDate) {

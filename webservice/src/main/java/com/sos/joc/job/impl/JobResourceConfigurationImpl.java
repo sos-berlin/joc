@@ -1,10 +1,7 @@
 package com.sos.joc.job.impl;
 
-import java.math.BigInteger;
-
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -14,7 +11,6 @@ import com.sos.joc.job.resource.IJobResourceConfiguration;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.job.JobConfigurationFilter;
-import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJobResourceConfiguration {
@@ -36,7 +32,8 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             if (checkRequiredParameter("job", jobBody.getJob())) {
                 boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, createJobConfigurationPostCommand(jobBody), "/spooler/answer/job",
+                String jobCommand = jocXmlCommand.getShowJobCommand(normalizePath(jobBody.getJob()), "source", 0, 0);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job",
                         "job", responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
@@ -46,14 +43,5 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
-    }
-
-    private String createJobConfigurationPostCommand(final JobConfigurationFilter body) {
-        JSCmdShowJob showJob = new JSCmdShowJob(Globals.schedulerObjectFactory);
-        showJob.setWhat("source");
-        showJob.setJob(normalizePath(body.getJob()));
-        showJob.setMaxOrders(BigInteger.valueOf(0));
-        showJob.setMaxTaskHistory(BigInteger.valueOf(0));
-        return Globals.schedulerObjectFactory.toXMLString(showJob);
     }
 }

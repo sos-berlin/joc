@@ -1,6 +1,5 @@
 package com.sos.joc.job.impl;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +8,6 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -21,14 +19,11 @@ import com.sos.joc.model.job.TaskHistoryFilter;
 import com.sos.joc.model.job.TaskHistoryItem;
 import com.sos.joc.model.job.TaskHistoryState;
 import com.sos.joc.model.job.TaskHistoryStateText;
-import com.sos.scheduler.model.commands.JSCmdShowJob;
 
 @Path("job")
 public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResourceHistory {
 
-    private static final String TASK_HISTORY = "task_history";
     private static final Integer DEFAULT_MAX_HISTORY_ITEMS = 25;
-    private static final String XPATH_FOR_TASK_HISTORY = "/spooler/answer/job/history/history.entry";
     private static final String API_CALL = "./job/configuration";
 
     @Override
@@ -47,10 +42,11 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
             if (taskHistoryFilter.getMaxLastHistoryItems() == null) {
                 taskHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
-            String postCommand = createJobHistoryPostCommand(taskHistoryFilter);
+            String postCommand = jocXmlCommand.getShowJobCommand(normalizePath(taskHistoryFilter.getJob()), "task_history", null, taskHistoryFilter
+                    .getMaxLastHistoryItems());
             jocXmlCommand.executePostWithThrowBadRequest(postCommand, accessToken);
 
-            jocXmlCommand.createNodeList(XPATH_FOR_TASK_HISTORY);
+            jocXmlCommand.createNodeList("/spooler/answer/job/history/history.entry");
 
             int count = jocXmlCommand.getNodeList().getLength();
 
@@ -103,13 +99,4 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
 
         }
     }
-
-    public String createJobHistoryPostCommand(final TaskHistoryFilter jobHistoryFilterSchema) {
-        JSCmdShowJob showJob = Globals.schedulerObjectFactory.createShowJob();
-        showJob.setMaxTaskHistory(BigInteger.valueOf(jobHistoryFilterSchema.getMaxLastHistoryItems()));
-        showJob.setWhat(TASK_HISTORY);
-        showJob.setJob(normalizePath(jobHistoryFilterSchema.getJob()));
-        return showJob.toXMLString();
-    }
-
 }
