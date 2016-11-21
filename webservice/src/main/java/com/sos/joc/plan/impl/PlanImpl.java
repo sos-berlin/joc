@@ -113,6 +113,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
                         p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId().toString());
                         p.setStartTime(dailyPlanDBItem.getDbItemReportExecution().getStartTime());
+                        p.setExitCode(dailyPlanDBItem.getDbItemReportExecution().getExitCode());
                         err.setCode(dailyPlanDBItem.getDbItemReportExecution().getErrorCode());
                         err.setMessage(dailyPlanDBItem.getDbItemReportExecution().getErrorText());
                         p.setError(err);
@@ -129,7 +130,6 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
                         p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId().toString());
                         p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
-                        p.setExitCode(Integer.valueOf(dailyPlanDBItem.getDbItemReportTrigger().getState()));
                         p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
                         p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getOrderId());
                     }
