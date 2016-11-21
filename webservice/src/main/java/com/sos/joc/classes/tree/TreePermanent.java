@@ -128,11 +128,7 @@ public class TreePermanent {
             fillTreeMap(treeMap, pFolder, tree);
         }
         if (treeMap.isEmpty()) {
-            TreeModel root = new TreeModel();
-            root.setFolders(null); 
-            root.setName("");
-            root.setPath("/");
-            treeMap.put(Paths.get("/"), root);
+            return null;
         }
         return treeMap.get(Paths.get("/"));
     }
