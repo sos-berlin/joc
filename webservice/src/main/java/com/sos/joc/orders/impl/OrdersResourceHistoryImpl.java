@@ -3,6 +3,8 @@ package com.sos.joc.orders.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
@@ -46,14 +48,19 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateFromDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
             reportTriggerDBLayer.getFilter().setTimeZone(ordersFilter.getTimeZone());
 
-            for (OrderPath orderPath : ordersFilter.getOrders()) {
-                reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(),orderPath.getOrderId());
+            if (ordersFilter.getOrders().size() > 0) {
+                for (OrderPath orderPath : ordersFilter.getOrders()) {
+                    reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(), orderPath.getOrderId());
+                }
+            } else {
+                ordersFilter.setRegex("");
             }
 
             List<DBItemReportTrigger> listOfReportTriggerDBItems = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
 
             for (DBItemReportTrigger dbItemReportTrigger : listOfReportTriggerDBItems) {
 
+                boolean add = true;
                 OrderHistoryItem history = new OrderHistoryItem();
                 history.setEndTime(dbItemReportTrigger.getEndTime());
                 history.setHistoryId(String.valueOf(dbItemReportTrigger.getHistoryId()));
@@ -79,14 +86,22 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 }
                 history.setState(state);
                 history.setSurveyDate(dbItemReportTrigger.getCreated());
-                listHistory.add(history);
+
+                if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
+                    Matcher regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName());
+                    add = regExMatcher.find();
+                }
+
+                if (add) {
+                    listHistory.add(history);
+                }
 
             }
 
             OrderHistory entity = new OrderHistory();
             entity.setDeliveryDate(new Date());
             entity.setHistory(listHistory);
- 
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

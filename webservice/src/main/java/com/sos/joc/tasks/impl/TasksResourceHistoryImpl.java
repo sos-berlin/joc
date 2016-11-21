@@ -3,13 +3,20 @@ package com.sos.joc.tasks.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import com.sos.jitl.dailyplan.db.ReportExecutionsDBLayer;
+import com.sos.jitl.reporting.db.DBItemReportExecution;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
+import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
@@ -26,54 +33,80 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
     public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
         try {
             initLogging(API_CALL, jobsFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissons(accessToken).getHistory()
-                    .isView());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissons(accessToken).getHistory().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            TaskHistory entity = new TaskHistory();
-            entity.setDeliveryDate(new Date());
+            Globals.beginTransaction();
 
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
 
-            TaskHistoryItem history1 = new TaskHistoryItem();
-            history1.setAgent("myAgent");
-            history1.setClusterMember("myClusterMember");
-            history1.setEndTime(new Date());
-            Err error = new Err();
-            error.setCode("myCode");
-            error.setMessage("myMessage");
-            history1.setError(error);
+            ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(Globals.sosHibernateConnection);
+            reportExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
+            reportExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFromDateFrom(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
+            reportExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateFromDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
+            reportExecutionsDBLayer.getFilter().setTimeZone(jobsFilter.getTimeZone());
 
-            history1.setExitCode(-1);
-            history1.setJob("myJob");
-            history1.setStartTime(new Date());
-            TaskHistoryState state = new TaskHistoryState();
-            state.setSeverity(-1);
-            state.set_text(TaskHistoryStateText.SUCCESSFUL);
-            history1.setState(state);
+            if (jobsFilter.getJobs().size() > 0){
+                for (JobPath jobPath : jobsFilter.getJobs()) {
+                    reportExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
+                }
+            }else{
+                jobsFilter.setRegex("");
+            }
 
-            history1.setSteps(-1);
-            history1.setTaskId("-1");
-            listOfHistory.add(history1);
+            List<DBItemReportExecution> listOfDBItemReportExecutionDBItems = reportExecutionsDBLayer.getSchedulerHistoryListFromTo();
 
-            entity.setHistory(listOfHistory);
+            for (DBItemReportExecution dbItemReportExecution : listOfDBItemReportExecutionDBItems) {
+                boolean add = true;
+                TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
+                taskHistoryItem.setAgent(dbItemReportExecution.getAgentUrl());
+                // taskHistoryItem.setClusterMember(dbItemReportExecution.getClusterMemberId());
+                taskHistoryItem.setEndTime(dbItemReportExecution.getEndTime());
+                if (dbItemReportExecution.getError()) {
+                    Err error = new Err();
+                    error.setCode(dbItemReportExecution.getErrorCode());
+                    error.setMessage(dbItemReportExecution.getErrorText());
+                    taskHistoryItem.setError(error);
+                }
 
-            TaskHistoryItem history2 = new TaskHistoryItem();
-            history2.setAgent("myAgent");
-            history2.setClusterMember("myClusterMember");
-            history2.setEndTime(new Date());
-            history2.setError(error);
+                taskHistoryItem.setExitCode(dbItemReportExecution.getExitCode());
+                taskHistoryItem.setJob(dbItemReportExecution.getName());
+                taskHistoryItem.setStartTime(dbItemReportExecution.getStartTime());
 
-            history2.setExitCode(-1);
-            history2.setJob("myJob");
-            history2.setStartTime(new Date());
-            history2.setState(state);
+                TaskHistoryState state = new TaskHistoryState();
+                if (dbItemReportExecution.isSuccessFull()) {
+                    state.setSeverity(0);
+                    state.set_text(TaskHistoryStateText.SUCCESSFUL);
+                }
+                if (dbItemReportExecution.isInComplete()) {
+                    state.setSeverity(1);
+                    state.set_text(TaskHistoryStateText.INCOMPLETE);
+                }
+                if (dbItemReportExecution.isFailed()) {
+                    state.setSeverity(2);
+                    state.set_text(TaskHistoryStateText.FAILED);
+                }
+                taskHistoryItem.setState(state);
+                taskHistoryItem.setSurveyDate(dbItemReportExecution.getCreated());
 
-            history2.setSteps(-1);
-            history2.setTaskId("-1");
-            listOfHistory.add(history1);
+                // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
+                taskHistoryItem.setTaskId(dbItemReportExecution.getHistoryIdAsString());
+
+                if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {
+                    Matcher regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher(dbItemReportExecution.getName());
+                    add = regExMatcher.find();
+                }
+
+                if (add) {
+                    listOfHistory.add(taskHistoryItem);
+                }
+
+            }
+
+            TaskHistory entity = new TaskHistory();
+            entity.setDeliveryDate(new Date());
             entity.setHistory(listOfHistory);
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -82,6 +115,8 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.rollback();
         }
     }
 }
