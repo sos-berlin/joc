@@ -4,10 +4,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
-
-import org.omg.PortableInterceptor.SUCCESSFUL;
 
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
@@ -62,10 +62,11 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             Plan entity = new Plan();
             for (DailyPlanDBItem dailyPlanDBItem : listOfDailyPlanDBItems) {
+
+                boolean add = true;
+
                 PlanItem p = new PlanItem();
                 Err err = new Err();
-                p.setJob(dailyPlanDBItem.getJob());
-                p.setJobChain(dailyPlanDBItem.getJobChain());
                 p.setLate(dailyPlanDBItem.getIsLate());
 
                 Period period = new Period();
@@ -102,26 +103,41 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setSurveyDate(dailyPlanDBItem.getCreated());
 
                 if (dailyPlanDBItem.isStandalone()) {
+                    if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                        Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getJob());
+                        add = regExMatcher.find();
+                    }
+                    p.setJob(dailyPlanDBItem.getJob());
+
                     if (dailyPlanDBItem.getDbItemReportExecution() != null) {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
-                        p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId().toString());
                         p.setStartTime(dailyPlanDBItem.getDbItemReportExecution().getStartTime());
                         err.setCode(dailyPlanDBItem.getDbItemReportExecution().getErrorCode());
                         err.setMessage(dailyPlanDBItem.getDbItemReportExecution().getErrorText());
                         p.setError(err);
                     }
                 } else {
+                    if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                        Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
+                        add = regExMatcher.find();
+                    }
+                    p.setJobChain(dailyPlanDBItem.getJobChain());
+                    p.setOrderId(dailyPlanDBItem.getOrderId());
+
                     if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
                         p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
-                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId());
+                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId().toString());
                         p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
-                        p.setExitCode(dailyPlanDBItem.getDbItemReportTrigger().getState());
+                        p.setExitCode(Integer.valueOf(dailyPlanDBItem.getDbItemReportTrigger().getState()));
                         p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
                         p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getOrderId());
                     }
 
                 }
-                result.add(p);
+                if (add) {
+                    result.add(p);
+                }
             }
             entity.setPlanItems(result);
             entity.setDeliveryDate(Date.from(Instant.now()));

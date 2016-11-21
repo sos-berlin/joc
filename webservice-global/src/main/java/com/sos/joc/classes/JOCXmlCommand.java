@@ -152,4 +152,74 @@ public class JOCXmlCommand extends SOSXmlCommand {
         throwJobSchedulerError();
         return s;
     }
+    
+    public String getShowStateCommand(String subsystems, String what, String path, Integer maxOrders, Integer maxOrderHistory) {
+        StringBuilder s = new StringBuilder();
+        s.append("<show_state");
+        if (subsystems != null && !subsystems.isEmpty()) {
+            s.append(" subsystems=\"" + subsystems + "\"");
+        }
+        if (what != null && !what.isEmpty()) {
+            s.append(" what=\"" + what + "\"");
+        }
+        if (path != null && !path.isEmpty()) {
+            s.append(" path=\"" + path + "\"");
+        }
+        if (maxOrders != null) {
+            s.append(" max_orders=\"" + maxOrders + "\"");
+        }
+        if (maxOrderHistory != null) {
+            s.append(" max_order_history=\"" + maxOrderHistory + "\"");
+        }
+        s.append(" />");
+        return s.toString();
+    }
+    
+    public String getShowJobCommand(String job, String what, Integer maxOrders, Integer maxTaskHistory) {
+        StringBuilder s = new StringBuilder();
+        s.append("<show_job");
+        s.append(" job=\"" + job + "\"");
+        if (what != null && !what.isEmpty()) {
+            s.append(" what=\"" + what + "\"");
+        }
+        if (maxTaskHistory == null) {
+            maxTaskHistory = 0; 
+        }
+        if (maxTaskHistory != null) {
+            s.append(" max_task_history=\"" + maxTaskHistory + "\"");
+        }
+        if (maxOrders != null) {
+            s.append(" max_orders=\"" + maxOrders + "\"");
+        }
+        s.append(" />");
+        return s.toString();
+    }
+    
+    public String getShowJobChainCommand(String jobChain, String what) {
+        return getShowJobChainCommand(jobChain, what, null, null);
+    }
+    
+    public String getShowJobChainCommand(String jobChain, String what, Integer maxOrders) {
+        return getShowJobChainCommand(jobChain, what, maxOrders, null);
+    }
+    
+    public String getShowJobChainCommand(String jobChain, String what, Integer maxOrders, Integer maxOrderHistory) {
+        StringBuilder s = new StringBuilder();
+        s.append("<show_job_chain");
+        s.append(" job_chain=\"" + jobChain + "\"");
+        if (what != null && !what.isEmpty()) {
+            s.append(" what=\"" + what + "\"");
+        }
+        if (maxOrders != null) {
+            s.append(" max_orders=\"" + maxOrders + "\"");
+        }
+        if (maxOrderHistory == null) {
+            maxOrderHistory = 0; 
+        }
+        if (maxOrderHistory != null) {
+            s.append(" max_order_history=\"" + maxOrderHistory + "\"");
+        }
+        s.append(" />");
+        return s.toString();
+    }
 }

@@ -152,13 +152,14 @@ public class JobChainVolatile extends JobChainV {
             order.setHistoryId(blacklistedOrder.getAttribute("history_id"));
             order.setJobChain(blacklistedOrder.getAttribute("job_chain"));
             order.setOrderId(blacklistedOrder.getAttribute("id"));
-            order.setPath(blacklistedOrder.getAttribute(order.getJobChain()+","+order.getOrderId()));
+            order.setPath(order.getJobChain()+","+order.getOrderId());
             OrderState orderState = new OrderState();
             orderState.set_text(OrderStateText.BLACKLIST);
             orderState.setSeverity(3);
             order.setProcessingState(orderState);
             order.setStartedAt(JobSchedulerDate.getDateFromISO8601String(blacklistedOrder.getAttribute("start_time")));
             order.setState(blacklistedOrder.getAttribute("state"));
+            order.setParams(null); //TODO set params
             orders.add(order);
         }
         if (orders.size() == 0) {
@@ -174,7 +175,7 @@ public class JobChainVolatile extends JobChainV {
         setName(jobChain.getAttribute(WebserviceConstants.NAME));
         jobNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job]");
         jobChainNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node[@job_chain] | job_chain_node.job_chain[@job_chain]");
-        blacklist = jocXmlCommand.getSosxml().selectNodeList(jobChain, "blacklist");
+        blacklist = jocXmlCommand.getSosxml().selectNodeList(jobChain, "blacklist/order");
         setNumOfNodes(jobNodes.getLength() + jobChainNodes.getLength());
         //Integer numOfFileOrders = Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(jobChain, "file_order_source/files/@count", "0"));
         setNumOfOrders(Integer.parseInt(jobChain.getAttribute("orders")) + blacklist.getLength());

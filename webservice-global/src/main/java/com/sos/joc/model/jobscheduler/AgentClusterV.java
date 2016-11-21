@@ -31,6 +31,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "agents",
     "numOfProcesses",
     "processes",
+    "maxProcesses",
+    "_type",
     "configurationStatus"
 })
 public class AgentClusterV {
@@ -79,6 +81,22 @@ public class AgentClusterV {
     private Integer numOfProcesses;
     @JsonProperty("processes")
     private List<Process> processes = new ArrayList<Process>();
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("maxProcesses")
+    private Integer maxProcesses;
+    /**
+     * agent cluster type
+     * <p>
+     * the type of agent cluster
+     * 
+     */
+    @JsonProperty("_type")
+    private AgentClusterType _type;
     /**
      * configuration status
      * <p>
@@ -259,6 +277,58 @@ public class AgentClusterV {
     }
 
     /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The maxProcesses
+     */
+    @JsonProperty("maxProcesses")
+    public Integer getMaxProcesses() {
+        return maxProcesses;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param maxProcesses
+     *     The maxProcesses
+     */
+    @JsonProperty("maxProcesses")
+    public void setMaxProcesses(Integer maxProcesses) {
+        this.maxProcesses = maxProcesses;
+    }
+
+    /**
+     * agent cluster type
+     * <p>
+     * the type of agent cluster
+     * 
+     * @return
+     *     The _type
+     */
+    @JsonProperty("_type")
+    public AgentClusterType get_type() {
+        return _type;
+    }
+
+    /**
+     * agent cluster type
+     * <p>
+     * the type of agent cluster
+     * 
+     * @param _type
+     *     The _type
+     */
+    @JsonProperty("_type")
+    public void set_type(AgentClusterType _type) {
+        this._type = _type;
+    }
+
+    /**
      * configuration status
      * <p>
      * 
@@ -291,7 +361,7 @@ public class AgentClusterV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(state).append(numOfAgents).append(agents).append(numOfProcesses).append(processes).append(configurationStatus).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(state).append(numOfAgents).append(agents).append(numOfProcesses).append(processes).append(maxProcesses).append(_type).append(configurationStatus).toHashCode();
     }
 
     @Override
@@ -303,7 +373,7 @@ public class AgentClusterV {
             return false;
         }
         AgentClusterV rhs = ((AgentClusterV) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(state, rhs.state).append(numOfAgents, rhs.numOfAgents).append(agents, rhs.agents).append(numOfProcesses, rhs.numOfProcesses).append(processes, rhs.processes).append(configurationStatus, rhs.configurationStatus).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(state, rhs.state).append(numOfAgents, rhs.numOfAgents).append(agents, rhs.agents).append(numOfProcesses, rhs.numOfProcesses).append(processes, rhs.processes).append(maxProcesses, rhs.maxProcesses).append(_type, rhs._type).append(configurationStatus, rhs.configurationStatus).isEquals();
     }
 
 }

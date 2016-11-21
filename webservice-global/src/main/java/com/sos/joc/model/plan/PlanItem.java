@@ -98,8 +98,8 @@ public class PlanItem {
      */
     @JsonProperty("endTime")
     private Date endTime;
-    /**     * non negative integer     * <p>     *      *      */    @JsonProperty("historyId")
-    private Long historyId;
+    @JsonProperty("historyId")
+    private String historyId;
     /**
      * only for orders
      * 
@@ -107,10 +107,14 @@ public class PlanItem {
     @JsonProperty("node")
     private String node;
     /**
-     * non negative integer     * <p>     * 
-     *      */
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
     @JsonProperty("exitCode")
-    private String exitCode;    /**
+    private Integer exitCode;
+    /**
      * error
      * <p>
      * 
@@ -344,22 +348,22 @@ public class PlanItem {
     }
 
     /**
-     * non negative integer     * <p>     * 
-     *      * @return
+     * 
+     * @return
      *     The historyId
      */
     @JsonProperty("historyId")
-    public Long getHistoryId() {
+    public String getHistoryId() {
         return historyId;
     }
 
     /**
-     * non negative integer     * <p>     * 
-     *      * @param historyId
+     * 
+     * @param historyId
      *     The historyId
      */
     @JsonProperty("historyId")
-    public void setHistoryId(Long historyId) {
+    public void setHistoryId(String historyId) {
         this.historyId = historyId;
     }
 
@@ -386,21 +390,29 @@ public class PlanItem {
     }
 
     /**
-     * non negative integer     * <p>     * 
-     *      * @return
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
      *     The exitCode
      */
     @JsonProperty("exitCode")
-    public String getExitCode() {        return exitCode;
+    public Integer getExitCode() {
+        return exitCode;
     }
 
     /**
-     * non negative integer     * <p>     * 
-     *      * @param exitCode
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param exitCode
      *     The exitCode
      */
     @JsonProperty("exitCode")
-    public void setExitCode(String exitCode) {        this.exitCode = exitCode;
+    public void setExitCode(Integer exitCode) {
+        this.exitCode = exitCode;
     }
 
     /**

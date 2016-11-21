@@ -192,13 +192,12 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         numOfAgents.setRunning(countRunning);
         agentClusterPSchema.setNumOfAgents(numOfAgents);
         AgentClusterState state = new AgentClusterState();
-        int diff = numOfAgents.getAny() - numOfAgents.getRunning();
-        if (diff == 0) {
+        if (numOfAgents.getAny() == numOfAgents.getRunning()) {
             state.setSeverity(0);
             state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_RUNNING);
-        } else if (diff == numOfAgents.getAny()) {
+        } else if (0 == numOfAgents.getRunning()) {
             state.setSeverity(2);
-            state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_RUNNING);
+            state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_UNREACHABLE);
         } else {
             state.setSeverity(1);
             state.set_text(AgentClusterStateText.ONLY_SOME_AGENTS_ARE_RUNNING);

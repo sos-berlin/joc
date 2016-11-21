@@ -19,6 +19,7 @@ import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.model.jobscheduler.AgentClusterState;
 import com.sos.joc.model.jobscheduler.AgentClusterStateText;
+import com.sos.joc.model.jobscheduler.AgentClusterType;
 import com.sos.joc.model.jobscheduler.AgentClusterV;
 import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
@@ -51,7 +52,7 @@ public class AgentClusterVolatile extends AgentClusterV {
         if (getPath() == null) {
             String path = overview.getString("path", null);
             if (path == null || path.isEmpty()) {
-                throw new JobSchedulerInvalidResponseDataException("Invalid resonsed data: path is empty");
+                throw new JobSchedulerInvalidResponseDataException("Invalid responsed data: path is empty");
             }
             LOGGER.debug("...processing AgentCluster " + path);
             setPath(path);
@@ -127,9 +128,25 @@ public class AgentClusterVolatile extends AgentClusterV {
 
     private void setCompactFields(Map<String,AgentV> mapOfAgents) throws JobSchedulerInvalidResponseDataException {
         setAgentClusterPath();
+        setMaxProcesses(overview.getInt("processLimit", 1));
         setNumOfProcesses(overview.getInt("usedProcessCount", 0));
         JsonArray obstacles = overview.getJsonArray("obstacles");
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(obstacles));
+        JsonArray agents = agent.getJsonArray("agents");
+        if (agents != null) {
+            if (agents.size() == 1) {
+                set_type(AgentClusterType.SINGLE_AGENT); 
+            } else {
+                switch (agent.getString("selectionMethod", "")) {
+                case "FixedPriority":
+                    set_type(AgentClusterType.FIX_PRIORITY);
+                    break;
+                case "RoundRobin":
+                    set_type(AgentClusterType.ROUND_ROBIN);
+                    break;
+                } 
+            }   
+        }
     }
     
     private JsonObject getAgentOverview() {

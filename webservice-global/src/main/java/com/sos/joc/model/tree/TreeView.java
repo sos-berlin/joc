@@ -8,12 +8,6 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.sos.joc.model.job.JobP;
-import com.sos.joc.model.jobChain.JobChainP;
-import com.sos.joc.model.lock.LockP;
-import com.sos.joc.model.order.OrderP;
-import com.sos.joc.model.processClass.ProcessClassP;
-import com.sos.joc.model.schedule.ScheduleP;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -29,13 +23,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "folders",
-    "jobs",
-    "jobChains",
-    "orders",
-    "processClasses",
-    "locks",
-    "schedules"
+    "folders"
 })
 public class TreeView {
 
@@ -55,18 +43,6 @@ public class TreeView {
      */
     @JsonProperty("folders")
     private List<Tree> folders = new ArrayList<Tree>();
-    @JsonProperty("jobs")
-    private List<JobP> jobs = new ArrayList<JobP>();
-    @JsonProperty("jobChains")
-    private List<JobChainP> jobChains = new ArrayList<JobChainP>();
-    @JsonProperty("orders")
-    private List<OrderP> orders = new ArrayList<OrderP>();
-    @JsonProperty("processClasses")
-    private List<ProcessClassP> processClasses = new ArrayList<ProcessClassP>();
-    @JsonProperty("locks")
-    private List<LockP> locks = new ArrayList<LockP>();
-    @JsonProperty("schedules")
-    private List<ScheduleP> schedules = new ArrayList<ScheduleP>();
 
     /**
      * delivery date
@@ -120,126 +96,6 @@ public class TreeView {
         this.folders = folders;
     }
 
-    /**
-     * 
-     * @return
-     *     The jobs
-     */
-    @JsonProperty("jobs")
-    public List<JobP> getJobs() {
-        return jobs;
-    }
-
-    /**
-     * 
-     * @param jobs
-     *     The jobs
-     */
-    @JsonProperty("jobs")
-    public void setJobs(List<JobP> jobs) {
-        this.jobs = jobs;
-    }
-
-    /**
-     * 
-     * @return
-     *     The jobChains
-     */
-    @JsonProperty("jobChains")
-    public List<JobChainP> getJobChains() {
-        return jobChains;
-    }
-
-    /**
-     * 
-     * @param jobChains
-     *     The jobChains
-     */
-    @JsonProperty("jobChains")
-    public void setJobChains(List<JobChainP> jobChains) {
-        this.jobChains = jobChains;
-    }
-
-    /**
-     * 
-     * @return
-     *     The orders
-     */
-    @JsonProperty("orders")
-    public List<OrderP> getOrders() {
-        return orders;
-    }
-
-    /**
-     * 
-     * @param orders
-     *     The orders
-     */
-    @JsonProperty("orders")
-    public void setOrders(List<OrderP> orders) {
-        this.orders = orders;
-    }
-
-    /**
-     * 
-     * @return
-     *     The processClasses
-     */
-    @JsonProperty("processClasses")
-    public List<ProcessClassP> getProcessClasses() {
-        return processClasses;
-    }
-
-    /**
-     * 
-     * @param processClasses
-     *     The processClasses
-     */
-    @JsonProperty("processClasses")
-    public void setProcessClasses(List<ProcessClassP> processClasses) {
-        this.processClasses = processClasses;
-    }
-
-    /**
-     * 
-     * @return
-     *     The locks
-     */
-    @JsonProperty("locks")
-    public List<LockP> getLocks() {
-        return locks;
-    }
-
-    /**
-     * 
-     * @param locks
-     *     The locks
-     */
-    @JsonProperty("locks")
-    public void setLocks(List<LockP> locks) {
-        this.locks = locks;
-    }
-
-    /**
-     * 
-     * @return
-     *     The schedules
-     */
-    @JsonProperty("schedules")
-    public List<ScheduleP> getSchedules() {
-        return schedules;
-    }
-
-    /**
-     * 
-     * @param schedules
-     *     The schedules
-     */
-    @JsonProperty("schedules")
-    public void setSchedules(List<ScheduleP> schedules) {
-        this.schedules = schedules;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -247,7 +103,7 @@ public class TreeView {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(folders).append(jobs).append(jobChains).append(orders).append(processClasses).append(locks).append(schedules).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(folders).toHashCode();
     }
 
     @Override
@@ -259,7 +115,7 @@ public class TreeView {
             return false;
         }
         TreeView rhs = ((TreeView) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(folders, rhs.folders).append(jobs, rhs.jobs).append(jobChains, rhs.jobChains).append(orders, rhs.orders).append(processClasses, rhs.processClasses).append(locks, rhs.locks).append(schedules, rhs.schedules).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(folders, rhs.folders).isEquals();
     }
 
 }

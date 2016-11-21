@@ -86,10 +86,10 @@ public class TreePermanent {
     }
     
     public static Tree getTree(SortedSet<String> folders) {
-        Map<Path, Tree> treeMap = new HashMap<Path, Tree>();
+        Map<Path, TreeModel> treeMap = new HashMap<Path, TreeModel>();
         for(String folder : folders) {
             Path pFolder = Paths.get(folder);
-            Tree tree = new Tree();
+            TreeModel tree = new TreeModel();
             if (treeMap.containsKey(pFolder)) {
                 tree = treeMap.get(pFolder);
             } else {
@@ -104,10 +104,10 @@ public class TreePermanent {
         return treeMap.get(Paths.get("/"));
     }
     
-    private static void fillTreeMap(Map<Path, Tree> treeMap, Path folder, Tree tree) {
+    private static void fillTreeMap(Map<Path, TreeModel> treeMap, Path folder, TreeModel tree) {
         Path parent = folder.getParent();
         if (parent != null) {
-            Tree parentTree = new Tree();
+            TreeModel parentTree = new TreeModel();
             if (treeMap.containsKey(parent)) {
                 parentTree = treeMap.get(parent);
                 List<Tree> treeList = parentTree.getFolders();
@@ -119,7 +119,7 @@ public class TreePermanent {
                     if (treeList.contains(tree)) {
                         treeList.remove(tree);
                     }
-                    treeList.add(tree);
+                    treeList.add(0, tree);
                 }
             } else {
                 parentTree.setPath(parent.toString().replace('\\', '/'));

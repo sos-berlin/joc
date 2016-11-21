@@ -28,10 +28,10 @@ public class JobChainPermanent {
         jobChain.setName(inventoryJobChain.getBaseName());
         List<DBItemInventoryJobChainNode> jobChainNodesFromDb = dbLayer.getJobChainNodesByJobChainId(inventoryJobChain.getId(), instanceId);
         if (jobChainNodesFromDb != null) {
-            int numOfNodes = jobChainNodesFromDb.size();
-            for(DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
-                if(node.getNodeType() == 5) {
-                    numOfNodes--;
+            int numOfNodes = 0;
+            for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
+                if (node.getNodeType() < 3) { //JobNode and JobChainNode
+                    numOfNodes += 1;  
                 }
             }
             jobChain.setNumOfNodes(numOfNodes);
@@ -79,7 +79,7 @@ public class JobChainPermanent {
                         } else {
                             jobChainNode.setJobChain(null);
                         }
-                        //                    jobChainNode.setLevel(???);
+                        //TODO                    jobChainNode.setLevel(???);
                         jobChainNode.setName(node.getState());
                         jobChainNode.setNextNode(node.getNextState());
                         jobChainNode.setOnError(node.getOnError());
