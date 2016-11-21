@@ -28,7 +28,13 @@ public class JobChainPermanent {
         jobChain.setName(inventoryJobChain.getBaseName());
         List<DBItemInventoryJobChainNode> jobChainNodesFromDb = dbLayer.getJobChainNodesByJobChainId(inventoryJobChain.getId(), instanceId);
         if (jobChainNodesFromDb != null) {
-            jobChain.setNumOfNodes(jobChainNodesFromDb.size());
+            int numOfNodes = jobChainNodesFromDb.size();
+            for(DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
+                if(node.getNodeType() == 5) {
+                    numOfNodes--;
+                }
+            }
+            jobChain.setNumOfNodes(numOfNodes);
         }
         jobChain.setTitle(inventoryJobChain.getTitle());
         jobChain.setMaxOrders(inventoryJobChain.getMaxOrders());
