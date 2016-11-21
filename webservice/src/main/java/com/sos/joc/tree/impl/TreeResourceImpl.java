@@ -50,17 +50,13 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 checkFoldersFilterParam(treeBody.getFolders());
             }
             Globals.beginTransaction();
-            List<String> folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId());
-            SortedSet<String> folderSet = new TreeSet<String>(new Comparator<String>(){
-                public int compare(String a, String b){
-                    return b.compareTo(a);
-                }
-            });
-            folderSet.addAll(folders);
-            Tree root = TreePermanent.getTree(folderSet);
+            SortedSet<String> folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId());
+            Tree root = TreePermanent.getTree(folders);
 
             TreeView entity = new TreeView();
-            entity.getFolders().add(root);
+            if (root != null) {
+                entity.getFolders().add(root); 
+            }
 //            if (types == null || types.isEmpty()) {
 //                entity.setJobChains(null);
 //                entity.setJobs(null);

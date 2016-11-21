@@ -1,7 +1,6 @@
 package com.sos.joc.db.inventory.files;
 
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.Query;
 
@@ -121,17 +120,13 @@ public class InventoryFilesDBLayer extends DBLayer {
 //    }
     
     @SuppressWarnings("unchecked")
-    public List<String> getFoldersByFolderAndType(Long instanceId, String folderName, Boolean recursive, List<String> types) throws Exception {
+    public List<String> getFoldersByFolderAndType(Long instanceId, String folderName, List<String> types) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select fileDirectory from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
             if (folderName != null) {
-                if (recursive != null && recursive) {
-                    sql.append(" and fileDirectory like :folderName");
-                } else {
-                    sql.append(" and fileDirectory = :folderName");
-                }
+                sql.append(" and fileDirectory like :folderName");
             }
             if (types != null && !types.isEmpty()) {
                 if (types.size() == 1) {
@@ -143,11 +138,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (folderName != null) {
-                if (recursive != null && recursive) {
-                    query.setParameter("folderName", folderName + "%");
-                } else {
-                    query.setParameter("folderName", folderName);
-                } 
+                query.setParameter("folderName", folderName + "%");
             }
             if (types != null && !types.isEmpty()) {
                 if (types.size() == 1) {

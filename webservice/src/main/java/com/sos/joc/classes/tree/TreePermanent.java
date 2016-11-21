@@ -3,10 +3,12 @@ package com.sos.joc.classes.tree;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.joc.Globals;
@@ -61,27 +63,51 @@ public class TreePermanent {
         return types;
     }
 
-    public static List<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId) throws Exception {
-        List<String> folders = new ArrayList<String>();
+    public static SortedSet<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId) throws Exception {
+        SortedSet<String> folders = new TreeSet<String>(new Comparator<String>(){
+            public int compare(String a, String b){
+                return b.compareTo(a);
+            }
+        });
         List<String> bodyTypes = new ArrayList<String>();
         if(treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
             for(JobSchedulerObjectType type : treeBody.getTypes()) {
-                bodyTypes.add(type.name().toLowerCase().replaceFirst("([bs])c", "$1_c"));
+                switch (type) {
+                case JOBCHAIN: 
+                    bodyTypes.add("job_chain");
+                    break;
+                case PROCESSCLASS: 
+                    bodyTypes.add("process_class");
+                    break;
+                default: 
+                    bodyTypes.add(type.name().toLowerCase());
+                    break;
+                }
             }
         }
         InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(Globals.sosHibernateConnection);
         List<String> results = null;
         if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
             for (Folder folder : treeBody.getFolders()) {
-                results = dbLayer.getFoldersByFolderAndType(instanceId, ("/"+folder.getFolder()).replaceAll("//+", "/"), folder.getRecursive(), bodyTypes);
+                String normalizedFolder = ("/"+folder.getFolder()).replaceAll("//+", "/");
+                results = dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes);
+                if (results != null && !results.isEmpty()) {
+                    if (folder.getRecursive() == null || folder.getRecursive()) {
+                        folders.addAll(results);
+                    } else {
+                        Path parent = Paths.get(normalizedFolder);
+                        for (String result : results) {
+                            folders.add("/"+Paths.get(result).subpath(0, parent.getNameCount()+1).toString());
+                        } 
+                    } 
+                }
             }
         } else {
-            results = dbLayer.getFoldersByFolderAndType(instanceId, "/", true, bodyTypes);
+            results = dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes);
+            if(results != null && !results.isEmpty()) {
+                folders.addAll(results);
+            }
         }
-        if(results != null && !results.isEmpty()) {
-            folders.addAll(results);
-        }
-    
         return folders;
     }
     
@@ -100,6 +126,13 @@ public class TreePermanent {
                 treeMap.put(pFolder, tree);
             }
             fillTreeMap(treeMap, pFolder, tree);
+        }
+        if (treeMap.isEmpty()) {
+            TreeModel root = new TreeModel();
+            root.setFolders(null); 
+            root.setName("");
+            root.setPath("/");
+            treeMap.put(Paths.get("/"), root);
         }
         return treeMap.get(Paths.get("/"));
     }
