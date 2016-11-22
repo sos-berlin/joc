@@ -47,7 +47,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             // command.addProcessClassCompactQuery(jobSchedulerAgentClustersBody.getCompact());
             command.addProcessClassCompactQuery(false);
             URI uri = command.getURI();
-            
+
             List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
             Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(processClassFilter.getProcessClasses());
             List<Folder> folders = processClassFilter.getFolders();
@@ -61,14 +61,16 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 entity.setProcessClasses(listProcessClasses);
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    folder.setFolder(normalizePath(folder.getFolder()));
-                    tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(), uri, accessToken));
+                    folder.setFolder(normalizeFolder(folder.getFolder()));
+                    tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(), uri,
+                            accessToken));
                 }
             } else {
                 Folder rootFolder = new Folder();
                 rootFolder.setFolder("/");
                 rootFolder.setRecursive(true);
-                ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder, processClassFilter.getRegex(), uri, accessToken);
+                ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder, processClassFilter.getRegex(), processClassFilter
+                        .getIsAgentCluster(), uri, accessToken);
                 entity.setProcessClasses(callable.getProcessClasses());
             }
             if (tasks.size() > 0) {
@@ -86,7 +88,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 }
                 entity.setProcessClasses(listProcessClasses);
             }
-            
+
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
 

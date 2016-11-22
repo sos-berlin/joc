@@ -67,6 +67,10 @@ public class ProcessClassVolatile extends ProcessClassV {
         }
     }
     
+    public boolean isAgentCluster() {
+        return processClass.containsKey("agents") && !processClass.getJsonArray("agents").isEmpty();
+    }
+    
     private JsonObject getOrderOverview() {
         return processClass.containsKey("overview") ? processClass.getJsonObject("overview") : processClass;
     }

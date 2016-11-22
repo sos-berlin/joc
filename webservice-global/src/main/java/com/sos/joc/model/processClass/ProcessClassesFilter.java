@@ -25,7 +25,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "jobschedulerId",
     "processClasses",
     "regex",
-    "folders"
+    "folders",
+    "isAgentCluster"
 })
 public class ProcessClassesFilter {
 
@@ -54,6 +55,12 @@ public class ProcessClassesFilter {
      */
     @JsonProperty("folders")
     private List<Folder> folders = new ArrayList<Folder>();
+    /**
+     * only relevant for volatile request
+     * 
+     */
+    @JsonProperty("isAgentCluster")
+    private Boolean isAgentCluster = false;
 
     /**
      * 
@@ -151,6 +158,28 @@ public class ProcessClassesFilter {
         this.folders = folders;
     }
 
+    /**
+     * only relevant for volatile request
+     * 
+     * @return
+     *     The isAgentCluster
+     */
+    @JsonProperty("isAgentCluster")
+    public Boolean getIsAgentCluster() {
+        return isAgentCluster;
+    }
+
+    /**
+     * only relevant for volatile request
+     * 
+     * @param isAgentCluster
+     *     The isAgentCluster
+     */
+    @JsonProperty("isAgentCluster")
+    public void setIsAgentCluster(Boolean isAgentCluster) {
+        this.isAgentCluster = isAgentCluster;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -158,7 +187,7 @@ public class ProcessClassesFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(processClasses).append(regex).append(folders).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(processClasses).append(regex).append(folders).append(isAgentCluster).toHashCode();
     }
 
     @Override
@@ -170,7 +199,7 @@ public class ProcessClassesFilter {
             return false;
         }
         ProcessClassesFilter rhs = ((ProcessClassesFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(processClasses, rhs.processClasses).append(regex, rhs.regex).append(folders, rhs.folders).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(processClasses, rhs.processClasses).append(regex, rhs.regex).append(folders, rhs.folders).append(isAgentCluster, rhs.isAgentCluster).isEquals();
     }
 
 }

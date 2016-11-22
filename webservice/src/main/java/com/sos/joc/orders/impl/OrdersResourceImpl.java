@@ -87,7 +87,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
-                    folder.setFolder(normalizePath(folder.getFolder()));
+                    folder.setFolder(normalizeFolder(folder.getFolder()));
                     tasks.add(new OrdersVCallable(folder, ordersBody, uri, accessToken));
                 }
             } else {
