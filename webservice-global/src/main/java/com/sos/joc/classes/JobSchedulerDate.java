@@ -55,44 +55,22 @@ public class JobSchedulerDate {
         return Date.from(fromEpochMilli);
     }
     
-    public static Date getDateFromDateTo(String dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
+    public static Date getDate(String date, String timeZone) throws JobSchedulerInvalidResponseDataException {
         try {
-            return Date.from(getInstantFromDateTo(dateTo, timeZone));
+            return Date.from(getInstantFromDateStr(date, timeZone));
         } catch (JobSchedulerInvalidResponseDataException e) {
             throw e;
         } catch (Exception e) {
             throw new JobSchedulerInvalidResponseDataException(e);
         }
     }
-    
-    public static Date getDateFromDateFrom(String dateFrom, String timeZone) throws JobSchedulerInvalidResponseDataException {
-        try {
-            return Date.from(getInstantFromDateFrom(dateFrom, timeZone));
-        } catch (JobSchedulerInvalidResponseDataException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JobSchedulerInvalidResponseDataException(e);
-        }
-    }
-    
-    public static Instant getInstantFromDateFrom(String dateFrom, String timeZone) throws JobSchedulerInvalidResponseDataException {
-        return getInstantFromDateStr(dateFrom, timeZone, -1);
-    }
-    
-    public static Instant getInstantFromDateTo(String dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
-        return getInstantFromDateStr(dateTo, timeZone);
-    }
-    
+   
     private static Instant getInstantFromDateStr(String dateStr, String timeZone) throws JobSchedulerInvalidResponseDataException {
-        return getInstantFromDateStr(dateStr, timeZone, null);
-    }
-    
-    private static Instant getInstantFromDateStr(String dateStr, String timeZone, Integer multiplicator) throws JobSchedulerInvalidResponseDataException {
         if (dateStr == null){
             return  Instant.now();
         }
         Pattern offsetPattern = Pattern.compile("([\\ssmhdwMyT:\\.\\d-]+)([+-][0-9:]+|Z)?$");
-        Pattern dateTimePattern = Pattern.compile("(?:(\\d+)([smhdwMy])\\s*)");
+        Pattern dateTimePattern = Pattern.compile("(?:(-?\\d+)([smhdwMy])\\s*)");
         Matcher m = offsetPattern.matcher(dateStr);
         ZonedDateTime zdt = null;
         ZoneId zoneId = null;
@@ -109,16 +87,14 @@ public class JobSchedulerDate {
             } else if (zoneId == null) {
                 zoneId = ZoneOffset.UTC;
             }
-            m = dateTimePattern.matcher(dateStr.replaceAll("([smhdwMy])", "$1\\s"));
+            m = dateTimePattern.matcher(dateStr.replaceAll("([smhdwMy])", "$1 "));
             while (m.find()) {
                 dateTimeIsRelative = true;
                 if (zdt == null) {
                     zdt = ZonedDateTime.ofInstant(Instant.now(), zoneId);
                 }
                 Long number = Long.valueOf(m.group(1));
-                if (multiplicator != null) {
-                    number = multiplicator * number;
-                }
+                
                 switch (m.group(2)) {
                 case "s":
                     zdt = zdt.plusSeconds(number);

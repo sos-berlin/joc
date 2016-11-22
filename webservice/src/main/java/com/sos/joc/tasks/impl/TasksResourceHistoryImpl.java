@@ -44,8 +44,8 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
             ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(Globals.sosHibernateConnection);
             reportExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
-            reportExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFromDateFrom(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
-            reportExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateFromDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
+            reportExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDate(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
+            reportExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDate(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
             reportExecutionsDBLayer.getFilter().setTimeZone(jobsFilter.getTimeZone());
 
             if (jobsFilter.getJobs().size() > 0){

@@ -15,11 +15,13 @@ public class JobSchedulerDateTest {
     public void testGetDateFromDateFrom() throws JobSchedulerInvalidResponseDataException {
         Date d = new Date();
         String timeZone = "UTC";
-        String dateFrom = "6d";
-        d = JobSchedulerDate.getDateFromDateFrom(dateFrom, timeZone);
-        dateFrom = "2015-12-17T15:02:22.999Z";
-        d = JobSchedulerDate.getDateFromDateFrom(dateFrom, timeZone);
-        dateFrom = "2015-12-17T15:02:22.999Z";
+        String date = "6d";
+        d = JobSchedulerDate.getDate(date, timeZone);
+        date = "-6d";
+        d = JobSchedulerDate.getDate(date, timeZone);
+        date = "2015-12-17T15:02:22.999-02";
+        d = JobSchedulerDate.getDate(date, timeZone);
+        date = "2015-12-17T15:02:22.999Z";
         
     }
 
