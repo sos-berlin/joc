@@ -53,11 +53,10 @@ public class OrdersSummaryCallable implements Callable<Map<String, JobChainVolat
         OrdersSummary summary = new OrdersSummary();
         summary.setBlacklist(json.getInt("blacklisted", 0));
         summary.setPending(json.getInt("notPlanned", 0) + json.getInt("planned", 0));
-        summary.setRunning(json.getInt("inProcess", 0));
+        summary.setRunning(json.getInt("inTaskProcess", 0) + json.getInt("occupiedByClusterMember", 0));
         summary.setSetback(json.getInt("setback", 0));
         summary.setSuspended(json.getInt("suspended", 0));
-        summary.setWaitingForResource(json.getInt("total", 0) - summary.getBlacklist() - summary.getPending() - summary.getRunning() - summary
-                .getSetback() - summary.getSuspended());
+        summary.setWaitingForResource(json.getInt("waitingForResource", 0) + json.getInt("due", 0) + json.getInt("inTask", 0) - json.getInt("inTaskProcess", 0));
         return summary;
     }
 

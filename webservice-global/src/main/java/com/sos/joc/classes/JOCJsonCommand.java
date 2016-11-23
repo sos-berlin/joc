@@ -76,7 +76,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
 
     public void addOrderStatisticsQuery() {
-        uriBuilder.queryParam("return", "OrderStatistics");
+        uriBuilder.queryParam("return", "JocOrderStatistics");
     }
     
     public void addEventQuery(String eventId, Integer timeout, String event) {
