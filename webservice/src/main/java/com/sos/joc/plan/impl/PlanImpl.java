@@ -131,7 +131,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId().toString());
                         p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
                         p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
-                        p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getOrderId());
+                        p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getName());
                     }
 
                 }
@@ -144,9 +144,11 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
+            e.printStackTrace();
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
+            e.printStackTrace();
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.rollback();
