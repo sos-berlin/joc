@@ -26,7 +26,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "url",
     "os",
     "state",
-    "startedAt"
+    "startedAt",
+    "runningTasks"
 })
 public class AgentOfCluster {
 
@@ -87,6 +88,14 @@ public class AgentOfCluster {
      */
     @JsonProperty("startedAt")
     private Date startedAt;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("runningTasks")
+    private Integer runningTasks;
 
     /**
      * survey date of the inventory data; last time the inventory job has checked the live folder
@@ -272,6 +281,32 @@ public class AgentOfCluster {
         this.startedAt = startedAt;
     }
 
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The runningTasks
+     */
+    @JsonProperty("runningTasks")
+    public Integer getRunningTasks() {
+        return runningTasks;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param runningTasks
+     *     The runningTasks
+     */
+    @JsonProperty("runningTasks")
+    public void setRunningTasks(Integer runningTasks) {
+        this.runningTasks = runningTasks;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -279,7 +314,7 @@ public class AgentOfCluster {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(version).append(host).append(url).append(os).append(state).append(startedAt).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(version).append(host).append(url).append(os).append(state).append(startedAt).append(runningTasks).toHashCode();
     }
 
     @Override
@@ -291,7 +326,7 @@ public class AgentOfCluster {
             return false;
         }
         AgentOfCluster rhs = ((AgentOfCluster) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(host, rhs.host).append(url, rhs.url).append(os, rhs.os).append(state, rhs.state).append(startedAt, rhs.startedAt).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(version, rhs.version).append(host, rhs.host).append(url, rhs.url).append(os, rhs.os).append(state, rhs.state).append(startedAt, rhs.startedAt).append(runningTasks, rhs.runningTasks).isEquals();
     }
 
 }

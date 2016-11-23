@@ -18,12 +18,12 @@ import com.sos.joc.db.inventory.agents.AgentClusterPermanent;
 import com.sos.joc.db.inventory.agents.InventoryAgentsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClustersP;
+import com.sos.joc.model.jobscheduler.AgentCluster;
 import com.sos.joc.model.jobscheduler.AgentClusterFilter;
-import com.sos.joc.model.jobscheduler.AgentClusterP;
 import com.sos.joc.model.jobscheduler.AgentClusterPath;
 import com.sos.joc.model.jobscheduler.AgentClusterState;
 import com.sos.joc.model.jobscheduler.AgentClusterStateText;
-import com.sos.joc.model.jobscheduler.AgentClustersP;
+import com.sos.joc.model.jobscheduler.AgentClusters;
 import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
 
@@ -45,6 +45,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             Set<String> agentClusterPaths = new HashSet<String>();
             if (jobSchedulerAgentClustersBody.getAgentClusters() != null) {
                 for (AgentClusterPath agentCluster : jobSchedulerAgentClustersBody.getAgentClusters()) {
+                    checkRequiredParameter("agentCluster", agentCluster.getAgentCluster());
                     agentClusterPaths.add(agentCluster.getAgentCluster());
                 }
             }
@@ -53,7 +54,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             //List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembers(dbItemInventoryInstance.getId(), null);
             List<AgentClusterPermanent> agentClusters = agentLayer.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
             
-            ArrayList<AgentClusterP> listOfAgentClusters = new ArrayList<AgentClusterP>();
+            ArrayList<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
             for (AgentClusterPermanent agentCluster : agentClusters) {
                 if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentCluster.getPath())) {
                     continue;
@@ -88,7 +89,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 listOfAgentClusters.add(agentCluster);
             }
             
-            AgentClustersP entity = new AgentClustersP();
+            AgentClusters entity = new AgentClusters();
             entity.setAgentClusters(listOfAgentClusters);
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);

@@ -4,11 +4,12 @@ import java.nio.file.Paths;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.model.jobscheduler.AgentCluster;
 import com.sos.joc.model.jobscheduler.AgentClusterP;
 import com.sos.joc.model.jobscheduler.AgentClusterType;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
 
-public class AgentClusterPermanent extends AgentClusterP {
+public class AgentClusterPermanent extends AgentCluster {
 
     @JsonIgnore
     private Long agentClusterId;

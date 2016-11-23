@@ -17,16 +17,16 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.model.jobscheduler.AgentCluster;
 import com.sos.joc.model.jobscheduler.AgentClusterState;
 import com.sos.joc.model.jobscheduler.AgentClusterStateText;
 import com.sos.joc.model.jobscheduler.AgentClusterType;
-import com.sos.joc.model.jobscheduler.AgentClusterV;
-import com.sos.joc.model.jobscheduler.AgentV;
+import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
 import com.sos.joc.model.processClass.Process;
 
-public class AgentClusterVolatile extends AgentClusterV {
+public class AgentClusterVolatile extends AgentCluster {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgentClusterVolatile.class);
     private final JsonObject agent;
@@ -38,13 +38,13 @@ public class AgentClusterVolatile extends AgentClusterV {
         setSurveyDate(surveyDate);
     }
 
-    public void setFields(Map<String,AgentV> mapOfAgents, boolean compact) throws JobSchedulerInvalidResponseDataException {
+    public void setFields(Map<String,AgentOfCluster> mapOfAgents, boolean compact) throws JobSchedulerInvalidResponseDataException {
         setAgentsListAndState(mapOfAgents, compact);
         if (compact) {
-            setCompactFields(mapOfAgents);
+            setCompactFields();
             cleanArrays();
         } else {
-            setDetailedFields(mapOfAgents);
+            setDetailedFields();
         }
     }
     
@@ -70,16 +70,17 @@ public class AgentClusterVolatile extends AgentClusterV {
         return agentSet;
     }
     
-    public void setAgentsListAndState(Map<String, AgentV> mapOfAgents, boolean compact) {
+    public void setAgentsListAndState(Map<String, AgentOfCluster> mapOfAgents, boolean compact) {
         if (getNumOfAgents() == null) {
-            List<AgentV> agentList = new ArrayList<AgentV>();
+            List<AgentOfCluster> agentList = new ArrayList<AgentOfCluster>();
             NumOfAgentsInCluster numOf = new NumOfAgentsInCluster();
             int numOfRunning = 0;
             JsonArray agents = agent.getJsonArray("agents");
             if (agents != null) {
                 for (JsonString agent : agents.getValuesAs(JsonString.class)) {
-                    AgentV a = mapOfAgents.get(agent.getString());
+                    AgentOfCluster a = mapOfAgents.get(agent.getString());
                     if (a != null) {
+                        a.setRunningTasks(null); //only send for Agents call and not for AgentsCluster
                         agentList.add(a);
                         if (a.getState().get_text() == JobSchedulerStateText.RUNNING) {
                             numOfRunning += 1;
@@ -108,8 +109,8 @@ public class AgentClusterVolatile extends AgentClusterV {
         }
     }
 
-    private void setDetailedFields(Map<String,AgentV> mapOfAgents) throws JobSchedulerInvalidResponseDataException {
-        setCompactFields(mapOfAgents);
+    private void setDetailedFields() throws JobSchedulerInvalidResponseDataException {
+        setCompactFields();
         List<Process> processList = new ArrayList<Process>();
         JsonArray processes = agent.getJsonArray("processes");
         if (processes != null) {
@@ -126,7 +127,7 @@ public class AgentClusterVolatile extends AgentClusterV {
         setProcesses(processList);
     }
 
-    private void setCompactFields(Map<String,AgentV> mapOfAgents) throws JobSchedulerInvalidResponseDataException {
+    private void setCompactFields() throws JobSchedulerInvalidResponseDataException {
         setAgentClusterPath();
         setMaxProcesses(overview.getInt("processLimit", 1));
         setNumOfProcesses(overview.getInt("usedProcessCount", 0));

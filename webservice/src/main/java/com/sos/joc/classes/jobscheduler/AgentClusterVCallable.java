@@ -27,11 +27,12 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.jobscheduler.AgentCluster;
 import com.sos.joc.model.jobscheduler.AgentClusterFilter;
-import com.sos.joc.model.jobscheduler.AgentClusterV;
-import com.sos.joc.model.jobscheduler.AgentV;
+import com.sos.joc.model.jobscheduler.AgentClusterPath;
+import com.sos.joc.model.jobscheduler.AgentOfCluster;
 
-public class AgentClusterVCallable implements Callable<AgentClusterV> {
+public class AgentClusterVCallable implements Callable<AgentCluster> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgentClusterVCallable.class);
     private final String masterUrl;
@@ -57,13 +58,17 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
     }
 
     @Override
-    public AgentClusterV call() throws Exception {
-        return getAgentCluster(agentCluster, agentClusterBody, uri, accessToken);
+    public AgentCluster call() throws Exception {
+        return getAgentCluster(agentCluster, agentClusterBody, uri, masterUrl, accessToken);
     }
     
-    public List<AgentClusterV> getAgentClusters() throws Exception {
+    public List<AgentCluster> getAgentClusters() throws Exception {
         JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(agentCluster), accessToken);
         String regex = agentClusterBody.getRegex();
+        Set<String> agentClusterPaths = new HashSet<String>();
+        for (AgentClusterPath agentClusterPath : agentClusterBody.getAgentClusters()) {
+            agentClusterPaths.add(agentClusterPath.getAgentCluster());
+        }
         Set<String> agentSet = new HashSet<String>();
         Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();
         Date surveyDate = JobSchedulerDate.getDateFromEventId(jsonObjectFromPost.getJsonNumber("eventId").longValue());
@@ -74,6 +79,9 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
             }
             AgentClusterVolatile agentClusterV = new AgentClusterVolatile(processClass, surveyDate);
             agentClusterV.setAgentClusterPath();
+            if (!agentClusterPaths.contains(agentClusterV.getPath())) {
+                continue;
+            }
             if (!FilterAfterResponse.matchRegex(regex, agentClusterV.getPath())) {
                 LOGGER.debug("...processing skipped caused by 'regex=" + regex + "'");
                 continue;
@@ -87,10 +95,10 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
             tasks.add(new AgentVCallable(agent, masterUrl, accessToken));
         }
         ExecutorService executorService = Executors.newFixedThreadPool(10);
-        Map<String,AgentV> mapOfAgents = new HashMap<String,AgentV>();
-        for (Future<AgentV> result : executorService.invokeAll(tasks)) {
+        Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();
+        for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
             try {
-                AgentV a = result.get();
+                AgentOfCluster a = result.get();
                 mapOfAgents.put(a.getUrl(), a);
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof JocException) {
@@ -100,7 +108,7 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
                 }
             }
         }
-        List<AgentClusterV> listAgentClusterV = new ArrayList<AgentClusterV>();
+        List<AgentCluster> listAgentClusterV = new ArrayList<AgentCluster>();
         for (AgentClusterVolatile agentClusterV : listAgentCluster) {
             agentClusterV.setAgentsListAndState(mapOfAgents, agentClusterBody.getCompact());
             if (agentClusterBody.getState() != null && agentClusterV.getState().getSeverity() != agentClusterBody.getState()) {
@@ -112,7 +120,7 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
         return listAgentClusterV;
     }
 
-    private AgentClusterV getAgentCluster(String agentCluster, AgentClusterFilter agentClusterBody, URI uri, String accessToken) throws Exception {
+    private AgentCluster getAgentCluster(String agentCluster, AgentClusterFilter agentClusterBody, URI uri, String masterUrl, String accessToken) throws Exception {
         JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(agentCluster), accessToken);
         Date surveyDate = JobSchedulerDate.getDateFromEventId(jsonObjectFromPost.getJsonNumber("eventId").longValue());
         JsonArray agents = jsonObjectFromPost.getJsonArray("agents");
@@ -126,10 +134,10 @@ public class AgentClusterVCallable implements Callable<AgentClusterV> {
             tasks.add(new AgentVCallable(agent, masterUrl, accessToken));
         }
         ExecutorService executorService = Executors.newFixedThreadPool(5);
-        Map<String,AgentV> mapOfAgents = new HashMap<String,AgentV>();
-        for (Future<AgentV> result : executorService.invokeAll(tasks)) {
+        Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();
+        for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
             try {
-                AgentV a = result.get();
+                AgentOfCluster a = result.get();
                 mapOfAgents.put(a.getUrl(), a);
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof JocException) {

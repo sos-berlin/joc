@@ -23,8 +23,8 @@ import com.sos.joc.classes.jobscheduler.AgentVCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgents;
 import com.sos.joc.model.jobscheduler.AgentFilter;
+import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.AgentUrl;
-import com.sos.joc.model.jobscheduler.AgentV;
 import com.sos.joc.model.jobscheduler.AgentsV;
 
 @Path("jobscheduler")
@@ -43,7 +43,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                 return jocDefaultResponse;
             }
 
-            List<AgentV> listOfAgents = new ArrayList<AgentV>();
+            List<AgentOfCluster> listOfAgents = new ArrayList<AgentOfCluster>();
             List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
 
             if (agentFilter.getAgents() != null && agentFilter.getAgents().size() > 0) {
@@ -61,7 +61,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
             }
 
             ExecutorService executorService = Executors.newFixedThreadPool(10);
-            for (Future<AgentV> result : executorService.invokeAll(tasks)) {
+            for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
                 try {
                     listOfAgents.add(result.get());
                 } catch (ExecutionException e) {

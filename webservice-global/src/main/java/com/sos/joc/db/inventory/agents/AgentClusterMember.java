@@ -12,8 +12,8 @@ public class AgentClusterMember extends AgentOfCluster {
 
     @JsonIgnore
     private Long agentClusterId;
-
-    public AgentClusterMember(Long agentClusterId, String url, Integer ordering, Date surveyDate, String version, Integer state, Date startedAt, String hostname, String osName,
+    
+    public AgentClusterMember(Long agentClusterId, String url, Date surveyDate, String version, Integer state, Date startedAt, String hostname, String osName,
             String osArchitecture, String osDistribution) {
         this.agentClusterId = agentClusterId;
         JobSchedulerState jsState = new JobSchedulerState();
@@ -40,16 +40,10 @@ public class AgentClusterMember extends AgentOfCluster {
         setVersion(version);
         setSurveyDate(surveyDate);
         setUrl(url);
-        setHost(hostname);
-        setVersion(version);
     }
 
     @JsonIgnore
     public Long getAgentClusterId() {
         return agentClusterId;
-    }
-    
-    public AgentOfCluster getSuper() {
-        return this;
     }
 }

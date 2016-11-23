@@ -9,11 +9,12 @@ import javax.json.JsonObject;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.jobscheduler.AgentV;
+import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
+import com.sos.joc.model.jobscheduler.OperatingSystem;
 
-public class AgentVCallable implements Callable<AgentV> {
+public class AgentVCallable implements Callable<AgentOfCluster> {
 
     public static final String AGENT_API_PATH_FORMAT = "/jobscheduler/master/api/agent/%1$s/jobscheduler/agent/api";
     private final String masterUrl;
@@ -27,16 +28,16 @@ public class AgentVCallable implements Callable<AgentV> {
     }
 
     @Override
-    public AgentV call() throws Exception {
+    public AgentOfCluster call() throws Exception {
         // "/jobscheduler/master/api/agent/http://[agent-host]:{agent-port]/jobscheduler/agent/api"
         String jsonPath = String.format(AGENT_API_PATH_FORMAT, agentUrl);
         return getAgentV(agentUrl, masterUrl, accessToken, jsonPath);
     }
 
-    public AgentV getAgentV(String agentUrl, String masterUrl, String accessToken, String jsonPath) throws JocException {
+    public AgentOfCluster getAgentV(String agentUrl, String masterUrl, String accessToken, String jsonPath) throws JocException {
         JOCJsonCommand jocJsonCommand = new JOCJsonCommand(masterUrl, jsonPath);
         jocJsonCommand.setSocketTimeout(1000);
-        AgentV agent = new AgentV();
+        AgentOfCluster agent = new AgentOfCluster();
         agent.setSurveyDate(Date.from(Instant.now()));
         agent.setUrl(agentUrl);
         JobSchedulerState state = new JobSchedulerState();
@@ -44,6 +45,22 @@ public class AgentVCallable implements Callable<AgentV> {
             JsonObject json = jocJsonCommand.getJsonObjectFromGet(accessToken);
             agent.setRunningTasks(json.getInt("currentTaskCount", 0));
             agent.setStartedAt(JobSchedulerDate.getDateFromISO8601String(json.getString("startedAt")));
+            JsonObject system = json.getJsonObject("system");
+            JsonObject java = json.getJsonObject("java");
+            OperatingSystem o = new OperatingSystem();
+            if (system != null) {
+                agent.setHost(system.getString("hostname", null));
+                o.setDistribution(system.getString("distribution", null));
+            }
+            if (java != null) {
+                JsonObject os = java.getJsonObject("systemProperties"); 
+                if (os != null) {
+                    o.setArchitecture(os.getString("os.arch", null));
+                    o.setName(os.getString("os.name", null));
+                }
+            }    
+            agent.setOs(o);    
+            agent.setVersion(json.getString("version", null));
             if (json.getBoolean("isTerminating", false)) {
                 state.set_text(JobSchedulerStateText.TERMINATING);
                 state.setSeverity(3);

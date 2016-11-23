@@ -9,9 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentCluster;
-import com.sos.jitl.reporting.db.DBItemInventoryAgentClusterMember;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
-import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
 
@@ -19,6 +17,8 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 public class InventoryAgentsDBLayer extends DBLayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryAgentsDBLayer.class);
+    private static final String AGENT_CLUSTER_MEMBER = AgentClusterMember.class.getName();
+    private static final String AGENT_CLUSTER_P = AgentClusterPermanent.class.getName();
 
     public InventoryAgentsDBLayer(SOSHibernateConnection connection) {
         super(connection);
@@ -113,7 +113,8 @@ public class InventoryAgentsDBLayer extends DBLayer {
     public List<AgentClusterPermanent> getInventoryAgentClusters(Long instanceId, Set<String> agentClusters) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select new com.sos.joc.db.inventory.agents.AgentClusterPermanent(iac.id, iac.schedulingType, iac.numberOfAgents, iac.modified, ipc.name, ipc.maxProcesses) from ");
+            sql.append("select new ").append(AGENT_CLUSTER_P);
+            sql.append("(iac.id, iac.schedulingType, iac.numberOfAgents, iac.modified, ipc.name, ipc.maxProcesses) from ");
             sql.append(DBITEM_INVENTORY_AGENT_CLUSTER).append(" iac, ");
             sql.append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc ");
             sql.append("where iac.processClassId = ipc.id ");
@@ -146,7 +147,8 @@ public class InventoryAgentsDBLayer extends DBLayer {
     public List<AgentClusterMember> getInventoryAgentClusterMembers(Long instanceId, Set<Long> agentClusterIds) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select new com.sos.joc.db.inventory.agents.AgentClusterMember(iacm.agentClusterId, iacm.url, iacm.ordering, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
+            sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
+            sql.append("(iacm.agentClusterId, iacm.url, iacm.ordering, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
             sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
             sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
             sql.append(DBITEM_INVENTORY_OPERATING_SYSTEMS).append(" ios ");
@@ -181,7 +183,8 @@ public class InventoryAgentsDBLayer extends DBLayer {
     public List<AgentClusterMember> getInventoryAgentClusterMembersById(Long instanceId, Long agentClusterId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select new com.sos.joc.db.inventory.agents.AgentClusterMember(iacm.agentClusterId, iacm.url, iacm.ordering, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
+            sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
+            sql.append("(iacm.agentClusterId, iacm.url, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
             sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
             sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
             sql.append(DBITEM_INVENTORY_OPERATING_SYSTEMS).append(" ios ");
@@ -191,6 +194,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
             if (agentClusterId != null) {
                 sql.append(" and iacm.agentClusterId = :agentClusterId");
             }
+            sql.append(" order by iacm.ordering");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);

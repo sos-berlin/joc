@@ -14,7 +14,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * agents with delivery date (volatile part)
+ * agent clusters
  * <p>
  * 
  * 
@@ -23,9 +23,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "agents"
+    "agentClusters"
 })
-public class AgentsV {
+public class AgentClusters {
 
     /**
      * delivery date
@@ -41,8 +41,8 @@ public class AgentsV {
      * (Required)
      * 
      */
-    @JsonProperty("agents")
-    private List<AgentOfCluster> agents = new ArrayList<AgentOfCluster>();
+    @JsonProperty("agentClusters")
+    private List<AgentCluster> agentClusters = new ArrayList<AgentCluster>();
 
     /**
      * delivery date
@@ -77,23 +77,23 @@ public class AgentsV {
      * (Required)
      * 
      * @return
-     *     The agents
+     *     The agentClusters
      */
-    @JsonProperty("agents")
-    public List<AgentOfCluster> getAgents() {
-        return agents;
+    @JsonProperty("agentClusters")
+    public List<AgentCluster> getAgentClusters() {
+        return agentClusters;
     }
 
     /**
      * 
      * (Required)
      * 
-     * @param agents
-     *     The agents
+     * @param agentClusters
+     *     The agentClusters
      */
-    @JsonProperty("agents")
-    public void setAgents(List<AgentOfCluster> agents) {
-        this.agents = agents;
+    @JsonProperty("agentClusters")
+    public void setAgentClusters(List<AgentCluster> agentClusters) {
+        this.agentClusters = agentClusters;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class AgentsV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(agents).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(agentClusters).toHashCode();
     }
 
     @Override
@@ -111,11 +111,11 @@ public class AgentsV {
         if (other == this) {
             return true;
         }
-        if ((other instanceof AgentsV) == false) {
+        if ((other instanceof AgentClusters) == false) {
             return false;
         }
-        AgentsV rhs = ((AgentsV) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(agents, rhs.agents).isEquals();
+        AgentClusters rhs = ((AgentClusters) other);
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(agentClusters, rhs.agentClusters).isEquals();
     }
 
 }
