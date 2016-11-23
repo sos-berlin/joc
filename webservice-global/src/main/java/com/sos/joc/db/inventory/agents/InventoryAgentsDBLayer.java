@@ -1,6 +1,7 @@
 package com.sos.joc.db.inventory.agents;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Query;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryAgentClusterMember;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.DBInvalidDataException;
 
 
 public class InventoryAgentsDBLayer extends DBLayer {
@@ -23,7 +25,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryAgentInstance getInventoryAgentInstances(String url, Long instanceId) throws Exception {
+    public DBItemInventoryAgentInstance getInventoryAgentInstances(String url, Long instanceId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_INSTANCES);
@@ -39,12 +41,12 @@ public class InventoryAgentsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryAgentInstance> getInventoryAgentInstances(Long instanceId) throws Exception {
+    public List<DBItemInventoryAgentInstance> getInventoryAgentInstances(Long instanceId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_INSTANCES);
@@ -58,79 +60,12 @@ public class InventoryAgentsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryAgentClusterMember> getInventoryAgentClusterMembersByAgentId(Long agentInstanceId, Long instanceId)
-            throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS);
-            sql.append(" where agentInstanceId = :agentInstanceId");
-            sql.append(" and instanceId = :instanceId");
-            sql.append(" order by ordering");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("agentInstanceId", agentInstanceId);
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentClusterMember> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryAgentClusterMember> getInventoryAgentClusterMembersByClusterId(Long agentClusterId, Long instanceId)
-            throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS);
-            sql.append(" where agentClusterId = :agentClusterId");
-            sql.append(" and instanceId = :instanceId");
-            sql.append(" order by ordering");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("agentClusterId", agentClusterId);
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentClusterMember> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryAgentCluster getInventoryAgentClusterById(Long id, Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTER);
-            sql.append(" where id = :id");
-            sql.append(" and instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("id", id);
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentCluster> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<String> getProcessClassesFromAgentCluster(Long agentId, Long instanceId) throws Exception {
+    public List<String> getProcessClassesFromAgentCluster(Long agentId, Long instanceId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ipc.name from ");
@@ -151,31 +86,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryAgentInstance> getInventoryAgentInstancesByClusterId(Long agentClusterId, Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select iai from ");
-            sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
-            sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm ");
-            sql.append("where iai.id = iacm.agentInstanceId");
-            sql.append(" and iacm.agentClusterId = :agentClusterId");
-            sql.append(" and iai.instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("agentClusterId", agentClusterId);
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentInstance> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
@@ -199,183 +110,97 @@ public class InventoryAgentsDBLayer extends DBLayer {
     }
     
     @SuppressWarnings("unchecked")
-    public DBItemInventoryAgentCluster getAgentClusterByProcessClass(String processClassName, Long instanceId) throws Exception {
+    public List<AgentClusterPermanent> getInventoryAgentClusters(Long instanceId, Set<String> agentClusters) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select iac from ").append(DBITEM_INVENTORY_AGENT_CLUSTER).append(" iac, ");
-            sql.append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, ");
-            sql.append("where iac.processClassId = ipc.id");
-            sql.append(" and ipc.name = :processClassName");
-            sql.append(" and instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("processClassName", processClassName);
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentCluster> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryProcessClass getInventoryClusterProcessClass(String processClassName, Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
-            sql.append(" where name = :name");
-            sql.append(" and instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("name", processClassName);
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryProcessClass> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryAgentCluster getInventoryClusterByProcessClassId(Long processClassId, Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTER);
-            sql.append(" where processClassId = :processClassId");
-            sql.append(" and instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("processClassId", processClassId);
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentCluster> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-
-    public String getPathForProcessClass(Long fileId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select fileDirectory from ")
-                .append(DBITEM_INVENTORY_FILES)
-                .append(" where id = :fileId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("fileId", fileId);
-            String result = (String)query.uniqueResult();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryProcessClass getInventoryProcessClassById(Long processClassId, Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
-            sql.append(" where id = :id");
-            sql.append(" and instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("id", processClassId);
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryProcessClass> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryProcessClass> getInventoryProcessClasses(Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select ipc from ").append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, ");
-            sql.append(DBITEM_INVENTORY_AGENT_CLUSTER).append(" iac ");
-            sql.append(" where ipc.id = iac.processClassId");
-            sql.append(" and ipc.instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryProcessClass> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-
-    public String getInventoryProcessClassFileName(Long processClassId, Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select ifile.fileName from ").append(DBITEM_INVENTORY_FILES).append(" invf, ");
-            sql.append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, ");
-            sql.append(" where ipc.fileId = invf.id");
-            sql.append(" and ipc.id = :id");
-            sql.append(" and ipc.instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("id", processClassId);
-            query.setParameter("instanceId", instanceId);
-            Object result = query.uniqueResult();
-            if (result != null) {
-                return (String)result;
-            }
-            return null;
-        } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryProcessClass> getInventoryProcessClassByState(Integer state, Long instanceId) throws Exception {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select ipc from ").append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc, "); 
+            sql.append("select new com.sos.joc.db.inventory.agents.AgentClusterPermanent(iac.id, iac.schedulingType, iac.numberOfAgents, iac.modified, ipc.name, ipc.maxProcesses) from ");
             sql.append(DBITEM_INVENTORY_AGENT_CLUSTER).append(" iac, ");
-            sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, "); 
-            sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai "); 
-            sql.append("where ipc.id = iac.processClassId ");
-            sql.append("and iac.id = iacm.agentClusterId ");
-            sql.append("and iacm.agentInstanceId = iai.id ");
-            sql.append("and ipc.instanceId = :instanceId ");
-            if(state != null) {
-                sql.append("and iai.state = :state ");
+            sql.append(DBITEM_INVENTORY_PROCESS_CLASSES).append(" ipc ");
+            sql.append("where iac.processClassId = ipc.id ");
+            sql.append("and iac.instanceId = :instanceId");
+            if (agentClusters != null && !agentClusters.isEmpty()) {
+                if (agentClusters.size() == 1) {
+                    sql.append(" and ipc.name = :agentCluster");
+                } else {
+                    sql.append(" and ipc.name in (:agentCluster)");
+                }
             }
-            sql.append("group by ipc.id");
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            if(state != null) {
-                query.setParameter("state", state);
+            if (agentClusters != null && !agentClusters.isEmpty()) {
+                if (agentClusters.size() == 1) {
+                    query.setParameter("agentCluster", agentClusters.iterator().next());
+                } else {
+                    query.setParameterList("agentCluster", agentClusters);
+                }
             }
-            List<DBItemInventoryProcessClass> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
+            List<AgentClusterPermanent> result = query.list();
+            return result;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-
+    
+    @SuppressWarnings("unchecked")
+    public List<AgentClusterMember> getInventoryAgentClusterMembers(Long instanceId, Set<Long> agentClusterIds) throws DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new com.sos.joc.db.inventory.agents.AgentClusterMember(iacm.agentClusterId, iacm.url, iacm.ordering, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
+            sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
+            sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
+            sql.append(DBITEM_INVENTORY_OPERATING_SYSTEMS).append(" ios ");
+            sql.append("where iacm.agentInstanceId = iai.id ");
+            sql.append("and iai.osId = ios.id ");
+            sql.append("and iacm.instanceId = :instanceId");
+            if (agentClusterIds != null && !agentClusterIds.isEmpty()) {
+                if (agentClusterIds.size() == 1) {
+                    sql.append(" and iacm.agentClusterId = :agentClusterId");
+                } else {
+                    sql.append(" and iacm.agentClusterId in (:agentClusterId)");
+                }
+            }
+            LOGGER.debug(sql.toString());
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            if (agentClusterIds != null && !agentClusterIds.isEmpty()) {
+                if (agentClusterIds.size() == 1) {
+                    query.setParameter("agentClusterId", agentClusterIds.iterator().next());
+                } else {
+                    query.setParameterList("agentClusterId", agentClusterIds);
+                }
+            }
+            List<AgentClusterMember> result = query.list();
+            return result;
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<AgentClusterMember> getInventoryAgentClusterMembersById(Long instanceId, Long agentClusterId) throws DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new com.sos.joc.db.inventory.agents.AgentClusterMember(iacm.agentClusterId, iacm.url, iacm.ordering, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
+            sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
+            sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
+            sql.append(DBITEM_INVENTORY_OPERATING_SYSTEMS).append(" ios ");
+            sql.append("where iacm.agentInstanceId = iai.id ");
+            sql.append("and iai.osId = ios.id ");
+            sql.append("and iacm.instanceId = :instanceId");
+            if (agentClusterId != null) {
+                sql.append(" and iacm.agentClusterId = :agentClusterId");
+            }
+            LOGGER.debug(sql.toString());
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            if (agentClusterId != null) {
+                query.setParameter("agentClusterId", agentClusterId);
+            }
+            List<AgentClusterMember> result = query.list();
+            return result;
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
+    }
 }

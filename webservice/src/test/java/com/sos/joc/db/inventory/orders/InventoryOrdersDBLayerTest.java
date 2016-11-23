@@ -7,15 +7,18 @@ import java.util.UUID;
 
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
+import com.sos.joc.db.inventory.agents.AgentClusterPermanent;
+import com.sos.joc.db.inventory.agents.InventoryAgentsDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 
 public class InventoryOrdersDBLayerTest {
-    private static final String LDAP_PASSWORD = "sos01";
-    private static final String LDAP_USER = "SOS01";
+    private static final String LDAP_PASSWORD = "secret";
+    private static final String LDAP_USER = "root";
 
     @Test
     public void getOrderschedulerOrders() throws Exception {
@@ -42,6 +45,21 @@ public class InventoryOrdersDBLayerTest {
     
     private String getAccessToken() {
         return UUID.randomUUID().toString();
+    }
+    
+    @Test
+    public void getAgentCluster() throws Exception {
+        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+        sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        InventoryAgentsDBLayer layer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
+        Globals.sosHibernateConnection.beginTransaction();
+        List<AgentClusterPermanent> result = layer.getInventoryAgentClusters(8L, null);
+        Globals.sosHibernateConnection.rollback();
+        ObjectMapper mapper = new ObjectMapper();
+        for (AgentClusterPermanent row : result) {
+            System.out.println(row.getSurveyDate());
+            System.out.println(mapper.writeValueAsString(row));
+        }
     }
 
 }
