@@ -69,8 +69,8 @@ public class JobSchedulerDate {
         if (dateStr == null){
             return  Instant.now();
         }
-        Pattern offsetPattern = Pattern.compile("([\\ssmhdwMyT:\\.\\d-]+)([+-][0-9:]+|Z)?$");
-        Pattern dateTimePattern = Pattern.compile("(?:(-?\\d+)([smhdwMy])\\s*)");
+        Pattern offsetPattern = Pattern.compile("(\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(?:\\.\\d+)?|(?:\\s*-?\\d+\\s*[smhdwMy])+)([+-][0-9:]+|Z)?$");
+        Pattern dateTimePattern = Pattern.compile("(?:(-?\\d+)\\s*([smhdwMy])\\s*)");
         Matcher m = offsetPattern.matcher(dateStr);
         ZonedDateTime zdt = null;
         ZoneId zoneId = null;
