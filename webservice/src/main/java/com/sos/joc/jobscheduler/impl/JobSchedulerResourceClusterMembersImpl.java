@@ -61,8 +61,8 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             } else {
                 Map<String, DBItemInventoryInstance> jobSchedulerClusterMemberUrls = new HashMap<String, DBItemInventoryInstance>();
                 for (DBItemInventoryInstance schedulerInstance : schedulerInstances) {
-                    String clusterMemberId = schedulerInstance.getHostname() + ":" + schedulerInstance.getPort();
-                    jobSchedulerClusterMemberUrls.put(clusterMemberId.toLowerCase(), schedulerInstance);
+                    String clusterMemberKey = schedulerInstance.getHostname() + ":" + schedulerInstance.getPort();
+                    jobSchedulerClusterMemberUrls.put(clusterMemberKey.toLowerCase(), schedulerInstance);
                 }
                 Date surveyDate = jocXmlCommand.getSurveyDate();
 
@@ -70,8 +70,10 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                     Element clusterMember = (Element) clusterMembers.item(i);
                     JobSchedulerState state = new JobSchedulerState();
                     JobSchedulerV jobscheduler = null;
-                    String port = jocXmlCommand.getAttributeValue(clusterMember, "tcp_port", "0");
-                    port = jocXmlCommand.getAttributeValue(clusterMember, "http_port", port);
+                    String port = jocXmlCommand.getAttributeValue(clusterMember, "cluster_member_id", "").replaceFirst(":(\\d+)$", "$1");
+                    if (port.isEmpty()) {
+                        port = "0";
+                    }
                     if ("yes".equals(clusterMember.getAttribute("dead"))) {
                         state.setSeverity(2);
                         state.set_text(JobSchedulerStateText.DEAD);
