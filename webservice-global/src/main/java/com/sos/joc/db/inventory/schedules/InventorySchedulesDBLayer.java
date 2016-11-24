@@ -127,12 +127,12 @@ public class InventorySchedulesDBLayer extends DBLayer {
                 sql.append(" where name like :folderName");
                 sql.append(" and instanceId = :instanceId");
             } else {
-                sql.append("select is from ");
-                sql.append(DBITEM_INVENTORY_SCHEDULES).append(" is, ");
+                sql.append("select isched from ");
+                sql.append(DBITEM_INVENTORY_SCHEDULES).append(" isched, ");
                 sql.append(DBITEM_INVENTORY_FILES).append(" ifile ");
-                sql.append(" where is.fileId = ifile.id");
+                sql.append(" where isched.fileId = ifile.id");
                 sql.append(" and ifile.fileDirectory = :folderName");
-                sql.append(" and is.instanceId = :instanceId");
+                sql.append(" and isched.instanceId = :instanceId");
             }
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
