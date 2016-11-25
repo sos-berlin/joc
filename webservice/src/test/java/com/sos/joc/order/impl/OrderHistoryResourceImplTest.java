@@ -6,7 +6,7 @@ import org.junit.Test;
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.model.order.OrderFilter;
+import com.sos.joc.model.order.OrderHistoryFilter;
 import com.sos.joc.model.order.OrdersStepHistory;
 
 public class OrderHistoryResourceImplTest {
@@ -18,10 +18,11 @@ public class OrderHistoryResourceImplTest {
          
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        OrderFilter orderFilterSchema = new OrderFilter();
+        OrderHistoryFilter orderFilterSchema = new OrderHistoryFilter();
         orderFilterSchema.setJobChain("Cluster/cluster/job_chain1");
         orderFilterSchema.setOrderId("8");
-        orderFilterSchema.setJobschedulerId("scheduler_current");
+        orderFilterSchema.setJobschedulerId("scheduler_joc_cockpit");
+        orderFilterSchema.setHistoryId("690");
         OrderHistoryResourceImpl orderHistoryImpl = new OrderHistoryResourceImpl();
         JOCDefaultResponse ordersResponse = orderHistoryImpl.postOrderHistory(sosShiroCurrentUserAnswer.getAccessToken(), orderFilterSchema);
         OrdersStepHistory stepHistorySchema = (OrdersStepHistory) ordersResponse.getEntity();

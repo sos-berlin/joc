@@ -1,17 +1,20 @@
 package com.sos.joc.order.impl;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.jitl.dailyplan.db.ReportExecutionsDBLayer;
+import com.sos.jitl.reporting.db.DBItemReportExecution;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.order.History;
-import com.sos.joc.model.order.OrderFilter;
+import com.sos.joc.model.order.OrderHistoryFilter;
 import com.sos.joc.model.order.OrdersStepHistory;
 import com.sos.joc.model.order.OrdersStepHistoryItem;
 import com.sos.joc.order.resource.IOrderHistoryResource;
@@ -22,56 +25,50 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
     private static final String API_CALL = "./order/history";
 
     @Override
-    public JOCDefaultResponse postOrderHistory(String accessToken, OrderFilter orderFilter) throws Exception {
+    public JOCDefaultResponse postOrderHistory(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
 
         try {
-            initLogging(API_CALL, orderFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+            initLogging(API_CALL, orderHistoryFilter);
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            // TODO JOC Cockpit Webservice
 
-            History history = new History();
-            history.setHistoryId("-1");
+            Globals.beginTransaction();
 
-            ArrayList<OrdersStepHistoryItem> listOfSteps = new ArrayList<OrdersStepHistoryItem>();
-            OrdersStepHistoryItem step1 = new OrdersStepHistoryItem();
-            step1.setEndTime(new Date());
-            Err errorSchema1 = new Err();
-            errorSchema1.setCode("myCode1");
-            errorSchema1.setMessage("myMessage1");
-            step1.setError(errorSchema1);
-            step1.setJob("myJob1");
-            step1.setNode("myNode1");
-            step1.setStartTime(new Date());
-            step1.setStep(1);
-            step1.setClusterMember(-1);
-            step1.setExitCode(-1);
-            step1.setTaskId("-1");
-            listOfSteps.add(step1);
+            List<OrdersStepHistoryItem> listOrderStepHistory = new ArrayList<OrdersStepHistoryItem>();
 
-            OrdersStepHistoryItem step2 = new OrdersStepHistoryItem();
-            step2.setEndTime(new Date());
-            Err errorSchema2 = new Err();
-            errorSchema2.setCode("myCode2");
-            errorSchema2.setMessage("myMessage2");
-            step2.setError(errorSchema2);
-            step2.setJob("myJob2");
-            step2.setNode("myNode2");
-            step2.setStartTime(new Date());
-            step2.setStep(1);
-            step2.setClusterMember(-1);
-            step2.setExitCode(-1);
-            step2.setTaskId("-1");
-            listOfSteps.add(step2);
+            ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(Globals.sosHibernateConnection);
+            reportExecutionsDBLayer.getFilter().setSchedulerId(orderHistoryFilter.getJobschedulerId());
+            reportExecutionsDBLayer.getFilter().setOrderHistoryId(orderHistoryFilter.getHistoryId());
+            List<DBItemReportExecution> listOfOrderStepHistoryItems = reportExecutionsDBLayer.getOrderStepHistoryItems();
 
-            history.setSteps(listOfSteps);
+            for (DBItemReportExecution orderStepHistoryItem : listOfOrderStepHistoryItems) {
+
+                OrdersStepHistoryItem orderStepHistory = new OrdersStepHistoryItem();
+                orderStepHistory.setEndTime(orderStepHistoryItem.getEndTime());
+                Err errorSchema = new Err();
+                errorSchema.setCode(orderStepHistoryItem.getErrorCode());
+                errorSchema.setMessage(orderStepHistoryItem.getErrorText());
+                orderStepHistory.setError(errorSchema);
+                orderStepHistory.setJob(orderStepHistoryItem.getJob());
+                orderStepHistory.setNode(orderStepHistoryItem.getState());
+                orderStepHistory.setStartTime(orderStepHistoryItem.getStartTime());
+                orderStepHistory.setStep(orderStepHistoryItem.getStep().intValue());
+                orderStepHistory.setAgent(orderStepHistoryItem.getAgentUrl());
+         //       orderStepHistory.setClusterMember(dbItemReportExecution.getClusterMemberId());
+                orderStepHistory.setExitCode(orderStepHistoryItem.getExitCode());
+                orderStepHistory.setTaskId(orderStepHistoryItem.getHistoryIdAsString());
+                listOrderStepHistory.add(orderStepHistory);
+            }
 
             OrdersStepHistory entity = new OrdersStepHistory();
+            History history = new History();
+            history.setHistoryId(orderHistoryFilter.getHistoryId());
+            history.setSteps(listOrderStepHistory);
+            entity.setDeliveryDate(new Date());
             entity.setHistory(history);
-            entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -79,8 +76,8 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-
+        } finally {
+            Globals.rollback();
+        } 
     }
-
 }

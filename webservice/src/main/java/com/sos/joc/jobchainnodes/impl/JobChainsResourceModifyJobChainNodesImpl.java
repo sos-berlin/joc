@@ -100,7 +100,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
                 xml.addAttribute("action", "stop");
                 break;
             case SKIP:
-                xml.addAttribute("action", "next_start");
+                xml.addAttribute("action", "next_state");
                 break;
             case ACTIVATE:
                 xml.addAttribute("action", "process");
