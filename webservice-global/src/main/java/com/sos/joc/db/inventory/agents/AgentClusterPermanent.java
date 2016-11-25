@@ -5,7 +5,6 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.jobscheduler.AgentCluster;
-import com.sos.joc.model.jobscheduler.AgentClusterP;
 import com.sos.joc.model.jobscheduler.AgentClusterType;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
 

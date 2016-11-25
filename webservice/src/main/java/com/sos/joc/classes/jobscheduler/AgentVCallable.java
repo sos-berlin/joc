@@ -56,7 +56,13 @@ public class AgentVCallable implements Callable<AgentOfCluster> {
                 JsonObject os = java.getJsonObject("systemProperties"); 
                 if (os != null) {
                     o.setArchitecture(os.getString("os.arch", null));
-                    o.setName(os.getString("os.name", null));
+                    String osName = os.getString("os.name", null);
+                    if (osName != null) {
+                        o.setName(osName.replaceFirst("(?i).*(windows|linux|aix|solaris).*", "$1"));
+                        if (o.getDistribution() == null) {
+                            o.setDistribution(osName);
+                        }
+                    }
                 }
             }    
             agent.setOs(o);    
