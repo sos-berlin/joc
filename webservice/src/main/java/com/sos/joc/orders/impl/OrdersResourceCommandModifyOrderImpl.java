@@ -9,11 +9,13 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
@@ -155,10 +157,13 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 if (order.getRemoveSetback() != null && !"".equals(order.getRemoveSetback())) {
                     xml.addAttribute("setback", "no");
                 }
-                // TODO resume order implicitly if new state is an end state
-                // Here, asks database.
-                if (order.getResume() != null && !"".equals(order.getResume())) {
+                if (order.getResume() != null && order.getResume()) {
                     xml.addAttribute("suspended", "no");
+                } else {
+                    InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
+                    if (dbLayer.isEndNode(normalizePath(order.getJobChain()), order.getState(), dbItemInventoryInstance.getId())) {
+                        xml.addAttribute("suspended", "no");
+                    }
                 }
                 break;
             case "suspend":
@@ -208,8 +213,19 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             throw new JocMissingRequiredParameterException("undefined 'orders'");
         }
         Date surveyDate = Date.from(Instant.now());
-        for (ModifyOrder order : modifyOrders.getOrders()) {
-            surveyDate = executeModifyOrderCommand(order, command);
+        try {
+            if ("set_state".equals(command)) {
+                Globals.beginTransaction();
+            }
+            for (ModifyOrder order : modifyOrders.getOrders()) {
+                surveyDate = executeModifyOrderCommand(order, command);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if ("set_state".equals(command)) {
+                Globals.rollback();;
+            }
         }
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);

@@ -11,6 +11,7 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChainNode;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.DBInvalidDataException;
 
 /** @author SP */
 public class InventoryJobChainsDBLayer extends DBLayer {
@@ -22,7 +23,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryJobChain getJobChainByPath(String jobChainPath, Long instanceId) throws Exception {
+    public DBItemInventoryJobChain getJobChainByPath(String jobChainPath, Long instanceId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
@@ -37,12 +38,12 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }        
     }
     
     @SuppressWarnings("unchecked")
-    public DBItemInventoryJobChain getJobChainByName(String jobChainName, Long instanceId) throws Exception {
+    public DBItemInventoryJobChain getJobChainByName(String jobChainName, Long instanceId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
@@ -57,11 +58,11 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }        
     }
     
-    public Date getJobChainConfigurationDate(Long id) throws Exception {
+    public Date getJobChainConfigurationDate(Long id) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder("select ifile.fileModified from ");
             sql.append(DBITEM_INVENTORY_FILES).append(" ifile, ");
@@ -77,12 +78,12 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id, Long instanceId) throws Exception {
+    public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id, Long instanceId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES);
@@ -98,12 +99,12 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath, boolean recursive, Long instanceId) throws Exception {
+    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath, boolean recursive, Long instanceId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             if (recursive) {
@@ -131,17 +132,17 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }        
     }
     
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChains(Long instanceId) throws Exception {
+    public List<DBItemInventoryJobChain> getJobChains(Long instanceId) throws DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where instanceId = :instanceId");
-           Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -149,8 +150,31 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             }
             return null;
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }        
     }
     
+    public boolean isEndNode(String jobChain, String node, Long instanceId) throws DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select count(*) from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn, ");
+            sql.append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc");
+            sql.append(" where ijcn.jobChainId = ijc.id");
+            sql.append(" and ijcn.state = :nodeName");
+            sql.append(" and ijcn.nodeType = 5");
+            sql.append(" and ijcn.instanceId = :instanceId");
+            sql.append(" and ijc.name = :jobChain");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("nodeName", node);
+            query.setParameter("jobChain", jobChain);
+            query.setParameter("instanceId", instanceId);
+            Long result = (Long) query.uniqueResult();
+            if (result == null) {
+                return false;
+            }
+            return result > 0;
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }        
+    }
 }

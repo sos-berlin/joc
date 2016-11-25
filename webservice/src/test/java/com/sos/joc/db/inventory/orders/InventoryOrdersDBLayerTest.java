@@ -15,6 +15,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.agents.AgentClusterPermanent;
 import com.sos.joc.db.inventory.agents.InventoryAgentsDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 
 public class InventoryOrdersDBLayerTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -53,7 +54,7 @@ public class InventoryOrdersDBLayerTest {
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         InventoryAgentsDBLayer layer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
         Globals.sosHibernateConnection.beginTransaction();
-        List<AgentClusterPermanent> result = layer.getInventoryAgentClusters(8L, null);
+        List<AgentClusterPermanent> result = layer.getInventoryAgentClusters(12L, null);
         Globals.sosHibernateConnection.rollback();
         ObjectMapper mapper = new ObjectMapper();
         for (AgentClusterPermanent row : result) {
@@ -61,5 +62,15 @@ public class InventoryOrdersDBLayerTest {
             System.out.println(mapper.writeValueAsString(row));
         }
     }
-
+    
+    @Test
+    public void isEndNode() throws Exception {
+        SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+        sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
+        InventoryJobChainsDBLayer layer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
+        Globals.sosHibernateConnection.beginTransaction();
+        boolean result = layer.isEndNode("/reporting/Reporting", "success", 12L);
+        Globals.sosHibernateConnection.rollback();
+        System.out.println(result);
+    }
 }
