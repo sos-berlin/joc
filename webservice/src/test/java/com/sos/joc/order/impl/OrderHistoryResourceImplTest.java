@@ -7,7 +7,7 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.order.OrderHistoryFilter;
-import com.sos.joc.model.order.OrdersStepHistory;
+import com.sos.joc.model.order.OrderStepHistory;
 
 public class OrderHistoryResourceImplTest {
     private static final String LDAP_PASSWORD = "secret";
@@ -25,7 +25,7 @@ public class OrderHistoryResourceImplTest {
         orderFilterSchema.setHistoryId("690");
         OrderHistoryResourceImpl orderHistoryImpl = new OrderHistoryResourceImpl();
         JOCDefaultResponse ordersResponse = orderHistoryImpl.postOrderHistory(sosShiroCurrentUserAnswer.getAccessToken(), orderFilterSchema);
-        OrdersStepHistory stepHistorySchema = (OrdersStepHistory) ordersResponse.getEntity();
+        OrderStepHistory stepHistorySchema = (OrderStepHistory) ordersResponse.getEntity();
         assertEquals("postOrderHistoryTest",2, stepHistorySchema.getHistory().getSteps().get(1).getStep().intValue());
      }
 

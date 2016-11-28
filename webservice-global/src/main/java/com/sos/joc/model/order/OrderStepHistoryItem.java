@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "error",
     "agent"
 })
-public class OrdersStepHistoryItem {
+public class OrderStepHistoryItem {
 
     /**
      * 
@@ -387,10 +387,10 @@ public class OrdersStepHistoryItem {
         if (other == this) {
             return true;
         }
-        if ((other instanceof OrdersStepHistoryItem) == false) {
+        if ((other instanceof OrderStepHistoryItem) == false) {
             return false;
         }
-        OrdersStepHistoryItem rhs = ((OrdersStepHistoryItem) other);
+        OrderStepHistoryItem rhs = ((OrderStepHistoryItem) other);
         return new EqualsBuilder().append(node, rhs.node).append(job, rhs.job).append(step, rhs.step).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(taskId, rhs.taskId).append(clusterMember, rhs.clusterMember).append(exitCode, rhs.exitCode).append(error, rhs.error).append(agent, rhs.agent).isEquals();
     }
 

@@ -15,8 +15,8 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.order.History;
 import com.sos.joc.model.order.OrderHistoryFilter;
-import com.sos.joc.model.order.OrdersStepHistory;
-import com.sos.joc.model.order.OrdersStepHistoryItem;
+import com.sos.joc.model.order.OrderStepHistory;
+import com.sos.joc.model.order.OrderStepHistoryItem;
 import com.sos.joc.order.resource.IOrderHistoryResource;
 
 @Path("order")
@@ -37,7 +37,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
 
             Globals.beginTransaction();
 
-            List<OrdersStepHistoryItem> listOrderStepHistory = new ArrayList<OrdersStepHistoryItem>();
+            List<OrderStepHistoryItem> listOrderStepHistory = new ArrayList<OrderStepHistoryItem>();
 
             ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(Globals.sosHibernateConnection);
             reportExecutionsDBLayer.getFilter().setSchedulerId(orderHistoryFilter.getJobschedulerId());
@@ -46,7 +46,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
 
             for (DBItemReportExecution orderStepHistoryItem : listOfOrderStepHistoryItems) {
 
-                OrdersStepHistoryItem orderStepHistory = new OrdersStepHistoryItem();
+                OrderStepHistoryItem orderStepHistory = new OrderStepHistoryItem();
                 orderStepHistory.setEndTime(orderStepHistoryItem.getEndTime());
                 Err errorSchema = new Err();
                 errorSchema.setCode(orderStepHistoryItem.getErrorCode());
@@ -63,7 +63,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
                 listOrderStepHistory.add(orderStepHistory);
             }
 
-            OrdersStepHistory entity = new OrdersStepHistory();
+            OrderStepHistory entity = new OrderStepHistory();
             History history = new History();
             history.setHistoryId(orderHistoryFilter.getHistoryId());
             history.setSteps(listOrderStepHistory);

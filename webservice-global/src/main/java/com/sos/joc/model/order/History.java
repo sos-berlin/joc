@@ -32,7 +32,7 @@ public class History {
      * 
      */
     @JsonProperty("steps")
-    private List<OrdersStepHistoryItem> steps = new ArrayList<OrdersStepHistoryItem>();
+    private List<OrderStepHistoryItem> steps = new ArrayList<OrderStepHistoryItem>();
 
     /**
      * 
@@ -66,7 +66,7 @@ public class History {
      *     The steps
      */
     @JsonProperty("steps")
-    public List<OrdersStepHistoryItem> getSteps() {
+    public List<OrderStepHistoryItem> getSteps() {
         return steps;
     }
 
@@ -78,7 +78,7 @@ public class History {
      *     The steps
      */
     @JsonProperty("steps")
-    public void setSteps(List<OrdersStepHistoryItem> steps) {
+    public void setSteps(List<OrderStepHistoryItem> steps) {
         this.steps = steps;
     }
 

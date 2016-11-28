@@ -23,7 +23,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "deliveryDate",
     "history"
 })
-public class OrdersStepHistory {
+public class OrderStepHistory {
 
     /**
      * delivery date
@@ -109,10 +109,10 @@ public class OrdersStepHistory {
         if (other == this) {
             return true;
         }
-        if ((other instanceof OrdersStepHistory) == false) {
+        if ((other instanceof OrderStepHistory) == false) {
             return false;
         }
-        OrdersStepHistory rhs = ((OrdersStepHistory) other);
+        OrderStepHistory rhs = ((OrderStepHistory) other);
         return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(history, rhs.history).isEquals();
     }
 
