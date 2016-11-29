@@ -1,13 +1,22 @@
 package com.sos.joc.orders.impl;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import com.sos.jitl.reporting.db.DBItemReportTrigger;
+import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersHistoricSummary;
 import com.sos.joc.model.order.OrdersOverView;
@@ -29,34 +38,48 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
                 return jocDefaultResponse;
             }
 
-            // Reading orders from the database tale inventory.orders filtered
-            // by
-            // ordersFilter.getDateFrom(); // is ISO 8601 or something like
-            // // 6h 1w 65y
-            // ordersFilter.getDateTo(); // same as dateFrom
-            // ordersFilter.getTimeZone();
-            // ordersFilter.getRegex();
-            // ordersFilter.getOrders(); // list of wanted orders.
+            OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
+            Globals.beginTransaction();
 
-            // TODO JOC Cockpit Webservice (Inventory_Orders)
+            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(Globals.sosHibernateConnection);
+            reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
+          
+            if (ordersFilter.getDateFrom() != null) {
+                reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDate(ordersFilter.getDateFrom(), ordersFilter.getTimeZone()));
+            }
+            if (ordersFilter.getDateTo() != null) {
+                reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDate(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
+            }
 
-            OrdersHistoricSummary orders = new OrdersHistoricSummary();
-            orders.setFailed(-1);
-            orders.setSuccessful(-1);
-
+            if (ordersFilter.getOrders().size() > 0) {
+                for (OrderPath orderPath : ordersFilter.getOrders()) {
+                    reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(), orderPath.getOrderId());
+                }
+            } 
+ 
             OrdersOverView entity = new OrdersOverView();
-            entity.setSurveyDate(Date.from(Instant.now()));
-            entity.setOrders(orders);
-            entity.setDeliveryDate(Date.from(Instant.now()));
+            entity.setDeliveryDate(new Date());
+            entity.setSurveyDate(new Date());
+            entity.setOrders(ordersHistoricSummary);
+            reportTriggerDBLayer.getFilter().setFailed(true);
+            ordersHistoricSummary.setFailed(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
 
+            reportTriggerDBLayer.getFilter().setSuccess(true);
+            ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+
+ 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.rollback();
         }
-
     }
+
+          
+ 
 
 }

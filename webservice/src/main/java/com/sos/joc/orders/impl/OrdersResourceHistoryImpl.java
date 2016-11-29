@@ -8,8 +8,8 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import com.sos.jitl.dailyplan.db.ReportTriggerDBLayer;
 import com.sos.jitl.reporting.db.DBItemReportTrigger;
+import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -38,8 +38,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             }
 
             Globals.beginTransaction();
-            ordersFilter.getRegex();
-
+            
             List<OrderHistoryItem> listHistory = new ArrayList<OrderHistoryItem>();
 
             ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(Globals.sosHibernateConnection);
