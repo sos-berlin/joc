@@ -144,7 +144,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
             return getJsonObjectFromResponse(response, uri, jocError);
         } catch (SocketException e) {
             if (isForcedClosingHttpClient()) {
-                throw new ForcedClosingHttpClientException(jocError, e);
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
                 throw new JobSchedulerNoResponseException(jocError, e);
             }

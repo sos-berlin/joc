@@ -1,6 +1,5 @@
 package com.sos.joc.classes.event;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -9,8 +8,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
-import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -37,9 +34,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     public JobSchedulerEvent call() throws JocException {
         try {
             jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId()));
-            try {
-                command.getHttpClient().close();
-            } catch (Exception e) {}
+            command.closeHttpClient();
         } catch (JocException e) {
             Err err = new Err();
             err.setCode(e.getError().getCode());
