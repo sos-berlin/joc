@@ -1,13 +1,13 @@
 package com.sos.auth.rest;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class SOSShiroCurrentUsersList {
 
-    private HashMap<String, SOSShiroCurrentUser> currentUsers;
+    private Map<String, SOSShiroCurrentUser> currentUsers;
 
     public SOSShiroCurrentUsersList() {
-        super();
         this.currentUsers = new HashMap<String, SOSShiroCurrentUser>();
     }
 

@@ -79,6 +79,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                     try {
                         listProcessClasses.addAll(result.get());
                     } catch (ExecutionException e) {
+                        executorService.shutdown();
                         if (e.getCause() instanceof JocException) {
                             throw (JocException) e.getCause();
                         } else {
@@ -86,9 +87,10 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                         }
                     }
                 }
+                executorService.shutdown();
                 entity.setProcessClasses(listProcessClasses);
             }
-
+            
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
 

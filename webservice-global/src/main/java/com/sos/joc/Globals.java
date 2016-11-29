@@ -1,6 +1,7 @@
 package com.sos.joc;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.sos.auth.rest.SOSShiroCurrentUsersList;
 import com.sos.hibernate.classes.SOSHibernateConnection;
@@ -16,8 +17,9 @@ public class Globals {
     public static SOSShiroCurrentUsersList currentUsersList;
     public static SOSHibernateConnection sosHibernateConnection;
     public static SchedulerObjectFactory schedulerObjectFactory;
-    public static HashMap<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
+    public static Map<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
     public static JocCockpitProperties sosShiroProperties;
+    
     public static SOSHibernateConnection getConnection(String schedulerId) throws JocException {
         if (sosSchedulerHibernateConnections == null) {
             sosSchedulerHibernateConnections = new HashMap<String, SOSHibernateConnection>();

@@ -1,11 +1,9 @@
 package com.sos.joc.tree.impl;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.ws.rs.Path;
 

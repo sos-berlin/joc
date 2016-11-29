@@ -101,6 +101,7 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
                 AgentOfCluster a = result.get();
                 mapOfAgents.put(a.getUrl(), a);
             } catch (ExecutionException e) {
+                executorService.shutdown();
                 if (e.getCause() instanceof JocException) {
                     throw (JocException) e.getCause();
                 } else {
@@ -108,6 +109,7 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
                 }
             }
         }
+        executorService.shutdown();
         List<AgentCluster> listAgentClusterV = new ArrayList<AgentCluster>();
         for (AgentClusterVolatile agentClusterV : listAgentCluster) {
             agentClusterV.setAgentsListAndState(mapOfAgents, agentClusterBody.getCompact());
@@ -140,6 +142,7 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
                 AgentOfCluster a = result.get();
                 mapOfAgents.put(a.getUrl(), a);
             } catch (ExecutionException e) {
+                executorService.shutdown();
                 if (e.getCause() instanceof JocException) {
                     throw (JocException) e.getCause();
                 } else {
@@ -147,6 +150,7 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
                 }
             }
         }
+        executorService.shutdown();
         agentClusterV.setFields(mapOfAgents, agentClusterBody.getCompact());
         return agentClusterV;
     }

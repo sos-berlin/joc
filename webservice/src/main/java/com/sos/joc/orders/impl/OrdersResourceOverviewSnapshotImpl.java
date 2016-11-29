@@ -14,7 +14,6 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
 public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implements IOrdersResourceOverviewSnapshot {
 
     private static final String API_CALL = "./orders/overview/snapshot";
-    private static final String EVENT_ID_PROPKEY = "orders/overview/snapshot/eventId";
 
     @Override
     public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
@@ -26,8 +25,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 return jocDefaultResponse;
             }
             
-            String eventIdPropKey = accessToken + ":" + EVENT_ID_PROPKEY + ":" + getJsonString(jobChainsFilter);
-            OrdersSnapshot entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, eventIdPropKey, jobChainsFilter);
+            OrdersSnapshot entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, jobChainsFilter);
             
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

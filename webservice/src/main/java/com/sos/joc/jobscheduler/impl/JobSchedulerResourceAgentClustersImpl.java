@@ -115,6 +115,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                         AgentOfCluster a = result.get();
                         mapOfAgents.put(a.getUrl(), a);
                     } catch (ExecutionException e) {
+                        executorService.shutdown();
                         if (e.getCause() instanceof JocException) {
                             throw (JocException) e.getCause();
                         } else {
@@ -122,6 +123,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                         }
                     }
                 }
+                executorService.shutdown();
                 List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
                 for (AgentClusterVolatile agentClusterV : listAgentCluster) {
                     agentClusterV.setAgentsListAndState(mapOfAgents, jobSchedulerAgentClustersBody.getCompact());

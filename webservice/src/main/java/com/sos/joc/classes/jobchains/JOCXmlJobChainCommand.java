@@ -174,6 +174,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
             try {
                 jobChainMap.putAll(result.get());
             } catch (ExecutionException e) {
+                executorService.shutdown();
                 if (e.getCause() instanceof JocException) {
                     throw (JocException) e.getCause();
                 } else {
@@ -192,6 +193,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                         // jobChainMap.put(jobChain, j);
                     }
                 } catch (ExecutionException e) {
+                    executorService.shutdown();
                     if (e.getCause() instanceof JocException) {
                         throw (JocException) e.getCause();
                     } else {
@@ -200,6 +202,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                 }
             }
         }
+        executorService.shutdown();
         //LOGGER.debug("..." + jobChainMap.size() + " jobChains processed");
         return new ArrayList<JobChainV>(jobChainMap.values());
     }

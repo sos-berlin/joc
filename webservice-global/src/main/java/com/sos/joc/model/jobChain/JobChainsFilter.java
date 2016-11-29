@@ -27,7 +27,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "compact",
     "regex",
     "folders",
-    "states"
+    "states",
+    "close"
 })
 public class JobChainsFilter {
 
@@ -66,6 +67,12 @@ public class JobChainsFilter {
     private List<Folder> folders = new ArrayList<Folder>();
     @JsonProperty("states")
     private List<JobChainStateText> states = new ArrayList<JobChainStateText>();
+    /**
+     * concerns only events
+     * 
+     */
+    @JsonProperty("close")
+    private Boolean close = false;
 
     /**
      * 
@@ -209,6 +216,28 @@ public class JobChainsFilter {
         this.states = states;
     }
 
+    /**
+     * concerns only events
+     * 
+     * @return
+     *     The close
+     */
+    @JsonProperty("close")
+    public Boolean getClose() {
+        return close;
+    }
+
+    /**
+     * concerns only events
+     * 
+     * @param close
+     *     The close
+     */
+    @JsonProperty("close")
+    public void setClose(Boolean close) {
+        this.close = close;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -216,7 +245,7 @@ public class JobChainsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobChains).append(compact).append(regex).append(folders).append(states).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobChains).append(compact).append(regex).append(folders).append(states).append(close).toHashCode();
     }
 
     @Override
@@ -228,7 +257,7 @@ public class JobChainsFilter {
             return false;
         }
         JobChainsFilter rhs = ((JobChainsFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChains, rhs.jobChains).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).append(states, rhs.states).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChains, rhs.jobChains).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).append(states, rhs.states).append(close, rhs.close).isEquals();
     }
 
 }

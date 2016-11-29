@@ -55,6 +55,8 @@ public class TreePermanent {
                     types.add(type);
                 }
                 break;
+            case FOLDER:
+                break;
             case OTHER: 
                 types.add(type);
                 break;

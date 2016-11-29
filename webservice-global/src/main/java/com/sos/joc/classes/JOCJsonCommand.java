@@ -1,6 +1,7 @@
 package com.sos.joc.classes;
 
 import java.io.StringReader;
+import java.net.SocketException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.exception.ConnectionRefusedException;
 import com.sos.exception.NoResponseException;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
+import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
@@ -51,7 +53,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     public void setUriBuilderForJobs(String url) {
         setUriBuilder(url, MASTER_API_PATH + "job");
     }
-
+    
     public void setUriBuilder(String url, String path) {
         StringBuilder s = new StringBuilder();
         s.append(url).append(path);
@@ -79,14 +81,28 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         uriBuilder.queryParam("return", "JocOrderStatistics");
     }
     
+    public void addEventTimeout(Integer timeout) {
+        if (timeout == null) {
+            timeout = 0;
+        }
+        uriBuilder.queryParam("timeout", timeout);
+    }
+    
+    public void replaceEventId(String eventId) {
+        uriBuilder.replaceQueryParam("after", eventId);
+    }
+    
+    public void addEventQuery(String eventId, Integer timeout) {
+        addEventQuery(eventId, timeout, null);
+    }
+    
     public void addEventQuery(String eventId, Integer timeout, String event) {
-        if (event == null || event.isEmpty()) {
-            event = "Event";
+        if (event != null && event.isEmpty()) {
+            uriBuilder.queryParam("return", event);
         }
         if (timeout == null) {
             timeout = 0;
         }
-        uriBuilder.queryParam("return", event);
         uriBuilder.queryParam("timeout", timeout);
         uriBuilder.queryParam("after", eventId);
     }
@@ -126,6 +142,12 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = postRestService(uri, postBody);
             return getJsonObjectFromResponse(response, uri, jocError);
+        } catch (SocketException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(jocError, e);
+            } else {
+                throw new JobSchedulerNoResponseException(jocError, e);
+            }
         } catch (ConnectionRefusedException e) {
             throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
@@ -155,6 +177,12 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = getRestService(uri);
             return getJsonObjectFromResponse(response, uri, jocError);
+        } catch (SocketException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerNoResponseException(jocError, e);
+            }
         } catch (ConnectionRefusedException e) {
             throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {

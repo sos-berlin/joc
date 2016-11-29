@@ -65,6 +65,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                 try {
                     listOfAgents.add(result.get());
                 } catch (ExecutionException e) {
+                    executorService.shutdown();
                     if (e.getCause() instanceof JocException) {
                         throw (JocException) e.getCause();
                     } else {
@@ -72,6 +73,7 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                     }
                 }
             }
+            executorService.shutdown();
 
             AgentsV entity = new AgentsV();
             entity.setAgents(listOfAgents);

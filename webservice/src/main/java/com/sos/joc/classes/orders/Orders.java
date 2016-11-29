@@ -13,6 +13,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.shiro.session.Session;
+
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
@@ -25,10 +27,18 @@ import com.sos.joc.model.order.OrdersSummary;
 
 public class Orders {
     
-    public static OrdersSnapshot getSnapshot(String url, String accessToken, String eventIdPropKey, JobChainsFilter jobChainsFilter) throws Exception {
+    public static OrdersSnapshot getSnapshot(String url, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
+        return getSnapshot(url, null, accessToken, null, null, jobChainsFilter);
+    }
+    
+    public static OrdersSnapshot getSnapshot(String url, Session session, String accessToken, String httpClientPropKey, String eventIdPropKey, JobChainsFilter jobChainsFilter) throws Exception {
         JOCJsonCommand command = new JOCJsonCommand();
         command.setUriBuilderForOrders(url);
         command.addOrderStatisticsQuery();
+        command.createHttpClient();
+        if (session != null && httpClientPropKey != null) {
+            session.setAttribute(httpClientPropKey, command.getHttpClient());
+        }
         URI uri = command.getURI();
 
         Set<String> jobChains = getJobChainsWithoutDuplicates(jobChainsFilter.getJobChains());
@@ -71,6 +81,7 @@ public class Orders {
                     eventId = event; 
                 }
             } catch (ExecutionException e) {
+                executorService.shutdown();
                 if (e.getCause() instanceof JocException) {
                     throw (JocException) e.getCause();
                 } else {
@@ -78,8 +89,12 @@ public class Orders {
                 }
             }
         }
+        executorService.shutdown();
         
-        System.setProperty(eventIdPropKey, eventId.toString());
+        //System.setProperty(eventIdPropKey, eventId.toString());
+        if (session != null && eventIdPropKey != null) {
+            session.setAttribute(eventIdPropKey, eventId.toString());
+        }
         
         OrdersSnapshot entity = new OrdersSnapshot();
         entity.setSurveyDate(JobSchedulerDate.getDateFromEventId(eventId));

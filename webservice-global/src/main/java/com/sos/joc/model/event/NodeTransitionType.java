@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.common;
+package com.sos.joc.model.event;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,26 +8,20 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @Generated("org.jsonschema2pojo")
-public enum JobSchedulerObjectType {
+public enum NodeTransitionType {
 
-    JOB("JOB"),
-    JOBCHAIN("JOBCHAIN"),
-    ORDER("ORDER"),
-    PROCESSCLASS("PROCESSCLASS"),
-    LOCK("LOCK"),
-    SCHEDULE("SCHEDULE"),
-    FOLDER("FOLDER"),
-    OTHER("OTHER");
+    SUCCESS("SUCCESS"),
+    ERROR("ERROR");
     private final String value;
-    private final static Map<String, JobSchedulerObjectType> CONSTANTS = new HashMap<String, JobSchedulerObjectType>();
+    private final static Map<String, NodeTransitionType> CONSTANTS = new HashMap<String, NodeTransitionType>();
 
     static {
-        for (JobSchedulerObjectType c: values()) {
+        for (NodeTransitionType c: values()) {
             CONSTANTS.put(c.value, c);
         }
     }
 
-    private JobSchedulerObjectType(String value) {
+    private NodeTransitionType(String value) {
         this.value = value;
     }
 
@@ -38,8 +32,8 @@ public enum JobSchedulerObjectType {
     }
 
     @JsonCreator
-    public static JobSchedulerObjectType fromValue(String value) {
-        JobSchedulerObjectType constant = CONSTANTS.get(value);
+    public static NodeTransitionType fromValue(String value) {
+        NodeTransitionType constant = CONSTANTS.get(value);
         if (constant == null) {
             throw new IllegalArgumentException(value);
         } else {

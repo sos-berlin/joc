@@ -104,6 +104,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                     try {
                         listOrders.putAll(result.get());
                     } catch (ExecutionException e) {
+                        executorService.shutdown();
                         if (e.getCause() instanceof JocException) {
                             throw (JocException) e.getCause();
                         } else {
@@ -111,6 +112,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                         }
                     }
                 }
+                executorService.shutdown();
             }
 
             OrdersV entity = new OrdersV();
