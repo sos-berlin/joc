@@ -100,10 +100,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     throw (Exception) e.getCause();
                 }
             } finally {
-                executorService.shutdown(); 
+                Globals.forceClosingHttpClients(session);
+                executorService.shutdown();
             }
-
-            Globals.forceClosingHttpClients(session);
 
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
