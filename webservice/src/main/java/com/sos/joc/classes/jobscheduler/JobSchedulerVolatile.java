@@ -53,7 +53,7 @@ public class JobSchedulerVolatile extends JobSchedulerV {
         setHost(dbItemInventoryInstance.getHostname());
         setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
         setPort(dbItemInventoryInstance.getPort());
-        setStartedAt(JobSchedulerDate.getDateFromISO8601String(stateElem.getAttribute("running_since")));
+        setStartedAt(JobSchedulerDate.getDateFromISO8601String(stateElem.getAttribute("spooler_running_since")));
         setState(getJobSchedulerState(stateElem));
         if (stateElem.hasAttribute("waiting_errno_text")) {
             Err err = new Err();
