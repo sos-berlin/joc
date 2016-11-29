@@ -1,11 +1,15 @@
 package com.sos.joc;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.shiro.session.Session;
 
 import com.sos.auth.rest.SOSShiroCurrentUsersList;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocError;
@@ -14,6 +18,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 
 public class Globals {
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
+    public static final String SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS = "event_http_clients";
     public static SOSShiroCurrentUsersList currentUsersList;
     public static SOSHibernateConnection sosHibernateConnection;
     public static SchedulerObjectFactory schedulerObjectFactory;
@@ -81,5 +86,15 @@ public class Globals {
         }
     }
 
-
+    @SuppressWarnings("unchecked")
+    public static void forceClosingHttpClients(Session session) {
+        if (session != null && session.getAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS) != null) {
+            try {
+                for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS)) {
+                    command.forcedClosingHttpClient();
+                }
+                session.removeAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS);
+            } catch (Exception e) {}
+        }
+    }
 }

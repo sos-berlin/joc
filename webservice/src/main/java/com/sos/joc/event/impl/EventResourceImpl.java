@@ -35,7 +35,6 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 
     private static final String API_CALL = "./events";
     private static final int EVENT_TIMEOUT = 90;
-    private static final String HTTP_CLIENT_PROPKEY = "events";
 
     @Override
     public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) throws Exception {
@@ -47,8 +46,8 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             initLogging(API_CALL, eventBody);
             boolean perms = getPermissons(accessToken).getJobschedulerMaster().getView().isStatus();
 
-            Session session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession();
-            forceClosingHttpClients(session);
+            Session session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession(false);
+            Globals.forceClosingHttpClients(session);
 
             if (eventBody.getClose() != null && eventBody.getClose()) {
                 entity.setEvents(null);
@@ -88,7 +87,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 jocJsonCommands.add(command);
                 tasks.add(new EventCallable(command, jsEvent, accessToken));
             }
-            session.setAttribute(HTTP_CLIENT_PROPKEY, jocJsonCommands);
+            session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
 
             ExecutorService executorService = Executors.newFixedThreadPool(eventBody.getJobscheduler().size());
             try {
@@ -104,7 +103,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 executorService.shutdown(); 
             }
 
-            forceClosingHttpClients(session);
+            Globals.forceClosingHttpClients(session);
 
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -121,18 +120,6 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.rollback();
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void forceClosingHttpClients(Session session) {
-        if (session.getAttribute(HTTP_CLIENT_PROPKEY) != null) {
-            try {
-                for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(HTTP_CLIENT_PROPKEY)) {
-                    command.forcedClosingHttpClient();
-                }
-                session.removeAttribute(HTTP_CLIENT_PROPKEY);
-            } catch (Exception e) {}
         }
     }
 }
