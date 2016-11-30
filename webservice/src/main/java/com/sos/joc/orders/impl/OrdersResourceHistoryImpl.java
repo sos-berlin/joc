@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.ws.rs.Path;
 
 import com.sos.jitl.reporting.db.DBItemReportTrigger;
+import com.sos.jitl.reporting.db.DBItemReportTriggerWithResult;
 import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -38,7 +39,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             }
 
             Globals.beginTransaction();
-            
+
             List<OrderHistoryItem> listHistory = new ArrayList<OrderHistoryItem>();
 
             ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(Globals.sosHibernateConnection);
@@ -58,26 +59,26 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 ordersFilter.setRegex("");
             }
 
-            List<DBItemReportTrigger> listOfReportTriggerDBItems = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
+            List<DBItemReportTriggerWithResult> listOfReportTriggerWithResultDBItems = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
 
-            for (DBItemReportTrigger dbItemReportTrigger : listOfReportTriggerDBItems) {
+            for (DBItemReportTriggerWithResult dbItemReportTriggerWithResult : listOfReportTriggerWithResultDBItems) {
 
                 boolean add = true;
                 OrderHistoryItem history = new OrderHistoryItem();
-                history.setEndTime(dbItemReportTrigger.getEndTime());
-                history.setHistoryId(String.valueOf(dbItemReportTrigger.getHistoryId()));
-                history.setJobChain(dbItemReportTrigger.getParentName());
-                history.setNode(dbItemReportTrigger.getState());
-                history.setOrderId(dbItemReportTrigger.getName());
-                history.setPath(dbItemReportTrigger.getFullOrderQualifier());
-                history.setStartTime(dbItemReportTrigger.getStartTime());
+                history.setEndTime(dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime());
+                history.setHistoryId(String.valueOf(dbItemReportTriggerWithResult.getDbItemReportTrigger().getHistoryId()));
+                history.setJobChain(dbItemReportTriggerWithResult.getDbItemReportTrigger().getParentName());
+                history.setNode(dbItemReportTriggerWithResult.getDbItemReportTrigger().getState());
+                history.setOrderId(dbItemReportTriggerWithResult.getDbItemReportTrigger().getName());
+                history.setPath(dbItemReportTriggerWithResult.getDbItemReportTrigger().getFullOrderQualifier());
+                history.setStartTime(dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime());
                 OrderHistoryState state = new OrderHistoryState();
 
-                if (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null) {
+                if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null) {
                     state.setSeverity(1);
                     state.set_text(OrderHistoryStateText.INCOMPLETE);
                 } else {
-                    if (dbItemReportTrigger.haveError()) {
+                    if (dbItemReportTriggerWithResult.haveError()) {
                         state.setSeverity(2);
                         state.set_text(OrderHistoryStateText.FAILED);
                     } else {
@@ -87,10 +88,10 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 
                 }
                 history.setState(state);
-                history.setSurveyDate(dbItemReportTrigger.getCreated());
+                history.setSurveyDate(dbItemReportTriggerWithResult.getDbItemReportTrigger().getCreated());
 
                 if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName());
+                    Matcher regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher(dbItemReportTriggerWithResult.getDbItemReportTrigger().getParentName() + "," + dbItemReportTriggerWithResult.getDbItemReportTrigger().getName());
                     add = regExMatcher.find();
                 }
 
