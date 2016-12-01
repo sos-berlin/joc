@@ -52,7 +52,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
                 errorSchema.setCode(orderStepHistoryItem.getErrorCode());
                 errorSchema.setMessage(orderStepHistoryItem.getErrorText());
                 orderStepHistory.setError(errorSchema);
-                orderStepHistory.setJob(orderStepHistoryItem.getJob());
+                orderStepHistory.setJob(orderStepHistoryItem.getName());
                 orderStepHistory.setNode(orderStepHistoryItem.getState());
                 orderStepHistory.setStartTime(orderStepHistoryItem.getStartTime());
                 orderStepHistory.setStep(orderStepHistoryItem.getStep().intValue());
