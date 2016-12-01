@@ -31,7 +31,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "dateFrom",
     "dateTo",
     "timeZone",
-    "folders"
+    "folders",
+    "limit"
 })
 public class OrdersFilter {
 
@@ -82,6 +83,12 @@ public class OrdersFilter {
      */
     @JsonProperty("folders")
     private List<Folder> folders = new ArrayList<Folder>();
+    /**
+     * only for db history urls to restrict the number of responsed records; -1=unlimited
+     * 
+     */
+    @JsonProperty("limit")
+    private Integer limit = 10000;
 
     /**
      * 
@@ -307,6 +314,28 @@ public class OrdersFilter {
         this.folders = folders;
     }
 
+    /**
+     * only for db history urls to restrict the number of responsed records; -1=unlimited
+     * 
+     * @return
+     *     The limit
+     */
+    @JsonProperty("limit")
+    public Integer getLimit() {
+        return limit;
+    }
+
+    /**
+     * only for db history urls to restrict the number of responsed records; -1=unlimited
+     * 
+     * @param limit
+     *     The limit
+     */
+    @JsonProperty("limit")
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -314,7 +343,7 @@ public class OrdersFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(orders).append(compact).append(regex).append(processingStates).append(types).append(dateFrom).append(dateTo).append(timeZone).append(folders).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(orders).append(compact).append(regex).append(processingStates).append(types).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(limit).toHashCode();
     }
 
     @Override
@@ -326,7 +355,7 @@ public class OrdersFilter {
             return false;
         }
         OrdersFilter rhs = ((OrdersFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(orders, rhs.orders).append(compact, rhs.compact).append(regex, rhs.regex).append(processingStates, rhs.processingStates).append(types, rhs.types).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(orders, rhs.orders).append(compact, rhs.compact).append(regex, rhs.regex).append(processingStates, rhs.processingStates).append(types, rhs.types).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(limit, rhs.limit).isEquals();
     }
 
 }
