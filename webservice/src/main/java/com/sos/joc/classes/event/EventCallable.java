@@ -1,5 +1,6 @@
 package com.sos.joc.classes.event;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -8,7 +9,16 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 
+import org.apache.shiro.session.InvalidSessionException;
+import org.apache.shiro.session.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
+import com.sos.joc.exceptions.ForcedClosingHttpClientException;
+import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
+import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Err;
@@ -20,14 +30,17 @@ import com.sos.joc.model.event.NodeTransitionType;
 
 public class EventCallable implements Callable<JobSchedulerEvent> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventCallable.class);
     private final String accessToken;
     private final JobSchedulerEvent jobSchedulerEvent;
     private final JOCJsonCommand command;
+    private final Session session;
 
-    public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken) {
+    public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session) {
         this.accessToken = accessToken;
         this.command = command;
         this.jobSchedulerEvent = jobSchedulerEvent;
+        this.session = session;
     }
 
     @Override
@@ -35,15 +48,42 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         try {
             jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId()));
             command.closeHttpClient();
-        } catch (JocException e) {
-            Err err = new Err();
-            err.setCode(e.getError().getCode());
-            err.setMessage(e.getClass().getSimpleName() + ": " + e.getMessage());
-            jobSchedulerEvent.setError(err);
+        } catch (ForcedClosingHttpClientException e) {
             jobSchedulerEvent.setEventSnapshots(null);
+            handleError(e.getError().getCode(), e.getClass().getSimpleName());
             throw e;
+        } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException e) {
+            if (Globals.UrlFromJobSchedulerId.containsKey(jobSchedulerEvent.getJobschedulerId())) {
+                Globals.UrlFromJobSchedulerId.remove(jobSchedulerEvent.getJobschedulerId());
+            }
+            //TODO create JobScheduler unreachable event?
+            jobSchedulerEvent.setEventSnapshots(null);
+            handleError(e.getError().getCode(), e.getClass().getSimpleName());
+            throw e;
+        } catch (JocException e) {
+            LOGGER.error("", e);
+            jobSchedulerEvent.setEventSnapshots(null);
+            handleError(e.getError().getCode(), e.getClass().getSimpleName());
+            throw e;
+        } catch (InvalidSessionException e) {
+            command.closeHttpClient();
+            jobSchedulerEvent.setEventSnapshots(null);
+            LOGGER.error("", e);
+            throw new JocException(e);
+        } catch (Exception e) {
+            jobSchedulerEvent.setEventSnapshots(null);
+            LOGGER.error("", e);
+            throw new JocException(e);
         }
         return jobSchedulerEvent;
+    }
+    
+    private void handleError(String code, String simpleName) {
+        URI uri = command.getURI();
+        Err err = new Err();
+        err.setCode(code);
+        err.setMessage(simpleName + ": " + uri.getScheme()+"://"+uri.getAuthority());
+        jobSchedulerEvent.setError(err);
     }
     
     private String getServiceBody() throws JocMissingRequiredParameterException {
@@ -58,6 +98,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     }
     
     private List<EventSnapshot> getEventSnapshots (String eventId) throws JocException {
+        getSessionTimeout();
         List<EventSnapshot> eventSnapshots = new ArrayList<EventSnapshot>();
         JsonObject json = getJsonObject(eventId);
         Long newEventId = json.getJsonNumber("eventId").longValue();
@@ -120,5 +161,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             break;
         }
         return eventSnapshots;
+    }
+    
+    private long getSessionTimeout() throws InvalidSessionException {
+        return session.getTimeout();
     }
 }

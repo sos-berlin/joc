@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 
 import javax.ws.rs.Path;
 
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -46,7 +47,10 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             initLogging(API_CALL, eventBody);
             boolean perms = getPermissons(accessToken).getJobschedulerMaster().getView().isStatus();
 
-            Session session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession(false);
+            Session session = null;
+            try {
+                session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession(false);
+            } catch (InvalidSessionException e1) {}
             Globals.forceClosingHttpClients(session);
 
             if (eventBody.getClose() != null && eventBody.getClose()) {
@@ -77,15 +81,20 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 jsEvent.setEventId(jsObject.getEventId());
                 jsEvent.setJobschedulerId(jsObject.getJobschedulerId());
                 eventList.put(jsObject.getJobschedulerId(), jsEvent);
-                DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jsObject.getJobschedulerId(), accessToken);
+                String url = Globals.UrlFromJobSchedulerId.get(jsObject.getJobschedulerId());
+                if (url == null) {
+                    DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId(jsObject.getJobschedulerId(), accessToken);
+                    url = instance.getUrl();
+                    Globals.UrlFromJobSchedulerId.put(jsObject.getJobschedulerId(), url);
+                }
                 JOCJsonCommand command = new JOCJsonCommand();
-                command.setUriBuilderForEvents(instance.getUrl());
+                command.setUriBuilderForEvents(url);
                 command.setSocketTimeout((EVENT_TIMEOUT + 5) * 1000);
                 command.createHttpClient();
                 command.setAutoCloseHttpClient(false);
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
-                tasks.add(new EventCallable(command, jsEvent, accessToken));
+                tasks.add(new EventCallable(command, jsEvent, accessToken, session));
             }
             session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
 
