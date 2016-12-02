@@ -35,7 +35,7 @@ import com.sos.joc.model.event.RegisterEvent;
 public class EventResourceImpl extends JOCResourceImpl implements IEventResource {
 
     private static final String API_CALL = "./events";
-    private static final int EVENT_TIMEOUT = 90;
+    private static final Integer EVENT_TIMEOUT = 90;
 
     @Override
     public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) throws Exception {
@@ -94,9 +94,11 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 command.setAutoCloseHttpClient(false);
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
-                tasks.add(new EventCallable(command, jsEvent, accessToken, session));
+                tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT));
             }
-            session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
+            try {
+                session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
+            } catch (Exception e1) {}
 
             ExecutorService executorService = Executors.newFixedThreadPool(eventBody.getJobscheduler().size());
             try {
@@ -124,6 +126,10 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (InvalidSessionException e) {
+            entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {

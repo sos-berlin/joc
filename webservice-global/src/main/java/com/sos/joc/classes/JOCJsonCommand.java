@@ -70,6 +70,11 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     public URI getURI() {
         return uriBuilder.build();
     }
+    
+    public String getSchemeAndAuthority() {
+        URI uri = uriBuilder.build();
+        return uri.getScheme()+"://"+uri.getAuthority();
+    }
 
     public void addOrderCompactQuery(boolean compact) {
         String returnQuery = (compact) ? "OrdersComplemented/OrderOverview" : "OrdersComplemented/OrderDetailed";
@@ -87,8 +92,9 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         uriBuilder.queryParam("timeout", timeout);
     }
     
-    public void replaceEventId(String eventId) {
+    public void replaceEventQuery(String eventId, Integer timeout) {
         uriBuilder.replaceQueryParam("after", eventId);
+        uriBuilder.replaceQueryParam("timeout", timeout);
     }
     
     public void addEventQuery(String eventId, Integer timeout) {
