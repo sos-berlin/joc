@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import com.sos.jitl.reporting.db.DBItemReportTrigger;
 import com.sos.jitl.reporting.db.DBItemReportTriggerWithResult;
 import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
@@ -55,7 +54,6 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
                     reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(), orderPath.getOrderId());
                 }
-            } else {
                 ordersFilter.setRegex("");
             }
 
@@ -91,7 +89,8 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 history.setSurveyDate(dbItemReportTriggerWithResult.getDbItemReportTrigger().getCreated());
 
                 if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher(dbItemReportTriggerWithResult.getDbItemReportTrigger().getParentName() + "," + dbItemReportTriggerWithResult.getDbItemReportTrigger().getName());
+                    Matcher regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher(dbItemReportTriggerWithResult.getDbItemReportTrigger().getParentName() + ","
+                            + dbItemReportTriggerWithResult.getDbItemReportTrigger().getName());
                     add = regExMatcher.find();
                 }
 

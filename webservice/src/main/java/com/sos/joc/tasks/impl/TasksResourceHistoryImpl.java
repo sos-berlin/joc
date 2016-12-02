@@ -55,7 +55,6 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 for (JobPath jobPath : jobsFilter.getJobs()) {
                     reportExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
                 }
-            } else {
                 jobsFilter.setRegex("");
             }
 
