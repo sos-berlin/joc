@@ -1,7 +1,6 @@
 package com.sos.joc.classes;
 
 import java.io.StringReader;
-import java.net.SocketException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -142,14 +141,12 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = postRestService(uri, postBody);
             return getJsonObjectFromResponse(response, uri, jocError);
-        } catch (SocketException e) {
+        } catch (ConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
-                throw new JobSchedulerNoResponseException(jocError, e);
+                throw new JobSchedulerConnectionRefusedException(jocError, e);
             }
-        } catch (ConnectionRefusedException e) {
-            throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
             throw new JobSchedulerNoResponseException(jocError, e);
         } catch (JocException e) {
@@ -177,14 +174,12 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = getRestService(uri);
             return getJsonObjectFromResponse(response, uri, jocError);
-        } catch (SocketException e) {
+        } catch (ConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
-                throw new JobSchedulerNoResponseException(jocError, e);
+                throw new JobSchedulerConnectionRefusedException(jocError, e);
             }
-        } catch (ConnectionRefusedException e) {
-            throw new JobSchedulerConnectionRefusedException(jocError, e);
         } catch (NoResponseException e) {
             throw new JobSchedulerNoResponseException(jocError, e);
         } catch (JocException e) {

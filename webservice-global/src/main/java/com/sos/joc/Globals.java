@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 
 import com.sos.auth.rest.SOSShiroCurrentUsersList;
@@ -24,6 +25,7 @@ public class Globals {
     public static SchedulerObjectFactory schedulerObjectFactory;
     public static Map<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
     public static JocCockpitProperties sosShiroProperties;
+    public static Map<String, String> UrlFromJobSchedulerId = new HashMap<String, String>();
     
     public static SOSHibernateConnection getConnection(String schedulerId) throws JocException {
         if (sosSchedulerHibernateConnections == null) {
@@ -88,13 +90,15 @@ public class Globals {
 
     @SuppressWarnings("unchecked")
     public static void forceClosingHttpClients(Session session) {
-        if (session != null && session.getAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS) != null) {
-            try {
-                for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS)) {
-                    command.forcedClosingHttpClient();
-                }
-                session.removeAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS);
-            } catch (Exception e) {}
-        }
+        try {
+            if (session != null && session.getAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS) != null) {
+                try {
+                    for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS)) {
+                        command.forcedClosingHttpClient();
+                    }
+                    session.removeAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS);
+                } catch (Exception e) {}
+            }
+        } catch (InvalidSessionException e) {}
     }
 }
