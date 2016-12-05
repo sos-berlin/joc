@@ -14,7 +14,9 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderHistory;
 import com.sos.joc.model.order.OrderHistoryItem;
 import com.sos.joc.model.order.OrderHistoryState;
@@ -55,8 +57,18 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                     reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(), orderPath.getOrderId());
                 }
                 ordersFilter.setRegex("");
+            }else{
+                if (ordersFilter.getFolders().size() > 0) {
+                    for (Folder folder : ordersFilter.getFolders()) {
+                        reportTriggerDBLayer.getFilter().addFolderPath(folder.getFolder());
+                    }
+                }
             }
-
+                
+            if (ordersFilter.getLimit() == null){
+                ordersFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
+            }
+            reportTriggerDBLayer.getFilter().setLimit(ordersFilter.getLimit());
             List<DBItemReportTriggerWithResult> listOfReportTriggerWithResultDBItems = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
 
             for (DBItemReportTriggerWithResult dbItemReportTriggerWithResult : listOfReportTriggerWithResultDBItems) {

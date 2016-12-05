@@ -14,8 +14,10 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.TaskHistory;
@@ -56,7 +58,18 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                     reportExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
                 }
                 jobsFilter.setRegex("");
+            } else {
+                if (jobsFilter.getFolders().size() > 0) {
+                    for (Folder folder : jobsFilter.getFolders()) {
+                        reportExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder());
+                    }
+                }
             }
+
+            if (jobsFilter.getLimit() == null) {
+                jobsFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
+            }
+            reportExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
 
             List<DBItemReportExecution> listOfDBItemReportExecutionDBItems = reportExecutionsDBLayer.getSchedulerHistoryListFromTo();
 
@@ -64,7 +77,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 boolean add = true;
                 TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
                 taskHistoryItem.setAgent(dbItemReportExecution.getAgentUrl());
-                // taskHistoryItem.setClusterMember(dbItemReportExecution.getClusterMemberId());
+                taskHistoryItem.setClusterMember(dbItemReportExecution.getClusterMemberId());
                 taskHistoryItem.setEndTime(dbItemReportExecution.getEndTime());
                 if (dbItemReportExecution.getError()) {
                     Err error = new Err();
