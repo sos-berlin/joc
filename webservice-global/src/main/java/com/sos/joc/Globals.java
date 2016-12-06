@@ -1,5 +1,7 @@
 package com.sos.joc;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import com.sos.scheduler.model.SchedulerObjectFactory;
 public class Globals {
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
     public static final String SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS = "event_http_clients";
+    public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
     public static SOSShiroCurrentUsersList currentUsersList;
     public static SOSHibernateConnection sosHibernateConnection;
     public static SchedulerObjectFactory schedulerObjectFactory;
@@ -49,22 +52,36 @@ public class Globals {
 
         return sosHibernateConnection;
     }
+    
+    public static String getShiroIniInClassPath() {
+        if (sosShiroProperties != null) {
+            return "classpath:" + sosShiroProperties.getPropertiesFileClassPathParent() + "shiro.ini";
+        }
+        return DEFAULT_SHIRO_INI_PATH;
+    }
 
     private static String getConfFile(String schedulerId) throws JocException {
-        String propertieKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
-        String confFile = sosShiroProperties.getProperty(propertieKey);
+        String propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
+        String confFile = sosShiroProperties.getProperty(propertyKey);
+        JocError error = new JocError();
+        error.setCode("JOC-310");
         if (confFile == null) {
             confFile = sosShiroProperties.getProperty(HIBERNATE_CONFIGURATION_FILE);
             if (confFile == null) {
-                JocError error = new JocError();
-                error.setCode("JOC-310");
-                error.setMessage(String.format("Could find value for %s in joc_properties file", propertieKey));
+                error.setMessage(String.format("Could find value for %1$s in joc_properties file", propertyKey));
                 throw new JocException(error);
             }
         }
-
+        Path p = sosShiroProperties.resolvePath(confFile);
+        if (p != null) {
+            if (!Files.exists(p)) {
+                error.setMessage(String.format("hibernate configuration (%1$s) is set but file (%2$s) not found.", confFile, p.toString()));
+                throw new JocException(error);
+            } else {
+                confFile = p.toString().replace('\\', '/');
+            }
+        }
         return confFile;
-
     }
     
     public static void beginTransaction(){
