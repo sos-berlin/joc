@@ -61,7 +61,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             } else {
                 if (jobsFilter.getFolders().size() > 0) {
                     for (Folder folder : jobsFilter.getFolders()) {
-                        reportExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder());
+                        reportExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder(),folder.getRecursive());
                     }
                 }
             }

@@ -60,7 +60,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             }else{
                 if (ordersFilter.getFolders().size() > 0) {
                     for (Folder folder : ordersFilter.getFolders()) {
-                        reportTriggerDBLayer.getFilter().addFolderPath(folder.getFolder());
+                        reportTriggerDBLayer.getFilter().addFolderPath(folder.getFolder(),folder.getRecursive());
                     }
                 }
             }
