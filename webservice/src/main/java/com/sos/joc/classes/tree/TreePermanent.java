@@ -45,6 +45,11 @@ public class TreePermanent {
                     types.add(type);
                 }
                 break;
+            case AGENTCLUSTER: 
+                if (sosPermission.getProcessClass().getView().isStatus()) {
+                    types.add(type);
+                }
+                break;
             case LOCK: 
                 if (sosPermission.getLock().getView().isStatus()) {
                     types.add(type);
@@ -78,6 +83,7 @@ public class TreePermanent {
                 case JOBCHAIN: 
                     bodyTypes.add("job_chain");
                     break;
+                case AGENTCLUSTER:
                 case PROCESSCLASS: 
                     bodyTypes.add("process_class");
                     break;
