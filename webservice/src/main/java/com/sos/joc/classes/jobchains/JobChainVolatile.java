@@ -103,6 +103,22 @@ public class JobChainVolatile extends JobChainV {
             node.setNumOfOrders(o == null ? 0 : o.size());
         }
     }
+    
+    public void setOrders(Map<String, OrderV> orders) {
+        Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
+        for (OrderV order : orders.values()) {
+            String node = order.getState();
+            if (!nodeMap.containsKey(node)) {
+                nodeMap.put(node, new ArrayList<OrderV>()); 
+            }
+            nodeMap.get(node).add(order);
+        }
+        for (JobChainNodeV node : getNodes()) {
+            List<OrderV> o = nodeMap.get(node.getName());
+            node.setOrders(o);
+            node.setNumOfOrders(o == null ? 0 : o.size());
+        }
+    }
 
     private void cleanArrays() {
         setNodes(null);
@@ -118,6 +134,8 @@ public class JobChainVolatile extends JobChainV {
             Element jobNodeElem = (Element) jobNodes.item(i);
             JobChainNodeV node = new JobChainNodeV();
             node.setName(jobNodeElem.getAttribute("state"));
+            jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "order_queue/order");
+            //node.setOrders(orders);
             Element jobElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "job");
             JobVolatile jobV = new JobVolatile(jobElem, jocXmlCommand);
             JobChainNodeJobV job = new JobChainNodeJobV();
