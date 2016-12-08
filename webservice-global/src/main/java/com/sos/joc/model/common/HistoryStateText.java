@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.job;
+package com.sos.joc.model.common;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,21 +8,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @Generated("org.jsonschema2pojo")
-public enum TaskHistoryStateText {
+public enum HistoryStateText {
 
     SUCCESSFUL("SUCCESSFUL"),
     INCOMPLETE("INCOMPLETE"),
     FAILED("FAILED");
     private final String value;
-    private final static Map<String, TaskHistoryStateText> CONSTANTS = new HashMap<String, TaskHistoryStateText>();
+    private final static Map<String, HistoryStateText> CONSTANTS = new HashMap<String, HistoryStateText>();
 
     static {
-        for (TaskHistoryStateText c: values()) {
+        for (HistoryStateText c: values()) {
             CONSTANTS.put(c.value, c);
         }
     }
 
-    private TaskHistoryStateText(String value) {
+    private HistoryStateText(String value) {
         this.value = value;
     }
 
@@ -33,8 +33,8 @@ public enum TaskHistoryStateText {
     }
 
     @JsonCreator
-    public static TaskHistoryStateText fromValue(String value) {
-        TaskHistoryStateText constant = CONSTANTS.get(value);
+    public static HistoryStateText fromValue(String value) {
+        HistoryStateText constant = CONSTANTS.get(value);
         if (constant == null) {
             throw new IllegalArgumentException(value);
         } else {

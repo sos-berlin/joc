@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.HistoryStateText;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -32,7 +33,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "timeZone",
     "folders",
     "states",
-    "limit"
+    "limit",
+    "historyStates"
 })
 public class JobsFilter {
 
@@ -89,6 +91,8 @@ public class JobsFilter {
      */
     @JsonProperty("limit")
     private Integer limit = 10000;
+    @JsonProperty("historyStates")
+    private List<HistoryStateText> historyStates = new ArrayList<HistoryStateText>();
 
     /**
      * 
@@ -336,6 +340,26 @@ public class JobsFilter {
         this.limit = limit;
     }
 
+    /**
+     * 
+     * @return
+     *     The historyStates
+     */
+    @JsonProperty("historyStates")
+    public List<HistoryStateText> getHistoryStates() {
+        return historyStates;
+    }
+
+    /**
+     * 
+     * @param historyStates
+     *     The historyStates
+     */
+    @JsonProperty("historyStates")
+    public void setHistoryStates(List<HistoryStateText> historyStates) {
+        this.historyStates = historyStates;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -343,7 +367,7 @@ public class JobsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(compact).append(regex).append(isOrderJob).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(states).append(limit).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(compact).append(regex).append(isOrderJob).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(states).append(limit).append(historyStates).toHashCode();
     }
 
     @Override
@@ -355,7 +379,7 @@ public class JobsFilter {
             return false;
         }
         JobsFilter rhs = ((JobsFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(compact, rhs.compact).append(regex, rhs.regex).append(isOrderJob, rhs.isOrderJob).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(states, rhs.states).append(limit, rhs.limit).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(compact, rhs.compact).append(regex, rhs.regex).append(isOrderJob, rhs.isOrderJob).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(states, rhs.states).append(limit, rhs.limit).append(historyStates, rhs.historyStates).isEquals();
     }
 
 }

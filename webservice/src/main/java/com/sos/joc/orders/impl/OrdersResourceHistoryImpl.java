@@ -17,10 +17,10 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.HistoryState;
+import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.order.OrderHistory;
 import com.sos.joc.model.order.OrderHistoryItem;
-import com.sos.joc.model.order.OrderHistoryState;
-import com.sos.joc.model.order.OrderHistoryStateText;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.orders.resource.IOrdersResourceHistory;
@@ -82,18 +82,18 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 history.setOrderId(dbItemReportTriggerWithResult.getDbItemReportTrigger().getName());
                 history.setPath(dbItemReportTriggerWithResult.getDbItemReportTrigger().getFullOrderQualifier());
                 history.setStartTime(dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime());
-                OrderHistoryState state = new OrderHistoryState();
+                HistoryState state = new HistoryState();
 
                 if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null) {
                     state.setSeverity(1);
-                    state.set_text(OrderHistoryStateText.INCOMPLETE);
+                    state.set_text(HistoryStateText.INCOMPLETE);
                 } else {
                     if (dbItemReportTriggerWithResult.haveError()) {
                         state.setSeverity(2);
-                        state.set_text(OrderHistoryStateText.FAILED);
+                        state.set_text(HistoryStateText.FAILED);
                     } else {
                         state.setSeverity(0);
-                        state.set_text(OrderHistoryStateText.SUCCESSFUL);
+                        state.set_text(HistoryStateText.SUCCESSFUL);
                     }
 
                 }

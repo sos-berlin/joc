@@ -11,11 +11,11 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceHistory;
+import com.sos.joc.model.common.HistoryState;
+import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.jobChain.JobChainHistoryFilter;
 import com.sos.joc.model.order.OrderHistory;
 import com.sos.joc.model.order.OrderHistoryItem;
-import com.sos.joc.model.order.OrderHistoryState;
-import com.sos.joc.model.order.OrderHistoryStateText;
 
 @Path("job_chain")
 public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJobChainResourceHistory {
@@ -53,7 +53,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             List<OrderHistoryItem> listOfHistory = new ArrayList<OrderHistoryItem>();
 
             for (int i = 0; i < count; i++) {
-                OrderHistoryState state = new OrderHistoryState();
+                HistoryState state = new HistoryState();
                 jocXmlCommand.getElementFromList(i);
                 String node = jocXmlCommand.getAttribute("state");
                 OrderHistoryItem history = new OrderHistoryItem();
@@ -62,15 +62,15 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                     jocXmlCommand.createNodeList(KEY_FOR_ERROR_NODE_LIST, String.format(XPATH_FOR_ERROR_NODES, node));
                     if (jocXmlCommand.getNodeList(KEY_FOR_ERROR_NODE_LIST).getLength() == 0) {
                         state.setSeverity(0);
-                        state.set_text(OrderHistoryStateText.SUCCESSFUL);
+                        state.set_text(HistoryStateText.SUCCESSFUL);
                     } else {
                         state.setSeverity(2);
-                        state.set_text(OrderHistoryStateText.FAILED);
+                        state.set_text(HistoryStateText.FAILED);
                     }
                     history.setState(state);
                 } else {
                     state.setSeverity(1);
-                    state.set_text(OrderHistoryStateText.INCOMPLETE);
+                    state.set_text(HistoryStateText.INCOMPLETE);
                     history.setState(state);
 
                 }

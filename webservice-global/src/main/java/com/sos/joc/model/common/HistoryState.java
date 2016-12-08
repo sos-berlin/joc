@@ -1,5 +1,5 @@
 
-package com.sos.joc.model.job;
+package com.sos.joc.model.common;
 
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,7 +11,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * task history state
+ * orderHistory state
  * <p>
  * 
  * 
@@ -22,7 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "severity",
     "_text"
 })
-public class TaskHistoryState {
+public class HistoryState {
 
     /**
      *  0=successful, 1=incomplete, 2=failed with a green/yellow/red representation
@@ -32,12 +32,14 @@ public class TaskHistoryState {
     @JsonProperty("severity")
     private Integer severity;
     /**
+     * orderHistory state text
+     * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("_text")
-    private TaskHistoryStateText _text;
+    private HistoryStateText _text;
 
     /**
      *  0=successful, 1=incomplete, 2=failed with a green/yellow/red representation
@@ -64,6 +66,8 @@ public class TaskHistoryState {
     }
 
     /**
+     * orderHistory state text
+     * <p>
      * 
      * (Required)
      * 
@@ -71,11 +75,13 @@ public class TaskHistoryState {
      *     The _text
      */
     @JsonProperty("_text")
-    public TaskHistoryStateText get_text() {
+    public HistoryStateText get_text() {
         return _text;
     }
 
     /**
+     * orderHistory state text
+     * <p>
      * 
      * (Required)
      * 
@@ -83,7 +89,7 @@ public class TaskHistoryState {
      *     The _text
      */
     @JsonProperty("_text")
-    public void set_text(TaskHistoryStateText _text) {
+    public void set_text(HistoryStateText _text) {
         this._text = _text;
     }
 
@@ -102,10 +108,10 @@ public class TaskHistoryState {
         if (other == this) {
             return true;
         }
-        if ((other instanceof TaskHistoryState) == false) {
+        if ((other instanceof HistoryState) == false) {
             return false;
         }
-        TaskHistoryState rhs = ((TaskHistoryState) other);
+        HistoryState rhs = ((HistoryState) other);
         return new EqualsBuilder().append(severity, rhs.severity).append(_text, rhs._text).isEquals();
     }
 

@@ -18,12 +18,12 @@ import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.common.HistoryState;
+import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
-import com.sos.joc.model.job.TaskHistoryState;
-import com.sos.joc.model.job.TaskHistoryStateText;
 import com.sos.joc.tasks.resource.ITasksResourceHistory;
 
 @Path("tasks")
@@ -90,18 +90,18 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 taskHistoryItem.setJob(dbItemReportExecution.getName());
                 taskHistoryItem.setStartTime(dbItemReportExecution.getStartTime());
 
-                TaskHistoryState state = new TaskHistoryState();
+                HistoryState state = new HistoryState();
                 if (dbItemReportExecution.isSuccessFull()) {
                     state.setSeverity(0);
-                    state.set_text(TaskHistoryStateText.SUCCESSFUL);
+                    state.set_text(HistoryStateText.SUCCESSFUL);
                 }
                 if (dbItemReportExecution.isInComplete()) {
                     state.setSeverity(1);
-                    state.set_text(TaskHistoryStateText.INCOMPLETE);
+                    state.set_text(HistoryStateText.INCOMPLETE);
                 }
                 if (dbItemReportExecution.isFailed()) {
                     state.setSeverity(2);
-                    state.set_text(TaskHistoryStateText.FAILED);
+                    state.set_text(HistoryStateText.FAILED);
                 }
                 taskHistoryItem.setState(state);
                 taskHistoryItem.setSurveyDate(dbItemReportExecution.getCreated());

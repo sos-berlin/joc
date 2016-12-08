@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.Err;
+import com.sos.joc.model.common.HistoryState;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -69,14 +70,14 @@ public class TaskHistoryItem {
     @JsonProperty("endTime")
     private Date endTime;
     /**
-     * task history state
+     * orderHistory state
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("state")
-    private TaskHistoryState state;
+    private HistoryState state;
     /**
      * 
      * (Required)
@@ -224,7 +225,7 @@ public class TaskHistoryItem {
     }
 
     /**
-     * task history state
+     * orderHistory state
      * <p>
      * 
      * (Required)
@@ -233,12 +234,12 @@ public class TaskHistoryItem {
      *     The state
      */
     @JsonProperty("state")
-    public TaskHistoryState getState() {
+    public HistoryState getState() {
         return state;
     }
 
     /**
-     * task history state
+     * orderHistory state
      * <p>
      * 
      * (Required)
@@ -247,7 +248,7 @@ public class TaskHistoryItem {
      *     The state
      */
     @JsonProperty("state")
-    public void setState(TaskHistoryState state) {
+    public void setState(HistoryState state) {
         this.state = state;
     }
 

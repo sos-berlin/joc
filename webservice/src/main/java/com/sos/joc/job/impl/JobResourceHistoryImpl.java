@@ -14,11 +14,11 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceHistory;
 import com.sos.joc.model.common.Err;
+import com.sos.joc.model.common.HistoryState;
+import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryFilter;
 import com.sos.joc.model.job.TaskHistoryItem;
-import com.sos.joc.model.job.TaskHistoryState;
-import com.sos.joc.model.job.TaskHistoryStateText;
 
 @Path("job")
 public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResourceHistory {
@@ -70,16 +70,16 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
                 history.setJob(jocXmlCommand.getAttribute("job_name"));
                 history.setStartTime(jocXmlCommand.getAttributeAsDate("start_time"));
 
-                TaskHistoryState state = new TaskHistoryState();
+                HistoryState state = new HistoryState();
                 if (history.getEndTime() == null) {
                     state.setSeverity(1);
-                    state.set_text(TaskHistoryStateText.INCOMPLETE);
+                    state.set_text(HistoryStateText.INCOMPLETE);
                 } else if (history.getExitCode() != null && history.getExitCode() == 0) {
                     state.setSeverity(0);
-                    state.set_text(TaskHistoryStateText.SUCCESSFUL);
+                    state.set_text(HistoryStateText.SUCCESSFUL);
                 } else {
                     state.setSeverity(2);
-                    state.set_text(TaskHistoryStateText.FAILED);
+                    state.set_text(HistoryStateText.FAILED);
                 }
                 history.setState(state);
                 history.setSteps(jocXmlCommand.getAttributeAsInteger("steps"));
