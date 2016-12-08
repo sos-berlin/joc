@@ -183,9 +183,11 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
     }
     
     private String getServiceBody(String job) throws JocMissingRequiredParameterException {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add("jobPath", job);
-        return builder.build().toString();
+        JsonObjectBuilder oBuilder = Json.createObjectBuilder();
+        JsonArrayBuilder aBuilder =  Json.createArrayBuilder();
+        aBuilder.add(job);
+        oBuilder.add("jobPaths", aBuilder);
+        return oBuilder.build().toString();
     }
     
     private String getServiceBody(Folder folder, OrdersFilter ordersBody) throws JocMissingRequiredParameterException {

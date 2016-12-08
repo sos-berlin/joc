@@ -273,7 +273,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static String getErrorMessage(Throwable e) {
-        return ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
+        return ((e.getCause() != null) ? e.getClass().getSimpleName() + ": " + e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
     }
     
     private static Err420 getErr420(JocError e) {
