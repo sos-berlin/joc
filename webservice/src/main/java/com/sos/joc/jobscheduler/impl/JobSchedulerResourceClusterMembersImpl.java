@@ -70,8 +70,8 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                     Element clusterMember = (Element) clusterMembers.item(i);
                     JobSchedulerState state = new JobSchedulerState();
                     JobSchedulerV jobscheduler = null;
-                    String port = jocXmlCommand.getAttributeValue(clusterMember, "cluster_member_id", "").replaceFirst(":(\\d+)$", "$1");
-                    if (port.isEmpty()) {
+                    String port = clusterMember.getAttribute("http_port");
+                    if (port == null || port.isEmpty()) {
                         port = "0";
                     }
                     if ("yes".equals(clusterMember.getAttribute("dead"))) {
