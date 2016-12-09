@@ -87,7 +87,6 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
 
     public static JOCDefaultResponse responseStatusJSError(String message) {
-        LOGGER.error(message);
         return responseStatus420(getErr420(new JocError(message)));
     }
     
@@ -104,7 +103,6 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (!"".equals(e.getError().printMetaInfo())) {
             LOGGER.info(e.getError().printMetaInfo());
         }
-        LOGGER.error("", e);
         String errorMsg = getErrorMessage(e);
         e.getError().setMessage(errorMsg);
         return responseStatus420(getErr420(e.getError()), mediaType);
@@ -126,7 +124,6 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (e.getCause() != null && e.getCause() instanceof JocException) {
             return responseStatusJSError((JocException) e.getCause(), mediaType);
         }
-        LOGGER.error("", e);
         return responseStatus420(getErr420(new JocError(getErrorMessage(e))), mediaType);
     }
     
@@ -152,7 +149,6 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (!"".equals(err.printMetaInfo())) {
             LOGGER.info(err.printMetaInfo());
         }
-        LOGGER.error("", e);
         return responseStatus420(getErr420(new JocError(getErrorMessage(e))), mediaType);
     }
     
@@ -278,7 +274,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         entity.setError(e);
         entity.setSurveyDate(new Date());
         entity.setDeliveryDate(new Date());
-        LOGGER.error(e.getMessage());
+        LOGGER.error(e.getMessage(),e);
         return entity;
     }
 
