@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://www.sos-berlin.com/scheduler"
+  elementFormDefault="qualified">
+    <xsd:import schemaLocation="C:\development\products\joc\webservice-global\src\test\resources\scheduler.xsd"/>
+    <xsd:complexType name="jobscheduler_command">
+
+      <xsd:choice minOccurs="1" maxOccurs="unbounded">
+          <xsd:element ref="add_order"/>
+          <xsd:element name="check_folders" type="check_folders"/>
+          <xsd:element ref="kill_task"/>
+          <xsd:element name="lock.remove" type="lock.remove"/>
+          <xsd:element ref="modify_job"/>
+          <xsd:element ref="modify_order"/>
+          <xsd:element ref="modify_spooler"/>
+          <xsd:element ref="modify_hot_folder"/>
+          <xsd:element ref="job.why"/>
+          <xsd:element ref="job_chain.modify"/>
+          <xsd:element ref="job_chain_node.modify"/>
+          <xsd:element name="order" type="order"/>
+          <xsd:element ref="param.get"/>
+          <xsd:element ref="params.get"/>
+          <xsd:element ref="plugin.command"/>
+          <xsd:element name="process_class" type="process_class"/>
+          <xsd:element name="process_class.remove" type="process_class.remove"/>
+          <xsd:element ref="job_chain.check_distributed"/>
+          <xsd:element ref="register_remote_scheduler"/>
+          <xsd:element ref="remove_job_chain"/>
+          <xsd:element ref="remove_order"/>
+          <xsd:element name="run_time" type="run_time"/>
+          <xsd:element ref="setting.set"/>
+          <xsd:element ref="schedule.remove"/>
+          <xsd:element ref="scheduler_log.log_categories.reset"/>
+          <xsd:element ref="scheduler_log.log_categories.set"/>
+          <xsd:element ref="scheduler_log.log_categories.show"/>
+          <xsd:element ref="show_calendar"/>
+          <xsd:element ref="show_history"/>
+          <xsd:element ref="show_job"/>
+          <xsd:element ref="show_jobs"/>
+          <xsd:element ref="show_job_chains"/>
+          <xsd:element ref="show_job_chain"/>
+          <xsd:element ref="show_order"/>
+          <xsd:element ref="show_schedulers"/>
+          <xsd:element ref="s"/>
+          <xsd:element ref="show_state"/>
+          <xsd:element ref="show_task"/>
+          <xsd:element ref="service_request"/>
+          <xsd:element ref="start_job"/>
+          <xsd:element ref="subsystem.show"/>
+          <xsd:element ref="remote_scheduler.start_remote_task"/>
+          <xsd:element ref="remote_scheduler.remote_task.close"/>
+          <xsd:element ref="remote_scheduler.remote_task.kill"/>
+          <xsd:element ref="terminate"/>
+      </xsd:choice>
+            <xsd:attribute name="url" type="String"/>
+      <xsd:attribute name="jobschedulerId" type="String"/>
+    </xsd:complexType>
+</xsd:schema>

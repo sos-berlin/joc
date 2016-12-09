@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.08.29 um 04:30:14 PM CEST 
+// Generiert: 2016.12.08 um 04:21:41 PM CET 
 //
 
 
@@ -291,6 +291,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Schedule.Edit }
+     * 
+     */
+    public SOSPermissionJocCockpit.Schedule.Edit createSOSPermissionJocCockpitScheduleEdit() {
+        return new SOSPermissionJocCockpit.Schedule.Edit();
+    }
+
+    /**
      * Create an instance of {@link SOSPermissionJocCockpit.ProcessClass.View }
      * 
      */
@@ -299,19 +307,19 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link SOSPermissionJocCockpit.ProcessClass.Edit }
+     * 
+     */
+    public SOSPermissionJocCockpit.ProcessClass.Edit createSOSPermissionJocCockpitProcessClassEdit() {
+        return new SOSPermissionJocCockpit.ProcessClass.Edit();
+    }
+
+    /**
      * Create an instance of {@link SOSPermissionJocCockpit.Job.View }
      * 
      */
     public SOSPermissionJocCockpit.Job.View createSOSPermissionJocCockpitJobView() {
         return new SOSPermissionJocCockpit.Job.View();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionJocCockpit.Job.Start }
-     * 
-     */
-    public SOSPermissionJocCockpit.Job.Start createSOSPermissionJocCockpitJobStart() {
-        return new SOSPermissionJocCockpit.Job.Start();
     }
 
     /**

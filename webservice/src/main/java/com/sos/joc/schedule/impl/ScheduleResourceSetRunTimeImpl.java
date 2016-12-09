@@ -30,7 +30,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
         try {
             initLogging(API_CALL, modifyRuntime);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyRuntime.getJobschedulerId(), getPermissons(accessToken).getSchedule()
-                    .isEdit());
+                    .getEdit().isChange());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

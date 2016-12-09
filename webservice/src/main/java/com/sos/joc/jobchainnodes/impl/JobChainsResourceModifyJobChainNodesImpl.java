@@ -57,8 +57,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     public JOCDefaultResponse postJobChainNodesActivate(String accessToken, ModifyJobChainNodes modifyNodes) {
         initLogging(API_CALL + ACTIVATE, modifyNodes);
         try {
-            return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissons(accessToken).getJobChain().isUnskipJobChainNode() || getPermissons(
-                    accessToken).getJobChain().isUnstopJobChainNode(), modifyNodes);
+            return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissons(accessToken).getJobChain().isProcessJobChainNode(), modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

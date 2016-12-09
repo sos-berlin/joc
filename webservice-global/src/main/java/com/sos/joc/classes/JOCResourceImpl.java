@@ -106,7 +106,7 @@ public class JOCResourceImpl {
         }
         return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
-    
+
     public String normalizeFolder(String path) {
         if (path == null) {
             return null;
@@ -202,11 +202,11 @@ public class JOCResourceImpl {
         if (schedulerId == null) {
             throw new JocMissingRequiredParameterException("undefined 'jobschedulerId'");
         }
-        checkConnection(Globals.sosHibernateConnection);
+        checkConnection(Globals.sosHibernateConnection, schedulerId);
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
             if (withJobSchedulerDBCheck) {
-                checkConnection(Globals.getConnection(schedulerId));
+                checkConnection(Globals.getConnection(schedulerId), schedulerId);
             }
         }
         return jocDefaultResponse;
@@ -219,14 +219,18 @@ public class JOCResourceImpl {
         return null;
     }
 
-    private void checkConnection(SOSHibernateConnection connection) throws DBConnectionRefusedException {
+    private void checkConnection(SOSHibernateConnection connection, String schedulerId) throws JocException {
+        if (connection == null) {
+            connection = Globals.getConnection(schedulerId);
+            if (connection == null) {
+                throw new DBConnectionRefusedException("Connection is null");
+            }
+        }
         try {
             connection.beginTransaction();
             connection.rollback();
         } catch (Exception ex) {
-            if (connection != null) {
-                connection.disconnect();
-            }
+            connection.disconnect();
             try {
                 connection.connect();
             } catch (Exception e) {
