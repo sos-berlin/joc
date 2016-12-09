@@ -4,6 +4,7 @@ package com.sos.joc.classes;
 public class WebserviceConstants {
 
     public static final String DEFAULT_ERROR_CODE = "JOC-420";
+    public static final String COMMAND_ERROR_CODE = "COMMAND-001";
     public static final String AUDIT_LOGGER = "JOCAuditLog";
     
     

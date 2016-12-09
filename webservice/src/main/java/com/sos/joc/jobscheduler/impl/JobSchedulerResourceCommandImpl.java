@@ -6,6 +6,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerCommandFactory;
+import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCommand;
@@ -26,13 +27,15 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 return jocDefaultResponse;
             }
 
-            checkRequiredParameter("url", jobschedulerCommand.getUrl());
             checkRequiredParameter("jobschedulerId", jobschedulerCommand.getJobschedulerId());
+            if ("".equals(jobschedulerCommand.getUrl()) || jobschedulerCommand.getUrl() == null){
+                jobschedulerCommand.setUrl(dbItemInventoryInstance.getUrl());
+            }
 
             if (jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().size() > 1){
                 JocError e = new JocError();
-                e.setCode("");
-                e.setMessage("for than one command specified");
+                e.setCode(WebserviceConstants.COMMAND_ERROR_CODE);
+                e.setMessage(String.format("There are %s commands specified. Only one command is allowed",jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().size()));
                 throw new JocException(e);
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jobschedulerCommand.getUrl());
@@ -40,7 +43,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
 
             if (jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().size() < 1){
-                getJocError().setCode("");
+                getJocError().setCode(WebserviceConstants.COMMAND_ERROR_CODE);
                 getJocError().setMessage("Unknown command");
             }
             
