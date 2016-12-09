@@ -87,6 +87,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
 
     public static JOCDefaultResponse responseStatusJSError(String message) {
+        LOGGER.error(message);
         return responseStatus420(getErr420(new JocError(message)));
     }
     
@@ -103,6 +104,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (!"".equals(e.getError().printMetaInfo())) {
             LOGGER.info(e.getError().printMetaInfo());
         }
+        LOGGER.error("", e);
         String errorMsg = getErrorMessage(e);
         e.getError().setMessage(errorMsg);
         return responseStatus420(getErr420(e.getError()), mediaType);
@@ -117,13 +119,6 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatusJSError(e, MediaType.TEXT_HTML + "; charset=UTF-8");
     }
     
-    public static JOCDefaultResponse responseStatusJSError(JocError e) {
-        if (!"".equals(e.printMetaInfo())) {
-            LOGGER.info(e.printMetaInfo());
-        }
-        return responseStatus420(getErr420(e));
-    }
-    
     public static JOCDefaultResponse responseStatusJSError(Exception e, String mediaType) {
         if (e instanceof JocException) {
             return responseStatusJSError((JocException) e, mediaType);
@@ -131,6 +126,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (e.getCause() != null && e.getCause() instanceof JocException) {
             return responseStatusJSError((JocException) e.getCause(), mediaType);
         }
+        LOGGER.error("", e);
         return responseStatus420(getErr420(new JocError(getErrorMessage(e))), mediaType);
     }
     
@@ -156,6 +152,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (!"".equals(err.printMetaInfo())) {
             LOGGER.info(err.printMetaInfo());
         }
+        LOGGER.error("", e);
         return responseStatus420(getErr420(new JocError(getErrorMessage(e))), mediaType);
     }
     
