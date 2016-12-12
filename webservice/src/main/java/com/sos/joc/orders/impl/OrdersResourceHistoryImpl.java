@@ -57,15 +57,20 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                     reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(), orderPath.getOrderId());
                 }
                 ordersFilter.setRegex("");
-            }else{
+            } else {
+                if (ordersFilter.getHistoryStates().size() > 0) {
+                    for (HistoryStateText historyStateText : ordersFilter.getHistoryStates()) {
+                        reportTriggerDBLayer.getFilter().addState(historyStateText.toString());
+                    }
+                }
                 if (ordersFilter.getFolders().size() > 0) {
                     for (Folder folder : ordersFilter.getFolders()) {
-                        reportTriggerDBLayer.getFilter().addFolderPath(folder.getFolder(),folder.getRecursive());
+                        reportTriggerDBLayer.getFilter().addFolderPath(folder.getFolder(), folder.getRecursive());
                     }
                 }
             }
-                
-            if (ordersFilter.getLimit() == null){
+
+            if (ordersFilter.getLimit() == null) {
                 ordersFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
             }
             reportTriggerDBLayer.getFilter().setLimit(ordersFilter.getLimit());
@@ -92,8 +97,10 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                         state.setSeverity(2);
                         state.set_text(HistoryStateText.FAILED);
                     } else {
-                        state.setSeverity(0);
-                        state.set_text(HistoryStateText.SUCCESSFUL);
+                        if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() != null && !dbItemReportTriggerWithResult.haveError()) {
+                            state.setSeverity(0);
+                            state.set_text(HistoryStateText.SUCCESSFUL);
+                        }
                     }
 
                 }

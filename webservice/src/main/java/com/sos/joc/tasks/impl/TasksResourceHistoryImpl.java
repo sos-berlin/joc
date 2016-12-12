@@ -21,6 +21,7 @@ import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
 import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.job.JobPath;
+import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;
@@ -59,6 +60,12 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 }
                 jobsFilter.setRegex("");
             } else {
+                if (jobsFilter.getHistoryStates().size() > 0) {
+                    for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
+                        reportExecutionsDBLayer.getFilter().addState(historyStateText.toString());
+                    }
+                }
+
                 if (jobsFilter.getFolders().size() > 0) {
                     for (Folder folder : jobsFilter.getFolders()) {
                         reportExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder(),folder.getRecursive());
