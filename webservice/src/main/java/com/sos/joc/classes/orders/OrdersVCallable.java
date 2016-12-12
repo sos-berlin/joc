@@ -24,7 +24,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.order.OrderFilter;
-import com.sos.joc.model.order.OrderStateText;
+import com.sos.joc.model.order.OrderStateFilter;
 import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrdersFilter;
@@ -205,11 +205,11 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
         }
         
         // add processingState from response body
-        List<OrderStateText> states = ordersBody.getProcessingStates();
+        List<OrderStateFilter> states = ordersBody.getProcessingStates();
         Map<String, Boolean> filterValues = new HashMap<String, Boolean>();
         boolean suspended = false;
         if (states != null && !states.isEmpty()) {
-            for (OrderStateText state : states) {
+            for (OrderStateFilter state : states) {
                 switch (state) {
                 case PENDING:
                     filterValues.put("Planned", true);

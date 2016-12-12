@@ -64,7 +64,7 @@ public class OrdersFilter {
     @JsonProperty("regex")
     private String regex;
     @JsonProperty("processingStates")
-    private List<OrderStateText> processingStates = new ArrayList<OrderStateText>();
+    private List<OrderStateFilter> processingStates = new ArrayList<OrderStateFilter>();
     @JsonProperty("types")
     private List<OrderType> types = new ArrayList<OrderType>();
     @JsonProperty("dateFrom")
@@ -196,7 +196,7 @@ public class OrdersFilter {
      *     The processingStates
      */
     @JsonProperty("processingStates")
-    public List<OrderStateText> getProcessingStates() {
+    public List<OrderStateFilter> getProcessingStates() {
         return processingStates;
     }
 
@@ -206,7 +206,7 @@ public class OrdersFilter {
      *     The processingStates
      */
     @JsonProperty("processingStates")
-    public void setProcessingStates(List<OrderStateText> processingStates) {
+    public void setProcessingStates(List<OrderStateFilter> processingStates) {
         this.processingStates = processingStates;
     }
 

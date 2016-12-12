@@ -83,7 +83,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                     continue;
                 }
                 agentCluster.setState(state);
-                if (jobSchedulerAgentClustersBody.getCompact() != null && !jobSchedulerAgentClustersBody.getCompact()) {
+                if (jobSchedulerAgentClustersBody.getCompact() == null || !jobSchedulerAgentClustersBody.getCompact()) {
                     agentCluster.setAgents(new ArrayList<AgentOfCluster>(agentClusterMembers));
                 }
                 listOfAgentClusters.add(agentCluster);
