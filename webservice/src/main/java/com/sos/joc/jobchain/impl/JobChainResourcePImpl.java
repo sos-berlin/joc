@@ -8,11 +8,13 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JobChainPermanent;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceP;
 import com.sos.joc.model.jobChain.JobChainFilter;
@@ -39,6 +41,11 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
             Long instanceId = dbItemInventoryInstance.getId();
             DBItemInventoryJobChain inventoryJobChain = dbLayer.getJobChainByPath(normalizePath(jobChainFilter.getJobChain()), instanceId);
+            if (inventoryJobChain == null){
+                    String errMessage = String.format("job chain %s for instance %s with internal id %s not found in table %s", jobChainFilter.getJobChain(),jobChainFilter.getJobschedulerId(),instanceId,
+                            DBLayer.TABLE_INVENTORY_JOB_CHAINS);
+                    throw new DBInvalidDataException(errMessage);
+            }
             JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, inventoryJobChain, jobChainFilter.getCompact(), instanceId);
             if (jobChain != null) {
                 entity.setJobChain(jobChain);

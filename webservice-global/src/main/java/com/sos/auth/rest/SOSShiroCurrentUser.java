@@ -30,6 +30,13 @@ public class SOSShiroCurrentUser {
         this.password = password;
     }
 
+    public SOSShiroCurrentUser(String username, String password, String authorization) {
+        super();
+        this.listOfSchedulerInstances = new HashMap<String, DBItemInventoryInstance>();
+        this.username = username;
+        this.authorization = authorization;
+        this.password = password;
+    }
     public SOSPermissionJocCockpit getSosPermissionJocCockpit() {
         return sosPermissionJocCockpit;
     }
