@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.NoUserWithAccessTokenException;
@@ -168,6 +169,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         } else {
             responseBuilder.entity(entity);
         }
+        Globals.forceRollback();
         return new JOCDefaultResponse(responseBuilder.build());
     }
 
@@ -192,6 +194,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
         Response.ResponseBuilder responseBuilder = Response.status(419).header("Content-Type", MediaType.APPLICATION_JSON);
         responseBuilder.entity(errors);
+        Globals.forceRollback();
         return new JOCDefaultResponse(responseBuilder.build());
     }
     

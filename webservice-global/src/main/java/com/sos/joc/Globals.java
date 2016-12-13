@@ -30,6 +30,25 @@ public class Globals {
     public static JocCockpitProperties sosShiroProperties;
     public static Map<String, String> UrlFromJobSchedulerId = new HashMap<String, String>();
     
+    public static SOSHibernateConnection getConnection() throws JocException {
+        if (sosHibernateConnection == null) {
+            try {
+                String confFile = getConfFile(null);
+                sosHibernateConnection = new SOSHibernateConnection(confFile);
+                sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
+                sosHibernateConnection.addClassMapping(DBLayer.getReportingClassMapping());
+                sosHibernateConnection.setAutoCommit(true);
+                sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
+                sosHibernateConnection.connect();
+            } catch (JocException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new DBConnectionRefusedException(e);
+            }
+        }
+        return sosHibernateConnection;
+    }
+    
     public static SOSHibernateConnection getConnection(String schedulerId) throws JocException {
         if (sosSchedulerHibernateConnections == null) {
             sosSchedulerHibernateConnections = new HashMap<String, SOSHibernateConnection>();
@@ -41,6 +60,8 @@ public class Globals {
                 String confFile = getConfFile(schedulerId);
                 sosHibernateConnection = new SOSHibernateConnection(confFile);
                 sosHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
+                sosHibernateConnection.setAutoCommit(true);
+                sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
                 sosHibernateConnection.connect();
                 sosSchedulerHibernateConnections.put(schedulerId, sosHibernateConnection);
             } catch (JocException e) {
@@ -61,12 +82,17 @@ public class Globals {
     }
 
     private static String getConfFile(String schedulerId) throws JocException {
-        String propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
-        String confFile = sosShiroProperties.getProperty(propertyKey);
+        String confFile = null;
         JocError error = new JocError();
-        error.setCode("JOC-310");
+        String propertyKey = null;
+        if (schedulerId != null) {
+            propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
+            confFile = sosShiroProperties.getProperty(propertyKey);
+            error.setCode("JOC-310");
+        }
         if (confFile == null) {
-            confFile = sosShiroProperties.getProperty(HIBERNATE_CONFIGURATION_FILE);
+            propertyKey = HIBERNATE_CONFIGURATION_FILE;
+            confFile = sosShiroProperties.getProperty(propertyKey,"./hibernate.cfg.xml");
             if (confFile == null) {
                 error.setMessage(String.format("Could find value for %1$s in joc_properties file", propertyKey));
                 throw new JocException(error);
@@ -95,6 +121,16 @@ public class Globals {
         try {
             sosHibernateConnection.rollback();
         } catch (Exception e) {
+        }
+    }
+    
+    public static void forceRollback(){
+        try {
+            sosHibernateConnection.setIgnoreAutoCommitTransactions(false);
+            sosHibernateConnection.rollback();
+        } catch (Exception e) {
+        } finally {
+            sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
         }
     }
     

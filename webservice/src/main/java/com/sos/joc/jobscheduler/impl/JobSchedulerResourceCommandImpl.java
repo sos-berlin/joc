@@ -1,13 +1,13 @@
 package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
+
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerCommandFactory;
-import com.sos.joc.classes.WebserviceConstants;
-import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCommand;
 import com.sos.joc.model.commands.JobschedulerCommand;
@@ -33,18 +33,15 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             }
 
             if (jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().size() > 1){
-                JocError e = new JocError();
-                e.setCode(WebserviceConstants.COMMAND_ERROR_CODE);
-                e.setMessage(String.format("There are %s commands specified. Only one command is allowed",jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().size()));
-                throw new JocException(e);
+                String message = String.format("There are %s commands specified. Only one command is allowed",jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().size());
+                throw new JobSchedulerBadRequestException(message);
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jobschedulerCommand.getUrl());
 
             JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
 
             if (jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().size() < 1){
-                getJocError().setCode(WebserviceConstants.COMMAND_ERROR_CODE);
-                getJocError().setMessage("Unknown command");
+                throw new JobSchedulerBadRequestException("Unknown command");
             }
             
             String xml = jobSchedulerCommandFactory.getXml(jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().get(0));
