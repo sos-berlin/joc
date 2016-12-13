@@ -62,7 +62,7 @@ public class TreePermanent {
                 break;
             case FOLDER:
                 break;
-            case OTHER: 
+            default: 
                 types.add(type);
                 break;
             }
