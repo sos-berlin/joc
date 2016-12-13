@@ -148,11 +148,14 @@ public class OrderVolatile extends OrderV {
     
     public void readJobObstacles(Job job) {
         OrderStateText text = job.getState();
-        if (text == OrderStateText.JOB_NOT_IN_PERIOD) {
-            setNextStartTime(JobSchedulerDate.getDateFromISO8601String(job.nextPeriodBeginsAt()));
-        }
-        if (text == OrderStateText.WAITING_FOR_LOCK) {
-            setLock(job.getLock());
+        if (text != null) {
+            setSeverity(text);
+            if (text == OrderStateText.JOB_NOT_IN_PERIOD) {
+                setNextStartTime(JobSchedulerDate.getDateFromISO8601String(job.nextPeriodBeginsAt()));
+            }
+            if (text == OrderStateText.WAITING_FOR_LOCK) {
+                setLock(job.getLock());
+            } 
         }
     }
     
