@@ -29,7 +29,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
             }
 
             Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (checkRequiredParameter("job", jobBody.getJob())) {
                 boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;
                 String jobCommand = jocXmlCommand.getShowJobCommand(normalizePath(jobBody.getJob()), "source", 0, 0);

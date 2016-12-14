@@ -110,11 +110,15 @@ public class SOSShiroCurrentUser {
             return false;
         }
     }
+    
+    public Map<String, DBItemInventoryInstance> getMapOfSchedulerInstances() {
+        return listOfSchedulerInstances;
+    }
 
     public DBItemInventoryInstance getSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier) {
         return listOfSchedulerInstances.get(jobSchedulerIdentifier.getId());
     }
-
+    
     public void addSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier, DBItemInventoryInstance schedulerInstancesDBItem) {
         listOfSchedulerInstances.put(jobSchedulerIdentifier.getId(), schedulerInstancesDBItem);
     }

@@ -32,7 +32,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
             }
 
             JobChainsV entity = new JobChainsV();
-            JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(dbItemInventoryInstance.getUrl(), accessToken);
+            JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
             List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
             List<Folder> folders = jobChainsFilter.getFolders();
             if (jobChains != null && !jobChains.isEmpty()) {

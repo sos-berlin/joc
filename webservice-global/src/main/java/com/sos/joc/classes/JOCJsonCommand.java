@@ -29,34 +29,72 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCJsonCommand.class);
     private static final String MASTER_API_PATH = "/jobscheduler/master/api/";
     private UriBuilder uriBuilder;
+    private JOCResourceImpl jocResourceImpl;
     
     public JOCJsonCommand() {
+    }
+
+    public JOCJsonCommand(JOCResourceImpl jocResourceImpl) {
+        this.jocResourceImpl = jocResourceImpl;
+    }
+    
+    public JOCJsonCommand(JOCResourceImpl jocResourceImpl, String path) {
+        this.jocResourceImpl = jocResourceImpl;
+        setUriBuilder(jocResourceImpl.getUrl(), path);
     }
 
     public JOCJsonCommand(String url, String path) {
         setUriBuilder(url, path);
     }
+    
+    public void setJOCResourceImpl(JOCResourceImpl jocResourceImpl) {
+        this.jocResourceImpl = jocResourceImpl;
+    }
+    
+    public JOCResourceImpl getJOCResourceImpl() {
+        return jocResourceImpl;
+    }
 
+    public void setUriBuilderForOrders() {
+        setUriBuilderForOrders(jocResourceImpl.getUrl());
+    }
+    
     public void setUriBuilderForOrders(String url) {
         setUriBuilder(url, MASTER_API_PATH + "order");
+    }
+    
+    public void setUriBuilderForEvents() {
+        setUriBuilderForEvents(jocResourceImpl.getUrl());
     }
     
     public void setUriBuilderForEvents(String url) {
         setUriBuilder(url, MASTER_API_PATH + "event");
     }
 
+    public void setUriBuilderForProcessClasses() {
+        setUriBuilderForProcessClasses(jocResourceImpl.getUrl());
+    }
+    
     public void setUriBuilderForProcessClasses(String url) {
         setUriBuilder(url, MASTER_API_PATH + "processClass");
     }
 
+    public void setUriBuilderForJobs() {
+        setUriBuilderForJobs(jocResourceImpl.getUrl());
+    }
+    
     public void setUriBuilderForJobs(String url) {
         setUriBuilder(url, MASTER_API_PATH + "job");
     }
     
+    public void setUriBuilder(String path) {
+        uriBuilder = UriBuilder.fromPath(jocResourceImpl.getUrl());
+        uriBuilder.path(path);
+    }
+    
     public void setUriBuilder(String url, String path) {
-        StringBuilder s = new StringBuilder();
-        s.append(url).append(path);
-        uriBuilder = UriBuilder.fromPath(s.toString());
+        uriBuilder = UriBuilder.fromPath(url);
+        uriBuilder.path(path);
     }
 
     public void setUriBuilder(UriBuilder uriBuilder) {
@@ -64,6 +102,13 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
 
     public UriBuilder getUriBuilder() {
+        return uriBuilder;
+    }
+    
+    public UriBuilder replaceUriBuilder(String url, URI uri) {
+        uriBuilder = UriBuilder.fromPath(url);
+        uriBuilder.path(uri.getPath());
+        uriBuilder.replaceQuery(uri.getQuery());
         return uriBuilder;
     }
 
@@ -161,6 +206,29 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
             throw new JobSchedulerBadRequestException(jocError, e);
         }
     }
+    
+    public JsonObject getJsonObjectFromPostWithRetry(String postBody, String csrfToken) throws JocException {
+        return getJsonObjectFromPostWithRetry(getURI(), postBody, csrfToken);
+    }
+    
+    public JsonObject getJsonObjectFromPostWithRetry(URI uri, String postBody, String csrfToken) throws JocException {
+        try {
+            return getJsonObjectFromPost(uri, postBody, csrfToken);
+        } catch (JobSchedulerConnectionRefusedException e) {
+            String url = null;
+            if (jocResourceImpl != null) {
+                url = jocResourceImpl.retrySchedulerInstance(); 
+            }
+            if (url != null) {
+                uri = replaceUriBuilder(url, uri).build();
+                return getJsonObjectFromPost(uri, postBody, csrfToken);
+            } else {
+                throw e;
+            }
+        } catch (JocException e) {
+            throw e;
+        }
+    }
 
     public JsonObject getJsonObjectFromGet(String csrfToken) throws JocException {
         try {
@@ -192,6 +260,29 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
             throw e;
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(jocError, e);
+        }
+    }
+    
+    public JsonObject getJsonObjectFromGetWithRetry(String csrfToken) throws JocException {
+        return getJsonObjectFromGetWithRetry(getURI(), csrfToken);
+    }
+    
+    public JsonObject getJsonObjectFromGetWithRetry(URI uri, String csrfToken) throws JocException {
+        try {
+            return getJsonObjectFromGet(uri, csrfToken);
+        } catch (JobSchedulerConnectionRefusedException e) {
+            String url = null;
+            if (jocResourceImpl != null) {
+                url = jocResourceImpl.retrySchedulerInstance(); 
+            }
+            if (url != null) {
+                uri = replaceUriBuilder(url, uri).build();
+                return getJsonObjectFromGet(uri, csrfToken);
+            } else {
+                throw e;
+            }
+        } catch (JocException e) {
+            throw e;
         }
     }
     

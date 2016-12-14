@@ -28,7 +28,7 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
             }
 
             Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
                 boolean responseInHtml = jobChainBody.getMime() == ConfigurationMime.HTML;
                 String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainBody.getJobChain()), "source", 0, 0);

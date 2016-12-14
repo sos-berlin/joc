@@ -30,7 +30,7 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
             }
 
             Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (checkRequiredParameter("processClass", processClassConfigurationFilter.getProcessClass())) {
                 boolean responseInHtml = processClassConfigurationFilter.getMime() == ConfigurationMime.HTML;
                 String processClassPath = normalizePath(processClassConfigurationFilter.getProcessClass());

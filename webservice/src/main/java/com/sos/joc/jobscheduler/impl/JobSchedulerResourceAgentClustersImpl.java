@@ -1,6 +1,5 @@
 package com.sos.joc.jobscheduler.impl;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,12 +58,11 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                 return jocDefaultResponse;
             }
 
-            JOCJsonCommand command = new JOCJsonCommand();
-            command.setUriBuilderForProcessClasses(dbItemInventoryInstance.getUrl());
+            JOCJsonCommand command = new JOCJsonCommand(this);
+            command.setUriBuilderForProcessClasses();
             // always false otherwise no agent info
             // command.addProcessClassCompactQuery(jobSchedulerAgentClustersBody.getCompact());
             command.addProcessClassCompactQuery(false);
-            URI uri = command.getURI();
             
             AgentClusters entity = new AgentClusters();
             boolean volatileResponseIsAvailable = true;
@@ -81,7 +79,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             Globals.beginTransaction();
             
             try {
-                JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(null), accessToken);
+                JsonObject jsonObjectFromPost = command.getJsonObjectFromPostWithRetry(getServiceBody(null), accessToken);
                 Date surveyDate = JobSchedulerDate.getDateFromEventId(jsonObjectFromPost.getJsonNumber("eventId").longValue());
                 for (JsonObject processClass : jsonObjectFromPost.getJsonArray("elements").getValuesAs(JsonObject.class)) {
                     JsonArray agents = processClass.getJsonArray("agents");
@@ -106,7 +104,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             if (volatileResponseIsAvailable) {
                 List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
                 for (String agent : agentSet) {
-                    tasks.add(new AgentVCallable(agent, dbItemInventoryInstance.getUrl(), accessToken));
+                    tasks.add(new AgentVCallable(agent, new JOCJsonCommand(this), accessToken));
                 }
                 ExecutorService executorService = Executors.newFixedThreadPool(10);
                 Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();

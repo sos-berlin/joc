@@ -28,7 +28,7 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
             }
 
             Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (checkRequiredParameter("lock", lockBody.getLock())) {
                 String lockPath = normalizePath(lockBody.getLock());
                 boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;

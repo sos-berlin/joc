@@ -29,14 +29,14 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
                 return jocDefaultResponse;
             }
 
-            JOCJsonCommand command = new JOCJsonCommand();
-            command.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
+            JOCJsonCommand command = new JOCJsonCommand(this);
+            command.setUriBuilderForOrders();
             command.addOrderCompactQuery(orderBody.getCompact());
             OrderV200 entity = new OrderV200();
 
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
                 orderBody.setJobChain(normalizePath(orderBody.getJobChain()));
-                OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI(), accessToken);
+                OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken);
                 entity.setOrder(o.getOrder());
                 entity.setDeliveryDate(Date.from(Instant.now()));
             }

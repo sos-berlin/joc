@@ -28,7 +28,7 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
                 return jocDefaultResponse;
             }
             JobChainV200 entity = new JobChainV200();
-            JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(dbItemInventoryInstance.getUrl(), accessToken);
+            JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
             if (checkRequiredParameter("jobChain", jobChainFilter.getJobChain())) {
                 entity.setDeliveryDate(Date.from(Instant.now()));
                 entity.setJobChain(jocXmlCommand.getJobChain(normalizePath(jobChainFilter.getJobChain()), jobChainFilter.getCompact()));

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -28,6 +29,11 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         this.accessToken = accessToken;
     }
     
+    public JOCXmlJobCommand(JOCResourceImpl jocResourceImpl, String accessToken) {
+        super(jocResourceImpl);
+        this.accessToken = accessToken;
+    }
+    
     public JobV getJob(String job, Boolean compact) throws Exception {
         return getJob(job, compact, false);
     }
@@ -37,7 +43,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     }
     
     public JobV getJob(String job, Boolean compact, Boolean withOrderQueue) throws Exception {
-        executePostWithThrowBadRequest(createShowJobPostCommand(job, compact), accessToken);
+        executePostWithThrowBadRequestAfterRetry(createShowJobPostCommand(job, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job");
         JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue);
         jobV.setFields(compact, accessToken);
@@ -106,7 +112,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     }
     
     private List<JobV> getJobs(String command, JobsFilter jobsFilter, String xPath) throws Exception {
-        executePostWithThrowBadRequest(command, accessToken);
+        executePostWithThrowBadRequestAfterRetry(command, accessToken);
         StringBuilder x = new StringBuilder();
         x.append(xPath);
         if (jobsFilter.getIsOrderJob() != null) {

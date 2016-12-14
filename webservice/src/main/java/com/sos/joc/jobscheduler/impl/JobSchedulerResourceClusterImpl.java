@@ -33,9 +33,9 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
                 return jocDefaultResponse;
             }
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             String command = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders cluster", "/does/not/exist");
-            jocXmlCommand.executePostWithThrowBadRequest(command, accessToken);
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
             Cluster cluster = new Cluster();
             cluster.setJobschedulerId(jobSchedulerFilter.getJobschedulerId());

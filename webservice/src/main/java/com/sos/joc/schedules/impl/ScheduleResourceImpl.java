@@ -44,9 +44,9 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements ISchedulesR
 
             this.schedulesFilter = schedulesFilter;
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders", null);
-            jocXmlCommand.executePostWithThrowBadRequest(command, accessToken);
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
             jocXmlCommand.createNodeList("//schedule");
 

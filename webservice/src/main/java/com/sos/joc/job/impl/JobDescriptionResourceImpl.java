@@ -45,12 +45,12 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
             checkRequiredParameter("jobschedulerId", jobFilter.getJobschedulerId());
             checkRequiredParameter("job", jobFilter.getJob());
 
-            JOCJsonCommand jocJsonCommand = new JOCJsonCommand();
-            jocJsonCommand.setUriBuilderForJobs(dbItemInventoryInstance.getUrl());
+            JOCJsonCommand jocJsonCommand = new JOCJsonCommand(this);
+            jocJsonCommand.setUriBuilderForJobs();
             jocJsonCommand.addJobDescriptionQuery();
             JsonObjectBuilder builder = Json.createObjectBuilder();
             builder.add("path", normalizePath(jobFilter.getJob()));
-            JsonObject json = jocJsonCommand.getJsonObjectFromPost(builder.build().toString(), accessToken);
+            JsonObject json = jocJsonCommand.getJsonObjectFromPostWithRetry(builder.build().toString(), accessToken);
             String description = json.getString("description", "").trim();
             if (description.isEmpty()) {
                 throw new JobSchedulerBadRequestException(String.format("%1$s doesn't have a description", jobFilter.getJob()));

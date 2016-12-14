@@ -74,7 +74,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
                     orderBody.setJobChain(orderElem.getAttribute("job_chain"));
                     orderBody.setOrderId(orderElem.getAttribute("order"));
                     command.addOrderCompactQuery(orderBody.getCompact());
-                    OrdersVCallable o = new OrdersVCallable(orderBody, command.getURI(), accessToken);
+                    OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken);
                     task.setOrder(o.getOrder());
                 } catch (JocMissingRequiredParameterException e) {
                     throw new JobSchedulerBadRequestException("missing attributes in order element", e);

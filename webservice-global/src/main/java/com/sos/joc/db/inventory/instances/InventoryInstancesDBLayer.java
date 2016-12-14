@@ -138,25 +138,35 @@ public class InventoryInstancesDBLayer extends DBLayer {
     private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList, String accessToken) {
         switch (schedulerInstancesDBList.get(0).getClusterType()) {
         case "passive":
+            DBItemInventoryInstance schedulerInstancesDBItemOfWaitingScheduler = null;
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
                     String xml = "<show_state subsystems=\"folder\" what=\"folders no_subfolders\" path=\"/does/not/exist\" />";
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
+                    resourceImpl.setConnectTimeout(1000);
                     resourceImpl.executePost(xml, accessToken);
                     String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
-                    if (!"waiting_for_activation,dead".contains(state)) {
+                    if ("running,paused".contains(state)) {
+                        schedulerInstancesDBItemOfWaitingScheduler = null;
                         return schedulerInstancesDBItem;
+                    }
+                    if (schedulerInstancesDBItemOfWaitingScheduler == null && "waiting_for_activation".equals(state)) {
+                        schedulerInstancesDBItemOfWaitingScheduler = schedulerInstancesDBItem;
                     }
                 } catch (Exception e) {
                     // unreachable
                 }
             }
+//            if (schedulerInstancesDBItemOfWaitingScheduler != null) {
+//                return schedulerInstancesDBItemOfWaitingScheduler;
+//            }
             break;
         case "active":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
                     String xml = "<param.get name=\"\" />";
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
+                    resourceImpl.setConnectTimeout(1000);
                     resourceImpl.executePost(xml, accessToken);
                     return schedulerInstancesDBItem;
                 } catch (Exception e) {

@@ -16,6 +16,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.JocException;
 import com.sos.xml.SOSXmlCommand;
 
 public class JOCXmlCommand extends SOSXmlCommand {
@@ -25,9 +26,23 @@ public class JOCXmlCommand extends SOSXmlCommand {
     private Map<String, NodeList> listOfNodeLists = new HashMap<String, NodeList>();;
     private URI uriForJsonCommand;
     private String xmlCommand = null;
+    private JOCResourceImpl jocResourceImpl;
 
     public JOCXmlCommand(String url) {
         super(url + XML_COMMAND_API_PATH);
+    }
+    
+    public JOCXmlCommand(JOCResourceImpl jocResourceImpl) {
+        super(jocResourceImpl.getUrl() + XML_COMMAND_API_PATH);
+        this.jocResourceImpl = jocResourceImpl;
+    }
+    
+    public void setJOCResourceImpl(JOCResourceImpl jocResourceImpl) {
+        this.jocResourceImpl = jocResourceImpl;
+    }
+    
+    public JOCResourceImpl getJOCResourceImpl() {
+        return jocResourceImpl;
     }
     
     public Date getSurveyDate() {
@@ -128,11 +143,11 @@ public class JOCXmlCommand extends SOSXmlCommand {
         }
     }
     
-    public String executePost(String xmlCommand) throws JobSchedulerNoResponseException, JobSchedulerConnectionRefusedException {
+    public String executePost(String xmlCommand) throws JocException {
         return executePost(xmlCommand, UUID.randomUUID().toString());
     }
     
-    public String executePost(String xmlCommand, String accessToken) throws JobSchedulerNoResponseException, JobSchedulerConnectionRefusedException {
+    public String executePost(String xmlCommand, String accessToken) throws JocException {
         this.xmlCommand = xmlCommand;
         try {
             return executeXMLPost(xmlCommand, accessToken);
@@ -147,8 +162,33 @@ public class JOCXmlCommand extends SOSXmlCommand {
         }
     }
     
-    public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws JobSchedulerBadRequestException, JobSchedulerNoResponseException, JobSchedulerConnectionRefusedException {
+    public String executePostWithRetry(String xmlCommand, String accessToken) throws JocException {
+        try {
+            return executePost(xmlCommand, accessToken);
+        } catch (JobSchedulerConnectionRefusedException e) {
+            String url = null;
+            if (jocResourceImpl != null) {
+                url = jocResourceImpl.retrySchedulerInstance(); 
+            }
+            if (url != null) {
+                setUrl(url + XML_COMMAND_API_PATH);
+                return executePost(xmlCommand, accessToken);
+            } else {
+                throw e;
+            }
+        } catch (JocException e) {
+            throw e;
+        }
+    }
+    
+    public String executePostWithThrowBadRequest(String xmlCommand, String accessToken) throws JocException {
         String s = executePost(xmlCommand, accessToken);
+        throwJobSchedulerError();
+        return s;
+    }
+    
+    public String executePostWithThrowBadRequestAfterRetry(String xmlCommand, String accessToken) throws JocException {
+        String s = executePostWithRetry(xmlCommand, accessToken);
         throwJobSchedulerError();
         return s;
     }

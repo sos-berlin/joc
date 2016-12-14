@@ -18,8 +18,6 @@ import org.w3c.dom.Node;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
-import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
-import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Configuration;
 import com.sos.joc.model.common.Configuration200;
@@ -32,7 +30,7 @@ public class ConfigurationUtils {
 
     public static Configuration200 getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
             boolean responseInHtml, String accessToken) throws JocException {
-        jocXmlCommand.executePostWithThrowBadRequest(postCommand, accessToken);
+        jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
         try {
             Configuration configuration = new Configuration();
             configuration.setSurveyDate(jocXmlCommand.getSurveyDate());
@@ -58,8 +56,8 @@ public class ConfigurationUtils {
     }
 
     public static Configuration200 getConfigurationSchemaOfDefaultProcessClass(JOCXmlCommand jocXmlCommand, String postCommand,
-            String xPathObjElement, boolean responseInHtml, String accessToken) throws JobSchedulerBadRequestException, JobSchedulerNoResponseException, JobSchedulerConnectionRefusedException {
-        jocXmlCommand.executePostWithThrowBadRequest(postCommand, accessToken);
+            String xPathObjElement, boolean responseInHtml, String accessToken) throws JocException {
+        jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
         try {
             Configuration configuration = new Configuration();
             configuration.setSurveyDate(jocXmlCommand.getSurveyDate());

@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.exceptions.JocException;
@@ -30,11 +29,7 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
             }
 
             JobV200 entity = new JobV200();
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl(), accessToken);
-            JOCJsonCommand jocJsonCommand = new JOCJsonCommand();
-            jocJsonCommand.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
-            jocJsonCommand.addOrderCompactQuery(jobFilter.getCompact());
-            jocXmlCommand.setUriForJsonCommand(jocJsonCommand.getURI());
+            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
             if (checkRequiredParameter("job", jobFilter.getJob())) {
                 entity.setJob(jocXmlCommand.getJobWithOrderQueue(normalizePath(jobFilter.getJob()), jobFilter.getCompact()));
                 entity.setDeliveryDate(new Date());

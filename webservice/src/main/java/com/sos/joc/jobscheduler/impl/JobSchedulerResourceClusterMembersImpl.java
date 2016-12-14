@@ -43,12 +43,12 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             boolean isUnreachable = false;
             List<JobSchedulerV> masters = new ArrayList<JobSchedulerV>();
             try {
                 String clusterCommand = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders", "/does/not/exist");
-                jocXmlCommand.executePost(clusterCommand, accessToken);
+                jocXmlCommand.executePostWithRetry(clusterCommand, accessToken);
             } catch (JocException e) {
                 isUnreachable = true;
             }
