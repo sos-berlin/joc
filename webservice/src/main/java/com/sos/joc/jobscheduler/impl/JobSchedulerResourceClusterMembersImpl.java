@@ -38,12 +38,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         String jobSchedulerId = jobSchedulerFilter.getJobschedulerId();
         try {
             initLogging(API_CALL, jobSchedulerFilter);
-<<<<<<< HEAD
-            String jobSchedulerId = jobSchedulerFilter.getJobschedulerId();
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId, getPermissonsJocCockpit(accessToken)
-=======
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId, getPermissons(accessToken)
->>>>>>> 78641f7d4080afde02253160a00996f3073ba1c8
                     .getJobschedulerMasterCluster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
