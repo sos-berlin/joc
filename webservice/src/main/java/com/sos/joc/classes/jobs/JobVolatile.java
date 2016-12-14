@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
@@ -130,7 +131,10 @@ public class JobVolatile extends JobV {
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(job));
         setSummary();
         if (isOrderJob() && withOrderQueue) {
-            setOrderQueue(new OrdersVCallable(getPath(), false, jocXmlCommand.getUriForJsonCommand(), accessToken).getOrdersOfJob());
+            JOCJsonCommand jocJsonCommand = new JOCJsonCommand(jocXmlCommand.getJOCResourceImpl());
+            jocJsonCommand.setUriBuilderForOrders();
+            jocJsonCommand.addOrderCompactQuery(false);
+            setOrderQueue(new OrdersVCallable(getPath(), false, jocJsonCommand, accessToken).getOrdersOfJob());
         } else {
             setOrderQueue(null);
         }

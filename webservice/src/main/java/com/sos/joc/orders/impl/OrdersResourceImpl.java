@@ -1,6 +1,5 @@
 package com.sos.joc.orders.impl;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,16 +44,14 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             }
 
             // TODO date post body parameters are not yet considered
-            JOCJsonCommand command = new JOCJsonCommand();
-            command.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
+            JOCJsonCommand command = new JOCJsonCommand(this);
+            command.setUriBuilderForOrders();
             command.addOrderCompactQuery(ordersBody.getCompact());
 
             Map<String, OrderV> listOrders = new HashMap<String, OrderV>();
             List<OrderPath> orders = ordersBody.getOrders();
             List<Folder> folders = ordersBody.getFolders();
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
-
-            URI uri = command.getURI();
 
             Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
             if (orders != null && !orders.isEmpty()) {
@@ -83,18 +80,18 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             if (!ordersLists.isEmpty()) {
                 for (OrdersPerJobChain opj : ordersLists.values()) {
-                    tasks.add(new OrdersVCallable(opj, ordersBody.getCompact(), uri, accessToken));
+                    tasks.add(new OrdersVCallable(opj, ordersBody.getCompact(), command, accessToken));
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
-                    tasks.add(new OrdersVCallable(folder, ordersBody, uri, accessToken));
+                    tasks.add(new OrdersVCallable(folder, ordersBody, command, accessToken));
                 }
             } else {
                 Folder rootFolder = new Folder();
                 rootFolder.setFolder("/");
                 rootFolder.setRecursive(true);
-                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, uri, accessToken);
+                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken);
                 listOrders.putAll(callable.call());
             }
             

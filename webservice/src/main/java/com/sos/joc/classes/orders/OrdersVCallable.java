@@ -1,6 +1,5 @@
 package com.sos.joc.classes.orders;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,30 +35,30 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
     private final Folder folder;
     private final OrdersFilter ordersBody;
     private final Boolean compact;
-    private final URI uri;
+    private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
     
-    public OrdersVCallable(String job, Boolean compact, URI uri, String accessToken) {
+    public OrdersVCallable(String job, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.orders = null;
         this.job = ("/"+job.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
         this.folder = null;
         this.ordersBody = null;
         this.compact = compact;
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
     
-    public OrdersVCallable(OrdersPerJobChain orders, Boolean compact, URI uri, String accessToken) {
+    public OrdersVCallable(OrdersPerJobChain orders, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.orders = orders;
         this.job = null;
         this.folder = null;
         this.ordersBody = null;
         this.compact = compact;
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
     
-    public OrdersVCallable(JobChainV jobChain, Boolean compact, URI uri, String accessToken) {
+    public OrdersVCallable(JobChainV jobChain, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(jobChain.getPath());
         this.orders = o;
@@ -67,11 +66,11 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
         this.folder = null;
         this.ordersBody = null;
         this.compact = compact;
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
     
-    public OrdersVCallable(OrderFilter order, URI uri, String accessToken) {
+    public OrdersVCallable(OrderFilter order, JOCJsonCommand jocJsonCommand, String accessToken) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(order.getJobChain());
         o.addOrder(order.getOrderId());
@@ -80,33 +79,33 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
         this.folder = null;
         this.ordersBody = null;
         this.compact = order.getCompact();
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
     
-    public OrdersVCallable(Folder folder, OrdersFilter ordersBody, URI uri, String accessToken) {
+    public OrdersVCallable(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.orders = null;
         this.job = null;
         this.folder = folder;
         this.ordersBody = ordersBody;
         this.compact = ordersBody.getCompact();
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
     
     @Override
     public Map<String,OrderV> call() throws Exception {
         if(orders != null) {
-            return getOrders(orders, compact, uri, accessToken);
+            return getOrders(orders, compact, jocJsonCommand, accessToken);
         } else if(job != null) { 
-            return getOrders(job, compact, uri, accessToken);
+            return getOrders(job, compact, jocJsonCommand, accessToken);
         } else {
-            return getOrders(folder, ordersBody, uri, accessToken);
+            return getOrders(folder, ordersBody, jocJsonCommand, accessToken);
         }
     }
     
     public OrderV getOrder() throws Exception {
-        Map<String,OrderV> orderMap = getOrders(orders, compact, uri, accessToken);
+        Map<String,OrderV> orderMap = getOrders(orders, compact, jocJsonCommand, accessToken);
         if (orderMap == null || orderMap.isEmpty()) {
             throw new JobSchedulerInvalidResponseDataException(String.format("Order doesn't exist: %1$s,%2$s", orders.getJobChain(), orders.getOrders().get(0)));
         }
@@ -114,23 +113,23 @@ public class OrdersVCallable implements Callable<Map<String,OrderV>> {
     }
     
     public List<OrderV> getOrdersOfJob() throws Exception {
-        Map<String,OrderV> orderMap = getOrders(job, compact, uri, accessToken);
+        Map<String,OrderV> orderMap = getOrders(job, compact, jocJsonCommand, accessToken);
         if (orderMap == null || orderMap.isEmpty()) {
             return null;
         }
         return new ArrayList<OrderV>(orderMap.values());
     }
     
-    private Map<String,OrderV> getOrders(OrdersPerJobChain orders, boolean compact, URI uri, String accessToken) throws Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(orders), accessToken), compact);
+    private Map<String,OrderV> getOrders(OrdersPerJobChain orders, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders), accessToken), compact);
     }
     
-    private Map<String,OrderV> getOrders(String job, boolean compact, URI uri, String accessToken) throws Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(job), accessToken), compact);
+    private Map<String,OrderV> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), compact);
     }
     
-    private Map<String,OrderV> getOrders(Folder folder, OrdersFilter ordersBody, URI uri, String accessToken) throws Exception {
-        return getOrders(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(folder, ordersBody), accessToken), ordersBody.getCompact(), ordersBody.getRegex());
+    private Map<String,OrderV> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), ordersBody.getCompact(), ordersBody.getRegex());
     }
     
     private Map<String,OrderV> getOrders(JsonObject json, boolean compact) throws JobSchedulerInvalidResponseDataException {

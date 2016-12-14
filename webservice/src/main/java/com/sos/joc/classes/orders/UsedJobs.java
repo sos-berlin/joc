@@ -31,7 +31,7 @@ public class UsedJobs {
         private Integer processLimit = null;
         private boolean stopped = false;
         private boolean parsed = false;
-        private OrderStateText state;
+        private OrderStateText state = null;
 
         public Job(JsonArray obstacles) {
             this.obstacles = obstacles;
@@ -57,6 +57,11 @@ public class UsedJobs {
                         taskLimit = obstacle.getInt("limit");
                         state = OrderStateText.WAITING_FOR_TASK;
                         break;
+//                    case "WaitingForProcessClass":
+//                        processLimit = obstacle.getJsonObject("processClassObstacles").getInt("limit");
+//                        state = OrderStateText.WAITING_FOR_PROCESS;
+//                        stateIsSet = true;
+//                        break;
                     case "ProcessClassObstacles":
                         processLimit = obstacle.getJsonObject("processClassObstacles").getInt("limit");
                         state = OrderStateText.WAITING_FOR_PROCESS;

@@ -35,9 +35,9 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             String schedulePath = normalizePath(scheduleFilter.getSchedule());
             String scheduleParent = getParent(schedulePath);
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders no_subfolders", scheduleParent);
-            jocXmlCommand.executePostWithThrowBadRequest(command, accessToken);
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
             String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", schedulePath);
             Element scheduleElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(xPath);

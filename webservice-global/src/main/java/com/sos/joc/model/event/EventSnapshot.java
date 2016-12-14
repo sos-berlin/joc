@@ -27,6 +27,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "nodeId",
     "fromNodeId",
     "taskId",
+    "state",
     "nodeTransition"
 })
 public class EventSnapshot {
@@ -81,6 +82,12 @@ public class EventSnapshot {
      */
     @JsonProperty("taskId")
     private String taskId;
+    /**
+     * comes with event ...State
+     * 
+     */
+    @JsonProperty("state")
+    private String state;
     /**
      * comes with event OrderStepEnded
      * 
@@ -257,6 +264,16 @@ public class EventSnapshot {
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
+    
+    @JsonProperty("state")
+    public String getState() {
+        return state;
+    }
+    
+    @JsonProperty("state")
+    public void setState(String state) {
+        this.state = state;
+    }
 
     /**
      * comes with event OrderStepEnded
@@ -287,7 +304,7 @@ public class EventSnapshot {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(eventId).append(path).append(eventType).append(objectType).append(nodeId).append(fromNodeId).append(taskId).append(nodeTransition).toHashCode();
+        return new HashCodeBuilder().append(eventId).append(path).append(eventType).append(objectType).append(nodeId).append(fromNodeId).append(taskId).append(state).append(nodeTransition).toHashCode();
     }
 
     @Override
@@ -299,7 +316,7 @@ public class EventSnapshot {
             return false;
         }
         EventSnapshot rhs = ((EventSnapshot) other);
-        return new EqualsBuilder().append(eventId, rhs.eventId).append(path, rhs.path).append(eventType, rhs.eventType).append(objectType, rhs.objectType).append(nodeId, rhs.nodeId).append(fromNodeId, rhs.fromNodeId).append(taskId, rhs.taskId).append(nodeTransition, rhs.nodeTransition).isEquals();
+        return new EqualsBuilder().append(eventId, rhs.eventId).append(path, rhs.path).append(eventType, rhs.eventType).append(objectType, rhs.objectType).append(nodeId, rhs.nodeId).append(fromNodeId, rhs.fromNodeId).append(taskId, rhs.taskId).append(state, rhs.state).append(nodeTransition, rhs.nodeTransition).isEquals();
     }
 
 }

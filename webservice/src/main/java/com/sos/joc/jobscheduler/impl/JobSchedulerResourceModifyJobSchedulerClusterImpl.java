@@ -89,8 +89,8 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
             xml.addAttribute("continue_exclusive_operation", "yes");
             break;
         }
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
-        jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+        jocXmlCommand.executePostWithThrowBadRequestAfterRetry(xml.asXML(), getAccessToken());
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 }

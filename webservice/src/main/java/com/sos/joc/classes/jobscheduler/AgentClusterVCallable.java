@@ -1,6 +1,5 @@
 package com.sos.joc.classes.jobscheduler;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,35 +34,32 @@ import com.sos.joc.model.jobscheduler.AgentOfCluster;
 public class AgentClusterVCallable implements Callable<AgentCluster> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgentClusterVCallable.class);
-    private final String masterUrl;
     private final String agentCluster;
     private final AgentClusterFilter agentClusterBody;
-    private final URI uri;
+    private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
 
-    public AgentClusterVCallable(String agentCluster, AgentClusterFilter agentClusterBody, URI uri, String masterUrl, String accessToken) {
+    public AgentClusterVCallable(String agentCluster, AgentClusterFilter agentClusterBody, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.agentCluster = agentCluster;
         this.agentClusterBody = agentClusterBody;
-        this.uri = uri;
-        this.masterUrl = masterUrl;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
     
-    public AgentClusterVCallable(AgentClusterFilter agentClusterBody, URI uri, String masterUrl, String accessToken) {
+    public AgentClusterVCallable(AgentClusterFilter agentClusterBody, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.agentCluster = null;
         this.agentClusterBody = agentClusterBody;
-        this.uri = uri;
-        this.masterUrl = masterUrl;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
 
     @Override
     public AgentCluster call() throws Exception {
-        return getAgentCluster(agentCluster, agentClusterBody, uri, masterUrl, accessToken);
+        return getAgentCluster(agentCluster, agentClusterBody, jocJsonCommand, accessToken);
     }
     
     public List<AgentCluster> getAgentClusters() throws Exception {
-        JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(agentCluster), accessToken);
+        JsonObject jsonObjectFromPost = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(agentCluster), accessToken);
         String regex = agentClusterBody.getRegex();
         Set<String> agentClusterPaths = new HashSet<String>();
         for (AgentClusterPath agentClusterPath : agentClusterBody.getAgentClusters()) {
@@ -92,7 +88,7 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         
         List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
         for (String agent : agentSet) {
-            tasks.add(new AgentVCallable(agent, masterUrl, accessToken));
+            tasks.add(new AgentVCallable(agent, new JOCJsonCommand(jocJsonCommand.getJOCResourceImpl()), accessToken));
         }
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();
@@ -122,8 +118,8 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         return listAgentClusterV;
     }
 
-    private AgentCluster getAgentCluster(String agentCluster, AgentClusterFilter agentClusterBody, URI uri, String masterUrl, String accessToken) throws Exception {
-        JsonObject jsonObjectFromPost = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(agentCluster), accessToken);
+    private AgentCluster getAgentCluster(String agentCluster, AgentClusterFilter agentClusterBody, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
+        JsonObject jsonObjectFromPost = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(agentCluster), accessToken);
         Date surveyDate = JobSchedulerDate.getDateFromEventId(jsonObjectFromPost.getJsonNumber("eventId").longValue());
         JsonArray agents = jsonObjectFromPost.getJsonArray("agents");
         if (agents == null || agents.isEmpty()) {
@@ -133,7 +129,7 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         agentClusterV.setAgentClusterPath();
         List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
         for (String agent :  agentClusterV.getAgentSet()) {
-            tasks.add(new AgentVCallable(agent, masterUrl, accessToken));
+            tasks.add(new AgentVCallable(agent, jocJsonCommand, accessToken));
         }
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();

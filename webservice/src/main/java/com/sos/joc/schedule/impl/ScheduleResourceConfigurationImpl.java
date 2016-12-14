@@ -29,7 +29,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             }
 
             Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (checkRequiredParameter("schedule", scheduleBody.getSchedule())) {
                 String schedulePath = normalizePath(scheduleBody.getSchedule());
                 String scheduleParent = getParent(schedulePath);

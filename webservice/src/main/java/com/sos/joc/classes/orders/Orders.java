@@ -1,6 +1,5 @@
 package com.sos.joc.classes.orders;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,19 +26,17 @@ import com.sos.joc.model.order.OrdersSummary;
 
 public class Orders {
     
-    public static OrdersSnapshot getSnapshot(String url, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        return getSnapshot(url, null, accessToken, null, null, jobChainsFilter);
+    public static OrdersSnapshot getSnapshot(JOCJsonCommand command, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
+        return getSnapshot(command, null, accessToken, null, null, jobChainsFilter);
     }
     
-    public static OrdersSnapshot getSnapshot(String url, Session session, String accessToken, String httpClientPropKey, String eventIdPropKey, JobChainsFilter jobChainsFilter) throws Exception {
-        JOCJsonCommand command = new JOCJsonCommand();
-        command.setUriBuilderForOrders(url);
+    public static OrdersSnapshot getSnapshot(JOCJsonCommand command, Session session, String accessToken, String httpClientPropKey, String eventIdPropKey, JobChainsFilter jobChainsFilter) throws Exception {
+        command.setUriBuilderForOrders();
         command.addOrderStatisticsQuery();
         command.createHttpClient();
         if (session != null && httpClientPropKey != null) {
             session.setAttribute(httpClientPropKey, command.getHttpClient());
         }
-        URI uri = command.getURI();
 
         Set<String> jobChains = getJobChainsWithoutDuplicates(jobChainsFilter.getJobChains());
         Set<String> folders = getFoldersWithoutDuplicatesAndSubfolders(jobChainsFilter.getFolders());
@@ -47,14 +44,14 @@ public class Orders {
 
         if (jobChains.size() > 0) {
             for (String jobChain : jobChains) {
-                tasks.add(new OrdersSnapshotCallable(jobChain, uri, accessToken));
+                tasks.add(new OrdersSnapshotCallable(jobChain, command, accessToken));
             }
         } else if (folders.size() > 0) {
             for (String folder : folders) {
-                tasks.add(new OrdersSnapshotCallable(folder, uri, accessToken));
+                tasks.add(new OrdersSnapshotCallable(folder, command, accessToken));
             }
         } else {
-            tasks.add(new OrdersSnapshotCallable("/", uri, accessToken));
+            tasks.add(new OrdersSnapshotCallable("/", command, accessToken));
         }
         
         Long eventId = 0L;

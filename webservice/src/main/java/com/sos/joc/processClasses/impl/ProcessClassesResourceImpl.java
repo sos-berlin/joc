@@ -1,6 +1,5 @@
 package com.sos.joc.processClasses.impl;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,12 +40,11 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 return jocDefaultResponse;
             }
 
-            JOCJsonCommand command = new JOCJsonCommand();
-            command.setUriBuilderForProcessClasses(dbItemInventoryInstance.getUrl());
+            JOCJsonCommand command = new JOCJsonCommand(this);
+            command.setUriBuilderForProcessClasses();
             // always false otherwise no processes info
             // command.addProcessClassCompactQuery(jobSchedulerAgentClustersBody.getCompact());
             command.addProcessClassCompactQuery(false);
-            URI uri = command.getURI();
 
             List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
             Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(processClassFilter.getProcessClasses());
@@ -56,13 +54,13 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             if (processClasses != null && !processClasses.isEmpty()) {
                 for (ProcessClassPath processClass : processClasses) {
                     checkRequiredParameter("processClass", processClass.getProcessClass());
-                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), uri, accessToken));
+                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), command, accessToken));
                 }
                 entity.setProcessClasses(listProcessClasses);
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
-                    tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(), uri,
+                    tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(), command,
                             accessToken));
                 }
             } else {
@@ -70,7 +68,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 rootFolder.setFolder("/");
                 rootFolder.setRecursive(true);
                 ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder, processClassFilter.getRegex(), processClassFilter
-                        .getIsAgentCluster(), uri, accessToken);
+                        .getIsAgentCluster(), command, accessToken);
                 entity.setProcessClasses(callable.getProcessClasses());
             }
             if (tasks.size() > 0) {

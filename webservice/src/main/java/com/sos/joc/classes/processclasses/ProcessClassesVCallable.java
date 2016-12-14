@@ -1,6 +1,5 @@
 package com.sos.joc.classes.processclasses;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,46 +25,46 @@ public class ProcessClassesVCallable implements Callable<List<ProcessClassV>> {
     private final String regex;
     private final Boolean isAgentCluster;
     private final Folder folder;
-    private final URI uri;
+    private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
 
-    public ProcessClassesVCallable(String processClass, URI uri, String accessToken) {
+    public ProcessClassesVCallable(String processClass, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.processClass = processClass;
         this.regex = null;
         this.isAgentCluster = null;
         this.folder = null;
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
 
-    public ProcessClassesVCallable(Folder folder, String regex, Boolean isAgentCluster, URI uri, String accessToken) {
+    public ProcessClassesVCallable(Folder folder, String regex, Boolean isAgentCluster, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.processClass = null;
         this.regex = regex;
         this.isAgentCluster = isAgentCluster;
         this.folder = folder;
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
 
     @Override
     public List<ProcessClassV> call() throws JocException {
         if (processClass != null) {
-            return getProcessClasses(processClass, uri, accessToken);
+            return getProcessClasses(processClass, jocJsonCommand, accessToken);
         } else {
-            return getProcessClasses(folder, regex, isAgentCluster, uri, accessToken);
+            return getProcessClasses(folder, regex, isAgentCluster, jocJsonCommand, accessToken);
         }
     }
     
     public List<ProcessClassV> getProcessClasses() throws JocException {
-        return getProcessClasses(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(folder), accessToken), regex, isAgentCluster); 
+        return getProcessClasses(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder), accessToken), regex, isAgentCluster); 
     }
 
-    private List<ProcessClassV> getProcessClasses(Folder folder, String regex, Boolean isAgentCluster, URI uri, String accessToken) throws JocException {
-        return getProcessClasses(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(folder), accessToken), regex, isAgentCluster);
+    private List<ProcessClassV> getProcessClasses(Folder folder, String regex, Boolean isAgentCluster, JOCJsonCommand jocJsonCommand, String accessToken) throws JocException {
+        return getProcessClasses(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder), accessToken), regex, isAgentCluster);
     }
 
-    private List<ProcessClassV> getProcessClasses(String processClass, URI uri, String accessToken) throws JocException {
-        return getProcessClasses(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(processClass), accessToken));
+    private List<ProcessClassV> getProcessClasses(String processClass, JOCJsonCommand jocJsonCommand, String accessToken) throws JocException {
+        return getProcessClasses(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(processClass), accessToken));
     }
 
     private List<ProcessClassV> getProcessClasses(JsonObject json) throws JobSchedulerInvalidResponseDataException {

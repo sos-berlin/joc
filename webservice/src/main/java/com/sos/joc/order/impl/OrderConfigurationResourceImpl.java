@@ -28,7 +28,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
             }
 
             Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
                 boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
                 String orderCommand = jocXmlCommand.getShowOrderCommand(normalizePath(orderBody.getJobChain()), orderBody.getOrderId(), "source");

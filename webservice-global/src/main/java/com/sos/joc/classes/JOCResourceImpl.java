@@ -18,6 +18,8 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -30,6 +32,7 @@ public class JOCResourceImpl {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
     private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private String accessToken;
+    private String jobschedulerId;
 
     private ObjectMapper mapper = new ObjectMapper();
     private JocError jocError = new JocError();
@@ -66,6 +69,10 @@ public class JOCResourceImpl {
     public JobSchedulerUser getJobschedulerUser() {
         return jobschedulerUser;
     }
+    
+//    public JOCXmlCommand getJOCXmlCommand(String jobschedulerId) {
+//        return new JOCXmlCommand(dbItemInventoryInstance.getUrl(), jobschedulerUser, jobschedulerId);
+//    }
 
     public JocError getJocError() {
         return jocError;
@@ -203,6 +210,31 @@ public class JOCResourceImpl {
         }
         return "-";
     }
+    
+    public String getUrl() {
+        return dbItemInventoryInstance.getUrl();
+    }
+    
+    public String retrySchedulerInstance() throws DBInvalidDataException, DBMissingDataException {
+        return retrySchedulerInstance(null);
+    }
+    
+    public String retrySchedulerInstance(String schedulerId) throws DBInvalidDataException, DBMissingDataException {
+        if (schedulerId == null) {
+            schedulerId = jobschedulerId;
+        }
+        String url = dbItemInventoryInstance.getUrl();
+        if (schedulerId != null) {
+            jobschedulerUser.getSosShiroCurrentUser().getMapOfSchedulerInstances().remove(jobschedulerId);
+            dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
+        } else {
+            return null;
+        }
+        if (!url.equals(dbItemInventoryInstance.getUrl())) {
+            return dbItemInventoryInstance.getUrl();
+        }
+        return null;
+    }
 
     private JOCDefaultResponse init(String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws JocException {
         JOCDefaultResponse jocDefaultResponse = init401And440();
@@ -211,6 +243,8 @@ public class JOCResourceImpl {
         }
         if (schedulerId == null) {
             throw new JocMissingRequiredParameterException("undefined 'jobschedulerId'");
+        } else {
+            jobschedulerId = schedulerId;
         }
         checkConnection(Globals.sosHibernateConnection);
         if (!"".equals(schedulerId)) {

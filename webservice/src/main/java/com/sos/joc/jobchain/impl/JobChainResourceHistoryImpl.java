@@ -37,14 +37,14 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 return jocDefaultResponse;
             }
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
                 jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
             // TODO nested job chains have to consider too
             String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
                     jobChainHistoryFilter.getMaxLastHistoryItems());
-            jocXmlCommand.executePostWithThrowBadRequest(jobChainCommand, accessToken);
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
 
             jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
 

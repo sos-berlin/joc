@@ -3,6 +3,7 @@ package com.sos.joc.orders.impl;
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
+import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.Orders;
 import com.sos.joc.exceptions.JocException;
@@ -25,7 +26,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
                 return jocDefaultResponse;
             }
             
-            OrdersSnapshot entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), accessToken, jobChainsFilter);
+            OrdersSnapshot entity = Orders.getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
             
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

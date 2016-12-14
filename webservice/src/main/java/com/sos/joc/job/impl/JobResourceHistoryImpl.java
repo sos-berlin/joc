@@ -38,13 +38,13 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
             }
 
             checkRequiredParameter("job", taskHistoryFilter.getJob());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (taskHistoryFilter.getMaxLastHistoryItems() == null) {
                 taskHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
             String postCommand = jocXmlCommand.getShowJobCommand(normalizePath(taskHistoryFilter.getJob()), "task_history", null, taskHistoryFilter
                     .getMaxLastHistoryItems());
-            jocXmlCommand.executePostWithThrowBadRequest(postCommand, accessToken);
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
 
             jocXmlCommand.createNodeList("/spooler/answer/job/history/history.entry");
 

@@ -1,6 +1,5 @@
 package com.sos.joc.classes.orders;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -16,35 +15,35 @@ import com.sos.joc.model.order.OrdersSummary;
 public class OrdersSummaryCallable implements Callable<Map<String, JobChainVolatile>> {
 
     private final JobChainVolatile jobChain;
-    private final URI uri;
+    private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
 
-    public OrdersSummaryCallable(URI uri, String accessToken) {
+    public OrdersSummaryCallable(JOCJsonCommand jocJsonCommand, String accessToken) {
         JobChainVolatile jobC = new JobChainVolatile();
         jobC.setPath("/");
         this.jobChain = jobC;
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
 
-    public OrdersSummaryCallable(JobChainVolatile jobChain, URI uri, String accessToken) {
+    public OrdersSummaryCallable(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.jobChain = jobChain;
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
 
     @Override
     public Map<String, JobChainVolatile> call() throws Exception {
-        return getOrdersSummary(jobChain, uri, accessToken);
+        return getOrdersSummary(jobChain, jocJsonCommand, accessToken);
     }
 
     public OrdersSummary getOrdersSummary() throws Exception {
-        return getOrdersSummary(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(jobChain.getPath()), accessToken));
+        return getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken));
     }
 
-    private Map<String, JobChainVolatile> getOrdersSummary(JobChainVolatile jobChain, URI uri, String accessToken) throws Exception {
+    private Map<String, JobChainVolatile> getOrdersSummary(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
         Map<String, JobChainVolatile> summaryMap = new HashMap<String, JobChainVolatile>();
-        jobChain.setOrdersSummary(getOrdersSummary(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(jobChain.getPath()), accessToken)));
+        jobChain.setOrdersSummary(getOrdersSummary(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(jobChain.getPath()), accessToken)));
         summaryMap.put(jobChain.getPath(), jobChain);
         return summaryMap;
     }

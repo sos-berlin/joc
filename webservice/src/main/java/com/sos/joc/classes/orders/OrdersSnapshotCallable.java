@@ -1,6 +1,5 @@
 package com.sos.joc.classes.orders;
 
-import java.net.URI;
 import java.util.concurrent.Callable;
 
 import javax.json.Json;
@@ -11,32 +10,32 @@ import com.sos.joc.classes.JOCJsonCommand;
 
 public class OrdersSnapshotCallable implements Callable<OrdersSnapshotEvent> {
     private final String path;
-    private final URI uri;
+    private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
     
-    public OrdersSnapshotCallable(URI uri, String accessToken) {
+    public OrdersSnapshotCallable(JOCJsonCommand jocJsonCommand, String accessToken) {
         this.path = "/";
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
     
-    public OrdersSnapshotCallable(String path, URI uri, String accessToken) {
+    public OrdersSnapshotCallable(String path, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.path = path;
-        this.uri = uri;
+        this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
     
     @Override
     public OrdersSnapshotEvent call() throws Exception {
-        return getOrdersSnapshot(path, uri, accessToken); 
+        return getOrdersSnapshot(path, jocJsonCommand, accessToken); 
     }
     
     public OrdersSnapshotEvent getOrdersSnapshot() throws Exception {
-        return getOrdersSnapshot(new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(path), accessToken));
+        return getOrdersSnapshot(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(path), accessToken));
     }
     
-    public OrdersSnapshotEvent getOrdersSnapshot(String path, URI uri, String accessToken) throws Exception {
-        JsonObject json = new JOCJsonCommand().getJsonObjectFromPost(uri, getServiceBody(path), accessToken);
+    public OrdersSnapshotEvent getOrdersSnapshot(String path, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
+        JsonObject json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(path), accessToken);
         return getOrdersSnapshot(json);
     }
     

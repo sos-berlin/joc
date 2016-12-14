@@ -1,6 +1,5 @@
 package com.sos.joc.classes.jobchains;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +17,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.sos.joc.classes.JOCJsonCommand;
+import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.orders.OrdersSummaryCallable;
@@ -33,18 +33,16 @@ import com.sos.joc.model.order.OrderV;
 
 public class JOCXmlJobChainCommand extends JOCXmlCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlJobChainCommand.class);
-    private String jsonUrl = null;
     private Set<String> nestedJobChains = new HashSet<String>();
     private String accessToken;
     
-    public JOCXmlJobChainCommand(String url, String accessToken) {
-        super(url);
-        this.jsonUrl = url;
+    public JOCXmlJobChainCommand(JOCResourceImpl jocResourceImpl, String accessToken) {
+        super(jocResourceImpl);
         this.accessToken = accessToken;
     }
     
     public JobChainV getJobChain(String jobChain, Boolean compact) throws Exception {
-        executePostWithThrowBadRequest(createShowJobChainPostCommand(jobChain, compact), accessToken);
+        executePostWithThrowBadRequestAfterRetry(createShowJobChainPostCommand(jobChain, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job_chain");
         JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this);
         jobChainV.setFields(compact);
@@ -143,7 +141,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     }
     
     private List<JobChainV> getJobChains(String command, JobChainsFilter jobChainsFilter, String xPath) throws Exception {
-        executePostWithThrowBadRequest(command, accessToken);
+        executePostWithThrowBadRequestAfterRetry(command, accessToken);
         StringBuilder x = new StringBuilder();
         x.append(xPath);
         NodeList jobChainNodes = getSosxml().selectNodeList(x.toString());
@@ -152,8 +150,8 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         Map<String, JobChainVolatile> jobChainMap = new HashMap<String, JobChainVolatile>();
         List<OrdersSummaryCallable> summaryTasks = new ArrayList<OrdersSummaryCallable>();
         List<OrdersVCallable> orderTasks = new ArrayList<OrdersVCallable>();
-        URI uriForJsonSummaryCommand = setUriForOrdersSummaryJsonCommand();
-        URI uriForJsonOrdersCommand = setUriForOrdersJsonCommand();
+        JOCJsonCommand uriForJsonSummaryCommand = setUriForOrdersSummaryJsonCommand();
+        JOCJsonCommand uriForJsonOrdersCommand = setUriForOrdersJsonCommand();
         
         for (int i= 0; i < jobChainNodes.getLength(); i++) {
            Element jobChainElem = (Element) jobChainNodes.item(i);
@@ -213,17 +211,17 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         return new ArrayList<JobChainV>(jobChainMap.values());
     }
     
-    private URI setUriForOrdersSummaryJsonCommand() {
+    private JOCJsonCommand setUriForOrdersSummaryJsonCommand() {
         JOCJsonCommand jsonSummaryCommand = new JOCJsonCommand();
-        jsonSummaryCommand.setUriBuilderForOrders(jsonUrl);
+        jsonSummaryCommand.setUriBuilderForOrders(getJOCResourceImpl().getUrl());
         jsonSummaryCommand.addOrderStatisticsQuery();
-        return jsonSummaryCommand.getURI();
+        return jsonSummaryCommand;
     }
     
-    private URI setUriForOrdersJsonCommand() {
+    private JOCJsonCommand setUriForOrdersJsonCommand() {
         JOCJsonCommand jsonOrdersCommand = new JOCJsonCommand();
-        jsonOrdersCommand.setUriBuilderForOrders(jsonUrl);
+        jsonOrdersCommand.setUriBuilderForOrders(getJOCResourceImpl().getUrl());
         jsonOrdersCommand.addOrderCompactQuery(false);
-        return jsonOrdersCommand.getURI();
+        return jsonOrdersCommand;
     }
 }

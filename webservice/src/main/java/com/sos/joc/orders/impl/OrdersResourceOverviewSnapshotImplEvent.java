@@ -56,6 +56,7 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
             }
             eventIdStr = (String) session.getAttribute(eventIdPropKey);
             OrdersSnapshot entity = new OrdersSnapshot();
+            JOCJsonCommand command = new JOCJsonCommand(this);
             if (jobChainsFilter.getClose() != null && jobChainsFilter.getClose()) {
                 entity.setOrders(null);
                 entity.setDeliveryDate(Date.from(Instant.now()));
@@ -84,16 +85,16 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
 //                        if (isOrderStarted) {
 //                            getJsonObject(newEventId.toString(), session, accessToken);
 //                        }
-                        entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
+                        entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
                                 jobChainsFilter);
                         break;
                     case "Torn":
-                        entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
+                        entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
                                 jobChainsFilter);
                         break;
                     }
                 } else {
-                    entity = Orders.getSnapshot(dbItemInventoryInstance.getUrl(), session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
+                    entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
                             jobChainsFilter);
                 }
             }
@@ -118,12 +119,12 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
     private JsonObject getJsonObject(String eventIdStr, Session session, String accessToken) throws JocException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("path", "/");
-        JOCJsonCommand command = new JOCJsonCommand();
-        command.setUriBuilderForEvents(dbItemInventoryInstance.getUrl());
+        JOCJsonCommand command = new JOCJsonCommand(this);
+        command.setUriBuilderForEvents();
         command.addOrderEventQuery(eventIdStr, EVENT_TIMEOUT);
         command.setSocketTimeout((EVENT_TIMEOUT + 5) * 1000);
         command.createHttpClient();
         session.setAttribute(HTTP_CLIENT_PROPKEY, command.getHttpClient());
-        return command.getJsonObjectFromPost(builder.build().toString(), accessToken);
+        return command.getJsonObjectFromPostWithRetry(builder.build().toString(), accessToken);
     }
 }
