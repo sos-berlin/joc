@@ -11,19 +11,20 @@ package com.sos.joc.model.commands;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für Subsystem.show complex type.
+ * <p>Java-Klasse für anonymous complex type.
  * 
  * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
  * 
  * <pre>
- * &lt;complexType name="Subsystem.show">
+ * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="what" type="{}String" />
+ *       &lt;attribute name="dummy" use="required" type="{}String" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -32,34 +33,35 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Subsystem.show")
-public class SubsystemShow {
+@XmlType(name = "")
+@XmlRootElement(name = "scheduler_log.log_categories.show")
+public class SchedulerLogLogCategoriesShow {
 
-    @XmlAttribute(name = "what")
-    protected String what;
+    @XmlAttribute(name = "dummy", required = true)
+    protected String dummy;
 
     /**
-     * Ruft den Wert der what-Eigenschaft ab.
+     * Ruft den Wert der dummy-Eigenschaft ab.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getWhat() {
-        return what;
+    public String getDummy() {
+        return dummy;
     }
 
     /**
-     * Legt den Wert der what-Eigenschaft fest.
+     * Legt den Wert der dummy-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setWhat(String value) {
-        this.what = value;
+    public void setDummy(String value) {
+        this.dummy = value;
     }
 
 }

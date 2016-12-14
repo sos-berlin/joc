@@ -38,7 +38,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
         try {
             initLogging(API_CALL, planFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, planFilter.getJobschedulerId(), getPermissons(accessToken).getDailyPlan().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getDailyPlan().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

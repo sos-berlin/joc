@@ -31,7 +31,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             initLogging(API_CALL, treeBody);
             List<JobSchedulerObjectType> types = null;
             boolean permission = false;
-            SOSPermissionJocCockpit sosPermission = getPermissons(accessToken);
+            SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
             if (treeBody.getTypes() == null || treeBody.getTypes().isEmpty()) {
                 permission = true;
             } else {

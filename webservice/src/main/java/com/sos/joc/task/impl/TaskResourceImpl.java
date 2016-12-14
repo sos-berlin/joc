@@ -34,7 +34,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
     public JOCDefaultResponse postTask(String accessToken, TaskFilter taskFilter) throws Exception {
         try {
             initLogging(API_CALL, taskFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, taskFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, taskFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

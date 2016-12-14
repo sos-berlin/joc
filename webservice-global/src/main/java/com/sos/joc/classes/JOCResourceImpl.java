@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -33,7 +34,8 @@ public class JOCResourceImpl {
     private ObjectMapper mapper = new ObjectMapper();
     private JocError jocError = new JocError();
 
-    protected SOSPermissionJocCockpit getPermissons(String accessToken) throws JocException {
+    
+    private void initGetPermissions(String accessToken) throws NoUserWithAccessTokenException{
         if (jobschedulerUser == null) {
             this.accessToken = accessToken;
             jobschedulerUser = new JobSchedulerUser(accessToken);
@@ -42,9 +44,17 @@ public class JOCResourceImpl {
             throw new NoUserWithAccessTokenException("No user logged in with accessToken: " + accessToken);
         }
         updateUserInMetaInfo();
+    }
+    protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws JocException {
+        initGetPermissions(accessToken);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
     }
 
+    protected SOSPermissionCommands getPermissonsCommands(String accessToken) throws JocException {
+        initGetPermissions(accessToken);
+        return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands();
+    }
+    
     protected static Logger getAuditLogger() {
         return AUDIT_LOGGER;
     }

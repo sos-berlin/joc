@@ -21,7 +21,7 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
 
         try {
             initLogging(API_CALL, jobSchedulerId);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

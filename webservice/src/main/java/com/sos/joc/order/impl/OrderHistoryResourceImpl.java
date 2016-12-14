@@ -29,7 +29,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
 
         try {
             initLogging(API_CALL, orderHistoryFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

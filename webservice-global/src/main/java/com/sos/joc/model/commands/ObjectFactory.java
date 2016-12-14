@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.12.09 um 03:59:27 PM CET 
+// Generiert: 2016.12.14 um 03:43:51 PM CET 
 //
 
 
@@ -31,7 +31,6 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _SchedulerLogLogCategoriesShow_QNAME = new QName("", "scheduler_log.log_categories.show");
     private final static QName _ShowSchedulers_QNAME = new QName("", "show_schedulers");
     private final static QName _ProcessClassRemove_QNAME = new QName("", "process_class.remove");
     private final static QName _RunTime_QNAME = new QName("", "run_time");
@@ -864,6 +863,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link SchedulerLogLogCategoriesShow }
+     * 
+     */
+    public SchedulerLogLogCategoriesShow createSchedulerLogLogCategoriesShow() {
+        return new SchedulerLogLogCategoriesShow();
+    }
+
+    /**
      * Create an instance of {@link SettingSet }
      * 
      */
@@ -1085,15 +1092,6 @@ public class ObjectFactory {
      */
     public RunTime.Month createRunTimeMonth() {
         return new RunTime.Month();
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "scheduler_log.log_categories.show")
-    public JAXBElement<Object> createSchedulerLogLogCategoriesShow(Object value) {
-        return new JAXBElement<Object>(_SchedulerLogLogCategoriesShow_QNAME, Object.class, null, value);
     }
 
     /**

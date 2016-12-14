@@ -30,7 +30,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
     public JOCDefaultResponse postJobChainsStop(String accessToken, ModifyJobChains modifyJobChains) {
         initLogging(API_CALL + STOP, modifyJobChains);
         try {
-            return postJobChainsCommand(STOP, accessToken, getPermissons(accessToken).getJobChain().isStop(), modifyJobChains);
+            return postJobChainsCommand(STOP, accessToken, getPermissonsJocCockpit(accessToken).getJobChain().isStop(), modifyJobChains);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -43,7 +43,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
     public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifyJobChains modifyJobChains) {
         initLogging(API_CALL + UNSTOP, modifyJobChains);
         try {
-            return postJobChainsCommand(UNSTOP, accessToken, getPermissons(accessToken).getJobChain().isUnstop(), modifyJobChains);
+            return postJobChainsCommand(UNSTOP, accessToken, getPermissonsJocCockpit(accessToken).getJobChain().isUnstop(), modifyJobChains);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

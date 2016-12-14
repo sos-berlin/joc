@@ -1035,7 +1035,11 @@
             <xsd:attribute name="value" type="Yes_no"/>
         </xsd:complexType>
     </xsd:element>
-    <xsd:element name="scheduler_log.log_categories.show"/>
+    <xsd:element name="scheduler_log.log_categories.show">
+        <xsd:complexType>
+            <xsd:attribute name="dummy" type="String" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
     <xsd:element name="service_request">
         <xsd:complexType>
             <xsd:sequence>

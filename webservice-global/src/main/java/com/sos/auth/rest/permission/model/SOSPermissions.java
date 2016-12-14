@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.12.08 um 04:21:41 PM CET 
+// Generiert: 2016.12.14 um 03:42:09 PM CET 
 //
 
 
@@ -25,9 +25,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}SOSPermissionJoc"/>
- *         &lt;element ref="{}SOSPermissionJoe"/>
- *         &lt;element ref="{}SOSPermissionJid"/>
+ *         &lt;element ref="{}SOSPermissionListCommands"/>
+ *         &lt;element ref="{}SOSPermissionListJoc"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,90 +37,63 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "sosPermissionJoc",
-    "sosPermissionJoe",
-    "sosPermissionJid"
+    "sosPermissionListCommands",
+    "sosPermissionListJoc"
 })
 @XmlRootElement(name = "SOSPermissions")
 public class SOSPermissions {
 
-    @XmlElement(name = "SOSPermissionJoc", required = true)
-    protected SOSPermissionJoc sosPermissionJoc;
-    @XmlElement(name = "SOSPermissionJoe", required = true)
-    protected SOSPermissionJoe sosPermissionJoe;
-    @XmlElement(name = "SOSPermissionJid", required = true)
-    protected SOSPermissionJid sosPermissionJid;
+    @XmlElement(name = "SOSPermissionListCommands", required = true)
+    protected SOSPermissionListCommands sosPermissionListCommands;
+    @XmlElement(name = "SOSPermissionListJoc", required = true)
+    protected SOSPermissionListJoc sosPermissionListJoc;
 
     /**
-     * Ruft den Wert der sosPermissionJoc-Eigenschaft ab.
+     * Ruft den Wert der sosPermissionListCommands-Eigenschaft ab.
      * 
      * @return
      *     possible object is
-     *     {@link SOSPermissionJoc }
+     *     {@link SOSPermissionListCommands }
      *     
      */
-    public SOSPermissionJoc getSOSPermissionJoc() {
-        return sosPermissionJoc;
+    public SOSPermissionListCommands getSOSPermissionListCommands() {
+        return sosPermissionListCommands;
     }
 
     /**
-     * Legt den Wert der sosPermissionJoc-Eigenschaft fest.
+     * Legt den Wert der sosPermissionListCommands-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
-     *     {@link SOSPermissionJoc }
+     *     {@link SOSPermissionListCommands }
      *     
      */
-    public void setSOSPermissionJoc(SOSPermissionJoc value) {
-        this.sosPermissionJoc = value;
+    public void setSOSPermissionListCommands(SOSPermissionListCommands value) {
+        this.sosPermissionListCommands = value;
     }
 
     /**
-     * Ruft den Wert der sosPermissionJoe-Eigenschaft ab.
+     * Ruft den Wert der sosPermissionListJoc-Eigenschaft ab.
      * 
      * @return
      *     possible object is
-     *     {@link SOSPermissionJoe }
+     *     {@link SOSPermissionListJoc }
      *     
      */
-    public SOSPermissionJoe getSOSPermissionJoe() {
-        return sosPermissionJoe;
+    public SOSPermissionListJoc getSOSPermissionListJoc() {
+        return sosPermissionListJoc;
     }
 
     /**
-     * Legt den Wert der sosPermissionJoe-Eigenschaft fest.
+     * Legt den Wert der sosPermissionListJoc-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
-     *     {@link SOSPermissionJoe }
+     *     {@link SOSPermissionListJoc }
      *     
      */
-    public void setSOSPermissionJoe(SOSPermissionJoe value) {
-        this.sosPermissionJoe = value;
-    }
-
-    /**
-     * Ruft den Wert der sosPermissionJid-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SOSPermissionJid }
-     *     
-     */
-    public SOSPermissionJid getSOSPermissionJid() {
-        return sosPermissionJid;
-    }
-
-    /**
-     * Legt den Wert der sosPermissionJid-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SOSPermissionJid }
-     *     
-     */
-    public void setSOSPermissionJid(SOSPermissionJid value) {
-        this.sosPermissionJid = value;
+    public void setSOSPermissionListJoc(SOSPermissionListJoc value) {
+        this.sosPermissionListJoc = value;
     }
 
 }

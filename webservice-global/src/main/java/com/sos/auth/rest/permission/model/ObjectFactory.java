@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.12.08 um 04:21:41 PM CET 
+// Generiert: 2016.12.14 um 03:42:09 PM CET 
 //
 
 
@@ -31,7 +31,6 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Filter_QNAME = new QName("", "filter");
     private final static QName _SOSPermissionRole_QNAME = new QName("", "SOSPermissionRole");
     private final static QName _SOSPermission_QNAME = new QName("", "SOSPermission");
 
@@ -48,6 +47,78 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit createSOSPermissionJocCockpit() {
         return new SOSPermissionJocCockpit();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands }
+     * 
+     */
+    public SOSPermissionCommands createSOSPermissionCommands() {
+        return new SOSPermissionCommands();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Lock }
+     * 
+     */
+    public SOSPermissionCommands.Lock createSOSPermissionCommandsLock() {
+        return new SOSPermissionCommands.Lock();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Schedule }
+     * 
+     */
+    public SOSPermissionCommands.Schedule createSOSPermissionCommandsSchedule() {
+        return new SOSPermissionCommands.Schedule();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.ProcessClass }
+     * 
+     */
+    public SOSPermissionCommands.ProcessClass createSOSPermissionCommandsProcessClass() {
+        return new SOSPermissionCommands.ProcessClass();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Job }
+     * 
+     */
+    public SOSPermissionCommands.Job createSOSPermissionCommandsJob() {
+        return new SOSPermissionCommands.Job();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.JobChain }
+     * 
+     */
+    public SOSPermissionCommands.JobChain createSOSPermissionCommandsJobChain() {
+        return new SOSPermissionCommands.JobChain();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Order }
+     * 
+     */
+    public SOSPermissionCommands.Order createSOSPermissionCommandsOrder() {
+        return new SOSPermissionCommands.Order();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.DailyPlan }
+     * 
+     */
+    public SOSPermissionCommands.DailyPlan createSOSPermissionCommandsDailyPlan() {
+        return new SOSPermissionCommands.DailyPlan();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.JobschedulerMaster }
+     * 
+     */
+    public SOSPermissionCommands.JobschedulerMaster createSOSPermissionCommandsJobschedulerMaster() {
+        return new SOSPermissionCommands.JobschedulerMaster();
     }
 
     /**
@@ -171,51 +242,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJoc }
+     * Create an instance of {@link SOSPermissionListCommands }
      * 
      */
-    public SOSPermissionJoc createSOSPermissionJoc() {
-        return new SOSPermissionJoc();
+    public SOSPermissionListCommands createSOSPermissionListCommands() {
+        return new SOSPermissionListCommands();
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJoe }
+     * Create an instance of {@link SOSPermissionListJoc }
      * 
      */
-    public SOSPermissionJoe createSOSPermissionJoe() {
-        return new SOSPermissionJoe();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionJid }
-     * 
-     */
-    public SOSPermissionJid createSOSPermissionJid() {
-        return new SOSPermissionJid();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionDashboard }
-     * 
-     */
-    public SOSPermissionDashboard createSOSPermissionDashboard() {
-        return new SOSPermissionDashboard();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionEvents }
-     * 
-     */
-    public SOSPermissionEvents createSOSPermissionEvents() {
-        return new SOSPermissionEvents();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionWorkingplan }
-     * 
-     */
-    public SOSPermissionWorkingplan createSOSPermissionWorkingplan() {
-        return new SOSPermissionWorkingplan();
+    public SOSPermissionListJoc createSOSPermissionListJoc() {
+        return new SOSPermissionListJoc();
     }
 
     /**
@@ -240,6 +279,102 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit.History createSOSPermissionJocCockpitHistory() {
         return new SOSPermissionJocCockpit.History();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.JobschedulerMasterCluster }
+     * 
+     */
+    public SOSPermissionCommands.JobschedulerMasterCluster createSOSPermissionCommandsJobschedulerMasterCluster() {
+        return new SOSPermissionCommands.JobschedulerMasterCluster();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.History }
+     * 
+     */
+    public SOSPermissionCommands.History createSOSPermissionCommandsHistory() {
+        return new SOSPermissionCommands.History();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Lock.View }
+     * 
+     */
+    public SOSPermissionCommands.Lock.View createSOSPermissionCommandsLockView() {
+        return new SOSPermissionCommands.Lock.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Schedule.View }
+     * 
+     */
+    public SOSPermissionCommands.Schedule.View createSOSPermissionCommandsScheduleView() {
+        return new SOSPermissionCommands.Schedule.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.ProcessClass.View }
+     * 
+     */
+    public SOSPermissionCommands.ProcessClass.View createSOSPermissionCommandsProcessClassView() {
+        return new SOSPermissionCommands.ProcessClass.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Job.View }
+     * 
+     */
+    public SOSPermissionCommands.Job.View createSOSPermissionCommandsJobView() {
+        return new SOSPermissionCommands.Job.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.JobChain.View }
+     * 
+     */
+    public SOSPermissionCommands.JobChain.View createSOSPermissionCommandsJobChainView() {
+        return new SOSPermissionCommands.JobChain.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Order.View }
+     * 
+     */
+    public SOSPermissionCommands.Order.View createSOSPermissionCommandsOrderView() {
+        return new SOSPermissionCommands.Order.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.Order.Change }
+     * 
+     */
+    public SOSPermissionCommands.Order.Change createSOSPermissionCommandsOrderChange() {
+        return new SOSPermissionCommands.Order.Change();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.DailyPlan.View }
+     * 
+     */
+    public SOSPermissionCommands.DailyPlan.View createSOSPermissionCommandsDailyPlanView() {
+        return new SOSPermissionCommands.DailyPlan.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.JobschedulerMaster.View }
+     * 
+     */
+    public SOSPermissionCommands.JobschedulerMaster.View createSOSPermissionCommandsJobschedulerMasterView() {
+        return new SOSPermissionCommands.JobschedulerMaster.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionCommands.JobschedulerMaster.Restart }
+     * 
+     */
+    public SOSPermissionCommands.JobschedulerMaster.Restart createSOSPermissionCommandsJobschedulerMasterRestart() {
+        return new SOSPermissionCommands.JobschedulerMaster.Restart();
     }
 
     /**
@@ -291,27 +426,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJocCockpit.Schedule.Edit }
-     * 
-     */
-    public SOSPermissionJocCockpit.Schedule.Edit createSOSPermissionJocCockpitScheduleEdit() {
-        return new SOSPermissionJocCockpit.Schedule.Edit();
-    }
-
-    /**
      * Create an instance of {@link SOSPermissionJocCockpit.ProcessClass.View }
      * 
      */
     public SOSPermissionJocCockpit.ProcessClass.View createSOSPermissionJocCockpitProcessClassView() {
         return new SOSPermissionJocCockpit.ProcessClass.View();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionJocCockpit.ProcessClass.Edit }
-     * 
-     */
-    public SOSPermissionJocCockpit.ProcessClass.Edit createSOSPermissionJocCockpitProcessClassEdit() {
-        return new SOSPermissionJocCockpit.ProcessClass.Edit();
     }
 
     /**
@@ -400,15 +519,6 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit.JobschedulerMaster.Restart createSOSPermissionJocCockpitJobschedulerMasterRestart() {
         return new SOSPermissionJocCockpit.JobschedulerMaster.Restart();
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "filter")
-    public JAXBElement<String> createFilter(String value) {
-        return new JAXBElement<String>(_Filter_QNAME, String.class, null, value);
     }
 
     /**

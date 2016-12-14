@@ -34,7 +34,7 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
                 accessToken = queryAccessToken;
             }
 
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissons(accessToken).getOrder().getView().isOrderLog(),
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken).getOrder().getView().isOrderLog(),
                     true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

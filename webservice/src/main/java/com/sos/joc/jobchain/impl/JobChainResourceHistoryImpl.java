@@ -31,7 +31,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
         try {
             initLogging(API_CALL, jobChainHistoryFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainHistoryFilter.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobChain().getView().isHistory());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

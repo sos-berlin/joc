@@ -22,7 +22,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
 
         try {
             initLogging(API_CALL, jobschedulerCommand.getJobschedulerId());
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerCommand.getJobschedulerId(), getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerCommand.getJobschedulerId(), getPermissonsCommands(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -45,6 +45,10 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             }
             
             String xml = jobSchedulerCommandFactory.getXml(jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().get(0));
+            if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(accessToken))){
+                return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, "Access denied"));
+            }
+            
             String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
 
             return JOCDefaultResponse.responseStatus200(answer, "application/xml");

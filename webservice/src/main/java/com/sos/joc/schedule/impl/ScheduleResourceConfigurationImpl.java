@@ -22,7 +22,7 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
 
         try {
             initLogging(API_CALL, scheduleBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, scheduleBody.getJobschedulerId(), getPermissons(accessToken).getSchedule()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, scheduleBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()
                     .getView().isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

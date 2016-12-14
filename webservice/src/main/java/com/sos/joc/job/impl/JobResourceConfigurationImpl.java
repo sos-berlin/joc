@@ -22,7 +22,7 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
 
         try {
             initLogging(API_CALL, jobBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobBody.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

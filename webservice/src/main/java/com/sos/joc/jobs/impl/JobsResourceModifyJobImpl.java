@@ -36,7 +36,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
         initLogging(API_CALL + STOP, modifyJobs);
         try {
-            return postJobsCommand(accessToken, STOP, getPermissons(accessToken).getJob().isStop(), modifyJobs);
+            return postJobsCommand(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJob().isStop(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -49,7 +49,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
         initLogging(API_CALL + UNSTOP, modifyJobs);
         try {
-            return postJobsCommand(accessToken, UNSTOP, getPermissons(accessToken).getJob().isUnstop(), modifyJobs);
+            return postJobsCommand(accessToken, UNSTOP, getPermissonsJocCockpit(accessToken).getJob().isUnstop(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -62,7 +62,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
         initLogging(API_CALL + SET_RUN_TIME, modifyJobs);
         try {
-            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissons(accessToken).getJob().isSetRunTime(), modifyJobs);
+            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().isSetRunTime(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -75,7 +75,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
         initLogging(API_CALL + END, modifyJobs);
         try {
-            return postJobsCommand(accessToken, END, getPermissons(accessToken).getJob().isEndAllTasks(), modifyJobs);
+            return postJobsCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().isEndAllTasks(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -88,7 +88,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
         initLogging(API_CALL + SUSPEND, modifyJobs);
         try {
-            return postJobsCommand(accessToken, SUSPEND, getPermissons(accessToken).getJob().isSuspendAllTasks(), modifyJobs);
+            return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(accessToken).getJob().isSuspendAllTasks(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -101,7 +101,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
         initLogging(API_CALL + CONTINUE, modifyJobs);
         try {
-            return postJobsCommand(accessToken, CONTINUE, getPermissons(accessToken).getJob().isContinueAllTasks(), modifyJobs);
+            return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(accessToken).getJob().isContinueAllTasks(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

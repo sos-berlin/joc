@@ -21,7 +21,7 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
     public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilter lockBody) throws Exception {
         try {
             initLogging(API_CALL, lockBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, lockBody.getJobschedulerId(), getPermissons(accessToken).getLock().getView()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, lockBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock().getView()
                     .isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

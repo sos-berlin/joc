@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.12.08 um 04:21:41 PM CET 
+// Generiert: 2016.12.14 um 03:42:09 PM CET 
 //
 
 
@@ -208,7 +208,7 @@ import javax.xml.bind.annotation.XmlType;
  *                   &lt;element name="setRunTime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="setState" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="reset" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -238,8 +238,7 @@ import javax.xml.bind.annotation.XmlType;
  *                   &lt;element name="skipJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="processJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="stopJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -273,7 +272,7 @@ import javax.xml.bind.annotation.XmlType;
  *                   &lt;element name="endAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="suspendAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="continueAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -296,19 +295,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
- *                   &lt;element name="edit">
- *                     &lt;complexType>
- *                       &lt;complexContent>
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                           &lt;sequence>
- *                             &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
- *                             &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
- *                           &lt;/sequence>
- *                         &lt;/restriction>
- *                       &lt;/complexContent>
- *                     &lt;/complexType>
- *                   &lt;/element>
- *                   &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -331,20 +318,9 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
- *                   &lt;element name="edit">
- *                     &lt;complexType>
- *                       &lt;complexContent>
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                           &lt;sequence>
- *                             &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                           &lt;/sequence>
- *                         &lt;/restriction>
- *                       &lt;/complexContent>
- *                     &lt;/complexType>
- *                   &lt;/element>
+ *                   &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="addSubstitute" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -367,8 +343,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
- *                   &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -1552,7 +1527,7 @@ public class SOSPermissionJocCockpit {
      *         &lt;element name="endAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="suspendAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="continueAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -1588,7 +1563,6 @@ public class SOSPermissionJocCockpit {
         protected boolean endAllTasks;
         protected boolean suspendAllTasks;
         protected boolean continueAllTasks;
-        @XmlElement(name = "modify_hot_folder")
         protected boolean modifyHotFolder;
 
         /**
@@ -1910,8 +1884,7 @@ public class SOSPermissionJocCockpit {
      *         &lt;element name="skipJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="processJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="stopJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -1929,8 +1902,7 @@ public class SOSPermissionJocCockpit {
         "skipJobChainNode",
         "processJobChainNode",
         "stopJobChainNode",
-        "modifyHotFolder",
-        "remove"
+        "modifyHotFolder"
     })
     public static class JobChain {
 
@@ -1942,10 +1914,7 @@ public class SOSPermissionJocCockpit {
         protected boolean skipJobChainNode;
         protected boolean processJobChainNode;
         protected boolean stopJobChainNode;
-        @XmlElement(name = "modify_hot_folder")
         protected boolean modifyHotFolder;
-        @XmlElement(required = true)
-        protected Object remove;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -2081,30 +2050,6 @@ public class SOSPermissionJocCockpit {
          */
         public void setModifyHotFolder(boolean value) {
             this.modifyHotFolder = value;
-        }
-
-        /**
-         * Ruft den Wert der remove-Eigenschaft ab.
-         * 
-         * @return
-         *     possible object is
-         *     {@link Object }
-         *     
-         */
-        public Object getRemove() {
-            return remove;
-        }
-
-        /**
-         * Legt den Wert der remove-Eigenschaft fest.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link Object }
-         *     
-         */
-        public void setRemove(Object value) {
-            this.remove = value;
         }
 
 
@@ -2988,8 +2933,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
-     *         &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -3001,15 +2945,12 @@ public class SOSPermissionJocCockpit {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "view",
-        "remove",
         "modifyHotFolder"
     })
     public static class Lock {
 
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Lock.View view;
-        protected boolean remove;
-        @XmlElement(name = "modify_hot_folder")
         protected boolean modifyHotFolder;
 
         /**
@@ -3034,22 +2975,6 @@ public class SOSPermissionJocCockpit {
          */
         public void setView(SOSPermissionJocCockpit.Lock.View value) {
             this.view = value;
-        }
-
-        /**
-         * Ruft den Wert der remove-Eigenschaft ab.
-         * 
-         */
-        public boolean isRemove() {
-            return remove;
-        }
-
-        /**
-         * Legt den Wert der remove-Eigenschaft fest.
-         * 
-         */
-        public void setRemove(boolean value) {
-            this.remove = value;
         }
 
         /**
@@ -3322,7 +3247,7 @@ public class SOSPermissionJocCockpit {
      *         &lt;element name="setRunTime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="setState" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="reset" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -3362,7 +3287,6 @@ public class SOSPermissionJocCockpit {
         protected boolean setRunTime;
         protected boolean setState;
         protected boolean reset;
-        @XmlElement(name = "modify_hot_folder")
         protected boolean modifyHotFolder;
 
         /**
@@ -3839,19 +3763,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
-     *         &lt;element name="edit">
-     *           &lt;complexType>
-     *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;sequence>
-     *                   &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
-     *                   &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
-     *                 &lt;/sequence>
-     *               &lt;/restriction>
-     *             &lt;/complexContent>
-     *           &lt;/complexType>
-     *         &lt;/element>
-     *         &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -3863,16 +3775,12 @@ public class SOSPermissionJocCockpit {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "view",
-        "edit",
         "modifyHotFolder"
     })
     public static class ProcessClass {
 
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.ProcessClass.View view;
-        @XmlElement(required = true)
-        protected SOSPermissionJocCockpit.ProcessClass.Edit edit;
-        @XmlElement(name = "modify_hot_folder")
         protected boolean modifyHotFolder;
 
         /**
@@ -3900,30 +3808,6 @@ public class SOSPermissionJocCockpit {
         }
 
         /**
-         * Ruft den Wert der edit-Eigenschaft ab.
-         * 
-         * @return
-         *     possible object is
-         *     {@link SOSPermissionJocCockpit.ProcessClass.Edit }
-         *     
-         */
-        public SOSPermissionJocCockpit.ProcessClass.Edit getEdit() {
-            return edit;
-        }
-
-        /**
-         * Legt den Wert der edit-Eigenschaft fest.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link SOSPermissionJocCockpit.ProcessClass.Edit }
-         *     
-         */
-        public void setEdit(SOSPermissionJocCockpit.ProcessClass.Edit value) {
-            this.edit = value;
-        }
-
-        /**
          * Ruft den Wert der modifyHotFolder-Eigenschaft ab.
          * 
          */
@@ -3937,89 +3821,6 @@ public class SOSPermissionJocCockpit {
          */
         public void setModifyHotFolder(boolean value) {
             this.modifyHotFolder = value;
-        }
-
-
-        /**
-         * <p>Java-Klasse für anonymous complex type.
-         * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-         * 
-         * <pre>
-         * &lt;complexType>
-         *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *       &lt;sequence>
-         *         &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
-         *         &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
-         *       &lt;/sequence>
-         *     &lt;/restriction>
-         *   &lt;/complexContent>
-         * &lt;/complexType>
-         * </pre>
-         * 
-         * 
-         */
-        @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "change",
-            "remove"
-        })
-        public static class Edit {
-
-            @XmlElement(required = true)
-            protected Object change;
-            @XmlElement(required = true)
-            protected Object remove;
-
-            /**
-             * Ruft den Wert der change-Eigenschaft ab.
-             * 
-             * @return
-             *     possible object is
-             *     {@link Object }
-             *     
-             */
-            public Object getChange() {
-                return change;
-            }
-
-            /**
-             * Legt den Wert der change-Eigenschaft fest.
-             * 
-             * @param value
-             *     allowed object is
-             *     {@link Object }
-             *     
-             */
-            public void setChange(Object value) {
-                this.change = value;
-            }
-
-            /**
-             * Ruft den Wert der remove-Eigenschaft ab.
-             * 
-             * @return
-             *     possible object is
-             *     {@link Object }
-             *     
-             */
-            public Object getRemove() {
-                return remove;
-            }
-
-            /**
-             * Legt den Wert der remove-Eigenschaft fest.
-             * 
-             * @param value
-             *     allowed object is
-             *     {@link Object }
-             *     
-             */
-            public void setRemove(Object value) {
-                this.remove = value;
-            }
-
         }
 
 
@@ -4112,20 +3913,9 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
-     *         &lt;element name="edit">
-     *           &lt;complexType>
-     *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;sequence>
-     *                   &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                 &lt;/sequence>
-     *               &lt;/restriction>
-     *             &lt;/complexContent>
-     *           &lt;/complexType>
-     *         &lt;/element>
+     *         &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="addSubstitute" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="modify_hot_folder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -4145,10 +3935,8 @@ public class SOSPermissionJocCockpit {
 
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Schedule.View view;
-        @XmlElement(required = true)
-        protected SOSPermissionJocCockpit.Schedule.Edit edit;
+        protected boolean edit;
         protected boolean addSubstitute;
-        @XmlElement(name = "modify_hot_folder")
         protected boolean modifyHotFolder;
 
         /**
@@ -4178,24 +3966,16 @@ public class SOSPermissionJocCockpit {
         /**
          * Ruft den Wert der edit-Eigenschaft ab.
          * 
-         * @return
-         *     possible object is
-         *     {@link SOSPermissionJocCockpit.Schedule.Edit }
-         *     
          */
-        public SOSPermissionJocCockpit.Schedule.Edit getEdit() {
+        public boolean isEdit() {
             return edit;
         }
 
         /**
          * Legt den Wert der edit-Eigenschaft fest.
          * 
-         * @param value
-         *     allowed object is
-         *     {@link SOSPermissionJocCockpit.Schedule.Edit }
-         *     
          */
-        public void setEdit(SOSPermissionJocCockpit.Schedule.Edit value) {
+        public void setEdit(boolean value) {
             this.edit = value;
         }
 
@@ -4229,71 +4009,6 @@ public class SOSPermissionJocCockpit {
          */
         public void setModifyHotFolder(boolean value) {
             this.modifyHotFolder = value;
-        }
-
-
-        /**
-         * <p>Java-Klasse für anonymous complex type.
-         * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-         * 
-         * <pre>
-         * &lt;complexType>
-         *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *       &lt;sequence>
-         *         &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="remove" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *       &lt;/sequence>
-         *     &lt;/restriction>
-         *   &lt;/complexContent>
-         * &lt;/complexType>
-         * </pre>
-         * 
-         * 
-         */
-        @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "change",
-            "remove"
-        })
-        public static class Edit {
-
-            protected boolean change;
-            protected boolean remove;
-
-            /**
-             * Ruft den Wert der change-Eigenschaft ab.
-             * 
-             */
-            public boolean isChange() {
-                return change;
-            }
-
-            /**
-             * Legt den Wert der change-Eigenschaft fest.
-             * 
-             */
-            public void setChange(boolean value) {
-                this.change = value;
-            }
-
-            /**
-             * Ruft den Wert der remove-Eigenschaft ab.
-             * 
-             */
-            public boolean isRemove() {
-                return remove;
-            }
-
-            /**
-             * Legt den Wert der remove-Eigenschaft fest.
-             * 
-             */
-            public void setRemove(boolean value) {
-                this.remove = value;
-            }
-
         }
 
 

@@ -29,7 +29,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
         try {
             initLogging(API_CALL, null);
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissons(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

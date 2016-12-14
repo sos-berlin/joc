@@ -35,7 +35,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasks modifyTasks) {
         try {
             initLogging(API_CALL + TERMINATE, modifyTasks);
-            return postTasksCommand(accessToken, TERMINATE, getPermissons(accessToken).getJob().isTerminate(), modifyTasks);
+            return postTasksCommand(accessToken, TERMINATE, getPermissonsJocCockpit(accessToken).getJob().isTerminate(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -48,7 +48,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasks modifyTasks) {
         try {
             initLogging(API_CALL + TERMINATE_WITHIN, modifyTasks);
-            return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissons(accessToken).getJob().isTerminate(), modifyTasks);
+            return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissonsJocCockpit(accessToken).getJob().isTerminate(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -61,7 +61,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasks modifyTasks) {
         try {
             initLogging(API_CALL + KILL, modifyTasks);
-            return postTasksCommand(accessToken, KILL, getPermissons(accessToken).getJob().isKill(), modifyTasks);
+            return postTasksCommand(accessToken, KILL, getPermissonsJocCockpit(accessToken).getJob().isKill(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -74,7 +74,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasks modifyTasks) {
         try {
             initLogging(API_CALL + END, modifyTasks);
-            return postTasksCommand(accessToken, END, getPermissons(accessToken).getJob().isKill(), modifyTasks);
+            return postTasksCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().isKill(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

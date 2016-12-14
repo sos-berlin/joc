@@ -38,7 +38,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
         try {
             initLogging(API_CALL, ordersBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.shiro.subject.Subject;
 
+import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCPreferences;
@@ -21,6 +22,7 @@ public class SOSShiroCurrentUser {
     private String selectedInstance;
 
     private SOSPermissionJocCockpit sosPermissionJocCockpit;
+    private SOSPermissionCommands sosPermissionCommands;
     private Map<String, DBItemInventoryInstance> listOfSchedulerInstances;
 
     public SOSShiroCurrentUser(String username, String password) {
@@ -45,6 +47,14 @@ public class SOSShiroCurrentUser {
         this.sosPermissionJocCockpit = sosPermissionJocCockpit;
     }
 
+    public SOSPermissionCommands getSosPermissionCommands() {
+        return sosPermissionCommands;
+    }
+
+    public void setSosPermissionCommands(SOSPermissionCommands sosPermissionCommands) {
+        this.sosPermissionCommands = sosPermissionCommands;
+    }
+    
     public String getAccessToken() {
         return accessToken;
     }
@@ -137,5 +147,6 @@ public class SOSShiroCurrentUser {
     public void setAuthorization(String authorization) {
         this.authorization = authorization;
     }
+
 
 }

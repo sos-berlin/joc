@@ -45,7 +45,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         
         try {
             initLogging(API_CALL, eventBody);
-            boolean perms = getPermissons(accessToken).getJobschedulerMaster().getView().isStatus();
+            boolean perms = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus();
 
             Session session = null;
             try {

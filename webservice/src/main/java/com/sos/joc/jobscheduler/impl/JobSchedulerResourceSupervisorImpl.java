@@ -29,7 +29,7 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
         try {
             initLogging(API_CALL, jobSchedulerId);
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

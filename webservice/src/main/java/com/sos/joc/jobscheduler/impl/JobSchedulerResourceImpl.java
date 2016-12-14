@@ -27,7 +27,7 @@ public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSch
 
         try {
             initLogging(API_CALL, jobSchedulerBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerBody.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

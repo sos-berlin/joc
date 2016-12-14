@@ -33,7 +33,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCDefaultResponse postJobschedulerTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             initLogging(API_CALL + TERMINATE, urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().isTerminate());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
@@ -51,7 +51,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             initLogging(API_CALL + RESTART[0], urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().getRestart().isTerminate());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
@@ -69,7 +69,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCDefaultResponse postJobschedulerAbort(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             initLogging(API_CALL + ABORT[0], urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().isAbort());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
@@ -87,7 +87,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             initLogging(API_CALL + ABORT_AND_RESTART[0], urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().getRestart().isAbort());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
@@ -106,7 +106,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCDefaultResponse postJobschedulerPause(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             initLogging(API_CALL + PAUSE, urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().isPause());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
@@ -124,7 +124,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     public JOCDefaultResponse postJobschedulerContinue(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             initLogging(API_CALL + CONTINUE, urlTimeoutParamSchema);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, urlTimeoutParamSchema.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().isContinue());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;

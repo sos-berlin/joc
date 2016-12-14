@@ -31,7 +31,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     public JOCDefaultResponse postJobChainNodesStop(String accessToken, ModifyJobChainNodes modifyNodes) {
         initLogging(API_CALL + STOP, modifyNodes);
         try {
-            return postJobChainNodesCommands(accessToken, STOP, getPermissons(accessToken).getJobChain().isStopJobChainNode(), modifyNodes);
+            return postJobChainNodesCommands(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJobChain().isStopJobChainNode(), modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -44,7 +44,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     public JOCDefaultResponse postJobChainNodesSkip(String accessToken, ModifyJobChainNodes modifyNodes) {
         initLogging(API_CALL + SKIP, modifyNodes);
         try {
-            return postJobChainNodesCommands(accessToken, SKIP, getPermissons(accessToken).getJobChain().isSkipJobChainNode(), modifyNodes);
+            return postJobChainNodesCommands(accessToken, SKIP, getPermissonsJocCockpit(accessToken).getJobChain().isSkipJobChainNode(), modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -57,7 +57,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     public JOCDefaultResponse postJobChainNodesActivate(String accessToken, ModifyJobChainNodes modifyNodes) {
         initLogging(API_CALL + ACTIVATE, modifyNodes);
         try {
-            return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissons(accessToken).getJobChain().isProcessJobChainNode(), modifyNodes);
+            return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissonsJocCockpit(accessToken).getJobChain().isProcessJobChainNode(), modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

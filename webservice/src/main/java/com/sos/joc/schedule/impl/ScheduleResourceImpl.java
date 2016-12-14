@@ -25,7 +25,7 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
     public JOCDefaultResponse postSchedule(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
         try {
             initLogging(API_CALL, scheduleFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, scheduleFilter.getJobschedulerId(), getPermissons(accessToken).getSchedule()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, scheduleFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()
                     .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

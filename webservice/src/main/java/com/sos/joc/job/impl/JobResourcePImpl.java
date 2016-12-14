@@ -26,7 +26,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) throws Exception {
         try {
             initLogging(API_CALL, jobFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

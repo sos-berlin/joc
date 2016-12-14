@@ -37,7 +37,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         try {
             initLogging(API_CALL, jobsFilter);
             Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissons(accessToken).getJob().getView()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

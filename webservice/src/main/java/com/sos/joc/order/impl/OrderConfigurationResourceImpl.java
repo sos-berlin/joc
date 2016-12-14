@@ -21,7 +21,7 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
     public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilter orderBody) throws Exception {
         try {
             initLogging(API_CALL, orderBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderBody.getJobschedulerId(), getPermissons(accessToken).getOrder().getView()
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

@@ -22,7 +22,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     public JOCDefaultResponse postJobschedulerTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
             initLogging(API_CALL + TERMINATE, timeoutParameter);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMasterCluster().isTerminate());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
@@ -40,7 +40,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
             initLogging(API_CALL + RESTART, timeoutParameter);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMasterCluster().isRestart());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;
@@ -58,7 +58,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
             initLogging(API_CALL + TERMINATE_FAILSAFE, timeoutParameter);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissons(accessToken)
+            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMasterCluster().isTerminateFailSafe());
             if (JOCDefaultResponse != null) {
                 return JOCDefaultResponse;

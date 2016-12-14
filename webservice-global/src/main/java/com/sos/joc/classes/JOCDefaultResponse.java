@@ -259,7 +259,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         }
         entity.setHasRole(false);
         entity.setIsPermitted(false);
-        entity.setIsAuthenticated(false);
+        entity.setIsAuthenticated(sosJobschedulerUser.isAuthenticated());
         if ("".equals(message)){
             message = "Authentication failure";
         }
