@@ -183,7 +183,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                                     eventSnapshot.setNodeTransition(nodeTransition); 
                                 }
                             }
-                        } else if (eventType.startsWith("SchedulerState")) {
+                        } else if (eventType.startsWith("Scheduler")) {
                             eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
                             eventSnapshot.setState(event.getString("state", null));
                             eventSnapshot.setPath(command.getSchemeAndAuthority());
