@@ -84,7 +84,7 @@ public class JobsFilter {
     @JsonProperty("folders")
     private List<Folder> folders = new ArrayList<Folder>();
     @JsonProperty("states")
-    private List<JobStateText> states = new ArrayList<JobStateText>();
+    private List<JobStateFilter> states = new ArrayList<JobStateFilter>();
     /**
      * only for db history urls to restrict the number of responsed records; -1=unlimited
      * 
@@ -304,7 +304,7 @@ public class JobsFilter {
      *     The states
      */
     @JsonProperty("states")
-    public List<JobStateText> getStates() {
+    public List<JobStateFilter> getStates() {
         return states;
     }
 
@@ -314,7 +314,7 @@ public class JobsFilter {
      *     The states
      */
     @JsonProperty("states")
-    public void setStates(List<JobStateText> states) {
+    public void setStates(List<JobStateFilter> states) {
         this.states = states;
     }
 
