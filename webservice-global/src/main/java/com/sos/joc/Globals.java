@@ -110,31 +110,39 @@ public class Globals {
     
     public static void beginTransaction(){
         try {
-            sosHibernateConnection.beginTransaction();
+            if (sosHibernateConnection != null) {
+                sosHibernateConnection.beginTransaction();
+            }
         } catch (Exception e) {
         }
     }
 
     public static void rollback(){
         try {
-            sosHibernateConnection.rollback();
+            if (sosHibernateConnection != null) {
+                sosHibernateConnection.rollback();
+            }
         } catch (Exception e) {
         }
     }
     
     public static void forceRollback(){
-        try {
-            sosHibernateConnection.setIgnoreAutoCommitTransactions(false);
-            sosHibernateConnection.rollback();
-        } catch (Exception e) {
-        } finally {
-            sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
+        if (sosHibernateConnection != null) {
+            try {
+                sosHibernateConnection.setIgnoreAutoCommitTransactions(false);
+                sosHibernateConnection.rollback();
+            } catch (Exception e) {
+            } finally {
+                sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
+            } 
         }
     }
     
     public static void commit(){
         try {
-            sosHibernateConnection.commit();
+            if (sosHibernateConnection != null) {
+                sosHibernateConnection.commit();
+            }
         } catch (Exception e) {
         }
     }
