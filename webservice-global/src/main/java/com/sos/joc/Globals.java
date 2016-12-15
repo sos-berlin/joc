@@ -17,7 +17,6 @@ import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 
 public class Globals {
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
@@ -25,7 +24,6 @@ public class Globals {
     public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
     public static SOSShiroCurrentUsersList currentUsersList;
     public static SOSHibernateConnection sosHibernateConnection;
-    public static SchedulerObjectFactory schedulerObjectFactory;
     public static Map<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
     public static JocCockpitProperties sosShiroProperties;
     public static Map<String, String> UrlFromJobSchedulerId = new HashMap<String, String>();

@@ -116,6 +116,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             logAuditMessage(modifyJob);
 
             checkRequiredParameter("job", modifyJob.getJob());
+            if (SET_RUN_TIME.equals(command)) {
+                checkRequiredParameter("runTime", modifyJob.getRunTime()); 
+            }
             
             XMLBuilder xml = new XMLBuilder("modify_job");
             xml.addAttribute("job", normalizePath(modifyJob.getJob())).addAttribute("cmd", command);

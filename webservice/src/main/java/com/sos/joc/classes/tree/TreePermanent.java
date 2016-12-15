@@ -5,8 +5,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -76,10 +78,11 @@ public class TreePermanent {
                 return b.compareTo(a);
             }
         });
-        List<String> bodyTypes = new ArrayList<String>();
+        Set<String> bodyTypes = new HashSet<String>();
         if(treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
             for(JobSchedulerObjectType type : treeBody.getTypes()) {
                 switch (type) {
+                case ORDER: 
                 case JOBCHAIN: 
                     bodyTypes.add("job_chain");
                     break;

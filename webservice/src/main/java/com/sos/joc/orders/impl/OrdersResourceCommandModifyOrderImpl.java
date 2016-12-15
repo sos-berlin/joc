@@ -133,6 +133,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
+            if ("set_run_time".equals(command)) {
+                checkRequiredParameter("runTime", order.getRunTime()); 
+            }
             
             XMLBuilder xml = new XMLBuilder("modify_order");
             xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", normalizePath(order.getJobChain()));
@@ -182,16 +185,15 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 xml.addAttribute("setback", "no");
                 break;
             case "set_run_time":
-                if (order.getRunTime() != null && !order.getRunTime().isEmpty()) {
-                    try {
-                        ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
-                        xml.add(XMLBuilder.parse(order.getRunTime()));
-                    } catch (JocException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
-                    }
+                try {
+                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
+                    xml.add(XMLBuilder.parse(order.getRunTime()));
+                } catch (JocException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
                 }
+                break;
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());

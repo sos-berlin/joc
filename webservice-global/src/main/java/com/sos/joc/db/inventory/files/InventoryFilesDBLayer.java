@@ -1,6 +1,7 @@
 package com.sos.joc.db.inventory.files;
 
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.Query;
 
@@ -120,7 +121,7 @@ public class InventoryFilesDBLayer extends DBLayer {
 //    }
     
     @SuppressWarnings("unchecked")
-    public List<String> getFoldersByFolderAndType(Long instanceId, String folderName, List<String> types) throws Exception {
+    public List<String> getFoldersByFolderAndType(Long instanceId, String folderName, Set<String> types) throws Exception {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select fileDirectory from ").append(DBITEM_INVENTORY_FILES);
@@ -142,7 +143,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             }
             if (types != null && !types.isEmpty()) {
                 if (types.size() == 1) {
-                    query.setParameter("fileType", types.get(0));
+                    query.setParameter("fileType", types.iterator().next());
                 } else {
                     query.setParameterList("fileType", types);
                 }

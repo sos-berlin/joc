@@ -42,15 +42,20 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 
         JobSchedulerEvents entity = new JobSchedulerEvents();
         Map<String, JobSchedulerEvent> eventList = new HashMap<String, JobSchedulerEvent>();
-        
+
         try {
             initLogging(API_CALL, eventBody);
-            boolean perms = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus();
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
+                    .isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
             Session session = null;
             try {
                 session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession(false);
-            } catch (InvalidSessionException e1) {}
+            } catch (InvalidSessionException e1) {
+            }
             Globals.forceClosingHttpClients(session);
 
             if (eventBody.getClose() != null && eventBody.getClose()) {
@@ -70,10 +75,6 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             Globals.beginTransaction();
 
             for (JobSchedulerObjects jsObject : eventBody.getJobscheduler()) {
-                JOCDefaultResponse jocDefaultResponse = init(accessToken, jsObject.getJobschedulerId(), perms);
-                if (jocDefaultResponse != null) {
-                    return jocDefaultResponse;
-                }
                 if (jsObject.getEventId() == null || jsObject.getEventId().isEmpty()) {
                     jsObject.setEventId(defaultEventId.toString());
                 }
@@ -98,7 +99,8 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             }
             try {
                 session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
-            } catch (Exception e1) {}
+            } catch (Exception e1) {
+            }
 
             ExecutorService executorService = Executors.newFixedThreadPool(eventBody.getJobscheduler().size());
             try {
