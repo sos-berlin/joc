@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.Globals;
-import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.NoUserWithAccessTokenException;
@@ -269,8 +268,12 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return entity;
     }
     
+    public static String getErrorMessage(JocException e) {
+        return e.getClass().getSimpleName() + ": " +((e.getCause() != null) ? e.getCause().toString() : e.getMessage());
+    }
+    
     public static String getErrorMessage(Throwable e) {
-        return ((e.getCause() != null) ? e.getCause().toString() : e.getClass().getSimpleName()) + ": " + e.getMessage();
+        return e.toString();
     }
     
     private static Err420 getErr420(JocError e) {

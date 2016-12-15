@@ -11,6 +11,7 @@ import org.apache.shiro.session.Session;
 
 import com.sos.auth.rest.SOSShiroCurrentUsersList;
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JocCockpitProperties;
@@ -26,7 +27,7 @@ public class Globals {
     public static SOSHibernateConnection sosHibernateConnection;
     public static Map<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
     public static JocCockpitProperties sosShiroProperties;
-    public static Map<String, String> UrlFromJobSchedulerId = new HashMap<String, String>();
+    public static Map<String, DBItemInventoryInstance> UrlFromJobSchedulerId = new HashMap<String, DBItemInventoryInstance>();
     
     public static SOSHibernateConnection getConnection() throws JocException {
         if (sosHibernateConnection == null) {

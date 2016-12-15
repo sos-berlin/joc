@@ -1,6 +1,5 @@
 package com.sos.joc.classes.event;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -14,6 +13,7 @@ import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
@@ -56,7 +56,10 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             throw e;
         } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException e) {
             if (Globals.UrlFromJobSchedulerId.containsKey(jobSchedulerEvent.getJobschedulerId())) {
-                Globals.UrlFromJobSchedulerId.remove(jobSchedulerEvent.getJobschedulerId());
+                DBItemInventoryInstance instance = Globals.UrlFromJobSchedulerId.get(jobSchedulerEvent.getJobschedulerId());
+                if (instance != null && !"standalone".equals(instance.getClusterType())) {
+                    Globals.UrlFromJobSchedulerId.remove(jobSchedulerEvent.getJobschedulerId());
+                }
             }
             //TODO create JobScheduler unreachable event?
             jobSchedulerEvent.setEventSnapshots(null);
