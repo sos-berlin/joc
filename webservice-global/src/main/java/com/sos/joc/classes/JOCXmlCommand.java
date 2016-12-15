@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -22,6 +24,7 @@ import com.sos.xml.SOSXmlCommand;
 public class JOCXmlCommand extends SOSXmlCommand {
 
     public static final String XML_COMMAND_API_PATH = "/jobscheduler/master/api/command";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JOCJsonCommand.class);
     private Date surveyDate;
     private Map<String, NodeList> listOfNodeLists = new HashMap<String, NodeList>();;
     private URI uriForJsonCommand;
@@ -172,6 +175,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
             }
             if (url != null) {
                 setUrl(url + XML_COMMAND_API_PATH);
+                LOGGER.debug("...retry with " + url + XML_COMMAND_API_PATH);
                 return executePost(xmlCommand, accessToken);
             } else {
                 throw e;

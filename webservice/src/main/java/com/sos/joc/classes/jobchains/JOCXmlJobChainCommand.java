@@ -150,8 +150,6 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         Map<String, JobChainVolatile> jobChainMap = new HashMap<String, JobChainVolatile>();
         List<OrdersSummaryCallable> summaryTasks = new ArrayList<OrdersSummaryCallable>();
         List<OrdersVCallable> orderTasks = new ArrayList<OrdersVCallable>();
-        JOCJsonCommand uriForJsonSummaryCommand = setUriForOrdersSummaryJsonCommand();
-        JOCJsonCommand uriForJsonOrdersCommand = setUriForOrdersJsonCommand();
         
         for (int i= 0; i < jobChainNodes.getLength(); i++) {
            Element jobChainElem = (Element) jobChainNodes.item(i);
@@ -168,9 +166,9 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            }
            jobChainV.setFields(jobChainsFilter.getCompact());
            nestedJobChains.addAll(jobChainV.getNestedJobChains());
-           summaryTasks.add(new OrdersSummaryCallable(jobChainV, uriForJsonSummaryCommand, accessToken));
+           summaryTasks.add(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken));
            if (!jobChainsFilter.getCompact() && jobChainV.hasJobNodes()) {
-               orderTasks.add(new OrdersVCallable(jobChainV, false, uriForJsonOrdersCommand, accessToken)); 
+               orderTasks.add(new OrdersVCallable(jobChainV, false, setUriForOrdersJsonCommand(), accessToken)); 
            }
         }
         

@@ -50,6 +50,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         try {
             jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId()));
         } catch (ForcedClosingHttpClientException e) {
+            LOGGER.debug("Connection force close: " + command.getSchemeAndAuthority());
             jobSchedulerEvent.setEventSnapshots(null);
             handleError(e.getError().getCode(), e.getClass().getSimpleName());
             throw e;
@@ -77,7 +78,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             LOGGER.error("", e);
             throw e;
         } finally {
-            LOGGER.debug("Connection close: " + command.getSchemeAndAuthority());
+            if (command.getHttpClient() != null) {
+                LOGGER.debug("Connection close: " + command.getSchemeAndAuthority());
+            }
             command.closeHttpClient();
         }
         return jobSchedulerEvent;
