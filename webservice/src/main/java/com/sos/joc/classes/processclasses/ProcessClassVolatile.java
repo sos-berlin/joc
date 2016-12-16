@@ -62,7 +62,7 @@ public class ProcessClassVolatile extends ProcessClassV {
             } else if (path.isEmpty()) {
                 path = "/(default)";
             }
-            LOGGER.debug("...processing Order " + path);
+            LOGGER.debug("...processing ProcessClass " + path);
             setPath(path);
         }
     }

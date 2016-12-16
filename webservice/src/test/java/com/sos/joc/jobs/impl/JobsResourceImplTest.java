@@ -1,6 +1,6 @@
 package com.sos.joc.jobs.impl;
  
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,7 +14,7 @@ import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.job.JobStateText;
+import com.sos.joc.model.job.JobStateFilter;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.JobsV;
 
@@ -109,8 +109,8 @@ public class JobsResourceImplTest {
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobsFilter jobsFilterSchema = new JobsFilter();
         jobsFilterSchema.setJobschedulerId(SCHEDULER_ID);
-        List<JobStateText> states = new ArrayList<JobStateText>();
-        states.add(JobStateText.PENDING);
+        List<JobStateFilter> states = new ArrayList<JobStateFilter>();
+        states.add(JobStateFilter.PENDING);
         jobsFilterSchema.setStates(states);
         JobsResourceImpl jobsImpl = new JobsResourceImpl();
         JOCDefaultResponse jobsResponse = jobsImpl.postJobs(sosShiroCurrentUserAnswer.getAccessToken(), jobsFilterSchema);

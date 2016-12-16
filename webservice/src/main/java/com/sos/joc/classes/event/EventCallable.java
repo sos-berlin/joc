@@ -1,6 +1,5 @@
 package com.sos.joc.classes.event;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -14,6 +13,7 @@ import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
@@ -50,12 +50,16 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         try {
             jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId()));
         } catch (ForcedClosingHttpClientException e) {
+            LOGGER.debug("Connection force close: " + command.getSchemeAndAuthority());
             jobSchedulerEvent.setEventSnapshots(null);
             handleError(e.getError().getCode(), e.getClass().getSimpleName());
             throw e;
         } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException e) {
             if (Globals.UrlFromJobSchedulerId.containsKey(jobSchedulerEvent.getJobschedulerId())) {
-                Globals.UrlFromJobSchedulerId.remove(jobSchedulerEvent.getJobschedulerId());
+                DBItemInventoryInstance instance = Globals.UrlFromJobSchedulerId.get(jobSchedulerEvent.getJobschedulerId());
+                if (instance != null && !"standalone".equals(instance.getClusterType())) {
+                    Globals.UrlFromJobSchedulerId.remove(jobSchedulerEvent.getJobschedulerId());
+                }
             }
             //TODO create JobScheduler unreachable event?
             jobSchedulerEvent.setEventSnapshots(null);
@@ -77,7 +81,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             LOGGER.error("", e);
             throw e;
         } finally {
-            LOGGER.debug("Connection close: " + command.getSchemeAndAuthority());
+            if (command.getHttpClient() != null) {
+                LOGGER.debug("Connection close: " + command.getSchemeAndAuthority());
+            }
             command.closeHttpClient();
         }
         return jobSchedulerEvent;
@@ -180,7 +186,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                                     eventSnapshot.setNodeTransition(nodeTransition); 
                                 }
                             }
-                        } else if (eventType.startsWith("SchedulerState")) {
+                        } else if (eventType.startsWith("Scheduler")) {
                             eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
                             eventSnapshot.setState(event.getString("state", null));
                             eventSnapshot.setPath(command.getSchemeAndAuthority());

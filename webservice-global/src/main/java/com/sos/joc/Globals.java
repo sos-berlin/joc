@@ -11,13 +11,13 @@ import org.apache.shiro.session.Session;
 
 import com.sos.auth.rest.SOSShiroCurrentUsersList;
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.scheduler.model.SchedulerObjectFactory;
 
 public class Globals {
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
@@ -25,10 +25,9 @@ public class Globals {
     public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
     public static SOSShiroCurrentUsersList currentUsersList;
     public static SOSHibernateConnection sosHibernateConnection;
-    public static SchedulerObjectFactory schedulerObjectFactory;
     public static Map<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
     public static JocCockpitProperties sosShiroProperties;
-    public static Map<String, String> UrlFromJobSchedulerId = new HashMap<String, String>();
+    public static Map<String, DBItemInventoryInstance> UrlFromJobSchedulerId = new HashMap<String, DBItemInventoryInstance>();
     
     public static SOSHibernateConnection getConnection() throws JocException {
         if (sosHibernateConnection == null) {
@@ -112,31 +111,39 @@ public class Globals {
     
     public static void beginTransaction(){
         try {
-            sosHibernateConnection.beginTransaction();
+            if (sosHibernateConnection != null) {
+                sosHibernateConnection.beginTransaction();
+            }
         } catch (Exception e) {
         }
     }
 
     public static void rollback(){
         try {
-            sosHibernateConnection.rollback();
+            if (sosHibernateConnection != null) {
+                sosHibernateConnection.rollback();
+            }
         } catch (Exception e) {
         }
     }
     
     public static void forceRollback(){
-        try {
-            sosHibernateConnection.setIgnoreAutoCommitTransactions(false);
-            sosHibernateConnection.rollback();
-        } catch (Exception e) {
-        } finally {
-            sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
+        if (sosHibernateConnection != null) {
+            try {
+                sosHibernateConnection.setIgnoreAutoCommitTransactions(false);
+                sosHibernateConnection.rollback();
+            } catch (Exception e) {
+            } finally {
+                sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
+            } 
         }
     }
     
     public static void commit(){
         try {
-            sosHibernateConnection.commit();
+            if (sosHibernateConnection != null) {
+                sosHibernateConnection.commit();
+            }
         } catch (Exception e) {
         }
     }

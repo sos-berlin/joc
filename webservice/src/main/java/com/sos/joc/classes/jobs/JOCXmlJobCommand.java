@@ -16,6 +16,8 @@ import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
+import com.sos.joc.model.job.JobStateFilter;
+import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.job.JobsFilter;
 
@@ -113,6 +115,29 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     
     private List<JobV> getJobs(String command, JobsFilter jobsFilter, String xPath) throws Exception {
         executePostWithThrowBadRequestAfterRetry(command, accessToken);
+        List<JobStateText> filterStates = new ArrayList<JobStateText>();
+        for (JobStateFilter filterState : jobsFilter.getStates()) {
+            switch (filterState) {
+            case RUNNING: 
+                filterStates.add(JobStateText.RUNNING);
+                filterStates.add(JobStateText.STOPPING);
+                break;
+            case PENDING: 
+                filterStates.add(JobStateText.PENDING);
+                break;
+            case STOPPED: 
+                filterStates.add(JobStateText.STOPPED);
+                break;
+            case QUEUED:
+            case WAITINGFORRESOURCE: 
+                filterStates.add(JobStateText.NOT_IN_PERIOD);
+                filterStates.add(JobStateText.WAITING_FOR_AGENT);
+                filterStates.add(JobStateText.WAITING_FOR_LOCK);
+                filterStates.add(JobStateText.WAITING_FOR_PROCESS);
+                filterStates.add(JobStateText.WAITING_FOR_TASK);
+                break;
+            }
+        }
         StringBuilder x = new StringBuilder();
         x.append(xPath);
         if (jobsFilter.getIsOrderJob() != null) {
@@ -135,7 +160,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
                continue; 
            }
            jobV.setState();
-           if (!FilterAfterResponse.filterStateHasState(jobsFilter.getStates(), jobV.getState().get_text())) {
+           if (!FilterAfterResponse.filterStateHasState(filterStates, jobV.getState().get_text())) {
                LOGGER.debug(String.format("...processing skipped because job's state '%1$s' doesn't contain in state filter '%2$s'", jobV.getState().get_text().name(),jobsFilter.getStates().toString()));
                continue; 
            }
