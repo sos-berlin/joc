@@ -41,6 +41,8 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
     private static final String API_CALL = "./events";
     private static final Integer EVENT_TIMEOUT = 90;
     private static final String SESSION_KEY = "EventsStarted";
+    private String threadName = "";
+    private String urlOfCurrentJs = null;
 
     @Override
     public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) throws Exception {
@@ -48,6 +50,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         JobSchedulerEvents entity = new JobSchedulerEvents();
         Map<String, JobSchedulerEvent> eventList = new HashMap<String, JobSchedulerEvent>();
         Session session = null;
+        threadName = Thread.currentThread().getName();
         try {
             initLogging(API_CALL, eventBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
@@ -55,10 +58,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
             try {
                 session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession(false);
-                session.setAttribute(SESSION_KEY, true);
+                session.setAttribute(SESSION_KEY, threadName);
             } catch (InvalidSessionException e1) {
             }
             Globals.forceClosingHttpClients(session);
@@ -100,6 +102,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
                 tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT));
+                if (urlOfCurrentJs == null) {
+                    urlOfCurrentJs = instance.getUrl();
+                }
             }
             try {
                 session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
@@ -125,42 +130,48 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             entity.setDeliveryDate(Date.from(Instant.now()));
 
         } catch (ForcedClosingHttpClientException e) {
-            //
+            entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
+            entity.setDeliveryDate(Date.from(Instant.now()));
         } catch (JobSchedulerConnectionRefusedException e) {
-            Boolean concurrentEventsCallIsStarted = false;
-            if (session != null) {
+            entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
+            if (!concurrentEventsCallIsStarted(session)) {
                 try {
-                    concurrentEventsCallIsStarted = (Boolean) session.getAttribute(SESSION_KEY);
-                } catch (Exception ee) {
+                    e = new JobSchedulerConnectionRefusedException(urlOfCurrentJs);
+                } catch (Exception e1) {
                 }
-            }
-            setEventsEndedInSesssion(session);
-            if (!concurrentEventsCallIsStarted) {
-                throw e;
+                e.addErrorMetaInfo(getJocError());
+                return JOCDefaultResponse.responseStatus434JSError(e);
+            } else {
+                LOGGER.warn("./events concurrent call was started");
+                entity.setDeliveryDate(Date.from(Instant.now()));
             }
         } catch (JocException e) {
-            setEventsEndedInSesssion(session);
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (InvalidSessionException e) {
-            setEventsEndedInSesssion(session);
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(entity);
         } catch (Exception e) {
-            setEventsEndedInSesssion(session);
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             LOGGER.debug("./events ended");
             Globals.rollback();
         }
-        setEventsEndedInSesssion(session);
         return JOCDefaultResponse.responseStatus200(entity);
     }
     
-    private void setEventsEndedInSesssion(Session session) {
+    private boolean concurrentEventsCallIsStarted(Session session) {
+        boolean concurrentEventsCallIsStarted = false;
+        String sessionUuid = null;
         if (session != null) {
-            session.setAttribute(SESSION_KEY, false); 
-        } 
+            try {
+                sessionUuid = (String) session.getAttribute(SESSION_KEY);
+            } catch (Exception ee) {
+            }
+        }
+        if (sessionUuid != null && !sessionUuid.equals(threadName)) {
+            concurrentEventsCallIsStarted = true; 
+        }
+        return concurrentEventsCallIsStarted;
     }
 }

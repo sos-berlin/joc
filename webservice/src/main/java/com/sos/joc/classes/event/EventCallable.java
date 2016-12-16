@@ -64,7 +64,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             //TODO create JobScheduler unreachable event?
             jobSchedulerEvent.setEventSnapshots(null);
             handleError(e.getError().getCode(), e.getClass().getSimpleName());
-            LOGGER.error(e.getClass().getSimpleName() + ": " + e.getMessage());
+            LOGGER.warn(e.getClass().getSimpleName() + ": " + e.getMessage());
             throw e;
         } catch (JocException e) {
             jobSchedulerEvent.setEventSnapshots(null);
