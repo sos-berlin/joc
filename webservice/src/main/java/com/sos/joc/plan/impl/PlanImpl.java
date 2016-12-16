@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import org.hibernate.Session;
+
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.joc.Globals;
@@ -65,6 +67,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             Plan entity = new Plan();
             for (DailyPlanDBItem dailyPlanDBItem : listOfDailyPlanDBItems) {
+                Session session = (Session) dailyPlanDBLayer.getConnection().getCurrentSession();
+                session.refresh(dailyPlanDBItem);
 
                 boolean add = true;
 
