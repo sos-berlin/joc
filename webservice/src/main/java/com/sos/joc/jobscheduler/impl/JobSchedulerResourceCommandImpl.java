@@ -22,7 +22,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
 
         try {
             initLogging(API_CALL, jobschedulerCommand.getJobschedulerId());
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerCommand.getJobschedulerId(), getPermissonsCommands(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerCommand.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
