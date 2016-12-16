@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import javax.ws.rs.Path;
 
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
@@ -29,6 +31,8 @@ import com.sos.joc.plan.resource.IPlanResource;
 
 @Path("plan")
 public class PlanImpl extends JOCResourceImpl implements IPlanResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
 
     private static final int SUCCESSFUL = 0;
     private static final int INCOMPLETE = 1;
@@ -67,8 +71,14 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             Plan entity = new Plan();
             for (DailyPlanDBItem dailyPlanDBItem : listOfDailyPlanDBItems) {
-                Session session = (Session) dailyPlanDBLayer.getConnection().getCurrentSession();
-                session.refresh(dailyPlanDBItem);
+             
+                try{
+                    Session session = (Session) dailyPlanDBLayer.getConnection().getCurrentSession();
+                    session.refresh(dailyPlanDBItem);
+                }catch(Exception e){
+                    LOGGER.warn(e.getMessage());
+                }
+                
 
                 boolean add = true;
 
