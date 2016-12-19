@@ -155,6 +155,9 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
            Element jobElem = (Element) jobNodes.item(i);
            JobVolatile jobV = new JobVolatile(jobElem, this);
            jobV.setPath();
+           if ("/scheduler_file_order_sink".equals(jobV.getPath())) {
+              continue; 
+           }
            if (!FilterAfterResponse.matchRegex(jobsFilter.getRegex(), jobV.getPath())) {
                LOGGER.debug("...processing skipped caused by 'regex=" + jobsFilter.getRegex() + "'");
                continue; 
