@@ -3,13 +3,15 @@ package com.sos.joc.db.inventory.os;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.jitl.reporting.db.DBLayer;
-
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class InventoryOperatingSystemsDBLayer extends DBLayer {
 
@@ -20,7 +22,7 @@ public class InventoryOperatingSystemsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryOperatingSystem getInventoryOperatingSystem(Long osId) throws Exception {
+    public DBItemInventoryOperatingSystem getInventoryOperatingSystem(Long osId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_OPERATING_SYSTEMS);
@@ -33,8 +35,10 @@ public class InventoryOperatingSystemsDBLayer extends DBLayer {
                 return result.get(0);
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 

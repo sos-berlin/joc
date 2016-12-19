@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
@@ -161,7 +162,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     private void getJobSchedulerInstanceByHostPort(HostPortTimeOutParameter jobSchedulerTerminateBody) throws DBInvalidDataException,
-            DBMissingDataException {
+            DBMissingDataException, DBConnectionRefusedException {
         JobSchedulerIdentifier jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerTerminateBody.getJobschedulerId());
         jobSchedulerIdentifier.setHost(jobSchedulerTerminateBody.getHost());
         jobSchedulerIdentifier.setPort(jobSchedulerTerminateBody.getPort());

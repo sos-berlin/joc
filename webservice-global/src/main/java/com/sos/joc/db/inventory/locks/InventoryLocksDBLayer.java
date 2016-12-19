@@ -4,13 +4,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.jitl.reporting.db.DBLayer;
-
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class InventoryLocksDBLayer extends DBLayer {
 
@@ -21,7 +23,7 @@ public class InventoryLocksDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryLock> getLocks(Long instanceId) throws Exception {
+    public List<DBItemInventoryLock> getLocks(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
@@ -33,13 +35,16 @@ public class InventoryLocksDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
     }
-    
+
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryLock> getLocksByFolders(String folderPath, Long instanceId, boolean recursive) throws Exception {
+    public List<DBItemInventoryLock> getLocksByFolders(String folderPath, Long instanceId, boolean recursive) throws DBInvalidDataException,
+            DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             if (recursive) {
@@ -66,13 +71,15 @@ public class InventoryLocksDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
     }
-    
+
     @SuppressWarnings("unchecked")
-    public DBItemInventoryLock getLock(String lockPath, Long instanceId) throws Exception {
+    public DBItemInventoryLock getLock(String lockPath, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
@@ -86,12 +93,14 @@ public class InventoryLocksDBLayer extends DBLayer {
                 return result.get(0);
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
     }
-    
-    public Date getLockConfigurationDate(Long id) throws Exception {
+
+    public Date getLockConfigurationDate(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder("select files.fileModified from ");
             sql.append(DBITEM_INVENTORY_FILES).append(" files, ");
@@ -103,12 +112,14 @@ public class InventoryLocksDBLayer extends DBLayer {
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {
-                return (Date)result;
+                return (Date) result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-    
+
 }

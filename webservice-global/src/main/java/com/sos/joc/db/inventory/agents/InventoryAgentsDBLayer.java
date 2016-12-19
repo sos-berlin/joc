@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Query;
+import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentCluster;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 
 
@@ -25,7 +27,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryAgentInstance getInventoryAgentInstances(String url, Long instanceId) throws DBInvalidDataException {
+    public DBItemInventoryAgentInstance getInventoryAgentInstances(String url, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_INSTANCES);
@@ -40,13 +42,15 @@ public class InventoryAgentsDBLayer extends DBLayer {
                 return result.get(0);
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryAgentInstance> getInventoryAgentInstances(Long instanceId) throws DBInvalidDataException {
+    public List<DBItemInventoryAgentInstance> getInventoryAgentInstances(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_INSTANCES);
@@ -59,13 +63,15 @@ public class InventoryAgentsDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getProcessClassesFromAgentCluster(Long agentId, Long instanceId) throws DBInvalidDataException {
+    public List<String> getProcessClassesFromAgentCluster(Long agentId, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ipc.name from ");
@@ -85,13 +91,15 @@ public class InventoryAgentsDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryAgentCluster> getAgentClusters(Long instanceId) throws Exception {
+    public List<DBItemInventoryAgentCluster> getAgentClusters(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTER);
@@ -104,13 +112,15 @@ public class InventoryAgentsDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
     
     @SuppressWarnings("unchecked")
-    public List<AgentClusterPermanent> getInventoryAgentClusters(Long instanceId, Set<String> agentClusters) throws DBInvalidDataException {
+    public List<AgentClusterPermanent> getInventoryAgentClusters(Long instanceId, Set<String> agentClusters) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_P);
@@ -138,13 +148,15 @@ public class InventoryAgentsDBLayer extends DBLayer {
             }
             List<AgentClusterPermanent> result = query.list();
             return result;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
     
     @SuppressWarnings("unchecked")
-    public List<AgentClusterMember> getInventoryAgentClusterMembers(Long instanceId, Set<Long> agentClusterIds) throws DBInvalidDataException {
+    public List<AgentClusterMember> getInventoryAgentClusterMembers(Long instanceId, Set<Long> agentClusterIds) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
@@ -174,13 +186,15 @@ public class InventoryAgentsDBLayer extends DBLayer {
             }
             List<AgentClusterMember> result = query.list();
             return result;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
     
     @SuppressWarnings("unchecked")
-    public List<AgentClusterMember> getInventoryAgentClusterMembersById(Long instanceId, Long agentClusterId) throws DBInvalidDataException {
+    public List<AgentClusterMember> getInventoryAgentClusterMembersById(Long instanceId, Long agentClusterId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
@@ -203,6 +217,8 @@ public class InventoryAgentsDBLayer extends DBLayer {
             }
             List<AgentClusterMember> result = query.list();
             return result;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }

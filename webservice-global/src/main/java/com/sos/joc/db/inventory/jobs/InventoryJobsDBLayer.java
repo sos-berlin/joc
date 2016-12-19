@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,8 @@ import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 
 /** @author Uwe Risse */
 public class InventoryJobsDBLayer extends DBLayer {
@@ -23,7 +26,7 @@ public class InventoryJobsDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryJob getInventoryJobByName(String name, Long instanceId) throws Exception {
+    public DBItemInventoryJob getInventoryJobByName(String name, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
@@ -39,13 +42,15 @@ public class InventoryJobsDBLayer extends DBLayer {
                 return result.get(0);
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobs(Long instanceId) throws Exception {
+    public List<DBItemInventoryJob> getInventoryJobs(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOBS);
@@ -53,13 +58,16 @@ public class InventoryJobsDBLayer extends DBLayer {
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             return query.list();
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob, Long instanceId) throws Exception {
+    public List<DBItemInventoryJob> getInventoryJobs(Boolean isOrderJob, Long instanceId) throws DBInvalidDataException,
+            DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
@@ -74,12 +82,14 @@ public class InventoryJobsDBLayer extends DBLayer {
             }
             query.setParameter("instanceId", instanceId);
             return query.list();
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
-    public Date getJobConfigurationDate(Long id) throws Exception {
+    public Date getJobConfigurationDate(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ifile.fileModified from ");
@@ -92,16 +102,18 @@ public class InventoryJobsDBLayer extends DBLayer {
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {
-                return (Date)result;
+                return (Date) result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-    
+
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryLock> getLocksIfExists(Long id, Long instanceId) throws Exception {
+    public List<DBItemInventoryLock> getLocksIfExists(Long id, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select il from ").append(DBITEM_INVENTORY_LOCKS).append(" il, ");
@@ -117,13 +129,15 @@ public class InventoryJobsDBLayer extends DBLayer {
                 return result;
             }
             return null;
-        } catch (Exception e) {
-            throw new Exception(SOSHibernateConnection.getException(e));
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
- 
+
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChainsByJobId(Long id, Long instanceId) throws Exception {
+    public List<DBItemInventoryJobChain> getJobChainsByJobId(Long id, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ijc from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
@@ -139,13 +153,16 @@ public class InventoryJobsDBLayer extends DBLayer {
                 return result;
             }
             return null;
-        } catch (Exception e) {
-            throw new Exception(SOSHibernateConnection.getException(e));
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
- 
+
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob, Long instanceId) throws Exception {
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByJobPath(String jobPath, Boolean isOrderJob, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOBS);
@@ -165,14 +182,16 @@ public class InventoryJobsDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, boolean recursive, Long instanceId)
-            throws Exception {
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             if (recursive) {
@@ -205,8 +224,10 @@ public class InventoryJobsDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 }

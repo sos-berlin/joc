@@ -14,7 +14,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
-import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -37,8 +36,7 @@ public class JOCResourceImpl {
     private ObjectMapper mapper = new ObjectMapper();
     private JocError jocError = new JocError();
 
-    
-    private void initGetPermissions(String accessToken) throws NoUserWithAccessTokenException{
+    private void initGetPermissions(String accessToken) throws NoUserWithAccessTokenException {
         if (jobschedulerUser == null) {
             this.accessToken = accessToken;
             jobschedulerUser = new JobSchedulerUser(accessToken);
@@ -48,6 +46,7 @@ public class JOCResourceImpl {
         }
         updateUserInMetaInfo();
     }
+
     protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws JocException {
         initGetPermissions(accessToken);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
@@ -57,7 +56,7 @@ public class JOCResourceImpl {
         initGetPermissions(accessToken);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands();
     }
-    
+
     protected static Logger getAuditLogger() {
         return AUDIT_LOGGER;
     }
@@ -69,10 +68,11 @@ public class JOCResourceImpl {
     public JobSchedulerUser getJobschedulerUser() {
         return jobschedulerUser;
     }
-    
-//    public JOCXmlCommand getJOCXmlCommand(String jobschedulerId) {
-//        return new JOCXmlCommand(dbItemInventoryInstance.getUrl(), jobschedulerUser, jobschedulerId);
-//    }
+
+    // public JOCXmlCommand getJOCXmlCommand(String jobschedulerId) {
+    // return new JOCXmlCommand(dbItemInventoryInstance.getUrl(),
+    // jobschedulerUser, jobschedulerId);
+    // }
 
     public JocError getJocError() {
         return jocError;
@@ -210,16 +210,16 @@ public class JOCResourceImpl {
         }
         return "-";
     }
-    
+
     public String getUrl() {
         return dbItemInventoryInstance.getUrl();
     }
-    
-    public String retrySchedulerInstance() throws DBInvalidDataException, DBMissingDataException {
+
+    public String retrySchedulerInstance() throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
         return retrySchedulerInstance(null);
     }
-    
-    public String retrySchedulerInstance(String schedulerId) throws DBInvalidDataException, DBMissingDataException {
+
+    public String retrySchedulerInstance(String schedulerId) throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
         if (schedulerId == null) {
             schedulerId = jobschedulerId;
         }
@@ -246,11 +246,11 @@ public class JOCResourceImpl {
         } else {
             jobschedulerId = schedulerId;
         }
-        checkConnection(Globals.sosHibernateConnection);
+        Globals.checkConnection();
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
             if (withJobSchedulerDBCheck) {
-                checkConnection(Globals.getConnection(schedulerId), schedulerId);
+                Globals.checkConnection(schedulerId);
             }
         }
         return jocDefaultResponse;
@@ -261,52 +261,6 @@ public class JOCResourceImpl {
             return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
         }
         return null;
-    }
-    
-    private void checkConnection(SOSHibernateConnection connection) throws JocException {
-        if (connection == null) {
-            connection = Globals.getConnection();
-            if (connection == null) {
-                throw new DBConnectionRefusedException("Connection is null");
-            }
-        }
-        try {
-            connection.setIgnoreAutoCommitTransactions(false);
-            connection.beginTransaction();
-            connection.rollback();
-            connection.setIgnoreAutoCommitTransactions(true);
-        } catch (Exception ex) {
-            connection.disconnect();
-            try {
-                connection.setIgnoreAutoCommitTransactions(true);
-                connection.connect();
-            } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
-            }
-        }
-    }
-
-    private void checkConnection(SOSHibernateConnection connection, String schedulerId) throws JocException {
-        if (connection == null) {
-            connection = Globals.getConnection(schedulerId);
-            if (connection == null) {
-                throw new DBConnectionRefusedException("Connection is null");
-            }
-        }
-        try {
-            connection.setIgnoreAutoCommitTransactions(false);
-            connection.beginTransaction();
-            connection.rollback();
-            connection.setIgnoreAutoCommitTransactions(true);
-        } catch (Exception ex) {
-            connection.disconnect();
-            try {
-                connection.setIgnoreAutoCommitTransactions(true);
-                connection.connect();
-            } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
-            }
-        }
     }
 
     private void updateUserInMetaInfo() {

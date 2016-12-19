@@ -3,6 +3,7 @@ package com.sos.joc.db.inventory.instances;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerIdentifier;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
 
@@ -24,7 +26,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken) throws DBInvalidDataException, DBMissingDataException {
+    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken) throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
@@ -39,13 +41,15 @@ public class InventoryInstancesDBLayer extends DBLayer {
             }
         } catch (DBMissingDataException ex) {
             throw ex;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryInstance getInventoryInstanceByHostPort(JobSchedulerIdentifier jobSchedulerIdentifier) throws DBMissingDataException, DBInvalidDataException {
+    public DBItemInventoryInstance getInventoryInstanceByHostPort(JobSchedulerIdentifier jobSchedulerIdentifier) throws DBMissingDataException, DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where hostname = :hostname and port = :port", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
@@ -69,17 +73,17 @@ public class InventoryInstancesDBLayer extends DBLayer {
                         DBLayer.TABLE_INVENTORY_INSTANCES);
                 throw new DBMissingDataException(errMessage);
             }
-        }catch (DBMissingDataException e){
+        } catch (DBMissingDataException e){
             throw e;
-        }catch (DBInvalidDataException e){
-            throw e;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws DBInvalidDataException   {
+    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws DBInvalidDataException, DBConnectionRefusedException   {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
@@ -90,36 +94,42 @@ public class InventoryInstancesDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryInstance> getInventoryInstances() throws DBInvalidDataException {
+    public List<DBItemInventoryInstance> getInventoryInstances() throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = "from " + DBITEM_INVENTORY_INSTANCES;
             Query query = getConnection().createQuery(sql);
             return query.list();
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventoryInstance> getJobSchedulerIds() throws DBInvalidDataException {
+    public List<DBItemInventoryInstance> getJobSchedulerIds() throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %1$s order by created desc", DBITEM_INVENTORY_INSTANCES);
             Query query = getConnection().createQuery(sql);
 
             return query.list();
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws DBInvalidDataException {
+    public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
@@ -130,6 +140,8 @@ public class InventoryInstancesDBLayer extends DBLayer {
                 return result.get(0);
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }

@@ -4,13 +4,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.jitl.reporting.db.DBLayer;
-
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class InventorySchedulesDBLayer extends DBLayer {
 
@@ -21,7 +23,7 @@ public class InventorySchedulesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DBItemInventorySchedule> getSchedules(Long instanceId) throws Exception {
+    public List<DBItemInventorySchedule> getSchedules(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
@@ -33,13 +35,15 @@ public class InventorySchedulesDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
     }
-    
+
     @SuppressWarnings("unchecked")
-    public DBItemInventorySchedule getSchedule(String schedulePath, Long instanceId) throws Exception {
+    public DBItemInventorySchedule getSchedule(String schedulePath, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
@@ -53,13 +57,15 @@ public class InventorySchedulesDBLayer extends DBLayer {
                 return result.get(0);
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
     }
-    
+
     @SuppressWarnings("unchecked")
-    public DBItemInventorySchedule getSchedule(Long id) throws Exception {
+    public DBItemInventorySchedule getSchedule(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
@@ -71,12 +77,14 @@ public class InventorySchedulesDBLayer extends DBLayer {
                 return result.get(0);
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
     }
-    
-    public Date getScheduleConfigurationDate(Long id) throws Exception {
+
+    public Date getScheduleConfigurationDate(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select files.fileModified from ");
@@ -89,16 +97,18 @@ public class InventorySchedulesDBLayer extends DBLayer {
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {
-                return (Date)result;
+                return (Date) result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }
     }
-    
+
     @SuppressWarnings("rawtypes")
-    public List getUsedIn(Long id, Long instanceId, String tableName) throws Exception {
+    public List getUsedIn(Long id, Long instanceId, String tableName) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(tableName);
@@ -107,19 +117,22 @@ public class InventorySchedulesDBLayer extends DBLayer {
             LOGGER.debug(sql.toString());
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
-            query.setParameter("instanceId", instanceId);                    
+            query.setParameter("instanceId", instanceId);
             List result = query.list();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
     }
-    
+
     @SuppressWarnings("unchecked")
-    public List<DBItemInventorySchedule> getSchedulesByFolders(String folderName, Long instanceId, boolean recursive) throws Exception {
+    public List<DBItemInventorySchedule> getSchedulesByFolders(String folderName, Long instanceId, boolean recursive) throws DBInvalidDataException,
+            DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             if (recursive) {
@@ -146,8 +159,10 @@ public class InventorySchedulesDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new Exception(SOSHibernateConnection.getException(ex));
-        }        
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
     }
 }

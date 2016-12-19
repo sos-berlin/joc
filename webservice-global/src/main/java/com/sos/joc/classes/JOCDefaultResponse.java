@@ -195,7 +195,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         }
         String errorMsg = getErrorMessage(e);
         e.getError().setMessage(errorMsg);
-        return responseStatus434(getErr434(e.getError()));
+        return responseStatus434(getErr420(e.getError()));
     }
     
     public static JOCDefaultResponse responseStatus434JSError(Exception e) {
@@ -205,7 +205,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         if (e.getCause() != null && e.getCause() instanceof JocException) {
             return responseStatus434JSError((JocException) e.getCause());
         }
-        return responseStatus434(getErr434(new JocError(getErrorMessage(e))));
+        return responseStatus434(getErr420(new JocError(getErrorMessage(e))));
     }
     
     public static JOCDefaultResponse responseStatus434(Err420 entity) {
@@ -309,14 +309,6 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         entity.setSurveyDate(new Date());
         entity.setDeliveryDate(new Date());
         LOGGER.error(e.getMessage(),e);
-        return entity;
-    }
-    
-    private static Err420 getErr434(JocError e) {
-        Err420 entity = new Err420();
-        entity.setError(e);
-        entity.setSurveyDate(new Date());
-        entity.setDeliveryDate(new Date());
         return entity;
     }
     
