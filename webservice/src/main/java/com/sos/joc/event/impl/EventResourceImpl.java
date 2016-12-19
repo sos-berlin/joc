@@ -101,7 +101,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 command.setAutoCloseHttpClient(false);
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
-                tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT));
+                tasks.add(new EventCallable(command, jsEvent, instance.getId(), accessToken, session, EVENT_TIMEOUT));
                 if (urlOfCurrentJs == null) {
                     urlOfCurrentJs = instance.getUrl();
                 }

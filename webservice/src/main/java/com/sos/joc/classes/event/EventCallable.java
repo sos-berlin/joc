@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
@@ -36,19 +37,22 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     private final JOCJsonCommand command;
     private final Session session;
     private final Integer eventTimeout;
+    private final Long instanceId;
 
-    public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session, Integer eventTimeout) {
+    public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, Long instanceId, String accessToken, Session session, Integer eventTimeout) {
         this.accessToken = accessToken;
         this.command = command;
         this.jobSchedulerEvent = jobSchedulerEvent;
         this.session = session;
         this.eventTimeout = eventTimeout;
+        this.instanceId = instanceId;
     }
 
     @Override
     public JobSchedulerEvent call() throws JocException {
         try {
-            jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId()));
+            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
+            jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId(), dbLayer));
         } catch (ForcedClosingHttpClientException e) {
             LOGGER.debug("Connection force close: " + command.getSchemeAndAuthority());
             jobSchedulerEvent.setEventSnapshots(null);
@@ -108,14 +112,14 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         return command.getJsonObjectFromPost(getServiceBody(), accessToken);
     }
     
-    private List<EventSnapshot> getEventSnapshots (String eventId) throws JocException {
+    private List<EventSnapshot> getEventSnapshots (String eventId, InventoryJobChainsDBLayer dbLayer) throws JocException {
         List<EventSnapshot> eventSnapshots = new ArrayList<EventSnapshot>();
         JsonObject json = getJsonObject(eventId);
         Long newEventId = json.getJsonNumber("eventId").longValue();
         String type = json.getString("TYPE", "Empty");
         switch (type) {
         case "Empty":
-            eventSnapshots.addAll(getEventSnapshots(newEventId.toString()));
+            eventSnapshots.addAll(getEventSnapshots(newEventId.toString(), dbLayer));
             break;
         case "NonEmpty":
 //            boolean isOrderStarted = false;
@@ -174,9 +178,14 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                                 eventSnapshot.setNodeId(event.getString("nodeId", null));
                                 eventSnapshot.setTaskId(event.getString("taskId", null));
                             } else if ("OrderFinished".equals(eventType)) {
-                                //TODO OrderFailed, OrderSuccess
-                                eventSnapshot.setNodeId(event.getString("nodeId", null));
-                                
+                                String node = event.getString("nodeId", null);
+                                eventSnapshot.setNodeId(node);
+                                eventSnapshot.setState("successful");
+                                String[] pathParts = eventSnapshot.getPath().split(",", 2);
+                                String jobChain = pathParts[0];
+                                if (node != null && dbLayer.isErrorNode(jobChain, node, instanceId)) {
+                                    eventSnapshot.setState("failed");
+                                }
                             } else if ("OrderStepEnded".equals(eventType)) {
                                 JsonObject nodeTrans = event.getJsonObject("nodeTransition");
                                 if (nodeTrans != null) {
@@ -201,7 +210,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
 //            }
             break;
         case "Torn":
-            eventSnapshots.addAll(getEventSnapshots(newEventId.toString()));
+            eventSnapshots.addAll(getEventSnapshots(newEventId.toString(), dbLayer));
             break;
         }
         return eventSnapshots;

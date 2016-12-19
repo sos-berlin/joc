@@ -193,4 +193,29 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         }        
     }
+    
+    public boolean isErrorNode(String jobChain, String node, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select count(*) from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn, ");
+            sql.append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc");
+            sql.append(" where ijcn.jobChainId = ijc.id");
+            sql.append(" and ijcn.errorState = :nodeName");
+            sql.append(" and ijcn.instanceId = :instanceId");
+            sql.append(" and ijc.name = :jobChain");
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("nodeName", node);
+            query.setParameter("jobChain", jobChain);
+            query.setParameter("instanceId", instanceId);
+            Long result = (Long) query.uniqueResult();
+            if (result == null) {
+                return false;
+            }
+            return result > 0;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        }
+    }
 }
