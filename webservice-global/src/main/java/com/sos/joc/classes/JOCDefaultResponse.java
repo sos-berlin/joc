@@ -296,10 +296,13 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static String getErrorMessage(JocException e) {
-        return e.getClass().getSimpleName() + ": " +((e.getCause() != null) ? e.getCause().toString() : e.getMessage());
+        String errorOutput = e.getClass().getSimpleName() + ": " +((e.getCause() != null) ? e.getCause().toString() : e.getMessage());
+        LOGGER.error(errorOutput, e);
+        return errorOutput;
     }
     
     public static String getErrorMessage(Throwable e) {
+        LOGGER.error(e.toString(), e);
         return e.toString();
     }
     
@@ -308,7 +311,6 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         entity.setError(e);
         entity.setSurveyDate(new Date());
         entity.setDeliveryDate(new Date());
-        LOGGER.error(e.getMessage(),e);
         return entity;
     }
     
