@@ -136,7 +136,11 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                 eventSnapshot.setEventType(eventType);
                 if (eventType.startsWith("Task")) {
                     JsonObject eventKeyO = event.getJsonObject("key");
-                    eventSnapshot.setPath(eventKeyO.getString("jobPath"));
+                    String jobPath = eventKeyO.getString("jobPath", null);
+                    if (jobPath == null || "/scheduler_file_order_sink".equals(jobPath)) {
+                        continue;
+                    }
+                    eventSnapshot.setPath(jobPath);
                     eventSnapshot.setTaskId(eventKeyO.getString("taskId", null));
                     eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
                 } else {
