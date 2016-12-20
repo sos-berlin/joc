@@ -87,8 +87,10 @@ public class TreePermanent {
                     bodyTypes.add("job_chain");
                     break;
                 case AGENTCLUSTER:
+                    bodyTypes.add("agent_cluster");
                 case PROCESSCLASS: 
                     bodyTypes.add("process_class");
+                    bodyTypes.add("agent_cluster");
                     break;
                 default: 
                     bodyTypes.add(type.name().toLowerCase());
