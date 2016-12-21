@@ -34,6 +34,7 @@ import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceAgentClusters;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobscheduler.AgentCluster;
 import com.sos.joc.model.jobscheduler.AgentClusterFilter;
 import com.sos.joc.model.jobscheduler.AgentClusterPath;
@@ -75,7 +76,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                 }
             }
             Set<String> agentSet = new HashSet<String>();
-            Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();;
+            Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();
             Globals.beginTransaction();
             
             try {
@@ -92,6 +93,9 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                         continue;
                     }
                     if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentClusterV.getPath())) {
+                        continue;
+                    }
+                    if (!isInFolders(agentClusterV.getPath(), jobSchedulerAgentClustersBody.getFolders())) {
                         continue;
                     }
                     agentSet.addAll(agentClusterV.getAgentSet());
@@ -143,6 +147,9 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                     if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentCluster.getPath())) {
                         continue;
                     }
+                    if (!isInFolders(agentCluster.getPath(), jobSchedulerAgentClustersBody.getFolders())) {
+                        continue;
+                    }
                     List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(dbItemInventoryInstance.getId(), agentCluster.getAgentClusterId());
                     int countRunningAgents = 0;
                     for (AgentClusterMember agentClusterMember : agentClusterMembers) {
@@ -188,6 +195,27 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
         }
     }
     
+    private boolean isInFolders(String objPath, List<Folder> folders) {
+        if (folders == null || folders.isEmpty()) {
+            return true;
+        }
+        String parent = getParent(objPath);
+        if (parent == null) {
+            return false;
+        }
+        for (Folder folder : folders) {
+            String f = normalizeFolder(folder.getFolder());
+            if (folder.getRecursive() == null || folder.getRecursive()) {
+                if (parent.startsWith(f)) {
+                    return true;
+                }
+            } else if (parent.equals(f)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String getServiceBody(String agentCluster) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         if (agentCluster == null) {

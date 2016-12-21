@@ -7,6 +7,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.common.Folder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -25,7 +26,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "agentClusters",
     "regex",
     "state",
-    "compact"
+    "compact",
+    "folders"
 })
 public class AgentClusterFilter {
 
@@ -56,6 +58,14 @@ public class AgentClusterFilter {
      */
     @JsonProperty("compact")
     private Boolean compact = false;
+    /**
+     * folders
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("folders")
+    private List<Folder> folders = new ArrayList<Folder>();
 
     /**
      * 
@@ -173,6 +183,32 @@ public class AgentClusterFilter {
         this.compact = compact;
     }
 
+    /**
+     * folders
+     * <p>
+     * 
+     * 
+     * @return
+     *     The folders
+     */
+    @JsonProperty("folders")
+    public List<Folder> getFolders() {
+        return folders;
+    }
+
+    /**
+     * folders
+     * <p>
+     * 
+     * 
+     * @param folders
+     *     The folders
+     */
+    @JsonProperty("folders")
+    public void setFolders(List<Folder> folders) {
+        this.folders = folders;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -180,7 +216,7 @@ public class AgentClusterFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(agentClusters).append(regex).append(state).append(compact).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(agentClusters).append(regex).append(state).append(compact).append(folders).toHashCode();
     }
 
     @Override
@@ -192,7 +228,7 @@ public class AgentClusterFilter {
             return false;
         }
         AgentClusterFilter rhs = ((AgentClusterFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(agentClusters, rhs.agentClusters).append(regex, rhs.regex).append(state, rhs.state).append(compact, rhs.compact).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(agentClusters, rhs.agentClusters).append(regex, rhs.regex).append(state, rhs.state).append(compact, rhs.compact).append(folders, rhs.folders).isEquals();
     }
 
 }
