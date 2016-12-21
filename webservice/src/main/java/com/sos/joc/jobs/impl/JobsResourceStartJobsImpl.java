@@ -68,7 +68,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             checkRequiredParameter("job", startJob.getJob());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
 
-            XMLBuilder xml = new XMLBuilder("modify_job");
+            XMLBuilder xml = new XMLBuilder("start_job");
             xml.addAttribute("job", normalizePath(startJob.getJob())).addAttribute("force", "yes");
             if (startJob.getAt() == null || "".equals(startJob.getAt())) {
                 xml.addAttribute("at", "now");
