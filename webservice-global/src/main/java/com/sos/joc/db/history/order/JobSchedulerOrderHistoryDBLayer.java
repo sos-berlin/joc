@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.scheduler.history.db.SchedulerOrderHistoryDBItem;
-import com.sos.scheduler.history.db.SchedulerOrderHistoryLogDBItemPostgres;
+import com.sos.jitl.schedulerhistory.db.SchedulerOrderHistoryDBItem;
+import com.sos.jitl.schedulerhistory.db.SchedulerOrderHistoryLogDBItemPostgres;
 
 /** @author Uwe Risse */
 public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
