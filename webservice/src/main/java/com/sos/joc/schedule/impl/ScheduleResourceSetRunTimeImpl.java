@@ -39,8 +39,12 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             String schedule = normalizePath(modifyRuntime.getSchedule());
             XMLBuilder command = new XMLBuilder("modify_hot_folder");
-            command.addAttribute("folder", getParent(schedule)).addElement("schedule").addAttribute("name", Paths.get(schedule).getFileName()
-                    .toString()).add(XMLBuilder.parse(modifyRuntime.getRunTime()));
+            // the below command results in an ERROR: XMLBuilder.parse creates Element with root "schedule" which will be added to 
+            // already existing "schedule" Element with name Attribute
+//            command.addAttribute("folder", getParent(schedule)).addElement("schedule").addAttribute("name", Paths.get(schedule).getFileName()
+//                    .toString()).add(XMLBuilder.parse(modifyRuntime.getRunTime()));
+            command.addAttribute("folder", getParent(schedule)).add(
+                    XMLBuilder.parse(modifyRuntime.getRunTime()).addAttribute("name", Paths.get(schedule).getFileName().toString()));
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
             jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
