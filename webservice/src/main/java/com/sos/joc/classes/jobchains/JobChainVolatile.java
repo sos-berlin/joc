@@ -1,5 +1,7 @@
 package com.sos.joc.classes.jobchains;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +18,8 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.jobs.JobVolatile;
+import com.sos.joc.model.common.ConfigurationState;
+import com.sos.joc.model.common.ConfigurationStateText;
 import com.sos.joc.model.jobChain.FileWatchingNodeFile;
 import com.sos.joc.model.jobChain.FileWatchingNodeV;
 import com.sos.joc.model.jobChain.JobChainNodeJobChainV;
@@ -137,13 +141,28 @@ public class JobChainVolatile extends JobChainV {
             jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "order_queue/order");
             //node.setOrders(orders);
             Element jobElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "job");
-            JobVolatile jobV = new JobVolatile(jobElem, jocXmlCommand);
-            JobChainNodeJobV job = new JobChainNodeJobV();
-            job.setPath(jobElem.getAttribute(WebserviceConstants.PATH));
-            job.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(jobElem));
-            jobV.setState();
-            job.setState(jobV.getState());
-            node.setJob(job);
+            if (jobElem != null) {
+                JobVolatile jobV = new JobVolatile(jobElem, jocXmlCommand);
+                JobChainNodeJobV job = new JobChainNodeJobV();
+                job.setPath(jobElem.getAttribute(WebserviceConstants.PATH));
+                job.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(jobElem));
+                jobV.setState();
+                job.setState(jobV.getState());
+                node.setJob(job);
+            } else {
+                // ISSUE 131: If Job is missing do not throw NPE, rather set state to Severity -> 2, Text -> RESOURCE_IS_MISSING
+                JobVolatile jobV = new JobVolatile();
+                JobChainNodeJobV job = new JobChainNodeJobV();
+                Path jobPath = Paths.get(jobChain.getAttribute(WebserviceConstants.PATH)).getParent().resolve(jobNodeElem.getAttribute("job")).normalize();
+                job.setPath(jobPath.toString().replace("\\", "/"));
+                ConfigurationState confStatus = new ConfigurationState();
+                confStatus.setSeverity(2);
+                confStatus.setMessage(ConfigurationStateText.RESOURCE_IS_MISSING.toString());
+                job.setConfigurationStatus(confStatus);
+//                jobV.setState();
+//                job.setState(jobV.getState());
+                node.setJob(job);
+            }
             node.setState(getNodeState(jobNodeElem));
             getNodes().add(node);
         }

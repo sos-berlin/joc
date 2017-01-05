@@ -49,6 +49,13 @@ public class JobVolatile extends JobV {
         this.withOrderQueue = false;
     }
     
+    public JobVolatile() {
+        this.job = null;
+        this.jocXmlCommand = null;
+        this.orderJob = false;
+        this.withOrderQueue = false;
+    }
+    
     public boolean isOrderJob() {
         return orderJob;
     }
