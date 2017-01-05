@@ -25,11 +25,14 @@ public class ScheduleVolatile extends ScheduleV {
     }
 
     public void setValues() {
-        String path = jocXmlCommand.getAttribute(ATTRIBUTE_PATH);
-        String activeValue = jocXmlCommand.getAttribute(ATTRIBUTE_ACTIVE);
+//        String path = jocXmlCommand.getAttribute(ATTRIBUTE_PATH);
+//        String activeValue = jocXmlCommand.getAttribute(ATTRIBUTE_ACTIVE);
+        String path = scheduleElement.getAttribute(ATTRIBUTE_PATH);
+        String activeValue = scheduleElement.getAttribute(ATTRIBUTE_ACTIVE);
         setSurveyDate(jocXmlCommand.getSurveyDate());
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(scheduleElement));
-        setName(jocXmlCommand.getAttribute(ATTRIBUTE_NAME));
+//        setName(jocXmlCommand.getAttribute(ATTRIBUTE_NAME));
+        setName(scheduleElement.getAttribute(ATTRIBUTE_NAME));
         setPath(path);
         ScheduleState state = new ScheduleState();
         if ("yes".equals(activeValue)) {
@@ -40,6 +43,7 @@ public class ScheduleVolatile extends ScheduleV {
             state.set_text(ScheduleStateText.INACTIVE);
         }
         setState(state);
-        setSubstitutedBy(jocXmlCommand.getAttribute(ATTRIBUTE_NOW_COVERED_BY_SCHEDULE));
+        // TODO: ERROR NPE when schedule doesn´t have a substitute, some checks on NULL could be helpfull, but where? 
+//        setSubstitutedBy(jocXmlCommand.getAttribute(ATTRIBUTE_NOW_COVERED_BY_SCHEDULE));
     }
 }
