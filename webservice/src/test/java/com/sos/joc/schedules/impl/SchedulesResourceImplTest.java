@@ -24,7 +24,7 @@ public class SchedulesResourceImplTest {
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         SchedulesFilter schedulesFilterSchema = new SchedulesFilter();
         schedulesFilterSchema.setJobschedulerId(SCHEDULER_ID);
-        ScheduleResourceImpl schedulesResourceImpl = new ScheduleResourceImpl();
+        SchedulesResourceImpl schedulesResourceImpl = new SchedulesResourceImpl();
         JOCDefaultResponse jobsResponse = schedulesResourceImpl.postSchedules(sosShiroCurrentUserAnswer.getAccessToken(), schedulesFilterSchema);
         SchedulesV schedulesVSchema = (SchedulesV) jobsResponse.getEntity();
         assertEquals("postSchedulesTest", "myName", schedulesVSchema.getSchedules().get(0).getName());

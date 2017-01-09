@@ -11,6 +11,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.schedule.ScheduleVolatile;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ScheduleFilter;
 import com.sos.joc.model.schedule.ScheduleV200;
@@ -39,14 +40,15 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders no_subfolders", scheduleParent);
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
-            String xPath = String.format("/spooler/answer//schedules/schedule[@path='%s']", schedulePath);
+            String xPath = String.format("/spooler/answer//schedules/schedule[@path='%1$s']", schedulePath);
             Element scheduleElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(xPath);
-
-            ScheduleVolatile scheduleV = new ScheduleVolatile(jocXmlCommand, scheduleElement);
-            scheduleV.setValues();
+            
+            if (scheduleElement == null) {
+                throw new JobSchedulerBadRequestException(String.format("Schedule '%1$s' doesn't exit.", schedulePath));
+            }
 
             ScheduleV200 entity = new ScheduleV200();
-            entity.setSchedule(scheduleV);
+            entity.setSchedule(new ScheduleVolatile(jocXmlCommand.getSurveyDate(), scheduleElement));
             entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);
