@@ -122,7 +122,6 @@ public class JobVolatile extends JobV {
         setTaskQueue();
         setRunningTasks();
         setTemporary(WebserviceConstants.YES.equals(job.getAttribute("temporary")) ? true : null);
-        setNextStartTime(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, WebserviceConstants.NEXT_START_TIME, null)));
         setDelayUntil(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, "delay_after_error", null)));
     }
 
@@ -135,6 +134,7 @@ public class JobVolatile extends JobV {
         setLocks(getLocks(jocXmlCommand.getSosxml().selectNodeList(job, "lock.requestor/lock.use")));
         setStateText(job.getAttribute("state_text"));
         setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));
+        setNextStartTime(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, WebserviceConstants.NEXT_START_TIME, null)));
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(job));
         setSummary();
         if (isOrderJob() && withOrderQueue) {
