@@ -41,5 +41,8 @@ public class WebserviceConstants {
     public static final int DEFAULT_LIMIT = 30;
     public static final int HISTORY_RESULTSET_LIMIT = 10000;
 
+    /** Table JOC_CONFIGURATIONS */
+    public static final String TABLE_JOC_CONFIGURATIONS = "JOC_CONFIGURATIONS";
+
 
 }

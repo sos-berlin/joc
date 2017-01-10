@@ -61,7 +61,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 if (history.getEndTime() != null) {
                     jocXmlCommand.createNodeList(KEY_FOR_ERROR_NODE_LIST, String.format(XPATH_FOR_ERROR_NODES, node));
                     if (jocXmlCommand.getNodeList(KEY_FOR_ERROR_NODE_LIST).getLength() == 0) {
-                        state.setSeverity(0);
+                        state.setSeverity(0);  
                         state.set_text(HistoryStateText.SUCCESSFUL);
                     } else {
                         state.setSeverity(2);

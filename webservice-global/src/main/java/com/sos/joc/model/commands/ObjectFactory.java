@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.12.14 um 03:43:51 PM CET 
+// Generiert: 2017.01.10 um 05:11:36 PM CET 
 //
 
 
@@ -32,9 +32,9 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _ShowSchedulers_QNAME = new QName("", "show_schedulers");
+    private final static QName _ModifyHotFolder_QNAME = new QName("", "modify_hot_folder");
     private final static QName _ProcessClassRemove_QNAME = new QName("", "process_class.remove");
     private final static QName _RunTime_QNAME = new QName("", "run_time");
-    private final static QName _ModifyHotFolder_QNAME = new QName("", "modify_hot_folder");
     private final static QName _CheckFolders_QNAME = new QName("", "check_folders");
     private final static QName _SubsystemShow_QNAME = new QName("", "subsystem.show");
     private final static QName _AddOrder_QNAME = new QName("", "add_order");
@@ -71,6 +71,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link RegisterRemoteScheduler }
+     * 
+     */
+    public RegisterRemoteScheduler createRegisterRemoteScheduler() {
+        return new RegisterRemoteScheduler();
+    }
+
+    /**
+     * Create an instance of {@link ServiceRequest }
+     * 
+     */
+    public ServiceRequest createServiceRequest() {
+        return new ServiceRequest();
+    }
+
+    /**
      * Create an instance of {@link Holidays }
      * 
      */
@@ -100,22 +116,6 @@ public class ObjectFactory {
      */
     public Job createJob() {
         return new Job();
-    }
-
-    /**
-     * Create an instance of {@link RegisterRemoteScheduler }
-     * 
-     */
-    public RegisterRemoteScheduler createRegisterRemoteScheduler() {
-        return new RegisterRemoteScheduler();
-    }
-
-    /**
-     * Create an instance of {@link ServiceRequest }
-     * 
-     */
-    public ServiceRequest createServiceRequest() {
-        return new ServiceRequest();
     }
 
     /**
@@ -183,22 +183,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ProcessClass }
-     * 
-     */
-    public ProcessClass createProcessClass() {
-        return new ProcessClass();
-    }
-
-    /**
-     * Create an instance of {@link ProcessClass.RemoteSchedulers }
-     * 
-     */
-    public ProcessClass.RemoteSchedulers createProcessClassRemoteSchedulers() {
-        return new ProcessClass.RemoteSchedulers();
-    }
-
-    /**
      * Create an instance of {@link Job.Login }
      * 
      */
@@ -207,27 +191,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Environment }
-     * 
-     */
-    public Environment createEnvironment() {
-        return new Environment();
-    }
-
-    /**
      * Create an instance of {@link Spooler.Config }
      * 
      */
     public Spooler.Config createSpoolerConfig() {
         return new Spooler.Config();
-    }
-
-    /**
-     * Create an instance of {@link Order }
-     * 
-     */
-    public Order createOrder() {
-        return new Order();
     }
 
     /**
@@ -263,11 +231,43 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Environment }
+     * 
+     */
+    public Environment createEnvironment() {
+        return new Environment();
+    }
+
+    /**
+     * Create an instance of {@link ProcessClass }
+     * 
+     */
+    public ProcessClass createProcessClass() {
+        return new ProcessClass();
+    }
+
+    /**
+     * Create an instance of {@link ProcessClass.RemoteSchedulers }
+     * 
+     */
+    public ProcessClass.RemoteSchedulers createProcessClassRemoteSchedulers() {
+        return new ProcessClass.RemoteSchedulers();
+    }
+
+    /**
      * Create an instance of {@link RunTime }
      * 
      */
     public RunTime createRunTime() {
         return new RunTime();
+    }
+
+    /**
+     * Create an instance of {@link Order }
+     * 
+     */
+    public Order createOrder() {
+        return new Order();
     }
 
     /**
@@ -279,19 +279,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ModifySpooler }
+     * Create an instance of {@link CheckFolders }
      * 
      */
-    public ModifySpooler createModifySpooler() {
-        return new ModifySpooler();
+    public CheckFolders createCheckFolders() {
+        return new CheckFolders();
     }
 
     /**
-     * Create an instance of {@link LicenceUse }
+     * Create an instance of {@link KillTask }
      * 
      */
-    public LicenceUse createLicenceUse() {
-        return new LicenceUse();
+    public KillTask createKillTask() {
+        return new KillTask();
+    }
+
+    /**
+     * Create an instance of {@link LockRemove }
+     * 
+     */
+    public LockRemove createLockRemove() {
+        return new LockRemove();
     }
 
     /**
@@ -300,62 +308,6 @@ public class ObjectFactory {
      */
     public ModifyJob createModifyJob() {
         return new ModifyJob();
-    }
-
-    /**
-     * Create an instance of {@link Cluster }
-     * 
-     */
-    public Cluster createCluster() {
-        return new Cluster();
-    }
-
-    /**
-     * Create an instance of {@link ProcessClassRemove }
-     * 
-     */
-    public ProcessClassRemove createProcessClassRemove() {
-        return new ProcessClassRemove();
-    }
-
-    /**
-     * Create an instance of {@link RemoveOrder }
-     * 
-     */
-    public RemoveOrder createRemoveOrder() {
-        return new RemoveOrder();
-    }
-
-    /**
-     * Create an instance of {@link ShowTask }
-     * 
-     */
-    public ShowTask createShowTask() {
-        return new ShowTask();
-    }
-
-    /**
-     * Create an instance of {@link SupervisorRemoteSchedulerConfigurationFetchUpdatedFiles }
-     * 
-     */
-    public SupervisorRemoteSchedulerConfigurationFetchUpdatedFiles createSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles() {
-        return new SupervisorRemoteSchedulerConfigurationFetchUpdatedFiles();
-    }
-
-    /**
-     * Create an instance of {@link ConfigurationFile }
-     * 
-     */
-    public ConfigurationFile createConfigurationFile() {
-        return new ConfigurationFile();
-    }
-
-    /**
-     * Create an instance of {@link ConfigurationDirectory }
-     * 
-     */
-    public ConfigurationDirectory createConfigurationDirectory() {
-        return new ConfigurationDirectory();
     }
 
     /**
@@ -399,11 +351,259 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ModifySpooler }
+     * 
+     */
+    public ModifySpooler createModifySpooler() {
+        return new ModifySpooler();
+    }
+
+    /**
+     * Create an instance of {@link ModifyHotFolder }
+     * 
+     */
+    public ModifyHotFolder createModifyHotFolder() {
+        return new ModifyHotFolder();
+    }
+
+    /**
+     * Create an instance of {@link JobWhy }
+     * 
+     */
+    public JobWhy createJobWhy() {
+        return new JobWhy();
+    }
+
+    /**
+     * Create an instance of {@link JobChainModify }
+     * 
+     */
+    public JobChainModify createJobChainModify() {
+        return new JobChainModify();
+    }
+
+    /**
+     * Create an instance of {@link JobChainNodeModify }
+     * 
+     */
+    public JobChainNodeModify createJobChainNodeModify() {
+        return new JobChainNodeModify();
+    }
+
+    /**
      * Create an instance of {@link ParamGet }
      * 
      */
     public ParamGet createParamGet() {
         return new ParamGet();
+    }
+
+    /**
+     * Create an instance of {@link PluginCommand }
+     * 
+     */
+    public PluginCommand createPluginCommand() {
+        return new PluginCommand();
+    }
+
+    /**
+     * Create an instance of {@link ProcessClassRemove }
+     * 
+     */
+    public ProcessClassRemove createProcessClassRemove() {
+        return new ProcessClassRemove();
+    }
+
+    /**
+     * Create an instance of {@link JobChainCheckDistributed }
+     * 
+     */
+    public JobChainCheckDistributed createJobChainCheckDistributed() {
+        return new JobChainCheckDistributed();
+    }
+
+    /**
+     * Create an instance of {@link RegisterRemoteScheduler.ERROR }
+     * 
+     */
+    public RegisterRemoteScheduler.ERROR createRegisterRemoteSchedulerERROR() {
+        return new RegisterRemoteScheduler.ERROR();
+    }
+
+    /**
+     * Create an instance of {@link RemoveJobChain }
+     * 
+     */
+    public RemoveJobChain createRemoveJobChain() {
+        return new RemoveJobChain();
+    }
+
+    /**
+     * Create an instance of {@link RemoveOrder }
+     * 
+     */
+    public RemoveOrder createRemoveOrder() {
+        return new RemoveOrder();
+    }
+
+    /**
+     * Create an instance of {@link SettingSet }
+     * 
+     */
+    public SettingSet createSettingSet() {
+        return new SettingSet();
+    }
+
+    /**
+     * Create an instance of {@link ScheduleRemove }
+     * 
+     */
+    public ScheduleRemove createScheduleRemove() {
+        return new ScheduleRemove();
+    }
+
+    /**
+     * Create an instance of {@link SchedulerLogLogCategoriesReset }
+     * 
+     */
+    public SchedulerLogLogCategoriesReset createSchedulerLogLogCategoriesReset() {
+        return new SchedulerLogLogCategoriesReset();
+    }
+
+    /**
+     * Create an instance of {@link SchedulerLogLogCategoriesSet }
+     * 
+     */
+    public SchedulerLogLogCategoriesSet createSchedulerLogLogCategoriesSet() {
+        return new SchedulerLogLogCategoriesSet();
+    }
+
+    /**
+     * Create an instance of {@link SchedulerLogLogCategoriesShow }
+     * 
+     */
+    public SchedulerLogLogCategoriesShow createSchedulerLogLogCategoriesShow() {
+        return new SchedulerLogLogCategoriesShow();
+    }
+
+    /**
+     * Create an instance of {@link ShowCalendar }
+     * 
+     */
+    public ShowCalendar createShowCalendar() {
+        return new ShowCalendar();
+    }
+
+    /**
+     * Create an instance of {@link ShowHistory }
+     * 
+     */
+    public ShowHistory createShowHistory() {
+        return new ShowHistory();
+    }
+
+    /**
+     * Create an instance of {@link ShowJob }
+     * 
+     */
+    public ShowJob createShowJob() {
+        return new ShowJob();
+    }
+
+    /**
+     * Create an instance of {@link ShowJobs }
+     * 
+     */
+    public ShowJobs createShowJobs() {
+        return new ShowJobs();
+    }
+
+    /**
+     * Create an instance of {@link ShowJobChains }
+     * 
+     */
+    public ShowJobChains createShowJobChains() {
+        return new ShowJobChains();
+    }
+
+    /**
+     * Create an instance of {@link ShowJobChain }
+     * 
+     */
+    public ShowJobChain createShowJobChain() {
+        return new ShowJobChain();
+    }
+
+    /**
+     * Create an instance of {@link ShowOrder }
+     * 
+     */
+    public ShowOrder createShowOrder() {
+        return new ShowOrder();
+    }
+
+    /**
+     * Create an instance of {@link ShowState }
+     * 
+     */
+    public ShowState createShowState() {
+        return new ShowState();
+    }
+
+    /**
+     * Create an instance of {@link ShowTask }
+     * 
+     */
+    public ShowTask createShowTask() {
+        return new ShowTask();
+    }
+
+    /**
+     * Create an instance of {@link WebService }
+     * 
+     */
+    public WebService createWebService() {
+        return new WebService();
+    }
+
+    /**
+     * Create an instance of {@link ServiceRequest.Content }
+     * 
+     */
+    public ServiceRequest.Content createServiceRequestContent() {
+        return new ServiceRequest.Content();
+    }
+
+    /**
+     * Create an instance of {@link StartJob }
+     * 
+     */
+    public StartJob createStartJob() {
+        return new StartJob();
+    }
+
+    /**
+     * Create an instance of {@link SubsystemShow }
+     * 
+     */
+    public SubsystemShow createSubsystemShow() {
+        return new SubsystemShow();
+    }
+
+    /**
+     * Create an instance of {@link RemoteSchedulerStartRemoteTask }
+     * 
+     */
+    public RemoteSchedulerStartRemoteTask createRemoteSchedulerStartRemoteTask() {
+        return new RemoteSchedulerStartRemoteTask();
+    }
+
+    /**
+     * Create an instance of {@link RemoteSchedulerRemoteTaskClose }
+     * 
+     */
+    public RemoteSchedulerRemoteTaskClose createRemoteSchedulerRemoteTaskClose() {
+        return new RemoteSchedulerRemoteTaskClose();
     }
 
     /**
@@ -415,11 +615,59 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RemoteSchedulerStartRemoteTask }
+     * Create an instance of {@link com.sos.joc.model.commands.Terminate }
      * 
      */
-    public RemoteSchedulerStartRemoteTask createRemoteSchedulerStartRemoteTask() {
-        return new RemoteSchedulerStartRemoteTask();
+    public com.sos.joc.model.commands.Terminate createTerminate() {
+        return new com.sos.joc.model.commands.Terminate();
+    }
+
+    /**
+     * Create an instance of {@link JobschedulerCommands }
+     * 
+     */
+    public JobschedulerCommands createJobschedulerCommands() {
+        return new JobschedulerCommands();
+    }
+
+    /**
+     * Create an instance of {@link LicenceUse }
+     * 
+     */
+    public LicenceUse createLicenceUse() {
+        return new LicenceUse();
+    }
+
+    /**
+     * Create an instance of {@link Cluster }
+     * 
+     */
+    public Cluster createCluster() {
+        return new Cluster();
+    }
+
+    /**
+     * Create an instance of {@link SupervisorRemoteSchedulerConfigurationFetchUpdatedFiles }
+     * 
+     */
+    public SupervisorRemoteSchedulerConfigurationFetchUpdatedFiles createSupervisorRemoteSchedulerConfigurationFetchUpdatedFiles() {
+        return new SupervisorRemoteSchedulerConfigurationFetchUpdatedFiles();
+    }
+
+    /**
+     * Create an instance of {@link ConfigurationFile }
+     * 
+     */
+    public ConfigurationFile createConfigurationFile() {
+        return new ConfigurationFile();
+    }
+
+    /**
+     * Create an instance of {@link ConfigurationDirectory }
+     * 
+     */
+    public ConfigurationDirectory createConfigurationDirectory() {
+        return new ConfigurationDirectory();
     }
 
     /**
@@ -436,14 +684,6 @@ public class ObjectFactory {
      */
     public com.sos.joc.model.commands.Include createInclude() {
         return new com.sos.joc.model.commands.Include();
-    }
-
-    /**
-     * Create an instance of {@link KillTask }
-     * 
-     */
-    public KillTask createKillTask() {
-        return new KillTask();
     }
 
     /**
@@ -615,155 +855,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CheckFolders }
-     * 
-     */
-    public CheckFolders createCheckFolders() {
-        return new CheckFolders();
-    }
-
-    /**
-     * Create an instance of {@link JobWhy }
-     * 
-     */
-    public JobWhy createJobWhy() {
-        return new JobWhy();
-    }
-
-    /**
-     * Create an instance of {@link JobChainCheckDistributed }
-     * 
-     */
-    public JobChainCheckDistributed createJobChainCheckDistributed() {
-        return new JobChainCheckDistributed();
-    }
-
-    /**
-     * Create an instance of {@link RegisterRemoteScheduler.ERROR }
-     * 
-     */
-    public RegisterRemoteScheduler.ERROR createRegisterRemoteSchedulerERROR() {
-        return new RegisterRemoteScheduler.ERROR();
-    }
-
-    /**
-     * Create an instance of {@link RemoveJobChain }
-     * 
-     */
-    public RemoveJobChain createRemoveJobChain() {
-        return new RemoveJobChain();
-    }
-
-    /**
-     * Create an instance of {@link ShowCalendar }
-     * 
-     */
-    public ShowCalendar createShowCalendar() {
-        return new ShowCalendar();
-    }
-
-    /**
-     * Create an instance of {@link ShowHistory }
-     * 
-     */
-    public ShowHistory createShowHistory() {
-        return new ShowHistory();
-    }
-
-    /**
-     * Create an instance of {@link ShowJob }
-     * 
-     */
-    public ShowJob createShowJob() {
-        return new ShowJob();
-    }
-
-    /**
-     * Create an instance of {@link ShowJobs }
-     * 
-     */
-    public ShowJobs createShowJobs() {
-        return new ShowJobs();
-    }
-
-    /**
-     * Create an instance of {@link ShowJobChains }
-     * 
-     */
-    public ShowJobChains createShowJobChains() {
-        return new ShowJobChains();
-    }
-
-    /**
-     * Create an instance of {@link ShowJobChain }
-     * 
-     */
-    public ShowJobChain createShowJobChain() {
-        return new ShowJobChain();
-    }
-
-    /**
-     * Create an instance of {@link ShowOrder }
-     * 
-     */
-    public ShowOrder createShowOrder() {
-        return new ShowOrder();
-    }
-
-    /**
      * Create an instance of {@link ShowProcessClasses }
      * 
      */
     public ShowProcessClasses createShowProcessClasses() {
         return new ShowProcessClasses();
-    }
-
-    /**
-     * Create an instance of {@link ShowState }
-     * 
-     */
-    public ShowState createShowState() {
-        return new ShowState();
-    }
-
-    /**
-     * Create an instance of {@link WebService }
-     * 
-     */
-    public WebService createWebService() {
-        return new WebService();
-    }
-
-    /**
-     * Create an instance of {@link ServiceRequest.Content }
-     * 
-     */
-    public ServiceRequest.Content createServiceRequestContent() {
-        return new ServiceRequest.Content();
-    }
-
-    /**
-     * Create an instance of {@link StartJob }
-     * 
-     */
-    public StartJob createStartJob() {
-        return new StartJob();
-    }
-
-    /**
-     * Create an instance of {@link SubsystemShow }
-     * 
-     */
-    public SubsystemShow createSubsystemShow() {
-        return new SubsystemShow();
-    }
-
-    /**
-     * Create an instance of {@link com.sos.joc.model.commands.Terminate }
-     * 
-     */
-    public com.sos.joc.model.commands.Terminate createTerminate() {
-        return new com.sos.joc.model.commands.Terminate();
     }
 
     /**
@@ -775,43 +871,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SchedulerLogLogCategoriesReset }
-     * 
-     */
-    public SchedulerLogLogCategoriesReset createSchedulerLogLogCategoriesReset() {
-        return new SchedulerLogLogCategoriesReset();
-    }
-
-    /**
-     * Create an instance of {@link JobChainModify }
-     * 
-     */
-    public JobChainModify createJobChainModify() {
-        return new JobChainModify();
-    }
-
-    /**
      * Create an instance of {@link ClusterMemberCommand.Terminate }
      * 
      */
     public ClusterMemberCommand.Terminate createClusterMemberCommandTerminate() {
         return new ClusterMemberCommand.Terminate();
-    }
-
-    /**
-     * Create an instance of {@link PluginCommand }
-     * 
-     */
-    public PluginCommand createPluginCommand() {
-        return new PluginCommand();
-    }
-
-    /**
-     * Create an instance of {@link LockRemove }
-     * 
-     */
-    public LockRemove createLockRemove() {
-        return new LockRemove();
     }
 
     /**
@@ -839,67 +903,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ScheduleRemove }
-     * 
-     */
-    public ScheduleRemove createScheduleRemove() {
-        return new ScheduleRemove();
-    }
-
-    /**
-     * Create an instance of {@link JobChainNodeModify }
-     * 
-     */
-    public JobChainNodeModify createJobChainNodeModify() {
-        return new JobChainNodeModify();
-    }
-
-    /**
-     * Create an instance of {@link SchedulerLogLogCategoriesSet }
-     * 
-     */
-    public SchedulerLogLogCategoriesSet createSchedulerLogLogCategoriesSet() {
-        return new SchedulerLogLogCategoriesSet();
-    }
-
-    /**
-     * Create an instance of {@link SchedulerLogLogCategoriesShow }
-     * 
-     */
-    public SchedulerLogLogCategoriesShow createSchedulerLogLogCategoriesShow() {
-        return new SchedulerLogLogCategoriesShow();
-    }
-
-    /**
-     * Create an instance of {@link SettingSet }
-     * 
-     */
-    public SettingSet createSettingSet() {
-        return new SettingSet();
-    }
-
-    /**
-     * Create an instance of {@link ModifyHotFolder }
-     * 
-     */
-    public ModifyHotFolder createModifyHotFolder() {
-        return new ModifyHotFolder();
-    }
-
-    /**
      * Create an instance of {@link Jobs }
      * 
      */
     public Jobs createJobs() {
         return new Jobs();
-    }
-
-    /**
-     * Create an instance of {@link RemoteSchedulerRemoteTaskClose }
-     * 
-     */
-    public RemoteSchedulerRemoteTaskClose createRemoteSchedulerRemoteTaskClose() {
-        return new RemoteSchedulerRemoteTaskClose();
     }
 
     /**
@@ -999,27 +1007,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ProcessClass.RemoteSchedulers.RemoteScheduler }
-     * 
-     */
-    public ProcessClass.RemoteSchedulers.RemoteScheduler createProcessClassRemoteSchedulersRemoteScheduler() {
-        return new ProcessClass.RemoteSchedulers.RemoteScheduler();
-    }
-
-    /**
      * Create an instance of {@link Job.Login.PasswordPlain }
      * 
      */
     public Job.Login.PasswordPlain createJobLoginPasswordPlain() {
         return new Job.Login.PasswordPlain();
-    }
-
-    /**
-     * Create an instance of {@link Environment.Variable }
-     * 
-     */
-    public Environment.Variable createEnvironmentVariable() {
-        return new Environment.Variable();
     }
 
     /**
@@ -1047,14 +1039,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Order.Payload }
-     * 
-     */
-    public Order.Payload createOrderPayload() {
-        return new Order.Payload();
-    }
-
-    /**
      * Create an instance of {@link JobChain.JobChainNode.OnReturnCodes.OnReturnCode.ToState }
      * 
      */
@@ -1068,6 +1052,22 @@ public class ObjectFactory {
      */
     public Holidays.Weekdays.Day createHolidaysWeekdaysDay() {
         return new Holidays.Weekdays.Day();
+    }
+
+    /**
+     * Create an instance of {@link Environment.Variable }
+     * 
+     */
+    public Environment.Variable createEnvironmentVariable() {
+        return new Environment.Variable();
+    }
+
+    /**
+     * Create an instance of {@link ProcessClass.RemoteSchedulers.RemoteScheduler }
+     * 
+     */
+    public ProcessClass.RemoteSchedulers.RemoteScheduler createProcessClassRemoteSchedulersRemoteScheduler() {
+        return new ProcessClass.RemoteSchedulers.RemoteScheduler();
     }
 
     /**
@@ -1095,12 +1095,29 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Order.Payload }
+     * 
+     */
+    public Order.Payload createOrderPayload() {
+        return new Order.Payload();
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ShowState }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "", name = "show_schedulers")
     public JAXBElement<ShowState> createShowSchedulers(ShowState value) {
         return new JAXBElement<ShowState>(_ShowSchedulers_QNAME, ShowState.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ModifyHotFolder }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "", name = "modify_hot_folder")
+    public JAXBElement<ModifyHotFolder> createModifyHotFolder(ModifyHotFolder value) {
+        return new JAXBElement<ModifyHotFolder>(_ModifyHotFolder_QNAME, ModifyHotFolder.class, null, value);
     }
 
     /**
@@ -1119,15 +1136,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "run_time")
     public JAXBElement<RunTime> createRunTime(RunTime value) {
         return new JAXBElement<RunTime>(_RunTime_QNAME, RunTime.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ModifyHotFolder }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "modify_hot_folder")
-    public JAXBElement<ModifyHotFolder> createModifyHotFolder(ModifyHotFolder value) {
-        return new JAXBElement<ModifyHotFolder>(_ModifyHotFolder_QNAME, ModifyHotFolder.class, null, value);
     }
 
     /**
@@ -1248,60 +1256,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Order }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "order", scope = JobschedulerCommand.class)
-    public JAXBElement<Order> createJobschedulerCommandOrder(Order value) {
-        return new JAXBElement<Order>(_JobschedulerCommandOrder_QNAME, Order.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClass }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class", scope = JobschedulerCommand.class)
-    public JAXBElement<ProcessClass> createJobschedulerCommandProcessClass(ProcessClass value) {
-        return new JAXBElement<ProcessClass>(_JobschedulerCommandProcessClass_QNAME, ProcessClass.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link CheckFolders }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "check_folders", scope = JobschedulerCommand.class)
-    public JAXBElement<CheckFolders> createJobschedulerCommandCheckFolders(CheckFolders value) {
-        return new JAXBElement<CheckFolders>(_JobschedulerCommandCheckFolders_QNAME, CheckFolders.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link LockRemove }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "lock.remove", scope = JobschedulerCommand.class)
-    public JAXBElement<LockRemove> createJobschedulerCommandLockRemove(LockRemove value) {
-        return new JAXBElement<LockRemove>(_JobschedulerCommandLockRemove_QNAME, LockRemove.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class.remove", scope = JobschedulerCommand.class)
-    public JAXBElement<ProcessClassRemove> createJobschedulerCommandProcessClassRemove(ProcessClassRemove value) {
-        return new JAXBElement<ProcessClassRemove>(_JobschedulerCommandProcessClassRemove_QNAME, ProcessClassRemove.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RunTime }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "run_time", scope = JobschedulerCommand.class)
-    public JAXBElement<RunTime> createJobschedulerCommandRunTime(RunTime value) {
-        return new JAXBElement<RunTime>(_JobschedulerCommandRunTime_QNAME, RunTime.class, JobschedulerCommand.class, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}}
      * 
      */
@@ -1362,6 +1316,60 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "order", scope = Commands.class)
     public JAXBElement<Order> createCommandsOrder(Order value) {
         return new JAXBElement<Order>(_Order_QNAME, Order.class, Commands.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Order }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "order", scope = JobschedulerCommand.class)
+    public JAXBElement<Order> createJobschedulerCommandOrder(Order value) {
+        return new JAXBElement<Order>(_JobschedulerCommandOrder_QNAME, Order.class, JobschedulerCommand.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClass }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class", scope = JobschedulerCommand.class)
+    public JAXBElement<ProcessClass> createJobschedulerCommandProcessClass(ProcessClass value) {
+        return new JAXBElement<ProcessClass>(_JobschedulerCommandProcessClass_QNAME, ProcessClass.class, JobschedulerCommand.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CheckFolders }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "check_folders", scope = JobschedulerCommand.class)
+    public JAXBElement<CheckFolders> createJobschedulerCommandCheckFolders(CheckFolders value) {
+        return new JAXBElement<CheckFolders>(_JobschedulerCommandCheckFolders_QNAME, CheckFolders.class, JobschedulerCommand.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LockRemove }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "lock.remove", scope = JobschedulerCommand.class)
+    public JAXBElement<LockRemove> createJobschedulerCommandLockRemove(LockRemove value) {
+        return new JAXBElement<LockRemove>(_JobschedulerCommandLockRemove_QNAME, LockRemove.class, JobschedulerCommand.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class.remove", scope = JobschedulerCommand.class)
+    public JAXBElement<ProcessClassRemove> createJobschedulerCommandProcessClassRemove(ProcessClassRemove value) {
+        return new JAXBElement<ProcessClassRemove>(_JobschedulerCommandProcessClassRemove_QNAME, ProcessClassRemove.class, JobschedulerCommand.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RunTime }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "run_time", scope = JobschedulerCommand.class)
+    public JAXBElement<RunTime> createJobschedulerCommandRunTime(RunTime value) {
+        return new JAXBElement<RunTime>(_JobschedulerCommandRunTime_QNAME, RunTime.class, JobschedulerCommand.class, value);
     }
 
 }

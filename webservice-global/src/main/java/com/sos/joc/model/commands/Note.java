@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.12.14 um 03:43:51 PM CET 
+// Generiert: 2017.01.10 um 05:11:36 PM CET 
 //
 
 
@@ -80,8 +80,8 @@ public class Note {
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link Object }
-     * {@link String }
      * {@link Element }
+     * {@link String }
      * 
      * 
      */

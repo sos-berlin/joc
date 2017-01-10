@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+
+<job  title="Launch remote commands or executable files by SSH" order="yes" stop_on_error="no">
+    <settings >
+        <log_level ><![CDATA[info]]></log_level>
+    </settings>
+
+    <description >
+        <include  file="jobs/JobSchedulerSSHJob.xml"/>
+    </description>
+
+    <params />
+
+    <script  language="java" java_class="sos.scheduler.job.SOSSSHJob2JSAdapter">
+        <![CDATA[
+echo Executing PerformInstall ${target_dir}
+
+echo ${sudo_password} | sudo -S chmod a+x ${target_dir}/jobscheduler_universal_agent_install.sh 
+echo ${sudo_password} | sudo -S ${target_dir}/jobscheduler_universal_agent_install.sh -d${install_path} -p${agent_options.scheduler_http_port} -f${installation_file}
+
+${command_0}
+${command_1}
+${command_2}
+        ]]>
+    </script>
+
+    <monitor  name="state_text" ordering="0">
+        <script  language="java:javascript">
+            <![CDATA[
+function spooler_process_before(){
+    var order = spooler_task.order;
+    scheduler_ip_address = order.params.value("agent_options.scheduler_ip_address");
+    scheduler_http_port = order.params.value("agent_options.scheduler_http_port");
+    spooler_task.order.state_text="Installing JobScheduler Universal Agent: " + scheduler_ip_address + ":" + scheduler_http_port ;
+	return true;
+}
+            ]]>
+        </script>
+    </monitor>
+
+    <run_time />
+</job>

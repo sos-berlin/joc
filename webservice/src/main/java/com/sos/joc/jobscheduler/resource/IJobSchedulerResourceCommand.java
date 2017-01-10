@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.commands.JobschedulerCommand;
+import com.sos.joc.model.commands.JobschedulerCommands;
   
 public interface IJobSchedulerResourceCommand {
   
@@ -19,5 +20,13 @@ public interface IJobSchedulerResourceCommand {
     @Consumes(MediaType.APPLICATION_XML)
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobschedulerCommand(
-            @HeaderParam("access_token") String accessToken, JobschedulerCommand command) throws Exception;
+            @HeaderParam("access_token") String accessToken, JobschedulerCommand jobschedulerCommand) throws Exception;
+
+    @POST
+    @Path("commands")
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces({ MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse postJobschedulerCommands(
+            @HeaderParam("access_token") String accessToken, JobschedulerCommands jobschedulerCommands) throws Exception;
+
 }

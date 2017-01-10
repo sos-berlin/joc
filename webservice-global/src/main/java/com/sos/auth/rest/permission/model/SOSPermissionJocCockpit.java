@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.12.14 um 03:42:09 PM CET 
+// Generiert: 2016.12.21 um 04:33:24 PM CET 
 //
 
 
@@ -238,7 +238,6 @@ import javax.xml.bind.annotation.XmlType;
  *                   &lt;element name="skipJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="processJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="stopJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -272,7 +271,6 @@ import javax.xml.bind.annotation.XmlType;
  *                   &lt;element name="endAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="suspendAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="continueAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -295,7 +293,6 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
- *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -320,7 +317,6 @@ import javax.xml.bind.annotation.XmlType;
  *                   &lt;/element>
  *                   &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="addSubstitute" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -343,7 +339,6 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
- *                   &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -1527,7 +1522,6 @@ public class SOSPermissionJocCockpit {
      *         &lt;element name="endAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="suspendAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="continueAllTasks" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -1547,8 +1541,7 @@ public class SOSPermissionJocCockpit {
         "setRunTime",
         "endAllTasks",
         "suspendAllTasks",
-        "continueAllTasks",
-        "modifyHotFolder"
+        "continueAllTasks"
     })
     public static class Job {
 
@@ -1563,7 +1556,6 @@ public class SOSPermissionJocCockpit {
         protected boolean endAllTasks;
         protected boolean suspendAllTasks;
         protected boolean continueAllTasks;
-        protected boolean modifyHotFolder;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -1733,22 +1725,6 @@ public class SOSPermissionJocCockpit {
             this.continueAllTasks = value;
         }
 
-        /**
-         * Ruft den Wert der modifyHotFolder-Eigenschaft ab.
-         * 
-         */
-        public boolean isModifyHotFolder() {
-            return modifyHotFolder;
-        }
-
-        /**
-         * Legt den Wert der modifyHotFolder-Eigenschaft fest.
-         * 
-         */
-        public void setModifyHotFolder(boolean value) {
-            this.modifyHotFolder = value;
-        }
-
 
         /**
          * <p>Java-Klasse für anonymous complex type.
@@ -1884,7 +1860,6 @@ public class SOSPermissionJocCockpit {
      *         &lt;element name="skipJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="processJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="stopJobChainNode" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -1901,8 +1876,7 @@ public class SOSPermissionJocCockpit {
         "addOrder",
         "skipJobChainNode",
         "processJobChainNode",
-        "stopJobChainNode",
-        "modifyHotFolder"
+        "stopJobChainNode"
     })
     public static class JobChain {
 
@@ -1914,7 +1888,6 @@ public class SOSPermissionJocCockpit {
         protected boolean skipJobChainNode;
         protected boolean processJobChainNode;
         protected boolean stopJobChainNode;
-        protected boolean modifyHotFolder;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -2034,22 +2007,6 @@ public class SOSPermissionJocCockpit {
          */
         public void setStopJobChainNode(boolean value) {
             this.stopJobChainNode = value;
-        }
-
-        /**
-         * Ruft den Wert der modifyHotFolder-Eigenschaft ab.
-         * 
-         */
-        public boolean isModifyHotFolder() {
-            return modifyHotFolder;
-        }
-
-        /**
-         * Legt den Wert der modifyHotFolder-Eigenschaft fest.
-         * 
-         */
-        public void setModifyHotFolder(boolean value) {
-            this.modifyHotFolder = value;
         }
 
 
@@ -2933,7 +2890,6 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
-     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -2944,14 +2900,12 @@ public class SOSPermissionJocCockpit {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "view",
-        "modifyHotFolder"
+        "view"
     })
     public static class Lock {
 
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Lock.View view;
-        protected boolean modifyHotFolder;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -2975,22 +2929,6 @@ public class SOSPermissionJocCockpit {
          */
         public void setView(SOSPermissionJocCockpit.Lock.View value) {
             this.view = value;
-        }
-
-        /**
-         * Ruft den Wert der modifyHotFolder-Eigenschaft ab.
-         * 
-         */
-        public boolean isModifyHotFolder() {
-            return modifyHotFolder;
-        }
-
-        /**
-         * Legt den Wert der modifyHotFolder-Eigenschaft fest.
-         * 
-         */
-        public void setModifyHotFolder(boolean value) {
-            this.modifyHotFolder = value;
         }
 
 
@@ -3763,7 +3701,6 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
-     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -3774,14 +3711,12 @@ public class SOSPermissionJocCockpit {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "view",
-        "modifyHotFolder"
+        "view"
     })
     public static class ProcessClass {
 
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.ProcessClass.View view;
-        protected boolean modifyHotFolder;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -3805,22 +3740,6 @@ public class SOSPermissionJocCockpit {
          */
         public void setView(SOSPermissionJocCockpit.ProcessClass.View value) {
             this.view = value;
-        }
-
-        /**
-         * Ruft den Wert der modifyHotFolder-Eigenschaft ab.
-         * 
-         */
-        public boolean isModifyHotFolder() {
-            return modifyHotFolder;
-        }
-
-        /**
-         * Legt den Wert der modifyHotFolder-Eigenschaft fest.
-         * 
-         */
-        public void setModifyHotFolder(boolean value) {
-            this.modifyHotFolder = value;
         }
 
 
@@ -3915,7 +3834,6 @@ public class SOSPermissionJocCockpit {
      *         &lt;/element>
      *         &lt;element name="edit" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="addSubstitute" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *         &lt;element name="modifyHotFolder" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -3928,8 +3846,7 @@ public class SOSPermissionJocCockpit {
     @XmlType(name = "", propOrder = {
         "view",
         "edit",
-        "addSubstitute",
-        "modifyHotFolder"
+        "addSubstitute"
     })
     public static class Schedule {
 
@@ -3937,7 +3854,6 @@ public class SOSPermissionJocCockpit {
         protected SOSPermissionJocCockpit.Schedule.View view;
         protected boolean edit;
         protected boolean addSubstitute;
-        protected boolean modifyHotFolder;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -3993,22 +3909,6 @@ public class SOSPermissionJocCockpit {
          */
         public void setAddSubstitute(boolean value) {
             this.addSubstitute = value;
-        }
-
-        /**
-         * Ruft den Wert der modifyHotFolder-Eigenschaft ab.
-         * 
-         */
-        public boolean isModifyHotFolder() {
-            return modifyHotFolder;
-        }
-
-        /**
-         * Legt den Wert der modifyHotFolder-Eigenschaft fest.
-         * 
-         */
-        public void setModifyHotFolder(boolean value) {
-            this.modifyHotFolder = value;
         }
 
 
