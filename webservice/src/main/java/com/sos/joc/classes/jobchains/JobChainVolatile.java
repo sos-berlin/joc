@@ -153,8 +153,8 @@ public class JobChainVolatile extends JobChainV {
                 // ISSUE 131: If Job is missing do not throw NPE, rather set state to Severity -> 2, Text -> RESOURCE_IS_MISSING
                 JobVolatile jobV = new JobVolatile();
                 JobChainNodeJobV job = new JobChainNodeJobV();
-                Path jobPath = Paths.get(jobChain.getAttribute(WebserviceConstants.PATH)).getParent().resolve(jobNodeElem.getAttribute("job")).normalize();
-                job.setPath(jobPath.toString().replace("\\", "/"));
+//                Path jobPath = Paths.get(jobChain.getAttribute(WebserviceConstants.PATH)).getParent().resolve(jobNodeElem.getAttribute("job")).normalize();
+                job.setPath(jobNodeElem.getAttribute("job"));
                 ConfigurationState confStatus = new ConfigurationState();
                 confStatus.setSeverity(2);
                 confStatus.setMessage(ConfigurationStateText.RESOURCE_IS_MISSING.toString());
