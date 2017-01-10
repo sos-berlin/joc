@@ -11,6 +11,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceP;
 import com.sos.joc.model.job.JobFilter;
@@ -35,7 +36,9 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
             Long instanceId = dbItemInventoryInstance.getId();
             DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(normalizePath(jobFilter.getJob()), instanceId);
-
+            if (inventoryJob == null) {
+                throw new DBMissingDataException(String.format("no entry found in DB for job: %1$s", jobFilter.getJob()));
+            }
             JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId);
             JobP200 entity = new JobP200();
             entity.setJob(job);
