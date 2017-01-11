@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.01.10 um 05:11:36 PM CET 
+// Generiert: 2017.01.11 um 11:41:39 AM CET 
 //
 
 
@@ -48,12 +48,12 @@ public class ObjectFactory {
     private final static QName _ProcessClass_QNAME = new QName("", "process_class");
     private final static QName _Commands_QNAME = new QName("", "commands");
     private final static QName _Order_QNAME = new QName("", "order");
-    private final static QName _JobschedulerCommandOrder_QNAME = new QName("http://www.sos-berlin.com/scheduler", "order");
-    private final static QName _JobschedulerCommandProcessClass_QNAME = new QName("http://www.sos-berlin.com/scheduler", "process_class");
-    private final static QName _JobschedulerCommandCheckFolders_QNAME = new QName("http://www.sos-berlin.com/scheduler", "check_folders");
-    private final static QName _JobschedulerCommandLockRemove_QNAME = new QName("http://www.sos-berlin.com/scheduler", "lock.remove");
-    private final static QName _JobschedulerCommandProcessClassRemove_QNAME = new QName("http://www.sos-berlin.com/scheduler", "process_class.remove");
-    private final static QName _JobschedulerCommandRunTime_QNAME = new QName("http://www.sos-berlin.com/scheduler", "run_time");
+    private final static QName _JobschedulerCommandsOrder_QNAME = new QName("http://www.sos-berlin.com/scheduler", "order");
+    private final static QName _JobschedulerCommandsProcessClass_QNAME = new QName("http://www.sos-berlin.com/scheduler", "process_class");
+    private final static QName _JobschedulerCommandsCheckFolders_QNAME = new QName("http://www.sos-berlin.com/scheduler", "check_folders");
+    private final static QName _JobschedulerCommandsLockRemove_QNAME = new QName("http://www.sos-berlin.com/scheduler", "lock.remove");
+    private final static QName _JobschedulerCommandsProcessClassRemove_QNAME = new QName("http://www.sos-berlin.com/scheduler", "process_class.remove");
+    private final static QName _JobschedulerCommandsRunTime_QNAME = new QName("http://www.sos-berlin.com/scheduler", "run_time");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.sos.joc.model.commands
@@ -271,11 +271,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JobschedulerCommand }
+     * Create an instance of {@link JobschedulerCommands }
      * 
      */
-    public JobschedulerCommand createJobschedulerCommand() {
-        return new JobschedulerCommand();
+    public JobschedulerCommands createJobschedulerCommands() {
+        return new JobschedulerCommands();
     }
 
     /**
@@ -620,14 +620,6 @@ public class ObjectFactory {
      */
     public com.sos.joc.model.commands.Terminate createTerminate() {
         return new com.sos.joc.model.commands.Terminate();
-    }
-
-    /**
-     * Create an instance of {@link JobschedulerCommands }
-     * 
-     */
-    public JobschedulerCommands createJobschedulerCommands() {
-        return new JobschedulerCommands();
     }
 
     /**
@@ -1256,6 +1248,60 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Order }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "order", scope = JobschedulerCommands.class)
+    public JAXBElement<Order> createJobschedulerCommandsOrder(Order value) {
+        return new JAXBElement<Order>(_JobschedulerCommandsOrder_QNAME, Order.class, JobschedulerCommands.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClass }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class", scope = JobschedulerCommands.class)
+    public JAXBElement<ProcessClass> createJobschedulerCommandsProcessClass(ProcessClass value) {
+        return new JAXBElement<ProcessClass>(_JobschedulerCommandsProcessClass_QNAME, ProcessClass.class, JobschedulerCommands.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CheckFolders }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "check_folders", scope = JobschedulerCommands.class)
+    public JAXBElement<CheckFolders> createJobschedulerCommandsCheckFolders(CheckFolders value) {
+        return new JAXBElement<CheckFolders>(_JobschedulerCommandsCheckFolders_QNAME, CheckFolders.class, JobschedulerCommands.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LockRemove }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "lock.remove", scope = JobschedulerCommands.class)
+    public JAXBElement<LockRemove> createJobschedulerCommandsLockRemove(LockRemove value) {
+        return new JAXBElement<LockRemove>(_JobschedulerCommandsLockRemove_QNAME, LockRemove.class, JobschedulerCommands.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class.remove", scope = JobschedulerCommands.class)
+    public JAXBElement<ProcessClassRemove> createJobschedulerCommandsProcessClassRemove(ProcessClassRemove value) {
+        return new JAXBElement<ProcessClassRemove>(_JobschedulerCommandsProcessClassRemove_QNAME, ProcessClassRemove.class, JobschedulerCommands.class, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RunTime }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "run_time", scope = JobschedulerCommands.class)
+    public JAXBElement<RunTime> createJobschedulerCommandsRunTime(RunTime value) {
+        return new JAXBElement<RunTime>(_JobschedulerCommandsRunTime_QNAME, RunTime.class, JobschedulerCommands.class, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}}
      * 
      */
@@ -1316,60 +1362,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "", name = "order", scope = Commands.class)
     public JAXBElement<Order> createCommandsOrder(Order value) {
         return new JAXBElement<Order>(_Order_QNAME, Order.class, Commands.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Order }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "order", scope = JobschedulerCommand.class)
-    public JAXBElement<Order> createJobschedulerCommandOrder(Order value) {
-        return new JAXBElement<Order>(_JobschedulerCommandOrder_QNAME, Order.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClass }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class", scope = JobschedulerCommand.class)
-    public JAXBElement<ProcessClass> createJobschedulerCommandProcessClass(ProcessClass value) {
-        return new JAXBElement<ProcessClass>(_JobschedulerCommandProcessClass_QNAME, ProcessClass.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link CheckFolders }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "check_folders", scope = JobschedulerCommand.class)
-    public JAXBElement<CheckFolders> createJobschedulerCommandCheckFolders(CheckFolders value) {
-        return new JAXBElement<CheckFolders>(_JobschedulerCommandCheckFolders_QNAME, CheckFolders.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link LockRemove }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "lock.remove", scope = JobschedulerCommand.class)
-    public JAXBElement<LockRemove> createJobschedulerCommandLockRemove(LockRemove value) {
-        return new JAXBElement<LockRemove>(_JobschedulerCommandLockRemove_QNAME, LockRemove.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class.remove", scope = JobschedulerCommand.class)
-    public JAXBElement<ProcessClassRemove> createJobschedulerCommandProcessClassRemove(ProcessClassRemove value) {
-        return new JAXBElement<ProcessClassRemove>(_JobschedulerCommandProcessClassRemove_QNAME, ProcessClassRemove.class, JobschedulerCommand.class, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RunTime }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "run_time", scope = JobschedulerCommand.class)
-    public JAXBElement<RunTime> createJobschedulerCommandRunTime(RunTime value) {
-        return new JAXBElement<RunTime>(_JobschedulerCommandRunTime_QNAME, RunTime.class, JobschedulerCommand.class, value);
     }
 
 }

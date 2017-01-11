@@ -8,7 +8,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.model.commands.JobChainNodeAction;
 import com.sos.joc.model.commands.JobChainNodeModify;
-import com.sos.joc.model.commands.JobschedulerCommand;
+import com.sos.joc.model.commands.JobschedulerCommands;
 import com.sos.joc.model.commands.ShowJobs;
 import com.sos.joc.model.commands.ShowState;
 
@@ -21,7 +21,7 @@ public class JobSchedulerResourceCommandImplTest {
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        JobschedulerCommand jobschedulerCommand = new JobschedulerCommand();
+        JobschedulerCommands jobschedulerCommand = new JobschedulerCommands();
         jobschedulerCommand.setUrl("http://localhost:4444");
         jobschedulerCommand.setJobschedulerId("scheduler_joc_cockpit");
         ShowState command = new ShowState();

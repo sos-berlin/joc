@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema targetNamespace="http://www.sos-berlin.com/scheduler" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.sos-berlin.com/scheduler" elementFormDefault="qualified">
+<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com) by Andreas Pueschel (APL Software GmbH) -->
+<xsd:schema targetNamespace="http://www.sos-berlin.com/scheduler" xmlns:ns1="http://www.sos-berlin.com/scheduler" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xsd:import schemaLocation="C:\development\products\joc\webservice-global\src\test\resources\scheduler.xsd"/>
-	<xsd:element name="jobscheduler_command">
+	<xsd:element name="jobscheduler_commands">
 		<xsd:complexType>
 			<xsd:choice maxOccurs="unbounded">
 				<xsd:element ref="add_order"/>
@@ -54,11 +55,4 @@
 			<xsd:attribute name="jobschedulerId" type="String"/>
 		</xsd:complexType>
 	</xsd:element>
-	<xsd:complexType name="jobscheduler_commands">
-		<xsd:sequence>
-			<xsd:element ref="ns1:jobscheduler_command" maxOccurs="unbounded"/>
-		</xsd:sequence>
-		<xsd:attribute name="url" type="String"/>
-		<xsd:attribute name="jobschedulerId" type="String"/>
-	</xsd:complexType>
 </xsd:schema>
