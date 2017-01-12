@@ -182,15 +182,19 @@ public class Globals {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static void forceClosingHttpClients(Session session) {
+        forceClosingHttpClients(session, SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void forceClosingHttpClients(Session session, String sessionKey) {
         try {
-            if (session != null && session.getAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS) != null) {
+            if (session != null && session.getAttribute(sessionKey) != null) {
                 try {
-                    for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS)) {
+                    for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(sessionKey)) {
                         command.forcedClosingHttpClient();
                     }
-                    session.removeAttribute(SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS);
+                    session.removeAttribute(sessionKey);
                 } catch (Exception e) {
                 }
             }

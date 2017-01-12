@@ -123,7 +123,10 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     throw (Exception) e.getCause();
                 }
             } finally {
-                Globals.forceClosingHttpClients(session);
+                //Globals.forceClosingHttpClients(session);
+                for (JOCJsonCommand command : jocJsonCommands) {
+                    command.forcedClosingHttpClient();
+                }
                 executorService.shutdown();
             }
             
