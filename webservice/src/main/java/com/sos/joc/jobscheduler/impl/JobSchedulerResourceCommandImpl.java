@@ -17,11 +17,11 @@ import com.sos.joc.model.commands.JobschedulerCommands;
 @Path("jobscheduler")
 public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements IJobSchedulerResourceCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceCommandImpl.class);
-    private static final String API_CALL_COMMAND = "./jobscheduler/command";
+    private static final String API_CALL_COMMAND = "./jobscheduler/commands";
 
  
     @Override
-    public JOCDefaultResponse postJobschedulerCommand(String accessToken, JobschedulerCommands jobSchedulerCommands) throws Exception {
+    public JOCDefaultResponse postJobschedulerCommands(String accessToken, JobschedulerCommands jobSchedulerCommands) throws Exception {
 
         try {
             initLogging(API_CALL_COMMAND, jobSchedulerCommands.getJobschedulerId());
