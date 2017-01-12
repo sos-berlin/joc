@@ -63,7 +63,8 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 session.setAttribute(SESSION_KEY, threadName);
             } catch (InvalidSessionException e1) {
             }
-            Globals.forceClosingHttpClients(session);
+            //Not a good idea: Same session in multiple tabs closed http clients vice versa
+            //Globals.forceClosingHttpClients(session);
 
             if (eventBody.getClose() != null && eventBody.getClose()) {
                 entity.setEvents(null);

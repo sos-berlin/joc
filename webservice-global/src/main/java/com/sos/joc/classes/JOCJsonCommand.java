@@ -183,7 +183,9 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     public JsonObject getJsonObjectFromPost(URI uri, String postBody, String csrfToken) throws JocException {
         addHeader("Content-Type", "application/json");
         addHeader("Accept", "application/json");
+        //addHeader("Authorization", "Basic cm9vdDpzZWNyZXQ=");
         addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
+        setAllowAllHostnameVerifier();
         if (postBody == null) {
             postBody = "";
         }
@@ -199,7 +201,11 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                 throw new JobSchedulerConnectionRefusedException(jocError, e);
             }
         } catch (NoResponseException e) {
-            throw new JobSchedulerNoResponseException(jocError, e);
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerNoResponseException(jocError, e);
+            }
         } catch (JocException e) {
             throw e;
         } catch (Exception e) {
@@ -243,6 +249,8 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     public JsonObject getJsonObjectFromGet(URI uri, String csrfToken) throws JocException {
         addHeader("Accept", "application/json");
         addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
+        //addHeader("Authorization", "Basic cm9vdDpzZWNyZXQ=");
+        setAllowAllHostnameVerifier();
         JocError jocError = new JocError();
         jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         try {
@@ -255,7 +263,11 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                 throw new JobSchedulerConnectionRefusedException(jocError, e);
             }
         } catch (NoResponseException e) {
-            throw new JobSchedulerNoResponseException(jocError, e);
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerNoResponseException(jocError, e);
+            }
         } catch (JocException e) {
             throw e;
         } catch (Exception e) {

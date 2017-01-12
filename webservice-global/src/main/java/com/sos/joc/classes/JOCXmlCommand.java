@@ -33,10 +33,12 @@ public class JOCXmlCommand extends SOSXmlCommand {
 
     public JOCXmlCommand(String url) {
         super(url + XML_COMMAND_API_PATH);
+        setAllowAllHostnameVerifier();
     }
     
     public JOCXmlCommand(JOCResourceImpl jocResourceImpl) {
         super(jocResourceImpl.getUrl() + XML_COMMAND_API_PATH);
+        setAllowAllHostnameVerifier();
         this.jocResourceImpl = jocResourceImpl;
     }
     

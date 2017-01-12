@@ -116,34 +116,31 @@ public class Globals {
         }
         return DEFAULT_SHIRO_INI_PATH;
     }
-
-    private static String getConfFile(String schedulerId) throws JocException {
-        String confFile = null;
-        JocError error = new JocError();
-        String propertyKey = null;
-        if (schedulerId != null) {
-            propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
-            confFile = sosShiroProperties.getProperty(propertyKey);
-            error.setCode("JOC-310");
+    
+    public static int getJobSchedulerConnectionTimeout() {
+        int defaultSeconds = 2;
+        if (sosShiroProperties != null) {
+            int seconds = sosShiroProperties.getProperty("jobscheduler_connection_timeout", defaultSeconds);
+            return seconds*1000;
         }
-        if (confFile == null) {
-            propertyKey = HIBERNATE_CONFIGURATION_FILE;
-            confFile = sosShiroProperties.getProperty(propertyKey, "./hibernate.cfg.xml");
-            if (confFile == null) {
-                error.setMessage(String.format("Could find value for %1$s in joc_properties file", propertyKey));
-                throw new JocException(error);
-            }
+        return defaultSeconds*1000;
+    }
+    
+    public static int getJobSchedulerSocketTimeout() {
+        int defaultSeconds = 2;
+        if (sosShiroProperties != null) {
+            int seconds = sosShiroProperties.getProperty("jobscheduler_socket_timeout", defaultSeconds);
+            return seconds*1000;
         }
-        Path p = sosShiroProperties.resolvePath(confFile);
-        if (p != null) {
-            if (!Files.exists(p)) {
-                error.setMessage(String.format("hibernate configuration (%1$s) is set but file (%2$s) not found.", confFile, p.toString()));
-                throw new JocException(error);
-            } else {
-                confFile = p.toString().replace('\\', '/');
-            }
+        return defaultSeconds*1000;
+    }
+    
+    public static boolean getHostnameVerification() {
+        boolean defaultVerification = false;
+        if (sosShiroProperties != null) {
+            return sosShiroProperties.getProperty("with_hostname_verification", defaultVerification);
         }
-        return confFile;
+        return defaultVerification;
     }
 
     public static void beginTransaction() {
@@ -199,5 +196,34 @@ public class Globals {
             }
         } catch (InvalidSessionException e) {
         }
+    }
+    
+    private static String getConfFile(String schedulerId) throws JocException {
+        String confFile = null;
+        JocError error = new JocError();
+        String propertyKey = null;
+        if (schedulerId != null) {
+            propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
+            confFile = sosShiroProperties.getProperty(propertyKey);
+            error.setCode("JOC-310");
+        }
+        if (confFile == null) {
+            propertyKey = HIBERNATE_CONFIGURATION_FILE;
+            confFile = sosShiroProperties.getProperty(propertyKey, "./hibernate.cfg.xml");
+            if (confFile == null) {
+                error.setMessage(String.format("Could find value for %1$s in joc_properties file", propertyKey));
+                throw new JocException(error);
+            }
+        }
+        Path p = sosShiroProperties.resolvePath(confFile);
+        if (p != null) {
+            if (!Files.exists(p)) {
+                error.setMessage(String.format("hibernate configuration (%1$s) is set but file (%2$s) not found.", confFile, p.toString()));
+                throw new JocException(error);
+            } else {
+                confFile = p.toString().replace('\\', '/');
+            }
+        }
+        return confFile;
     }
 }

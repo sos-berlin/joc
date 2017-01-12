@@ -73,10 +73,24 @@ public class JocCockpitProperties {
             return defaultValue;
         } else {
             try{
-            return Integer.parseInt(s);
+                return Integer.parseInt(s);
             } catch (NumberFormatException e){
-                LOGGER.warn(String.format("Property value for %1$s is not an Integer. Returning 0 %2$s", property, e.getMessage()));
-                return 0;
+                LOGGER.warn(String.format("Property value for %1$s is not an Integer. Returning default %2$s: %3$s", property, defaultValue, e.getMessage()));
+                return defaultValue;
+            }
+        }
+    }
+    
+    public boolean getProperty(String property, boolean defaultValue) {
+        String s = getProperty(property);
+        if (s == null){
+            return defaultValue;
+        } else {
+            try{
+                return Boolean.parseBoolean(s);
+            } catch (Exception e){
+                LOGGER.warn(String.format("Property value for %1$s could not be parsed to boolean. Returning default %2$s: %3$s", property, defaultValue, e.getMessage()));
+                return defaultValue;
             }
         }
     }
