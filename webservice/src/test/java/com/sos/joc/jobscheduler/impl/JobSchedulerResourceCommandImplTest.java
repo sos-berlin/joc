@@ -34,7 +34,7 @@ public class JobSchedulerResourceCommandImplTest {
           
          jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().add(command);
         JobSchedulerResourceCommandImpl orderConfigurationImpl = new JobSchedulerResourceCommandImpl();
-        JOCDefaultResponse response = orderConfigurationImpl.postJobschedulerCommand(sosShiroCurrentUserAnswer.getAccessToken(), jobschedulerCommand);
+        JOCDefaultResponse response = orderConfigurationImpl.postJobschedulerCommands(sosShiroCurrentUserAnswer.getAccessToken(), jobschedulerCommand);
         System.out.println(response.getEntity().toString());
     }
 
