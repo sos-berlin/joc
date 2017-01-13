@@ -30,6 +30,10 @@ public class JobSchedulerDate {
         Instant fromString = null;
         if (dateString != null && !dateString.isEmpty()) {
             try {
+                if (dateString.trim().matches("^\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?Z?$")) {
+                    //only time will be extended with today to complete timestamp
+                    dateString = Instant.now().toString().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}T).*", "$1" + dateString.trim() + "Z").replaceFirst("ZZ+$", "Z"); 
+                }
                 dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
                 //dateString must have 'Z' as offset
                 fromString = Instant.parse(dateString);

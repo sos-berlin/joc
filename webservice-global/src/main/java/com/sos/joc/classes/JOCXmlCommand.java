@@ -1,6 +1,7 @@
 package com.sos.joc.classes;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,8 +56,11 @@ public class JOCXmlCommand extends SOSXmlCommand {
             try {
                 String surveyDateStr = getSosxml().selectSingleNodeValue("/spooler/answer/@time");
                 surveyDate = JobSchedulerDate.getDateFromISO8601String(surveyDateStr);
+                if(surveyDate == null) {
+                    surveyDate = Date.from(Instant.now()); 
+                }
             } catch (Exception e) {
-                surveyDate = new Date();
+                surveyDate = Date.from(Instant.now());
             }
         }
         return surveyDate;

@@ -27,5 +27,13 @@ public class JobSchedulerDateTest {
         d = JobSchedulerDate.getDate(date, null);
         
     }
+    
+    @Test
+    public void testInstantFromISO8601StringWithOnlyTime() throws JobSchedulerInvalidResponseDataException {
+        System.out.println(JobSchedulerDate.getInstantFromISO8601String("01:12:34.567Z"));
+        System.out.println(JobSchedulerDate.getInstantFromISO8601String("01:12:34.567"));
+        System.out.println(JobSchedulerDate.getInstantFromISO8601String("01:12:34Z"));
+        System.out.println(JobSchedulerDate.getInstantFromISO8601String("01:12:34"));
+    }
 
 }
