@@ -16,6 +16,7 @@ import javax.ws.rs.Path;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JocException;
@@ -48,7 +49,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             command.setUriBuilderForOrders();
             command.addOrderCompactQuery(ordersBody.getCompact());
 
-            Map<String, OrderV> listOrders = new HashMap<String, OrderV>();
+            Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
             List<OrderPath> orders = ordersBody.getOrders();
             List<Folder> folders = ordersBody.getFolders();
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
@@ -97,7 +98,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             
             if(tasks != null && !tasks.isEmpty()) {
                 ExecutorService executorService = Executors.newFixedThreadPool(10);
-                for (Future<Map<String, OrderV>> result : executorService.invokeAll(tasks)) {
+                for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
                     try {
                         listOrders.putAll(result.get());
                     } catch (ExecutionException e) {

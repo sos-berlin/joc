@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
+import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.classes.orders.OrdersSummaryCallable;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.exceptions.JocException;
@@ -49,7 +50,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         nestedJobChains.addAll(jobChainV.getNestedJobChains());
         if ((compact == null || !compact) && jobChainV.hasJobNodes() && jobChainV.getNumOfOrders() > 0) {
             OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, false, setUriForOrdersJsonCommand(), accessToken);
-            Map<String, OrderV> orders = ordersVCallable.call();
+            Map<String, OrderVolatile> orders = ordersVCallable.call();
             if (orders != null && orders.size() > 0) {
                 jobChainV.setOrders(orders);
             }
@@ -185,12 +186,12 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                 }
             }
         }
-        if (!jobChainsFilter.getCompact()) {
-            for (Future<Map<String, OrderV>> result : executorService.invokeAll(orderTasks)) {
+        if (!jobChainsFilter.getCompact() && !orderTasks.isEmpty()) {
+            for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(orderTasks)) {
                 try {
-                    Map<String, OrderV> orders = result.get();
+                    Map<String, OrderVolatile> orders = result.get();
                     if (orders.size() > 0) {
-                        JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().getJobChain());
+                        JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
                         j.setOrders(orders);
                         // jobChainMap.put(jobChain, j);
                     }

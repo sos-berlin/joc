@@ -9,6 +9,7 @@ import javax.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.UsedJobs.Job;
@@ -28,22 +29,36 @@ public class OrderVolatile extends OrderV {
     //private static final String ZERO_HOUR = "1970-01-01T00:00:00Z";
     private final JsonObject order;
     private final JsonObject overview;
+    @JsonIgnore
     private boolean isWaitingForJob = false;
+    @JsonIgnore
+    private String origJobChain;
     
     public OrderVolatile(JsonObject order) {
         this.order = order;
         this.overview = getOrderOverview();
+        this.origJobChain = null;
     }
     
+    public OrderVolatile(JsonObject order, String origJobChain) {
+        this.order = order;
+        this.overview = getOrderOverview();
+        this.origJobChain = origJobChain;
+    }
+    
+    @JsonIgnore
     public boolean isWaitingForJob() {
         return isWaitingForJob;
     }
-
-    private void cleanArrays() {
-        setParams(null);
-        setPriority(null);
-    }
     
+    @JsonIgnore
+    public String origJobChain() {
+        if (origJobChain == null) {
+            return getJobChain();
+        }
+        return origJobChain;
+    }
+
     public void setFields(UsedNodes usedNodes, UsedTasks usedTasks, boolean compact) throws JobSchedulerInvalidResponseDataException {
         if (compact) {
             setCompactFields(usedNodes, usedTasks);
@@ -184,6 +199,14 @@ public class OrderVolatile extends OrderV {
         setPath(path);
         setJobChain(pathParts[0]);
         setOrderId(pathParts[1]);
+        if (origJobChain == null) {
+            origJobChain = pathParts[0];  
+        }
+    }
+    
+    private void cleanArrays() {
+        setParams(null);
+        setPriority(null);
     }
     
     private void setSeverity(OrderStateText text) {

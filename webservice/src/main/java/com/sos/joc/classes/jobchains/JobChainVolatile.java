@@ -1,7 +1,5 @@
 package com.sos.joc.classes.jobchains;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +16,7 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.jobs.JobVolatile;
+import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.model.common.ConfigurationState;
 import com.sos.joc.model.common.ConfigurationStateText;
 import com.sos.joc.model.jobChain.FileWatchingNodeFile;
@@ -108,7 +107,7 @@ public class JobChainVolatile extends JobChainV {
         }
     }
     
-    public void setOrders(Map<String, OrderV> orders) {
+    public void setOrders(Map<String, OrderVolatile> orders) {
         Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
         for (OrderV order : orders.values()) {
             String node = order.getState();
@@ -151,16 +150,12 @@ public class JobChainVolatile extends JobChainV {
                 node.setJob(job);
             } else {
                 // ISSUE 131: If Job is missing do not throw NPE, rather set state to Severity -> 2, Text -> RESOURCE_IS_MISSING
-                JobVolatile jobV = new JobVolatile();
                 JobChainNodeJobV job = new JobChainNodeJobV();
-//                Path jobPath = Paths.get(jobChain.getAttribute(WebserviceConstants.PATH)).getParent().resolve(jobNodeElem.getAttribute("job")).normalize();
                 job.setPath(jobNodeElem.getAttribute("job"));
                 ConfigurationState confStatus = new ConfigurationState();
                 confStatus.setSeverity(2);
                 confStatus.setMessage(ConfigurationStateText.RESOURCE_IS_MISSING.toString());
                 job.setConfigurationStatus(confStatus);
-//                jobV.setState();
-//                job.setState(jobV.getState());
                 node.setJob(job);
             }
             node.setState(getNodeState(jobNodeElem));
