@@ -192,8 +192,9 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                     Map<String, OrderVolatile> orders = result.get();
                     if (orders.size() > 0) {
                         JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
-                        j.setOrders(orders);
-                        // jobChainMap.put(jobChain, j);
+                        if (j != null) {
+                            j.setOrders(orders);
+                        }
                     }
                 } catch (ExecutionException e) {
                     executorService.shutdown();

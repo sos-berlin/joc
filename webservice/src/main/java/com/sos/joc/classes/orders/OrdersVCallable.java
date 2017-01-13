@@ -121,7 +121,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
     }
     
     private Map<String,OrderVolatile> getOrders(OrdersPerJobChain orders, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders), accessToken), orders, compact, null);
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders), accessToken), orders.getJobChain(), compact, null);
     }
     
     private Map<String,OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
@@ -132,7 +132,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), null, ordersBody.getCompact(), ordersBody.getRegex());
     }
     
-    private Map<String,OrderVolatile> getOrders(JsonObject json, OrdersPerJobChain orders, boolean compact, String regex) throws JobSchedulerInvalidResponseDataException {
+    private Map<String,OrderVolatile> getOrders(JsonObject json, String origJobChain, boolean compact, String regex) throws JobSchedulerInvalidResponseDataException {
         UsedNodes usedNodes = new UsedNodes();
         UsedJobs usedJobs = new UsedJobs();
         UsedJobChains usedJobChains = new UsedJobChains();
@@ -143,7 +143,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         Map<String,OrderVolatile> listOrderQueue = new HashMap<String,OrderVolatile>();
         
         for (JsonObject ordersItem: json.getJsonArray("orders").getValuesAs(JsonObject.class)) {
-            OrderVolatile order = new OrderVolatile(ordersItem, orders.getJobChain());
+            OrderVolatile order = new OrderVolatile(ordersItem, origJobChain);
             order.setPathJobChainAndOrderId();
             if (!FilterAfterResponse.matchRegex(regex, order.getPath())) {
                 LOGGER.debug("...processing skipped caused by 'regex=" + regex + "'");
