@@ -79,8 +79,10 @@ public class JobChainPermanent {
                         } else {
                             jobChainNode.setJobChain(null);
                         }
-                        //TODO                    jobChainNode.setLevel(???);
                         jobChainNode.setName(node.getState());
+                        //TODO jobChainNode.setLevel(???);
+                        //for now the colons in the node name are counted
+                        jobChainNode.setLevel(node.getState().replaceAll("[^:]", "").length());
                         jobChainNode.setNextNode(node.getNextState());
                         jobChainNode.setOnError(node.getOnError());
                         jobChainNodes.add(jobChainNode);
