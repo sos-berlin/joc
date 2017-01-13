@@ -90,10 +90,10 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 jsEvent.setEventId(jsObject.getEventId());
                 jsEvent.setJobschedulerId(jsObject.getJobschedulerId());
                 eventList.put(jsObject.getJobschedulerId(), jsEvent);
-                DBItemInventoryInstance instance = Globals.UrlFromJobSchedulerId.get(jsObject.getJobschedulerId());
+                DBItemInventoryInstance instance = Globals.urlFromJobSchedulerId.get(jsObject.getJobschedulerId());
                 if (instance == null) {
                     instance = instanceLayer.getInventoryInstanceBySchedulerId(jsObject.getJobschedulerId(), accessToken);
-                    Globals.UrlFromJobSchedulerId.put(jsObject.getJobschedulerId(), instance);
+                    Globals.urlFromJobSchedulerId.put(jsObject.getJobschedulerId(), instance);
                 }
                 JOCJsonCommand command = new JOCJsonCommand();
                 command.setUriBuilderForEvents(instance.getUrl());

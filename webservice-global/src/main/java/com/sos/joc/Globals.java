@@ -31,7 +31,8 @@ public class Globals {
     public static SOSHibernateConnection sosHibernateConnection;
     public static Map<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
     public static JocCockpitProperties sosShiroProperties;
-    public static Map<String, DBItemInventoryInstance> UrlFromJobSchedulerId = new HashMap<String, DBItemInventoryInstance>();
+    public static Map<String, DBItemInventoryInstance> urlFromJobSchedulerId = new HashMap<String, DBItemInventoryInstance>();
+    public static Map<String, Boolean> jobSchedulerIsRunning = new HashMap<String, Boolean>();
 
     public static SOSHibernateConnection getConnection() throws JocException {
         if (sosHibernateConnection == null) {

@@ -53,22 +53,27 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         try {
             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
             jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId(), dbLayer));
+            Globals.jobSchedulerIsRunning.put(command.getSchemeAndAuthority(), true);
         } catch (ForcedClosingHttpClientException e) {
             LOGGER.debug("Connection force close: " + command.getSchemeAndAuthority());
             jobSchedulerEvent.setEventSnapshots(null);
             handleError(e.getError().getCode(), e.getClass().getSimpleName());
             throw e;
         } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException e) {
-            if (Globals.UrlFromJobSchedulerId.containsKey(jobSchedulerEvent.getJobschedulerId())) {
-                DBItemInventoryInstance instance = Globals.UrlFromJobSchedulerId.get(jobSchedulerEvent.getJobschedulerId());
+            if (Globals.urlFromJobSchedulerId.containsKey(jobSchedulerEvent.getJobschedulerId())) {
+                DBItemInventoryInstance instance = Globals.urlFromJobSchedulerId.get(jobSchedulerEvent.getJobschedulerId());
                 if (instance != null && !"standalone".equals(instance.getClusterType())) {
-                    Globals.UrlFromJobSchedulerId.remove(jobSchedulerEvent.getJobschedulerId());
+                    Globals.urlFromJobSchedulerId.remove(jobSchedulerEvent.getJobschedulerId());
                 }
             }
             //TODO create JobScheduler unreachable event?
             jobSchedulerEvent.setEventSnapshots(null);
             handleError(e.getError().getCode(), e.getClass().getSimpleName());
-            LOGGER.warn(e.getClass().getSimpleName() + ": " + e.getMessage());
+            Boolean jobSchedulerIsRunning = Globals.jobSchedulerIsRunning.get(command.getSchemeAndAuthority());
+            if (jobSchedulerIsRunning == null || jobSchedulerIsRunning) {
+                LOGGER.warn(e.getClass().getSimpleName() + ": " + e.getMessage());
+            }
+            Globals.jobSchedulerIsRunning.put(command.getSchemeAndAuthority(), false);
             throw e;
         } catch (JocException e) {
             jobSchedulerEvent.setEventSnapshots(null);
