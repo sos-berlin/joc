@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.sos.exception.ConnectionRefusedException;
 import com.sos.exception.NoResponseException;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
+import com.sos.joc.Globals;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
@@ -32,18 +33,22 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     private JOCResourceImpl jocResourceImpl;
     
     public JOCJsonCommand() {
+        setProperties();
     }
 
     public JOCJsonCommand(JOCResourceImpl jocResourceImpl) {
         this.jocResourceImpl = jocResourceImpl;
+        setProperties();
     }
     
     public JOCJsonCommand(JOCResourceImpl jocResourceImpl, String path) {
         this.jocResourceImpl = jocResourceImpl;
+        setProperties();
         setUriBuilder(jocResourceImpl.getUrl(), path);
     }
 
     public JOCJsonCommand(String url, String path) {
+        setProperties();
         setUriBuilder(url, path);
     }
     
@@ -185,7 +190,6 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         addHeader("Accept", "application/json");
         //addHeader("Authorization", "Basic cm9vdDpzZWNyZXQ=");
         addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
-        setAllowAllHostnameVerifier();
         if (postBody == null) {
             postBody = "";
         }
@@ -250,7 +254,6 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         addHeader("Accept", "application/json");
         addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
         //addHeader("Authorization", "Basic cm9vdDpzZWNyZXQ=");
-        setAllowAllHostnameVerifier();
         JocError jocError = new JocError();
         jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         try {
@@ -296,6 +299,12 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         } catch (JocException e) {
             throw e;
         }
+    }
+    
+    private void setProperties() {
+        setAllowAllHostnameVerifier(!Globals.withHostnameVerification);
+        setConnectionTimeout(Globals.httpConnectionTimeout);
+        setSocketTimeout(Globals.httpSocketTimeout);
     }
     
     private String getCsrfToken(String csrfToken) {

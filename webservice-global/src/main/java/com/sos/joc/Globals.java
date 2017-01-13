@@ -33,7 +33,10 @@ public class Globals {
     public static JocCockpitProperties sosShiroProperties;
     public static Map<String, DBItemInventoryInstance> urlFromJobSchedulerId = new HashMap<String, DBItemInventoryInstance>();
     public static Map<String, Boolean> jobSchedulerIsRunning = new HashMap<String, Boolean>();
-
+    public static int httpConnectionTimeout = 2000;
+    public static int httpSocketTimeout = 2000;
+    public static boolean withHostnameVerification = false;
+    
     public static SOSHibernateConnection getConnection() throws JocException {
         if (sosHibernateConnection == null) {
             try {
@@ -118,32 +121,12 @@ public class Globals {
         return DEFAULT_SHIRO_INI_PATH;
     }
     
-    public static int getJobSchedulerConnectionTimeout() {
-        int defaultSeconds = 2;
-        if (sosShiroProperties != null) {
-            int seconds = sosShiroProperties.getProperty("jobscheduler_connection_timeout", defaultSeconds);
-            return seconds*1000;
-        }
-        return defaultSeconds*1000;
+    public static void setProperties() {
+        getJobSchedulerConnectionTimeout();
+        getJobSchedulerSocketTimeout();
+        getHostnameVerification();
     }
     
-    public static int getJobSchedulerSocketTimeout() {
-        int defaultSeconds = 2;
-        if (sosShiroProperties != null) {
-            int seconds = sosShiroProperties.getProperty("jobscheduler_socket_timeout", defaultSeconds);
-            return seconds*1000;
-        }
-        return defaultSeconds*1000;
-    }
-    
-    public static boolean getHostnameVerification() {
-        boolean defaultVerification = false;
-        if (sosShiroProperties != null) {
-            return sosShiroProperties.getProperty("with_hostname_verification", defaultVerification);
-        }
-        return defaultVerification;
-    }
-
     public static void beginTransaction() {
         try {
             if (sosHibernateConnection != null) {
@@ -230,5 +213,31 @@ public class Globals {
             }
         }
         return confFile;
+    }
+    
+    private static void getJobSchedulerConnectionTimeout() {
+        int defaultSeconds = 2;
+        if (sosShiroProperties != null) {
+            int seconds = sosShiroProperties.getProperty("jobscheduler_connection_timeout", defaultSeconds);
+            httpConnectionTimeout = seconds*1000;
+            LOGGER.info("HTTP(S) connection timeout = " + seconds );
+        }
+    }
+    
+    private static void getJobSchedulerSocketTimeout() {
+        int defaultSeconds = 2;
+        if (sosShiroProperties != null) {
+            int seconds = sosShiroProperties.getProperty("jobscheduler_socket_timeout", defaultSeconds);
+            httpSocketTimeout = seconds*1000;
+            LOGGER.info("HTTP(S) socket timeout = " + seconds );
+        }
+    }
+    
+    private static void getHostnameVerification() {
+        boolean defaultVerification = false;
+        if (sosShiroProperties != null) {
+            withHostnameVerification = sosShiroProperties.getProperty("https_with_hostname_verification", defaultVerification);
+            LOGGER.info("HTTPS with hostname verification in certicate = " + withHostnameVerification );
+        }
     }
 }

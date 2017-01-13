@@ -15,6 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.sos.exception.NoResponseException;
+import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
@@ -34,12 +35,16 @@ public class JOCXmlCommand extends SOSXmlCommand {
 
     public JOCXmlCommand(String url) {
         super(url + XML_COMMAND_API_PATH);
-        setAllowAllHostnameVerifier();
+        setAllowAllHostnameVerifier(!Globals.withHostnameVerification);
+        setConnectTimeout(Globals.httpConnectionTimeout);
+        setReadTimeout(Globals.httpSocketTimeout);
     }
     
     public JOCXmlCommand(JOCResourceImpl jocResourceImpl) {
         super(jocResourceImpl.getUrl() + XML_COMMAND_API_PATH);
-        setAllowAllHostnameVerifier();
+        setAllowAllHostnameVerifier(!Globals.withHostnameVerification);
+        setConnectTimeout(Globals.httpConnectionTimeout);
+        setReadTimeout(Globals.httpSocketTimeout);
         this.jocResourceImpl = jocResourceImpl;
     }
     
