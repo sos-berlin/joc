@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
+import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,26 +95,28 @@ public class Globals {
             connection = getConnection(schedulerId);
         }
         try {
-            // connection.setIgnoreAutoCommitTransactions(false);
-            // connection.beginTransaction();
-            // connection.rollback();
-            if (connection.getCurrentSession() == null 
-                    || (connection.getSessionFactory() != null && connection.getSessionFactory().isClosed())
-                    || (!connection.isUseOpenStatelessSession() && !((org.hibernate.Session) connection.getCurrentSession()).isOpen())) {
+            if (connection.getCurrentSession() == null || (connection.getSessionFactory() != null && connection.getSessionFactory().isClosed()) || (!connection
+                    .isUseOpenStatelessSession() && !((org.hibernate.Session) connection.getCurrentSession()).isOpen())) {
                 LOGGER.info("Database session is closed. Retry connect...");
                 connection.reconnect();
             }
-            // connection.setIgnoreAutoCommitTransactions(true);
+            
+            String sql = String.format("from %s where 1=0", DBItemInventoryInstance.class.getSimpleName());
+            connection.createQuery(sql.toString()).list();
+
+        } catch (HibernateException ex) {
+            try {
+                LOGGER.info("Database session is invalid. Retry connect...");
+                connection.reconnect();
+            } catch (Exception e) {
+                throw new DBConnectionRefusedException(e);
+            }
+
         } catch (Exception e) {
-            // connection.disconnect();
-            // try {
-            // connection.setIgnoreAutoCommitTransactions(true);
-            // connection.connect();
-            // } catch (Exception e) {
             throw new DBConnectionRefusedException(e);
-            // }
         }
     }
+
 
     public static String getShiroIniInClassPath() {
         if (sosShiroProperties != null) {
