@@ -1,5 +1,7 @@
 package com.sos.joc.classes.jobscheduler;
 
+import java.util.concurrent.Callable;
+
 import org.w3c.dom.Element;
 
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -11,18 +13,18 @@ import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.JobSchedulerV;
 
-
-public class JobSchedulerVolatile extends JobSchedulerV {
-    private DBItemInventoryInstance dbItemInventoryInstance;
-    private String accessToken;
-
-    public JobSchedulerVolatile(DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
+public class JobSchedulerVCallable implements Callable<JobSchedulerV> {
+    private final DBItemInventoryInstance dbItemInventoryInstance;
+    private final String accessToken;
+    
+    public JobSchedulerVCallable(DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
         this.dbItemInventoryInstance = dbItemInventoryInstance;
         this.accessToken = accessToken;
     }
     
-    public JobSchedulerV getJobScheduler() throws Exception {
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+    @Override
+    public JobSchedulerV call() throws Exception {
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
         try {
             String xmlCommand = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders", "/does/not/exist");
             jocXmlCommand.executePost(xmlCommand, accessToken);
@@ -34,34 +36,33 @@ public class JobSchedulerVolatile extends JobSchedulerV {
     }
     
     private JobSchedulerV getUnreachableJobScheduler() {
-        setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
-        setHost(dbItemInventoryInstance.getHostname());
-        setPort(dbItemInventoryInstance.getPort());
+        JobSchedulerV js = new JobSchedulerV();
+        js.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
+        js.setHost(dbItemInventoryInstance.getHostname());
+        js.setPort(dbItemInventoryInstance.getPort());
         JobSchedulerState jobSchedulerState = new JobSchedulerState();
         jobSchedulerState.set_text(JobSchedulerStateText.UNREACHABLE);
         jobSchedulerState.setSeverity(2);
-        setState(jobSchedulerState);
-        return this;
+        js.setState(jobSchedulerState);
+        return js;
     }
     
     private JobSchedulerV getReachableJobScheduler(JOCXmlCommand jocXmlCommand) throws Exception {
-        setSurveyDate(jocXmlCommand.getSurveyDate());
+        JobSchedulerV js = new JobSchedulerV();
+        js.setSurveyDate(jocXmlCommand.getSurveyDate());
         Element stateElem = jocXmlCommand.executeXPath("/spooler/answer/state");
-//        setHost(stateElem.getAttribute("host"));
-//        setJobschedulerId(stateElem.getAttribute("id"));
-//        setPort(Integer.parseInt(jocXmlCommand.getAttributeValue(stateElem, "http_port", "0")));
-        setHost(dbItemInventoryInstance.getHostname());
-        setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
-        setPort(dbItemInventoryInstance.getPort());
-        setStartedAt(JobSchedulerDate.getDateFromISO8601String(stateElem.getAttribute("spooler_running_since")));
-        setState(getJobSchedulerState(stateElem));
+        js.setHost(dbItemInventoryInstance.getHostname());
+        js.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
+        js.setPort(dbItemInventoryInstance.getPort());
+        js.setStartedAt(JobSchedulerDate.getDateFromISO8601String(stateElem.getAttribute("spooler_running_since")));
+        js.setState(getJobSchedulerState(stateElem));
         if (stateElem.hasAttribute("waiting_errno_text")) {
             Err err = new Err();
             err.setCode(stateElem.getAttribute("waiting_errno"));
             err.setMessage(stateElem.getAttribute("waiting_errno_text"));
-            setError(err);
+            js.setError(err);
         }
-        return this;
+        return js;
     }
     
     private JobSchedulerState getJobSchedulerState(Element stateElem) {

@@ -29,7 +29,6 @@ import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainPath;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.jobChain.JobChainsFilter;
-import com.sos.joc.model.order.OrderV;
 
 
 public class JOCXmlJobChainCommand extends JOCXmlCommand {
@@ -212,15 +211,15 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     }
     
     private JOCJsonCommand setUriForOrdersSummaryJsonCommand() {
-        JOCJsonCommand jsonSummaryCommand = new JOCJsonCommand();
-        jsonSummaryCommand.setUriBuilderForOrders(getJOCResourceImpl().getUrl());
+        JOCJsonCommand jsonSummaryCommand = new JOCJsonCommand(getJOCResourceImpl());
+        jsonSummaryCommand.setUriBuilderForOrders();
         jsonSummaryCommand.addOrderStatisticsQuery();
         return jsonSummaryCommand;
     }
     
     private JOCJsonCommand setUriForOrdersJsonCommand() {
-        JOCJsonCommand jsonOrdersCommand = new JOCJsonCommand();
-        jsonOrdersCommand.setUriBuilderForOrders(getJOCResourceImpl().getUrl());
+        JOCJsonCommand jsonOrdersCommand = new JOCJsonCommand(getJOCResourceImpl());
+        jsonOrdersCommand.setUriBuilderForOrders();
         jsonOrdersCommand.addOrderCompactQuery(false);
         return jsonOrdersCommand;
     }

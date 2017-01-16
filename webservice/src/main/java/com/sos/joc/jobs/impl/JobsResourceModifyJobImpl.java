@@ -132,7 +132,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     throw new JobSchedulerInvalidResponseDataException(modifyJob.getRunTime());
                 }
             } 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
             return jocXmlCommand.getSurveyDate();

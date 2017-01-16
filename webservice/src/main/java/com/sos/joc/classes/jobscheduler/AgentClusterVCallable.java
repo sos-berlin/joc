@@ -88,7 +88,10 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         
         List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
         for (String agent : agentSet) {
-            tasks.add(new AgentVCallable(agent, new JOCJsonCommand(jocJsonCommand.getJOCResourceImpl()), accessToken));
+            JOCJsonCommand command = new JOCJsonCommand();
+            command.setJOCResourceImpl(jocJsonCommand.getJOCResourceImpl());
+            command.setBasicAuthorization(jocJsonCommand.getBasicAuthorization());
+            tasks.add(new AgentVCallable(agent, command, accessToken));
         }
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();

@@ -26,7 +26,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
                 return jocDefaultResponse;
             }
             checkRequiredParameter("job", jobFilter.getJob());
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl(), accessToken);
+            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken);
             JobV200 entity = new JobV200();
             entity.setJob(jocXmlCommand.getJob(normalizePath(jobFilter.getJob()), jobFilter.getCompact(), true));
             entity.setDeliveryDate(new Date());

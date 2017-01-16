@@ -66,7 +66,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             logAuditMessage(startJob);
 
             checkRequiredParameter("job", startJob.getJob());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 
             XMLBuilder xml = new XMLBuilder("start_job");
             xml.addAttribute("job", normalizePath(startJob.getJob())).addAttribute("force", "yes");

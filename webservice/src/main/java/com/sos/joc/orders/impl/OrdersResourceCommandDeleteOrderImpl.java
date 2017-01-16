@@ -61,7 +61,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
             
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             XMLBuilder xml = new XMLBuilder("remove_order");
             xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", normalizePath(order.getJobChain()));
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());

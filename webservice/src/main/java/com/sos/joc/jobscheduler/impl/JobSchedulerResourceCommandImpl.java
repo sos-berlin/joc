@@ -36,6 +36,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jobSchedulerCommands.getUrl());
+            jocXmlCommand.setBasicAuthorization(getBasicAuthorization());
 
             JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
 

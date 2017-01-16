@@ -46,7 +46,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             command.addAttribute("folder", getParent(schedule)).add(
                     XMLBuilder.parse(modifyRuntime.getRunTime()).addAttribute("name", Paths.get(schedule).getFileName().toString()));
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {

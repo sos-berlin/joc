@@ -195,7 +195,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 }
                 break;
             }
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

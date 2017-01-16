@@ -36,7 +36,7 @@ public class LogTaskContent extends LogContent {
     private String getTaskLogFromXmlCommand() throws Exception {
 
         String xml = String.format("<show_task id=\"%1$s\" what=\"log\" />", taskFilter.getTaskId());
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
         jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
         return jocXmlCommand.getSosxml().selectSingleNodeValue(XPATH_TASK_LOG, null);
     }

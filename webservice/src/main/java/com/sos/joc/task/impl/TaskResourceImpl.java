@@ -41,7 +41,7 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
             }
 
             checkRequiredParameter("taskId", taskFilter.getTaskId());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(createTaskPostCommand(taskFilter.getTaskId()), accessToken);
             Element taskElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/task");
 
@@ -67,8 +67,8 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
                 try {
                     checkRequiredParameter("order", orderElem.getAttribute("order"));
                     checkRequiredParameter("job_chain", orderElem.getAttribute("job_chain"));
-                    JOCJsonCommand command = new JOCJsonCommand();
-                    command.setUriBuilderForOrders(dbItemInventoryInstance.getUrl());
+                    JOCJsonCommand command = new JOCJsonCommand(this);
+                    command.setUriBuilderForOrders();
                     OrderFilter orderBody = new OrderFilter();
                     orderBody.setCompact(false);
                     orderBody.setJobChain(orderElem.getAttribute("job_chain"));

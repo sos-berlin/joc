@@ -214,6 +214,10 @@ public class JOCResourceImpl {
     public String getUrl() {
         return dbItemInventoryInstance.getUrl();
     }
+    
+    public String getBasicAuthorization() {
+        return dbItemInventoryInstance.getAuth();
+    }
 
     public String retrySchedulerInstance() throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
         return retrySchedulerInstance(null);

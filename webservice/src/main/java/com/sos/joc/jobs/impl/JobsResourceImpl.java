@@ -32,7 +32,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             }
 
             JobsV entity = new JobsV();
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance.getUrl(), accessToken);
+            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken);
             List<JobPath> jobs = jobsFilter.getJobs();
             List<Folder> folders = jobsFilter.getFolders();
             if (jobs != null && !jobs.isEmpty()) {

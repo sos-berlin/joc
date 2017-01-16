@@ -38,20 +38,17 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
 
     public JOCJsonCommand(JOCResourceImpl jocResourceImpl) {
         this.jocResourceImpl = jocResourceImpl;
+        setBasicAuthorization(jocResourceImpl.getBasicAuthorization());
         setProperties();
     }
     
     public JOCJsonCommand(JOCResourceImpl jocResourceImpl, String path) {
         this.jocResourceImpl = jocResourceImpl;
+        setBasicAuthorization(jocResourceImpl.getBasicAuthorization());
         setProperties();
         setUriBuilder(jocResourceImpl.getUrl(), path);
     }
 
-    public JOCJsonCommand(String url, String path) {
-        setProperties();
-        setUriBuilder(url, path);
-    }
-    
     public void setJOCResourceImpl(JOCResourceImpl jocResourceImpl) {
         this.jocResourceImpl = jocResourceImpl;
     }
@@ -188,7 +185,6 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     public JsonObject getJsonObjectFromPost(URI uri, String postBody, String csrfToken) throws JocException {
         addHeader("Content-Type", "application/json");
         addHeader("Accept", "application/json");
-        //addHeader("Authorization", "Basic cm9vdDpzZWNyZXQ=");
         addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
         if (postBody == null) {
             postBody = "";
@@ -253,7 +249,6 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     public JsonObject getJsonObjectFromGet(URI uri, String csrfToken) throws JocException {
         addHeader("Accept", "application/json");
         addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
-        //addHeader("Authorization", "Basic cm9vdDpzZWNyZXQ=");
         JocError jocError = new JocError();
         jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
         try {

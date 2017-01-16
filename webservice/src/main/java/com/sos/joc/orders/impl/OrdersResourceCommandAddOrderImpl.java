@@ -107,7 +107,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                     throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
                 }
             }
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
 
             return jocXmlCommand.getSurveyDate();

@@ -146,7 +146,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         if (urlTimeoutParamSchema.getTimeout() != null) {
             xml.addAttribute("timeout", urlTimeoutParamSchema.getTimeout().toString());
         }
-        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+        JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
         if (cmd.contains(ABORT[0])) {
             try {
                 jocXmlCommand.executePost(xml.asXML(), getAccessToken());

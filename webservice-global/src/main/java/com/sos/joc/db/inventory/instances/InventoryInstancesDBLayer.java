@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -155,7 +154,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
                     String xml = "<show_state subsystems=\"folder\" what=\"folders no_subfolders\" path=\"/does/not/exist\" />";
-                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
+                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem);
                     resourceImpl.executePost(xml, accessToken);
                     String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
                     if ("running,paused".contains(state)) {
@@ -177,7 +176,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
                     String xml = "<param.get name=\"\" />";
-                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem.getUrl());
+                    JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem);
                     resourceImpl.executePost(xml, accessToken);
                     return schedulerInstancesDBItem;
                 } catch (Exception e) {

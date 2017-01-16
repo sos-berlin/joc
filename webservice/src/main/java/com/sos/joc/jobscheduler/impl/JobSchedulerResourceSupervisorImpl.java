@@ -10,7 +10,7 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.jobscheduler.JobSchedulerVolatile;
+import com.sos.joc.classes.jobscheduler.JobSchedulerVCallable;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
@@ -47,7 +47,7 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
                             .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
-                entity.setJobscheduler(new JobSchedulerVolatile(dbItemInventorySupervisorInstance, accessToken).getJobScheduler());
+                entity.setJobscheduler(new JobSchedulerVCallable(dbItemInventorySupervisorInstance, accessToken).call());
             } else {
                 entity.setJobscheduler(new JobSchedulerV());
             }

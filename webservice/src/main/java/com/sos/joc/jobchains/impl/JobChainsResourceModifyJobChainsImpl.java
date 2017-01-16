@@ -76,7 +76,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
             logAuditMessage(jobChain);
 
             checkRequiredParameter("jobChain", jobChain.getJobChain());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             XMLBuilder xml = new XMLBuilder("job_chain.modify");
             xml.addAttribute("job_chain", normalizePath(jobChain.getJobChain()));
             switch (cmd) {

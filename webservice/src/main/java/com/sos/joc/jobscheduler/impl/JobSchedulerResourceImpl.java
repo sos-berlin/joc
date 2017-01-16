@@ -8,7 +8,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerIdentifier;
-import com.sos.joc.classes.jobscheduler.JobSchedulerVolatile;
+import com.sos.joc.classes.jobscheduler.JobSchedulerVCallable;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -35,7 +35,7 @@ public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSch
             }
             getJobSchedulerInstanceByHostPort(jobSchedulerBody);
             JobSchedulerV200 entity = new JobSchedulerV200();
-            entity.setJobscheduler(new JobSchedulerVolatile(dbItemInventoryInstance, accessToken).getJobScheduler());
+            entity.setJobscheduler(new JobSchedulerVCallable(dbItemInventoryInstance, accessToken).call());
             entity.setDeliveryDate(new Date());
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

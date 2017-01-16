@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
@@ -28,6 +29,11 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
     
     public JOCXmlJobCommand(String url, String accessToken) {
         super(url);
+        this.accessToken = accessToken;
+    }
+    
+    public JOCXmlJobCommand(DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
+        super(dbItemInventoryInstance);
         this.accessToken = accessToken;
     }
     

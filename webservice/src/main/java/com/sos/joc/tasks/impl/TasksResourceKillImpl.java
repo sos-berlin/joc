@@ -112,7 +112,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             logAuditMessage(job);
             
             checkRequiredParameter("job", job.getJob());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String command = jocXmlCommand.getShowJobCommand(normalizePath(job.getJob()), null);
             jocXmlCommand.executePostWithThrowBadRequest(command, getAccessToken());
 
@@ -136,7 +136,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         try {
             checkRequiredParameter("job", job.getJob());
             checkRequiredParameter("taskId", taskId.getTaskId());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
 
             XMLBuilder xml = new XMLBuilder("kill_task");
             xml.addAttribute("id", taskId.getTaskId()).addAttribute("job", normalizePath(job.getJob()));

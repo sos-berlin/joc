@@ -97,6 +97,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 }
                 JOCJsonCommand command = new JOCJsonCommand();
                 command.setUriBuilderForEvents(instance.getUrl());
+                command.setBasicAuthorization(instance.getAuth());
                 command.setSocketTimeout((EVENT_TIMEOUT + 5) * 1000);
                 command.createHttpClient();
                 command.setAutoCloseHttpClient(false);

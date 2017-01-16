@@ -91,7 +91,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
 
             checkRequiredParameter("jobChain", jobChainNode.getJobChain());
             checkRequiredParameter("node", jobChainNode.getNode());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance.getUrl());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             XMLBuilder xml = new XMLBuilder("job_chain_node.modify");
             xml.addAttribute("job_chain", normalizePath(jobChainNode.getJobChain())).addAttribute("state", jobChainNode.getNode());
             switch (cmd) {
