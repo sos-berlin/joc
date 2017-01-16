@@ -46,6 +46,7 @@ public class Globals {
                 sosHibernateConnection.addClassMapping(DBLayer.getReportingClassMapping());
                 sosHibernateConnection.setAutoCommit(true);
                 sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
+                sosHibernateConnection.setUseOpenStatelessSession(true);
                 sosHibernateConnection.connect();
             } catch (JocException e) {
                 throw e;
