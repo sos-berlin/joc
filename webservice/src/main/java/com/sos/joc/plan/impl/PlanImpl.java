@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
+import com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem;
+import com.sos.jitl.dailyplan.db.DailyPlanWithReportTriggerDBItem;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -39,7 +41,48 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
     private static final int FAILED = 2;
     private static final Integer PLANNED = 4;
     private static final String API_CALL = "./plan";
+    
+     
+    private PlanItem createPlanItem(DailyPlanDBItem dailyPlanDBItem){
+        PlanItem p = new PlanItem();
+        p.setLate(dailyPlanDBItem.getIsLate());
 
+        Period period = new Period();
+        period.setBegin(dailyPlanDBItem.getPeriodBegin());
+        period.setEnd(dailyPlanDBItem.getPeriodEnd());
+        period.setRepeat(dailyPlanDBItem.getRepeatInterval());
+        p.setPeriod(period);
+
+        p.setPlannedStartTime(dailyPlanDBItem.getPlannedStart());
+        p.setExpectedEndTime(dailyPlanDBItem.getExpectedEnd());
+
+        PlanState planState = new PlanState();
+
+        if (PlanStateText.FAILED.name().equals(dailyPlanDBItem.getState())) {
+            planState.set_text(PlanStateText.FAILED);
+            planState.setSeverity(FAILED);
+        }
+
+        if (PlanStateText.PLANNED.name().equals(dailyPlanDBItem.getState())) {
+            planState.set_text(PlanStateText.PLANNED);
+            planState.setSeverity(PLANNED);
+        }
+
+        if (PlanStateText.INCOMPLETE.name().equals(dailyPlanDBItem.getState())) {
+            planState.set_text(PlanStateText.INCOMPLETE);
+            planState.setSeverity(INCOMPLETE);
+        }
+        if (PlanStateText.SUCCESSFUL.name().equals(dailyPlanDBItem.getState())) {
+            planState.set_text(PlanStateText.SUCCESSFUL);
+            planState.setSeverity(SUCCESSFUL);
+        }
+        p.setState(planState);
+        p.setSurveyDate(dailyPlanDBItem.getCreated());
+        
+        return p;
+
+    }
+    
     @Override
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
         try {
@@ -66,92 +109,100 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 dailyPlanDBLayer.getFilter().addState(state.name());
             }
 
-            List<DailyPlanDBItem> listOfDailyPlanDBItems = dailyPlanDBLayer.getDailyPlanList(0);
+            List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(0);
+            List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(0);
+            List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
+            List<DailyPlanWithReportExecutionDBItem> listOfDailyPlanStandaloneDBItems = dailyPlanDBLayer.getDailyPlanListStandalone(0);
             ArrayList<PlanItem> result = new ArrayList<PlanItem>();
 
             Plan entity = new Plan();
-            for (DailyPlanDBItem dailyPlanDBItem : listOfDailyPlanDBItems) {
-             
-                try{
-                    Session session = (Session) dailyPlanDBLayer.getConnection().getCurrentSession();
-                    session.refresh(dailyPlanDBItem);
-                }catch(Exception e){
-                    LOGGER.warn(e.getMessage());
+            
+            for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfWaitingDailyPlanStandaloneDBItems) {
+
+                boolean add = true;
+                PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
+                p.setStartMode(dailyPlanDBItem.getStartMode());
+
+                if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                    add = regExMatcher.find();
                 }
-                
+                p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+
+                if (add) {
+                    result.add(p);
+                }
+            }
+            
+            for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfWaitingDailyPlanOrderDBItems) {
 
                 boolean add = true;
 
-                PlanItem p = new PlanItem();
-                Err err = new Err();
-                p.setLate(dailyPlanDBItem.getIsLate());
+                PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
+ 
+                if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
+                            .getDailyPlanDbItem().getOrderId());
+                    add = regExMatcher.find();
+                }
+                p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChain());
+                p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
 
-                Period period = new Period();
-                period.setBegin(dailyPlanDBItem.getPeriodBegin());
-                period.setEnd(dailyPlanDBItem.getPeriodEnd());
-                period.setRepeat(dailyPlanDBItem.getRepeatInterval());
-                p.setPeriod(period);
+                if (add) {
+                    result.add(p);
+                }
+            }
 
-                p.setPlannedStartTime(dailyPlanDBItem.getPlannedStart());
+            for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfDailyPlanStandaloneDBItems) {
+
+                boolean add = true;
+                PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
                 p.setStartMode(dailyPlanDBItem.getStartMode());
-                p.setExpectedEndTime(dailyPlanDBItem.getExpectedEnd());
 
-                PlanState planState = new PlanState();
+                Err err = new Err();
 
-                if (PlanStateText.FAILED.name().equals(dailyPlanDBItem.getState())) {
-                    planState.set_text(PlanStateText.FAILED);
-                    planState.setSeverity(FAILED);
+                if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                    add = regExMatcher.find();
+                }
+                p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+
+                if (dailyPlanDBItem.getDbItemReportExecution() != null) {
+                    p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
+                    p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId().toString());
+                    p.setStartTime(dailyPlanDBItem.getDbItemReportExecution().getStartTime());
+                    p.setExitCode(dailyPlanDBItem.getDbItemReportExecution().getExitCode());
+                    err.setCode(dailyPlanDBItem.getDbItemReportExecution().getErrorCode());
+                    err.setMessage(dailyPlanDBItem.getDbItemReportExecution().getErrorText());
+                    p.setError(err);
+                }
+                if (add) {
+                    result.add(p);
+                }
+            }
+
+            for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfDailyPlanOrderDBItems) {
+
+                boolean add = true;
+
+                PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
+ 
+                if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
+                            .getDailyPlanDbItem().getOrderId());
+                    add = regExMatcher.find();
+                }
+                p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChain());
+                p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
+
+                if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
+                    p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
+                    p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId().toString());
+                    p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
+                    p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
+                    p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getName());
                 }
 
-                if (PlanStateText.PLANNED.name().equals(dailyPlanDBItem.getState())) {
-                    planState.set_text(PlanStateText.PLANNED);
-                    planState.setSeverity(PLANNED);
-                }
-
-                if (PlanStateText.INCOMPLETE.name().equals(dailyPlanDBItem.getState())) {
-                    planState.set_text(PlanStateText.INCOMPLETE);
-                    planState.setSeverity(INCOMPLETE);
-                }
-                if (PlanStateText.SUCCESSFUL.name().equals(dailyPlanDBItem.getState())) {
-                    planState.set_text(PlanStateText.SUCCESSFUL);
-                    planState.setSeverity(SUCCESSFUL);
-                }
-                p.setState(planState);
-                p.setSurveyDate(dailyPlanDBItem.getCreated());
-
-                if (dailyPlanDBItem.isStandalone()) {
-                    if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
-                        Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getJob());
-                        add = regExMatcher.find();
-                    }
-                    p.setJob(dailyPlanDBItem.getJob());
-
-                    if (dailyPlanDBItem.getDbItemReportExecution() != null) {
-                        p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
-                        p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId().toString());
-                        p.setStartTime(dailyPlanDBItem.getDbItemReportExecution().getStartTime());
-                        p.setExitCode(dailyPlanDBItem.getDbItemReportExecution().getExitCode());
-                        err.setCode(dailyPlanDBItem.getDbItemReportExecution().getErrorCode());
-                        err.setMessage(dailyPlanDBItem.getDbItemReportExecution().getErrorText());
-                        p.setError(err);
-                    }
-                } else {
-                    if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
-                        Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
-                        add = regExMatcher.find();
-                    }
-                    p.setJobChain(dailyPlanDBItem.getJobChain());
-                    p.setOrderId(dailyPlanDBItem.getOrderId());
-
-                    if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
-                        p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
-                        p.setHistoryId(dailyPlanDBItem.getDbItemReportTrigger().getHistoryId().toString());
-                        p.setStartTime(dailyPlanDBItem.getDbItemReportTrigger().getStartTime());
-                        p.setNode(dailyPlanDBItem.getDbItemReportTrigger().getState());
-                        p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getName());
-                    }
-
-                }
                 if (add) {
                     result.add(p);
                 }
