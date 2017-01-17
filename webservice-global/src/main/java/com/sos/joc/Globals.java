@@ -125,10 +125,11 @@ public class Globals {
         return DEFAULT_SHIRO_INI_PATH;
     }
     
-    public static void setProperties() {
-        getJobSchedulerConnectionTimeout();
-        getJobSchedulerSocketTimeout();
-        getHostnameVerification();
+    public static void setProperties() throws JocException {
+        setJobSchedulerConnectionTimeout();
+        setJobSchedulerSocketTimeout();
+        setHostnameVerification();
+        setTrustStore();
     }
     
     public static void beginTransaction() {
@@ -219,7 +220,7 @@ public class Globals {
         return confFile;
     }
     
-    private static void getJobSchedulerConnectionTimeout() {
+    private static void setJobSchedulerConnectionTimeout() {
         int defaultSeconds = 2;
         if (sosShiroProperties != null) {
             int seconds = sosShiroProperties.getProperty("jobscheduler_connection_timeout", defaultSeconds);
@@ -228,7 +229,7 @@ public class Globals {
         }
     }
     
-    private static void getJobSchedulerSocketTimeout() {
+    private static void setJobSchedulerSocketTimeout() {
         int defaultSeconds = 2;
         if (sosShiroProperties != null) {
             int seconds = sosShiroProperties.getProperty("jobscheduler_socket_timeout", defaultSeconds);
@@ -237,11 +238,31 @@ public class Globals {
         }
     }
     
-    private static void getHostnameVerification() {
+    private static void setHostnameVerification() {
         boolean defaultVerification = false;
         if (sosShiroProperties != null) {
             withHostnameVerification = sosShiroProperties.getProperty("https_with_hostname_verification", defaultVerification);
             LOGGER.info("HTTPS with hostname verification in certicate = " + withHostnameVerification );
+        }
+    }
+    
+    private static void setTrustStore() throws JocException {
+        if (sosShiroProperties != null) {
+            JocError error = new JocError();
+            error.setCode("JOC-311");
+            String truststore = sosShiroProperties.getProperty("truststore_path", "");
+            if (truststore != null && !truststore.isEmpty()) {
+                Path p = sosShiroProperties.resolvePath(truststore);
+                if (p != null) {
+                    if (!Files.exists(p)) {
+                        error.setMessage(String.format("truststore path (%1$s) is set but file (%2$s) not found.", truststore, p.toString()));
+                        throw new JocException(error);
+                    } else {
+                        truststore = p.toString();
+                        System.setProperty("javax.net.ssl.trustStore", truststore);
+                    }
+                }
+            }
         }
     }
 }
