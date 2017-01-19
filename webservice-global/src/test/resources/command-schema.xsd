@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com) by Andreas Pueschel (APL Software GmbH) -->
-<xsd:schema targetNamespace="http://www.sos-berlin.com/scheduler" xmlns:ns1="http://www.sos-berlin.com/scheduler" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-	<xsd:import schemaLocation="C:\development\products\joc\webservice-global\src\test\resources\scheduler.xsd"/>
-	<xsd:element name="jobscheduler_commands">
+<xsd:schema targetNamespace="http://www.sos-berlin.com/scheduler" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xsd:import schemaLocation="scheduler.xsd" />
+    <xsd:element name="jobscheduler_commands">
 		<xsd:complexType>
 			<xsd:choice maxOccurs="unbounded">
 				<xsd:element ref="add_order"/>
@@ -50,9 +49,10 @@
 				<xsd:element ref="remote_scheduler.remote_task.close"/>
 				<xsd:element ref="remote_scheduler.remote_task.kill"/>
 				<xsd:element ref="terminate"/>
+                <xsd:element name="comment" type="xsd:string"/>
 			</xsd:choice>
-			<xsd:attribute name="url" type="String"/>
-			<xsd:attribute name="jobschedulerId" type="String"/>
+			<xsd:attribute name="url" type="xsd:string"/>
+			<xsd:attribute name="jobschedulerId" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>
