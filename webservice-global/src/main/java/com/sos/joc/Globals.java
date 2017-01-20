@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.hibernate.HibernateException;
+import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,14 +96,28 @@ public class Globals {
             connection = getConnection(schedulerId);
         }
         try {
-            if (connection.getCurrentSession() == null || (connection.getSessionFactory() != null && connection.getSessionFactory().isClosed()) || (!connection
+            if ((connection.getSessionFactory() != null && connection.getSessionFactory().isClosed()) || (!connection
                     .isUseOpenStatelessSession() && !((org.hibernate.Session) connection.getCurrentSession()).isOpen())) {
                 LOGGER.info("Database session is closed. Retry connect...");
                 connection.reconnect();
             }
+        } catch (Exception e) {
+            throw new DBConnectionRefusedException(e);
+        }
+    }
+
+    public static void trySelect(String schedulerId) throws JocException {
+        SOSHibernateConnection connection = null;
+        if (schedulerId == null) {
+            connection = getConnection();
+        } else {
+            connection = getConnection(schedulerId);
+        }
+        try {
             
-            String sql = String.format("from %s where 1=0", DBItemInventoryInstance.class.getSimpleName());
-            connection.createQuery(sql.toString()).list();
+            String sql = " from DailyPlanDBItem where 1=0";
+            StatelessSession session = connection.createStatelessSession();
+            connection.createQuery(sql,session).list();
 
         } catch (HibernateException ex) {
             try {
@@ -117,7 +132,7 @@ public class Globals {
         }
     }
 
-
+    
     public static String getShiroIniInClassPath() {
         if (sosShiroProperties != null) {
             return "classpath:" + sosShiroProperties.getPropertiesFileClassPathParent() + "shiro.ini";

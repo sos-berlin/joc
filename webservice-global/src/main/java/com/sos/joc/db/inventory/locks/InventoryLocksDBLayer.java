@@ -3,7 +3,7 @@ package com.sos.joc.db.inventory.locks;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class InventoryLocksDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
             sql.append(" where instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString(),getSession());
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryLock> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -59,7 +59,7 @@ public class InventoryLocksDBLayer extends DBLayer {
                 sql.append(" and ifile.fileDirectory = :folderName");
                 sql.append(" and il.instanceId = :instanceId");
             }
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString(),getSession());
             query.setParameter("instanceId", instanceId);
             if (recursive) {
                 query.setParameter("folderName", folderPath + "%");
@@ -85,7 +85,7 @@ public class InventoryLocksDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
             sql.append(" where instanceId = :instanceId");
             sql.append(" and name = :lockPath");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString(),getSession());
             query.setParameter("instanceId", instanceId);
             query.setParameter("lockPath", lockPath);
             List<DBItemInventoryLock> result = query.list();
@@ -108,7 +108,7 @@ public class InventoryLocksDBLayer extends DBLayer {
             sql.append(" where files.id = locks.fileId");
             sql.append(" and locks.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString(),getSession());
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {

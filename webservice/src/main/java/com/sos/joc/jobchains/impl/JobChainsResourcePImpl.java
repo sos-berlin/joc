@@ -113,6 +113,8 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             }
             entity.setJobChains(jobChains);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

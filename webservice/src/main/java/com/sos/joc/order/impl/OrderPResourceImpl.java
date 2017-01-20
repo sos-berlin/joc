@@ -63,6 +63,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             }
             entity.setOrder(order);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

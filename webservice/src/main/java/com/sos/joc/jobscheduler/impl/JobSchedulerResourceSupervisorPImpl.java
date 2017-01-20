@@ -47,12 +47,13 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
                             .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
+                dbLayer.closeSession();
                 entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventorySupervisorInstance, true));
             } else {
                 entity.setJobscheduler(new JobSchedulerP());
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
-
+            
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

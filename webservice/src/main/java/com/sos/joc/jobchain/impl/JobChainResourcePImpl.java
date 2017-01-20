@@ -38,8 +38,8 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
             }
 
             JobChainP200 entity = new JobChainP200();
-            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
             Long instanceId = dbItemInventoryInstance.getId();
+            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
             DBItemInventoryJobChain inventoryJobChain = dbLayer.getJobChainByPath(normalizePath(jobChainFilter.getJobChain()), instanceId);
             if (inventoryJobChain == null){
                     String errMessage = String.format("job chain %s for instance %s with internal id %s not found in table %s", jobChainFilter.getJobChain(),jobChainFilter.getJobschedulerId(),instanceId,
@@ -75,13 +75,17 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
                 }
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.rollback();
         }
     }
+        
 
 }

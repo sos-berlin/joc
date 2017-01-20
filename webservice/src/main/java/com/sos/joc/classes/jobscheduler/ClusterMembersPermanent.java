@@ -64,8 +64,10 @@ public class ClusterMembersPermanent {
                     jobscheduler.setSupervisor(supervisor);
                 }
                 masters.add(jobscheduler);
+                osLayer.closeSession();
             }               
         }
+        instanceLayer.closeSession();
         return masters;
     }
     

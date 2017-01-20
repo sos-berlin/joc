@@ -83,6 +83,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             SchedulesP entity = new SchedulesP();
             entity.setSchedules(listOfSchedules);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

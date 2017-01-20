@@ -81,6 +81,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             }
             entity.setLocks(listOfLocks);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, locksFilter));

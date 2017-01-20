@@ -58,6 +58,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             }
             entity.setAgents(listOfAgents);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            agentLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -105,6 +106,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
         if (!listOfClusters.isEmpty()) {
             agent.setClusters(listOfClusters);
         }
+        osLayer.closeSession();
         return agent;
     }
 

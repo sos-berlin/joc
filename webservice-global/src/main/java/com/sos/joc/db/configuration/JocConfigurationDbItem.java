@@ -8,16 +8,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import sos.util.SOSString;
-
 import com.sos.hibernate.classes.DbItem;
 
 @Entity
@@ -33,14 +29,12 @@ public class JocConfigurationDbItem extends DbItem implements Serializable {
     private Long instanceId;
 
     /** Others */
-    private String fileType;
-    private String fileName;
-    private String fileBaseName;
-    private String fileDirectory;
-    private Date fileCreated;
-    private Date fileModified;
-    private Date fileLocalCreated;
-    private Date fileLocalModified;
+    private String owner;
+    private String objectType;
+    private String objectSource;
+    private String name;
+    private Boolean shared;
+    private byte[] configurationItem;
     private Date created;
     private Date modified;
 
@@ -74,87 +68,61 @@ public class JocConfigurationDbItem extends DbItem implements Serializable {
     }
 
     /** Others */
-    @Column(name = "`FILE_TYPE`", nullable = false)
-    public void setFileType(String val) {
-        this.fileType = val;
+    @Column(name = "`OWNER`", nullable = false)
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 
-    @Column(name = "`FILE_TYPE`", nullable = false)
-    public String getFileType() {
-        return this.fileType;
+    @Column(name = "`OWNER`", nullable = false)
+    public String getOwner() {
+        return this.owner;
     }
 
-    @Column(name = "`FILE_NAME`", nullable = false)
-    public void setFileName(String val) {
-        this.fileName = val;
+    @Column(name = "`OBJECT_TYPE`", nullable = false)
+    public void setObjectType(String objectType) {
+        this.objectType = objectType;
     }
 
-    @Column(name = "`FILE_NAME`", nullable = false)
-    public String getFileName() {
-        return this.fileName;
+    @Column(name = "`OBJECT_TYPE`", nullable = false)
+    public String getObjectType() {
+        return this.objectType;
     }
 
-    @Column(name = "`FILE_BASENAME`", nullable = false)
-    public void setFileBaseName(String val) {
-        this.fileBaseName = val;
+    @Column(name = "`OBJECT_SOURCE`", nullable = false)
+    public void setObjectSource(String objectType) {
+        this.objectType = objectType;
     }
 
-    @Column(name = "`FILE_BASENAME`", nullable = false)
-    public String getFileBaseName() {
-        return this.fileBaseName;
+    @Column(name = "`OBJECT_SOURCE`", nullable = false)
+    public String getObjectSource() {
+        return this.objectType;
     }
 
-     
-
-    @Column(name = "`FILE_DIRECTORY`", nullable = false)
-    public String getFileDirectory() {
-        return this.fileDirectory;
+    @Column(name = "`NAME`", nullable = false)
+    public void setName(String name) {
+        this.name=name;
     }
 
-    @Column(name = "`FILE_CREATED`", nullable = true)
-    public void setFileCreated(Date val) {
-        this.fileCreated = val;
+    @Column(name = "`NAME`", nullable = false)
+    public String getName() {
+        return this.name;
     }
 
-    @Column(name = "`FILE_CREATED`", nullable = true)
-    public Date getFileCreated() {
-        return this.fileCreated;
+    @Column(name = "`SHARED`", nullable = false)
+    public void setShared(Boolean shared) {
+        this.shared=shared;
     }
 
-    @Column(name = "`FILE_MODIFIED`", nullable = true)
-    public void setFileModified(Date val) {
-        this.fileModified = val;
+    @Column(name = "`SHARED`", nullable = false)
+    public Boolean getShared() {
+        return this.shared;
     }
 
-    @Column(name = "`FILE_MODIFIED`", nullable = true)
-    public Date getFileModified() {
-        return this.fileModified;
-    }
-
-    @Column(name = "`FILE_LOCAL_CREATED`", nullable = true)
-    public void setFileLocalCreated(Date val) {
-        this.fileLocalCreated = val;
-    }
-
-    @Column(name = "`FILE_LOCAL_CREATED`", nullable = true)
-    public Date getFileLocalCreated() {
-        return this.fileLocalCreated;
-    }
-
-    @Column(name = "`FILE_LOCAL_MODIFIED`", nullable = true)
-    public void setFileLocalModified(Date val) {
-        this.fileLocalModified = val;
-    }
-
-    @Column(name = "`FILE_LOCAL_MODIFIED`", nullable = true)
-    public Date getFileLocalModified() {
-        return this.fileLocalModified;
-    }
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "`CREATED`", nullable = false)
-    public void setCreated(Date val) {
-        this.created = val;
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -165,8 +133,8 @@ public class JocConfigurationDbItem extends DbItem implements Serializable {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "`MODIFIED`", nullable = false)
-    public void setModified(Date val) {
-        this.modified = val;
+    public void setModified(Date modified) {
+        this.modified = modified;
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -177,8 +145,7 @@ public class JocConfigurationDbItem extends DbItem implements Serializable {
 
     @Override
     public int hashCode() {
-        // always build on unique constraint
-        return new HashCodeBuilder().append(instanceId).append(fileName).toHashCode();
+        return new HashCodeBuilder().append(instanceId).append(owner).append(objectType).append(objectSource).append(name).toHashCode();
     }
 
     @Override
@@ -191,7 +158,7 @@ public class JocConfigurationDbItem extends DbItem implements Serializable {
             return false;
         }
         JocConfigurationDbItem rhs = ((JocConfigurationDbItem) other);
-        return new EqualsBuilder().append(instanceId, rhs.instanceId).append(fileName, rhs.fileName).isEquals();
+        return new EqualsBuilder().append(instanceId, rhs.instanceId).append(owner, rhs.owner).append(objectType, rhs.objectType).append(objectSource, rhs.objectSource).append(name, rhs.name).isEquals();
     }
 
 }

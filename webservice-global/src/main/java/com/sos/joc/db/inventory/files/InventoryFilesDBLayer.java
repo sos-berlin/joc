@@ -3,7 +3,7 @@ package com.sos.joc.db.inventory.files;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionException;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;

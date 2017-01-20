@@ -130,6 +130,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             TaskHistory entity = new TaskHistory();
             entity.setDeliveryDate(new Date());
             entity.setHistory(listOfHistory);
+            reportExecutionsDBLayer.closeSession();
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

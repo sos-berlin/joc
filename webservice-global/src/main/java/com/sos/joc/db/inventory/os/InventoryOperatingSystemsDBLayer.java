@@ -2,7 +2,7 @@ package com.sos.joc.db.inventory.os;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class InventoryOperatingSystemsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_OPERATING_SYSTEMS);
             sql.append(" where id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString(),getSession());
             query.setParameter("id", osId);
             List<DBItemInventoryOperatingSystem> result = query.list();
             if (result != null && !result.isEmpty()) {

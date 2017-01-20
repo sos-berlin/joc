@@ -2,7 +2,7 @@ package com.sos.joc.db.inventory.instances;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString(),getSession());
             query.setParameter("schedulerId", schedulerId);
             List<DBItemInventoryInstance> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -53,7 +53,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
         try {
             String sql = String.format("from %s where hostname = :hostname and port = :port", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString(),getSession());
             query.setParameter("hostname", jobSchedulerIdentifier.getHost());
             query.setParameter("port", jobSchedulerIdentifier.getPort());
 
@@ -87,7 +87,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getConnection().createQuery(sql.toString(),getSession());
             query.setParameter("schedulerId", schedulerId);
             List<DBItemInventoryInstance> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -105,7 +105,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     public List<DBItemInventoryInstance> getInventoryInstances() throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = "from " + DBITEM_INVENTORY_INSTANCES;
-            Query query = getConnection().createQuery(sql);
+            Query query = getConnection().createQuery(sql,getSession());
             return query.list();
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -118,7 +118,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     public List<DBItemInventoryInstance> getJobSchedulerIds() throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %1$s order by created desc", DBITEM_INVENTORY_INSTANCES);
-            Query query = getConnection().createQuery(sql);
+            Query query = getConnection().createQuery(sql,getSession());
 
             return query.list();
         } catch (SessionException ex) {
@@ -133,7 +133,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
         try {
             String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
-            Query query = getConnection().createQuery(sql);
+            Query query = getConnection().createQuery(sql,getSession());
             query.setParameter("id", id);
             List<DBItemInventoryInstance> result = query.list();
             if (result != null && !result.isEmpty()) {

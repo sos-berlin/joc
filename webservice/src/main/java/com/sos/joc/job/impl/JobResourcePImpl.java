@@ -32,8 +32,8 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("job", jobFilter.getJob());
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
+            checkRequiredParameter("job", jobFilter.getJob());
             Long instanceId = dbItemInventoryInstance.getId();
             DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(normalizePath(jobFilter.getJob()), instanceId);
             if (inventoryJob == null) {
@@ -43,13 +43,17 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             JobP200 entity = new JobP200();
             entity.setJob(job);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
+    } finally {
+        Globals.rollback();
+    }
+
     }
 
 }

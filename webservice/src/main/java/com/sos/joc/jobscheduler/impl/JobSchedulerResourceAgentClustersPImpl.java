@@ -92,6 +92,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             AgentClusters entity = new AgentClusters();
             entity.setAgentClusters(listOfAgentClusters);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            agentLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

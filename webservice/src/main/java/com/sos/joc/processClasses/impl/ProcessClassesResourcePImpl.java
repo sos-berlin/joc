@@ -50,10 +50,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                     DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePath(processClassPath.getProcessClass()),
                             dbItemInventoryInstance.getId());
                     if (processClassFromDb == null) {
-                        // LOGGER.warn(String.format("process class '%1$s'
-                        // doesn't exist in table %2$s",
-                        // processClassPath.getProcessClass(),
-                        // DBLayer.DBITEM_INVENTORY_PROCESS_CLASSES));
+
                         continue;
                     }
                     listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));
@@ -75,6 +72,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             }
             entity.setProcessClasses(listOfProcessClasses);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

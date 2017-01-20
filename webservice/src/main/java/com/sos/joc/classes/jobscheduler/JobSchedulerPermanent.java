@@ -42,6 +42,7 @@ public class JobSchedulerPermanent {
         if (osId != DBLayer.DEFAULT_ID) {
             InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
             osItem = osLayer.getInventoryOperatingSystem(dbItemInventoryInstance.getOsId());
+            osLayer.closeSession();
         }
         if (osItem != null) {
             os.setArchitecture(osItem.getArchitecture());
@@ -70,6 +71,7 @@ public class JobSchedulerPermanent {
                     supervisor.setJobschedulerId(schedulerSupervisorInstancesDBItem.getSchedulerId());
                     jobscheduler.setSupervisor(supervisor);
                 }
+                dbLayer.closeSession();
             }
         }
         return jobscheduler;

@@ -27,7 +27,7 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
+                return jocDefaultResponse; 
             }
 
             DB entity = new DB();

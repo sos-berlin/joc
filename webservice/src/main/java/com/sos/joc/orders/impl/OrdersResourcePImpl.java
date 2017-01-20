@@ -78,6 +78,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             }
             entity.setOrders(OrderPermanent.fillOutputOrders(ordersFromDB, dbLayer, compact));
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

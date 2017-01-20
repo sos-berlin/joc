@@ -22,6 +22,7 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
     @Override
     public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
         try {
+            
             initLogging(API_CALL, ordersFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
                     .getView().isStatus());
@@ -33,7 +34,7 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
             Globals.beginTransaction();
 
-            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(Globals.sosHibernateConnection);
+            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(Globals.sosHibernateConnection,API_CALL);
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
           
             if (ordersFilter.getDateFrom() != null) {
@@ -58,7 +59,7 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 
             reportTriggerDBLayer.getFilter().setSuccess(true);
             ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
-
+            reportTriggerDBLayer.closeSession();
  
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

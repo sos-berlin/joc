@@ -60,6 +60,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             JobsP entity = new JobsP();
             entity.setJobs(listJobs);
             entity.setDeliveryDate(Date.from(Instant.now()));
+            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
