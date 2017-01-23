@@ -137,6 +137,8 @@ public class JobChainVolatile extends JobChainV {
             Element jobNodeElem = (Element) jobNodes.item(i);
             JobChainNodeV node = new JobChainNodeV();
             node.setName(jobNodeElem.getAttribute("state"));
+            node.setLevel(jobNodeElem.getAttribute("state").replaceAll("[^:]", "").length());
+            
             jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "order_queue/order");
             //node.setOrders(orders);
             Element jobElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "job");
@@ -169,6 +171,7 @@ public class JobChainVolatile extends JobChainV {
             jobChain.setPath(jobChainNodeElem.getAttribute("job_chain"));
             node.setJobChain(jobChain);
             node.setName(jobChainNodeElem.getAttribute("state"));
+            node.setLevel(0);
             node.setState(getNodeState(jobChainNodeElem));
             getNodes().add(node);
         }
