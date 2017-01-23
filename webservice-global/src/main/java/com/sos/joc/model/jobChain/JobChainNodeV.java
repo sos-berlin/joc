@@ -25,6 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "name",
     "state",
     "job",
+    "level",
     "jobChain",
     "numOfOrders",
     "orders"
@@ -46,6 +47,12 @@ public class JobChainNodeV {
      */
     @JsonProperty("job")
     private JobChainNodeJobV job;
+    /**
+     * Only relevant for job chain with splits and syncs. For example to imagine splits/sync in the job chain list view with different indents
+     * 
+     */
+    @JsonProperty("level")
+    private Integer level;
     /**
      * job chain object is included in nestedJobChains collection
      * 
@@ -130,6 +137,28 @@ public class JobChainNodeV {
     }
 
     /**
+     * Only relevant for job chain with splits and syncs. For example to imagine splits/sync in the job chain list view with different indents
+     * 
+     * @return
+     *     The level
+     */
+    @JsonProperty("level")
+    public Integer getLevel() {
+        return level;
+    }
+
+    /**
+     * Only relevant for job chain with splits and syncs. For example to imagine splits/sync in the job chain list view with different indents
+     * 
+     * @param level
+     *     The level
+     */
+    @JsonProperty("level")
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
+
+    /**
      * job chain object is included in nestedJobChains collection
      * 
      * @return
@@ -204,7 +233,7 @@ public class JobChainNodeV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(state).append(job).append(jobChain).append(numOfOrders).append(orders).toHashCode();
+        return new HashCodeBuilder().append(name).append(state).append(job).append(level).append(jobChain).append(numOfOrders).append(orders).toHashCode();
     }
 
     @Override
@@ -216,7 +245,7 @@ public class JobChainNodeV {
             return false;
         }
         JobChainNodeV rhs = ((JobChainNodeV) other);
-        return new EqualsBuilder().append(name, rhs.name).append(state, rhs.state).append(job, rhs.job).append(jobChain, rhs.jobChain).append(numOfOrders, rhs.numOfOrders).append(orders, rhs.orders).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(state, rhs.state).append(job, rhs.job).append(level, rhs.level).append(jobChain, rhs.jobChain).append(numOfOrders, rhs.numOfOrders).append(orders, rhs.orders).isEquals();
     }
 
 }
