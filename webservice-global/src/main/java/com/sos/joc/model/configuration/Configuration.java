@@ -20,7 +20,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "user",
+    "account",
     "configurationType",
     "objectType",
     "name",
@@ -41,8 +41,8 @@ public class Configuration {
      * (Required)
      * 
      */
-    @JsonProperty("user")
-    private String user;
+    @JsonProperty("account")
+    private String account;
     /**
      * configuration type
      * <p>
@@ -104,23 +104,23 @@ public class Configuration {
      * (Required)
      * 
      * @return
-     *     The user
+     *     The account
      */
-    @JsonProperty("user")
-    public String getUser() {
-        return user;
+    @JsonProperty("account")
+    public String getAccount() {
+        return account;
     }
 
     /**
      * 
      * (Required)
      * 
-     * @param user
-     *     The user
+     * @param account
+     *     The account
      */
-    @JsonProperty("user")
-    public void setUser(String user) {
-        this.user = user;
+    @JsonProperty("account")
+    public void setAccount(String account) {
+        this.account = account;
     }
 
     /**
@@ -248,7 +248,7 @@ public class Configuration {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(user).append(configurationType).append(objectType).append(name).append(shared).append(configurationItem).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(account).append(configurationType).append(objectType).append(name).append(shared).append(configurationItem).toHashCode();
     }
 
     @Override
@@ -260,7 +260,7 @@ public class Configuration {
             return false;
         }
         Configuration rhs = ((Configuration) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(user, rhs.user).append(configurationType, rhs.configurationType).append(objectType, rhs.objectType).append(name, rhs.name).append(shared, rhs.shared).append(configurationItem, rhs.configurationItem).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(account, rhs.account).append(configurationType, rhs.configurationType).append(objectType, rhs.objectType).append(name, rhs.name).append(shared, rhs.shared).append(configurationItem, rhs.configurationItem).isEquals();
     }
 
 }

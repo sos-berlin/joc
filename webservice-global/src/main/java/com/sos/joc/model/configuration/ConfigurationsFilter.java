@@ -20,7 +20,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "user"
+    "account"
 })
 public class ConfigurationsFilter {
 
@@ -31,13 +31,8 @@ public class ConfigurationsFilter {
      */
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("user")
-    private String user;
+    @JsonProperty("account")
+    private String account;
 
     /**
      * 
@@ -65,26 +60,22 @@ public class ConfigurationsFilter {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
-     *     The user
+     *     The account
      */
-    @JsonProperty("user")
-    public String getUser() {
-        return user;
+    @JsonProperty("account")
+    public String getAccount() {
+        return account;
     }
 
     /**
      * 
-     * (Required)
-     * 
-     * @param user
-     *     The user
+     * @param account
+     *     The account
      */
-    @JsonProperty("user")
-    public void setUser(String user) {
-        this.user = user;
+    @JsonProperty("account")
+    public void setAccount(String account) {
+        this.account = account;
     }
 
     @Override
@@ -94,7 +85,7 @@ public class ConfigurationsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(user).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(account).toHashCode();
     }
 
     @Override
@@ -106,7 +97,7 @@ public class ConfigurationsFilter {
             return false;
         }
         ConfigurationsFilter rhs = ((ConfigurationsFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(user, rhs.user).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(account, rhs.account).isEquals();
     }
 
 }
