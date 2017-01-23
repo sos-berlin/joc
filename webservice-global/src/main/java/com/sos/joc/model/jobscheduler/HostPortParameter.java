@@ -21,7 +21,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "host",
-    "port"
+    "port",
+    "comment"
 })
 public class HostPortParameter {
 
@@ -37,6 +38,12 @@ public class HostPortParameter {
      */
     @JsonProperty("port")
     private Integer port;
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     */
+    @JsonProperty("comment")
+    private String comment;
 
     /**
      * 
@@ -104,6 +111,28 @@ public class HostPortParameter {
         this.port = port;
     }
 
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     * @return
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     * @param comment
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -111,7 +140,7 @@ public class HostPortParameter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(host).append(port).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(host).append(port).append(comment).toHashCode();
     }
 
     @Override
@@ -123,7 +152,7 @@ public class HostPortParameter {
             return false;
         }
         HostPortParameter rhs = ((HostPortParameter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(comment, rhs.comment).isEquals();
     }
 
 }

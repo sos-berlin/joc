@@ -56,6 +56,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() > 1) {
                 xml = "<commands>" + xml + "</commands>";
             }
+            logAuditMessage(jobSchedulerCommands);
             String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
 
             return JOCDefaultResponse.responseStatus200(answer, "application/xml");

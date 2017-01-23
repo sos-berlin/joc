@@ -20,7 +20,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "timeout"
+    "timeout",
+    "comment"
 })
 public class TimeoutParameter {
 
@@ -39,6 +40,12 @@ public class TimeoutParameter {
      */
     @JsonProperty("timeout")
     private Integer timeout;
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     */
+    @JsonProperty("comment")
+    private String comment;
 
     /**
      * 
@@ -90,6 +97,28 @@ public class TimeoutParameter {
         this.timeout = timeout;
     }
 
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     * @return
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     * @param comment
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -97,7 +126,7 @@ public class TimeoutParameter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(timeout).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(timeout).append(comment).toHashCode();
     }
 
     @Override
@@ -109,7 +138,7 @@ public class TimeoutParameter {
             return false;
         }
         TimeoutParameter rhs = ((TimeoutParameter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(timeout, rhs.timeout).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(timeout, rhs.timeout).append(comment, rhs.comment).isEquals();
     }
 
 }

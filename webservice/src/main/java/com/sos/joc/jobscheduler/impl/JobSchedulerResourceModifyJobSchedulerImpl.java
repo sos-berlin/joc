@@ -141,6 +141,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
 
     private JOCDefaultResponse executeModifyJobSchedulerCommand(String cmd, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         getJobSchedulerInstanceByHostPort(urlTimeoutParamSchema);
+        logAuditMessage(urlTimeoutParamSchema);
         XMLBuilder xml = new XMLBuilder("modify_spooler");
         xml.addAttribute("cmd", cmd);
         if (urlTimeoutParamSchema.getTimeout() != null) {

@@ -22,7 +22,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "jobschedulerId",
     "host",
     "port",
-    "timeout"
+    "timeout",
+    "comment"
 })
 public class HostPortTimeOutParameter {
 
@@ -51,6 +52,12 @@ public class HostPortTimeOutParameter {
      */
     @JsonProperty("timeout")
     private Integer timeout;
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     */
+    @JsonProperty("comment")
+    private String comment;
 
     /**
      * 
@@ -148,6 +155,28 @@ public class HostPortTimeOutParameter {
         this.timeout = timeout;
     }
 
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     * @return
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     * @param comment
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -155,7 +184,7 @@ public class HostPortTimeOutParameter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(host).append(port).append(timeout).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(host).append(port).append(timeout).append(comment).toHashCode();
     }
 
     @Override
@@ -167,7 +196,7 @@ public class HostPortTimeOutParameter {
             return false;
         }
         HostPortTimeOutParameter rhs = ((HostPortTimeOutParameter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(timeout, rhs.timeout).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(timeout, rhs.timeout).append(comment, rhs.comment).isEquals();
     }
 
 }

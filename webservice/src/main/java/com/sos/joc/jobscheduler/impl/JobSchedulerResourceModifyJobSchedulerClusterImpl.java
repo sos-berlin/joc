@@ -73,7 +73,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String command, TimeoutParameter timeoutParameter) throws Exception {
-        logAuditMessage();
+        logAuditMessage(timeoutParameter);
         XMLBuilder xml = new XMLBuilder("terminate");
         if (timeoutParameter.getTimeout() != null) {
             xml.addAttribute("timeout", timeoutParameter.getTimeout().toString());
