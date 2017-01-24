@@ -2,6 +2,8 @@ package com.sos.joc.orders.impl;
 
 import java.util.Date;
 import javax.ws.rs.Path;
+
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -21,8 +23,11 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 
     @Override
     public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
+        SOSHibernateConnection connection = null;
+
         try {
-            
+            connection = Globals.createSosHibernateStatelessConnection();
+                        
             initLogging(API_CALL, ordersFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
                     .getView().isStatus());
@@ -32,9 +37,9 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             }
 
             OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
-            Globals.beginTransaction();
+            Globals.beginTransaction(connection);
 
-            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(Globals.sosHibernateConnection,API_CALL);
+            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
           
             if (ordersFilter.getDateFrom() != null) {
@@ -59,7 +64,6 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 
             reportTriggerDBLayer.getFilter().setSuccess(true);
             ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
-            reportTriggerDBLayer.closeSession();
  
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -68,7 +72,7 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
 

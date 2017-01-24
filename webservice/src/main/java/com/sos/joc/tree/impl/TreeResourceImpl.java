@@ -47,7 +47,6 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
                 checkFoldersFilterParam(treeBody.getFolders());
             }
-            Globals.beginTransaction();
             SortedSet<String> folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId());
             Tree root = TreePermanent.getTree(folders);
 
@@ -73,7 +72,6 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
         }
     }
 

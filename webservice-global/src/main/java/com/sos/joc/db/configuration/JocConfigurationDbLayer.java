@@ -1,11 +1,11 @@
 package com.sos.joc.db.configuration;
 
-import java.io.File;
-import java.io.IOException;
+ 
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
+import org.hibernate.query.Query;
+
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 
@@ -16,37 +16,15 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
 
     private JocConfigurationFilter filter= null;
     private static final Logger LOGGER = Logger.getLogger(JocConfigurationDbLayer.class);
-
-    public JocConfigurationDbLayer(final String configurationFilename) {
-        super();
-        this.setConfigurationFileName(configurationFilename);
-        this.initConnection(this.getConfigurationFileName());
-        resetFilter();
-    }
-
+ 
     public JocConfigurationDbLayer(SOSHibernateConnection connection) {
         super();
-        this.initConnection(connection);
         resetFilter();
     }
 
-    public JocConfigurationDbLayer(final File configurationFile) {
-        super();
-        try {
-            this.setConfigurationFileName(configurationFile.getCanonicalPath());
-        } catch (IOException e) {
-            this.setConfigurationFileName("");
-            LOGGER.error(e.getMessage(), e);
-        }
-        this.initConnection(this.getConfigurationFileName());
-        resetFilter();
-    }
-
+ 
     public JocConfigurationDbItem getJocConfigurationDbItem(final Long id) throws Exception {
-        if (connection == null) {
-            initConnection(getConfigurationFileName());
-        }
-        return (JocConfigurationDbItem) ((Session) connection.getCurrentSession()).get(JocConfigurationDbItem.class, id);
+        return (JocConfigurationDbItem) (connection.get(JocConfigurationDbItem.class, id));
     }
 
     public void resetFilter() {
@@ -60,9 +38,6 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
     }
 
     public int delete() throws Exception {
-        if (connection == null) {
-            initConnection(getConfigurationFileName());
-        }
         String hql = "delete from " + JocConfigurationDBItem + " " + getWhere();
         Query query = null;
         int row = 0;
@@ -120,12 +95,10 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
 
     @SuppressWarnings("unchecked")
     public List<JocConfigurationDbItem> getJocConfigurationList(final int limit) throws Exception {
-        if (connection == null) {
-            initConnection(getConfigurationFileName());
-        }
-        Query query = null;
-        List<JocConfigurationDbItem> daysScheduleList = null;
-        query = connection.createQuery("from " + JocConfigurationDBItem + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
+
+        Query<JocConfigurationDbItem> query = null;
+        List<JocConfigurationDbItem> configurationsList = null;
+      //  query = connection.createQuery("from " + JocConfigurationDBItem + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
         if (filter.getName() != null && !"".equals(filter.getName())) {
             query.setParameter("name", filter.getName());
         }
@@ -145,12 +118,19 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         if (limit > 0) {
             query.setMaxResults(limit);
         }
-        daysScheduleList = query.list();
-        return daysScheduleList;
+        configurationsList = query.list();
+        return configurationsList;
+    }
+    
+    public void saveConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws Exception{
+        try {
+            connection.update(jocConfigurationDbItem);
+        }catch (Exception e){
+            connection.save(jocConfigurationDbItem);
+        }
     }
 
-    
-
+     
     public JocConfigurationFilter getFilter() {
         return filter;
     }

@@ -5,6 +5,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -13,17 +14,17 @@ import com.sos.joc.classes.JobSchedulerCommandFactory;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCommand;
 import com.sos.joc.model.commands.JobschedulerCommands;
- 
+
 @Path("jobscheduler")
 public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements IJobSchedulerResourceCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceCommandImpl.class);
     private static final String API_CALL_COMMAND = "./jobscheduler/commands";
 
- 
     @Override
     public JOCDefaultResponse postJobschedulerCommands(String accessToken, JobschedulerCommands jobSchedulerCommands) throws Exception {
 
         try {
+
             initLogging(API_CALL_COMMAND, jobSchedulerCommands.getJobschedulerId());
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerCommands.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
@@ -66,10 +67,8 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
         }
 
     }
- 
 
 }

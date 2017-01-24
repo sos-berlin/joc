@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -24,15 +25,19 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     private static final String API_CALL = "./job/p";
 
     @Override
-    public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) throws Exception {
+    public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter)  {
+
+        SOSHibernateConnection connection = null;
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, jobFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
+            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             checkRequiredParameter("job", jobFilter.getJob());
             Long instanceId = dbItemInventoryInstance.getId();
             DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(normalizePath(jobFilter.getJob()), instanceId);
@@ -43,7 +48,6 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             JobP200 entity = new JobP200();
             entity.setJob(job);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -51,7 +55,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
     } finally {
-        Globals.rollback();
+        Globals.disconnect(connection);
     }
 
     }

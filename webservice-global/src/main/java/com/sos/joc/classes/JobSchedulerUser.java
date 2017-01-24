@@ -3,18 +3,20 @@ package com.sos.joc.classes;
 import org.apache.shiro.session.Session;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
+import com.sos.joc.exceptions.JocException;
 
 public class JobSchedulerUser {
 
     private String accessToken;
     private SOSShiroCurrentUser sosShiroCurrentUser;
-
+ 
     public JobSchedulerUser(String accessToken) {
         super();
         this.accessToken = accessToken;
@@ -38,12 +40,13 @@ public class JobSchedulerUser {
         return accessToken;
     }
 
-    public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
+    public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws JocException  {
         if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier) == null) {
-            Globals.beginTransaction();
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+            SOSHibernateConnection connection = Globals.createSosHibernateStatelessConnection();
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+            Globals.beginTransaction(connection);
             getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerIdentifier, dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId(), getAccessToken()));
-            Globals.rollback();
+            Globals.rollback(connection);
         }
         return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier);
     }

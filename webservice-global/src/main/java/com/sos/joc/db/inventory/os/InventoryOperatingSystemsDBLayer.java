@@ -28,7 +28,7 @@ public class InventoryOperatingSystemsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_OPERATING_SYSTEMS);
             sql.append(" where id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", osId);
             List<DBItemInventoryOperatingSystem> result = query.list();
             if (result != null && !result.isEmpty()) {

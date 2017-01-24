@@ -2,6 +2,7 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -17,6 +18,7 @@ import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
+import com.sos.joc.model.jobscheduler.HostPortParameter;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 
 @Path("jobscheduler")
@@ -140,7 +142,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     private JOCDefaultResponse executeModifyJobSchedulerCommand(String cmd, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-        getJobSchedulerInstanceByHostPort(urlTimeoutParamSchema);
+        getJobSchedulerInstanceByHostPort(urlTimeoutParamSchema.getHost(),urlTimeoutParamSchema.getPort(),urlTimeoutParamSchema.getJobschedulerId());
         logAuditMessage(urlTimeoutParamSchema);
         XMLBuilder xml = new XMLBuilder("modify_spooler");
         xml.addAttribute("cmd", cmd);
@@ -162,20 +164,5 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 
-    private void getJobSchedulerInstanceByHostPort(HostPortTimeOutParameter jobSchedulerTerminateBody) throws DBInvalidDataException,
-            DBMissingDataException, DBConnectionRefusedException {
-        JobSchedulerIdentifier jobSchedulerIdentifier = new JobSchedulerIdentifier(jobSchedulerTerminateBody.getJobschedulerId());
-        jobSchedulerIdentifier.setHost(jobSchedulerTerminateBody.getHost());
-        jobSchedulerIdentifier.setPort(jobSchedulerTerminateBody.getPort());
 
-        InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-        dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(jobSchedulerIdentifier);
-
-        if (dbItemInventoryInstance == null) {
-            String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
-                    jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
-                    DBLayer.TABLE_INVENTORY_INSTANCES);
-            throw new DBInvalidDataException(errMessage);
         }
-    }
-}

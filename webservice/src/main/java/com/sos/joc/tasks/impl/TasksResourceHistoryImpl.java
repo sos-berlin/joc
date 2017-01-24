@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemReportExecution;
 import com.sos.jitl.reporting.db.ReportExecutionsDBLayer;
 import com.sos.joc.Globals;
@@ -34,18 +35,22 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
     @Override
     public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, jobsFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getHistory().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            Globals.beginTransaction();
+            Globals.beginTransaction(connection);
 
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
 
-            ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(Globals.sosHibernateConnection);
+            ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(connection);
             reportExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
             if (jobsFilter.getDateFrom() != null) {
                 reportExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDate(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
@@ -130,7 +135,6 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             TaskHistory entity = new TaskHistory();
             entity.setDeliveryDate(new Date());
             entity.setHistory(listOfHistory);
-            reportExecutionsDBLayer.closeSession();
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -139,7 +143,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
 }

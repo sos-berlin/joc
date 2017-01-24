@@ -34,7 +34,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
             sql.append(" and orderId = :orderId");
             sql.append(" and instanceId = :instanceId");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("jobChainName", jobChainName);
             query.setParameter("orderId", orderId);
             query.setParameter("instanceId", instanceId);
@@ -57,7 +57,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
             sql.append("from ");
             sql.append(DBITEM_INVENTORY_ORDERS);
             sql.append(" where instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             return query.list();
         } catch (SessionException ex) {
@@ -75,7 +75,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
             sql.append(" where ifile.id = io.fileId");
             sql.append(" and io.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {
@@ -99,7 +99,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
             if (orderId != null) {
                 sql.append("and orderId = :orderId");
             }
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("jobChainName", jobChainName);
             query.setParameter("instanceId", instanceId);
             if (orderId != null) {
@@ -134,7 +134,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
                 sql.append(" and ifile.fileDirectory = :folderName");
                 sql.append(" and io.instanceId = :instanceId");
             }
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             if (recursive) {
                 query.setParameter("folderName", folderName + "%");
             } else {

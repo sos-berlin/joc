@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
@@ -12,18 +13,35 @@ import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.model.job.JobP;
 import com.sos.joc.model.job.LockUseP;
 
 public class JobPermanent {
-    
+
     public static Integer getEstimatedDurationInSeconds(DBItemInventoryJob job) throws Exception {
-        DBLayerReporting dbLayer = new DBLayerReporting(Globals.sosHibernateConnection);
-        Long estimatedDurationInMillis = dbLayer.getTaskEstimatedDuration(job.getName(),Globals.sosShiroProperties.getProperty("limit_for_average_calculation",WebserviceConstants.DEFAULT_LIMIT));
-        if (estimatedDurationInMillis != null) {
-            return estimatedDurationInMillis.intValue()/1000;
+        SOSHibernateConnection connection = null;
+
+        try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            try {
+                connection.connect();
+            } catch (Exception e) {
+                throw new DBConnectionRefusedException(e);
+            }
+
+            Globals.beginTransaction(connection);
+
+            DBLayerReporting dbLayer = new DBLayerReporting(connection);
+            Long estimatedDurationInMillis = dbLayer.getTaskEstimatedDuration(job.getName(), Globals.sosShiroProperties.getProperty("limit_for_average_calculation",
+                    WebserviceConstants.DEFAULT_LIMIT));
+            if (estimatedDurationInMillis != null) {
+                return estimatedDurationInMillis.intValue() / 1000;
+            }
+            return null;
+        } finally {
+            Globals.disconnect(connection);
         }
-        return null;
     }
 
     public static List<LockUseP> getLocks(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer, Long instanceId) throws Exception {
@@ -40,12 +58,11 @@ public class JobPermanent {
             return null;
         }
     }
-    
-    public static List<DBItemInventoryJobChain> getJobChains(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer, Long instanceId)
-            throws Exception {
+
+    public static List<DBItemInventoryJobChain> getJobChains(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer, Long instanceId) throws Exception {
         return dbLayer.getJobChainsByJobId(job.getId(), instanceId);
     }
-    
+
     public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, Boolean compact, Long instanceId) throws Exception {
         JobP job = new JobP();
         job.setHasDescription(inventoryJob.getHasDescription());
@@ -57,20 +74,20 @@ public class JobPermanent {
         job.setTitle(inventoryJob.getTitle());
         job.setUsedInJobChains(inventoryJob.getUsedInJobChains());
         Integer estimatedDuration = JobPermanent.getEstimatedDurationInSeconds(inventoryJob);
-        if(estimatedDuration != null) {
+        if (estimatedDuration != null) {
             job.setEstimatedDuration(estimatedDuration);
         } else {
             job.setEstimatedDuration(0);
         }
-        if(compact == null || !compact) {
-            if (inventoryJob.getProcessClassName() != null && !inventoryJob.getProcessClassName().isEmpty() 
-                    && !inventoryJob.getProcessClassName().equalsIgnoreCase(DBLayer.DEFAULT_NAME)) {
+        if (compact == null || !compact) {
+            if (inventoryJob.getProcessClassName() != null && !inventoryJob.getProcessClassName().isEmpty() && !inventoryJob.getProcessClassName().equalsIgnoreCase(
+                    DBLayer.DEFAULT_NAME)) {
                 job.setProcessClass(inventoryJob.getProcessClassName());
             } else if (inventoryJob.getProcessClass() != null) {
                 job.setProcessClass(inventoryJob.getProcessClass());
             }
             List<LockUseP> locks = JobPermanent.getLocks(inventoryJob, dbLayer, instanceId);
-            if(locks != null && !locks.isEmpty()) {
+            if (locks != null && !locks.isEmpty()) {
                 job.setLocks(locks);
             }
             if (inventoryJob.getIsOrderJob()) {
@@ -88,7 +105,7 @@ public class JobPermanent {
                 job.setJobChains(null);
             }
             Date configDate = dbLayer.getJobConfigurationDate(inventoryJob.getId());
-            if(configDate != null) {
+            if (configDate != null) {
                 job.setConfigurationDate(configDate);
             }
         } else {
@@ -97,5 +114,5 @@ public class JobPermanent {
         }
         return job;
     }
- 
+
 }

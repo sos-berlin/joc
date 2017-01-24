@@ -17,6 +17,7 @@ import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -45,13 +46,17 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
     private String urlOfCurrentJs = null;
 
     @Override
-    public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) throws Exception {
+    public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) {
 
         JobSchedulerEvents entity = new JobSchedulerEvents();
         Map<String, JobSchedulerEvent> eventList = new HashMap<String, JobSchedulerEvent>();
         Session session = null;
         threadName = Thread.currentThread().getName();
+        
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
             initLogging(API_CALL, eventBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
                     .isStatus());
@@ -79,8 +84,10 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             Long defaultEventId = Instant.now().toEpochMilli() * 1000;
             List<EventCallable> tasks = new ArrayList<EventCallable>();
             List<JOCJsonCommand> jocJsonCommands = new ArrayList<JOCJsonCommand>();
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
-            Globals.beginTransaction();
+
+            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
+            
+            Globals.beginTransaction(connection);
 
             for (JobSchedulerObjects jsObject : eventBody.getJobscheduler()) {
                 if (jsObject.getEventId() == null || jsObject.getEventId().isEmpty()) {
@@ -160,7 +167,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             LOGGER.debug("./events ended");
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
         return JOCDefaultResponse.responseStatus200(entity);
     }

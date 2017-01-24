@@ -28,7 +28,6 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            Globals.beginTransaction();
             JobSchedulerP200 entity = new JobSchedulerP200();
             entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventoryInstance, false));
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -39,7 +38,6 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
         }
     }
     

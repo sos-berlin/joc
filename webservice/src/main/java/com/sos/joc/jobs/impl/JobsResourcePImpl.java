@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -33,10 +34,15 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
     private Boolean isOrderJob;
 
     @Override
-    public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter) throws Exception {
+    public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter){
+        
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             initLogging(API_CALL, jobsFilter);
-            Globals.beginTransaction();
+            connection.beginTransaction();
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
@@ -48,7 +54,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             jobs = jobsFilter.getJobs();
             isOrderJob = jobsFilter.getIsOrderJob();
             List<JobP> listJobs = new ArrayList<JobP>();
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
+            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             Long instanceId = dbItemInventoryInstance.getId();
             List<DBItemInventoryJob> listOfJobs = processFilters(dbLayer);
             for (DBItemInventoryJob inventoryJob : listOfJobs) {
@@ -60,7 +66,6 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             JobsP entity = new JobsP();
             entity.setJobs(listJobs);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -68,7 +73,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
 

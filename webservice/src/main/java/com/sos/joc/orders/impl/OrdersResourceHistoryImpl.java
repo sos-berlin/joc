@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemReportTriggerWithResult;
 import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
@@ -32,18 +33,22 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 
     @Override
     public JOCDefaultResponse postOrdersHistory(String accessToken, OrdersFilter ordersFilter) throws Exception {
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, ordersFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            Globals.beginTransaction();
+            Globals.beginTransaction(connection);
 
             List<OrderHistoryItem> listHistory = new ArrayList<OrderHistoryItem>();
 
-            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(Globals.sosHibernateConnection);
+            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
             if (ordersFilter.getDateFrom() != null) {
                 reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDate(ordersFilter.getDateFrom(), ordersFilter.getTimeZone()));
@@ -130,7 +135,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
 

@@ -14,7 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUsersList;
+import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateStatelessConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -30,8 +32,8 @@ public class Globals {
     public static final String SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS = "event_http_clients";
     public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
     public static SOSShiroCurrentUsersList currentUsersList;
-    public static SOSHibernateConnection sosHibernateConnection;
-    public static Map<String, SOSHibernateConnection> sosSchedulerHibernateConnections;
+    public static SOSHibernateFactory sosHibernateFactory;
+    public static Map<String, SOSHibernateFactory> sosSchedulerHibernateFactories;
     public static JocCockpitProperties sosShiroProperties;
     public static Map<String, DBItemInventoryInstance> urlFromJobSchedulerId = new HashMap<String, DBItemInventoryInstance>();
     public static Map<String, Boolean> jobSchedulerIsRunning = new HashMap<String, Boolean>();
@@ -39,41 +41,40 @@ public class Globals {
     public static int httpSocketTimeout = 2000;
     public static boolean withHostnameVerification = false;
     
-    public static SOSHibernateConnection getConnection() throws JocException {
-        if (sosHibernateConnection == null) {
+    public static SOSHibernateFactory getHibernateFactory() throws JocException {
+        if (sosHibernateFactory == null) {
             try {
                 String confFile = getConfFile(null);
-                sosHibernateConnection = new SOSHibernateConnection(confFile);
-                sosHibernateConnection.addClassMapping(DBLayer.getInventoryClassMapping());
-                sosHibernateConnection.addClassMapping(DBLayer.getReportingClassMapping());
-                sosHibernateConnection.setAutoCommit(true);
-                sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
-                sosHibernateConnection.setUseOpenStatelessSession(true);
-                sosHibernateConnection.connect();
+                sosHibernateFactory = new SOSHibernateFactory(confFile);
+                sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
+                sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
+                sosHibernateFactory.setAutoCommit(true);
+                sosHibernateFactory.setIgnoreAutoCommitTransactions(true);
+                sosHibernateFactory.open();
             } catch (JocException e) {
                 throw e;
-            } catch (Exception e) {
+            } catch (Exception e) { 
                 throw new DBConnectionRefusedException(e);
             }
         }
-        return sosHibernateConnection;
+        return sosHibernateFactory;
     }
 
-    public static SOSHibernateConnection getConnection(String schedulerId) throws JocException {
-        if (sosSchedulerHibernateConnections == null) {
-            sosSchedulerHibernateConnections = new HashMap<String, SOSHibernateConnection>();
+    public static SOSHibernateFactory getConnection(String schedulerId) throws JocException {
+        if (sosSchedulerHibernateFactories == null) {
+            sosSchedulerHibernateFactories = new HashMap<String, SOSHibernateFactory>();
         }
-        SOSHibernateConnection sosHibernateConnection = sosSchedulerHibernateConnections.get(schedulerId);
+        SOSHibernateFactory sosHibernateConnection = sosSchedulerHibernateFactories.get(schedulerId);
 
         if (sosHibernateConnection == null) {
             try {
                 String confFile = getConfFile(schedulerId);
-                sosHibernateConnection = new SOSHibernateConnection(confFile);
+                sosHibernateConnection = new SOSHibernateFactory(confFile);
                 sosHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
                 sosHibernateConnection.setAutoCommit(true);
                 sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
-                sosHibernateConnection.connect();
-                sosSchedulerHibernateConnections.put(schedulerId, sosHibernateConnection);
+                sosHibernateConnection.open();
+                sosSchedulerHibernateFactories.put(schedulerId, sosHibernateConnection);
             } catch (JocException e) {
                 throw e;
             } catch (Exception e) {
@@ -89,15 +90,14 @@ public class Globals {
     }
 
     public static void checkConnection(String schedulerId) throws JocException {
-        SOSHibernateConnection connection = null;
+        SOSHibernateFactory connection = null;
         if (schedulerId == null) {
-            connection = getConnection();
+            connection = getHibernateFactory();
         } else {
             connection = getConnection(schedulerId);
         }
         try {
-            if ((connection.getSessionFactory() != null && connection.getSessionFactory().isClosed()) || (!connection
-                    .isUseOpenStatelessSession() && !((org.hibernate.Session) connection.getCurrentSession()).isOpen())) {
+            if ((connection.getSessionFactory() != null && connection.getSessionFactory().isClosed())) {
                 LOGGER.info("Database session is closed. Retry connect...");
                 connection.reconnect();
             }
@@ -106,18 +106,18 @@ public class Globals {
         }
     }
 
-    public static void trySelect(String schedulerId) throws JocException {
-        SOSHibernateConnection connection = null;
+    public static void trySelect(String schedulerId) throws Exception {
+        SOSHibernateFactory connection = null;
         if (schedulerId == null) {
-            connection = getConnection();
+            connection = getHibernateFactory();
         } else {
             connection = getConnection(schedulerId);
         }
+        SOSHibernateConnection session=new SOSHibernateStatelessConnection(connection);
         try {
             
             String sql = " from DailyPlanDBItem where 1=0";
-            StatelessSession session = connection.createStatelessSession();
-            connection.createQuery(sql,session).list();
+            session.createQuery(sql).list();
 
         } catch (HibernateException ex) {
             try {
@@ -127,6 +127,23 @@ public class Globals {
                 throw new DBConnectionRefusedException(e);
             }
 
+        } catch (Exception e) {
+            throw new DBConnectionRefusedException(e);
+        }finally{
+            if (session != null){
+                session.closeSession();
+            }
+        }
+    }
+    
+    public static SOSHibernateConnection createSosHibernateStatelessConnection() throws JocException   {
+        if (sosHibernateFactory == null){
+            getHibernateFactory();
+        }
+        SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
+        try {
+            connection.connect();
+            return connection;
         } catch (Exception e) {
             throw new DBConnectionRefusedException(e);
         }
@@ -147,40 +164,31 @@ public class Globals {
         setTrustStore();
     }
     
-    public static void beginTransaction() {
+    
+    public static void beginTransaction(SOSHibernateConnection connection) {
         try {
-            if (sosHibernateConnection != null) {
-                sosHibernateConnection.beginTransaction();
+            if (connection != null) {
+                connection.beginTransaction();
+            }
+        } catch (Exception e) {
+        }
+    }
+    
+    public static void rollback(SOSHibernateConnection connection) {
+        try {
+            if (connection != null) {
+                connection.rollback();
             }
         } catch (Exception e) {
         }
     }
 
-    public static void rollback() {
-        try {
-            if (sosHibernateConnection != null) {
-                sosHibernateConnection.rollback();
-            }
-        } catch (Exception e) {
-        }
-    }
+      
 
-    public static void forceRollback() {
-        if (sosHibernateConnection != null) {
-            try {
-                sosHibernateConnection.setIgnoreAutoCommitTransactions(false);
-                sosHibernateConnection.rollback();
-            } catch (Exception e) {
-            } finally {
-                sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
-            }
-        }
-    }
-
-    public static void commit() {
+    public static void commit(SOSHibernateConnection connection) {
         try {
-            if (sosHibernateConnection != null) {
-                sosHibernateConnection.commit();
+            if (connection != null) {
+                connection.commit();
             }
         } catch (Exception e) {
         }
@@ -279,5 +287,17 @@ public class Globals {
                 }
             }
         }
+    }
+
+    public static void forceRollback(Object object) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public static void disconnect(SOSHibernateConnection connection) {
+       if (connection != null){
+           connection.disconnect();
+       }
+        
     }
 }

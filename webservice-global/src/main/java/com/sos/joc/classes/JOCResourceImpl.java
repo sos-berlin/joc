@@ -14,8 +14,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
@@ -23,6 +26,7 @@ import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.NoUserWithAccessTokenException;
+import com.sos.joc.model.jobscheduler.HostPortParameter;
 
 public class JOCResourceImpl {
 
@@ -32,6 +36,7 @@ public class JOCResourceImpl {
     private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private String accessToken;
     private String jobschedulerId;
+ 
 
     private ObjectMapper mapper = new ObjectMapper();
     private JocError jocError = new JocError();
@@ -69,10 +74,7 @@ public class JOCResourceImpl {
         return jobschedulerUser;
     }
 
-    // public JOCXmlCommand getJOCXmlCommand(String jobschedulerId) {
-    // return new JOCXmlCommand(dbItemInventoryInstance.getUrl(),
-    // jobschedulerUser, jobschedulerId);
-    // }
+ 
 
     public JocError getJocError() {
         return jocError;
@@ -219,11 +221,11 @@ public class JOCResourceImpl {
         return dbItemInventoryInstance.getAuth();
     }
 
-    public String retrySchedulerInstance() throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
+    public String retrySchedulerInstance() throws JocException {
         return retrySchedulerInstance(null);
     }
 
-    public String retrySchedulerInstance(String schedulerId) throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
+    public String retrySchedulerInstance(String schedulerId) throws JocException {
         if (schedulerId == null) {
             schedulerId = jobschedulerId;
         }
@@ -242,6 +244,7 @@ public class JOCResourceImpl {
 
     private JOCDefaultResponse init(String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws JocException {
         JOCDefaultResponse jocDefaultResponse = init401And440();
+
         if (!permission) {
             return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, "Access denied"));
         }
@@ -276,6 +279,33 @@ public class JOCResourceImpl {
                 metaInfo.add(2, userMetaInfo);
             }
         } catch (Exception e) {
+        }
+    }
+    
+    public void getJobSchedulerInstanceByHostPort(String host, Integer port,String schedulerId) throws DBConnectionRefusedException, DBMissingDataException, DBInvalidDataException    {
+        if (host != null && !host.isEmpty() && port != null && port > 0) {
+
+            JobSchedulerIdentifier jobSchedulerIdentifier = new JobSchedulerIdentifier(schedulerId);
+            jobSchedulerIdentifier.setHost(host);
+            jobSchedulerIdentifier.setPort(port);
+
+            SOSHibernateConnection connection = null;
+
+            try {
+                connection = Globals.createSosHibernateStatelessConnection();
+            } catch (Exception e) {
+                throw new DBConnectionRefusedException(e);
+            }
+            
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+            dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(jobSchedulerIdentifier);
+            
+            if (dbItemInventoryInstance == null) {
+                String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
+                        jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
+                        DBLayer.TABLE_INVENTORY_INSTANCES);
+                throw new DBInvalidDataException(errMessage);
+            }
         }
     }
 

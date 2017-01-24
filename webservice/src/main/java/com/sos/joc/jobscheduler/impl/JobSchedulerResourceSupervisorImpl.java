@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
@@ -26,11 +27,16 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
 
     @Override
     public JOCDefaultResponse postJobschedulerSupervisor(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
+            Globals.beginTransaction(connection);
             initLogging(API_CALL, jobSchedulerId);
-            Globals.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMaster().getView().isStatus());
+
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -39,12 +45,12 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
 
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
             if (supervisorId != DBLayer.DEFAULT_ID) {
-                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
                 DBItemInventoryInstance dbItemInventorySupervisorInstance = dbLayer.getInventoryInstancesByKey(supervisorId);
 
                 if (dbItemInventorySupervisorInstance == null) {
-                    String errMessage = String.format("jobschedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerId
-                            .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
+                    String errMessage = String.format("jobschedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerId.getJobschedulerId(),
+                            supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
                 entity.setJobscheduler(new JobSchedulerVCallable(dbItemInventorySupervisorInstance, accessToken).call());
@@ -60,7 +66,7 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
 

@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.joc.Globals;
@@ -34,7 +35,11 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 
     @Override
     public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, schedulesFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulesFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()
                     .getView().isStatus());
@@ -46,8 +51,8 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             schedules = schedulesFilter.getSchedules();
             regex = schedulesFilter.getRegex();
 
-            Globals.beginTransaction();
-            InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(Globals.sosHibernateConnection);
+            Globals.beginTransaction(connection);
+            InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(connection);
             List<ScheduleP> listOfSchedules = new ArrayList<ScheduleP>();
 
             if (schedules != null && !schedules.isEmpty()) {
@@ -83,7 +88,6 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
             SchedulesP entity = new SchedulesP();
             entity.setSchedules(listOfSchedules);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -91,7 +95,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
 

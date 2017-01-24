@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -34,7 +35,13 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
+        
+        
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             initLogging(API_CALL, jobSchedulerAgentClustersBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentClustersBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerUniversalAgent().getView().isStatus());
@@ -49,8 +56,8 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                     agentClusterPaths.add(agentCluster.getAgentCluster());
                 }
             }
-            Globals.beginTransaction();
-            InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
+            Globals.beginTransaction(connection);
+            InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
             //List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembers(dbItemInventoryInstance.getId(), null);
             List<AgentClusterPermanent> agentClusters = agentLayer.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
             
@@ -92,7 +99,6 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             AgentClusters entity = new AgentClusters();
             entity.setAgentClusters(listOfAgentClusters);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            agentLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -100,7 +106,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();;
+            Globals.disconnect(connection);;
         }
     }
 }

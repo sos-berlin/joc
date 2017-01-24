@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemReportExecution;
 import com.sos.jitl.reporting.db.ReportExecutionsDBLayer;
 import com.sos.joc.Globals;
@@ -27,7 +28,11 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
     @Override
     public JOCDefaultResponse postOrderHistory(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
 
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             initLogging(API_CALL, orderHistoryFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
                     .isStatus());
@@ -35,11 +40,11 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
                 return jocDefaultResponse;
             }
 
-            Globals.beginTransaction();
+            Globals.beginTransaction(connection);
 
             List<OrderStepHistoryItem> listOrderStepHistory = new ArrayList<OrderStepHistoryItem>();
 
-            ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(Globals.sosHibernateConnection);
+            ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(connection);
             reportExecutionsDBLayer.getFilter().setSchedulerId(orderHistoryFilter.getJobschedulerId());
             reportExecutionsDBLayer.getFilter().setOrderHistoryId(orderHistoryFilter.getHistoryId());
             List<DBItemReportExecution> listOfOrderStepHistoryItems = reportExecutionsDBLayer.getOrderStepHistoryItems();
@@ -77,7 +82,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         } 
     }
 }

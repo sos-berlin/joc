@@ -4,20 +4,36 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.model.order.OrderP;
 import com.sos.joc.model.order.OrderType;
 
 
 public class OrderPermanent {
+    private static SOSHibernateConnection connection = null;
 
     public static List<OrderP> fillOutputOrders (List<DBItemInventoryOrder> ordersFromDB, InventoryOrdersDBLayer dbLayer, Boolean compact)
             throws Exception {
         List<OrderP> listOfOutputOrders = new ArrayList<OrderP>();
+
+        try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            try {
+                connection.connect();
+            } catch (Exception e) {
+                throw new DBConnectionRefusedException(e);
+            }
+
+            Globals.beginTransaction(connection);
+            
+            
+        
         for (DBItemInventoryOrder inventoryOrder : ordersFromDB) {
             OrderP order = new OrderP();
             order.setSurveyDate(inventoryOrder.getModified());
@@ -44,10 +60,13 @@ public class OrderPermanent {
             listOfOutputOrders.add(order);
         }
         return listOfOutputOrders;
+        }finally{
+            Globals.disconnect(connection);
+        }
     }
     
     private static Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
-        DBLayerReporting dbLayer = new DBLayerReporting(Globals.sosHibernateConnection);
+        DBLayerReporting dbLayer = new DBLayerReporting(connection);
         Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order,Globals.sosShiroProperties.getProperty("limit_for_average_calculation",WebserviceConstants.DEFAULT_LIMIT));
         if (estimatedDurationInMillis != null) {
             return estimatedDurationInMillis.intValue()/1000;

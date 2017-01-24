@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
@@ -27,9 +28,13 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
     private static final String API_CALL = "./job_chain/p";
 
     @Override
-    public JOCDefaultResponse postJobChainP(String accessToken, JobChainFilter jobChainFilter) throws Exception {
+    public JOCDefaultResponse postJobChainP(String accessToken, JobChainFilter jobChainFilter) {
 
+
+        SOSHibernateConnection connection = null;
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             initLogging(API_CALL, jobChainFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobChain()
                     .getView().isStatus());
@@ -39,7 +44,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
 
             JobChainP200 entity = new JobChainP200();
             Long instanceId = dbItemInventoryInstance.getId();
-            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
+            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
             DBItemInventoryJobChain inventoryJobChain = dbLayer.getJobChainByPath(normalizePath(jobChainFilter.getJobChain()), instanceId);
             if (inventoryJobChain == null){
                     String errMessage = String.format("job chain %s for instance %s with internal id %s not found in table %s", jobChainFilter.getJobChain(),jobChainFilter.getJobschedulerId(),instanceId,
@@ -75,7 +80,6 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
                 }
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -83,7 +87,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
         

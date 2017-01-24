@@ -13,10 +13,12 @@ import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
@@ -50,8 +52,19 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
 
     @Override
     public JobSchedulerEvent call() throws JocException {
+        SOSHibernateConnection connection = null;
+
         try {
-            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
+            connection = Globals.createSosHibernateStatelessConnection();
+            try {
+                connection.connect();
+            } catch (Exception e) {
+                throw new DBConnectionRefusedException(e);
+            }
+
+            Globals.beginTransaction(connection);
+            
+             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
             jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId(), dbLayer));
             Globals.jobSchedulerIsRunning.put(command.getSchemeAndAuthority(), true);
         } catch (ForcedClosingHttpClientException e) {
@@ -94,6 +107,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                 LOGGER.debug("Connection close: " + command.getSchemeAndAuthority());
             }
             command.closeHttpClient();
+            Globals.disconnect(connection);
         }
         return jobSchedulerEvent;
     }

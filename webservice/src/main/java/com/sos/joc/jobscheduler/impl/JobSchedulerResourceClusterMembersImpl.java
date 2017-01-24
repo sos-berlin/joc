@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -31,7 +32,11 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
     @Override
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
         String jobSchedulerId = jobSchedulerFilter.getJobschedulerId();
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, jobSchedulerFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId, getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMasterCluster().getView().isStatus());
@@ -40,7 +45,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             }
             List<JobSchedulerV> masters = new ArrayList<JobSchedulerV>();
             
-            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+            InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
             List<DBItemInventoryInstance> schedulersFromDb = instanceLayer.getInventoryInstancesBySchedulerId(jobSchedulerId);
             if(schedulersFromDb != null && !schedulersFromDb.isEmpty()) {
                 List<JobSchedulerVCallable> tasks = new ArrayList<JobSchedulerVCallable>();
@@ -74,7 +79,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.rollback(connection);
         }
     }
 }

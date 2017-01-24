@@ -28,7 +28,7 @@ public class InventorySchedulesDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
             sql.append(" where instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             List<DBItemInventorySchedule> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -49,7 +49,7 @@ public class InventorySchedulesDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
             sql.append(" where name = :name");
             sql.append(" and instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("name", schedulePath);
             query.setParameter("instanceId", instanceId);
             List<DBItemInventorySchedule> result = query.list();
@@ -70,7 +70,7 @@ public class InventorySchedulesDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_SCHEDULES);
             sql.append(" where id = :id");
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
             List<DBItemInventorySchedule> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -93,7 +93,7 @@ public class InventorySchedulesDBLayer extends DBLayer {
             sql.append(" where files.id = schedule.fileId");
             sql.append(" and schedule.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {
@@ -115,7 +115,7 @@ public class InventorySchedulesDBLayer extends DBLayer {
             sql.append(" where scheduleId = :id");
             sql.append(" and instanceId = :instanceId");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
             List result = query.list();
@@ -147,7 +147,7 @@ public class InventorySchedulesDBLayer extends DBLayer {
                 sql.append(" and ifile.fileDirectory = :folderName");
                 sql.append(" and isched.instanceId = :instanceId");
             }
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (recursive) {
                 query.setParameter("folderName", folderName + "%");

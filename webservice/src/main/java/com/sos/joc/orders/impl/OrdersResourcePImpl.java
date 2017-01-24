@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -33,7 +34,11 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
 
     @Override
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilter ordersFilter) throws Exception {
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, ordersFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
                     .getView().isStatus());
@@ -42,7 +47,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             }
             OrdersP entity = new OrdersP();
             Long instanceId = dbItemInventoryInstance.getId();
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
             regex = ordersFilter.getRegex();
             orderPaths = ordersFilter.getOrders();
             foldersFilter = ordersFilter.getFolders();
@@ -78,13 +83,14 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             }
             entity.setOrders(OrderPermanent.fillOutputOrders(ordersFromDB, dbLayer, compact));
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }finally{
+            Globals.disconnect(connection);
         }
     }
 

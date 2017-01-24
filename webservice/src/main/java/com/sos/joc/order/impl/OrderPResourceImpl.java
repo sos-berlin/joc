@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
@@ -23,10 +24,14 @@ import com.sos.joc.order.resource.IOrderPResource;
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
 
     private static final String API_CALL = "./order/p";
+    private SOSHibernateConnection connection = null;
 
     @Override
     public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             initLogging(API_CALL, orderFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
                     .isStatus());
@@ -36,7 +41,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             Long instanceId = dbItemInventoryInstance.getId();
             Boolean compact = orderFilter.getCompact();
             OrderP200 entity = new OrderP200();
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(Globals.sosHibernateConnection);
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
             DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePath(orderFilter.getJobChain()),
                     orderFilter.getOrderId(), instanceId);
             OrderP order = new OrderP();
@@ -63,19 +68,20 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             }
             entity.setOrder(order);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }finally{
+            Globals.disconnect(connection);
         }
 
     }
 
     private Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
-        DBLayerReporting dbLayer = new DBLayerReporting(Globals.sosHibernateConnection);
+        DBLayerReporting dbLayer = new DBLayerReporting(connection);
          
         Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order,Globals.sosShiroProperties.getProperty("limit_for_average_calculation",WebserviceConstants.DEFAULT_LIMIT));
         if (estimatedDurationInMillis != null) {

@@ -1,6 +1,8 @@
 package com.sos.joc.classes;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateFactory;
+import com.sos.hibernate.classes.SOSHibernateStatelessConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.task.JobSchedulerTaskHistoryDBLayer;
@@ -17,10 +19,12 @@ public class LogTaskContent extends LogContent {
     }
 
     public String getLog() throws Exception {
-        SOSHibernateConnection sosHibernateConnection = Globals.getConnection(taskFilter.getJobschedulerId());
-        sosHibernateConnection.beginTransaction();
+        SOSHibernateFactory sosHibernateFactory = Globals.getConnection(taskFilter.getJobschedulerId());
+        SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
+
+        connection.beginTransaction();
         try {
-            JobSchedulerTaskHistoryDBLayer jobSchedulerTaskHistoryDBLayer = new JobSchedulerTaskHistoryDBLayer(sosHibernateConnection);
+            JobSchedulerTaskHistoryDBLayer jobSchedulerTaskHistoryDBLayer = new JobSchedulerTaskHistoryDBLayer(connection);
             String log = jobSchedulerTaskHistoryDBLayer.getLogAsString(taskFilter.getTaskId());
             if (log == null) {
                 log = getTaskLogFromXmlCommand();
@@ -29,7 +33,7 @@ public class LogTaskContent extends LogContent {
         } catch (Exception e) {
             throw e;
         } finally {
-            sosHibernateConnection.rollback();
+            connection.rollback();
         }
     }
 

@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -37,7 +38,11 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
     @Override
     public JOCDefaultResponse postLocksP(String accessToken, LocksFilter locksFilter) throws Exception {
         LOGGER.debug(API_CALL);
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             JOCDefaultResponse jocDefaultResponse = init(accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock().getView()
                     .isStatus());
             if (jocDefaultResponse != null) {
@@ -47,7 +52,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             locks = locksFilter.getLocks();
             folders = locksFilter.getFolders();
             regex = locksFilter.getRegex();
-            InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(Globals.sosHibernateConnection);
+            InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(connection);
             LocksP entity = new LocksP();
             List<LockP> listOfLocks = new ArrayList<LockP>();
             if (locks != null && !locks.isEmpty()) {
@@ -81,7 +86,6 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             }
             entity.setLocks(listOfLocks);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getMetaInfo(API_CALL, locksFilter));
@@ -90,7 +94,10 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             JocError err = new JocError();
             err.addMetaInfoOnTop(getMetaInfo(API_CALL, locksFilter));
             return JOCDefaultResponse.responseStatusJSError(e, err);
+        }finally{
+            Globals.disconnect(connection);
         }
+        
     }
 
 }

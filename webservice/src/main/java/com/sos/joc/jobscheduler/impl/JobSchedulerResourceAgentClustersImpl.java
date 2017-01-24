@@ -19,6 +19,7 @@ import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -51,7 +52,12 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentClusters(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
+
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             initLogging(API_CALL, jobSchedulerAgentClustersBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentClustersBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerUniversalAgent().getView().isStatus());
@@ -77,7 +83,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
             }
             Set<String> agentSet = new HashSet<String>();
             Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();
-            Globals.beginTransaction();
+            connection.beginTransaction();
             
             try {
                 JsonObject jsonObjectFromPost = command.getJsonObjectFromPostWithRetry(getServiceBody(null), accessToken);
@@ -139,7 +145,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
                 entity.setAgentClusters(listOfAgentClusters);
                 
             } else {
-                InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
+                InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
                 List<AgentClusterPermanent> agentClusters = agentLayer.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
                 
                 List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
@@ -191,7 +197,7 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+           Globals.disconnect(connection);
         }
     }
     

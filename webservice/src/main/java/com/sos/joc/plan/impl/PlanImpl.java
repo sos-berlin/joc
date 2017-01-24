@@ -13,6 +13,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem;
@@ -85,14 +86,19 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
     
     @Override
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
-        DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(Globals.sosHibernateConnection);
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
+            DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(connection);
+            
             initLogging(API_CALL, planFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getDailyPlan().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            Globals.beginTransaction();
+            Globals.beginTransaction(connection);
             
             dailyPlanDBLayer.getFilter().setSchedulerId(planFilter.getJobschedulerId());
             dailyPlanDBLayer.getFilter().setJob(planFilter.getJob());
@@ -220,8 +226,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             e.printStackTrace();
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
-            dailyPlanDBLayer.closeSession();
+            Globals.disconnect(connection);
         }
     }
 }

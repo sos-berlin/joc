@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -31,6 +32,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     private static String API_CALL = "./orders/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
+    private SOSHibernateConnection connection = null;
 
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {
@@ -163,7 +165,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 if (order.getResume() != null && order.getResume()) {
                     xml.addAttribute("suspended", "no");
                 } else {
-                    InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
+                    InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
                     if (dbLayer.isEndNode(normalizePath(order.getJobChain()), order.getState(), dbItemInventoryInstance.getId())) {
                         xml.addAttribute("suspended", "no");
                     }
@@ -215,9 +217,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             throw new JocMissingRequiredParameterException("undefined 'orders'");
         }
         Date surveyDate = Date.from(Instant.now());
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             if ("set_state".equals(command)) {
-                Globals.beginTransaction();
+                Globals.beginTransaction(connection);
             }
             for (ModifyOrder order : modifyOrders.getOrders()) {
                 surveyDate = executeModifyOrderCommand(order, command);
@@ -226,7 +231,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             throw e;
         } finally {
             if ("set_state".equals(command)) {
-                Globals.rollback();;
+                Globals.disconnect(connection);;
             }
         }
         if (listOfErrors.size() > 0) {

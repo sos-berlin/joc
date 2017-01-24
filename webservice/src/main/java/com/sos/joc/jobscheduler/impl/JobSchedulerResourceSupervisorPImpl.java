@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
@@ -26,9 +27,13 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
 
     @Override
     public JOCDefaultResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             initLogging(API_CALL, jobSchedulerId);
-            Globals.beginTransaction();
+            Globals.beginTransaction(connection);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -39,7 +44,7 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
 
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
             if (supervisorId != DBLayer.DEFAULT_ID) {
-                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
                 DBItemInventoryInstance dbItemInventorySupervisorInstance = dbLayer.getInventoryInstancesByKey(supervisorId);
 
                 if (dbItemInventorySupervisorInstance == null) {
@@ -47,7 +52,6 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
                             .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
-                dbLayer.closeSession();
                 entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventorySupervisorInstance, true));
             } else {
                 entity.setJobscheduler(new JobSchedulerP());
@@ -61,7 +65,7 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
 

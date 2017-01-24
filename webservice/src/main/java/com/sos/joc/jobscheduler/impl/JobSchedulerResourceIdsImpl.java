@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -26,14 +27,18 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
 
     @Override
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, null);
-            Globals.beginTransaction();
+            Globals.beginTransaction(connection);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
             Set<String> jobSchedulerIds = new HashSet<String>();
             String first = "";
@@ -59,7 +64,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
 
     }

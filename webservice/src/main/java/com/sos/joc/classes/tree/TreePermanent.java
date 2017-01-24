@@ -13,121 +13,151 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.tree.Tree;
 import com.sos.joc.model.tree.TreeFilter;
 
-
 public class TreePermanent {
 
-    public static List<JobSchedulerObjectType> getAllowedTypes(TreeFilter treeBody, SOSPermissionJocCockpit sosPermission) {
-        List<JobSchedulerObjectType> types = new ArrayList<JobSchedulerObjectType>();
-        for (JobSchedulerObjectType type : treeBody.getTypes()) {
-            switch (type) {
-            case JOB: 
-                if (sosPermission.getJob().getView().isStatus()) {
-                    types.add(type);
-                }
-                break;
-            case JOBCHAIN: 
-                if (sosPermission.getJobChain().getView().isStatus()) {
-                    types.add(type);
-                }
-                break;
-            case ORDER: 
-                if (sosPermission.getOrder().getView().isStatus()) {
-                    types.add(type);
-                }
-                break;
-            case PROCESSCLASS: 
-                if (sosPermission.getProcessClass().getView().isStatus()) {
-                    types.add(type);
-                }
-                break;
-            case AGENTCLUSTER: 
-                if (sosPermission.getProcessClass().getView().isStatus()) {
-                    types.add(type);
-                }
-                break;
-            case LOCK: 
-                if (sosPermission.getLock().getView().isStatus()) {
-                    types.add(type);
-                }
-                break;
-            case SCHEDULE: 
-                if (sosPermission.getSchedule().getView().isStatus()) {
-                    types.add(type);
-                }
-                break;
-            case FOLDER:
-                break;
-            default: 
-                types.add(type);
-                break;
+    public static List<JobSchedulerObjectType> getAllowedTypes(TreeFilter treeBody, SOSPermissionJocCockpit sosPermission) throws JocException {
+        SOSHibernateConnection connection = null;
+
+        try {
+
+            connection = Globals.createSosHibernateStatelessConnection();
+
+            try {
+                connection.connect();
+            } catch (Exception e) {
+                throw new DBConnectionRefusedException(e);
             }
+
+            Globals.beginTransaction(connection);
+            List<JobSchedulerObjectType> types = new ArrayList<JobSchedulerObjectType>();
+
+            for (JobSchedulerObjectType type : treeBody.getTypes()) {
+                switch (type) {
+                case JOB:
+                    if (sosPermission.getJob().getView().isStatus()) {
+                        types.add(type);
+                    }
+                    break;
+                case JOBCHAIN:
+                    if (sosPermission.getJobChain().getView().isStatus()) {
+                        types.add(type);
+                    }
+                    break;
+                case ORDER:
+                    if (sosPermission.getOrder().getView().isStatus()) {
+                        types.add(type);
+                    }
+                    break;
+                case PROCESSCLASS:
+                    if (sosPermission.getProcessClass().getView().isStatus()) {
+                        types.add(type);
+                    }
+                    break;
+                case AGENTCLUSTER:
+                    if (sosPermission.getProcessClass().getView().isStatus()) {
+                        types.add(type);
+                    }
+                    break;
+                case LOCK:
+                    if (sosPermission.getLock().getView().isStatus()) {
+                        types.add(type);
+                    }
+                    break;
+                case SCHEDULE:
+                    if (sosPermission.getSchedule().getView().isStatus()) {
+                        types.add(type);
+                    }
+                    break;
+                case FOLDER:
+                    break;
+                default:
+                    types.add(type);
+                    break;
+                }
+            }
+            return types;
+        } finally {
+            Globals.disconnect(connection);
         }
-        return types;
     }
 
     public static SortedSet<String> initFoldersByFoldersFromBody(TreeFilter treeBody, Long instanceId) throws Exception {
-        SortedSet<String> folders = new TreeSet<String>(new Comparator<String>(){
-            public int compare(String a, String b){
+        SortedSet<String> folders = new TreeSet<String>(new Comparator<String>() {
+            public int compare(String a, String b) {
                 return b.compareTo(a);
             }
         });
         Set<String> bodyTypes = new HashSet<String>();
-        if(treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
-            for(JobSchedulerObjectType type : treeBody.getTypes()) {
+        if (treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
+            for (JobSchedulerObjectType type : treeBody.getTypes()) {
                 switch (type) {
-                case ORDER: 
-                case JOBCHAIN: 
+                case ORDER:
+                case JOBCHAIN:
                     bodyTypes.add("job_chain");
                     break;
                 case AGENTCLUSTER:
                     bodyTypes.add("agent_cluster");
                     break;
-                case PROCESSCLASS: 
+                case PROCESSCLASS:
                     bodyTypes.add("process_class");
                     bodyTypes.add("agent_cluster");
                     break;
-                default: 
+                default:
                     bodyTypes.add(type.name().toLowerCase());
                     break;
                 }
             }
         }
-        InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(Globals.sosHibernateConnection);
-        List<String> results = null;
-        if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
-            for (Folder folder : treeBody.getFolders()) {
-                String normalizedFolder = ("/"+folder.getFolder()).replaceAll("//+", "/");
-                results = dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes);
+
+        SOSHibernateConnection connection = null;
+
+        try {
+
+            connection = Globals.createSosHibernateStatelessConnection();
+
+            Globals.beginTransaction(connection);
+            InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(connection);
+            List<String> results = null;
+            if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
+                for (Folder folder : treeBody.getFolders()) {
+                    String normalizedFolder = ("/" + folder.getFolder()).replaceAll("//+", "/");
+                    results = dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes);
+                    if (results != null && !results.isEmpty()) {
+                        if (folder.getRecursive() == null || folder.getRecursive()) {
+                            folders.addAll(results);
+                        } else {
+                            Path parent = Paths.get(normalizedFolder);
+                            for (String result : results) {
+                                folders.add("/" + Paths.get(result).subpath(0, parent.getNameCount() + 1).toString());
+                            }
+                        }
+                    }
+                }
+            } else {
+                results = dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes);
                 if (results != null && !results.isEmpty()) {
-                    if (folder.getRecursive() == null || folder.getRecursive()) {
-                        folders.addAll(results);
-                    } else {
-                        Path parent = Paths.get(normalizedFolder);
-                        for (String result : results) {
-                            folders.add("/"+Paths.get(result).subpath(0, parent.getNameCount()+1).toString());
-                        } 
-                    } 
+                    folders.addAll(results);
                 }
             }
-        } else {
-            results = dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes);
-            if(results != null && !results.isEmpty()) {
-                folders.addAll(results);
-            }
+            return folders;
+        } finally {
+            Globals.disconnect(connection);
         }
-        return folders;
     }
-    
+
     public static Tree getTree(SortedSet<String> folders) {
         Map<Path, TreeModel> treeMap = new HashMap<Path, TreeModel>();
-        for(String folder : folders) {
+        for (String folder : folders) {
             Path pFolder = Paths.get(folder);
             TreeModel tree = new TreeModel();
             if (treeMap.containsKey(pFolder)) {
@@ -146,7 +176,7 @@ public class TreePermanent {
         }
         return treeMap.get(Paths.get("/"));
     }
-    
+
     private static void fillTreeMap(Map<Path, TreeModel> treeMap, Path folder, TreeModel tree) {
         Path parent = folder.getParent();
         if (parent != null) {
@@ -173,7 +203,7 @@ public class TreePermanent {
                 parentTree.setFolders(treeList);
                 treeMap.put(parent, parentTree);
             }
-            fillTreeMap(treeMap, parent, parentTree); 
+            fillTreeMap(treeMap, parent, parentTree);
         }
     }
 }

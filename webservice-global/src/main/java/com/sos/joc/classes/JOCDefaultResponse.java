@@ -170,7 +170,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         } else {
             responseBuilder.entity(entity);
         }
-        Globals.forceRollback();
+        Globals.forceRollback(null);
         return new JOCDefaultResponse(responseBuilder.build());
     }
 
@@ -211,7 +211,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     public static JOCDefaultResponse responseStatus434(Err420 entity) {
         Response.ResponseBuilder responseBuilder = Response.status(434).header("Content-Type", MediaType.APPLICATION_JSON).cacheControl(setNoCaching());
         responseBuilder.entity(entity);
-        Globals.forceRollback();
+        Globals.forceRollback(null);
         return new JOCDefaultResponse(responseBuilder.build());
     }
     
@@ -221,7 +221,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
         Response.ResponseBuilder responseBuilder = Response.status(419).header("Content-Type", MediaType.APPLICATION_JSON).cacheControl(setNoCaching());
         responseBuilder.entity(errors);
-        Globals.forceRollback();
+        Globals.forceRollback(null);
         return new JOCDefaultResponse(responseBuilder.build());
     }
     

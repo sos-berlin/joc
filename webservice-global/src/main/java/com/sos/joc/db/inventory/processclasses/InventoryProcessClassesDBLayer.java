@@ -28,7 +28,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
             sql.append(" where instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryProcessClass> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -59,7 +59,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
                 sql.append(" and ifile.fileDirectory = :folderName");
                 sql.append(" and ipc.instanceId = :instanceId");
             }
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (recursive) {
                 query.setParameter("folderName", folderName + "%");
@@ -86,7 +86,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
             sql.append(" where instanceId = :instanceId");
             sql.append(" and name = :processClassPath");
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("processClassPath", processClassPath);
             List<DBItemInventoryProcessClass> result = query.list();
@@ -109,7 +109,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
             sql.append(" where files.id = pc.fileId");
             sql.append(" and pc.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString(),getSession());
+            Query query = getConnection().createQuery(sql.toString());
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {

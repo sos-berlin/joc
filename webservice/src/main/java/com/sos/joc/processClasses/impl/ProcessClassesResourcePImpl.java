@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -30,16 +31,20 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
 
     @Override
     public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+        SOSHibernateConnection connection = null;
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, processClassFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock()
                     .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            Globals.beginTransaction();
+            Globals.beginTransaction(connection);
             ProcessClassesP entity = new ProcessClassesP();
-            InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(Globals.sosHibernateConnection);
+            InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(connection);
             List<ProcessClassP> listOfProcessClasses = new ArrayList<ProcessClassP>();
             List<ProcessClassPath> processClassPaths = processClassFilter.getProcessClasses();
             List<Folder> folders = processClassFilter.getFolders();
@@ -72,7 +77,6 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             }
             entity.setProcessClasses(listOfProcessClasses);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -80,7 +84,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.rollback();
+            Globals.disconnect(connection);
         }
     }
 

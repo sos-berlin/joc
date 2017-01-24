@@ -19,9 +19,9 @@ public class InventoryJobsDBLayerTest {
 
     @Test
     public void getJobSchedulerJobs() throws Exception {
-        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection());
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
-        InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
+        InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.createSosHibernateStatelessConnection());
         
         List<DBItemInventoryJob>  listOfJobs = dbLayer.getInventoryJobs(instance.getId());
         
@@ -34,9 +34,9 @@ public class InventoryJobsDBLayerTest {
     public void getJobSchedulerJob() throws Exception {
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.sosHibernateConnection);
+        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(Globals.createSosHibernateStatelessConnection());
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
-        InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.sosHibernateConnection);
+        InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(Globals.createSosHibernateStatelessConnection());
         
         DBItemInventoryJob job = dbLayer.getInventoryJobByName("batch_install_universal_agent/PerformInstall", instance.getId());
         

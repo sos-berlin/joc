@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.joc.Globals;
@@ -28,10 +29,14 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
 
     private static final String API_CALL = "./jobscheduler/agents/p";
+    private SOSHibernateConnection connection = null;
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {
+
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+
             initLogging(API_CALL, agentFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, agentFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getJobschedulerUniversalAgent().getView().isStatus());
@@ -41,7 +46,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             AgentsP entity = new AgentsP();
             List<AgentP> listOfAgents = new ArrayList<AgentP>();
             Long instanceId = dbItemInventoryInstance.getId();
-            InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(Globals.sosHibernateConnection);
+            InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
             if (!agentFilter.getAgents().isEmpty()) {
                 for (AgentUrl agentUrl : agentFilter.getAgents()) {
                     DBItemInventoryAgentInstance agentInstance = agentLayer.getInventoryAgentInstances(agentUrl.getAgent(), instanceId);
@@ -58,13 +63,14 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             }
             entity.setAgents(listOfAgents);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            agentLayer.closeSession();
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }finally{
+            Globals.disconnect(connection);
         }
     }
 
@@ -89,7 +95,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
         agent.setHost(agentInstance.getHostname());
         agent.setUrl(agentInstance.getUrl());
         agent.setVersion(agentInstance.getVersion());
-        InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(Globals.sosHibernateConnection);
+        InventoryOperatingSystemsDBLayer osLayer = new InventoryOperatingSystemsDBLayer(connection);
         DBItemInventoryOperatingSystem osInstance = osLayer.getInventoryOperatingSystem(agentInstance.getOsId());
         if (osInstance != null) {
             OperatingSystem os = new OperatingSystem();
@@ -106,7 +112,6 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
         if (!listOfClusters.isEmpty()) {
             agent.setClusters(listOfClusters);
         }
-        osLayer.closeSession();
         return agent;
     }
 

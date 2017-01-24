@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -34,10 +35,15 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
     private List<JobChainP> allNestedJobChains = new ArrayList<JobChainP>();
 
     @Override
-    public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
+    public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) {
+        
+       SOSHibernateConnection connection = null;
 
         try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            
             initLogging(API_CALL, jobChainsFilter);
+
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobChain()
                     .getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -51,7 +57,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             Long instanceId = dbItemInventoryInstance.getId();
 
             JobChainsP entity = new JobChainsP();
-            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(Globals.sosHibernateConnection);
+            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
             List<JobChainP> jobChains = new ArrayList<JobChainP>();
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 for (JobChainPath jobChainPath : jobChainPaths) {
@@ -113,7 +119,6 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             }
             entity.setJobChains(jobChains);
             entity.setDeliveryDate(Date.from(Instant.now()));
-            dbLayer.closeSession();
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -121,6 +126,8 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }finally{
+            Globals.disconnect(connection);
         }
     }
 
