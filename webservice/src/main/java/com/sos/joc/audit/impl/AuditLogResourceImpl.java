@@ -13,6 +13,9 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.audit.AuditLog;
 import com.sos.joc.model.audit.AuditLogFilter;
 import com.sos.joc.model.audit.AuditLogItem;
+import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.job.JobPath;
+import com.sos.joc.model.order.OrderPath;
 
 @Path("audit_log")
 public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogResource {
@@ -31,6 +34,15 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
                 return jocDefaultResponse;
             }
 
+            List<Folder> filterFolder = auditLogFilter.getFolders();
+            List<JobPath> filterJobs = auditLogFilter.getJobs();
+            Integer filterLimit = auditLogFilter.getLimit();
+            List<OrderPath> filterOrders = auditLogFilter.getOrders();
+            String filterDateFrom = auditLogFilter.getDateFrom();
+            String filterDateTo = auditLogFilter.getDateTo();
+            String filterTimeZone = auditLogFilter.getTimeZone();
+            String filterRegex = auditLogFilter.getRegex();
+            
             List<AuditLogItem> audits = new ArrayList<AuditLogItem>();
             // TODO fill audits collection
             AuditLog entity = new AuditLog();
