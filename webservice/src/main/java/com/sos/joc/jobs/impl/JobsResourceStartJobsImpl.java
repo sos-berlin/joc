@@ -12,6 +12,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyJobAudit;
+import com.sos.joc.classes.audit.StartJobAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -31,7 +33,8 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsStart(String accessToken, StartJobs startJobs) throws Exception {
         try {
             initLogging(API_CALL, startJobs);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, startJobs.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().isStart());
+            String jobschedulerId = startJobs.getJobschedulerId();
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken).getJob().isStart());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -40,7 +43,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             }
             Date surveyDate = new Date();
             for (StartJob job : startJobs.getJobs()) {
-                surveyDate = executeStartJobCommand(job);
+                surveyDate = executeStartJobCommand(job, jobschedulerId);
             }
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -54,7 +57,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-    private Date executeStartJobCommand(StartJob startJob) {
+    private Date executeStartJobCommand(StartJob startJob, String jobschedulerId) {
 
         try {
             if (startJob.getParams() != null && startJob.getParams().isEmpty()) {
@@ -63,7 +66,8 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             if (startJob.getEnvironment() != null && startJob.getEnvironment().isEmpty()) {
                 startJob.setEnvironment(null);
             }
-            logAuditMessage(startJob);
+            StartJobAudit jobAudit = new StartJobAudit(startJob, jobschedulerId);
+            logAuditMessage(jobAudit);
 
             checkRequiredParameter("job", startJob.getJob());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
@@ -90,6 +94,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
                 xml.add(envs);
             }
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            storeAuditLogEntry(jobAudit);
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {

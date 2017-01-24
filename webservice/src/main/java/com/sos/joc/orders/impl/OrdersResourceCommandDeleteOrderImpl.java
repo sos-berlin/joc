@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -28,7 +29,8 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrders modifyOrders) {
         try {
             initLogging(API_CALL, modifyOrders);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
+            String jobschedulerId = modifyOrders.getJobschedulerId();
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken).getOrder()
                     .getDelete().isTemporary());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -38,7 +40,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
             }
             Date surveyDate = new Date();
             for (ModifyOrder order : modifyOrders.getOrders()) {
-                surveyDate = executeDeleteOrderCommand(order);
+                surveyDate = executeDeleteOrderCommand(order, jobschedulerId);
             }
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -52,12 +54,13 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
         }
     }
 
-    private Date executeDeleteOrderCommand(ModifyOrder order) {
+    private Date executeDeleteOrderCommand(ModifyOrder order, String jobschedulerId) {
         try {
             if (order.getParams() != null && order.getParams().isEmpty()) {
                 order.setParams(null);
             }
-            logAuditMessage(order);
+            ModifyOrderAudit orderAudit = new ModifyOrderAudit(order, jobschedulerId);
+            logAuditMessage(orderAudit);
             
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
@@ -65,7 +68,8 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
             XMLBuilder xml = new XMLBuilder("remove_order");
             xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", normalizePath(order.getJobChain()));
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-
+            storeAuditLogEntry(orderAudit);
+            
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), order));

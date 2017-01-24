@@ -6,6 +6,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyJobSchedulerClusterAudit;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobSchedulerCluster;
 import com.sos.joc.model.jobscheduler.TimeoutParameter;
@@ -73,7 +74,9 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String command, TimeoutParameter timeoutParameter) throws Exception {
-        logAuditMessage(timeoutParameter);
+        
+        ModifyJobSchedulerClusterAudit clusterAudit = new ModifyJobSchedulerClusterAudit(timeoutParameter);
+        logAuditMessage(clusterAudit);
         XMLBuilder xml = new XMLBuilder("terminate");
         if (timeoutParameter.getTimeout() != null) {
             xml.addAttribute("timeout", timeoutParameter.getTimeout().toString());
@@ -91,6 +94,8 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
         }
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(xml.asXML(), getAccessToken());
+        storeAuditLogEntry(clusterAudit);
+        
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 }

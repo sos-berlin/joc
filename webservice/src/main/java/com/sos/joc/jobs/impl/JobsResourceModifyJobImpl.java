@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyJobAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
@@ -110,10 +111,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-    private Date executeModifyJobCommand(ModifyJob modifyJob, String command) {
+    private Date executeModifyJobCommand(ModifyJob modifyJob, String jobschedulerId, String command) {
 
         try {
-            logAuditMessage(modifyJob);
+            ModifyJobAudit jobAudit = new ModifyJobAudit(modifyJob, jobschedulerId);
+            logAuditMessage(jobAudit);
 
             checkRequiredParameter("job", modifyJob.getJob());
             if (SET_RUN_TIME.equals(command)) {
@@ -134,6 +136,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             } 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            storeAuditLogEntry(jobAudit);
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
@@ -145,7 +148,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobs modifyJobs) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobs.getJobschedulerId(), permission);
+        String jobschedulerId = modifyJobs.getJobschedulerId();
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -154,7 +158,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
         Date surveyDate = new Date();
         for (ModifyJob job : modifyJobs.getJobs()) {
-            surveyDate = executeModifyJobCommand(job, command);
+            surveyDate = executeModifyJobCommand(job, jobschedulerId, command);
         }
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);

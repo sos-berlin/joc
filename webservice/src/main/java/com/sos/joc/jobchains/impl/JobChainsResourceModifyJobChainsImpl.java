@@ -10,6 +10,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyJobChainAudit;
+import com.sos.joc.classes.audit.ModifyJobChainNodeAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -54,7 +56,8 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 
     private JOCDefaultResponse postJobChainsCommand(String command, String accessToken, boolean permission, ModifyJobChains modifyJobChains)
             throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobChains.getJobschedulerId(), permission);
+        String jobschedulerId = modifyJobChains.getJobschedulerId();
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -63,7 +66,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
         }
         Date surveyDate = new Date();
         for (ModifyJobChain jobChain : modifyJobChains.getJobChains()) {
-            surveyDate = executeModifyJobChainCommand(jobChain, command);
+            surveyDate = executeModifyJobChainCommand(jobChain, jobschedulerId, command);
         }
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -71,9 +74,10 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
         return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
 
-    private Date executeModifyJobChainCommand(ModifyJobChain jobChain, String cmd) {
+    private Date executeModifyJobChainCommand(ModifyJobChain jobChain, String jobschedulerId, String cmd) {
         try {
-            logAuditMessage(jobChain);
+            ModifyJobChainAudit jobChainAudit = new ModifyJobChainAudit(jobChain, jobschedulerId);
+            logAuditMessage(jobChainAudit);
 
             checkRequiredParameter("jobChain", jobChain.getJobChain());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
@@ -88,7 +92,8 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
                 break;
             }
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-
+            storeAuditLogEntry(jobChainAudit);
+            
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), jobChain));

@@ -2,23 +2,15 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.classes.XMLBuilder;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
-import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.DBMissingDataException;
+import com.sos.joc.classes.audit.ModifyJobSchedulerAudit;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceModifyJobScheduler;
-import com.sos.joc.model.jobscheduler.HostPortParameter;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 
 @Path("jobscheduler")
@@ -142,8 +134,12 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     private JOCDefaultResponse executeModifyJobSchedulerCommand(String cmd, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
-        getJobSchedulerInstanceByHostPort(urlTimeoutParamSchema.getHost(),urlTimeoutParamSchema.getPort(),urlTimeoutParamSchema.getJobschedulerId());
-        logAuditMessage(urlTimeoutParamSchema);
+        getJobSchedulerInstanceByHostPort(urlTimeoutParamSchema.getHost(), urlTimeoutParamSchema.getPort(), urlTimeoutParamSchema
+                .getJobschedulerId());
+
+        ModifyJobSchedulerAudit jobschedulerAudit = new ModifyJobSchedulerAudit(urlTimeoutParamSchema);
+        logAuditMessage(jobschedulerAudit);
+
         XMLBuilder xml = new XMLBuilder("modify_spooler");
         xml.addAttribute("cmd", cmd);
         if (urlTimeoutParamSchema.getTimeout() != null) {
@@ -161,8 +157,8 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         } else {
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
         }
+        storeAuditLogEntry(jobschedulerAudit);
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 
-
-        }
+}

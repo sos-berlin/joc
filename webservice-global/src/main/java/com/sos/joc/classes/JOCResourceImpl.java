@@ -18,6 +18,7 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
+import com.sos.joc.classes.audit.IAuditLog;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -36,7 +37,7 @@ public class JOCResourceImpl {
     private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
     private String accessToken;
     private String jobschedulerId;
- 
+    private String request;
 
     private ObjectMapper mapper = new ObjectMapper();
     private JocError jocError = new JocError();
@@ -175,6 +176,7 @@ public class JOCResourceImpl {
 
     public String[] getMetaInfo(String apiCall, Object body) {
         String[] strings = new String[3];
+        request = apiCall;
         if (apiCall == null) {
             apiCall = "-";
         }
@@ -192,14 +194,26 @@ public class JOCResourceImpl {
         logAuditMessage(null);
     }
 
-    public void logAuditMessage(Object body) {
+    public void logAuditMessage(IAuditLog body) {
         try {
             List<String> metaInfo = jocError.getMetaInfo();
             String params = (body == null) ? metaInfo.get(1) : "PARAMS: " + getJsonString(body);
-            AUDIT_LOGGER.info(String.format("%1$s - %2$s - %3$s", metaInfo.get(2), metaInfo.get(0).trim(), params));
+            String comment = (body == null) ? "-" : body.getComment();
+            comment = "COMMENT: " + comment;
+            AUDIT_LOGGER.info(String.format("%1$s - %2$s - %3$s - %4$s", metaInfo.get(2), metaInfo.get(0).trim(), params, comment));
         } catch (Exception e) {
             LOGGER.error("Cannot write to audit log file", e);
         }
+    }
+    
+    public void storeAuditLogEntry(IAuditLog body) {
+        String auditParams = getJsonString(body);
+        String auditAccount = null;
+        try {
+            auditAccount = jobschedulerUser.getSosShiroCurrentUser().getUsername();
+        } catch (Exception e) {
+        }
+        String auditRequest = request;
     }
 
     public String getJsonString(Object body) {

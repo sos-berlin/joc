@@ -14,6 +14,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyScheduleAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ModifyRunTime;
@@ -33,7 +34,8 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            logAuditMessage(modifyRuntime);
+            ModifyScheduleAudit scheduleAudit = new ModifyScheduleAudit(modifyRuntime);
+            logAuditMessage(scheduleAudit);
             checkRequiredParameter("schedule", modifyRuntime.getSchedule());
             ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTime());
 
@@ -48,6 +50,8 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
+            storeAuditLogEntry(scheduleAudit);
+            
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             AUDIT_LOGGER.error(e.getMessage());

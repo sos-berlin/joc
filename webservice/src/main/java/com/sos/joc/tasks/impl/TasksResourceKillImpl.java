@@ -13,6 +13,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyOrderAudit;
+import com.sos.joc.classes.audit.ModifyTaskAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err419;
@@ -109,8 +111,6 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 
     private List<TaskId> getTaskIds(TasksFilter job) {
         try {
-            logAuditMessage(job);
-            
             checkRequiredParameter("job", job.getJob());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String command = jocXmlCommand.getShowJobCommand(normalizePath(job.getJob()), null);
@@ -134,6 +134,10 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 
     private Date executeKillCommand(TasksFilter job, TaskId taskId, String command, ModifyTasks modifyTasks) {
         try {
+            
+            ModifyTaskAudit taskAudit = new ModifyTaskAudit(job, taskId, modifyTasks);
+            logAuditMessage(taskAudit);
+            
             checkRequiredParameter("job", job.getJob());
             checkRequiredParameter("taskId", taskId.getTaskId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
@@ -157,6 +161,8 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
                 break;
             }
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            storeAuditLogEntry(taskAudit);
+            
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), job, taskId));

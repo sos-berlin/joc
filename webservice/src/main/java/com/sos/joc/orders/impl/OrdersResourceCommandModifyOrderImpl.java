@@ -15,6 +15,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.BulkError;
@@ -125,13 +126,14 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
     }
 
-    private Date executeModifyOrderCommand(ModifyOrder order, String command) {
+    private Date executeModifyOrderCommand(ModifyOrder order, String jobschedulerId, String command) {
 
         try {
             if (order.getParams() != null && order.getParams().isEmpty()) {
                 order.setParams(null);
             }
-            logAuditMessage(order);
+            ModifyOrderAudit orderAudit = new ModifyOrderAudit(order, jobschedulerId);
+            logAuditMessage(orderAudit);
             
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
@@ -199,6 +201,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            storeAuditLogEntry(orderAudit);
+            
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), order));
@@ -209,7 +213,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), permission);
+        String jobschedulerId = modifyOrders.getJobschedulerId();
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -225,7 +230,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 Globals.beginTransaction(connection);
             }
             for (ModifyOrder order : modifyOrders.getOrders()) {
-                surveyDate = executeModifyOrderCommand(order, command);
+                surveyDate = executeModifyOrderCommand(order, jobschedulerId, command);
             }
         } catch (Exception e) {
             throw e;
