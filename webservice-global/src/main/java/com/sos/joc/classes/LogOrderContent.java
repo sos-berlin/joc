@@ -22,6 +22,7 @@ public class LogOrderContent extends LogContent {
  
         SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
         SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
+        connection.connect();
 
         connection.beginTransaction();
         try {
