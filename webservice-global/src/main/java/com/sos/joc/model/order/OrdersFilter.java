@@ -25,6 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "orders",
+    "excludeOrders",
     "compact",
     "regex",
     "processingStates",
@@ -47,6 +48,8 @@ public class OrdersFilter {
     private String jobschedulerId;
     @JsonProperty("orders")
     private List<OrderPath> orders = new ArrayList<OrderPath>();
+    @JsonProperty("excludeOrders")
+    private List<OrderPath> excludeOrders = new ArrayList<OrderPath>();
     /**
      * compact parameter
      * <p>
@@ -136,6 +139,26 @@ public class OrdersFilter {
     @JsonProperty("orders")
     public void setOrders(List<OrderPath> orders) {
         this.orders = orders;
+    }
+
+    /**
+     * 
+     * @return
+     *     The excludeOrders
+     */
+    @JsonProperty("excludeOrders")
+    public List<OrderPath> getExcludeOrders() {
+        return excludeOrders;
+    }
+
+    /**
+     * 
+     * @param excludeOrders
+     *     The excludeOrders
+     */
+    @JsonProperty("excludeOrders")
+    public void setExcludeOrders(List<OrderPath> excludeOrders) {
+        this.excludeOrders = excludeOrders;
     }
 
     /**
@@ -367,7 +390,7 @@ public class OrdersFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(orders).append(compact).append(regex).append(processingStates).append(types).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(limit).append(historyStates).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(orders).append(excludeOrders).append(compact).append(regex).append(processingStates).append(types).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(limit).append(historyStates).toHashCode();
     }
 
     @Override
@@ -379,7 +402,7 @@ public class OrdersFilter {
             return false;
         }
         OrdersFilter rhs = ((OrdersFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(orders, rhs.orders).append(compact, rhs.compact).append(regex, rhs.regex).append(processingStates, rhs.processingStates).append(types, rhs.types).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(limit, rhs.limit).append(historyStates, rhs.historyStates).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(orders, rhs.orders).append(excludeOrders, rhs.excludeOrders).append(compact, rhs.compact).append(regex, rhs.regex).append(processingStates, rhs.processingStates).append(types, rhs.types).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(limit, rhs.limit).append(historyStates, rhs.historyStates).isEquals();
     }
 
 }

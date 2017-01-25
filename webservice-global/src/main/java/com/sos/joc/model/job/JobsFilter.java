@@ -25,6 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "jobs",
+    "excludeJobs",
     "compact",
     "regex",
     "isOrderJob",
@@ -47,6 +48,8 @@ public class JobsFilter {
     private String jobschedulerId;
     @JsonProperty("jobs")
     private List<JobPath> jobs = new ArrayList<JobPath>();
+    @JsonProperty("excludeJobs")
+    private List<JobPath> excludeJobs = new ArrayList<JobPath>();
     /**
      * compact parameter
      * <p>
@@ -136,6 +139,26 @@ public class JobsFilter {
     @JsonProperty("jobs")
     public void setJobs(List<JobPath> jobs) {
         this.jobs = jobs;
+    }
+
+    /**
+     * 
+     * @return
+     *     The excludeJobs
+     */
+    @JsonProperty("excludeJobs")
+    public List<JobPath> getExcludeJobs() {
+        return excludeJobs;
+    }
+
+    /**
+     * 
+     * @param excludeJobs
+     *     The excludeJobs
+     */
+    @JsonProperty("excludeJobs")
+    public void setExcludeJobs(List<JobPath> excludeJobs) {
+        this.excludeJobs = excludeJobs;
     }
 
     /**
@@ -367,7 +390,7 @@ public class JobsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(compact).append(regex).append(isOrderJob).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(states).append(limit).append(historyStates).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(excludeJobs).append(compact).append(regex).append(isOrderJob).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(states).append(limit).append(historyStates).toHashCode();
     }
 
     @Override
@@ -379,7 +402,7 @@ public class JobsFilter {
             return false;
         }
         JobsFilter rhs = ((JobsFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(compact, rhs.compact).append(regex, rhs.regex).append(isOrderJob, rhs.isOrderJob).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(states, rhs.states).append(limit, rhs.limit).append(historyStates, rhs.historyStates).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(excludeJobs, rhs.excludeJobs).append(compact, rhs.compact).append(regex, rhs.regex).append(isOrderJob, rhs.isOrderJob).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(states, rhs.states).append(limit, rhs.limit).append(historyStates, rhs.historyStates).isEquals();
     }
 
 }
