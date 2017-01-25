@@ -63,17 +63,17 @@ public class Globals {
         if (sosSchedulerHibernateFactories == null) {
             sosSchedulerHibernateFactories = new HashMap<String, SOSHibernateFactory>();
         }
-        SOSHibernateFactory sosHibernateConnection = sosSchedulerHibernateFactories.get(schedulerId);
+        SOSHibernateFactory sosHibernateFactory = sosSchedulerHibernateFactories.get(schedulerId);
 
-        if (sosHibernateConnection == null) {
+        if (sosHibernateFactory == null) {
             try {
                 String confFile = getConfFile(schedulerId);
-                sosHibernateConnection = new SOSHibernateFactory(confFile);
-                sosHibernateConnection.addClassMapping(DBLayer.getSchedulerClassMapping());
-                sosHibernateConnection.setAutoCommit(true);
-                sosHibernateConnection.setIgnoreAutoCommitTransactions(true);
-                sosHibernateConnection.build();
-                sosSchedulerHibernateFactories.put(schedulerId, sosHibernateConnection);
+                sosHibernateFactory = new SOSHibernateFactory(confFile);
+                sosHibernateFactory.addClassMapping(DBLayer.getSchedulerClassMapping());
+                sosHibernateFactory.setAutoCommit(true);
+                sosHibernateFactory.setIgnoreAutoCommitTransactions(true);
+                sosHibernateFactory.build();
+                sosSchedulerHibernateFactories.put(schedulerId, sosHibernateFactory);
             } catch (JocException e) {
                 throw e;
             } catch (Exception e) {
@@ -81,7 +81,7 @@ public class Globals {
             }
         }
 
-        return sosHibernateConnection;
+        return sosHibernateFactory;
     }
 
 //    public static void checkConnection() throws JocException {
