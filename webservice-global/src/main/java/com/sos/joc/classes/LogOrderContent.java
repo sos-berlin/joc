@@ -20,7 +20,7 @@ public class LogOrderContent extends LogContent {
 
     public String getLog() throws Exception {
  
-        SOSHibernateFactory sosHibernateFactory = Globals.getConnection(orderHistoryFilter.getJobschedulerId());
+        SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
         SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
 
         connection.beginTransaction();

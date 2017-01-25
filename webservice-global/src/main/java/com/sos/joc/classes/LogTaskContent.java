@@ -19,7 +19,7 @@ public class LogTaskContent extends LogContent {
     }
 
     public String getLog() throws Exception {
-        SOSHibernateFactory sosHibernateFactory = Globals.getConnection(taskFilter.getJobschedulerId());
+        SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(taskFilter.getJobschedulerId());
         SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
 
         connection.beginTransaction();

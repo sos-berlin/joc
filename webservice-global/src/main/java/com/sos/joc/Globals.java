@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.hibernate.HibernateException;
-import org.hibernate.StatelessSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +59,7 @@ public class Globals {
         return sosHibernateFactory;
     }
 
-    public static SOSHibernateFactory getConnection(String schedulerId) throws JocException {
+    public static SOSHibernateFactory getHibernateFactory(String schedulerId) throws JocException {
         if (sosSchedulerHibernateFactories == null) {
             sosSchedulerHibernateFactories = new HashMap<String, SOSHibernateFactory>();
         }
@@ -85,57 +84,57 @@ public class Globals {
         return sosHibernateConnection;
     }
 
-    public static void checkConnection() throws JocException {
-        checkConnection(null);
-    }
+//    public static void checkConnection() throws JocException {
+//        checkFactory(null);
+//    }
 
-    public static void checkConnection(String schedulerId) throws JocException {
-        SOSHibernateFactory connection = null;
-        if (schedulerId == null) {
-            connection = getHibernateFactory();
-        } else {
-            connection = getConnection(schedulerId);
-        }
-        try {
-            if ((connection.getSessionFactory() != null && connection.getSessionFactory().isClosed())) {
-                LOGGER.info("Database session is closed. Retry connect...");
-                connection.reconnect();
-            }
-        } catch (Exception e) {
-            throw new DBConnectionRefusedException(e);
-        }
-    }
+//    public static void checkFactory(String schedulerId) throws JocException {
+//        SOSHibernateFactory connection = null;
+//        if (schedulerId == null) {
+//            connection = getHibernateFactory();
+//        } else {
+//            connection = getHibernateFactory(schedulerId);
+//        }
+//        try {
+//            if ((connection.getSessionFactory() != null && connection.getSessionFactory().isClosed())) {
+//                LOGGER.info("Database session is closed. Retry connect...");
+//                connection.reconnect();
+//            }
+//        } catch (Exception e) {
+//            throw new DBConnectionRefusedException(e);
+//        }
+//    }
 
-    public static void trySelect(String schedulerId) throws Exception {
-        SOSHibernateFactory connection = null;
-        if (schedulerId == null) {
-            connection = getHibernateFactory();
-        } else {
-            connection = getConnection(schedulerId);
-        }
-        SOSHibernateConnection session=new SOSHibernateStatelessConnection(connection);
-        try {
-            
-            String sql = " from DailyPlanDBItem where 1=0";
-            session.createQuery(sql).list();
-
-        } catch (HibernateException ex) {
-            try {
-                LOGGER.info("Database session is invalid. Retry connect...");
-                connection.reconnect();
-            } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
-            }
-
-        } catch (Exception e) {
-            throw new DBConnectionRefusedException(e);
-        }finally{
-            if (session != null){
-                session.closeSession();
-            }
-        }
-    }
-    
+//    public static void trySelect(String schedulerId) throws Exception {
+//        SOSHibernateFactory connection = null;
+//        if (schedulerId == null) {
+//            connection = getHibernateFactory();
+//        } else {
+//            connection = getHibernateFactory(schedulerId);
+//        }
+//        SOSHibernateConnection session=new SOSHibernateStatelessConnection(connection);
+//        try {
+//            
+//            String sql = " from DailyPlanDBItem where 1=0";
+//            session.createQuery(sql).list();
+//
+//        } catch (HibernateException ex) {
+//            try {
+//                LOGGER.info("Database session is invalid. Retry connect...");
+//                connection.reconnect();
+//            } catch (Exception e) {
+//                throw new DBConnectionRefusedException(e);
+//            }
+//
+//        } catch (Exception e) {
+//            throw new DBConnectionRefusedException(e);
+//        }finally{
+//            if (session != null){
+//                session.closeSession();
+//            }
+//        }
+//    }
+//    
     public static SOSHibernateConnection createSosHibernateStatelessConnection() throws JocException   {
         if (sosHibernateFactory == null){
             getHibernateFactory();
