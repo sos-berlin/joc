@@ -39,7 +39,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             connection = Globals.createSosHibernateStatelessConnection();
             
             initLogging(API_CALL, ordersFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getHistory().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
