@@ -29,7 +29,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             initLogging(API_CALL, auditLogFilter);
             // TODO use different permission .getAuditLog().getView()
             JOCDefaultResponse jocDefaultResponse = init(accessToken, auditLogFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobChain().getView().isStatus());
+                    .getAuditLog().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
