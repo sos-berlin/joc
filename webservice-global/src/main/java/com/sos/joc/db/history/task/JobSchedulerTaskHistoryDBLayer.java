@@ -20,7 +20,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
     public String getLogAsString(String taskHistoryId) throws Exception {
         String log = null;
         try {
-            if (this.getConnection().dbmsIsPostgres()) {
+            if (this.getConnection().getFactory().dbmsIsPostgres()) {
                 SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem =
                         (SchedulerTaskHistoryLogDBItemPostgres) this.getConnection().get(SchedulerTaskHistoryLogDBItemPostgres.class,
                                 Long.parseLong(taskHistoryId));
