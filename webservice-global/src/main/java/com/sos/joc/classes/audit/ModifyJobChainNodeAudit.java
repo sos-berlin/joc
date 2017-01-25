@@ -22,14 +22,16 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
     private String orderId;
 
     public ModifyJobChainNodeAudit(ModifyJobChainNode modifyJobChainNode, String jobschedulerId) {
-        Path p = Paths.get(modifyJobChainNode.getJobChain());
-        this.comment = modifyJobChainNode.getComment();
-        this.folder = p.getParent().toString().replace('\\', '/');
-        this.job = null;
-        this.jobChain = p.getFileName().toString();
-        this.orderId = null;
-        modifyJobChainNode.setComment(null);
-        getNodes().add(modifyJobChainNode);
+        if (modifyJobChainNode != null) {
+            this.comment = modifyJobChainNode.getComment(); 
+            modifyJobChainNode.setComment(null);
+            getNodes().add(modifyJobChainNode);
+            if (modifyJobChainNode.getJobChain() != null) {
+                Path p = Paths.get(modifyJobChainNode.getJobChain());
+                this.folder = p.getParent().toString().replace('\\', '/');
+                this.jobChain = p.getFileName().toString();
+            }
+        }
         setJobschedulerId(jobschedulerId);
     }
 

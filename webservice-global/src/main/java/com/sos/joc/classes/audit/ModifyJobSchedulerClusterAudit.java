@@ -18,13 +18,11 @@ public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements 
     private String orderId;
 
     public ModifyJobSchedulerClusterAudit(TimeoutParameter timeoutParameter) {
-        this.comment = timeoutParameter.getComment();
-        this.folder = null;
-        this.job = null;
-        this.jobChain = null;
-        this.orderId = null;
-        setTimeout(timeoutParameter.getTimeout());
-        setJobschedulerId(timeoutParameter.getJobschedulerId());
+        if (timeoutParameter != null) {
+            this.comment = timeoutParameter.getComment();
+            setTimeout(timeoutParameter.getTimeout());
+            setJobschedulerId(timeoutParameter.getJobschedulerId()); 
+        }
     }
 
     @Override

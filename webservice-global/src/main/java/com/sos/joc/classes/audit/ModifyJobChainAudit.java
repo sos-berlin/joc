@@ -22,14 +22,16 @@ public class ModifyJobChainAudit extends ModifyJobChains implements IAuditLog {
     private String orderId;
 
     public ModifyJobChainAudit(ModifyJobChain modifyJobChain, String jobschedulerId) {
-        Path p = Paths.get(modifyJobChain.getJobChain());
-        this.comment = modifyJobChain.getComment();
-        this.folder = p.getParent().toString().replace('\\', '/');
-        this.job = null;
-        this.jobChain = p.getFileName().toString();
-        this.orderId = null;
-        modifyJobChain.setComment(null);
-        getJobChains().add(modifyJobChain);
+        if (modifyJobChain != null) {
+            this.comment = modifyJobChain.getComment();
+            modifyJobChain.setComment(null);
+            getJobChains().add(modifyJobChain);
+            if (modifyJobChain.getJobChain() != null) {
+                Path p = Paths.get(modifyJobChain.getJobChain());
+                this.folder = p.getParent().toString().replace('\\', '/');
+                this.jobChain = p.getFileName().toString();
+            }
+        }
         setJobschedulerId(jobschedulerId);
     }
 

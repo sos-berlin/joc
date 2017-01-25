@@ -23,18 +23,22 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     private String orderId;
 
     public ModifyTaskAudit(TasksFilter job, TaskId taskId, ModifyTasks modifyTasks) {
-        Path p = Paths.get(job.getJob());
-        this.comment = job.getComment();
-        this.folder = p.getParent().toString().replace('\\', '/');
-        this.job = p.getFileName().toString();
-        this.jobChain = null;
-        this.orderId = null;
-        job.setComment(null);
-        job.getTaskIds().clear();
-        job.getTaskIds().add(taskId);
-        getJobs().add(job);
-        setTimeout(modifyTasks.getTimeout());
-        setJobschedulerId(modifyTasks.getJobschedulerId());
+        if (modifyTasks != null) {
+            setTimeout(modifyTasks.getTimeout());
+            setJobschedulerId(modifyTasks.getJobschedulerId()); 
+        }
+        if (job != null) {
+            this.comment = job.getComment();
+            job.setComment(null);
+            job.getTaskIds().clear();
+            job.getTaskIds().add(taskId);
+            getJobs().add(job);
+            if (job.getJob() != null) {
+                Path p = Paths.get(job.getJob()); 
+                this.folder = p.getParent().toString().replace('\\', '/');
+                this.job = p.getFileName().toString();
+            }
+        }
     }
 
     @Override

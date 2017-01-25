@@ -21,14 +21,16 @@ public class ModifyScheduleAudit extends ModifyRunTime implements IAuditLog {
     private String orderId;
 
     public ModifyScheduleAudit(ModifyRunTime modifyRunTime) {
-        Path p = Paths.get(modifyRunTime.getSchedule());
-        this.folder = p.getParent().toString().replace('\\', '/');
-        this.job = null;
-        this.jobChain = null;
-        this.orderId = null;
-        setSchedule(modifyRunTime.getSchedule());
-        setRunTime(modifyRunTime.getRunTime());
-        setJobschedulerId(modifyRunTime.getJobschedulerId());
+        if (modifyRunTime != null) {
+            this.comment = modifyRunTime.getComment();
+            setSchedule(modifyRunTime.getSchedule());
+            setRunTime(modifyRunTime.getRunTime());
+            setJobschedulerId(modifyRunTime.getJobschedulerId());
+            if (modifyRunTime.getSchedule() != null) {
+                Path p = Paths.get(modifyRunTime.getSchedule());
+                this.folder = p.getParent().toString().replace('\\', '/');
+            }
+        }
     }
 
     @Override

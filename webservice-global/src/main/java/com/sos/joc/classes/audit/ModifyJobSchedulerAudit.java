@@ -19,15 +19,13 @@ public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements
     private String orderId;
 
     public ModifyJobSchedulerAudit(HostPortTimeOutParameter hostPortTimeoutParamSchema) {
-        this.comment = hostPortTimeoutParamSchema.getComment();
-        this.folder = null;
-        this.job = null;
-        this.jobChain = null;
-        this.orderId = null;
-        setHost(hostPortTimeoutParamSchema.getHost());
-        setPort(hostPortTimeoutParamSchema.getPort());
-        setTimeout(hostPortTimeoutParamSchema.getTimeout());
-        setJobschedulerId(hostPortTimeoutParamSchema.getJobschedulerId());
+        if (hostPortTimeoutParamSchema != null) {
+            this.comment = hostPortTimeoutParamSchema.getComment();
+            setHost(hostPortTimeoutParamSchema.getHost());
+            setPort(hostPortTimeoutParamSchema.getPort());
+            setTimeout(hostPortTimeoutParamSchema.getTimeout());
+            setJobschedulerId(hostPortTimeoutParamSchema.getJobschedulerId()); 
+        }
     }
 
     @Override

@@ -22,14 +22,16 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
     private String orderId;
 
     public StartJobAudit(StartJob startJob, String jobschedulerId) {
-        Path p = Paths.get(startJob.getJob());
-        this.comment = startJob.getComment();
-        this.folder = p.getParent().toString().replace('\\', '/');
-        this.job = p.getFileName().toString();
-        this.jobChain = null;
-        this.orderId = null;
-        startJob.setComment(null);
-        getJobs().add(startJob);
+        if (startJob != null) {
+            this.comment = startJob.getComment();
+            startJob.setComment(null);
+            getJobs().add(startJob);
+            if (startJob.getJob() != null) {
+                Path p = Paths.get(startJob.getJob());
+                this.folder = p.getParent().toString().replace('\\', '/');
+                this.job = p.getFileName().toString();
+            }
+        }
         setJobschedulerId(jobschedulerId);
     }
 
