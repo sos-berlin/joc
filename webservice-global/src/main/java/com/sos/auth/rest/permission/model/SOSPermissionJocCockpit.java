@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2016.12.21 um 04:33:24 PM CET 
+// Generiert: 2017.01.25 um 02:48:07 PM CET 
 //
 
 
@@ -432,6 +432,27 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;/complexType>
  *         &lt;/element>
  *         &lt;element ref="{}SOSPermissionRoles"/>
+ *         &lt;element name="AuditLog">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="view">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="isAuthenticated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="user" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -460,7 +481,8 @@ import javax.xml.bind.annotation.XmlType;
     "eventAction",
     "holidayCalendar",
     "maintenanceWindow",
-    "sosPermissionRoles"
+    "sosPermissionRoles",
+    "auditLog"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpit")
 public class SOSPermissionJocCockpit {
@@ -497,6 +519,8 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionJocCockpit.MaintenanceWindow maintenanceWindow;
     @XmlElement(name = "SOSPermissionRoles", required = true)
     protected SOSPermissionRoles sosPermissionRoles;
+    @XmlElement(name = "AuditLog", required = true)
+    protected SOSPermissionJocCockpit.AuditLog auditLog;
     @XmlAttribute(name = "isAuthenticated")
     protected Boolean isAuthenticated;
     @XmlAttribute(name = "user")
@@ -889,6 +913,30 @@ public class SOSPermissionJocCockpit {
     }
 
     /**
+     * Ruft den Wert der auditLog-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SOSPermissionJocCockpit.AuditLog }
+     *     
+     */
+    public SOSPermissionJocCockpit.AuditLog getAuditLog() {
+        return auditLog;
+    }
+
+    /**
+     * Legt den Wert der auditLog-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SOSPermissionJocCockpit.AuditLog }
+     *     
+     */
+    public void setAuditLog(SOSPermissionJocCockpit.AuditLog value) {
+        this.auditLog = value;
+    }
+
+    /**
      * Ruft den Wert der isAuthenticated-Eigenschaft ab.
      * 
      * @return
@@ -958,6 +1006,117 @@ public class SOSPermissionJocCockpit {
      */
     public void setAccessToken(String value) {
         this.accessToken = value;
+    }
+
+
+    /**
+     * <p>Java-Klasse für anonymous complex type.
+     * 
+     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="view">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "view"
+    })
+    public static class AuditLog {
+
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.AuditLog.View view;
+
+        /**
+         * Ruft den Wert der view-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.AuditLog.View }
+         *     
+         */
+        public SOSPermissionJocCockpit.AuditLog.View getView() {
+            return view;
+        }
+
+        /**
+         * Legt den Wert der view-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.AuditLog.View }
+         *     
+         */
+        public void setView(SOSPermissionJocCockpit.AuditLog.View value) {
+            this.view = value;
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "status"
+        })
+        public static class View {
+
+            protected boolean status;
+
+            /**
+             * Ruft den Wert der status-Eigenschaft ab.
+             * 
+             */
+            public boolean isStatus() {
+                return status;
+            }
+
+            /**
+             * Legt den Wert der status-Eigenschaft fest.
+             * 
+             */
+            public void setStatus(boolean value) {
+                this.status = value;
+            }
+
+        }
+
     }
 
 
