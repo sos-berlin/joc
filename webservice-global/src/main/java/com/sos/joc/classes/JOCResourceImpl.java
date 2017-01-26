@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
@@ -27,7 +28,6 @@ import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.NoUserWithAccessTokenException;
-import com.sos.joc.model.jobscheduler.HostPortParameter;
 
 public class JOCResourceImpl {
 
@@ -211,9 +211,28 @@ public class JOCResourceImpl {
         String auditAccount = null;
         try {
             auditAccount = jobschedulerUser.getSosShiroCurrentUser().getUsername();
+        } catch (Exception e) {}
+        DBItemAuditLog auditLogToDb = new DBItemAuditLog();
+        auditLogToDb.setSchedulerId(jobschedulerId);
+        auditLogToDb.setAccount(auditAccount);
+        auditLogToDb.setRequest(request);
+        auditLogToDb.setParameters(auditParams);
+        auditLogToDb.setJob(body.getJob());
+        auditLogToDb.setJobChain(body.getJobChain());
+        auditLogToDb.setOrderId(body.getOrderId());
+        auditLogToDb.setFolder(body.getFolder());
+        auditLogToDb.setComment(body.getComment());
+        auditLogToDb.setCreated(Date.from(Instant.now()));
+        SOSHibernateConnection connection = null;
+        try {
+            connection = Globals.createSosHibernateStatelessConnection();
+            connection.connect();
+            connection.save(auditLogToDb);
+            connection.disconnect();
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
         }
-        String auditRequest = request;
+
     }
 
     public String getJsonString(Object body) {
