@@ -53,23 +53,23 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             String filterTimeZone = auditLogFilter.getTimeZone();
             String filterRegex = auditLogFilter.getRegex();
             if (filterOrders != null && !filterOrders.isEmpty()) {
-                Set<String> orders = new HashSet<String>(); 
-                for (OrderPath order : filterOrders) {
-                    orders.add(order.getOrderId());
-                }
-                auditLogs = dbLayer.getAuditLogByOrders(schedulerId, orders);
+//                Set<String> orders = new HashSet<String>(); 
+//                for (OrderPath order : filterOrders) {
+//                    orders.add(order.getOrderId());
+//                }
+                auditLogs = dbLayer.getAuditLogByOrders(schedulerId, filterOrders, filterLimit);
             } else if (filterJobs != null && !filterJobs.isEmpty()) {
                 Set<String> jobs = new HashSet<String>(); 
                 for (JobPath job : filterJobs) {
                     jobs.add(job.getJob());
                 }
-                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, jobs);
+                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, jobs, filterLimit);
             } else if (filterFolders != null && !filterFolders.isEmpty()) {
                 Set<String> folders = new HashSet<String>(); 
                 for (Folder folder : filterFolders) {
                     folders.add(folder.getFolder());
                 }
-                auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders);
+                auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit);
             }
             
             // TODO fill audits collection
