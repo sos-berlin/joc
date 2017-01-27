@@ -167,6 +167,12 @@ public class Globals {
         String confFile = null;
         JocError error = new JocError();
         String propertyKey = null;
+        
+        if (sosShiroProperties == null) {
+            error.setMessage("sosShiroProperties are not initialized");
+            throw new JocException(error);
+        }
+        
         if (schedulerId != null) {
             propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
             confFile = sosShiroProperties.getProperty(propertyKey);
