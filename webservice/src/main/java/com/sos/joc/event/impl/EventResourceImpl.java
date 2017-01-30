@@ -65,7 +65,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             }
             try {
                 session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession(false);
-                session.setAttribute(SESSION_KEY, threadName);
+                if (session != null) {
+                    session.setAttribute(SESSION_KEY, threadName);
+                }
             } catch (InvalidSessionException e1) {
             }
             //Not a good idea: Same session in multiple tabs closed http clients vice versa

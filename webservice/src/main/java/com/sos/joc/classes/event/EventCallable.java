@@ -10,6 +10,7 @@ import javax.json.JsonObjectBuilder;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.UnknownSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
 
             Globals.beginTransaction(connection);
             
-             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
+            InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
             jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId(), dbLayer));
             Globals.jobSchedulerIsRunning.put(command.getSchemeAndAuthority(), true);
         } catch (ForcedClosingHttpClientException e) {
@@ -240,6 +241,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     }
     
     private long getSessionTimeout() throws InvalidSessionException {
+        if (session == null) {
+            throw new UnknownSessionException("session is null");
+        }
         return session.getTimeout();
     }
 }
