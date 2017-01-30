@@ -5,21 +5,18 @@ import java.util.Set;
 
 import org.hibernate.SessionException;
 import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.order.OrderPath;
 
 
 public class AuditLogDBLayer extends DBLayer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuditLogDBLayer.class);
-    
     public AuditLogDBLayer(SOSHibernateConnection connection) {
         super(connection);
     }
@@ -37,8 +34,10 @@ public class AuditLogDBLayer extends DBLayer {
                     if(!first) {
                         sql.append(" or");
                     }
-                    sql.append(" (orderId = :orderId").append(i);
-                    sql.append(" and jobChain = :jobChain").append(i);
+                    sql.append(" (jobChain = :jobChain").append(i);
+                    if(orders.get(i).getOrderId() != null && !orders.get(i).getOrderId().isEmpty()) {
+                        sql.append(" and orderId = :orderId").append(i);
+                    }
                     sql.append(" and folder = :folder").append(i).append(")");
                     first = false;
                 }
@@ -49,8 +48,10 @@ public class AuditLogDBLayer extends DBLayer {
                 for (int i = 0; i < orders.size(); i++) {
                     String jobChain = orders.get(i).getJobChain().substring(orders.get(i).getJobChain().lastIndexOf("/") + 1);
                     String folder = orders.get(i).getJobChain().substring(0, orders.get(i).getJobChain().lastIndexOf("/"));;
-                    query.setParameter("orderId" + i, orders.get(i).getOrderId());
                     query.setParameter("jobChain" + i, jobChain);
+                    if(orders.get(i).getOrderId() != null && !orders.get(i).getOrderId().isEmpty()) {
+                        query.setParameter("orderId" + i, orders.get(i).getOrderId());
+                    }
                     query.setParameter("folder" + i, folder);
                 }
             }
@@ -66,26 +67,32 @@ public class AuditLogDBLayer extends DBLayer {
         } 
     }
 
-    public List<DBItemAuditLog> getAuditLogByJobs(String schedulerId, Set<String> jobs, Integer limit) throws DBConnectionRefusedException,
+    public List<DBItemAuditLog> getAuditLogByJobs(String schedulerId, List<JobPath> jobs, Integer limit) throws DBConnectionRefusedException,
         DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_AUDIT_LOG);
             sql.append(" where schedulerId = :schedulerId");
             if (jobs != null && !jobs.isEmpty()) {
-                if (jobs.size() == 1) {
-                    sql.append(" and job = :job");
-                } else {
-                    sql.append(" and job in (:job)");
+                sql.append(" and");
+                boolean first = true;
+                for(int i = 0; i < jobs.size(); i++) {
+                    if(!first) {
+                        sql.append(" or");
+                    }
+                    sql.append(" (job = :job").append(i);
+                    sql.append(" and folder = :folder").append(i).append(")");
+                    first = false;
                 }
             }
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (jobs != null && !jobs.isEmpty()) {
-                if (jobs.size() == 1) {
-                    query.setParameter("job", jobs.iterator().next());
-                } else {
-                    query.setParameterList("job", jobs);
+                for (int i = 0; i < jobs.size(); i++) {
+                    String job = jobs.get(i).getJob().substring(jobs.get(i).getJob().lastIndexOf("/") + 1);
+                    String folder = jobs.get(i).getJob().substring(0, jobs.get(i).getJob().lastIndexOf("/"));;
+                    query.setParameter("folder" + i, folder);
+                    query.setParameter("job" + i, job);
                 }
             }
             if (limit != null) {

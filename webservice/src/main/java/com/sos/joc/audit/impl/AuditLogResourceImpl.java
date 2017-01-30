@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
@@ -59,11 +61,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
 //                }
                 auditLogs = dbLayer.getAuditLogByOrders(schedulerId, filterOrders, filterLimit);
             } else if (filterJobs != null && !filterJobs.isEmpty()) {
-                Set<String> jobs = new HashSet<String>(); 
-                for (JobPath job : filterJobs) {
-                    jobs.add(job.getJob());
-                }
-                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, jobs, filterLimit);
+                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, filterJobs, filterLimit);
             } else if (filterFolders != null && !filterFolders.isEmpty()) {
                 Set<String> folders = new HashSet<String>(); 
                 for (Folder folder : filterFolders) {
@@ -71,7 +69,9 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
                 }
                 auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit);
             }
-            
+            if(filterRegex != null && !filterRegex.isEmpty()) {
+                auditLogs = filterComment(auditLogs, filterRegex);
+            }
             // TODO fill audits collection
             AuditLog entity = new AuditLog();
             entity.setAuditLog(fillAuditLogItems(auditLogs));
@@ -88,6 +88,19 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         }
     }
 
+    private List<DBItemAuditLog> filterComment(List<DBItemAuditLog> auditLogsUnfiltered, String regex) {
+        List<DBItemAuditLog> filteredAuditLogs = new ArrayList<DBItemAuditLog>();
+        for (DBItemAuditLog auditLogUnfiltered : auditLogsUnfiltered) {
+            if (auditLogUnfiltered.getComment() != null && !auditLogUnfiltered.getComment().isEmpty()) {
+                Matcher regExMatcher = Pattern.compile(regex).matcher(auditLogUnfiltered.getComment());
+                if (regExMatcher.find()) {
+                    filteredAuditLogs.add(auditLogUnfiltered);
+                }
+            }
+        }
+        return filteredAuditLogs;
+    }
+    
     private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb) {
         List<AuditLogItem> audits = new ArrayList<AuditLogItem>();
         for (DBItemAuditLog auditLogFromDb : auditLogsFromDb) {
