@@ -16,6 +16,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.audit.resource.IAuditLogResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.audit.AuditLog;
@@ -36,43 +37,37 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         try {
             connection = Globals.createSosHibernateStatelessConnection();
             initLogging(API_CALL, auditLogFilter);
-            // TODO use different permission .getAuditLog().getView()
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, auditLogFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getAuditLog().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, auditLogFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getAuditLog().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             String schedulerId = auditLogFilter.getJobschedulerId();
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
             List<DBItemAuditLog> auditLogs = new ArrayList<DBItemAuditLog>(); 
-            
+            // filters
             List<Folder> filterFolders = auditLogFilter.getFolders();
             List<JobPath> filterJobs = auditLogFilter.getJobs();
             Integer filterLimit = auditLogFilter.getLimit();
             List<OrderPath> filterOrders = auditLogFilter.getOrders();
-            String filterDateFrom = auditLogFilter.getDateFrom();
-            String filterDateTo = auditLogFilter.getDateTo();
-            String filterTimeZone = auditLogFilter.getTimeZone();
+            Date filterFrom = JobSchedulerDate.getDate(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
+            Date filterTo = JobSchedulerDate.getDate(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
             String filterRegex = auditLogFilter.getRegex();
+            // processing
             if (filterOrders != null && !filterOrders.isEmpty()) {
-//                Set<String> orders = new HashSet<String>(); 
-//                for (OrderPath order : filterOrders) {
-//                    orders.add(order.getOrderId());
-//                }
-                auditLogs = dbLayer.getAuditLogByOrders(schedulerId, filterOrders, filterLimit);
+                auditLogs = dbLayer.getAuditLogByOrders(schedulerId, filterOrders, filterLimit, filterFrom, filterTo);
             } else if (filterJobs != null && !filterJobs.isEmpty()) {
-                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, filterJobs, filterLimit);
+                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, filterJobs, filterLimit, filterFrom, filterTo);
             } else if (filterFolders != null && !filterFolders.isEmpty()) {
                 Set<String> folders = new HashSet<String>(); 
                 for (Folder folder : filterFolders) {
                     folders.add(folder.getFolder());
                 }
-                auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit);
+                auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit, filterFrom, filterTo);
             }
             if(filterRegex != null && !filterRegex.isEmpty()) {
                 auditLogs = filterComment(auditLogs, filterRegex);
             }
-            // TODO fill audits collection
             AuditLog entity = new AuditLog();
             entity.setAuditLog(fillAuditLogItems(auditLogs));
             entity.setDeliveryDate(new Date());
