@@ -28,7 +28,6 @@ public class TestJocConfigurationDbLayer {
         sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
         sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
         sosHibernateFactory.setAutoCommit(true);
-        sosHibernateFactory.setIgnoreAutoCommitTransactions(true);
         sosHibernateFactory.build();
         sosHibernateFactory.close();
     }

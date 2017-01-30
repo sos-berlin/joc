@@ -48,7 +48,6 @@ public class Globals {
                 sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
                 sosHibernateFactory.setAutoCommit(true);
-                sosHibernateFactory.setIgnoreAutoCommitTransactions(true);
                 sosHibernateFactory.build();
             } catch (JocException e) {
                 throw e;
@@ -71,7 +70,6 @@ public class Globals {
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(DBLayer.getSchedulerClassMapping());
                 sosHibernateFactory.setAutoCommit(true);
-                sosHibernateFactory.setIgnoreAutoCommitTransactions(true);
                 sosHibernateFactory.build();
                 sosSchedulerHibernateFactories.put(schedulerId, sosHibernateFactory);
             } catch (JocException e) {
