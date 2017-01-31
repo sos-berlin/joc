@@ -31,7 +31,7 @@ public class JocConfigurationImpl extends JOCResourceImpl implements IJocConfigu
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
         
             initLogging(API_CALL, jobFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()

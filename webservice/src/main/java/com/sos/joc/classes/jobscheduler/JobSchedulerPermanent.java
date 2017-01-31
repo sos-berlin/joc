@@ -28,7 +28,7 @@ public class JobSchedulerPermanent {
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("getJobScheduler");
 
             Globals.beginTransaction(connection);
             

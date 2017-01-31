@@ -39,7 +39,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             initLogging(API_CALL, jobsFilter);
             connection.beginTransaction();

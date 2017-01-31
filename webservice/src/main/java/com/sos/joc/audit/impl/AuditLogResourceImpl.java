@@ -35,7 +35,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
     public JOCDefaultResponse postAuditLog(String accessToken, AuditLogFilter auditLogFilter) throws Exception {
         SOSHibernateConnection connection = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             initLogging(API_CALL, auditLogFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, auditLogFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getAuditLog().getView().isStatus());

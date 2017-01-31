@@ -42,7 +42,7 @@ public class JobSchedulerUser {
 
     public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws JocException  {
         if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier) == null) {
-            SOSHibernateConnection connection = Globals.createSosHibernateStatelessConnection();
+            SOSHibernateConnection connection = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
             Globals.beginTransaction(connection);
             getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerIdentifier, dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId(), getAccessToken()));

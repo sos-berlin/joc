@@ -56,7 +56,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("EventCallable.call");
             try {
                 connection.connect();
             } catch (Exception e) {

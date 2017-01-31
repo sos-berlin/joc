@@ -56,7 +56,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("postEvent");
             initLogging(API_CALL, eventBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
                     .isStatus());

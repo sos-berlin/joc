@@ -225,7 +225,7 @@ public class JOCResourceImpl {
         auditLogToDb.setCreated(Date.from(Instant.now()));
         SOSHibernateConnection connection = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("storeAuditLogEntry");
             connection.connect();
             connection.save(auditLogToDb);
             connection.disconnect();
@@ -325,7 +325,7 @@ public class JOCResourceImpl {
             SOSHibernateConnection connection = null;
 
             try {
-                connection = Globals.createSosHibernateStatelessConnection();
+                connection = Globals.createSosHibernateStatelessConnection("getJobSchedulerInstanceByHostPort");
             } catch (Exception e) {
                 throw new DBConnectionRefusedException(e);
             }

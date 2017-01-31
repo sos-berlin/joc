@@ -40,7 +40,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             initLogging(API_CALL, jobSchedulerAgentClustersBody);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentClustersBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken)

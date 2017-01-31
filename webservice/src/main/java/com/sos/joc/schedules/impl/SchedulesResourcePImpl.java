@@ -38,7 +38,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             
             initLogging(API_CALL, schedulesFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulesFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()

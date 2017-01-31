@@ -29,7 +29,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
 
         SOSHibernateConnection connection = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             
             initLogging(API_CALL, jobFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()

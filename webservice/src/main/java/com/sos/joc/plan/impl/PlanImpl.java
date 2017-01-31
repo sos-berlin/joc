@@ -89,7 +89,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("postPlan");
 
             DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(connection);
             

@@ -34,7 +34,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             
             initLogging(API_CALL, processClassFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock()

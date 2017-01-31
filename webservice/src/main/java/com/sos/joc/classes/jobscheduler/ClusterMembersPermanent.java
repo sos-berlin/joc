@@ -24,7 +24,7 @@ public class ClusterMembersPermanent {
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("getClusterMembers");
             try {
                 connection.connect();
             } catch (Exception e) {

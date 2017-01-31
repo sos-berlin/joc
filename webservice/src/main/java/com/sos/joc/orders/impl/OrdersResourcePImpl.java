@@ -37,7 +37,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             
             initLogging(API_CALL, ordersFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()

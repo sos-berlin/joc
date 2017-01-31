@@ -224,7 +224,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         Date surveyDate = Date.from(Instant.now());
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             
             if ("set_state".equals(command)) {
                 Globals.beginTransaction(connection);
