@@ -226,7 +226,6 @@ public class JOCResourceImpl {
         SOSHibernateConnection connection = null;
         try {
             connection = Globals.createSosHibernateStatelessConnection("storeAuditLogEntry");
-            connection.connect();
             connection.save(auditLogToDb);
             connection.disconnect();
         } catch (Exception e) {

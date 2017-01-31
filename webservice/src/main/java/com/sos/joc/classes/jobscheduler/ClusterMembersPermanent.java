@@ -25,11 +25,6 @@ public class ClusterMembersPermanent {
 
         try {
             connection = Globals.createSosHibernateStatelessConnection("getClusterMembers");
-            try {
-                connection.connect();
-            } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
-            }
 
             Globals.beginTransaction(connection);
 

@@ -24,24 +24,17 @@ public class OrderPermanent {
 
         try {
             connection = Globals.createSosHibernateStatelessConnection("fillOutputOrders");
-            try {
-                connection.connect();
-            } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
-            }
 
             Globals.beginTransaction(connection);
-            
-            
-        
-        for (DBItemInventoryOrder inventoryOrder : ordersFromDB) {
-            OrderP order = new OrderP();
-            order.setSurveyDate(inventoryOrder.getModified());
-            order.setPath(inventoryOrder.getName());
-            order.setOrderId(inventoryOrder.getOrderId());
-            order.setJobChain(inventoryOrder.getJobChainName());
-            Integer estimatedDuration = getEstimatedDurationInSeconds(inventoryOrder);
-            if(estimatedDuration != null) {
+
+            for (DBItemInventoryOrder inventoryOrder : ordersFromDB) {
+                OrderP order = new OrderP();
+                order.setSurveyDate(inventoryOrder.getModified());
+                order.setPath(inventoryOrder.getName());
+                order.setOrderId(inventoryOrder.getOrderId());
+                order.setJobChain(inventoryOrder.getJobChainName());
+                Integer estimatedDuration = getEstimatedDurationInSeconds(inventoryOrder);
+                if (estimatedDuration != null) {
                 order.setEstimatedDuration(estimatedDuration);
             } else {
                 order.setEstimatedDuration(0);

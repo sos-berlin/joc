@@ -32,12 +32,6 @@ public class TreePermanent {
 
             connection = Globals.createSosHibernateStatelessConnection("getAllowedTypes");
 
-            try {
-                connection.connect();
-            } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
-            }
-
             Globals.beginTransaction(connection);
             List<JobSchedulerObjectType> types = new ArrayList<JobSchedulerObjectType>();
 

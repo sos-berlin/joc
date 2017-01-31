@@ -24,11 +24,6 @@ public class JobPermanent {
 
         try {
             connection = Globals.createSosHibernateStatelessConnection("getEstimatedDurationInSeconds");
-            try {
-                connection.connect();
-            } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
-            }
 
             Globals.beginTransaction(connection);
 
