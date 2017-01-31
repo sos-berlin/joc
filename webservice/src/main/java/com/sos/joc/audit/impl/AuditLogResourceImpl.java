@@ -64,6 +64,8 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
                     folders.add(folder.getFolder());
                 }
                 auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit, filterFrom, filterTo);
+            } else {
+                auditLogs = dbLayer.getAllAuditLogs(schedulerId, filterLimit, filterFrom, filterTo);
             }
             if(filterRegex != null && !filterRegex.isEmpty()) {
                 auditLogs = filterComment(auditLogs, filterRegex);

@@ -38,9 +38,10 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (orders != null && !orders.isEmpty()) {
                 sql.append(" and");
-                boolean first = true;
                 for(int i = 0; i < orders.size(); i++) {
-                    if(!first) {
+                    if(i == 0) {
+                        sql.append(" (");
+                    } else if(i != 0 && i != orders.size()) {
                         sql.append(" or");
                     }
                     sql.append(" (jobChain = :jobChain").append(i);
@@ -48,7 +49,9 @@ public class AuditLogDBLayer extends DBLayer {
                         sql.append(" and orderId = :orderId").append(i);
                     }
                     sql.append(" and folder = :folder").append(i).append(")");
-                    first = false;
+                    if(i == orders.size() -1) {
+                        sql.append(")");
+                    }
                 }
             }
             Query query = getConnection().createQuery(sql.toString());
@@ -96,14 +99,17 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (jobs != null && !jobs.isEmpty()) {
                 sql.append(" and");
-                boolean first = true;
                 for(int i = 0; i < jobs.size(); i++) {
-                    if(!first) {
+                    if(i == 0) {
+                        sql.append(" (");
+                    } else if(i != 0 && i != jobs.size()) {
                         sql.append(" or");
                     }
                     sql.append(" (job = :job").append(i);
                     sql.append(" and folder = :folder").append(i).append(")");
-                    first = false;
+                    if(i == jobs.size() -1) {
+                        sql.append(")");
+                    }
                 }
             }
             Query query = getConnection().createQuery(sql.toString());
@@ -121,6 +127,38 @@ public class AuditLogDBLayer extends DBLayer {
                     query.setParameter("folder" + i, folder);
                     query.setParameter("job" + i, job);
                 }
+            }
+            if (limit != null) {
+                query.setMaxResults(limit);
+            }
+            List<DBItemAuditLog> result = query.list();
+            return result;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+        } 
+    }
+
+    public List<DBItemAuditLog> getAllAuditLogs(String schedulerId, Integer limit, Date from, Date to)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_AUDIT_LOG);
+            sql.append(" where schedulerId = :schedulerId");
+            if (from != null) {
+                sql.append(" and created >= :from");
+            }
+            if (to != null) {
+                sql.append(" and created <= :to");                
+            }
+            Query query = getConnection().createQuery(sql.toString());
+            query.setParameter("schedulerId", schedulerId);
+            if (from != null) {
+                query.setParameter("from", from, TemporalType.TIMESTAMP);
+            }
+            if (to != null) {
+                query.setParameter("to", to, TemporalType.TIMESTAMP);
             }
             if (limit != null) {
                 query.setMaxResults(limit);
@@ -179,5 +217,4 @@ public class AuditLogDBLayer extends DBLayer {
             throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
         } 
     }
-
 }
