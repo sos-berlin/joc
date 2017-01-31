@@ -10,7 +10,7 @@ import com.sos.joc.Globals;
 public class ServletContextClass implements ServletContextListener {
 
     @Override
-    public void contextDestroyed(ServletContextEvent arg0) {
+    public void contextInitialized(ServletContextEvent arg0) {
         try {
             Globals.getHibernateFactory();
         } catch (Exception e) {
@@ -19,7 +19,7 @@ public class ServletContextClass implements ServletContextListener {
     }
 
     @Override
-    public void contextInitialized(ServletContextEvent arg0) {
+    public void contextDestroyed(ServletContextEvent arg0) {
         if (Globals.sosHibernateFactory != null) {
             Globals.sosHibernateFactory.close();
         }
