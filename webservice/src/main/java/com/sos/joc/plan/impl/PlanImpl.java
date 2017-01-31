@@ -146,7 +146,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 boolean add = true;
 
                 PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
- 
+                p.setStartMode(dailyPlanDBItem.getStartMode());
+
                 if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
                     Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
                             .getDailyPlanDbItem().getOrderId());
@@ -193,7 +194,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 boolean add = true;
 
                 PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
- 
+                p.setStartMode(dailyPlanDBItem.getStartMode());
+
                 if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
                     Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
                             .getDailyPlanDbItem().getOrderId());
