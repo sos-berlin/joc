@@ -3,6 +3,8 @@ package com.sos.auth.rest;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sos.joc.Globals;
+
 public class SOSShiroCurrentUsersList {
 
     private Map<String, SOSShiroCurrentUser> currentUsers;

@@ -23,15 +23,15 @@ public class JobSchedulerUser {
     }
 
     public SOSShiroCurrentUser getSosShiroCurrentUser() {
-        if (sosShiroCurrentUser == null && Globals.currentUsersList != null) {
-            sosShiroCurrentUser = Globals.currentUsersList.getUser(accessToken);
+        if (sosShiroCurrentUser == null && Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+            sosShiroCurrentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
         }
         return sosShiroCurrentUser;
     }
 
     public boolean isAuthenticated() {
-        if (sosShiroCurrentUser == null && Globals.currentUsersList != null) {
-            sosShiroCurrentUser = Globals.currentUsersList.getUser(accessToken);
+        if (sosShiroCurrentUser == null && Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
+            sosShiroCurrentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
         }
         return (sosShiroCurrentUser != null);
     }

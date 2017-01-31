@@ -20,6 +20,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JocCockpitProperties;
+import com.sos.joc.classes.JocWebserviceDataContainer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -30,7 +31,6 @@ public class Globals {
     private static final Logger LOGGER = LoggerFactory.getLogger(Globals.class);
     public static final String SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS = "event_http_clients";
     public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
-    public static SOSShiroCurrentUsersList currentUsersList;
     public static SOSHibernateFactory sosHibernateFactory;
     public static Map<String, SOSHibernateFactory> sosSchedulerHibernateFactories;
     public static JocCockpitProperties sosShiroProperties;
@@ -39,6 +39,8 @@ public class Globals {
     public static int httpConnectionTimeout = 2000;
     public static int httpSocketTimeout = 2000;
     public static boolean withHostnameVerification = false;
+    public static JocWebserviceDataContainer jocWebserviceDataContainer=JocWebserviceDataContainer.getInstance();
+
     
     public static SOSHibernateFactory getHibernateFactory() throws JocException {
         if (sosHibernateFactory == null) {
