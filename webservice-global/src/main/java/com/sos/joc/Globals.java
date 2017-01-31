@@ -83,11 +83,12 @@ public class Globals {
     }
 
  
-    public static SOSHibernateConnection createSosHibernateStatelessConnection() throws JocException   {
+    public static SOSHibernateConnection createSosHibernateStatelessConnection(String identifier) throws JocException   {
         if (sosHibernateFactory == null){
             getHibernateFactory();
         }
         SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
+        connection.setConnectionIdentifier(identifier);
         try {
             connection.connect();
             return connection;

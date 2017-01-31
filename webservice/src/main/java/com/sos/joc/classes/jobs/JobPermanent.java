@@ -23,7 +23,7 @@ public class JobPermanent {
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("getEstimatedDurationInSeconds");
             try {
                 connection.connect();
             } catch (Exception e) {

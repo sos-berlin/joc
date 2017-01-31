@@ -31,7 +31,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             initLogging(API_CALL, orderHistoryFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()

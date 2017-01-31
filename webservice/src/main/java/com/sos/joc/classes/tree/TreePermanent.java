@@ -30,7 +30,7 @@ public class TreePermanent {
 
         try {
 
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("getAllowedTypes");
 
             try {
                 connection.connect();
@@ -123,7 +123,7 @@ public class TreePermanent {
 
         try {
 
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("initFoldersByFoldersFromBody");
 
             Globals.beginTransaction(connection);
             InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(connection);

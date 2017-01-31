@@ -35,7 +35,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             initLogging(API_CALL, agentFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, agentFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)

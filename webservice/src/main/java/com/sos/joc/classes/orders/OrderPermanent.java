@@ -23,7 +23,7 @@ public class OrderPermanent {
         List<OrderP> listOfOutputOrders = new ArrayList<OrderP>();
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection("fillOutputOrders");
             try {
                 connection.connect();
             } catch (Exception e) {

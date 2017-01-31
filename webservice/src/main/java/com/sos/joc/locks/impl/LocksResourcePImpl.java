@@ -41,7 +41,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             JOCDefaultResponse jocDefaultResponse = init(accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock().getView()
                     .isStatus());

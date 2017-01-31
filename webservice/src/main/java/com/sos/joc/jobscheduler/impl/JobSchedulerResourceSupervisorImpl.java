@@ -30,7 +30,7 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             Globals.beginTransaction(connection);
             initLogging(API_CALL, jobSchedulerId);

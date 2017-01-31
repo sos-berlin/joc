@@ -30,7 +30,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             
             initLogging(API_CALL, null);
             Globals.beginTransaction(connection);

@@ -30,7 +30,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
     public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection();
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             initLogging(API_CALL, orderFilter);
             JOCDefaultResponse jocDefaultResponse = init(accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
