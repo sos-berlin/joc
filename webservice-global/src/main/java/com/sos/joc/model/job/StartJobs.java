@@ -22,7 +22,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "jobs"
+    "jobs",
+    "comment"
 })
 public class StartJobs {
 
@@ -40,6 +41,12 @@ public class StartJobs {
      */
     @JsonProperty("jobs")
     private List<StartJob> jobs = new ArrayList<StartJob>();
+    /**
+     * Field to comment manually job starts which can be logged.
+     * 
+     */
+    @JsonProperty("comment")
+    private String comment;
 
     /**
      * 
@@ -89,6 +96,28 @@ public class StartJobs {
         this.jobs = jobs;
     }
 
+    /**
+     * Field to comment manually job starts which can be logged.
+     * 
+     * @return
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Field to comment manually job starts which can be logged.
+     * 
+     * @param comment
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -96,7 +125,7 @@ public class StartJobs {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobs).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(comment).toHashCode();
     }
 
     @Override
@@ -108,7 +137,7 @@ public class StartJobs {
             return false;
         }
         StartJobs rhs = ((StartJobs) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(comment, rhs.comment).isEquals();
     }
 
 }

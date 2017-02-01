@@ -26,6 +26,7 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingCommentException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.NoUserWithAccessTokenException;
 
@@ -132,6 +133,13 @@ public class JOCResourceImpl {
             return null;
         }
         return ("/" + path.trim()).replaceAll("//+", "/");
+    }
+    
+    public boolean checkRequiredComment(String paramVal) throws JocMissingCommentException {
+        if (Globals.auditLogCommentsAreRequired && (paramVal == null || paramVal.isEmpty())) {
+            throw new JocMissingCommentException();
+        }
+        return true;
     }
 
     public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {

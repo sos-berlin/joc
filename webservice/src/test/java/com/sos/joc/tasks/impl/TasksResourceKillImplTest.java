@@ -27,7 +27,6 @@ public class TasksResourceKillImplTest {
         ModifyTasks modifyTasksSchema = new ModifyTasks();
         List<TasksFilter> listOfJobs = new ArrayList<TasksFilter>();
         TasksFilter jobKill1 = new TasksFilter();
-        jobKill1.setComment("myComment1");
         jobKill1.setJob("/test/job2kill");
        
         List<TaskId> listOfTasks = new ArrayList<TaskId>();
@@ -43,7 +42,6 @@ public class TasksResourceKillImplTest {
         listOfJobs.add(jobKill1);
 
         TasksFilter jobKill2 = new TasksFilter();
-        jobKill2.setComment("myComment2");
         jobKill2.setJob("/test/job3kill");
 
         List<TaskId> listOfTasks2 = new ArrayList<TaskId>();
@@ -60,6 +58,7 @@ public class TasksResourceKillImplTest {
         
         modifyTasksSchema.setJobs(listOfJobs);
         modifyTasksSchema.setJobschedulerId("scheduler_current");
+        modifyTasksSchema.setComment("myComment1");
         TasksResourceKillImpl tasksHistoryImpl = new TasksResourceKillImpl();
         JOCDefaultResponse taskKillResponse = tasksHistoryImpl.postTasksKill(sosShiroCurrentUserAnswer.getAccessToken(), modifyTasksSchema);
         Ok okSchema = (Ok) taskKillResponse.getEntity();

@@ -10,19 +10,11 @@ import com.sos.joc.model.schedule.ModifyRunTime;
 public class ModifyScheduleAudit extends ModifyRunTime implements IAuditLog {
     
     @JsonIgnore
-    private String comment;
-    @JsonIgnore
     private String folder;
-    @JsonIgnore
-    private String job;
-    @JsonIgnore
-    private String jobChain;
-    @JsonIgnore
-    private String orderId;
 
     public ModifyScheduleAudit(ModifyRunTime modifyRunTime) {
         if (modifyRunTime != null) {
-            this.comment = modifyRunTime.getComment();
+            setComment(modifyRunTime.getComment());
             setSchedule(modifyRunTime.getSchedule());
             setRunTime(modifyRunTime.getRunTime());
             setJobschedulerId(modifyRunTime.getJobschedulerId());
@@ -36,9 +28,9 @@ public class ModifyScheduleAudit extends ModifyRunTime implements IAuditLog {
     @Override
     @JsonIgnore
     public String getComment() {
-        return comment;
+        return super.getComment();
     }
-
+    
     @Override
     @JsonIgnore
     public String getFolder() {
@@ -48,18 +40,18 @@ public class ModifyScheduleAudit extends ModifyRunTime implements IAuditLog {
     @Override
     @JsonIgnore
     public String getJob() {
-        return job;
+        return null;
     }
 
     @Override
     @JsonIgnore
     public String getJobChain() {
-        return jobChain;
+        return null;
     }
 
     @Override
     @JsonIgnore
     public String getOrderId() {
-        return orderId;
+        return null;
     }
 }

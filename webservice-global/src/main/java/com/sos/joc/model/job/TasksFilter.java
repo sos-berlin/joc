@@ -15,7 +15,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "job",
-    "comment",
     "taskIds"
 })
 public class TasksFilter {
@@ -28,12 +27,6 @@ public class TasksFilter {
      */
     @JsonProperty("job")
     private String job;
-    /**
-     * Field to comment manually job modifications which can be logged.
-     * 
-     */
-    @JsonProperty("comment")
-    private String comment;
     @JsonProperty("taskIds")
     private List<TaskId> taskIds = new ArrayList<TaskId>();
 
@@ -64,28 +57,6 @@ public class TasksFilter {
     }
 
     /**
-     * Field to comment manually job modifications which can be logged.
-     * 
-     * @return
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
-    }
-
-    /**
-     * Field to comment manually job modifications which can be logged.
-     * 
-     * @param comment
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    /**
      * 
      * @return
      *     The taskIds
@@ -112,7 +83,7 @@ public class TasksFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(comment).append(taskIds).toHashCode();
+        return new HashCodeBuilder().append(job).append(taskIds).toHashCode();
     }
 
     @Override
@@ -124,7 +95,7 @@ public class TasksFilter {
             return false;
         }
         TasksFilter rhs = ((TasksFilter) other);
-        return new EqualsBuilder().append(job, rhs.job).append(comment, rhs.comment).append(taskIds, rhs.taskIds).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).append(taskIds, rhs.taskIds).isEquals();
     }
 
 }

@@ -11,20 +11,12 @@ import com.sos.joc.model.jobChain.ModifyJobChainNodes;
 public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAuditLog {
     
     @JsonIgnore
-    private String comment;
-    @JsonIgnore
     private String folder;
     @JsonIgnore
-    private String job;
-    @JsonIgnore
     private String jobChain;
-    @JsonIgnore
-    private String orderId;
-
-    public ModifyJobChainNodeAudit(ModifyJobChainNode modifyJobChainNode, String jobschedulerId) {
+    
+    public ModifyJobChainNodeAudit(ModifyJobChainNode modifyJobChainNode, ModifyJobChainNodes jobChainNodes) {
         if (modifyJobChainNode != null) {
-            this.comment = modifyJobChainNode.getComment(); 
-            modifyJobChainNode.setComment(null);
             getNodes().add(modifyJobChainNode);
             if (modifyJobChainNode.getJobChain() != null) {
                 Path p = Paths.get(modifyJobChainNode.getJobChain());
@@ -32,15 +24,18 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
                 this.jobChain = p.getFileName().toString();
             }
         }
-        setJobschedulerId(jobschedulerId);
+        if (jobChainNodes != null) {
+            setComment(jobChainNodes.getComment()); 
+            setJobschedulerId(jobChainNodes.getJobschedulerId());            
+        }
     }
 
     @Override
     @JsonIgnore
     public String getComment() {
-        return comment;
+        return super.getComment();
     }
-
+    
     @Override
     @JsonIgnore
     public String getFolder() {
@@ -50,7 +45,7 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
     @Override
     @JsonIgnore
     public String getJob() {
-        return job;
+        return null;
     }
 
     @Override
@@ -62,6 +57,6 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
     @Override
     @JsonIgnore
     public String getOrderId() {
-        return orderId;
+        return null;
     }
 }

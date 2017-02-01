@@ -23,7 +23,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "jobs",
-    "timeout"
+    "timeout",
+    "comment"
 })
 public class ModifyTasks {
 
@@ -44,6 +45,12 @@ public class ModifyTasks {
      */
     @JsonProperty("timeout")
     private Integer timeout;
+    /**
+     * Field to comment manually job starts which can be logged.
+     * 
+     */
+    @JsonProperty("comment")
+    private String comment;
 
     /**
      * 
@@ -115,6 +122,28 @@ public class ModifyTasks {
         this.timeout = timeout;
     }
 
+    /**
+     * Field to comment manually job starts which can be logged.
+     * 
+     * @return
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Field to comment manually job starts which can be logged.
+     * 
+     * @param comment
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -122,7 +151,7 @@ public class ModifyTasks {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(timeout).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(timeout).append(comment).toHashCode();
     }
 
     @Override
@@ -134,7 +163,7 @@ public class ModifyTasks {
             return false;
         }
         ModifyTasks rhs = ((ModifyTasks) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(timeout, rhs.timeout).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(timeout, rhs.timeout).append(comment, rhs.comment).isEquals();
     }
 
 }

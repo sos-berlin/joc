@@ -32,6 +32,8 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             }
 
             checkRequiredParameter("jobschedulerId", jobSchedulerCommands.getJobschedulerId());
+            //TODO comment in JobschedulerCommands missing
+            // checkRequiredComment(jobSchedulerCommands.getComment());
             if ("".equals(jobSchedulerCommands.getUrl()) || jobSchedulerCommands.getUrl() == null) {
                 jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
             }

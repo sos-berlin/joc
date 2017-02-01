@@ -34,6 +34,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            checkRequiredComment(modifyRuntime.getComment());
             ModifyScheduleAudit scheduleAudit = new ModifyScheduleAudit(modifyRuntime);
             logAuditMessage(scheduleAudit);
             checkRequiredParameter("schedule", modifyRuntime.getSchedule());

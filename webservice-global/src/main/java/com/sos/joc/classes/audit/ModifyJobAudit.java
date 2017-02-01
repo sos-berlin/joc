@@ -11,20 +11,12 @@ import com.sos.joc.model.job.ModifyJobs;
 public class ModifyJobAudit extends ModifyJobs implements IAuditLog {
     
     @JsonIgnore
-    private String comment;
-    @JsonIgnore
     private String folder;
     @JsonIgnore
     private String job;
-    @JsonIgnore
-    private String jobChain;
-    @JsonIgnore
-    private String orderId;
-
-    public ModifyJobAudit(ModifyJob modifyJob, String jobschedulerId) {
+    
+    public ModifyJobAudit(ModifyJob modifyJob, ModifyJobs modifyJobs) {
         if (modifyJob != null) {
-            this.comment = modifyJob.getComment();
-            modifyJob.setComment(null);
             getJobs().add(modifyJob);
             if (modifyJob.getJob() != null) {
                 Path p = Paths.get(modifyJob.getJob());
@@ -32,15 +24,18 @@ public class ModifyJobAudit extends ModifyJobs implements IAuditLog {
                 this.job = p.getFileName().toString();
             }
         }
-        setJobschedulerId(jobschedulerId);
+        if (modifyJobs != null) {
+            setComment(modifyJobs.getComment());
+            setJobschedulerId(modifyJobs.getJobschedulerId());
+        }
     }
 
     @Override
     @JsonIgnore
     public String getComment() {
-        return comment;
+        return super.getComment();
     }
-
+    
     @Override
     @JsonIgnore
     public String getFolder() {
@@ -56,12 +51,12 @@ public class ModifyJobAudit extends ModifyJobs implements IAuditLog {
     @Override
     @JsonIgnore
     public String getJobChain() {
-        return jobChain;
+        return null;
     }
 
     @Override
     @JsonIgnore
     public String getOrderId() {
-        return orderId;
+        return null;
     }
 }

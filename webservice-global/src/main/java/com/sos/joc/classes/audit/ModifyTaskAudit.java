@@ -12,24 +12,17 @@ import com.sos.joc.model.job.TasksFilter;
 public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     
     @JsonIgnore
-    private String comment;
-    @JsonIgnore
     private String folder;
     @JsonIgnore
     private String job;
-    @JsonIgnore
-    private String jobChain;
-    @JsonIgnore
-    private String orderId;
-
+    
     public ModifyTaskAudit(TasksFilter job, TaskId taskId, ModifyTasks modifyTasks) {
         if (modifyTasks != null) {
+            setComment(modifyTasks.getComment());
             setTimeout(modifyTasks.getTimeout());
             setJobschedulerId(modifyTasks.getJobschedulerId()); 
         }
         if (job != null) {
-            this.comment = job.getComment();
-            job.setComment(null);
             job.getTaskIds().clear();
             job.getTaskIds().add(taskId);
             getJobs().add(job);
@@ -44,9 +37,9 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     @Override
     @JsonIgnore
     public String getComment() {
-        return comment;
+        return super.getComment();
     }
-
+    
     @Override
     @JsonIgnore
     public String getFolder() {
@@ -62,12 +55,12 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     @Override
     @JsonIgnore
     public String getJobChain() {
-        return jobChain;
+        return null;
     }
 
     @Override
     @JsonIgnore
     public String getOrderId() {
-        return orderId;
+        return null;
     }
 }

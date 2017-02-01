@@ -26,7 +26,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "jobChain",
     "state",
     "endState",
-    "comment",
     "at",
     "resume",
     "removeSetback",
@@ -60,12 +59,6 @@ public class ModifyOrder {
      */
     @JsonProperty("endState")
     private String endState;
-    /**
-     * Field to comment this action which can be logged.
-     * 
-     */
-    @JsonProperty("comment")
-    private String comment;
     /**
      * timestamp with now
      * <p>
@@ -201,28 +194,6 @@ public class ModifyOrder {
     @JsonProperty("endState")
     public void setEndState(String endState) {
         this.endState = endState;
-    }
-
-    /**
-     * Field to comment this action which can be logged.
-     * 
-     * @return
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
-    }
-
-    /**
-     * Field to comment this action which can be logged.
-     * 
-     * @param comment
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 
     /**
@@ -396,7 +367,7 @@ public class ModifyOrder {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(orderId).append(jobChain).append(state).append(endState).append(comment).append(at).append(resume).append(removeSetback).append(title).append(priority).append(params).append(runTime).toHashCode();
+        return new HashCodeBuilder().append(orderId).append(jobChain).append(state).append(endState).append(at).append(resume).append(removeSetback).append(title).append(priority).append(params).append(runTime).toHashCode();
     }
 
     @Override
@@ -408,7 +379,7 @@ public class ModifyOrder {
             return false;
         }
         ModifyOrder rhs = ((ModifyOrder) other);
-        return new EqualsBuilder().append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(endState, rhs.endState).append(comment, rhs.comment).append(at, rhs.at).append(resume, rhs.resume).append(removeSetback, rhs.removeSetback).append(title, rhs.title).append(priority, rhs.priority).append(params, rhs.params).append(runTime, rhs.runTime).isEquals();
+        return new EqualsBuilder().append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(state, rhs.state).append(endState, rhs.endState).append(at, rhs.at).append(resume, rhs.resume).append(removeSetback, rhs.removeSetback).append(title, rhs.title).append(priority, rhs.priority).append(params, rhs.params).append(runTime, rhs.runTime).isEquals();
     }
 
 }

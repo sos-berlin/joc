@@ -8,13 +8,11 @@ import java.util.Map;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
-import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.auth.rest.SOSShiroCurrentUsersList;
-import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateStatelessConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -39,6 +37,7 @@ public class Globals {
     public static int httpConnectionTimeout = 2000;
     public static int httpSocketTimeout = 2000;
     public static boolean withHostnameVerification = false;
+    public static boolean auditLogCommentsAreRequired = false;
     public static JocWebserviceDataContainer jocWebserviceDataContainer=JocWebserviceDataContainer.getInstance();
 
     
@@ -111,6 +110,7 @@ public class Globals {
         setJobSchedulerConnectionTimeout();
         setJobSchedulerSocketTimeout();
         setHostnameVerification();
+        setForceCommentsForAuditLog();
         setTrustStore();
     }
     
@@ -242,6 +242,14 @@ public class Globals {
                     }
                 }
             }
+        }
+    }
+    
+    private static void setForceCommentsForAuditLog() {
+        boolean defaultForceCommentsForAuditLog = false;
+        if (sosShiroProperties != null) {
+            auditLogCommentsAreRequired = sosShiroProperties.getProperty("force_comments_for_audit_log", defaultForceCommentsForAuditLog);
+            LOGGER.info("AuditLog comment are required = " + auditLogCommentsAreRequired );
         }
     }
 

@@ -23,7 +23,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "job",
-    "comment",
     "at",
     "params",
     "environment"
@@ -39,12 +38,6 @@ public class StartJob {
      */
     @JsonProperty("job")
     private String job;
-    /**
-     * Field to comment manually job starts which can be logged.
-     * 
-     */
-    @JsonProperty("comment")
-    private String comment;
     /**
      * timestamp with now
      * <p>
@@ -96,28 +89,6 @@ public class StartJob {
     @JsonProperty("job")
     public void setJob(String job) {
         this.job = job;
-    }
-
-    /**
-     * Field to comment manually job starts which can be logged.
-     * 
-     * @return
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
-    }
-
-    /**
-     * Field to comment manually job starts which can be logged.
-     * 
-     * @param comment
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 
     /**
@@ -205,7 +176,7 @@ public class StartJob {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(comment).append(at).append(params).append(environment).toHashCode();
+        return new HashCodeBuilder().append(job).append(at).append(params).append(environment).toHashCode();
     }
 
     @Override
@@ -217,7 +188,7 @@ public class StartJob {
             return false;
         }
         StartJob rhs = ((StartJob) other);
-        return new EqualsBuilder().append(job, rhs.job).append(comment, rhs.comment).append(at, rhs.at).append(params, rhs.params).append(environment, rhs.environment).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).append(at, rhs.at).append(params, rhs.params).append(environment, rhs.environment).isEquals();
     }
 
 }

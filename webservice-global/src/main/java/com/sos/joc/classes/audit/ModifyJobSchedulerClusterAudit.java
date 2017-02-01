@@ -6,20 +6,9 @@ import com.sos.joc.model.jobscheduler.TimeoutParameter;
 
 public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements IAuditLog {
     
-    @JsonIgnore
-    private String comment;
-    @JsonIgnore
-    private String folder;
-    @JsonIgnore
-    private String job;
-    @JsonIgnore
-    private String jobChain;
-    @JsonIgnore
-    private String orderId;
-
     public ModifyJobSchedulerClusterAudit(TimeoutParameter timeoutParameter) {
         if (timeoutParameter != null) {
-            this.comment = timeoutParameter.getComment();
+            setComment(timeoutParameter.getComment());
             setTimeout(timeoutParameter.getTimeout());
             setJobschedulerId(timeoutParameter.getJobschedulerId()); 
         }
@@ -28,30 +17,30 @@ public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements 
     @Override
     @JsonIgnore
     public String getComment() {
-        return comment;
+        return super.getComment();
     }
-
+    
     @Override
     @JsonIgnore
     public String getFolder() {
-        return folder;
+        return null;
     }
 
     @Override
     @JsonIgnore
     public String getJob() {
-        return job;
+        return null;
     }
 
     @Override
     @JsonIgnore
     public String getJobChain() {
-        return jobChain;
+        return null;
     }
 
     @Override
     @JsonIgnore
     public String getOrderId() {
-        return orderId;
+        return null;
     }
 }

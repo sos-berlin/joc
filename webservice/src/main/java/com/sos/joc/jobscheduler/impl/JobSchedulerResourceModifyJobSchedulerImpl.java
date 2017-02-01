@@ -137,6 +137,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
         getJobSchedulerInstanceByHostPort(urlTimeoutParamSchema.getHost(), urlTimeoutParamSchema.getPort(), urlTimeoutParamSchema
                 .getJobschedulerId());
 
+        checkRequiredComment(urlTimeoutParamSchema.getComment());
         ModifyJobSchedulerAudit jobschedulerAudit = new ModifyJobSchedulerAudit(urlTimeoutParamSchema);
         logAuditMessage(jobschedulerAudit);
 

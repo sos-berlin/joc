@@ -11,7 +11,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyJobChainAudit;
-import com.sos.joc.classes.audit.ModifyJobChainNodeAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -56,17 +55,17 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 
     private JOCDefaultResponse postJobChainsCommand(String command, String accessToken, boolean permission, ModifyJobChains modifyJobChains)
             throws Exception {
-        String jobschedulerId = modifyJobChains.getJobschedulerId();
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, permission);
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobChains.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
+        checkRequiredComment(modifyJobChains.getComment());
         if (modifyJobChains.getJobChains().size() == 0) {
             throw new JocMissingRequiredParameterException("undefined 'jobChains'");
         }
         Date surveyDate = new Date();
         for (ModifyJobChain jobChain : modifyJobChains.getJobChains()) {
-            surveyDate = executeModifyJobChainCommand(jobChain, jobschedulerId, command);
+            surveyDate = executeModifyJobChainCommand(jobChain, modifyJobChains, command);
         }
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -74,9 +73,9 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
         return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
 
-    private Date executeModifyJobChainCommand(ModifyJobChain jobChain, String jobschedulerId, String cmd) {
+    private Date executeModifyJobChainCommand(ModifyJobChain jobChain, ModifyJobChains modifyJobChains, String cmd) {
         try {
-            ModifyJobChainAudit jobChainAudit = new ModifyJobChainAudit(jobChain, jobschedulerId);
+            ModifyJobChainAudit jobChainAudit = new ModifyJobChainAudit(jobChain, modifyJobChains);
             logAuditMessage(jobChainAudit);
 
             checkRequiredParameter("jobChain", jobChain.getJobChain());

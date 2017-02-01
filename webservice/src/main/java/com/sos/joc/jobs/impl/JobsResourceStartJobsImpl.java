@@ -12,7 +12,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
-import com.sos.joc.classes.audit.ModifyJobAudit;
 import com.sos.joc.classes.audit.StartJobAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -33,17 +32,18 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsStart(String accessToken, StartJobs startJobs) throws Exception {
         try {
             initLogging(API_CALL, startJobs);
-            String jobschedulerId = startJobs.getJobschedulerId();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken).getJob().isStart());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, startJobs.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob()
+                    .isStart());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            checkRequiredComment(startJobs.getComment());
             if (startJobs.getJobs().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'jobs'");
             }
             Date surveyDate = new Date();
             for (StartJob job : startJobs.getJobs()) {
-                surveyDate = executeStartJobCommand(job, jobschedulerId);
+                surveyDate = executeStartJobCommand(job, startJobs);
             }
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -57,7 +57,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-    private Date executeStartJobCommand(StartJob startJob, String jobschedulerId) {
+    private Date executeStartJobCommand(StartJob startJob, StartJobs startJobs) {
 
         try {
             if (startJob.getParams() != null && startJob.getParams().isEmpty()) {
@@ -66,7 +66,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             if (startJob.getEnvironment() != null && startJob.getEnvironment().isEmpty()) {
                 startJob.setEnvironment(null);
             }
-            StartJobAudit jobAudit = new StartJobAudit(startJob, jobschedulerId);
+            StartJobAudit jobAudit = new StartJobAudit(startJob, startJobs);
             logAuditMessage(jobAudit);
 
             checkRequiredParameter("job", startJob.getJob());

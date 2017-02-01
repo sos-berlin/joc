@@ -111,10 +111,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-    private Date executeModifyJobCommand(ModifyJob modifyJob, String jobschedulerId, String command) {
+    private Date executeModifyJobCommand(ModifyJob modifyJob, ModifyJobs modifyJobs, String command) {
 
         try {
-            ModifyJobAudit jobAudit = new ModifyJobAudit(modifyJob, jobschedulerId);
+            ModifyJobAudit jobAudit = new ModifyJobAudit(modifyJob, modifyJobs);
             logAuditMessage(jobAudit);
 
             checkRequiredParameter("job", modifyJob.getJob());
@@ -148,17 +148,17 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobs modifyJobs) throws Exception {
-        String jobschedulerId = modifyJobs.getJobschedulerId();
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, permission);
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobs.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
+        checkRequiredComment(modifyJobs.getComment());
         if (modifyJobs.getJobs().size() == 0) {
             throw new JocMissingRequiredParameterException("undefined 'jobs'");
         }
         Date surveyDate = new Date();
         for (ModifyJob job : modifyJobs.getJobs()) {
-            surveyDate = executeModifyJobCommand(job, jobschedulerId, command);
+            surveyDate = executeModifyJobCommand(job, modifyJobs, command);
         }
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);

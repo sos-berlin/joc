@@ -20,7 +20,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "job",
-    "comment",
     "runTime"
 })
 public class ModifyJob {
@@ -34,12 +33,6 @@ public class ModifyJob {
      */
     @JsonProperty("job")
     private String job;
-    /**
-     * Field to comment manually job modifications which can be logged.
-     * 
-     */
-    @JsonProperty("comment")
-    private String comment;
     /**
      * A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd
      * 
@@ -76,28 +69,6 @@ public class ModifyJob {
     }
 
     /**
-     * Field to comment manually job modifications which can be logged.
-     * 
-     * @return
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
-    }
-
-    /**
-     * Field to comment manually job modifications which can be logged.
-     * 
-     * @param comment
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
-    /**
      * A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd
      * 
      * @return
@@ -126,7 +97,7 @@ public class ModifyJob {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(comment).append(runTime).toHashCode();
+        return new HashCodeBuilder().append(job).append(runTime).toHashCode();
     }
 
     @Override
@@ -138,7 +109,7 @@ public class ModifyJob {
             return false;
         }
         ModifyJob rhs = ((ModifyJob) other);
-        return new EqualsBuilder().append(job, rhs.job).append(comment, rhs.comment).append(runTime, rhs.runTime).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).append(runTime, rhs.runTime).isEquals();
     }
 
 }

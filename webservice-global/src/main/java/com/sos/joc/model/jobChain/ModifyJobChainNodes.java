@@ -22,7 +22,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
-    "nodes"
+    "nodes",
+    "comment"
 })
 public class ModifyJobChainNodes {
 
@@ -40,6 +41,12 @@ public class ModifyJobChainNodes {
      */
     @JsonProperty("nodes")
     private List<ModifyJobChainNode> nodes = new ArrayList<ModifyJobChainNode>();
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     */
+    @JsonProperty("comment")
+    private String comment;
 
     /**
      * 
@@ -89,6 +96,28 @@ public class ModifyJobChainNodes {
         this.nodes = nodes;
     }
 
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     * @return
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Field to comment this action which can be logged.
+     * 
+     * @param comment
+     *     The comment
+     */
+    @JsonProperty("comment")
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -96,7 +125,7 @@ public class ModifyJobChainNodes {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(nodes).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(nodes).append(comment).toHashCode();
     }
 
     @Override
@@ -108,7 +137,7 @@ public class ModifyJobChainNodes {
             return false;
         }
         ModifyJobChainNodes rhs = ((ModifyJobChainNodes) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(nodes, rhs.nodes).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(nodes, rhs.nodes).append(comment, rhs.comment).isEquals();
     }
 
 }

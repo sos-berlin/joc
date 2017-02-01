@@ -13,7 +13,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
-import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.audit.ModifyTaskAudit;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -90,6 +89,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
+        checkRequiredComment(modifyTasks.getComment());
         Date surveyDate = Date.from(Instant.now());
         for (TasksFilter job : modifyTasks.getJobs()) {
             List<TaskId> taskIds = job.getTaskIds();

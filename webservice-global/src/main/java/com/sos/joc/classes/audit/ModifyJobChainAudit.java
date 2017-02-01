@@ -11,20 +11,12 @@ import com.sos.joc.model.jobChain.ModifyJobChains;
 public class ModifyJobChainAudit extends ModifyJobChains implements IAuditLog {
     
     @JsonIgnore
-    private String comment;
-    @JsonIgnore
     private String folder;
     @JsonIgnore
-    private String job;
-    @JsonIgnore
     private String jobChain;
-    @JsonIgnore
-    private String orderId;
-
-    public ModifyJobChainAudit(ModifyJobChain modifyJobChain, String jobschedulerId) {
+    
+    public ModifyJobChainAudit(ModifyJobChain modifyJobChain, ModifyJobChains modifyJobChains) {
         if (modifyJobChain != null) {
-            this.comment = modifyJobChain.getComment();
-            modifyJobChain.setComment(null);
             getJobChains().add(modifyJobChain);
             if (modifyJobChain.getJobChain() != null) {
                 Path p = Paths.get(modifyJobChain.getJobChain());
@@ -32,15 +24,18 @@ public class ModifyJobChainAudit extends ModifyJobChains implements IAuditLog {
                 this.jobChain = p.getFileName().toString();
             }
         }
-        setJobschedulerId(jobschedulerId);
+        if (modifyJobChains != null) {
+            setComment(modifyJobChains.getComment());
+            setJobschedulerId(modifyJobChains.getJobschedulerId());            
+        }
     }
 
     @Override
     @JsonIgnore
     public String getComment() {
-        return comment;
+        return super.getComment();
     }
-
+    
     @Override
     @JsonIgnore
     public String getFolder() {
@@ -50,7 +45,7 @@ public class ModifyJobChainAudit extends ModifyJobChains implements IAuditLog {
     @Override
     @JsonIgnore
     public String getJob() {
-        return job;
+        return null;
     }
 
     @Override
@@ -62,6 +57,6 @@ public class ModifyJobChainAudit extends ModifyJobChains implements IAuditLog {
     @Override
     @JsonIgnore
     public String getOrderId() {
-        return orderId;
+        return null;
     }
 }

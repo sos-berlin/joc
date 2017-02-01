@@ -19,8 +19,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "jobChain",
-    "comment"
+    "jobChain"
 })
 public class ModifyJobChain {
 
@@ -33,12 +32,6 @@ public class ModifyJobChain {
      */
     @JsonProperty("jobChain")
     private String jobChain;
-    /**
-     * Field to comment this action which can be logged.
-     * 
-     */
-    @JsonProperty("comment")
-    private String comment;
 
     /**
      * path
@@ -68,28 +61,6 @@ public class ModifyJobChain {
         this.jobChain = jobChain;
     }
 
-    /**
-     * Field to comment this action which can be logged.
-     * 
-     * @return
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
-    }
-
-    /**
-     * Field to comment this action which can be logged.
-     * 
-     * @param comment
-     *     The comment
-     */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -97,7 +68,7 @@ public class ModifyJobChain {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobChain).append(comment).toHashCode();
+        return new HashCodeBuilder().append(jobChain).toHashCode();
     }
 
     @Override
@@ -109,7 +80,7 @@ public class ModifyJobChain {
             return false;
         }
         ModifyJobChain rhs = ((ModifyJobChain) other);
-        return new EqualsBuilder().append(jobChain, rhs.jobChain).append(comment, rhs.comment).isEquals();
+        return new EqualsBuilder().append(jobChain, rhs.jobChain).isEquals();
     }
 
 }

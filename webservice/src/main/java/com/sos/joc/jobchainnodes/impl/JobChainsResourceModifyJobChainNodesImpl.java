@@ -69,17 +69,17 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
 
     private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission, ModifyJobChainNodes jobChainNodes)
             throws Exception {
-        String jobschedulerId = jobChainNodes.getJobschedulerId();
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, permission);
+        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainNodes.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
+        checkRequiredComment(jobChainNodes.getComment());
         if (jobChainNodes.getNodes().size() == 0) {
             throw new JocMissingRequiredParameterException("undefined 'nodes'");
         }
         Date surveyDate = new Date();
         for (ModifyJobChainNode jobChainNode : jobChainNodes.getNodes()) {
-            surveyDate = executeModifyJobChainNodeCommand(jobChainNode, jobschedulerId, command);
+            surveyDate = executeModifyJobChainNodeCommand(jobChainNode, jobChainNodes, command);
         }
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -87,9 +87,9 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
         return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
 
-    private Date executeModifyJobChainNodeCommand(ModifyJobChainNode jobChainNode, String jobschedulerId, String cmd) {
+    private Date executeModifyJobChainNodeCommand(ModifyJobChainNode jobChainNode, ModifyJobChainNodes jobChainNodes, String cmd) {
         try {
-            ModifyJobChainNodeAudit jobChainNodeAudit = new ModifyJobChainNodeAudit(jobChainNode, jobschedulerId);
+            ModifyJobChainNodeAudit jobChainNodeAudit = new ModifyJobChainNodeAudit(jobChainNode, jobChainNodes);
             logAuditMessage(jobChainNodeAudit);
 
             checkRequiredParameter("jobChain", jobChainNode.getJobChain());
