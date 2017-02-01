@@ -53,7 +53,7 @@ public class ConfigurationsFilter {
     @JsonProperty("objectType")
     private ConfigurationObjectType objectType;
     @JsonProperty("shared")
-    private Boolean shared = false;
+    private Boolean shared;
 
     /**
      * 
