@@ -47,7 +47,6 @@ public class Configuration {
      * configuration type
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("configurationType")
@@ -127,7 +126,6 @@ public class Configuration {
      * configuration type
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The configurationType
@@ -141,7 +139,6 @@ public class Configuration {
      * configuration type
      * <p>
      * 
-     * (Required)
      * 
      * @param configurationType
      *     The configurationType
