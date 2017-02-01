@@ -5,9 +5,9 @@ import com.sos.hibernate.classes.SOSHibernateFilter;
 public class JocConfigurationFilter extends SOSHibernateFilter{
 
     private Long instanceId;
-    private String owner;
+    private String account;
     private String objectType;
-    private String objectSource;
+    private String configurationType;
     private String name;
     private Boolean shared;
 
@@ -27,13 +27,13 @@ public class JocConfigurationFilter extends SOSHibernateFilter{
     }
 
 
-    public String getOwner() {
-        return owner;
+    public String getAccount() {
+        return account;
     }
 
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setAccount(String account) {
+        this.account = account;
     }
 
 
@@ -47,13 +47,13 @@ public class JocConfigurationFilter extends SOSHibernateFilter{
     }
 
 
-    public String getObjectSource() {
-        return objectSource;
+    public String getConfigurationType() {
+        return configurationType;
     }
 
 
-    public void setObjectSource(String objectSource) {
-        this.objectSource = objectSource;
+    public void setConfigurationType(String configurationType) {
+        this.configurationType = configurationType;
     }
 
 
@@ -72,7 +72,7 @@ public class JocConfigurationFilter extends SOSHibernateFilter{
     }
 
 
-    public void setShare(Boolean shared) {
+    public void setShared(Boolean shared) {
         this.shared = shared;
     }
     

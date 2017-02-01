@@ -293,12 +293,8 @@ public class JOCResourceImpl {
         } else {
             jobschedulerId = schedulerId;
         }
-//        Globals.checkConnection();
-        if (!"".equals(schedulerId)) {
+         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
-//            if (withJobSchedulerDBCheck) {
-//                Globals.checkFactory(schedulerId);
-//            }
         }
         return jocDefaultResponse;
     }
