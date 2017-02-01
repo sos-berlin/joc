@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.01.11 um 11:41:39 AM CET 
+// Generiert: 2017.02.01 um 11:11:42 PM CET 
 //
 
 
@@ -76,8 +76,9 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element ref="{}remote_scheduler.remote_task.kill"/>
  *         &lt;element ref="{}terminate"/>
  *       &lt;/choice>
- *       &lt;attribute name="url" type="{}String" />
- *       &lt;attribute name="jobschedulerId" type="{}String" />
+ *       &lt;attribute name="url" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="jobschedulerId" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -89,61 +90,63 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "addOrderOrCheckFoldersOrKillTask"
 })
-@XmlRootElement(name = "jobscheduler_commands")
+@XmlRootElement(name = "jobscheduler_commands", namespace = "http://www.sos-berlin.com/scheduler")
 public class JobschedulerCommands {
 
     @XmlElementRefs({
+        @XmlElementRef(name = "modify_job", type = ModifyJob.class, required = false),
+        @XmlElementRef(name = "run_time", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "job_chain_node.modify", type = JobChainNodeModify.class, required = false),
+        @XmlElementRef(name = "add_order", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "modify_hot_folder", type = JAXBElement.class, required = false),
         @XmlElementRef(name = "remote_scheduler.start_remote_task", type = RemoteSchedulerStartRemoteTask.class, required = false),
-        @XmlElementRef(name = "process_class.remove", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "remote_scheduler.remote_task.kill", type = RemoteSchedulerRemoteTaskKill.class, required = false),
-        @XmlElementRef(name = "modify_order", type = ModifyOrder.class, required = false),
-        @XmlElementRef(name = "lock.remove", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "remove_order", type = RemoveOrder.class, required = false),
-        @XmlElementRef(name = "show_calendar", type = ShowCalendar.class, required = false),
-        @XmlElementRef(name = "show_order", type = ShowOrder.class, required = false),
-        @XmlElementRef(name = "subsystem.show", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "scheduler_log.log_categories.reset", type = SchedulerLogLogCategoriesReset.class, required = false),
-        @XmlElementRef(name = "show_job", type = ShowJob.class, required = false),
-        @XmlElementRef(name = "terminate", type = Terminate.class, required = false),
-        @XmlElementRef(name = "register_remote_scheduler", type = RegisterRemoteScheduler.class, required = false),
-        @XmlElementRef(name = "schedule.remove", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "check_folders", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "job.why", type = JobWhy.class, required = false),
-        @XmlElementRef(name = "show_schedulers", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "param.get", type = ParamGet.class, required = false),
+        @XmlElementRef(name = "job_chain.modify", type = JobChainModify.class, required = false),
         @XmlElementRef(name = "show_job_chains", type = ShowJobChains.class, required = false),
-        @XmlElementRef(name = "modify_spooler", type = ModifySpooler.class, required = false),
-        @XmlElementRef(name = "scheduler_log.log_categories.set", type = SchedulerLogLogCategoriesSet.class, required = false),
-        @XmlElementRef(name = "show_job_chain", type = ShowJobChain.class, required = false),
-        @XmlElementRef(name = "job_chain.check_distributed", type = JobChainCheckDistributed.class, required = false),
+        @XmlElementRef(name = "show_schedulers", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "scheduler_log.log_categories.reset", type = SchedulerLogLogCategoriesReset.class, required = false),
+        @XmlElementRef(name = "lock.remove", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "plugin.command", type = PluginCommand.class, required = false),
+        @XmlElementRef(name = "s", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "remove_order", type = RemoveOrder.class, required = false),
+        @XmlElementRef(name = "job.why", type = JobWhy.class, required = false),
+        @XmlElementRef(name = "param.get", type = ParamGet.class, required = false),
+        @XmlElementRef(name = "remote_scheduler.remote_task.close", type = RemoteSchedulerRemoteTaskClose.class, required = false),
+        @XmlElementRef(name = "service_request", type = ServiceRequest.class, required = false),
+        @XmlElementRef(name = "scheduler_log.log_categories.show", type = SchedulerLogLogCategoriesShow.class, required = false),
+        @XmlElementRef(name = "show_order", type = ShowOrder.class, required = false),
+        @XmlElementRef(name = "setting.set", type = SettingSet.class, required = false),
         @XmlElementRef(name = "start_job", type = StartJob.class, required = false),
         @XmlElementRef(name = "remove_job_chain", type = RemoveJobChain.class, required = false),
-        @XmlElementRef(name = "scheduler_log.log_categories.show", type = SchedulerLogLogCategoriesShow.class, required = false),
-        @XmlElementRef(name = "job_chain_node.modify", type = JobChainNodeModify.class, required = false),
-        @XmlElementRef(name = "setting.set", type = SettingSet.class, required = false),
-        @XmlElementRef(name = "show_task", type = ShowTask.class, required = false),
+        @XmlElementRef(name = "register_remote_scheduler", type = RegisterRemoteScheduler.class, required = false),
         @XmlElementRef(name = "kill_task", type = KillTask.class, required = false),
-        @XmlElementRef(name = "show_history", type = ShowHistory.class, required = false),
-        @XmlElementRef(name = "order", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "show_job_chain", type = ShowJobChain.class, required = false),
+        @XmlElementRef(name = "terminate", type = Terminate.class, required = false),
         @XmlElementRef(name = "params.get", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "modify_hot_folder", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "add_order", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "run_time", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "show_jobs", type = ShowJobs.class, required = false),
         @XmlElementRef(name = "process_class", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "remote_scheduler.remote_task.close", type = RemoteSchedulerRemoteTaskClose.class, required = false),
+        @XmlElementRef(name = "remote_scheduler.remote_task.kill", type = RemoteSchedulerRemoteTaskKill.class, required = false),
+        @XmlElementRef(name = "show_calendar", type = ShowCalendar.class, required = false),
+        @XmlElementRef(name = "show_history", type = ShowHistory.class, required = false),
+        @XmlElementRef(name = "modify_spooler", type = ModifySpooler.class, required = false),
+        @XmlElementRef(name = "order", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "check_folders", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "scheduler_log.log_categories.set", type = SchedulerLogLogCategoriesSet.class, required = false),
+        @XmlElementRef(name = "modify_order", type = ModifyOrder.class, required = false),
+        @XmlElementRef(name = "schedule.remove", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "process_class.remove", namespace = "http://www.sos-berlin.com/scheduler", type = JAXBElement.class, required = false),
+        @XmlElementRef(name = "show_job", type = ShowJob.class, required = false),
+        @XmlElementRef(name = "show_jobs", type = ShowJobs.class, required = false),
+        @XmlElementRef(name = "subsystem.show", type = JAXBElement.class, required = false),
         @XmlElementRef(name = "show_state", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "job_chain.modify", type = JobChainModify.class, required = false),
-        @XmlElementRef(name = "s", type = JAXBElement.class, required = false),
-        @XmlElementRef(name = "plugin.command", type = PluginCommand.class, required = false),
-        @XmlElementRef(name = "service_request", type = ServiceRequest.class, required = false),
-        @XmlElementRef(name = "modify_job", type = ModifyJob.class, required = false)
+        @XmlElementRef(name = "show_task", type = ShowTask.class, required = false),
+        @XmlElementRef(name = "job_chain.check_distributed", type = JobChainCheckDistributed.class, required = false)
     })
     protected List<Object> addOrderOrCheckFoldersOrKillTask;
     @XmlAttribute(name = "url")
     protected String url;
     @XmlAttribute(name = "jobschedulerId")
     protected String jobschedulerId;
+    @XmlAttribute(name = "comment")
+    protected String comment;
 
     /**
      * Gets the value of the addOrderOrCheckFoldersOrKillTask property.
@@ -163,51 +166,51 @@ public class JobschedulerCommands {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
+     * {@link ModifyJob }
+     * {@link JAXBElement }{@code <}{@link RunTime }{@code >}
+     * {@link JobChainNodeModify }
+     * {@link JAXBElement }{@code <}{@link Order }{@code >}
+     * {@link JAXBElement }{@code <}{@link ModifyHotFolder }{@code >}
      * {@link RemoteSchedulerStartRemoteTask }
-     * {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}
-     * {@link RemoteSchedulerRemoteTaskKill }
-     * {@link ModifyOrder }
-     * {@link JAXBElement }{@code <}{@link LockRemove }{@code >}
-     * {@link RemoveOrder }
-     * {@link ShowCalendar }
-     * {@link ShowOrder }
-     * {@link JAXBElement }{@code <}{@link SubsystemShow }{@code >}
-     * {@link SchedulerLogLogCategoriesReset }
-     * {@link ShowJob }
-     * {@link Terminate }
-     * {@link RegisterRemoteScheduler }
-     * {@link JAXBElement }{@code <}{@link ScheduleRemove }{@code >}
-     * {@link JAXBElement }{@code <}{@link CheckFolders }{@code >}
-     * {@link JobWhy }
-     * {@link JAXBElement }{@code <}{@link ShowState }{@code >}
-     * {@link ParamGet }
+     * {@link JobChainModify }
      * {@link ShowJobChains }
-     * {@link ModifySpooler }
-     * {@link SchedulerLogLogCategoriesSet }
-     * {@link ShowJobChain }
-     * {@link JobChainCheckDistributed }
+     * {@link JAXBElement }{@code <}{@link ShowState }{@code >}
+     * {@link SchedulerLogLogCategoriesReset }
+     * {@link JAXBElement }{@code <}{@link LockRemove }{@code >}
+     * {@link PluginCommand }
+     * {@link JAXBElement }{@code <}{@link ShowState }{@code >}
+     * {@link RemoveOrder }
+     * {@link JobWhy }
+     * {@link ParamGet }
+     * {@link RemoteSchedulerRemoteTaskClose }
+     * {@link ServiceRequest }
+     * {@link SchedulerLogLogCategoriesShow }
+     * {@link ShowOrder }
+     * {@link SettingSet }
      * {@link StartJob }
      * {@link RemoveJobChain }
-     * {@link SchedulerLogLogCategoriesShow }
-     * {@link JobChainNodeModify }
-     * {@link SettingSet }
-     * {@link ShowTask }
+     * {@link RegisterRemoteScheduler }
      * {@link KillTask }
-     * {@link ShowHistory }
-     * {@link JAXBElement }{@code <}{@link Order }{@code >}
+     * {@link ShowJobChain }
+     * {@link Terminate }
      * {@link JAXBElement }{@code <}{@link Object }{@code >}
-     * {@link JAXBElement }{@code <}{@link ModifyHotFolder }{@code >}
-     * {@link JAXBElement }{@code <}{@link Order }{@code >}
-     * {@link JAXBElement }{@code <}{@link RunTime }{@code >}
-     * {@link ShowJobs }
      * {@link JAXBElement }{@code <}{@link ProcessClass }{@code >}
-     * {@link RemoteSchedulerRemoteTaskClose }
+     * {@link RemoteSchedulerRemoteTaskKill }
+     * {@link ShowCalendar }
+     * {@link ShowHistory }
+     * {@link ModifySpooler }
+     * {@link JAXBElement }{@code <}{@link Order }{@code >}
+     * {@link JAXBElement }{@code <}{@link CheckFolders }{@code >}
+     * {@link SchedulerLogLogCategoriesSet }
+     * {@link ModifyOrder }
+     * {@link JAXBElement }{@code <}{@link ScheduleRemove }{@code >}
+     * {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}
+     * {@link ShowJob }
+     * {@link ShowJobs }
+     * {@link JAXBElement }{@code <}{@link SubsystemShow }{@code >}
      * {@link JAXBElement }{@code <}{@link ShowState }{@code >}
-     * {@link JobChainModify }
-     * {@link JAXBElement }{@code <}{@link ShowState }{@code >}
-     * {@link PluginCommand }
-     * {@link ServiceRequest }
-     * {@link ModifyJob }
+     * {@link ShowTask }
+     * {@link JobChainCheckDistributed }
      * 
      * 
      */
@@ -264,6 +267,30 @@ public class JobschedulerCommands {
      */
     public void setJobschedulerId(String value) {
         this.jobschedulerId = value;
+    }
+
+    /**
+     * Ruft den Wert der comment-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * Legt den Wert der comment-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setComment(String value) {
+        this.comment = value;
     }
 
 }

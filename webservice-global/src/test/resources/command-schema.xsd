@@ -49,10 +49,11 @@
 				<xsd:element ref="remote_scheduler.remote_task.close"/>
 				<xsd:element ref="remote_scheduler.remote_task.kill"/>
 				<xsd:element ref="terminate"/>
-                <xsd:element name="comment" type="xsd:string"/>
+                <!-- xsd:element name="comment" type="xsd:string"/ -->
 			</xsd:choice>
 			<xsd:attribute name="url" type="xsd:string"/>
 			<xsd:attribute name="jobschedulerId" type="xsd:string"/>
+			<xsd:attribute name="comment" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>
 </xsd:schema>

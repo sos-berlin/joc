@@ -5,18 +5,18 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerCommandFactory;
+import com.sos.joc.classes.audit.JobSchedulerCommandAudit;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCommand;
 import com.sos.joc.model.commands.JobschedulerCommands;
 
 @Path("jobscheduler")
 public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements IJobSchedulerResourceCommand {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceCommandImpl.class);
     private static final String API_CALL_COMMAND = "./jobscheduler/commands";
 
@@ -32,8 +32,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             }
 
             checkRequiredParameter("jobschedulerId", jobSchedulerCommands.getJobschedulerId());
-            //TODO comment in JobschedulerCommands missing
-            // checkRequiredComment(jobSchedulerCommands.getComment());
+            checkRequiredComment(jobSchedulerCommands.getComment());
             if ("".equals(jobSchedulerCommands.getUrl()) || jobSchedulerCommands.getUrl() == null) {
                 jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
             }
@@ -56,12 +55,13 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 }
 
             }
-            if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() > 1) {
-                xml = "<commands>" + xml + "</commands>";
-            }
-            //TODO IAuditLog Object into logAuditMessage(jobSchedulerCommands);
-            String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            xml = "<commands>" + xml + "</commands>";
 
+            JobSchedulerCommandAudit jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
+            logAuditMessage(jobschedulerAudit);
+            String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            storeAuditLogEntry(jobschedulerAudit);
+            
             return JOCDefaultResponse.responseStatus200(answer, "application/xml");
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

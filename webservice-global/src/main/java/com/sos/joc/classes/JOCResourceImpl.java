@@ -246,7 +246,7 @@ public class JOCResourceImpl {
         if (body != null) {
             try {
                 return mapper.writeValueAsString(body);
-            } catch (JsonProcessingException e) {
+            } catch (Exception e) {
                 return body.toString();
             }
         }
