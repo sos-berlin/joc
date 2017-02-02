@@ -249,19 +249,16 @@ public class Globals {
         boolean defaultForceCommentsForAuditLog = false;
         if (sosShiroProperties != null) {
             auditLogCommentsAreRequired = sosShiroProperties.getProperty("force_comments_for_audit_log", defaultForceCommentsForAuditLog);
-            LOGGER.info("AuditLog comment are required = " + auditLogCommentsAreRequired );
+            LOGGER.info("force comments for audit log = " + auditLogCommentsAreRequired );
         }
     }
 
     public static void forceRollback(Object object) {
-        // TODO Auto-generated method stub
-        
     }
 
     public static void disconnect(SOSHibernateConnection connection) {
        if (connection != null){
            connection.disconnect();
        }
-        
     }
 }
