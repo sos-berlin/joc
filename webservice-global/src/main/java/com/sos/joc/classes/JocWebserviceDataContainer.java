@@ -21,11 +21,11 @@ public final class JocWebserviceDataContainer {
         return instance;
     }
 
-    public static SOSShiroCurrentUsersList getCurrentUsersList() {
+    public  SOSShiroCurrentUsersList getCurrentUsersList() {
         return currentUsersList;
     }
 
-    public static void setCurrentUsersList(SOSShiroCurrentUsersList currentUsersList) {
+    public  void setCurrentUsersList(SOSShiroCurrentUsersList currentUsersList) {
         JocWebserviceDataContainer.currentUsersList = currentUsersList;
     }
 

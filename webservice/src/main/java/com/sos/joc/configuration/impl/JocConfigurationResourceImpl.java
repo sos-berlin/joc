@@ -27,10 +27,17 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
     private SOSHibernateConnection connection = null;
     private JocConfigurationDbLayer jocConfigurationDBLayer;
     private JocConfigurationDbItem jocConfigurationDbItem;
+    private JocConfigurationDbItem oldJocConfigurationDbItem;
 
     private void init(Configuration configuration) throws Exception {
-        jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
         jocConfigurationDbItem = new JocConfigurationDbItem();
+        jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
+
+        List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
+        if (l.size() > 0) {
+            oldJocConfigurationDbItem = l.get(0);
+        }
+
         String objectType = "";
 
         if (configuration.getObjectType() == null) {
@@ -63,32 +70,41 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             jocConfigurationDbItem.setObjectType(objectType);
         }
 
-        jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
         jocConfigurationDbItem.setShared(configuration.getShared());
         jocConfigurationDbItem.setConfigurationItem(configuration.getConfigurationItem());
         jocConfigurationDbItem.setConfigurationType(configurationType);
         jocConfigurationDbItem.setAccount(configuration.getAccount());
 
-        jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
         jocConfigurationDBLayer.getFilter().setConfigurationType(configuration.getConfigurationType().name());
         jocConfigurationDBLayer.getFilter().setAccount(configuration.getAccount());
 
     }
 
-    private JOCDefaultResponse updateConfiguration(String accessToken, Configuration configuration) {
+    @Override
+    public JOCDefaultResponse postSaveConfiguration(String accessToken, Configuration configuration) throws Exception {
+
         try {
             connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
+            initLogging(API_CALL_SAVE, configuration);
+            init(configuration);
 
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
-                    .isStatus());
+            checkRequiredParameter("configurationItem", configuration.getConfigurationItem());
+
+            JOCDefaultResponse jocDefaultResponse;
+            if (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared()) {
+                jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isEditContent());
+            } else {
+                jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getPrivate().isEditContent());
+            }
+            
+            jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
+            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
+            
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            init(configuration);
-
             jocConfigurationDBLayer.saveConfiguration(jocConfigurationDbItem, configuration.getShared(), configuration.getConfigurationItem());
-
 
             return JOCDefaultResponse.responseStatusJSOk(new Date());
         } catch (JocException e) {
@@ -99,13 +115,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         } finally {
             Globals.disconnect(connection);
         }
-    }
 
-    @Override
-    public JOCDefaultResponse postSaveConfiguration(String accessToken, Configuration configuration) throws Exception {
-        initLogging(API_CALL_SAVE, configuration);
-        checkRequiredParameter("configurationItem", configuration.getConfigurationItem());
-        return updateConfiguration(accessToken, configuration);
     }
 
     @Override
@@ -113,14 +123,23 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         initLogging(API_CALL_READ, configuration);
         try {
             connection = Globals.createSosHibernateStatelessConnection("readConfiguration");
+            init(configuration);
 
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse;
+
+            if (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared()) {
+                jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView());
+            } else {
+                jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getPrivate().isView());
+            }
+
+            jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
+            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
+            
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            init(configuration);
             List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
             if (l.size() > 0) {
                 jocConfigurationDbItem = l.get(0);
@@ -153,12 +172,22 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         try {
             connection = Globals.createSosHibernateStatelessConnection("deleteConfiguration");
             initLogging(API_CALL_DELETE, configuration);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
-                    .isStatus());
+            init(configuration);
+
+            JOCDefaultResponse jocDefaultResponse;
+
+            if (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared()) {
+                jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isDelete());
+            } else {
+                jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getPrivate().isDelete());
+            }
+
+            jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
+            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
+            
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            init(configuration);
             jocConfigurationDBLayer.deleteConfiguration();
             return JOCDefaultResponse.responseStatusJSOk(new Date());
         } catch (JocException e) {
@@ -173,16 +202,64 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
     @Override
     public JOCDefaultResponse postShareConfiguration(String accessToken, Configuration configuration) throws Exception {
-        initLogging(API_CALL_SHARE, configuration);
-        configuration.setShared(true);
-        return updateConfiguration(accessToken, configuration);
+
+        try {
+            connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
+            initLogging(API_CALL_SHARE, configuration);
+            init(configuration);
+
+            JOCDefaultResponse jocDefaultResponse;
+
+            jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getPrivate().isMakeShared());
+
+            jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
+            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
+            
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
+            jocConfigurationDBLayer.saveConfiguration(jocConfigurationDbItem, true, configuration.getConfigurationItem());
+
+            return JOCDefaultResponse.responseStatusJSOk(new Date());
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
+        }
     }
 
     @Override
     public JOCDefaultResponse postMakePrivate(String accessToken, Configuration configuration) throws Exception {
-        initLogging(API_CALL_PRIVATE, configuration);
-        configuration.setShared(false);
-        return updateConfiguration(accessToken, configuration);
-    }
+        try {
+            connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
+            initLogging(API_CALL_PRIVATE, configuration);
+            init(configuration);
 
+            JOCDefaultResponse jocDefaultResponse;
+
+            jocDefaultResponse = init(accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isMakePrivate());
+            
+            jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
+            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
+            
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+
+            jocConfigurationDBLayer.saveConfiguration(jocConfigurationDbItem, false, configuration.getConfigurationItem());
+
+            return JOCDefaultResponse.responseStatusJSOk(new Date());
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
+        }
+    }
 }

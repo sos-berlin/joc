@@ -32,8 +32,8 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
             connection = Globals.createSosHibernateStatelessConnection("API_CALL");
             Globals.beginTransaction(connection);
 
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, configurationsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerMaster()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(accessToken, configurationsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations().getPrivate().isView());
+            
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
