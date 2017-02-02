@@ -50,8 +50,14 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             List<JobPath> filterJobs = auditLogFilter.getJobs();
             Integer filterLimit = auditLogFilter.getLimit();
             List<OrderPath> filterOrders = auditLogFilter.getOrders();
-            Date filterFrom = JobSchedulerDate.getDate(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
-            Date filterTo = JobSchedulerDate.getDate(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
+            Date filterFrom = null;
+            Date filterTo = null;
+            if (auditLogFilter.getDateFrom() != null && !auditLogFilter.getDateFrom().isEmpty()) {
+                filterFrom = JobSchedulerDate.getDate(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
+            }
+            if (auditLogFilter.getDateTo() != null && !auditLogFilter.getDateTo().isEmpty()) {
+                filterTo = JobSchedulerDate.getDate(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
+            }
             String filterRegex = auditLogFilter.getRegex();
             // processing
             if (filterOrders != null && !filterOrders.isEmpty()) {
