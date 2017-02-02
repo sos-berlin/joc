@@ -13,12 +13,16 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     
     @JsonIgnore
     private String folder;
+    
     @JsonIgnore
     private String job;
     
+    @JsonIgnore
+    private String comment;
+    
     public ModifyTaskAudit(TasksFilter job, TaskId taskId, ModifyTasks modifyTasks) {
         if (modifyTasks != null) {
-            setComment(modifyTasks.getComment());
+            this.comment = modifyTasks.getComment();
             setTimeout(modifyTasks.getTimeout());
             setJobschedulerId(modifyTasks.getJobschedulerId()); 
         }
@@ -37,7 +41,7 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     @Override
     @JsonIgnore
     public String getComment() {
-        return super.getComment();
+        return comment;
     }
     
     @Override

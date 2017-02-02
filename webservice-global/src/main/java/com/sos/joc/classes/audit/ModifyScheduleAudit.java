@@ -11,10 +11,13 @@ public class ModifyScheduleAudit extends ModifyRunTime implements IAuditLog {
     
     @JsonIgnore
     private String folder;
+    
+    @JsonIgnore
+    private String comment;
 
     public ModifyScheduleAudit(ModifyRunTime modifyRunTime) {
         if (modifyRunTime != null) {
-            setComment(modifyRunTime.getComment());
+            this.comment = modifyRunTime.getComment();
             setSchedule(modifyRunTime.getSchedule());
             setRunTime(modifyRunTime.getRunTime());
             setJobschedulerId(modifyRunTime.getJobschedulerId());
@@ -28,7 +31,7 @@ public class ModifyScheduleAudit extends ModifyRunTime implements IAuditLog {
     @Override
     @JsonIgnore
     public String getComment() {
-        return super.getComment();
+        return comment;
     }
     
     @Override

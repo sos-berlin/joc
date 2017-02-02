@@ -6,9 +6,12 @@ import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 
 public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements IAuditLog {
     
+    @JsonIgnore
+    private String comment;
+    
     public ModifyJobSchedulerAudit(HostPortTimeOutParameter hostPortTimeoutParamSchema) {
         if (hostPortTimeoutParamSchema != null) {
-            setComment(hostPortTimeoutParamSchema.getComment());
+            this.comment = hostPortTimeoutParamSchema.getComment();
             setHost(hostPortTimeoutParamSchema.getHost());
             setPort(hostPortTimeoutParamSchema.getPort());
             setTimeout(hostPortTimeoutParamSchema.getTimeout());
@@ -19,7 +22,7 @@ public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements
     @Override
     @JsonIgnore
     public String getComment() {
-        return super.getComment();
+        return comment;
     }
     
     @Override

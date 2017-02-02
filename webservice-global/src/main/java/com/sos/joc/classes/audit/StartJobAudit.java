@@ -12,8 +12,12 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
     
     @JsonIgnore
     private String folder;
+    
     @JsonIgnore
     private String job;
+    
+    @JsonIgnore
+    private String comment;
     
     public StartJobAudit(StartJob startJob, StartJobs startJobs) {
         if (startJob != null) {
@@ -24,14 +28,14 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
                 this.job = p.getFileName().toString();
             }
         }
-        setComment(startJobs.getComment());
+        this.comment = startJobs.getComment();
         setJobschedulerId(startJobs.getJobschedulerId());
     }
 
     @Override
     @JsonIgnore
     public String getComment() {
-        return super.getComment();
+        return comment;
     }
     
     @Override

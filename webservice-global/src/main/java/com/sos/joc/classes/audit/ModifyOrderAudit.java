@@ -12,10 +12,15 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
     
     @JsonIgnore
     private String folder;
+    
     @JsonIgnore
     private String jobChain;
+    
     @JsonIgnore
     private String orderId;
+    
+    @JsonIgnore
+    private String comment;
 
     public ModifyOrderAudit(ModifyOrder modifyOrder, ModifyOrders modifyOrders) {
         if (modifyOrder != null) {
@@ -28,7 +33,7 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
             }
         }
         if (modifyOrders != null) {
-           setComment(modifyOrders.getComment());
+            this.comment = modifyOrders.getComment();
            setJobschedulerId(modifyOrders.getJobschedulerId());
         }
     }
@@ -36,7 +41,7 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
     @Override
     @JsonIgnore
     public String getComment() {
-        return super.getComment();
+        return comment;
     }
     
     @Override

@@ -12,8 +12,12 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
     
     @JsonIgnore
     private String folder;
+    
     @JsonIgnore
     private String jobChain;
+    
+    @JsonIgnore
+    private String comment;
     
     public ModifyJobChainNodeAudit(ModifyJobChainNode modifyJobChainNode, ModifyJobChainNodes jobChainNodes) {
         if (modifyJobChainNode != null) {
@@ -25,7 +29,7 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
             }
         }
         if (jobChainNodes != null) {
-            setComment(jobChainNodes.getComment()); 
+            this.comment = jobChainNodes.getComment(); 
             setJobschedulerId(jobChainNodes.getJobschedulerId());            
         }
     }
@@ -33,7 +37,7 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
     @Override
     @JsonIgnore
     public String getComment() {
-        return super.getComment();
+        return comment;
     }
     
     @Override

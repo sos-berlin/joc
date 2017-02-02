@@ -7,11 +7,14 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
 
     @JsonIgnore
     private String xml;
+    
+    @JsonIgnore
+    private String comment;
 
     public JobSchedulerCommandAudit(String xml, JobschedulerCommands jobSchedulerCommands) {
         this.xml = xml;
         if (jobSchedulerCommands != null) {
-            setComment(jobSchedulerCommands.getComment());
+            this.comment = jobSchedulerCommands.getComment();
             setJobschedulerId(jobSchedulerCommands.getJobschedulerId());
             setUrl(jobSchedulerCommands.getUrl());
             getAddOrderOrCheckFoldersOrKillTask().addAll(jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask());
@@ -34,7 +37,7 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
     @Override
     @JsonIgnore
     public String getComment() {
-        return super.getComment();
+        return comment;
     }
 
     @Override

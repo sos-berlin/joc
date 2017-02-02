@@ -6,9 +6,12 @@ import com.sos.joc.model.jobscheduler.TimeoutParameter;
 
 public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements IAuditLog {
     
+    @JsonIgnore
+    private String comment;
+    
     public ModifyJobSchedulerClusterAudit(TimeoutParameter timeoutParameter) {
         if (timeoutParameter != null) {
-            setComment(timeoutParameter.getComment());
+            this.comment = timeoutParameter.getComment();
             setTimeout(timeoutParameter.getTimeout());
             setJobschedulerId(timeoutParameter.getJobschedulerId()); 
         }
@@ -17,7 +20,7 @@ public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements 
     @Override
     @JsonIgnore
     public String getComment() {
-        return super.getComment();
+        return comment;
     }
     
     @Override
