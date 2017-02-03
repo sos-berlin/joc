@@ -29,14 +29,17 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
     public JOCDefaultResponse postConfigurations(String accessToken, ConfigurationsFilter configurationsFilter) throws Exception {
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection("API_CALL");
-            Globals.beginTransaction(connection);
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL,configurationsFilter, accessToken, configurationsFilter.getJobschedulerId(), true);
+
             
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            connection = Globals.createSosHibernateStatelessConnection("API_CALL");
+            Globals.beginTransaction(connection);
+            
             String objectType = "";
 
             if (configurationsFilter.getObjectType() == null) {
