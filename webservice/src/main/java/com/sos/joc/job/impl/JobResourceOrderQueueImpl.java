@@ -21,9 +21,8 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
     public JOCDefaultResponse postJobOrderQueue(String accessToken, JobFilter jobFilter) throws Exception {
 
         try {
-            initLogging(API_CALL, jobFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

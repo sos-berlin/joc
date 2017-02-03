@@ -35,20 +35,17 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
-        
-        
+
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            initLogging(API_CALL, jobSchedulerAgentClustersBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerAgentClustersBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerAgentClustersBody, accessToken, jobSchedulerAgentClustersBody
+                    .getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Set<String> agentClusterPaths = new HashSet<String>();
             if (jobSchedulerAgentClustersBody.getAgentClusters() != null) {
                 for (AgentClusterPath agentCluster : jobSchedulerAgentClustersBody.getAgentClusters()) {
@@ -58,15 +55,18 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
             }
             Globals.beginTransaction(connection);
             InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
-            //List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembers(dbItemInventoryInstance.getId(), null);
+            // List<AgentClusterMember> agentClusterMembers =
+            // agentLayer.getInventoryAgentClusterMembers(dbItemInventoryInstance.getId(),
+            // null);
             List<AgentClusterPermanent> agentClusters = agentLayer.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
-            
+
             ArrayList<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
             for (AgentClusterPermanent agentCluster : agentClusters) {
                 if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentCluster.getPath())) {
                     continue;
                 }
-                List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(dbItemInventoryInstance.getId(), agentCluster.getAgentClusterId());
+                List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(dbItemInventoryInstance.getId(),
+                        agentCluster.getAgentClusterId());
                 int countRunningAgents = 0;
                 for (AgentClusterMember agentClusterMember : agentClusterMembers) {
                     if (agentClusterMember.getState().getSeverity() == 0) {
@@ -95,7 +95,7 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
                 }
                 listOfAgentClusters.add(agentCluster);
             }
-            
+
             AgentClusters entity = new AgentClusters();
             entity.setAgentClusters(listOfAgentClusters);
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -106,7 +106,8 @@ public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl impl
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.disconnect(connection);;
+            Globals.disconnect(connection);
+            ;
         }
     }
 }

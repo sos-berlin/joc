@@ -34,20 +34,18 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
     private Boolean isOrderJob;
 
     @Override
-    public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter){
-        
+    public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter) {
+
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            initLogging(API_CALL, jobsFilter);
-            connection.beginTransaction();
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            connection.beginTransaction();
             Boolean compact = jobsFilter.getCompact();
             regex = jobsFilter.getRegex();
             folders = jobsFilter.getFolders();

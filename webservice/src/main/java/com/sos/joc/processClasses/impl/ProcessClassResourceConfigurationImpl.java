@@ -22,9 +22,8 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
             throws Exception {
 
         try {
-            initLogging(API_CALL, processClassConfigurationFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassConfigurationFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getProcessClass().getView().isConfiguration());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassConfigurationFilter, accessToken, processClassConfigurationFilter
+                    .getJobschedulerId(), getPermissonsJocCockpit(accessToken).getProcessClass().getView().isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

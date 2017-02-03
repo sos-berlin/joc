@@ -23,11 +23,10 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
     public JOCDefaultResponse postJobschedulerDb(String accessToken, JobSchedulerId jobSchedulerFilter) {
 
         try {
-            initLogging(API_CALL, jobSchedulerFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
-                return jocDefaultResponse; 
+                return jocDefaultResponse;
             }
 
             DB entity = new DB();

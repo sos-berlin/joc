@@ -19,15 +19,14 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
     @Override
     public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
         try {
-            initLogging(API_CALL, jobChainsFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             OrdersSnapshot entity = Orders.getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

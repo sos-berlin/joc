@@ -24,9 +24,8 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     public JOCDefaultResponse postOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
 
         try {
-            initLogging(API_CALL, orderHistoryFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
-                    .getView().isOrderLog(), true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getOrder().getView().isOrderLog(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

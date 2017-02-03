@@ -7,9 +7,6 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.joc.Globals;
@@ -17,7 +14,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.locks.LockPermanent;
 import com.sos.joc.db.inventory.locks.InventoryLocksDBLayer;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.locks.resource.ILocksResourceP;
 import com.sos.joc.model.common.Folder;
@@ -29,7 +25,6 @@ import com.sos.joc.model.lock.LocksP;
 @Path("locks")
 public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourceP {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourcePImpl.class);
     private static final String API_CALL = "./locks/p";
     private String regex;
     private List<Folder> folders;
@@ -37,17 +32,15 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 
     @Override
     public JOCDefaultResponse postLocksP(String accessToken, LocksFilter locksFilter) throws Exception {
-        LOGGER.debug(API_CALL);
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             // FILTER
             locks = locksFilter.getLocks();
             folders = locksFilter.getFolders();
@@ -88,16 +81,14 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, locksFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, locksFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
-        }finally{
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
             Globals.disconnect(connection);
         }
-        
+
     }
 
 }

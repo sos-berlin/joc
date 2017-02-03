@@ -22,9 +22,8 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
     @Override
     public JOCDefaultResponse postOrder(String accessToken, OrderFilter orderBody) throws Exception {
         try {
-            initLogging(API_CALL, orderBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderBody, accessToken, orderBody.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.shiro.session.InvalidSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +18,6 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.audit.IAuditLog;
 import com.sos.joc.classes.audit.JocAuditLog;
-import com.sos.joc.classes.audit.SecurityAudit;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -41,7 +39,7 @@ public class JOCResourceImpl {
 
     private JocError jocError = new JocError();
 
-    private void initGetPermissions(String accessToken) throws NoUserWithAccessTokenException {
+    protected void initGetPermissions(String accessToken) throws NoUserWithAccessTokenException {
         if (jobschedulerUser == null) {
             this.accessToken = accessToken;
             jobschedulerUser = new JobSchedulerUser(accessToken);
@@ -93,24 +91,26 @@ public class JOCResourceImpl {
         Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp / 1000);
         return Date.from(fromEpochMilli);
     }
-
-    public JOCDefaultResponse init(String accessToken, String schedulerId, boolean permission) throws Exception {
-        return init(accessToken, schedulerId, permission, false);
+    
+    public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws Exception {
+        return init(request, body, accessToken, schedulerId, permission, false);
     }
-
-    public JOCDefaultResponse init(String accessToken, String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws Exception {
+    
+    public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws Exception {
         this.accessToken = accessToken;
         if (jobschedulerUser == null) {
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
+        initLogging(request, body);
         return init(schedulerId, permission, withJobSchedulerDBCheck);
     }
-
-    public JOCDefaultResponse init(String accessToken) throws Exception {
+    
+    public JOCDefaultResponse init(String request, String accessToken) throws Exception {
         this.accessToken = accessToken;
         if (jobschedulerUser == null) {
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
+        initLogging(request, null);
         return init401And440();
     }
 
@@ -127,7 +127,7 @@ public class JOCResourceImpl {
         }
         return ("/" + path.trim()).replaceAll("//+", "/");
     }
-    
+
     public boolean checkRequiredComment(String paramVal) throws JocMissingCommentException {
         if (Globals.auditLogCommentsAreRequired && (paramVal == null || paramVal.isEmpty())) {
             throw new JocMissingCommentException();
@@ -170,44 +170,22 @@ public class JOCResourceImpl {
         }
     }
 
-    public void initLogging(String apiCall, Object body) {
-        jocAuditLog = new JocAuditLog(jobschedulerUser, apiCall);
-        LOGGER.debug(apiCall);
-        jocError.addMetaInfoOnTop(getMetaInfo(apiCall, body));
-    }
-
-    public String[] getMetaInfo(String apiCall, Object body) {
-        String[] strings = new String[3];
-        jocAuditLog.setRequest(apiCall);
-        if (apiCall == null) {
-            apiCall = "-";
-        }
-        strings[0] = "\nREQUEST: " + apiCall;
-        strings[1] = "PARAMS: " + getJsonString(body);
-        try {
-            strings[2] = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
-        } catch (Exception e) {
-            strings[2] = "USER: -";
-        }
-        return strings;
-    }
-
     public void logAuditMessage(IAuditLog body) {
         jocAuditLog.logAuditMessage(body);
-        }
-    
+    }
+
     public void storeAuditLogEntry(IAuditLog body) {
         jocAuditLog.storeAuditLogEntry(body);
-        }
+    }
 
     public String getJsonString(Object body) {
         return jocAuditLog.getJsonString(body);
-            }
+    }
 
     public String getUrl() {
         return dbItemInventoryInstance.getUrl();
     }
-    
+
     public String getBasicAuthorization() {
         return dbItemInventoryInstance.getAuth();
     }
@@ -232,19 +210,39 @@ public class JOCResourceImpl {
         }
         return null;
     }
+    
+    public JOCDefaultResponse accessDeniedResponse() {
+        return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, "Access denied"));
+    }
+
+    private void initLogging(String request, Object body) {
+        String user;
+        try {
+            user = jobschedulerUser.getSosShiroCurrentUser().getUsername().trim();
+        } catch (Exception e) {
+            user = "-";
+        }
+        if (request == null || request.isEmpty()) {
+            request = "-";
+        } else {
+            LOGGER.debug(request);
+        }
+        jocAuditLog = new JocAuditLog(user, request);
+        jocError.addMetaInfoOnTop("\nREQUEST: " + request, "PARAMS: " + getJsonString(body), "USER: " + user);
+    }
 
     private JOCDefaultResponse init(String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws JocException {
         JOCDefaultResponse jocDefaultResponse = init401And440();
 
         if (!permission) {
-            return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, "Access denied"));
+            return accessDeniedResponse();
         }
         if (schedulerId == null) {
             throw new JocMissingRequiredParameterException("undefined 'jobschedulerId'");
         } else {
             jobschedulerId = schedulerId;
         }
-         if (!"".equals(schedulerId)) {
+        if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
         }
         return jocDefaultResponse;
@@ -259,18 +257,20 @@ public class JOCResourceImpl {
 
     private void updateUserInMetaInfo() {
         try {
-            String userMetaInfo = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
-            List<String> metaInfo = getJocError().getMetaInfo();
-            if (metaInfo.size() > 2) {
-                metaInfo.remove(2);
-                metaInfo.add(2, userMetaInfo);
+            if (jocError != null) {
+                String userMetaInfo = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
+                List<String> metaInfo = jocError.getMetaInfo();
+                if (metaInfo.size() > 2) {
+                    metaInfo.remove(2);
+                    metaInfo.add(2, userMetaInfo);
+                } 
             }
         } catch (Exception e) {
         }
     }
-    
-    public void getJobSchedulerInstanceByHostPort(String host, Integer port, String schedulerId) throws DBConnectionRefusedException, DBMissingDataException,
-            DBInvalidDataException {
+
+    public void getJobSchedulerInstanceByHostPort(String host, Integer port, String schedulerId) throws DBConnectionRefusedException,
+            DBMissingDataException, DBInvalidDataException {
         if (host != null && !host.isEmpty() && port != null && port > 0) {
 
             JobSchedulerIdentifier jobSchedulerIdentifier = new JobSchedulerIdentifier(schedulerId);
@@ -284,13 +284,14 @@ public class JOCResourceImpl {
             } catch (Exception e) {
                 throw new DBConnectionRefusedException(e);
             }
-            
+
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
             dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(jobSchedulerIdentifier);
-            
+
             if (dbItemInventoryInstance == null) {
-                String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s", jobSchedulerIdentifier.getId(),
-                        jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(), DBLayer.TABLE_INVENTORY_INSTANCES);
+                String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
+                        jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
+                        DBLayer.TABLE_INVENTORY_INSTANCES);
                 throw new DBInvalidDataException(errMessage);
             }
         }

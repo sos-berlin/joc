@@ -35,14 +35,12 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            initLogging(API_CALL, agentFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, agentFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerUniversalAgent().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, agentFilter, accessToken, agentFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             AgentsP entity = new AgentsP();
             List<AgentP> listOfAgents = new ArrayList<AgentP>();
             Long instanceId = dbItemInventoryInstance.getId();
@@ -69,7 +67,7 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }finally{
+        } finally {
             Globals.disconnect(connection);
         }
     }

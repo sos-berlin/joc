@@ -25,18 +25,16 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     private static final String API_CALL = "./job/p";
 
     @Override
-    public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter)  {
+    public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) {
 
         SOSHibernateConnection connection = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, jobFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             checkRequiredParameter("job", jobFilter.getJob());
             Long instanceId = dbItemInventoryInstance.getId();
@@ -54,9 +52,9 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-    } finally {
-        Globals.disconnect(connection);
-    }
+        } finally {
+            Globals.disconnect(connection);
+        }
 
     }
 

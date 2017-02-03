@@ -37,14 +37,12 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, ordersFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken, ordersFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             OrdersP entity = new OrdersP();
             Long instanceId = dbItemInventoryInstance.getId();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
@@ -89,7 +87,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }finally{
+        } finally {
             Globals.disconnect(connection);
         }
     }

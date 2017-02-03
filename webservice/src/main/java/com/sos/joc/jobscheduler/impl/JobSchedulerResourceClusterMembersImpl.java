@@ -35,24 +35,22 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, jobSchedulerFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId, getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMasterCluster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerId, 
+                    getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             List<JobSchedulerV> masters = new ArrayList<JobSchedulerV>();
-            
+
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
             List<DBItemInventoryInstance> schedulersFromDb = instanceLayer.getInventoryInstancesBySchedulerId(jobSchedulerId);
-            if(schedulersFromDb != null && !schedulersFromDb.isEmpty()) {
+            if (schedulersFromDb != null && !schedulersFromDb.isEmpty()) {
                 List<JobSchedulerVCallable> tasks = new ArrayList<JobSchedulerVCallable>();
                 for (DBItemInventoryInstance instance : schedulersFromDb) {
                     tasks.add(new JobSchedulerVCallable(instance, accessToken));
                 }
-                if(!tasks.isEmpty()) {
+                if (!tasks.isEmpty()) {
                     ExecutorService executorService = Executors.newFixedThreadPool(10);
                     for (Future<JobSchedulerV> result : executorService.invokeAll(tasks)) {
                         try {

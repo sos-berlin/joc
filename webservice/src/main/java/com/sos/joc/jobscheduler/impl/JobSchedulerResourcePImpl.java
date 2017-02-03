@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.JobSchedulerPermanent;
@@ -22,9 +21,8 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
     @Override
     public JOCDefaultResponse postJobschedulerP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
         try {
-            initLogging(API_CALL, jobSchedulerId);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken, jobSchedulerId.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -40,5 +38,5 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
         } finally {
         }
     }
-    
+
 }

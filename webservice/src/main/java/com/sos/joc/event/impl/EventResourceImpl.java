@@ -52,17 +52,16 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         Map<String, JobSchedulerEvent> eventList = new HashMap<String, JobSchedulerEvent>();
         Session session = null;
         threadName = Thread.currentThread().getName();
-        
+
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection("postEvent");
-            initLogging(API_CALL, eventBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, eventBody, accessToken, "", getPermissonsJocCockpit(accessToken)
+                    .getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection("postEvent");
             try {
                 session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession(false);
                 if (session != null) {
@@ -70,8 +69,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 }
             } catch (InvalidSessionException e1) {
             }
-            //Not a good idea: Same session in multiple tabs closed http clients vice versa
-            //Globals.forceClosingHttpClients(session);
+            // Not a good idea: Same session in multiple tabs closed http
+            // clients vice versa
+            // Globals.forceClosingHttpClients(session);
 
             if (eventBody.getClose() != null && eventBody.getClose()) {
                 entity.setEvents(null);
@@ -88,7 +88,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             List<JOCJsonCommand> jocJsonCommands = new ArrayList<JOCJsonCommand>();
 
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
-            
+
             Globals.beginTransaction(connection);
 
             for (JobSchedulerObjects jsObject : eventBody.getJobscheduler()) {
@@ -133,13 +133,13 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     throw (Exception) e.getCause();
                 }
             } finally {
-                //Globals.forceClosingHttpClients(session);
+                // Globals.forceClosingHttpClients(session);
                 for (JOCJsonCommand command : jocJsonCommands) {
                     command.forcedClosingHttpClient();
                 }
                 executorService.shutdown();
             }
-            
+
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
 
@@ -173,7 +173,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         }
         return JOCDefaultResponse.responseStatus200(entity);
     }
-    
+
     private boolean concurrentEventsCallIsStarted(Session session) {
         boolean concurrentEventsCallIsStarted = false;
         String sessionUuid = null;
@@ -184,7 +184,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             }
         }
         if (sessionUuid != null && !sessionUuid.equals(threadName)) {
-            concurrentEventsCallIsStarted = true; 
+            concurrentEventsCallIsStarted = true;
         }
         return concurrentEventsCallIsStarted;
     }

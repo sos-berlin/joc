@@ -32,10 +32,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private static final String UNSTOP = "unstop";
     private static String API_CALL = "./jobs/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
-    
+
     @Override
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
-        initLogging(API_CALL + STOP, modifyJobs);
         try {
             return postJobsCommand(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJob().isStop(), modifyJobs);
         } catch (JocException e) {
@@ -48,7 +47,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
     @Override
     public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
-        initLogging(API_CALL + UNSTOP, modifyJobs);
         try {
             return postJobsCommand(accessToken, UNSTOP, getPermissonsJocCockpit(accessToken).getJob().isUnstop(), modifyJobs);
         } catch (JocException e) {
@@ -61,7 +59,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
     @Override
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
-        initLogging(API_CALL + SET_RUN_TIME, modifyJobs);
         try {
             return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().isSetRunTime(), modifyJobs);
         } catch (JocException e) {
@@ -74,7 +71,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
     @Override
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        initLogging(API_CALL + END, modifyJobs);
         try {
             return postJobsCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().isEndAllTasks(), modifyJobs);
         } catch (JocException e) {
@@ -87,7 +83,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
     @Override
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        initLogging(API_CALL + SUSPEND, modifyJobs);
         try {
             return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(accessToken).getJob().isSuspendAllTasks(), modifyJobs);
         } catch (JocException e) {
@@ -100,7 +95,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
     @Override
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        initLogging(API_CALL + CONTINUE, modifyJobs);
         try {
             return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(accessToken).getJob().isContinueAllTasks(), modifyJobs);
         } catch (JocException e) {
@@ -119,9 +113,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
             checkRequiredParameter("job", modifyJob.getJob());
             if (SET_RUN_TIME.equals(command)) {
-                checkRequiredParameter("runTime", modifyJob.getRunTime()); 
+                checkRequiredParameter("runTime", modifyJob.getRunTime());
             }
-            
+
             XMLBuilder xml = new XMLBuilder("modify_job");
             xml.addAttribute("job", normalizePath(modifyJob.getJob())).addAttribute("cmd", command);
             if (SET_RUN_TIME.equals(command)) {
@@ -133,7 +127,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 } catch (Exception e) {
                     throw new JobSchedulerInvalidResponseDataException(modifyJob.getRunTime());
                 }
-            } 
+            }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
             storeAuditLogEntry(jobAudit);
@@ -148,7 +142,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobs modifyJobs) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobs.getJobschedulerId(), permission);
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyJobs, accessToken, modifyJobs.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

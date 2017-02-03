@@ -33,9 +33,8 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     @Override
     public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
         try {
-            initLogging(API_CALL, processClassFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getProcessClass().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken, processClassFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getProcessClass().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -88,7 +87,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 executorService.shutdown();
                 entity.setProcessClasses(listProcessClasses);
             }
-            
+
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
 

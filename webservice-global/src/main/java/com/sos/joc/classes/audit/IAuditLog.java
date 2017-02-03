@@ -11,4 +11,6 @@ public interface IAuditLog {
     public String getJobChain();
     
     public String getOrderId();
+    
+    public String getJobschedulerId();
 }

@@ -1,11 +1,9 @@
 package com.sos.joc.classes.audit;
- 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
- 
-
 
 public class SecurityAudit implements IAuditLog {
+
     @JsonIgnore
     private String comment;
 
@@ -18,7 +16,7 @@ public class SecurityAudit implements IAuditLog {
     public String getComment() {
         return comment;
     }
-    
+
     @Override
     @JsonIgnore
     public String getFolder() {
@@ -42,10 +40,15 @@ public class SecurityAudit implements IAuditLog {
     public String getOrderId() {
         return null;
     }
-    
+
     @Override
-    public String toString(){
+    @JsonIgnore
+    public String getJobschedulerId() {
+        return "";
+    }
+
+    @Override
+    public String toString() {
         return "{}";
-        
     }
 }

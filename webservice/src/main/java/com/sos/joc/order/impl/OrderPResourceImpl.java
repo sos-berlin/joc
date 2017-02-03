@@ -30,20 +30,18 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
     public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            initLogging(API_CALL, orderFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken, orderFilter.getJobschedulerId(), 
+                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Long instanceId = dbItemInventoryInstance.getId();
             Boolean compact = orderFilter.getCompact();
             OrderP200 entity = new OrderP200();
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
-            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePath(orderFilter.getJobChain()),
-                    orderFilter.getOrderId(), instanceId);
+            DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePath(orderFilter.getJobChain()), orderFilter
+                    .getOrderId(), instanceId);
             OrderP order = new OrderP();
             order.setSurveyDate(dbItemInventoryOrder.getModified());
             order.setPath(dbItemInventoryOrder.getName());
@@ -74,7 +72,7 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }finally{
+        } finally {
             Globals.disconnect(connection);
         }
 
@@ -82,8 +80,9 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
 
     private Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
         DBLayerReporting dbLayer = new DBLayerReporting(connection);
-         
-        Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order,Globals.sosShiroProperties.getProperty("limit_for_average_calculation",WebserviceConstants.DEFAULT_LIMIT));
+
+        Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order, Globals.sosShiroProperties.getProperty(
+                "limit_for_average_calculation", WebserviceConstants.DEFAULT_LIMIT));
         if (estimatedDurationInMillis != null) {
             return estimatedDurationInMillis.intValue() / 1000;
         }

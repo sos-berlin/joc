@@ -30,14 +30,13 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
             jobFilter.setJob(normalizePath(job));
             jobFilter.setJobschedulerId(jobschedulerId);
             jobFilter.setCompact(null);
-            initLogging(API_CALL, jobFilter);
 
             if (accessToken == null) {
                 accessToken = queryAccessToken;
             }
 
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken).getJob().getView()
-                    .isConfiguration());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken)
+                    .getJob().getView().isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -55,7 +54,8 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
             if (description.isEmpty()) {
                 throw new JobSchedulerBadRequestException(String.format("%1$s doesn't have a description", jobFilter.getJob()));
             }
-            if (Pattern.compile("<\\?xml-stylesheet [^\\?]* href\\s*=\\s*\"" + Pattern.quote(XSL_FILE) + "\"[^\\?]*\\?>").matcher(description).find()) {
+            if (Pattern.compile("<\\?xml-stylesheet [^\\?]* href\\s*=\\s*\"" + Pattern.quote(XSL_FILE) + "\"[^\\?]*\\?>").matcher(description)
+                    .find()) {
                 // JITL-Job description
                 description = ConfigurationUtils.transformXmlToHtml(description, getClass().getResourceAsStream("/" + XSL_FILE));
             }

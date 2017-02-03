@@ -20,9 +20,8 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
     @Override
     public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilter lockBody) throws Exception {
         try {
-            initLogging(API_CALL, lockBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, lockBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock().getView()
-                    .isConfiguration());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, lockBody, accessToken, lockBody.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getLock().getView().isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -34,8 +33,7 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
                 boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
                 String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", lockPath);
                 String lockCommand = jocXmlCommand.getShowStateCommand("folder lock", "folders no_subfolders source", getParent(lockPath));
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, lockCommand, xPath, "lock", responseInHtml,
-                        accessToken);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, lockCommand, xPath, "lock", responseInHtml, accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

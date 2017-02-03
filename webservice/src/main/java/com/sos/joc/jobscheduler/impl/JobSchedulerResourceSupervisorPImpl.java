@@ -30,16 +30,13 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            initLogging(API_CALL, jobSchedulerId);
-            Globals.beginTransaction(connection);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken, jobSchedulerId.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            Globals.beginTransaction(connection);
             JobSchedulerP200 entity = new JobSchedulerP200();
 
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
@@ -57,7 +54,7 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
                 entity.setJobscheduler(new JobSchedulerP());
             }
             entity.setDeliveryDate(Date.from(Instant.now()));
-            
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

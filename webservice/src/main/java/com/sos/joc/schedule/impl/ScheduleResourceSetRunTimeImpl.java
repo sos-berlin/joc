@@ -29,8 +29,8 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
     @Override
     public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRunTime modifyRuntime) throws Exception {
         try {
-            initLogging(API_CALL, modifyRuntime);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyRuntime.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule().isEdit());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken, modifyRuntime.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getSchedule().isEdit());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -42,17 +42,20 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             String schedule = normalizePath(modifyRuntime.getSchedule());
             XMLBuilder command = new XMLBuilder("modify_hot_folder");
-            // the below command results in an ERROR: XMLBuilder.parse creates Element with root "schedule" which will be added to 
+            // the below command results in an ERROR: XMLBuilder.parse creates
+            // Element with root "schedule" which will be added to
             // already existing "schedule" Element with name Attribute
-//            command.addAttribute("folder", getParent(schedule)).addElement("schedule").addAttribute("name", Paths.get(schedule).getFileName()
-//                    .toString()).add(XMLBuilder.parse(modifyRuntime.getRunTime()));
-            command.addAttribute("folder", getParent(schedule)).add(
-                    XMLBuilder.parse(modifyRuntime.getRunTime()).addAttribute("name", Paths.get(schedule).getFileName().toString()));
+            // command.addAttribute("folder",
+            // getParent(schedule)).addElement("schedule").addAttribute("name",
+            // Paths.get(schedule).getFileName()
+            // .toString()).add(XMLBuilder.parse(modifyRuntime.getRunTime()));
+            command.addAttribute("folder", getParent(schedule)).add(XMLBuilder.parse(modifyRuntime.getRunTime()).addAttribute("name", Paths.get(
+                    schedule).getFileName().toString()));
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
             storeAuditLogEntry(scheduleAudit);
-            
+
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             AUDIT_LOGGER.error(e.getMessage());

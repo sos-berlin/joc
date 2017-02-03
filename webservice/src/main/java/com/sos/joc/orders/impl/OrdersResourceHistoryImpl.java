@@ -36,14 +36,13 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, ordersFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getHistory().isView());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken, ordersFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getHistory().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(connection);
 
             List<OrderHistoryItem> listHistory = new ArrayList<OrderHistoryItem>();
@@ -94,7 +93,8 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 history.setStartTime(dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime());
                 HistoryState state = new HistoryState();
 
-                if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null) {
+                if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null && dbItemReportTriggerWithResult
+                        .getDbItemReportTrigger().getEndTime() == null) {
                     state.setSeverity(1);
                     state.set_text(HistoryStateText.INCOMPLETE);
                 } else {
@@ -102,7 +102,8 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                         state.setSeverity(2);
                         state.set_text(HistoryStateText.FAILED);
                     } else {
-                        if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() != null && !dbItemReportTriggerWithResult.haveError()) {
+                        if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() != null && !dbItemReportTriggerWithResult
+                                .haveError()) {
                             state.setSeverity(0);
                             state.set_text(HistoryStateText.SUCCESSFUL);
                         }
@@ -113,8 +114,8 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 history.setSurveyDate(dbItemReportTriggerWithResult.getDbItemReportTrigger().getCreated());
 
                 if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher(dbItemReportTriggerWithResult.getDbItemReportTrigger().getParentName() + ","
-                            + dbItemReportTriggerWithResult.getDbItemReportTrigger().getName());
+                    Matcher regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher(dbItemReportTriggerWithResult.getDbItemReportTrigger()
+                            .getParentName() + "," + dbItemReportTriggerWithResult.getDbItemReportTrigger().getName());
                     add = regExMatcher.find();
                 }
 

@@ -25,9 +25,8 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
     @Override
     public JOCDefaultResponse postSchedule(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
         try {
-            initLogging(API_CALL, scheduleFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, scheduleFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleFilter, accessToken, scheduleFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -42,7 +41,7 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
 
             String xPath = String.format("/spooler/answer//schedules/schedule[@path='%1$s']", schedulePath);
             Element scheduleElement = (Element) jocXmlCommand.getSosxml().selectSingleNode(xPath);
-            
+
             if (scheduleElement == null) {
                 throw new JobSchedulerBadRequestException(String.format("Schedule '%1$s' doesn't exit.", schedulePath));
             }

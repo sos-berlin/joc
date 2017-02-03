@@ -38,14 +38,12 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, schedulesFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulesFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, schedulesFilter, accessToken, schedulesFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             // FILTER
             folders = schedulesFilter.getFolders();
             schedules = schedulesFilter.getSchedules();

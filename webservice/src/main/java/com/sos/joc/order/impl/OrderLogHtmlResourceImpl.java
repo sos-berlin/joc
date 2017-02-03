@@ -28,14 +28,12 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
             orderHistoryFilter.setJobschedulerId(jobschedulerId);
             orderHistoryFilter.setMime(LogMime.HTML);
 
-            initLogging(API_CALL, orderHistoryFilter);
-
             if (accessToken == null) {
                 accessToken = queryAccessToken;
             }
 
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken).getOrder().getView().isOrderLog(),
-                    true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken, jobschedulerId, getPermissonsJocCockpit(
+                    accessToken).getOrder().getView().isOrderLog(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

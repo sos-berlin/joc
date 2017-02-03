@@ -26,10 +26,9 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
     private static final String STOP = "stop";
     private static String API_CALL = "./job_chains/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
-    
+
     @Override
     public JOCDefaultResponse postJobChainsStop(String accessToken, ModifyJobChains modifyJobChains) {
-        initLogging(API_CALL + STOP, modifyJobChains);
         try {
             return postJobChainsCommand(STOP, accessToken, getPermissonsJocCockpit(accessToken).getJobChain().isStop(), modifyJobChains);
         } catch (JocException e) {
@@ -42,7 +41,6 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 
     @Override
     public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifyJobChains modifyJobChains) {
-        initLogging(API_CALL + UNSTOP, modifyJobChains);
         try {
             return postJobChainsCommand(UNSTOP, accessToken, getPermissonsJocCockpit(accessToken).getJobChain().isUnstop(), modifyJobChains);
         } catch (JocException e) {
@@ -55,7 +53,8 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
 
     private JOCDefaultResponse postJobChainsCommand(String command, String accessToken, boolean permission, ModifyJobChains modifyJobChains)
             throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyJobChains.getJobschedulerId(), permission);
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyJobChains, accessToken, modifyJobChains.getJobschedulerId(),
+                permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
@@ -92,7 +91,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
             }
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
             storeAuditLogEntry(jobChainAudit);
-            
+
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), jobChain));

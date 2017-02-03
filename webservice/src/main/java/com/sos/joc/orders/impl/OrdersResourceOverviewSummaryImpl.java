@@ -26,22 +26,20 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-                        
-            initLogging(API_CALL, ordersFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken, ordersFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
             Globals.beginTransaction(connection);
 
             ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
-          
+
             if (ordersFilter.getDateFrom() != null) {
                 reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDate(ordersFilter.getDateFrom(), ordersFilter.getTimeZone()));
             }
@@ -53,8 +51,8 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
                     reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(), orderPath.getOrderId());
                 }
-            } 
- 
+            }
+
             OrdersOverView entity = new OrdersOverView();
             entity.setDeliveryDate(new Date());
             entity.setSurveyDate(new Date());
@@ -64,7 +62,7 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 
             reportTriggerDBLayer.getFilter().setSuccess(true);
             ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
- 
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -75,8 +73,5 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             Globals.disconnect(connection);
         }
     }
-
-          
- 
 
 }

@@ -33,9 +33,8 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     @Override
     public JOCDefaultResponse postOrdersAdd(String accessToken, ModifyOrders modifyOrders) throws Exception {
         try {
-            initLogging(API_CALL, modifyOrders);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobChain().isAddOrder());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobChain().isAddOrder());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

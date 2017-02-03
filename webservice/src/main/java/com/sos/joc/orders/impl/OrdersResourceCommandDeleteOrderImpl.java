@@ -28,9 +28,8 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrders modifyOrders) {
         try {
-            initLogging(API_CALL, modifyOrders);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getOrder().getDelete().isTemporary());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getOrder().getDelete().isTemporary());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

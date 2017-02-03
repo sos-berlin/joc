@@ -35,9 +35,8 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
     @Override
     public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
         try {
-            initLogging(API_CALL, schedulesFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, schedulesFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, schedulesFilter, accessToken, schedulesFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getSchedule().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -46,7 +45,7 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             String command = jocXmlCommand.getShowStateCommand("folder schedule", "folders", null);
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
             Date surveyDate = jocXmlCommand.getSurveyDate();
-            
+
             NodeList schedules = jocXmlCommand.getSosxml().selectNodeList("/spooler/answer//schedules/schedule");
             List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
 
@@ -59,8 +58,8 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             for (int i = 0; i < schedules.getLength(); i++) {
                 Element scheduleElement = (Element) schedules.item(i);
                 ScheduleVolatile scheduleV = new ScheduleVolatile(surveyDate, scheduleElement);
-                
-                if(!setOfSchedules.isEmpty() && !setOfSchedules.contains(scheduleV.getPath())) {
+
+                if (!setOfSchedules.isEmpty() && !setOfSchedules.contains(scheduleV.getPath())) {
                     continue;
                 }
                 if (!FilterAfterResponse.matchRegex(schedulesFilter.getRegex(), scheduleV.getPath())) {
@@ -96,7 +95,7 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
         for (Folder folder : folders) {
             checkRequiredParameter("folders.folder", folder.getFolder());
             java.nio.file.Path folderFromFilter = Paths.get(normalizeFolder(folder.getFolder()));
-            if (folder.getRecursive() == null || folder.getRecursive() ) {
+            if (folder.getRecursive() == null || folder.getRecursive()) {
                 if (folderOfSchedule.startsWith(folderFromFilter)) {
                     return true;
                 }

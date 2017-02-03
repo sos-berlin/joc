@@ -24,9 +24,8 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
     public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
 
         try {
-            initLogging(API_CALL, jobChainsFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobChain()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobChain().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

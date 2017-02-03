@@ -36,19 +36,17 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
 
     @Override
     public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) {
-        
-       SOSHibernateConnection connection = null;
+
+        SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, jobChainsFilter);
-
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobChain()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobChain().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+
             compact = jobChainsFilter.getCompact();
             folders = jobChainsFilter.getFolders();
             jobChainPaths = jobChainsFilter.getJobChains();
@@ -126,7 +124,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }finally{
+        } finally {
             Globals.disconnect(connection);
         }
     }

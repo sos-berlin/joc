@@ -38,7 +38,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {
         try {
-            initLogging(API_CALL + "start", modifyOrders);
             return postOrdersCommand(accessToken, "start", getPermissonsJocCockpit(accessToken).getOrder().isStart(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -51,7 +50,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrders modifyOrders) {
         try {
-            initLogging(API_CALL + "suspend", modifyOrders);
             return postOrdersCommand(accessToken, "suspend", getPermissonsJocCockpit(accessToken).getOrder().isSuspend(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -64,7 +62,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrders modifyOrders) {
         try {
-            initLogging(API_CALL + "resume", modifyOrders);
             return postOrdersCommand(accessToken, "resume", getPermissonsJocCockpit(accessToken).getOrder().isResume(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -77,7 +74,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrders modifyOrders) {
         try {
-            initLogging(API_CALL + "reset", modifyOrders);
             return postOrdersCommand(accessToken, "reset", getPermissonsJocCockpit(accessToken).getOrder().isReset(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -90,7 +86,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrders modifyOrders) {
         try {
-            initLogging(API_CALL + "set_state", modifyOrders);
             return postOrdersCommand(accessToken, "set_state", getPermissonsJocCockpit(accessToken).getOrder().isSetState(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -103,7 +98,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
-            initLogging(API_CALL + "set_run_time", modifyOrders);
             return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().isSetRunTime(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -116,7 +110,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
         try {
-            initLogging(API_CALL + "remove_setback", modifyOrders);
             return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().isRemoveSetback(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -213,7 +206,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyOrders.getJobschedulerId(), permission);
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyOrders, accessToken, modifyOrders.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

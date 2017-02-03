@@ -30,14 +30,11 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, null);
-            Globals.beginTransaction(connection);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
             Set<String> jobSchedulerIds = new HashSet<String>();

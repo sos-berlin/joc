@@ -35,16 +35,15 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
     public JOCDefaultResponse postAuditLog(String accessToken, AuditLogFilter auditLogFilter) throws Exception {
         SOSHibernateConnection connection = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            initLogging(API_CALL, auditLogFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, auditLogFilter.getJobschedulerId(),
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, auditLogFilter, accessToken, auditLogFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getAuditLog().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             String schedulerId = auditLogFilter.getJobschedulerId();
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
-            List<DBItemAuditLog> auditLogs = new ArrayList<DBItemAuditLog>(); 
+            List<DBItemAuditLog> auditLogs = new ArrayList<DBItemAuditLog>();
             // filters
             List<Folder> filterFolders = auditLogFilter.getFolders();
             List<JobPath> filterJobs = auditLogFilter.getJobs();
@@ -65,7 +64,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             } else if (filterJobs != null && !filterJobs.isEmpty()) {
                 auditLogs = dbLayer.getAuditLogByJobs(schedulerId, filterJobs, filterLimit, filterFrom, filterTo);
             } else if (filterFolders != null && !filterFolders.isEmpty()) {
-                Set<String> folders = new HashSet<String>(); 
+                Set<String> folders = new HashSet<String>();
                 for (Folder folder : filterFolders) {
                     folders.add(folder.getFolder());
                 }
@@ -73,7 +72,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             } else {
                 auditLogs = dbLayer.getAllAuditLogs(schedulerId, filterLimit, filterFrom, filterTo);
             }
-            if(filterRegex != null && !filterRegex.isEmpty()) {
+            if (filterRegex != null && !filterRegex.isEmpty()) {
                 auditLogs = filterComment(auditLogs, filterRegex);
             }
             AuditLog entity = new AuditLog();
@@ -103,7 +102,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         }
         return filteredAuditLogs;
     }
-    
+
     private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb) {
         List<AuditLogItem> audits = new ArrayList<AuditLogItem>();
         for (DBItemAuditLog auditLogFromDb : auditLogsFromDb) {
@@ -120,5 +119,5 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         }
         return audits;
     }
-    
+
 }

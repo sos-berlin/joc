@@ -10,21 +10,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.joc.Globals;
-import com.sos.joc.classes.JobSchedulerUser;
 import com.sos.joc.classes.WebserviceConstants;
 
 public class JocAuditLog {
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
-    private JobSchedulerUser jobschedulerUser;
-    private String jobschedulerId;
-    private String request;
-    private ObjectMapper mapper = new ObjectMapper();
 
+    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JocAuditLog.class);
+    private String user;
+    private String request;
+
+    public JocAuditLog(String user, String request) {
+        this.user = user;
+        this.request = request;
+    }
     
-    public JocAuditLog(JobSchedulerUser jobschedulerUser, String jobschedulerId) {
-        super();
-        this.jobschedulerUser = jobschedulerUser;
-        this.jobschedulerId = jobschedulerId;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public void logAuditMessage() {
@@ -35,28 +36,21 @@ public class JocAuditLog {
         try {
             String params = getJsonString(body);
             String comment = "-";
-            if (body != null){
+            if (body != null) {
                 comment = body.getComment();
             }
-            comment = "COMMENT: " + comment;
-            String user =  jobschedulerUser.getSosShiroCurrentUser().getUsername().trim();
-            AUDIT_LOGGER.info(String.format("%1$s - %2$s - %3$s - %4$s", request, user, params, comment));
+            AUDIT_LOGGER.info(String.format("REQUEST: %1$s - USER: %2$s - PARAMS: %3$s - COMMENT: %4$s", request, user, params, comment));
         } catch (Exception e) {
-            AUDIT_LOGGER.error("Cannot write to audit log file", e);
+            LOGGER.error("Cannot write to audit log file", e);
         }
     }
-    
+
     public void storeAuditLogEntry(IAuditLog body) {
-        String auditParams = getJsonString(body);
-        String auditAccount = null;
-        try {
-            auditAccount = jobschedulerUser.getSosShiroCurrentUser().getUsername();
-        } catch (Exception e) {}
         DBItemAuditLog auditLogToDb = new DBItemAuditLog();
-        auditLogToDb.setSchedulerId(jobschedulerId);
-        auditLogToDb.setAccount(auditAccount);
+        auditLogToDb.setSchedulerId(body.getJobschedulerId());
+        auditLogToDb.setAccount(user);
         auditLogToDb.setRequest(request);
-        auditLogToDb.setParameters(auditParams);
+        auditLogToDb.setParameters(getJsonString(body));
         auditLogToDb.setJob(body.getJob());
         auditLogToDb.setJobChain(body.getJobChain());
         auditLogToDb.setOrderId(body.getOrderId());
@@ -69,23 +63,18 @@ public class JocAuditLog {
             connection.save(auditLogToDb);
             connection.disconnect();
         } catch (Exception e) {
-            AUDIT_LOGGER.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
-
     }
-    
+
     public String getJsonString(Object body) {
         if (body != null) {
             try {
-                return mapper.writeValueAsString(body);
+                return new ObjectMapper().writeValueAsString(body);
             } catch (Exception e) {
                 return body.toString();
             }
         }
         return "-";
-    }
-
-    public void setRequest(String request) {
-        this.request = request;
     }
 }

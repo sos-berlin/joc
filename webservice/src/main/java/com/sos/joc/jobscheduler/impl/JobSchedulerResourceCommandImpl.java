@@ -24,9 +24,8 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
     public JOCDefaultResponse postJobschedulerCommands(String accessToken, JobschedulerCommands jobSchedulerCommands) throws Exception {
 
         try {
-
-            initLogging(API_CALL_COMMAND, jobSchedulerCommands.getJobschedulerId());
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerCommands.getJobschedulerId(), true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_COMMAND, jobSchedulerCommands, accessToken, jobSchedulerCommands
+                    .getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -61,7 +60,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             logAuditMessage(jobschedulerAudit);
             String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             storeAuditLogEntry(jobschedulerAudit);
-            
+
             return JOCDefaultResponse.responseStatus200(answer, "application/xml");
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

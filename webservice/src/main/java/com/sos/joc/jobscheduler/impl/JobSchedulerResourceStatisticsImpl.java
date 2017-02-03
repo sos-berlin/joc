@@ -17,9 +17,8 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
     public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerId jobSchedulerFilter) throws Exception {
 
         try {
-            initLogging(API_CALL, jobSchedulerFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

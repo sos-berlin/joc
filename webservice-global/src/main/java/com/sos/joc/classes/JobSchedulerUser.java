@@ -7,9 +7,6 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
-import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 
 public class JobSchedulerUser {

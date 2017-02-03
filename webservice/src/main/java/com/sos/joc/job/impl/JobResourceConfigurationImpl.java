@@ -21,9 +21,8 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
     public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilter jobBody) throws Exception {
 
         try {
-            initLogging(API_CALL, jobBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobBody, accessToken, jobBody.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -33,8 +32,8 @@ public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJo
             if (checkRequiredParameter("job", jobBody.getJob())) {
                 boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;
                 String jobCommand = jocXmlCommand.getShowJobCommand(normalizePath(jobBody.getJob()), "source", 0, 0);
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job",
-                        "job", responseInHtml, accessToken);
+                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml,
+                        accessToken);
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

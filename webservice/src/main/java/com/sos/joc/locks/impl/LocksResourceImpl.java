@@ -9,8 +9,6 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -19,7 +17,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.locks.LockVolatile;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.locks.resource.ILocksResource;
@@ -32,16 +29,14 @@ import com.sos.joc.model.lock.LocksV;
 @Path("locks")
 public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocksResourceImpl.class);
     private static final String API_CALL = "./locks";
     private JOCXmlCommand jocXmlCommand;
 
     @Override
     public JOCDefaultResponse postLocks(String accessToken, LocksFilter locksFilter) throws Exception {
-        LOGGER.debug(API_CALL);
         try {
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -79,12 +74,10 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
 
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
-            e.addErrorMetaInfo(getMetaInfo(API_CALL, locksFilter));
+            e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            JocError err = new JocError();
-            err.addMetaInfoOnTop(getMetaInfo(API_CALL, locksFilter));
-            return JOCDefaultResponse.responseStatusJSError(e, err);
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
 

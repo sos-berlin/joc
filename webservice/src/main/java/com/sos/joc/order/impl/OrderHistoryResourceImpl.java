@@ -31,15 +31,12 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            initLogging(API_CALL, orderHistoryFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, orderHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(connection);
 
             List<OrderStepHistoryItem> listOrderStepHistory = new ArrayList<OrderStepHistoryItem>();
@@ -62,7 +59,7 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
                 orderStepHistory.setStartTime(orderStepHistoryItem.getStartTime());
                 orderStepHistory.setStep(orderStepHistoryItem.getStep().intValue());
                 orderStepHistory.setAgent(orderStepHistoryItem.getAgentUrl());
-         //       orderStepHistory.setClusterMember(dbItemReportExecution.getClusterMemberId());
+                // orderStepHistory.setClusterMember(dbItemReportExecution.getClusterMemberId());
                 orderStepHistory.setExitCode(orderStepHistoryItem.getExitCode());
                 orderStepHistory.setTaskId(orderStepHistoryItem.getHistoryIdAsString());
                 listOrderStepHistory.add(orderStepHistory);
@@ -83,6 +80,6 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
             Globals.disconnect(connection);
-        } 
+        }
     }
 }

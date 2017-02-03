@@ -15,8 +15,7 @@ public class TouchResourceImpl extends JOCResourceImpl implements ITouchResource
     @Override
     public JOCDefaultResponse postTouch(String accessToken) throws Exception {
         try {
-            initLogging(API_CALL, null);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, accessToken);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

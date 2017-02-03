@@ -37,9 +37,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
     public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
 
         try {
-            initLogging(API_CALL, ordersBody);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, ordersBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken, ordersBody.getJobschedulerId(), 
+                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -95,8 +94,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                 OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken);
                 listOrders.putAll(callable.call());
             }
-            
-            if(tasks != null && !tasks.isEmpty()) {
+
+            if (tasks != null && !tasks.isEmpty()) {
                 ExecutorService executorService = Executors.newFixedThreadPool(10);
                 for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
                     try {

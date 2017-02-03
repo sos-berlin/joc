@@ -30,26 +30,23 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
     @Override
     public JOCDefaultResponse postJobChainP(String accessToken, JobChainFilter jobChainFilter) {
 
-
         SOSHibernateConnection connection = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            initLogging(API_CALL, jobChainFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobChain()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainFilter, accessToken, jobChainFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobChain().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
             JobChainP200 entity = new JobChainP200();
             Long instanceId = dbItemInventoryInstance.getId();
             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
             DBItemInventoryJobChain inventoryJobChain = dbLayer.getJobChainByPath(normalizePath(jobChainFilter.getJobChain()), instanceId);
-            if (inventoryJobChain == null){
-                    String errMessage = String.format("job chain %s for instance %s with internal id %s not found in table %s", jobChainFilter.getJobChain(),jobChainFilter.getJobschedulerId(),instanceId,
-                            DBLayer.TABLE_INVENTORY_JOB_CHAINS);
-                    throw new DBInvalidDataException(errMessage);
+            if (inventoryJobChain == null) {
+                String errMessage = String.format("job chain %s for instance %s with internal id %s not found in table %s", jobChainFilter
+                        .getJobChain(), jobChainFilter.getJobschedulerId(), instanceId, DBLayer.TABLE_INVENTORY_JOB_CHAINS);
+                throw new DBInvalidDataException(errMessage);
             }
             JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, inventoryJobChain, jobChainFilter.getCompact(), instanceId);
             if (jobChain != null) {
@@ -90,6 +87,5 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
             Globals.disconnect(connection);
         }
     }
-        
 
 }

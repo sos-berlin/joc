@@ -34,9 +34,8 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
     @Override
     public JOCDefaultResponse postOrdersOverviewSnapshotEvent(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
         try {
-            initLogging(API_CALL, jobChainsFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -52,7 +51,7 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
                     command.setHttpClient(httpClient);
                     command.forcedClosingHttpClient();
                 } catch (Exception e) {
-                } 
+                }
             }
             eventIdStr = (String) session.getAttribute(eventIdPropKey);
             OrdersSnapshot entity = new OrdersSnapshot();
@@ -75,27 +74,28 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
                         entity.setDeliveryDate(Date.from(Instant.now()));
                         break;
                     case "NonEmpty":
-//                        boolean isOrderStarted = false;
-//                        for (JsonObject event : json.getJsonArray("eventSnapshots").getValuesAs(JsonObject.class)) {
-//                            if ("OrderStarted".equals(event.getString("TYPE", ""))) {
-//                                isOrderStarted = true;
-//                                break;
-//                            }
-//                        }
-//                        if (isOrderStarted) {
-//                            getJsonObject(newEventId.toString(), session, accessToken);
-//                        }
-                        entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
-                                jobChainsFilter);
+                        // boolean isOrderStarted = false;
+                        // for (JsonObject event :
+                        // json.getJsonArray("eventSnapshots").getValuesAs(JsonObject.class))
+                        // {
+                        // if ("OrderStarted".equals(event.getString("TYPE",
+                        // ""))) {
+                        // isOrderStarted = true;
+                        // break;
+                        // }
+                        // }
+                        // if (isOrderStarted) {
+                        // getJsonObject(newEventId.toString(), session,
+                        // accessToken);
+                        // }
+                        entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey, jobChainsFilter);
                         break;
                     case "Torn":
-                        entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
-                                jobChainsFilter);
+                        entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey, jobChainsFilter);
                         break;
                     }
                 } else {
-                    entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey,
-                            jobChainsFilter);
+                    entity = Orders.getSnapshot(command, session, accessToken, HTTP_CLIENT_PROPKEY, eventIdPropKey, jobChainsFilter);
                 }
             }
 

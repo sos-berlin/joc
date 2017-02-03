@@ -34,14 +34,12 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, processClassFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, processClassFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getLock()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken, processClassFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getLock().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(connection);
             ProcessClassesP entity = new ProcessClassesP();
             InventoryProcessClassesDBLayer dbLayer = new InventoryProcessClassesDBLayer(connection);

@@ -24,13 +24,11 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
             taskFilter.setJobschedulerId(jobschedulerId);
             taskFilter.setMime(LogMime.HTML);
 
-            initLogging(API_CALL, taskFilter);
-
             if (accessToken == null) {
                 accessToken = queryAccessToken;
             }
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken).getJob().getView().isTaskLog(),
-                    true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken)
+                    .getJob().getView().isTaskLog(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

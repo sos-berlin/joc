@@ -27,12 +27,12 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     private static final String STOP = "stop";
     private static String API_CALL = "./job_chain_nodes/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
-    
+
     @Override
     public JOCDefaultResponse postJobChainNodesStop(String accessToken, ModifyJobChainNodes modifyNodes) {
-        initLogging(API_CALL + STOP, modifyNodes);
         try {
-            return postJobChainNodesCommands(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJobChain().isStopJobChainNode(), modifyNodes);
+            return postJobChainNodesCommands(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJobChain().isStopJobChainNode(),
+                    modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -43,9 +43,9 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
 
     @Override
     public JOCDefaultResponse postJobChainNodesSkip(String accessToken, ModifyJobChainNodes modifyNodes) {
-        initLogging(API_CALL + SKIP, modifyNodes);
         try {
-            return postJobChainNodesCommands(accessToken, SKIP, getPermissonsJocCockpit(accessToken).getJobChain().isSkipJobChainNode(), modifyNodes);
+            return postJobChainNodesCommands(accessToken, SKIP, getPermissonsJocCockpit(accessToken).getJobChain().isSkipJobChainNode(),
+                    modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -56,9 +56,9 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
 
     @Override
     public JOCDefaultResponse postJobChainNodesActivate(String accessToken, ModifyJobChainNodes modifyNodes) {
-        initLogging(API_CALL + ACTIVATE, modifyNodes);
         try {
-            return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissonsJocCockpit(accessToken).getJobChain().isProcessJobChainNode(), modifyNodes);
+            return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissonsJocCockpit(accessToken).getJobChain()
+                    .isProcessJobChainNode(), modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -67,9 +67,9 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
         }
     }
 
-    private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission, ModifyJobChainNodes jobChainNodes)
-            throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, jobChainNodes.getJobschedulerId(), permission);
+    private JOCDefaultResponse postJobChainNodesCommands(String accessToken, String command, boolean permission,
+            ModifyJobChainNodes jobChainNodes) throws Exception {
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, jobChainNodes, accessToken, jobChainNodes.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

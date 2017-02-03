@@ -22,13 +22,8 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCDefaultResponse postJobschedulerTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
-            initLogging(API_CALL + TERMINATE, timeoutParameter);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMasterCluster().isTerminate());
-            if (JOCDefaultResponse != null) {
-                return JOCDefaultResponse;
-            }
-            return executeModifyJobSchedulerClusterCommand(TERMINATE, timeoutParameter);
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().isTerminate();
+            return executeModifyJobSchedulerClusterCommand(TERMINATE, timeoutParameter, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -40,13 +35,8 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
-            initLogging(API_CALL + RESTART, timeoutParameter);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMasterCluster().isRestart());
-            if (JOCDefaultResponse != null) {
-                return JOCDefaultResponse;
-            }
-            return executeModifyJobSchedulerClusterCommand(RESTART, timeoutParameter);
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().isRestart();
+            return executeModifyJobSchedulerClusterCommand(RESTART, timeoutParameter, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -58,13 +48,8 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
-            initLogging(API_CALL + TERMINATE_FAILSAFE, timeoutParameter);
-            JOCDefaultResponse JOCDefaultResponse = init(accessToken, timeoutParameter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMasterCluster().isTerminateFailSafe());
-            if (JOCDefaultResponse != null) {
-                return JOCDefaultResponse;
-            }
-            return executeModifyJobSchedulerClusterCommand(TERMINATE_FAILSAFE, timeoutParameter);
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().isTerminateFailSafe();
+            return executeModifyJobSchedulerClusterCommand(TERMINATE_FAILSAFE, timeoutParameter, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -73,8 +58,13 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
         }
     }
 
-    private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String command, TimeoutParameter timeoutParameter) throws Exception {
-        
+    private JOCDefaultResponse executeModifyJobSchedulerClusterCommand(String command, TimeoutParameter timeoutParameter, String accessToken,
+            boolean permission) throws Exception {
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, timeoutParameter, accessToken, timeoutParameter.getJobschedulerId(),
+                permission);
+        if (jocDefaultResponse != null) {
+            return jocDefaultResponse;
+        }
         checkRequiredComment(timeoutParameter.getComment());
         ModifyJobSchedulerClusterAudit clusterAudit = new ModifyJobSchedulerClusterAudit(timeoutParameter);
         logAuditMessage(clusterAudit);
@@ -96,7 +86,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(xml.asXML(), getAccessToken());
         storeAuditLogEntry(clusterAudit);
-        
+
         return JOCDefaultResponse.responseStatusJSOk(jocXmlCommand.getSurveyDate());
     }
 }

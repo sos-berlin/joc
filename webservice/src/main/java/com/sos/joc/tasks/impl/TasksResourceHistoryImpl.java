@@ -38,14 +38,13 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            initLogging(API_CALL, jobsFilter);
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getHistory().isView());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), 
+                    getPermissonsJocCockpit(accessToken).getHistory().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(connection);
 
             List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
@@ -73,7 +72,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
                 if (jobsFilter.getFolders().size() > 0) {
                     for (Folder folder : jobsFilter.getFolders()) {
-                        reportExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder(),folder.getRecursive());
+                        reportExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder(), folder.getRecursive());
                     }
                 }
             }

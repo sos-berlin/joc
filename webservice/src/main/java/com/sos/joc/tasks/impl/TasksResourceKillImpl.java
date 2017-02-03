@@ -35,7 +35,6 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     @Override
     public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasks modifyTasks) {
         try {
-            initLogging(API_CALL + TERMINATE, modifyTasks);
             return postTasksCommand(accessToken, TERMINATE, getPermissonsJocCockpit(accessToken).getJob().isTerminate(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -48,7 +47,6 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     @Override
     public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasks modifyTasks) {
         try {
-            initLogging(API_CALL + TERMINATE_WITHIN, modifyTasks);
             return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissonsJocCockpit(accessToken).getJob().isTerminate(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -61,7 +59,6 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     @Override
     public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasks modifyTasks) {
         try {
-            initLogging(API_CALL + KILL, modifyTasks);
             return postTasksCommand(accessToken, KILL, getPermissonsJocCockpit(accessToken).getJob().isKill(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -74,7 +71,6 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     @Override
     public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasks modifyTasks) {
         try {
-            initLogging(API_CALL + END, modifyTasks);
             return postTasksCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().isKill(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -85,7 +81,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     }
 
     private JOCDefaultResponse postTasksCommand(String accessToken, String command, boolean permission, ModifyTasks modifyTasks) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(accessToken, modifyTasks.getJobschedulerId(), permission);
+        JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyTasks, accessToken, modifyTasks.getJobschedulerId(), permission);
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }

@@ -30,16 +30,13 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-
-            Globals.beginTransaction(connection);
-            initLogging(API_CALL, jobSchedulerId);
-
-            JOCDefaultResponse jocDefaultResponse = init(accessToken, jobSchedulerId.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView()
-                    .isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken, jobSchedulerId.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            Globals.beginTransaction(connection);
 
             JobSchedulerV200 entity = new JobSchedulerV200();
 
@@ -49,8 +46,8 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
                 DBItemInventoryInstance dbItemInventorySupervisorInstance = dbLayer.getInventoryInstancesByKey(supervisorId);
 
                 if (dbItemInventorySupervisorInstance == null) {
-                    String errMessage = String.format("jobschedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerId.getJobschedulerId(),
-                            supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
+                    String errMessage = String.format("jobschedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerId
+                            .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
                 entity.setJobscheduler(new JobSchedulerVCallable(dbItemInventorySupervisorInstance, accessToken).call());

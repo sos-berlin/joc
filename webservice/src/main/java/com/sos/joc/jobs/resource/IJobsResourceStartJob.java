@@ -14,8 +14,8 @@ public interface IJobsResourceStartJob {
 
     @POST
     @Path("start")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes(MediaType.APPLICATION_JSON + ";charset=utf-8")
+    @Produces({ MediaType.APPLICATION_JSON + ";charset=utf-8" })
     public JOCDefaultResponse postJobsStart(@HeaderParam("access_token") String accessToken, StartJobs startJobs) throws Exception;
 
 }
