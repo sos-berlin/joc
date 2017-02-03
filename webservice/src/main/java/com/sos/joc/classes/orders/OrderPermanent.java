@@ -10,7 +10,6 @@ import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.model.order.OrderP;
 import com.sos.joc.model.order.OrderType;
 

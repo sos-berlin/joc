@@ -22,7 +22,6 @@ import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
 import com.sos.joc.model.common.HistoryStateText;
 import com.sos.joc.model.job.JobPath;
-import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.TaskHistory;
 import com.sos.joc.model.job.TaskHistoryItem;

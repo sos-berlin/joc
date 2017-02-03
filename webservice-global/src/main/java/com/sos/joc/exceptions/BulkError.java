@@ -51,7 +51,7 @@ public class BulkError extends Err419 {
         return this;
     }
     
-    public Err419 get(Throwable e, JocError jocError, JAXBElement j) {
+    public Err419 get(Throwable e, JocError jocError, @SuppressWarnings("rawtypes") JAXBElement j) {
         setCodeAndMessage(e, jocError);
         setPath(j.getClass().getName());
         return this;

@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +41,9 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
     private static final int FAILED = 2;
     private static final Integer PLANNED = 4;
     private static final String API_CALL = "./plan";
-
-    private PlanItem createPlanItem(DailyPlanDBItem dailyPlanDBItem) {
+    
+     
+    private PlanItem createPlanItem(DailyPlanDBItem dailyPlanDBItem){
         PlanItem p = new PlanItem();
         p.setLate(dailyPlanDBItem.getIsLate());
 
@@ -78,26 +78,27 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
         }
         p.setState(planState);
         p.setSurveyDate(dailyPlanDBItem.getCreated());
-
+        
         return p;
 
     }
-
+    
     @Override
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
         SOSHibernateConnection connection = null;
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), 
-                    getPermissonsJocCockpit(accessToken).getDailyPlan().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
             connection = Globals.createSosHibernateStatelessConnection("postPlan");
 
             DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(connection);
-            Globals.beginTransaction(connection);
 
+            LOGGER.debug("Reading the daily plan");
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL,planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getDailyPlan().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            Globals.beginTransaction(connection);
+            
             dailyPlanDBLayer.getFilter().setSchedulerId(planFilter.getJobschedulerId());
             dailyPlanDBLayer.getFilter().setJob(planFilter.getJob());
             dailyPlanDBLayer.getFilter().setJobChain(planFilter.getJobChain());
@@ -121,7 +122,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             ArrayList<PlanItem> result = new ArrayList<PlanItem>();
 
             Plan entity = new Plan();
-
+            
             for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfWaitingDailyPlanStandaloneDBItems) {
 
                 boolean add = true;
@@ -138,7 +139,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     result.add(p);
                 }
             }
-
+            
             for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfWaitingDailyPlanOrderDBItems) {
 
                 boolean add = true;
@@ -147,8 +148,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setStartMode(dailyPlanDBItem.getStartMode());
 
                 if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + ","
-                            + dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
+                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
+                            .getDailyPlanDbItem().getOrderId());
                     add = regExMatcher.find();
                 }
                 p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChain());
@@ -195,8 +196,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setStartMode(dailyPlanDBItem.getStartMode());
 
                 if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + ","
-                            + dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
+                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
+                            .getDailyPlanDbItem().getOrderId());
                     add = regExMatcher.find();
                 }
                 p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChain());

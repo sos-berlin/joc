@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.02.02 um 03:29:00 PM CET 
+// Generiert: 2017.02.03 um 10:52:25 AM CET 
 //
 
 
@@ -127,6 +127,22 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit.JOCConfigurations createSOSPermissionJocCockpitJOCConfigurations() {
         return new SOSPermissionJocCockpit.JOCConfigurations();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.JOCConfigurations.Share }
+     * 
+     */
+    public SOSPermissionJocCockpit.JOCConfigurations.Share createSOSPermissionJocCockpitJOCConfigurationsShare() {
+        return new SOSPermissionJocCockpit.JOCConfigurations.Share();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.JOCConfigurations.Share.Change }
+     * 
+     */
+    public SOSPermissionJocCockpit.JOCConfigurations.Share.Change createSOSPermissionJocCockpitJOCConfigurationsShareChange() {
+        return new SOSPermissionJocCockpit.JOCConfigurations.Share.Change();
     }
 
     /**
@@ -394,19 +410,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJocCockpit.JOCConfigurations.Share }
+     * Create an instance of {@link SOSPermissionJocCockpit.JOCConfigurations.Share.Change.SharedStatus }
      * 
      */
-    public SOSPermissionJocCockpit.JOCConfigurations.Share createSOSPermissionJocCockpitJOCConfigurationsShare() {
-        return new SOSPermissionJocCockpit.JOCConfigurations.Share();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionJocCockpit.JOCConfigurations.Private }
-     * 
-     */
-    public SOSPermissionJocCockpit.JOCConfigurations.Private createSOSPermissionJocCockpitJOCConfigurationsPrivate() {
-        return new SOSPermissionJocCockpit.JOCConfigurations.Private();
+    public SOSPermissionJocCockpit.JOCConfigurations.Share.Change.SharedStatus createSOSPermissionJocCockpitJOCConfigurationsShareChangeSharedStatus() {
+        return new SOSPermissionJocCockpit.JOCConfigurations.Share.Change.SharedStatus();
     }
 
     /**

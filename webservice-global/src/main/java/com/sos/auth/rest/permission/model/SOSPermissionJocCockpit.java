@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.02.02 um 03:29:00 PM CET 
+// Generiert: 2017.02.03 um 10:52:25 AM CET 
 //
 
 
@@ -463,24 +463,31 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
+ *                             &lt;element name="change">
+ *                               &lt;complexType>
+ *                                 &lt;complexContent>
+ *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                     &lt;sequence>
+ *                                       &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                       &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                       &lt;element name="sharedStatus">
+ *                                         &lt;complexType>
+ *                                           &lt;complexContent>
+ *                                             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                               &lt;sequence>
+ *                                                 &lt;element name="makePrivate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                                 &lt;element name="makeShared" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                               &lt;/sequence>
+ *                                             &lt;/restriction>
+ *                                           &lt;/complexContent>
+ *                                         &lt;/complexType>
+ *                                       &lt;/element>
+ *                                     &lt;/sequence>
+ *                                   &lt;/restriction>
+ *                                 &lt;/complexContent>
+ *                               &lt;/complexType>
+ *                             &lt;/element>
  *                             &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="makePrivate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                           &lt;/sequence>
- *                         &lt;/restriction>
- *                       &lt;/complexContent>
- *                     &lt;/complexType>
- *                   &lt;/element>
- *                   &lt;element name="private">
- *                     &lt;complexType>
- *                       &lt;complexContent>
- *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                           &lt;sequence>
- *                             &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="makeShared" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -1728,24 +1735,31 @@ public class SOSPermissionJocCockpit {
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
+     *                   &lt;element name="change">
+     *                     &lt;complexType>
+     *                       &lt;complexContent>
+     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                           &lt;sequence>
+     *                             &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                             &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                             &lt;element name="sharedStatus">
+     *                               &lt;complexType>
+     *                                 &lt;complexContent>
+     *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                                     &lt;sequence>
+     *                                       &lt;element name="makePrivate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                                       &lt;element name="makeShared" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                                     &lt;/sequence>
+     *                                   &lt;/restriction>
+     *                                 &lt;/complexContent>
+     *                               &lt;/complexType>
+     *                             &lt;/element>
+     *                           &lt;/sequence>
+     *                         &lt;/restriction>
+     *                       &lt;/complexContent>
+     *                     &lt;/complexType>
+     *                   &lt;/element>
      *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="makePrivate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                 &lt;/sequence>
-     *               &lt;/restriction>
-     *             &lt;/complexContent>
-     *           &lt;/complexType>
-     *         &lt;/element>
-     *         &lt;element name="private">
-     *           &lt;complexType>
-     *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;sequence>
-     *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="makeShared" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -1761,15 +1775,12 @@ public class SOSPermissionJocCockpit {
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "share",
-        "_private"
+        "share"
     })
     public static class JOCConfigurations {
 
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.JOCConfigurations.Share share;
-        @XmlElement(name = "private", required = true)
-        protected SOSPermissionJocCockpit.JOCConfigurations.Private _private;
 
         /**
          * Ruft den Wert der share-Eigenschaft ab.
@@ -1795,30 +1806,6 @@ public class SOSPermissionJocCockpit {
             this.share = value;
         }
 
-        /**
-         * Ruft den Wert der private-Eigenschaft ab.
-         * 
-         * @return
-         *     possible object is
-         *     {@link SOSPermissionJocCockpit.JOCConfigurations.Private }
-         *     
-         */
-        public SOSPermissionJocCockpit.JOCConfigurations.Private getPrivate() {
-            return _private;
-        }
-
-        /**
-         * Legt den Wert der private-Eigenschaft fest.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link SOSPermissionJocCockpit.JOCConfigurations.Private }
-         *     
-         */
-        public void setPrivate(SOSPermissionJocCockpit.JOCConfigurations.Private value) {
-            this._private = value;
-        }
-
 
         /**
          * <p>Java-Klasse für anonymous complex type.
@@ -1830,10 +1817,31 @@ public class SOSPermissionJocCockpit {
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
+         *         &lt;element name="change">
+         *           &lt;complexType>
+         *             &lt;complexContent>
+         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                 &lt;sequence>
+         *                   &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                   &lt;element name="sharedStatus">
+         *                     &lt;complexType>
+         *                       &lt;complexContent>
+         *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                           &lt;sequence>
+         *                             &lt;element name="makePrivate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                             &lt;element name="makeShared" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                           &lt;/sequence>
+         *                         &lt;/restriction>
+         *                       &lt;/complexContent>
+         *                     &lt;/complexType>
+         *                   &lt;/element>
+         *                 &lt;/sequence>
+         *               &lt;/restriction>
+         *             &lt;/complexContent>
+         *           &lt;/complexType>
+         *         &lt;/element>
          *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="makeShared" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -1844,120 +1852,38 @@ public class SOSPermissionJocCockpit {
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
-            "view",
-            "editContent",
-            "delete",
-            "makeShared"
-        })
-        public static class Private {
-
-            protected boolean view;
-            protected boolean editContent;
-            protected boolean delete;
-            protected boolean makeShared;
-
-            /**
-             * Ruft den Wert der view-Eigenschaft ab.
-             * 
-             */
-            public boolean isView() {
-                return view;
-            }
-
-            /**
-             * Legt den Wert der view-Eigenschaft fest.
-             * 
-             */
-            public void setView(boolean value) {
-                this.view = value;
-            }
-
-            /**
-             * Ruft den Wert der editContent-Eigenschaft ab.
-             * 
-             */
-            public boolean isEditContent() {
-                return editContent;
-            }
-
-            /**
-             * Legt den Wert der editContent-Eigenschaft fest.
-             * 
-             */
-            public void setEditContent(boolean value) {
-                this.editContent = value;
-            }
-
-            /**
-             * Ruft den Wert der delete-Eigenschaft ab.
-             * 
-             */
-            public boolean isDelete() {
-                return delete;
-            }
-
-            /**
-             * Legt den Wert der delete-Eigenschaft fest.
-             * 
-             */
-            public void setDelete(boolean value) {
-                this.delete = value;
-            }
-
-            /**
-             * Ruft den Wert der makeShared-Eigenschaft ab.
-             * 
-             */
-            public boolean isMakeShared() {
-                return makeShared;
-            }
-
-            /**
-             * Legt den Wert der makeShared-Eigenschaft fest.
-             * 
-             */
-            public void setMakeShared(boolean value) {
-                this.makeShared = value;
-            }
-
-        }
-
-
-        /**
-         * <p>Java-Klasse für anonymous complex type.
-         * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-         * 
-         * <pre>
-         * &lt;complexType>
-         *   &lt;complexContent>
-         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *       &lt;sequence>
-         *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="makePrivate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *       &lt;/sequence>
-         *     &lt;/restriction>
-         *   &lt;/complexContent>
-         * &lt;/complexType>
-         * </pre>
-         * 
-         * 
-         */
-        @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "view",
-            "editContent",
-            "delete",
-            "makePrivate"
+            "change",
+            "view"
         })
         public static class Share {
 
+            @XmlElement(required = true)
+            protected SOSPermissionJocCockpit.JOCConfigurations.Share.Change change;
             protected boolean view;
-            protected boolean editContent;
-            protected boolean delete;
-            protected boolean makePrivate;
+
+            /**
+             * Ruft den Wert der change-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link SOSPermissionJocCockpit.JOCConfigurations.Share.Change }
+             *     
+             */
+            public SOSPermissionJocCockpit.JOCConfigurations.Share.Change getChange() {
+                return change;
+            }
+
+            /**
+             * Legt den Wert der change-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link SOSPermissionJocCockpit.JOCConfigurations.Share.Change }
+             *     
+             */
+            public void setChange(SOSPermissionJocCockpit.JOCConfigurations.Share.Change value) {
+                this.change = value;
+            }
 
             /**
              * Ruft den Wert der view-Eigenschaft ab.
@@ -1975,52 +1901,173 @@ public class SOSPermissionJocCockpit {
                 this.view = value;
             }
 
-            /**
-             * Ruft den Wert der editContent-Eigenschaft ab.
-             * 
-             */
-            public boolean isEditContent() {
-                return editContent;
-            }
 
             /**
-             * Legt den Wert der editContent-Eigenschaft fest.
+             * <p>Java-Klasse für anonymous complex type.
+             * 
+             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * 
+             * <pre>
+             * &lt;complexType>
+             *   &lt;complexContent>
+             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *       &lt;sequence>
+             *         &lt;element name="editContent" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *         &lt;element name="sharedStatus">
+             *           &lt;complexType>
+             *             &lt;complexContent>
+             *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *                 &lt;sequence>
+             *                   &lt;element name="makePrivate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *                   &lt;element name="makeShared" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *                 &lt;/sequence>
+             *               &lt;/restriction>
+             *             &lt;/complexContent>
+             *           &lt;/complexType>
+             *         &lt;/element>
+             *       &lt;/sequence>
+             *     &lt;/restriction>
+             *   &lt;/complexContent>
+             * &lt;/complexType>
+             * </pre>
+             * 
              * 
              */
-            public void setEditContent(boolean value) {
-                this.editContent = value;
-            }
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "", propOrder = {
+                "editContent",
+                "delete",
+                "sharedStatus"
+            })
+            public static class Change {
 
-            /**
-             * Ruft den Wert der delete-Eigenschaft ab.
-             * 
-             */
-            public boolean isDelete() {
-                return delete;
-            }
+                protected boolean editContent;
+                protected boolean delete;
+                @XmlElement(required = true)
+                protected SOSPermissionJocCockpit.JOCConfigurations.Share.Change.SharedStatus sharedStatus;
 
-            /**
-             * Legt den Wert der delete-Eigenschaft fest.
-             * 
-             */
-            public void setDelete(boolean value) {
-                this.delete = value;
-            }
+                /**
+                 * Ruft den Wert der editContent-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isEditContent() {
+                    return editContent;
+                }
 
-            /**
-             * Ruft den Wert der makePrivate-Eigenschaft ab.
-             * 
-             */
-            public boolean isMakePrivate() {
-                return makePrivate;
-            }
+                /**
+                 * Legt den Wert der editContent-Eigenschaft fest.
+                 * 
+                 */
+                public void setEditContent(boolean value) {
+                    this.editContent = value;
+                }
 
-            /**
-             * Legt den Wert der makePrivate-Eigenschaft fest.
-             * 
-             */
-            public void setMakePrivate(boolean value) {
-                this.makePrivate = value;
+                /**
+                 * Ruft den Wert der delete-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isDelete() {
+                    return delete;
+                }
+
+                /**
+                 * Legt den Wert der delete-Eigenschaft fest.
+                 * 
+                 */
+                public void setDelete(boolean value) {
+                    this.delete = value;
+                }
+
+                /**
+                 * Ruft den Wert der sharedStatus-Eigenschaft ab.
+                 * 
+                 * @return
+                 *     possible object is
+                 *     {@link SOSPermissionJocCockpit.JOCConfigurations.Share.Change.SharedStatus }
+                 *     
+                 */
+                public SOSPermissionJocCockpit.JOCConfigurations.Share.Change.SharedStatus getSharedStatus() {
+                    return sharedStatus;
+                }
+
+                /**
+                 * Legt den Wert der sharedStatus-Eigenschaft fest.
+                 * 
+                 * @param value
+                 *     allowed object is
+                 *     {@link SOSPermissionJocCockpit.JOCConfigurations.Share.Change.SharedStatus }
+                 *     
+                 */
+                public void setSharedStatus(SOSPermissionJocCockpit.JOCConfigurations.Share.Change.SharedStatus value) {
+                    this.sharedStatus = value;
+                }
+
+
+                /**
+                 * <p>Java-Klasse für anonymous complex type.
+                 * 
+                 * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+                 * 
+                 * <pre>
+                 * &lt;complexType>
+                 *   &lt;complexContent>
+                 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+                 *       &lt;sequence>
+                 *         &lt;element name="makePrivate" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+                 *         &lt;element name="makeShared" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+                 *       &lt;/sequence>
+                 *     &lt;/restriction>
+                 *   &lt;/complexContent>
+                 * &lt;/complexType>
+                 * </pre>
+                 * 
+                 * 
+                 */
+                @XmlAccessorType(XmlAccessType.FIELD)
+                @XmlType(name = "", propOrder = {
+                    "makePrivate",
+                    "makeShared"
+                })
+                public static class SharedStatus {
+
+                    protected boolean makePrivate;
+                    protected boolean makeShared;
+
+                    /**
+                     * Ruft den Wert der makePrivate-Eigenschaft ab.
+                     * 
+                     */
+                    public boolean isMakePrivate() {
+                        return makePrivate;
+                    }
+
+                    /**
+                     * Legt den Wert der makePrivate-Eigenschaft fest.
+                     * 
+                     */
+                    public void setMakePrivate(boolean value) {
+                        this.makePrivate = value;
+                    }
+
+                    /**
+                     * Ruft den Wert der makeShared-Eigenschaft ab.
+                     * 
+                     */
+                    public boolean isMakeShared() {
+                        return makeShared;
+                    }
+
+                    /**
+                     * Legt den Wert der makeShared-Eigenschaft fest.
+                     * 
+                     */
+                    public void setMakeShared(boolean value) {
+                        this.makeShared = value;
+                    }
+
+                }
+
             }
 
         }

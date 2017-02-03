@@ -13,8 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class CharacterEncodingFilter implements Filter {
 
-    private FilterConfig fc; 
-
+ 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         // TODO Auto-generated method stub

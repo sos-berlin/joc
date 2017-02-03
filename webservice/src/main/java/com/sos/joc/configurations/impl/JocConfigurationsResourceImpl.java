@@ -27,17 +27,16 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
 
     @Override
     public JOCDefaultResponse postConfigurations(String accessToken, ConfigurationsFilter configurationsFilter) throws Exception {
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, configurationsFilter, accessToken, configurationsFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getJOCConfigurations().getPrivate().isView());
 
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            
+        try {
             connection = Globals.createSosHibernateStatelessConnection("API_CALL");
             Globals.beginTransaction(connection);
 
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL,configurationsFilter, accessToken, configurationsFilter.getJobschedulerId(), true);
+            
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
             String objectType = "";
 
             if (configurationsFilter.getObjectType() == null) {

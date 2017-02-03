@@ -10,7 +10,6 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.model.jobscheduler.ClusterMemberType;
 import com.sos.joc.model.jobscheduler.ClusterType;
 import com.sos.joc.model.jobscheduler.HostPortParameter;
