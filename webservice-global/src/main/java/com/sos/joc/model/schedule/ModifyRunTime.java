@@ -5,6 +5,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.audit.AuditParams;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,7 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "schedule",
-    "comment",
+    "auditLog",
     "runTime"
 })
 public class ModifyRunTime {
@@ -43,11 +44,13 @@ public class ModifyRunTime {
     @JsonProperty("schedule")
     private String schedule;
     /**
-     * Field to comment manually job modifications which can be logged.
+     * auditParams
+     * <p>
+     * 
      * 
      */
-    @JsonProperty("comment")
-    private String comment;
+    @JsonProperty("auditLog")
+    private AuditParams auditLog;
     /**
      * A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd
      * (Required)
@@ -109,25 +112,29 @@ public class ModifyRunTime {
     }
 
     /**
-     * Field to comment manually job modifications which can be logged.
+     * auditParams
+     * <p>
+     * 
      * 
      * @return
-     *     The comment
+     *     The auditLog
      */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
+    @JsonProperty("auditLog")
+    public AuditParams getAuditLog() {
+        return auditLog;
     }
 
     /**
-     * Field to comment manually job modifications which can be logged.
+     * auditParams
+     * <p>
      * 
-     * @param comment
-     *     The comment
+     * 
+     * @param auditLog
+     *     The auditLog
      */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
+    @JsonProperty("auditLog")
+    public void setAuditLog(AuditParams auditLog) {
+        this.auditLog = auditLog;
     }
 
     /**
@@ -161,7 +168,7 @@ public class ModifyRunTime {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(schedule).append(comment).append(runTime).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(schedule).append(auditLog).append(runTime).toHashCode();
     }
 
     @Override
@@ -173,7 +180,7 @@ public class ModifyRunTime {
             return false;
         }
         ModifyRunTime rhs = ((ModifyRunTime) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(schedule, rhs.schedule).append(comment, rhs.comment).append(runTime, rhs.runTime).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(schedule, rhs.schedule).append(auditLog, rhs.auditLog).append(runTime, rhs.runTime).isEquals();
     }
 
 }

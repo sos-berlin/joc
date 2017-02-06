@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
 
@@ -19,6 +20,12 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
     @JsonIgnore
     private String comment;
     
+    @JsonIgnore
+    private Integer timeSpent;
+    
+    @JsonIgnore
+    private String ticketLink;
+    
     public StartJobAudit(StartJob startJob, StartJobs startJobs) {
         if (startJob != null) {
             getJobs().add(startJob);
@@ -28,14 +35,35 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
                 this.job = p.getFileName().toString();
             }
         }
-        this.comment = startJobs.getComment();
+        setAuditParams(startJobs.getAuditLog());
         setJobschedulerId(startJobs.getJobschedulerId());
+    }
+
+    private void setAuditParams(AuditParams auditParams) {
+        this.comment = auditParams.getComment();
+        this.timeSpent = auditParams.getTimeSpent();
+        this.ticketLink = auditParams.getTicketLink();
     }
 
     @Override
     @JsonIgnore
     public String getComment() {
         return comment;
+    }
+
+    @Override
+    @JsonIgnore
+    public Long getTimeSpent() {
+        if (timeSpent == null) {
+            return null;
+        }
+        return timeSpent.longValue();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTicketLink() {
+        return ticketLink;
     }
     
     @Override

@@ -13,4 +13,8 @@ public interface IAuditLog {
     public String getOrderId();
     
     public String getJobschedulerId();
+    
+    public Long getTimeSpent();
+    
+    public String getTicketLink();
 }

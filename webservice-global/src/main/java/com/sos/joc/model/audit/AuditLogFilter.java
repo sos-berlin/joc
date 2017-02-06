@@ -32,7 +32,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "dateFrom",
     "dateTo",
     "timeZone",
-    "limit"
+    "limit",
+    "ticketLink"
 })
 public class AuditLogFilter {
 
@@ -79,6 +80,8 @@ public class AuditLogFilter {
      */
     @JsonProperty("limit")
     private Integer limit = 10000;
+    @JsonProperty("ticketLink")
+    private String ticketLink;
 
     /**
      * 
@@ -280,6 +283,26 @@ public class AuditLogFilter {
         this.limit = limit;
     }
 
+    /**
+     * 
+     * @return
+     *     The ticketLink
+     */
+    @JsonProperty("ticketLink")
+    public String getTicketLink() {
+        return ticketLink;
+    }
+
+    /**
+     * 
+     * @param ticketLink
+     *     The ticketLink
+     */
+    @JsonProperty("ticketLink")
+    public void setTicketLink(String ticketLink) {
+        this.ticketLink = ticketLink;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -287,7 +310,7 @@ public class AuditLogFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(orders).append(folders).append(regex).append(dateFrom).append(dateTo).append(timeZone).append(limit).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobs).append(orders).append(folders).append(regex).append(dateFrom).append(dateTo).append(timeZone).append(limit).append(ticketLink).toHashCode();
     }
 
     @Override
@@ -299,7 +322,7 @@ public class AuditLogFilter {
             return false;
         }
         AuditLogFilter rhs = ((AuditLogFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(orders, rhs.orders).append(folders, rhs.folders).append(regex, rhs.regex).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(limit, rhs.limit).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobs, rhs.jobs).append(orders, rhs.orders).append(folders, rhs.folders).append(regex, rhs.regex).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(limit, rhs.limit).append(ticketLink, rhs.ticketLink).isEquals();
     }
 
 }

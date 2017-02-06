@@ -7,6 +7,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.audit.AuditParams;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -23,7 +24,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "orders",
-    "comment"
+    "auditLog"
 })
 public class ModifyOrders {
 
@@ -42,11 +43,13 @@ public class ModifyOrders {
     @JsonProperty("orders")
     private List<ModifyOrder> orders = new ArrayList<ModifyOrder>();
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
+     * 
      * 
      */
-    @JsonProperty("comment")
-    private String comment;
+    @JsonProperty("auditLog")
+    private AuditParams auditLog;
 
     /**
      * 
@@ -97,25 +100,29 @@ public class ModifyOrders {
     }
 
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
+     * 
      * 
      * @return
-     *     The comment
+     *     The auditLog
      */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
+    @JsonProperty("auditLog")
+    public AuditParams getAuditLog() {
+        return auditLog;
     }
 
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
      * 
-     * @param comment
-     *     The comment
+     * 
+     * @param auditLog
+     *     The auditLog
      */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
+    @JsonProperty("auditLog")
+    public void setAuditLog(AuditParams auditLog) {
+        this.auditLog = auditLog;
     }
 
     @Override
@@ -125,7 +132,7 @@ public class ModifyOrders {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(orders).append(comment).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(orders).append(auditLog).toHashCode();
     }
 
     @Override
@@ -137,7 +144,7 @@ public class ModifyOrders {
             return false;
         }
         ModifyOrders rhs = ((ModifyOrders) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(orders, rhs.orders).append(comment, rhs.comment).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(orders, rhs.orders).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

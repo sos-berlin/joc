@@ -27,7 +27,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "parameters",
     "job",
     "jobChain",
-    "orderId"
+    "orderId",
+    "timeSpent",
+    "ticketLink"
 })
 public class AuditLogItem {
 
@@ -54,11 +56,6 @@ public class AuditLogItem {
      */
     @JsonProperty("created")
     private Date created;
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("comment")
     private String comment;
     /**
@@ -73,6 +70,16 @@ public class AuditLogItem {
     private String jobChain;
     @JsonProperty("orderId")
     private String orderId;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("timeSpent")
+    private Integer timeSpent;
+    @JsonProperty("ticketLink")
+    private String ticketLink;
 
     /**
      * 
@@ -152,8 +159,6 @@ public class AuditLogItem {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
      *     The comment
      */
@@ -163,8 +168,6 @@ public class AuditLogItem {
     }
 
     /**
-     * 
-     * (Required)
      * 
      * @param comment
      *     The comment
@@ -256,6 +259,52 @@ public class AuditLogItem {
         this.orderId = orderId;
     }
 
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The timeSpent
+     */
+    @JsonProperty("timeSpent")
+    public Integer getTimeSpent() {
+        return timeSpent;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param timeSpent
+     *     The timeSpent
+     */
+    @JsonProperty("timeSpent")
+    public void setTimeSpent(Integer timeSpent) {
+        this.timeSpent = timeSpent;
+    }
+
+    /**
+     * 
+     * @return
+     *     The ticketLink
+     */
+    @JsonProperty("ticketLink")
+    public String getTicketLink() {
+        return ticketLink;
+    }
+
+    /**
+     * 
+     * @param ticketLink
+     *     The ticketLink
+     */
+    @JsonProperty("ticketLink")
+    public void setTicketLink(String ticketLink) {
+        this.ticketLink = ticketLink;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -263,7 +312,7 @@ public class AuditLogItem {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(account).append(request).append(created).append(comment).append(parameters).append(job).append(jobChain).append(orderId).toHashCode();
+        return new HashCodeBuilder().append(account).append(request).append(created).append(comment).append(parameters).append(job).append(jobChain).append(orderId).append(timeSpent).append(ticketLink).toHashCode();
     }
 
     @Override
@@ -275,7 +324,7 @@ public class AuditLogItem {
             return false;
         }
         AuditLogItem rhs = ((AuditLogItem) other);
-        return new EqualsBuilder().append(account, rhs.account).append(request, rhs.request).append(created, rhs.created).append(comment, rhs.comment).append(parameters, rhs.parameters).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).isEquals();
+        return new EqualsBuilder().append(account, rhs.account).append(request, rhs.request).append(created, rhs.created).append(comment, rhs.comment).append(parameters, rhs.parameters).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(timeSpent, rhs.timeSpent).append(ticketLink, rhs.ticketLink).isEquals();
     }
 
 }

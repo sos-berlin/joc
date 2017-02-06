@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.job.ModifyTasks;
 import com.sos.joc.model.job.TaskId;
 import com.sos.joc.model.job.TasksFilter;
@@ -20,9 +21,15 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
     @JsonIgnore
     private String comment;
     
+    @JsonIgnore
+    private Integer timeSpent;
+    
+    @JsonIgnore
+    private String ticketLink;
+    
     public ModifyTaskAudit(TasksFilter job, TaskId taskId, ModifyTasks modifyTasks) {
         if (modifyTasks != null) {
-            this.comment = modifyTasks.getComment();
+            setAuditParams(modifyTasks.getAuditLog());
             setTimeout(modifyTasks.getTimeout());
             setJobschedulerId(modifyTasks.getJobschedulerId()); 
         }
@@ -38,10 +45,31 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
         }
     }
 
+    private void setAuditParams(AuditParams auditParams) {
+        this.comment = auditParams.getComment();
+        this.timeSpent = auditParams.getTimeSpent();
+        this.ticketLink = auditParams.getTicketLink();
+    }
+
     @Override
     @JsonIgnore
     public String getComment() {
         return comment;
+    }
+
+    @Override
+    @JsonIgnore
+    public Long getTimeSpent() {
+        if (timeSpent == null) {
+            return null;
+        }
+        return timeSpent.longValue();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTicketLink() {
+        return ticketLink;
     }
     
     @Override

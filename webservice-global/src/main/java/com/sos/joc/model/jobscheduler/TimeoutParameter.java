@@ -5,6 +5,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.audit.AuditParams;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -21,7 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "timeout",
-    "comment"
+    "auditLog"
 })
 public class TimeoutParameter {
 
@@ -41,11 +42,13 @@ public class TimeoutParameter {
     @JsonProperty("timeout")
     private Integer timeout;
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
+     * 
      * 
      */
-    @JsonProperty("comment")
-    private String comment;
+    @JsonProperty("auditLog")
+    private AuditParams auditLog;
 
     /**
      * 
@@ -98,25 +101,29 @@ public class TimeoutParameter {
     }
 
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
+     * 
      * 
      * @return
-     *     The comment
+     *     The auditLog
      */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
+    @JsonProperty("auditLog")
+    public AuditParams getAuditLog() {
+        return auditLog;
     }
 
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
      * 
-     * @param comment
-     *     The comment
+     * 
+     * @param auditLog
+     *     The auditLog
      */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
+    @JsonProperty("auditLog")
+    public void setAuditLog(AuditParams auditLog) {
+        this.auditLog = auditLog;
     }
 
     @Override
@@ -126,7 +133,7 @@ public class TimeoutParameter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(timeout).append(comment).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(timeout).append(auditLog).toHashCode();
     }
 
     @Override
@@ -138,7 +145,7 @@ public class TimeoutParameter {
             return false;
         }
         TimeoutParameter rhs = ((TimeoutParameter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(timeout, rhs.timeout).append(comment, rhs.comment).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(timeout, rhs.timeout).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

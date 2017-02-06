@@ -56,6 +56,8 @@ public class JocAuditLog {
         auditLogToDb.setOrderId(body.getOrderId());
         auditLogToDb.setFolder(body.getFolder());
         auditLogToDb.setComment(body.getComment());
+        auditLogToDb.setTicketLink(body.getTicketLink());
+        auditLogToDb.setTimeSpent(body.getTimeSpent());
         auditLogToDb.setCreated(Date.from(Instant.now()));
         SOSHibernateConnection connection = null;
         try {

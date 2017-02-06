@@ -7,6 +7,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.audit.AuditParams;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -23,7 +24,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "jobChains",
-    "comment"
+    "auditLog"
 })
 public class ModifyJobChains {
 
@@ -37,11 +38,13 @@ public class ModifyJobChains {
     @JsonProperty("jobChains")
     private List<ModifyJobChain> jobChains = new ArrayList<ModifyJobChain>();
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
+     * 
      * 
      */
-    @JsonProperty("comment")
-    private String comment;
+    @JsonProperty("auditLog")
+    private AuditParams auditLog;
 
     /**
      * 
@@ -88,25 +91,29 @@ public class ModifyJobChains {
     }
 
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
+     * 
      * 
      * @return
-     *     The comment
+     *     The auditLog
      */
-    @JsonProperty("comment")
-    public String getComment() {
-        return comment;
+    @JsonProperty("auditLog")
+    public AuditParams getAuditLog() {
+        return auditLog;
     }
 
     /**
-     * Field to comment this action which can be logged.
+     * auditParams
+     * <p>
      * 
-     * @param comment
-     *     The comment
+     * 
+     * @param auditLog
+     *     The auditLog
      */
-    @JsonProperty("comment")
-    public void setComment(String comment) {
-        this.comment = comment;
+    @JsonProperty("auditLog")
+    public void setAuditLog(AuditParams auditLog) {
+        this.auditLog = auditLog;
     }
 
     @Override
@@ -116,7 +123,7 @@ public class ModifyJobChains {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobChains).append(comment).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobChains).append(auditLog).toHashCode();
     }
 
     @Override
@@ -128,7 +135,7 @@ public class ModifyJobChains {
             return false;
         }
         ModifyJobChains rhs = ((ModifyJobChains) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChains, rhs.jobChains).append(comment, rhs.comment).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChains, rhs.jobChains).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

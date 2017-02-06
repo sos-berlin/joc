@@ -16,6 +16,18 @@ public class SecurityAudit implements IAuditLog {
     public String getComment() {
         return comment;
     }
+    
+    @Override
+    @JsonIgnore
+    public Long getTimeSpent() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTicketLink() {
+        return null;
+    }
 
     @Override
     @JsonIgnore

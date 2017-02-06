@@ -1,6 +1,7 @@
 package com.sos.joc.classes.audit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.jobscheduler.TimeoutParameter;
 
 
@@ -9,18 +10,45 @@ public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements 
     @JsonIgnore
     private String comment;
     
+    @JsonIgnore
+    private Integer timeSpent;
+    
+    @JsonIgnore
+    private String ticketLink;
+    
     public ModifyJobSchedulerClusterAudit(TimeoutParameter timeoutParameter) {
         if (timeoutParameter != null) {
-            this.comment = timeoutParameter.getComment();
+            setAuditParams(timeoutParameter.getAuditLog());
             setTimeout(timeoutParameter.getTimeout());
             setJobschedulerId(timeoutParameter.getJobschedulerId()); 
         }
+    }
+
+    private void setAuditParams(AuditParams auditParams) {
+        this.comment = auditParams.getComment();
+        this.timeSpent = auditParams.getTimeSpent();
+        this.ticketLink = auditParams.getTicketLink();
     }
 
     @Override
     @JsonIgnore
     public String getComment() {
         return comment;
+    }
+
+    @Override
+    @JsonIgnore
+    public Long getTimeSpent() {
+        if (timeSpent == null) {
+            return null;
+        }
+        return timeSpent.longValue();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTicketLink() {
+        return ticketLink;
     }
     
     @Override

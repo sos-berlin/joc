@@ -63,4 +63,16 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
     public String getOrderId() {
         return null;
     }
+
+    @Override
+    @JsonIgnore
+    public Long getTimeSpent() {
+        return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTicketLink() {
+        return null;
+    }
 }

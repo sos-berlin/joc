@@ -235,7 +235,8 @@ public class Globals {
                 if (p != null) {
                     if (!Files.exists(p)) {
                         error.setMessage(String.format("truststore path (%1$s) is set but file (%2$s) not found.", truststore, p.toString()));
-                        throw new JocException(error);
+                        //throw new JocException(error);
+                        LOGGER.error(error.getMessage());
                     } else {
                         truststore = p.toString();
                         System.setProperty("javax.net.ssl.trustStore", truststore);

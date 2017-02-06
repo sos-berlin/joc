@@ -1,6 +1,7 @@
 package com.sos.joc.classes.audit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 
 
@@ -9,9 +10,15 @@ public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements
     @JsonIgnore
     private String comment;
     
+    @JsonIgnore
+    private Integer timeSpent;
+    
+    @JsonIgnore
+    private String ticketLink;
+    
     public ModifyJobSchedulerAudit(HostPortTimeOutParameter hostPortTimeoutParamSchema) {
         if (hostPortTimeoutParamSchema != null) {
-            this.comment = hostPortTimeoutParamSchema.getComment();
+            setAuditParams(hostPortTimeoutParamSchema.getAuditLog());
             setHost(hostPortTimeoutParamSchema.getHost());
             setPort(hostPortTimeoutParamSchema.getPort());
             setTimeout(hostPortTimeoutParamSchema.getTimeout());
@@ -19,10 +26,31 @@ public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements
         }
     }
 
+    private void setAuditParams(AuditParams auditParams) {
+        this.comment = auditParams.getComment();
+        this.timeSpent = auditParams.getTimeSpent();
+        this.ticketLink = auditParams.getTicketLink();
+    }
+
     @Override
     @JsonIgnore
     public String getComment() {
         return comment;
+    }
+
+    @Override
+    @JsonIgnore
+    public Long getTimeSpent() {
+        if (timeSpent == null) {
+            return null;
+        }
+        return timeSpent.longValue();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTicketLink() {
+        return ticketLink;
     }
     
     @Override

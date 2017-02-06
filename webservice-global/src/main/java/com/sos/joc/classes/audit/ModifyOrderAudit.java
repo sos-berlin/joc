@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 
@@ -22,6 +23,12 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
     @JsonIgnore
     private String comment;
 
+    @JsonIgnore
+    private Integer timeSpent;
+    
+    @JsonIgnore
+    private String ticketLink;
+    
     public ModifyOrderAudit(ModifyOrder modifyOrder, ModifyOrders modifyOrders) {
         if (modifyOrder != null) {
             getOrders().add(modifyOrder);
@@ -33,15 +40,36 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
             }
         }
         if (modifyOrders != null) {
-            this.comment = modifyOrders.getComment();
-           setJobschedulerId(modifyOrders.getJobschedulerId());
+            setAuditParams(modifyOrders.getAuditLog());
+            setJobschedulerId(modifyOrders.getJobschedulerId());
         }
+    }
+
+    private void setAuditParams(AuditParams auditParams) {
+        this.comment = auditParams.getComment();
+        this.timeSpent = auditParams.getTimeSpent();
+        this.ticketLink = auditParams.getTicketLink();
     }
 
     @Override
     @JsonIgnore
     public String getComment() {
         return comment;
+    }
+
+    @Override
+    @JsonIgnore
+    public Long getTimeSpent() {
+        if (timeSpent == null) {
+            return null;
+        }
+        return timeSpent.longValue();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getTicketLink() {
+        return ticketLink;
     }
     
     @Override
