@@ -210,7 +210,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-        checkRequiredComment(modifyOrders.getComment());
+        checkRequiredComment(modifyOrders.getAuditLog());
         if (modifyOrders.getOrders().size() == 0) {
             throw new JocMissingRequiredParameterException("undefined 'orders'");
         }

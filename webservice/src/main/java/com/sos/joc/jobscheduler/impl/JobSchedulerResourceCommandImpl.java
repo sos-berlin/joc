@@ -12,6 +12,7 @@ import com.sos.joc.classes.JobSchedulerCommandFactory;
 import com.sos.joc.classes.audit.JobSchedulerCommandAudit;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCommand;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.commands.JobschedulerCommands;
 
 @Path("jobscheduler")
@@ -31,7 +32,9 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             }
 
             checkRequiredParameter("jobschedulerId", jobSchedulerCommands.getJobschedulerId());
-            checkRequiredComment(jobSchedulerCommands.getComment());
+            AuditParams auditParams = new AuditParams();
+            auditParams.setComment(jobSchedulerCommands.getComment());
+            checkRequiredComment(auditParams);
             if ("".equals(jobSchedulerCommands.getUrl()) || jobSchedulerCommands.getUrl() == null) {
                 jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
             }

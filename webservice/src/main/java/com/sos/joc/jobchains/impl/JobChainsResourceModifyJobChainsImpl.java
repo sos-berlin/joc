@@ -58,7 +58,7 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-        checkRequiredComment(modifyJobChains.getComment());
+        checkRequiredComment(modifyJobChains.getAuditLog());
         if (modifyJobChains.getJobChains().size() == 0) {
             throw new JocMissingRequiredParameterException("undefined 'jobChains'");
         }

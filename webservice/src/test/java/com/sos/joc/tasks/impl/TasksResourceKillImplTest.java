@@ -58,7 +58,7 @@ public class TasksResourceKillImplTest {
         
         modifyTasksSchema.setJobs(listOfJobs);
         modifyTasksSchema.setJobschedulerId("scheduler_current");
-        modifyTasksSchema.setComment("myComment1");
+        //modifyTasksSchema.setComment("myComment1");
         TasksResourceKillImpl tasksHistoryImpl = new TasksResourceKillImpl();
         JOCDefaultResponse taskKillResponse = tasksHistoryImpl.postTasksKill(sosShiroCurrentUserAnswer.getAccessToken(), modifyTasksSchema);
         Ok okSchema = (Ok) taskKillResponse.getEntity();

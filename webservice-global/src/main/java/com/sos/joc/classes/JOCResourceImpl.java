@@ -27,6 +27,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingCommentException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.NoUserWithAccessTokenException;
+import com.sos.joc.model.audit.AuditParams;
 
 public class JOCResourceImpl {
 
@@ -128,9 +129,15 @@ public class JOCResourceImpl {
         return ("/" + path.trim()).replaceAll("//+", "/");
     }
 
-    public boolean checkRequiredComment(String paramVal) throws JocMissingCommentException {
-        if (Globals.auditLogCommentsAreRequired && (paramVal == null || paramVal.isEmpty())) {
-            throw new JocMissingCommentException();
+    public boolean checkRequiredComment(AuditParams auditParams) throws JocMissingCommentException {
+        if (Globals.auditLogCommentsAreRequired) {
+            String comment = null;
+            if (auditParams != null) {
+                comment = auditParams.getComment();
+            }
+            if (comment == null || comment.isEmpty()) {
+                throw new JocMissingCommentException();
+            }
         }
         return true;
     }

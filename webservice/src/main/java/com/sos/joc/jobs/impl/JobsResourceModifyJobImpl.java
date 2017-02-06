@@ -146,7 +146,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-        checkRequiredComment(modifyJobs.getComment());
+        checkRequiredComment(modifyJobs.getAuditLog());
         if (modifyJobs.getJobs().size() == 0) {
             throw new JocMissingRequiredParameterException("undefined 'jobs'");
         }

@@ -85,7 +85,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-        checkRequiredComment(modifyTasks.getComment());
+        checkRequiredComment(modifyTasks.getAuditLog());
         Date surveyDate = Date.from(Instant.now());
         for (TasksFilter job : modifyTasks.getJobs()) {
             List<TaskId> taskIds = job.getTaskIds();

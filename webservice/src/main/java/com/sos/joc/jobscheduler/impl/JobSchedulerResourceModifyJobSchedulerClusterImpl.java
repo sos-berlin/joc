@@ -65,7 +65,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
         if (jocDefaultResponse != null) {
             return jocDefaultResponse;
         }
-        checkRequiredComment(timeoutParameter.getComment());
+        checkRequiredComment(timeoutParameter.getAuditLog());
         ModifyJobSchedulerClusterAudit clusterAudit = new ModifyJobSchedulerClusterAudit(timeoutParameter);
         logAuditMessage(clusterAudit);
         XMLBuilder xml = new XMLBuilder("terminate");
