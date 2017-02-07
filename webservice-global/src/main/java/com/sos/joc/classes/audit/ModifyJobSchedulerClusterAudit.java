@@ -25,9 +25,11 @@ public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements 
     }
 
     private void setAuditParams(AuditParams auditParams) {
-        this.comment = auditParams.getComment();
-        this.timeSpent = auditParams.getTimeSpent();
-        this.ticketLink = auditParams.getTicketLink();
+        if (auditParams != null) {
+            this.comment = auditParams.getComment();
+            this.timeSpent = auditParams.getTimeSpent();
+            this.ticketLink = auditParams.getTicketLink(); 
+        }
     }
 
     @Override

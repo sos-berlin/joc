@@ -40,9 +40,11 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
     }
 
     private void setAuditParams(AuditParams auditParams) {
-        this.comment = auditParams.getComment();
-        this.timeSpent = auditParams.getTimeSpent();
-        this.ticketLink = auditParams.getTicketLink();
+        if (auditParams != null) {
+            this.comment = auditParams.getComment();
+            this.timeSpent = auditParams.getTimeSpent();
+            this.ticketLink = auditParams.getTicketLink(); 
+        }
     }
 
     @Override
