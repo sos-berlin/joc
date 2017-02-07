@@ -19,7 +19,7 @@ public class SecurityAudit implements IAuditLog {
     
     @Override
     @JsonIgnore
-    public Long getTimeSpent() {
+    public Integer getTimeSpent() {
         return null;
     }
 

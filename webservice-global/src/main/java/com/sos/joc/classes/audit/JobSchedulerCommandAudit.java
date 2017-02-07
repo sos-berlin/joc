@@ -66,7 +66,7 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
 
     @Override
     @JsonIgnore
-    public Long getTimeSpent() {
+    public Integer getTimeSpent() {
         return null;
     }
 

@@ -40,11 +40,8 @@ public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements
 
     @Override
     @JsonIgnore
-    public Long getTimeSpent() {
-        if (timeSpent == null) {
-            return null;
-        }
-        return timeSpent.longValue();
+    public Integer getTimeSpent() {
+        return timeSpent;
     }
 
     @Override
