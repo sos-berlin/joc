@@ -18,13 +18,14 @@ import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.order.OrderPath;
 
 
+@SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
 public class AuditLogDBLayer extends DBLayer {
 
     public AuditLogDBLayer(SOSHibernateConnection connection) {
         super(connection);
     }
     
-    public List<DBItemAuditLog> getAuditLogByOrders(String schedulerId, List<OrderPath> orders, Integer limit, Date from, Date to)
+    public List<DBItemAuditLog> getAuditLogByOrders(String schedulerId, List<OrderPath> orders, Integer limit, Date from, Date to, String ticketLink)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -35,6 +36,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (to != null) {
                 sql.append(" and created <= :to");                
+            }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                sql.append(" and ticketLink = :ticketLink");
             }
             if (orders != null && !orders.isEmpty()) {
                 sql.append(" and");
@@ -62,6 +66,9 @@ public class AuditLogDBLayer extends DBLayer {
             if (to != null) {
                 query.setParameter("to", to, TemporalType.TIMESTAMP);
             }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                query.setParameter("ticketLink", ticketLink);
+            }
             if (orders != null && !orders.isEmpty()) {
                 for (int i = 0; i < orders.size(); i++) {
                     String jobChain = orders.get(i).getJobChain().substring(orders.get(i).getJobChain().lastIndexOf("/") + 1);
@@ -85,7 +92,7 @@ public class AuditLogDBLayer extends DBLayer {
         } 
     }
 
-    public List<DBItemAuditLog> getAuditLogByJobs(String schedulerId, List<JobPath> jobs, Integer limit, Date from, Date to)
+    public List<DBItemAuditLog> getAuditLogByJobs(String schedulerId, List<JobPath> jobs, Integer limit, Date from, Date to, String ticketLink)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -96,6 +103,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (to != null) {
                 sql.append(" and created <= :to");                
+            }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                sql.append(" and ticketLink = :ticketLink");
             }
             if (jobs != null && !jobs.isEmpty()) {
                 sql.append(" and");
@@ -120,6 +130,9 @@ public class AuditLogDBLayer extends DBLayer {
             if (to != null) {
                 query.setParameter("to", to, TemporalType.TIMESTAMP);
             }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                query.setParameter("ticketLink", ticketLink);
+            }
             if (jobs != null && !jobs.isEmpty()) {
                 for (int i = 0; i < jobs.size(); i++) {
                     String job = jobs.get(i).getJob().substring(jobs.get(i).getJob().lastIndexOf("/") + 1);
@@ -140,7 +153,7 @@ public class AuditLogDBLayer extends DBLayer {
         } 
     }
 
-    public List<DBItemAuditLog> getAllAuditLogs(String schedulerId, Integer limit, Date from, Date to)
+    public List<DBItemAuditLog> getAllAuditLogs(String schedulerId, Integer limit, Date from, Date to, String ticketLink)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -152,6 +165,9 @@ public class AuditLogDBLayer extends DBLayer {
             if (to != null) {
                 sql.append(" and created <= :to");                
             }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                sql.append(" and ticketLink = :ticketLink");
+            }
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
@@ -159,6 +175,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (to != null) {
                 query.setParameter("to", to, TemporalType.TIMESTAMP);
+            }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                query.setParameter("ticketLink", ticketLink);
             }
             if (limit != null) {
                 query.setMaxResults(limit);
@@ -172,7 +191,7 @@ public class AuditLogDBLayer extends DBLayer {
         } 
     }
 
-    public List<DBItemAuditLog> getAuditLogByFolders(String schedulerId, Set<String> folders, Integer limit, Date from, Date to)
+    public List<DBItemAuditLog> getAuditLogByFolders(String schedulerId, Set<String> folders, Integer limit, Date from, Date to, String ticketLink)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -183,6 +202,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (to != null) {
                 sql.append(" and created <= :to");                
+            }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                sql.append(" and ticketLink = :ticketLink");
             }
             if (folders != null && !folders.isEmpty()) {
                 if (folders.size() == 1) {
@@ -198,6 +220,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (to != null) {
                 query.setParameter("to", to, TemporalType.TIMESTAMP);
+            }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                query.setParameter("ticketLink", ticketLink);
             }
             if (folders != null && !folders.isEmpty()) {
                 if (folders.size() == 1) {

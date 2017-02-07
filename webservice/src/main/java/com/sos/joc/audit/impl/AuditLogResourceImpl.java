@@ -50,6 +50,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             List<JobPath> filterJobs = auditLogFilter.getJobs();
             Integer filterLimit = auditLogFilter.getLimit();
             List<OrderPath> filterOrders = auditLogFilter.getOrders();
+            String filterTicketLink = auditLogFilter.getTicketLink();
             Date filterFrom = null;
             Date filterTo = null;
             if (auditLogFilter.getDateFrom() != null && !auditLogFilter.getDateFrom().isEmpty()) {
@@ -61,17 +62,17 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             String filterRegex = auditLogFilter.getRegex();
             // processing
             if (filterOrders != null && !filterOrders.isEmpty()) {
-                auditLogs = dbLayer.getAuditLogByOrders(schedulerId, filterOrders, filterLimit, filterFrom, filterTo);
+                auditLogs = dbLayer.getAuditLogByOrders(schedulerId, filterOrders, filterLimit, filterFrom, filterTo, filterTicketLink);
             } else if (filterJobs != null && !filterJobs.isEmpty()) {
-                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, filterJobs, filterLimit, filterFrom, filterTo);
+                auditLogs = dbLayer.getAuditLogByJobs(schedulerId, filterJobs, filterLimit, filterFrom, filterTo, filterTicketLink);
             } else if (filterFolders != null && !filterFolders.isEmpty()) {
                 Set<String> folders = new HashSet<String>();
                 for (Folder folder : filterFolders) {
                     folders.add(folder.getFolder());
                 }
-                auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit, filterFrom, filterTo);
+                auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit, filterFrom, filterTo, filterTicketLink);
             } else {
-                auditLogs = dbLayer.getAllAuditLogs(schedulerId, filterLimit, filterFrom, filterTo);
+                auditLogs = dbLayer.getAllAuditLogs(schedulerId, filterLimit, filterFrom, filterTo, filterTicketLink);
             }
             if (filterRegex != null && !filterRegex.isEmpty()) {
                 auditLogs = filterComment(auditLogs, filterRegex);
