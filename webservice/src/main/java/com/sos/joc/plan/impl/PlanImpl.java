@@ -88,15 +88,15 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
         SOSHibernateConnection connection = null;
 
         try {
-            connection = Globals.createSosHibernateStatelessConnection("postPlan");
-
-            DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(connection);
-
             LOGGER.debug("Reading the daily plan");
             JOCDefaultResponse jocDefaultResponse = init(API_CALL,planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getDailyPlan().getView().isStatus());
+
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            connection = Globals.createSosHibernateStatelessConnection("postPlan");
+            DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(connection);
+
             Globals.beginTransaction(connection);
             
             dailyPlanDBLayer.getFilter().setSchedulerId(planFilter.getJobschedulerId());

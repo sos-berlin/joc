@@ -8,27 +8,26 @@ import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 
-
 public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
-    
+
     @JsonIgnore
     private String folder;
-    
+
     @JsonIgnore
     private String jobChain;
-    
+
     @JsonIgnore
     private String orderId;
-    
+
     @JsonIgnore
     private String comment;
 
     @JsonIgnore
     private Integer timeSpent;
-    
+
     @JsonIgnore
     private String ticketLink;
-    
+
     public ModifyOrderAudit(ModifyOrder modifyOrder, ModifyOrders modifyOrders) {
         if (modifyOrder != null) {
             getOrders().add(modifyOrder);
@@ -46,9 +45,11 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
     }
 
     private void setAuditParams(AuditParams auditParams) {
-        this.comment = auditParams.getComment();
-        this.timeSpent = auditParams.getTimeSpent();
-        this.ticketLink = auditParams.getTicketLink();
+        if (auditParams != null) {
+            this.comment = auditParams.getComment();
+            this.timeSpent = auditParams.getTimeSpent();
+            this.ticketLink = auditParams.getTicketLink();
+        }
     }
 
     @Override
@@ -68,7 +69,7 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
     public String getTicketLink() {
         return ticketLink;
     }
-    
+
     @Override
     @JsonIgnore
     public String getFolder() {
