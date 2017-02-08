@@ -32,10 +32,8 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             }
 
             checkRequiredParameter("jobschedulerId", jobSchedulerCommands.getJobschedulerId());
-            AuditParams auditParams = new AuditParams();
-            auditParams.setComment(jobSchedulerCommands.getComment());
-            checkRequiredComment(auditParams);
-            if ("".equals(jobSchedulerCommands.getUrl()) || jobSchedulerCommands.getUrl() == null) {
+            checkRequiredComment(jobSchedulerCommands.getComment());
+            if (jobSchedulerCommands.getUrl() == null || jobSchedulerCommands.getUrl().isEmpty()) {
                 jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
             }
 
@@ -50,7 +48,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 xml = xml + jobSchedulerCommandFactory.getXml(jobschedulerCommand);
                 if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(accessToken))) {
                     if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
-                        return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, "Access denied"));
+                        return accessDeniedResponse();
                     } else {
                         LOGGER.warn("Command: Access denied");
                     }

@@ -141,6 +141,15 @@ public class JOCResourceImpl {
         }
         return true;
     }
+    
+    public boolean checkRequiredComment(String comment) throws JocMissingCommentException {
+        if (Globals.auditLogCommentsAreRequired) {
+            if (comment == null || comment.isEmpty()) {
+                throw new JocMissingCommentException();
+            }
+        }
+        return true;
+    }
 
     public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null || paramVal.isEmpty()) {

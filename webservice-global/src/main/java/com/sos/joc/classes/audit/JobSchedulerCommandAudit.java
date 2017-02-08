@@ -11,10 +11,18 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
     @JsonIgnore
     private String comment;
 
+    @JsonIgnore
+    private Integer timeSpent;
+    
+    @JsonIgnore
+    private String ticketLink;
+    
     public JobSchedulerCommandAudit(String xml, JobschedulerCommands jobSchedulerCommands) {
         this.xml = xml;
         if (jobSchedulerCommands != null) {
             this.comment = jobSchedulerCommands.getComment();
+            this.ticketLink = jobSchedulerCommands.getTicketLink();
+            this.timeSpent = jobSchedulerCommands.getTimeSpent();
             setJobschedulerId(jobSchedulerCommands.getJobschedulerId());
             setUrl(jobSchedulerCommands.getUrl());
             getAddOrderOrCheckFoldersOrKillTask().addAll(jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask());
@@ -67,12 +75,12 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
     @Override
     @JsonIgnore
     public Integer getTimeSpent() {
-        return null;
+        return timeSpent;
     }
 
     @Override
     @JsonIgnore
     public String getTicketLink() {
-        return null;
+        return ticketLink;
     }
 }
