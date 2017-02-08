@@ -30,16 +30,15 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
 
         try {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL,configurationsFilter, accessToken, configurationsFilter.getJobschedulerId(), true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, configurationsFilter, accessToken, configurationsFilter.getJobschedulerId(), true);
 
-            
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             connection = Globals.createSosHibernateStatelessConnection("API_CALL");
             Globals.beginTransaction(connection);
-            
+
             String objectType = "";
 
             if (configurationsFilter.getObjectType() == null) {
@@ -78,14 +77,18 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
                 configuration.setName(jocConfigurationDbItem.getName());
                 configuration.setObjectType(ConfigurationObjectType.fromValue(jocConfigurationDbItem.getObjectType()));
                 configuration.setShared(jocConfigurationDbItem.getShared());
-                listOfConfigurations.add(configuration);
+                if (!jocConfigurationDbItem.getShared() || getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView()) {
+                    listOfConfigurations.add(configuration);
+                }
             }
 
             configurations.setDeliveryDate(new Date());
             configurations.setConfigurations(listOfConfigurations);
 
             return JOCDefaultResponse.responseStatus200(configurations);
-        } catch (JocException e) {
+        } catch (
+
+        JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {

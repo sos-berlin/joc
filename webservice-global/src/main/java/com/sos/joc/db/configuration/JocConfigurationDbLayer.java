@@ -3,11 +3,14 @@ package com.sos.joc.db.configuration;
 import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateFactory.Dbms;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
+import com.sos.jitl.reporting.db.DBItemReportTrigger;
 
 /** @author Uwe Risse */
 public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
@@ -96,12 +99,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return where;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<JocConfigurationDbItem> getJocConfigurationList(final int limit) throws Exception {
-
-        Query<JocConfigurationDbItem> query = null;
-        List<JocConfigurationDbItem> configurationsList = null;
-        query = connection.createQuery("from " + JocConfigurationDBItem + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode());
+    private void bindParameters(Query query) {
         if (filter.getInstanceId() != null) {
             query.setParameter("instanceId", filter.getInstanceId());
         }
@@ -120,12 +118,33 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         if (filter.isShared() != null) {
             query.setBoolean("shared", filter.isShared());
         }
+    }
 
-        if (limit > 0) {
-            query.setMaxResults(limit);
+    @SuppressWarnings("unchecked")
+    public List<JocConfigurationDbItem> getJocConfigurationList(final int limit) throws Exception {
+
+        List<JocConfigurationDbItem> configurationsList = null;
+
+        if (getConnection().getFactory().getDbms().equals(Dbms.MSSQL)) {
+            String sql = "from " + JocConfigurationDBItem + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode();
+            if (limit > 0) {
+                sql = String.format("Select TOP %s from " + JocConfigurationDBItem + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode(), limit);
+            }
+
+            NativeQuery<JocConfigurationDbItem> query = getConnection().createNativeQuery(sql.toString(), DBItemReportTrigger.class);
+            bindParameters(query);
+            configurationsList = query.getResultList();
+        } else {
+            String sql = "from " + JocConfigurationDBItem + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode();
+            Query<JocConfigurationDbItem> query = connection.createQuery(sql);
+            bindParameters(query);
+            if (limit > 0) {
+                query.setMaxResults(limit);
+            }
+            configurationsList = query.getResultList();
         }
-        configurationsList = query.list();
         return configurationsList;
+
     }
 
     public int saveConfiguration(JocConfigurationDbItem jocConfigurationDbItem, Boolean shared, String configurationItem) throws Exception {

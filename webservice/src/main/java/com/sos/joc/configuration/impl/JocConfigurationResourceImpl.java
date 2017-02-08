@@ -27,16 +27,10 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
     private SOSHibernateConnection connection = null;
     private JocConfigurationDbLayer jocConfigurationDBLayer;
     private JocConfigurationDbItem jocConfigurationDbItem;
-    private JocConfigurationDbItem oldJocConfigurationDbItem;
 
     private void init(Configuration configuration) throws Exception {
         jocConfigurationDbItem = new JocConfigurationDbItem();
         jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
-
-        List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
-        if (l.size() > 0) {
-            oldJocConfigurationDbItem = l.get(0);
-        }
 
         String objectType = "";
 
@@ -74,9 +68,11 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         jocConfigurationDbItem.setConfigurationItem(configuration.getConfigurationItem());
         jocConfigurationDbItem.setConfigurationType(configurationType);
         jocConfigurationDbItem.setAccount(configuration.getAccount());
+        jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
 
         jocConfigurationDBLayer.getFilter().setConfigurationType(configuration.getConfigurationType().name());
         jocConfigurationDBLayer.getFilter().setAccount(configuration.getAccount());
+        jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
 
     }
 
@@ -92,19 +88,20 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
             init(configuration);
 
+            List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
+            JocConfigurationDbItem oldJocConfigurationDbItem=null;
+            if (l.size() > 0) {
+                oldJocConfigurationDbItem = l.get(0);
+            }
+            
             checkRequiredParameter("configurationItem", configuration.getConfigurationItem());
 
-            Boolean owner = oldJocConfigurationDbItem.getAccount().equals(configuration.getAccount());
-            Boolean permission = owner || getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getChange().isEditContent();
+            Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(configuration.getAccount());
+            Boolean permission = owner ||  (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getChange().isEditContent());
 
-            if (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared()) {
-                if (!permission) {
-                    this.accessDeniedResponse();
-                }
+            if (!permission) {
+                return this.accessDeniedResponse();
             }
-
-            jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
-            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
 
             jocConfigurationDBLayer.saveConfiguration(jocConfigurationDbItem, configuration.getShared(), configuration.getConfigurationItem());
 
@@ -130,14 +127,6 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
             connection = Globals.createSosHibernateStatelessConnection("readConfiguration");
             init(configuration);
-            if (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared()) {
-                if (!getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView()) {
-                    this.accessDeniedResponse();
-                }
-            }
-
-            jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
-            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
 
             List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
             if (l.size() > 0) {
@@ -148,7 +137,15 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             } else {
                 configuration = new Configuration();
             }
+            
 
+            Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(configuration.getAccount());
+            Boolean permission = owner || (jocConfigurationDbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView());
+
+            if (!permission) {
+                return this.accessDeniedResponse();
+            }
+            
             Configuration200 entity = new Configuration200();
             entity.setDeliveryDate(new Date());
             entity.setConfiguration(configuration);
@@ -177,17 +174,18 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             connection = Globals.createSosHibernateStatelessConnection("deleteConfiguration");
             init(configuration);
 
-            Boolean owner = oldJocConfigurationDbItem.getAccount().equals(configuration.getAccount());
-            Boolean permission = owner || getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getChange().isDelete();
+            List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
+            if (l.size() > 0) {
+                jocConfigurationDbItem = l.get(0);
+            }
+            
+            Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(configuration.getAccount());
+            Boolean permission = owner || (jocConfigurationDbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getChange().isDelete());
 
-            if (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared()) {
-                if (!permission) {
-                    this.accessDeniedResponse();
-                }
+            if (!permission) {
+                return this.accessDeniedResponse();
             }
 
-            jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
-            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
 
             jocConfigurationDBLayer.deleteConfiguration();
             return JOCDefaultResponse.responseStatusJSOk(new Date());
@@ -205,8 +203,9 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
     public JOCDefaultResponse postShareConfiguration(String accessToken, Configuration configuration) throws Exception {
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_SHARE, configuration, accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations()
-                    .getShare().getChange().getSharedStatus().isMakeShared());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_SHARE, configuration, accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
+                    .getJOCConfigurations().getShare().getChange().getSharedStatus().isMakeShared());
+
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -233,19 +232,18 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
     @Override
     public JOCDefaultResponse postMakePrivate(String accessToken, Configuration configuration) throws Exception {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_PRIVATE, configuration, accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJOCConfigurations()
-                    .getShare().getChange().getSharedStatus().isMakePrivate());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_PRIVATE, configuration, accessToken, configuration.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
+                    .getJOCConfigurations().getShare().getChange().getSharedStatus().isMakePrivate());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
             init(configuration);
 
             jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
             jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
-
 
             jocConfigurationDBLayer.saveConfiguration(jocConfigurationDbItem, false, configuration.getConfigurationItem());
 
