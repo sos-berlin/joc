@@ -20,7 +20,8 @@ public enum ConfigurationObjectType {
     FOLDER("FOLDER"),
     JOBSCHEDULER("JOBSCHEDULER"),
     DAILYPLAN("DAILYPLAN"),
-    HISTORY("HISTORY");
+    TASK_HISTORY("TASK_HISTORY"),
+    ORDER_HISTORY("ORDER_HISTORY");
     private final String value;
     private final static Map<String, ConfigurationObjectType> CONSTANTS = new HashMap<String, ConfigurationObjectType>();
 
