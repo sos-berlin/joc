@@ -37,13 +37,15 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlanImpl.class);
 
     private static final int SUCCESSFUL = 0;
-    private static final int INCOMPLETE = 1;
+    private static final int SUCCESSFUL_LATE = 1;
+    private static final int INCOMPLETE = 6;
+    private static final int INCOMPLETE_LATE = 5;
     private static final int FAILED = 2;
+    private static final int PLANNED_LATE = 5;
     private static final Integer PLANNED = 4;
     private static final String API_CALL = "./plan";
-    
-     
-    private PlanItem createPlanItem(DailyPlanDBItem dailyPlanDBItem){
+
+    private PlanItem createPlanItem(DailyPlanDBItem dailyPlanDBItem) {
         PlanItem p = new PlanItem();
         p.setLate(dailyPlanDBItem.getIsLate());
 
@@ -65,31 +67,44 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
         if (PlanStateText.PLANNED.name().equals(dailyPlanDBItem.getState())) {
             planState.set_text(PlanStateText.PLANNED);
-            planState.setSeverity(PLANNED);
+            if (dailyPlanDBItem.getIsLate()) {
+                planState.setSeverity(PLANNED_LATE);
+            } else {
+                planState.setSeverity(PLANNED);
+            }
         }
 
         if (PlanStateText.INCOMPLETE.name().equals(dailyPlanDBItem.getState())) {
             planState.set_text(PlanStateText.INCOMPLETE);
-            planState.setSeverity(INCOMPLETE);
+            if (dailyPlanDBItem.getIsLate()) {
+                planState.setSeverity(INCOMPLETE_LATE);
+            } else {
+                planState.setSeverity(INCOMPLETE);
+            }
         }
         if (PlanStateText.SUCCESSFUL.name().equals(dailyPlanDBItem.getState())) {
             planState.set_text(PlanStateText.SUCCESSFUL);
-            planState.setSeverity(SUCCESSFUL);
+            if (dailyPlanDBItem.getIsLate()) {
+                planState.setSeverity(SUCCESSFUL_LATE);
+            } else {
+                planState.setSeverity(SUCCESSFUL);
+            }
         }
         p.setState(planState);
         p.setSurveyDate(dailyPlanDBItem.getCreated());
-        
+
         return p;
 
     }
-    
+
     @Override
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
         SOSHibernateConnection connection = null;
 
         try {
             LOGGER.debug("Reading the daily plan");
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL,planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getDailyPlan().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getDailyPlan()
+                    .getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -98,7 +113,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(connection);
 
             Globals.beginTransaction(connection);
-            
+
             dailyPlanDBLayer.getFilter().setSchedulerId(planFilter.getJobschedulerId());
             dailyPlanDBLayer.getFilter().setJob(planFilter.getJob());
             dailyPlanDBLayer.getFilter().setJobChain(planFilter.getJobChain());
@@ -122,7 +137,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             ArrayList<PlanItem> result = new ArrayList<PlanItem>();
 
             Plan entity = new Plan();
-            
+
             for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfWaitingDailyPlanStandaloneDBItems) {
 
                 boolean add = true;
@@ -139,7 +154,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     result.add(p);
                 }
             }
-            
+
             for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfWaitingDailyPlanOrderDBItems) {
 
                 boolean add = true;
