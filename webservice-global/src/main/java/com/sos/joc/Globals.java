@@ -26,6 +26,7 @@ import com.sos.joc.exceptions.JocException;
 public class Globals {
 
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
+    private static final String HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE = "hibernate_configuration_scheduler_default_file";
     private static final Logger LOGGER = LoggerFactory.getLogger(Globals.class);
     public static final String SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS = "event_http_clients";
     public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
@@ -38,9 +39,8 @@ public class Globals {
     public static int httpSocketTimeout = 2000;
     public static boolean withHostnameVerification = false;
     public static boolean auditLogCommentsAreRequired = false;
-    public static JocWebserviceDataContainer jocWebserviceDataContainer=JocWebserviceDataContainer.getInstance();
+    public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
 
-    
     public static SOSHibernateFactory getHibernateFactory() throws JocException {
         if (sosHibernateFactory == null) {
             try {
@@ -52,7 +52,7 @@ public class Globals {
                 sosHibernateFactory.build();
             } catch (JocException e) {
                 throw e;
-            } catch (Exception e) { 
+            } catch (Exception e) {
                 throw new DBConnectionRefusedException(e);
             }
         }
@@ -83,9 +83,8 @@ public class Globals {
         return sosHibernateFactory;
     }
 
- 
-    public static SOSHibernateConnection createSosHibernateStatelessConnection(String identifier) throws JocException   {
-        if (sosHibernateFactory == null){
+    public static SOSHibernateConnection createSosHibernateStatelessConnection(String identifier) throws JocException {
+        if (sosHibernateFactory == null) {
             getHibernateFactory();
         }
         SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
@@ -98,14 +97,13 @@ public class Globals {
         }
     }
 
-    
     public static String getShiroIniInClassPath() {
         if (sosShiroProperties != null) {
             return "classpath:" + sosShiroProperties.getPropertiesFileClassPathParent() + "shiro.ini";
         }
         return DEFAULT_SHIRO_INI_PATH;
     }
-    
+
     public static void setProperties() throws JocException {
         setJobSchedulerConnectionTimeout();
         setJobSchedulerSocketTimeout();
@@ -113,8 +111,7 @@ public class Globals {
         setForceCommentsForAuditLog();
         setTrustStore();
     }
-    
-    
+
     public static void beginTransaction(SOSHibernateConnection connection) {
         try {
             if (connection != null) {
@@ -123,7 +120,7 @@ public class Globals {
         } catch (Exception e) {
         }
     }
-    
+
     public static void rollback(SOSHibernateConnection connection) {
         try {
             if (connection != null) {
@@ -132,8 +129,6 @@ public class Globals {
         } catch (Exception e) {
         }
     }
-
-      
 
     public static void commit(SOSHibernateConnection connection) {
         try {
@@ -147,7 +142,7 @@ public class Globals {
     public static void forceClosingHttpClients(Session session) {
         forceClosingHttpClients(session, SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS);
     }
-    
+
     @SuppressWarnings("unchecked")
     public static void forceClosingHttpClients(Session session, String sessionKey) {
         try {
@@ -163,30 +158,32 @@ public class Globals {
         } catch (InvalidSessionException e) {
         }
     }
-    
+
     private static String getConfFile(String schedulerId) throws JocException {
         String confFile = null;
         JocError error = new JocError();
         String propertyKey = null;
-        
+
         if (sosShiroProperties == null) {
             error.setMessage("sosShiroProperties are not initialized");
             throw new JocException(error);
         }
-        
+
         if (schedulerId != null) {
             propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
             confFile = sosShiroProperties.getProperty(propertyKey);
-            error.setCode("JOC-310");
-        }
-        if (confFile == null) {
-            propertyKey = HIBERNATE_CONFIGURATION_FILE;
-            confFile = sosShiroProperties.getProperty(propertyKey, "./hibernate.cfg.xml");
+            
             if (confFile == null) {
-                error.setMessage(String.format("Could find value for %1$s in joc_properties file", propertyKey));
-                throw new JocException(error);
+                propertyKey = HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE;
+                confFile = sosShiroProperties.getProperty(propertyKey);
             }
         }
+
+        if (confFile == null) {
+            propertyKey = HIBERNATE_CONFIGURATION_FILE;
+            confFile = sosShiroProperties.getProperty(propertyKey, "hibernate.cfg.xml");
+        }
+        
         Path p = sosShiroProperties.resolvePath(confFile);
         if (p != null) {
             if (!Files.exists(p)) {
@@ -198,33 +195,33 @@ public class Globals {
         }
         return confFile;
     }
-    
+
     private static void setJobSchedulerConnectionTimeout() {
         int defaultSeconds = 2;
         if (sosShiroProperties != null) {
             int seconds = sosShiroProperties.getProperty("jobscheduler_connection_timeout", defaultSeconds);
-            httpConnectionTimeout = seconds*1000;
-            LOGGER.info("HTTP(S) connection timeout = " + seconds );
+            httpConnectionTimeout = seconds * 1000;
+            LOGGER.info("HTTP(S) connection timeout = " + seconds);
         }
     }
-    
+
     private static void setJobSchedulerSocketTimeout() {
         int defaultSeconds = 2;
         if (sosShiroProperties != null) {
             int seconds = sosShiroProperties.getProperty("jobscheduler_socket_timeout", defaultSeconds);
-            httpSocketTimeout = seconds*1000;
-            LOGGER.info("HTTP(S) socket timeout = " + seconds );
+            httpSocketTimeout = seconds * 1000;
+            LOGGER.info("HTTP(S) socket timeout = " + seconds);
         }
     }
-    
+
     private static void setHostnameVerification() {
         boolean defaultVerification = false;
         if (sosShiroProperties != null) {
             withHostnameVerification = sosShiroProperties.getProperty("https_with_hostname_verification", defaultVerification);
-            LOGGER.info("HTTPS with hostname verification in certicate = " + withHostnameVerification );
+            LOGGER.info("HTTPS with hostname verification in certicate = " + withHostnameVerification);
         }
     }
-    
+
     private static void setTrustStore() throws JocException {
         if (sosShiroProperties != null) {
             JocError error = new JocError();
@@ -235,7 +232,7 @@ public class Globals {
                 if (p != null) {
                     if (!Files.exists(p)) {
                         error.setMessage(String.format("truststore path (%1$s) is set but file (%2$s) not found.", truststore, p.toString()));
-                        //throw new JocException(error);
+                        // throw new JocException(error);
                         LOGGER.error(error.getMessage());
                     } else {
                         truststore = p.toString();
@@ -245,12 +242,12 @@ public class Globals {
             }
         }
     }
-    
+
     private static void setForceCommentsForAuditLog() {
         boolean defaultForceCommentsForAuditLog = false;
         if (sosShiroProperties != null) {
             auditLogCommentsAreRequired = sosShiroProperties.getProperty("force_comments_for_audit_log", defaultForceCommentsForAuditLog);
-            LOGGER.info("force comments for audit log = " + auditLogCommentsAreRequired );
+            LOGGER.info("force comments for audit log = " + auditLogCommentsAreRequired);
         }
     }
 
@@ -258,8 +255,8 @@ public class Globals {
     }
 
     public static void disconnect(SOSHibernateConnection connection) {
-       if (connection != null){
-           connection.disconnect();
-       }
+        if (connection != null) {
+            connection.disconnect();
+        }
     }
 }
