@@ -76,6 +76,12 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
     }
 
+    private boolean shareStatusMakePrivat(Configuration configuration, JocConfigurationDbItem jocConfigurationDbItem) {
+
+        return (jocConfigurationDbItem != null && jocConfigurationDbItem.getShared() && !configuration.getShared());
+
+    }
+
     @Override
     public JOCDefaultResponse postSaveConfiguration(String accessToken, Configuration configuration) throws Exception {
 
@@ -89,15 +95,24 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             init(configuration);
 
             List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
-            JocConfigurationDbItem oldJocConfigurationDbItem=null;
+            JocConfigurationDbItem oldJocConfigurationDbItem = null;
             if (l.size() > 0) {
                 oldJocConfigurationDbItem = l.get(0);
             }
-            
+
+            boolean shareStatusMakePrivate = (jocConfigurationDbItem != null && jocConfigurationDbItem.getShared() && !configuration.getShared());
+            boolean shareStatusMakeShare = (jocConfigurationDbItem != null && !jocConfigurationDbItem.getShared() && configuration.getShared());
+
+            if (shareStatusMakePrivate && !getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getChange().getSharedStatus().isMakePrivate()
+                    || (shareStatusMakeShare && !getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getChange().getSharedStatus().isMakeShared())) {
+                return this.accessDeniedResponse();
+            }
+
             checkRequiredParameter("configurationItem", configuration.getConfigurationItem());
 
             Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(configuration.getAccount());
-            Boolean permission = owner ||  (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getChange().isEditContent());
+            Boolean permission = owner || (oldJocConfigurationDbItem != null && oldJocConfigurationDbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations()
+                    .getShare().getChange().isEditContent());
 
             if (!permission) {
                 return this.accessDeniedResponse();
@@ -128,6 +143,9 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             connection = Globals.createSosHibernateStatelessConnection("readConfiguration");
             init(configuration);
 
+            Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(configuration.getAccount());
+            Boolean permission = owner || (jocConfigurationDbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView());
+
             List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
             if (l.size() > 0) {
                 jocConfigurationDbItem = l.get(0);
@@ -137,15 +155,12 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             } else {
                 configuration = new Configuration();
             }
-            
 
-            Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(configuration.getAccount());
-            Boolean permission = owner || (jocConfigurationDbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView());
 
             if (!permission) {
                 return this.accessDeniedResponse();
             }
-            
+
             Configuration200 entity = new Configuration200();
             entity.setDeliveryDate(new Date());
             entity.setConfiguration(configuration);
@@ -178,14 +193,13 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             if (l.size() > 0) {
                 jocConfigurationDbItem = l.get(0);
             }
-            
+
             Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(configuration.getAccount());
             Boolean permission = owner || (jocConfigurationDbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getChange().isDelete());
 
             if (!permission) {
                 return this.accessDeniedResponse();
             }
-
 
             jocConfigurationDBLayer.deleteConfiguration();
             return JOCDefaultResponse.responseStatusJSOk(new Date());
