@@ -14,6 +14,7 @@ import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.order.OrderPath;
 
@@ -52,7 +53,7 @@ public class AuditLogDBLayer extends DBLayer {
                     if(orders.get(i).getOrderId() != null && !orders.get(i).getOrderId().isEmpty()) {
                         sql.append(" and orderId = :orderId").append(i);
                     }
-                    sql.append(" and folder = :folder").append(i).append(")");
+                    sql.append(")");
                     if(i == orders.size() -1) {
                         sql.append(")");
                     }
@@ -71,13 +72,11 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (orders != null && !orders.isEmpty()) {
                 for (int i = 0; i < orders.size(); i++) {
-                    String jobChain = orders.get(i).getJobChain().substring(orders.get(i).getJobChain().lastIndexOf("/") + 1);
-                    String folder = orders.get(i).getJobChain().substring(0, orders.get(i).getJobChain().lastIndexOf("/"));;
+                    String jobChain = orders.get(i).getJobChain();
                     query.setParameter("jobChain" + i, jobChain);
                     if(orders.get(i).getOrderId() != null && !orders.get(i).getOrderId().isEmpty()) {
                         query.setParameter("orderId" + i, orders.get(i).getOrderId());
                     }
-                    query.setParameter("folder" + i, folder);
                 }
             }
             if (limit != null) {

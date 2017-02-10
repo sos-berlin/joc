@@ -35,7 +35,6 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
     public JOCDefaultResponse postAuditLog(String accessToken, AuditLogFilter auditLogFilter) throws Exception {
         SOSHibernateConnection connection = null;
         try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL,auditLogFilter,accessToken, auditLogFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getAuditLog().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -51,6 +50,12 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             Integer filterLimit = auditLogFilter.getLimit();
             List<OrderPath> filterOrders = auditLogFilter.getOrders();
             String filterTicketLink = auditLogFilter.getTicketLink();
+            if(filterOrders != null && !filterOrders.isEmpty()) {
+                for(OrderPath order : filterOrders) {
+                    checkRequiredParameter("jobChain", order.getJobChain());
+                }
+            }
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Date filterFrom = null;
             Date filterTo = null;
             if (auditLogFilter.getDateFrom() != null && !auditLogFilter.getDateFrom().isEmpty()) {
@@ -68,7 +73,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             } else if (filterFolders != null && !filterFolders.isEmpty()) {
                 Set<String> folders = new HashSet<String>();
                 for (Folder folder : filterFolders) {
-                    folders.add(folder.getFolder());
+                    folders.add(normalizeFolder(folder.getFolder()));
                 }
                 auditLogs = dbLayer.getAuditLogByFolders(schedulerId, folders, filterLimit, filterFrom, filterTo, filterTicketLink);
             } else {

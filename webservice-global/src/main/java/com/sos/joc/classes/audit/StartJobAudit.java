@@ -32,7 +32,7 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
             if (startJob.getJob() != null) {
                 Path p = Paths.get(startJob.getJob());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                this.job = p.getFileName().toString();
+                this.job = p.toString().replace('\\', '/');
             }
         }
         setAuditParams(startJobs.getAuditLog());

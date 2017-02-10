@@ -32,7 +32,7 @@ public class ModifyJobChainAudit extends ModifyJobChains implements IAuditLog {
             if (modifyJobChain.getJobChain() != null) {
                 Path p = Paths.get(modifyJobChain.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                this.jobChain = p.getFileName().toString();
+                this.jobChain = p.toString().replace('\\', '/');
             }
         }
         if (modifyJobChains != null) {

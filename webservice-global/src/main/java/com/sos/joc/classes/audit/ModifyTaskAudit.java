@@ -40,7 +40,7 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
             if (job.getJob() != null) {
                 Path p = Paths.get(job.getJob()); 
                 this.folder = p.getParent().toString().replace('\\', '/');
-                this.job = p.getFileName().toString();
+                this.job = p.toString().replace('\\', '/');
             }
         }
     }

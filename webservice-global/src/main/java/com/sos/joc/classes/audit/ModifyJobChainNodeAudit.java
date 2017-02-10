@@ -32,7 +32,7 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
             if (modifyJobChainNode.getJobChain() != null) {
                 Path p = Paths.get(modifyJobChainNode.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                this.jobChain = p.getFileName().toString();
+                this.jobChain = p.toString().replace('\\', '/');
             }
         }
         if (jobChainNodes != null) {

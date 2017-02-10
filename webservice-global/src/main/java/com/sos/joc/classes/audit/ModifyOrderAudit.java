@@ -34,7 +34,7 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
             if (modifyOrder.getJobChain() != null) {
                 Path p = Paths.get(modifyOrder.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
-                this.jobChain = p.getFileName().toString();
+                this.jobChain = p.toString().replace('\\', '/');
                 this.orderId = modifyOrder.getOrderId();
             }
         }
