@@ -84,7 +84,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 xml.addAttribute("end_state", order.getEndState());
             }
             if (order.getState() != null && !"".equals(order.getState())) {
-                xml.addAttribute("end_state", order.getState());
+                xml.addAttribute("state", order.getState());
             }
             if (order.getTitle() != null) {
                 xml.addAttribute("title", order.getTitle());
