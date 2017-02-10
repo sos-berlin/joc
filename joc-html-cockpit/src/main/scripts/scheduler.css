@@ -58,6 +58,7 @@ div.rb                          {border-right:1px solid #F8F9FD;border-bottom:1p
 #error_message                  {color:red;padding:0px 4px;font-size:12px;}
 #hide_button                    {display:none;position:absolute;bottom:10px;right:20px;z-index:5;background-color:#CFD7EB;}
 #backup                         {font-size:14px;font-weight:bold;font-style:italic;color:#EA7A14;}
+#joccockpit                     {font-size:14px;font-weight:bold;font-style:italic;color:#EA7A14;}
 #info_button                    {width:88px;}
 table.top                       {border:1px solid #F8F9FD;border-bottom:0px;}
 table.middle                    {border-left:1px solid #F8F9FD;border-right:1px solid #F8F9FD;}
