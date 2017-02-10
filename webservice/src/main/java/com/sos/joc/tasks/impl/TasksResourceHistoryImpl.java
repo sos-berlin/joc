@@ -63,6 +63,11 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 }
                 jobsFilter.setRegex("");
             } else {
+                if (jobsFilter.getExcludeJobs().size() > 0) {
+                    for (JobPath jobPath : jobsFilter.getExcludeJobs()) {
+                        reportExecutionsDBLayer.getFilter().addExcludedJob(jobPath.getJob());
+                    }
+                }
                 if (jobsFilter.getHistoryStates().size() > 0) {
                     for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
                         reportExecutionsDBLayer.getFilter().addState(historyStateText.toString());
@@ -79,6 +84,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             if (jobsFilter.getLimit() == null) {
                 jobsFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
             }
+            
             reportExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
 
             List<DBItemReportExecution> listOfDBItemReportExecutionDBItems = reportExecutionsDBLayer.getSchedulerHistoryListFromTo();
