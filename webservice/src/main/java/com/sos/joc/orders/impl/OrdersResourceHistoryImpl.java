@@ -90,8 +90,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             for (DBItemReportTriggerWithResult dbItemReportTriggerWithResult : listOfReportTriggerWithResultDBItems) {
 
                 boolean add = true;
-                ordersFilter.getExcludeOrders();
-
+ 
                 OrderHistoryItem history = new OrderHistoryItem();
                 history.setEndTime(dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime());
                 history.setHistoryId(String.valueOf(dbItemReportTriggerWithResult.getDbItemReportTrigger().getHistoryId()));
