@@ -36,10 +36,21 @@ public class JocAuditLog {
         try {
             String params = getJsonString(body);
             String comment = "-";
+            String timeSpent = "-";
+            String ticketLink = "-";
             if (body != null) {
                 comment = body.getComment();
+                if (body.getComment() != null) {
+                    comment = body.getComment();
+                }
+                if (body.getTimeSpent() != null) {
+                    timeSpent = body.getTimeSpent().toString()+"m";
+                }
+                if (body.getTicketLink() != null) {
+                    ticketLink = body.getTicketLink();
+                }
             }
-            AUDIT_LOGGER.info(String.format("REQUEST: %1$s - USER: %2$s - PARAMS: %3$s - COMMENT: %4$s", request, user, params, comment));
+            AUDIT_LOGGER.info(String.format("REQUEST: %1$s - USER: %2$s - PARAMS: %3$s - COMMENT: %4$s - TIMESPENT: %5$s - TICKET: %6$s", request, user, params, comment, timeSpent, ticketLink));
         } catch (Exception e) {
             LOGGER.error("Cannot write to audit log file", e);
         }
