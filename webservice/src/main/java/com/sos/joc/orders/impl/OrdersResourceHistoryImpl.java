@@ -62,6 +62,13 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 }
                 ordersFilter.setRegex("");
             } else {
+                
+                if (ordersFilter.getExcludeOrders().size() > 0) {
+                    for (OrderPath orderPath : ordersFilter.getExcludeOrders()) {
+                        reportTriggerDBLayer.getFilter().addIgnoreItems(orderPath.getJobChain(), orderPath.getOrderId());
+                    }
+                }
+                
                 if (ordersFilter.getHistoryStates().size() > 0) {
                     for (HistoryStateText historyStateText : ordersFilter.getHistoryStates()) {
                         reportTriggerDBLayer.getFilter().addState(historyStateText.toString());
@@ -83,6 +90,8 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             for (DBItemReportTriggerWithResult dbItemReportTriggerWithResult : listOfReportTriggerWithResultDBItems) {
 
                 boolean add = true;
+                ordersFilter.getExcludeOrders();
+
                 OrderHistoryItem history = new OrderHistoryItem();
                 history.setEndTime(dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime());
                 history.setHistoryId(String.valueOf(dbItemReportTriggerWithResult.getDbItemReportTrigger().getHistoryId()));
