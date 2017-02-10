@@ -191,7 +191,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
                 if (dailyPlanDBItem.getDbItemReportExecution() != null) {
                     p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
-                    p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getId().toString());
+                    p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getHistoryIdAsString());
                     p.setStartTime(dailyPlanDBItem.getDbItemReportExecution().getStartTime());
                     p.setExitCode(dailyPlanDBItem.getDbItemReportExecution().getExitCode());
                     err.setCode(dailyPlanDBItem.getDbItemReportExecution().getErrorCode());
