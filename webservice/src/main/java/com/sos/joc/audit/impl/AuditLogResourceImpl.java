@@ -42,7 +42,6 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             }
          
             String schedulerId = auditLogFilter.getJobschedulerId();
-            AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
             List<DBItemAuditLog> auditLogs = new ArrayList<DBItemAuditLog>();
             // filters
             List<Folder> filterFolders = auditLogFilter.getFolders();
@@ -56,6 +55,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
                 }
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
             Date filterFrom = null;
             Date filterTo = null;
             if (auditLogFilter.getDateFrom() != null && !auditLogFilter.getDateFrom().isEmpty()) {
