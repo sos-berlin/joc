@@ -125,21 +125,14 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
 
         List<JocConfigurationDbItem> configurationsList = null;
 
-        if (limit > 0 && getConnection().getFactory().getDbms().equals(Dbms.MSSQL)) {
-            String sql = String.format("Select TOP %s from " + JocConfigurationDBItem + " " + getWhere(), limit);
-
-            NativeQuery<JocConfigurationDbItem> query = getConnection().createNativeQuery(sql.toString(), DBItemReportTrigger.class);
-            bindParameters(query);
-            configurationsList = query.getResultList();
-        } else {
-            String sql = "from " + JocConfigurationDBItem + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode();
-            Query<JocConfigurationDbItem> query = connection.createQuery(sql);
-            bindParameters(query);
-            if (limit > 0) {
-                query.setMaxResults(limit);
-            }
-            configurationsList = query.getResultList();
+        String sql = "from " + JocConfigurationDBItem + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode();
+        Query<JocConfigurationDbItem> query = connection.createQuery(sql);
+        bindParameters(query);
+        if (limit > 0) {
+            query.setMaxResults(limit);
         }
+        configurationsList = query.getResultList();
+
         return configurationsList;
 
     }
