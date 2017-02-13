@@ -106,6 +106,9 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static JOCDefaultResponse responseStatusJSError(JocException e, String mediaType) {
+        if (e instanceof SessionNotExistException) {
+            return responseStatusJSError((SessionNotExistException) e, mediaType);
+        }
         if (!"".equals(e.getError().printMetaInfo())) {
             LOGGER.info(e.getError().printMetaInfo());
         }
@@ -284,8 +287,10 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         try {
             sosShiroCurrentUser = sosJobschedulerUser.getSosShiroCurrentUser();
         } catch (SessionNotExistException e) {
-            message = "Authentication failure:" + e.getMessage();
-
+            if ("".equals(message)) {
+                message = "Authentication failure:";
+            }
+            message += e.getMessage();
         }
         if (sosShiroCurrentUser != null) {
             entity.setAccessToken(sosShiroCurrentUser.getAccessToken());
