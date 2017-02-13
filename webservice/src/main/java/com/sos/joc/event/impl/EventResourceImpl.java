@@ -14,6 +14,7 @@ import javax.ws.rs.Path;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.StoppedSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,8 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 if (session != null) {
                     session.setAttribute(SESSION_KEY, threadName);
                 }
+            } catch (StoppedSessionException e1) {
+                throw new SessionNotExistException(e1);
             } catch (InvalidSessionException e1) {
                 throw new SessionNotExistException(e1);
             }
@@ -164,9 +167,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
-//        } catch (InvalidSessionException e) {
-//            entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
-//            entity.setDeliveryDate(Date.from(Instant.now()));
+        } catch (StoppedSessionException e) {
+            entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
+            entity.setDeliveryDate(Date.from(Instant.now()));
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
