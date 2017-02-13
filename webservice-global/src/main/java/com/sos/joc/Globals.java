@@ -162,6 +162,7 @@ public class Globals {
     private static String getConfFile(String schedulerId) throws JocException {
         String confFile = null;
         JocError error = new JocError();
+        error.setCode("JOC-003");
         String propertyKey = null;
 
         if (sosShiroProperties == null) {
@@ -181,7 +182,11 @@ public class Globals {
 
         if (confFile == null) {
             propertyKey = HIBERNATE_CONFIGURATION_FILE;
-            confFile = sosShiroProperties.getProperty(propertyKey, "hibernate.cfg.xml");
+            confFile = sosShiroProperties.getProperty(propertyKey, "reporting.hibernate.cfg.xml");
+        }
+        
+        if (confFile != null) {
+            confFile = confFile.trim(); 
         }
         
         Path p = sosShiroProperties.resolvePath(confFile);
@@ -227,8 +232,8 @@ public class Globals {
             JocError error = new JocError();
             error.setCode("JOC-311");
             String truststore = sosShiroProperties.getProperty("truststore_path", "");
-            if (truststore != null && !truststore.isEmpty()) {
-                Path p = sosShiroProperties.resolvePath(truststore);
+            if (truststore != null && !truststore.trim().isEmpty()) {
+                Path p = sosShiroProperties.resolvePath(truststore.trim());
                 if (p != null) {
                     if (!Files.exists(p)) {
                         error.setMessage(String.format("truststore path (%1$s) is set but file (%2$s) not found.", truststore, p.toString()));
