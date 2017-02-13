@@ -8,6 +8,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 
 public class JobSchedulerUser {
 
@@ -19,9 +20,12 @@ public class JobSchedulerUser {
         this.accessToken = accessToken;
     }
 
-    public SOSShiroCurrentUser getSosShiroCurrentUser() {
+    public SOSShiroCurrentUser getSosShiroCurrentUser() throws SessionNotExistException {
         if (sosShiroCurrentUser == null && Globals.jocWebserviceDataContainer.getCurrentUsersList() != null) {
             sosShiroCurrentUser = Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken);
+        }
+        if (sosShiroCurrentUser == null) {
+            throw new SessionNotExistException("Session doesn't exist");
         }
         return sosShiroCurrentUser;
     }

@@ -16,7 +16,7 @@ import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.NoUserWithAccessTokenException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.Err420;
 import com.sos.joc.model.common.Errs;
@@ -92,7 +92,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatus420(getErr420(new JocError(message)));
     }
     
-    public static JOCDefaultResponse responseStatusJSError(NoUserWithAccessTokenException e, String mediaType) {
+    public static JOCDefaultResponse responseStatusJSError(SessionNotExistException e, String mediaType) {
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
         sosShiroCurrentUserAnswer.setHasRole(false); 
         sosShiroCurrentUserAnswer.setIsAuthenticated(false);
@@ -276,7 +276,13 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
     public static SOSShiroCurrentUserAnswer getError401Schema(JobSchedulerUser sosJobschedulerUser,String message) {
         SOSShiroCurrentUserAnswer entity = new SOSShiroCurrentUserAnswer();
-        SOSShiroCurrentUser sosShiroCurrentUser = sosJobschedulerUser.getSosShiroCurrentUser();
+        SOSShiroCurrentUser sosShiroCurrentUser=null;
+        try {
+            sosShiroCurrentUser = sosJobschedulerUser.getSosShiroCurrentUser();
+        } catch (SessionNotExistException e) {
+            message = "Authentication failure:" + e.getMessage();
+
+        }
         if (sosShiroCurrentUser != null) {
             entity.setAccessToken(sosShiroCurrentUser.getAccessToken());
             entity.setUser(sosShiroCurrentUser.getUsername());

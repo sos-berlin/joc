@@ -26,7 +26,7 @@ import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingCommentException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.exceptions.NoUserWithAccessTokenException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.audit.AuditParams;
 
 public class JOCResourceImpl {
@@ -40,24 +40,21 @@ public class JOCResourceImpl {
 
     private JocError jocError = new JocError();
 
-    protected void initGetPermissions(String accessToken) throws NoUserWithAccessTokenException {
+    protected void initGetPermissions(String accessToken)  {
         if (jobschedulerUser == null) {
             this.accessToken = accessToken;
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
-        if (jobschedulerUser.getSosShiroCurrentUser() == null) {
-            throw new NoUserWithAccessTokenException("No user logged in with accessToken: " + accessToken);
-        }
-
+       
         updateUserInMetaInfo();
     }
 
-    protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws JocException {
+    protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws SessionNotExistException  {
         initGetPermissions(accessToken);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
     }
 
-    protected SOSPermissionCommands getPermissonsCommands(String accessToken) throws JocException {
+    protected SOSPermissionCommands getPermissonsCommands(String accessToken) throws SessionNotExistException   {
         initGetPermissions(accessToken);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands();
     }
