@@ -25,6 +25,7 @@ import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 import com.sos.joc.model.event.EventSnapshot;
@@ -89,14 +90,14 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             }
             Globals.jobSchedulerIsRunning.put(command.getSchemeAndAuthority(), false);
             throw e;
+        } catch (SessionNotExistException e) {
+            jobSchedulerEvent.setEventSnapshots(null);
+            handleError("JOC-440", e.getClass().getSimpleName());
+            throw e;
         } catch (JocException e) {
             jobSchedulerEvent.setEventSnapshots(null);
             handleError(e.getError().getCode(), e.getClass().getSimpleName());
             LOGGER.error(e.getClass().getSimpleName() + ": " + e.getMessage());
-            throw e;
-        } catch (InvalidSessionException e) {
-            jobSchedulerEvent.setEventSnapshots(null);
-            handleError("JOC-440", e.getClass().getSimpleName());
             throw e;
         } catch (Exception e) {
             jobSchedulerEvent.setEventSnapshots(null);
@@ -240,9 +241,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         return eventSnapshots;
     }
     
-    private long getSessionTimeout() throws InvalidSessionException {
+    private long getSessionTimeout() throws SessionNotExistException {
         if (session == null) {
-            throw new UnknownSessionException("session is null");
+            throw new SessionNotExistException("session is invalid");
         }
         return session.getTimeout();
     }

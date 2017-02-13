@@ -101,6 +101,10 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatus440(sosShiroCurrentUserAnswer, mediaType);
     }
     
+    public static JOCDefaultResponse responseStatusJSError(SessionNotExistException e) {
+        return responseStatusJSError(e, MediaType.APPLICATION_JSON);
+    }
+    
     public static JOCDefaultResponse responseStatusJSError(JocException e, String mediaType) {
         if (!"".equals(e.getError().printMetaInfo())) {
             LOGGER.info(e.getError().printMetaInfo());

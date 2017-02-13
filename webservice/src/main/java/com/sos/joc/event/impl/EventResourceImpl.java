@@ -30,6 +30,7 @@ import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.event.JobSchedulerEvent;
 import com.sos.joc.model.event.JobSchedulerEvents;
 import com.sos.joc.model.event.JobSchedulerObjects;
@@ -68,6 +69,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     session.setAttribute(SESSION_KEY, threadName);
                 }
             } catch (InvalidSessionException e1) {
+                throw new SessionNotExistException(e1);
             }
             // Not a good idea: Same session in multiple tabs closed http
             // clients vice versa
@@ -162,9 +164,9 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (InvalidSessionException e) {
-            entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
-            entity.setDeliveryDate(Date.from(Instant.now()));
+//        } catch (InvalidSessionException e) {
+//            entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
+//            entity.setDeliveryDate(Date.from(Instant.now()));
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
