@@ -24,7 +24,7 @@ public class LogOrderContent extends LogContent {
         SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
         connection.connect();
 
-        connection.beginTransaction();
+        Globals.beginTransaction(connection);
         try {
             JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(connection);
             String log = jobSchedulerOrderHistoryDBLayer.getLogAsString(orderHistoryFilter.getHistoryId());
@@ -36,7 +36,7 @@ public class LogOrderContent extends LogContent {
             connection.rollback();
             throw e;
         } finally {
-            connection.disconnect();
+            Globals.disconnect(connection);
         }
     }
 

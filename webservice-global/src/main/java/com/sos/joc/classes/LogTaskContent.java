@@ -23,7 +23,7 @@ public class LogTaskContent extends LogContent {
         SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
         connection.connect();
 
-        connection.beginTransaction();
+        Globals.beginTransaction(connection);
         try {
             JobSchedulerTaskHistoryDBLayer jobSchedulerTaskHistoryDBLayer = new JobSchedulerTaskHistoryDBLayer(connection);
             String log = jobSchedulerTaskHistoryDBLayer.getLogAsString(taskFilter.getTaskId());
@@ -34,7 +34,7 @@ public class LogTaskContent extends LogContent {
         } catch (Exception e) {
             throw e;
         } finally {
-            connection.rollback();
+            Globals.disconnect(connection);
         }
     }
 
