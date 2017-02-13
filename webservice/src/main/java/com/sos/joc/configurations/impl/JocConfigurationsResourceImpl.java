@@ -36,7 +36,7 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
                 return jocDefaultResponse;
             }
 
-            connection = Globals.createSosHibernateStatelessConnection("API_CALL");
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Globals.beginTransaction(connection);
 
             String objectType = "";

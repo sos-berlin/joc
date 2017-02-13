@@ -20,8 +20,8 @@ import com.sos.joc.model.configuration.ConfigurationType;
 public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJocConfigurationResource {
 
     private static final String API_CALL_READ = "./configuration";
-    private static final String API_CALL_SAVE = "./configuration/save_configuration";
-    private static final String API_CALL_DELETE = "./configuration/delete_configuration";
+    private static final String API_CALL_SAVE = "./configuration/save";
+    private static final String API_CALL_DELETE = "./configuration/delete";
     private static final String API_CALL_SHARE = "./configuration/share";
     private static final String API_CALL_PRIVATE = "./configuration/make_private";
     private SOSHibernateConnection connection = null;
@@ -91,7 +91,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
                 return jocDefaultResponse;
             }
 
-            connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL_SAVE);
             init(configuration);
 
             List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
@@ -140,7 +140,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
                 return jocDefaultResponse;
             }
 
-            connection = Globals.createSosHibernateStatelessConnection("readConfiguration");
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL_READ);
             init(configuration);
 
             Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(configuration.getAccount());
@@ -186,7 +186,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
                 return jocDefaultResponse;
             }
 
-            connection = Globals.createSosHibernateStatelessConnection("deleteConfiguration");
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL_DELETE);
             init(configuration);
 
             List<JocConfigurationDbItem> l = jocConfigurationDBLayer.getJocConfigurationList(1);
@@ -224,7 +224,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
                 return jocDefaultResponse;
             }
 
-            connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL_SHARE);
             init(configuration);
 
             jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
@@ -253,7 +253,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
                 return jocDefaultResponse;
             }
 
-            connection = Globals.createSosHibernateStatelessConnection("saveConfiguration");
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL_PRIVATE);
             init(configuration);
 
             jocConfigurationDbItem.setInstanceId(dbItemInventoryInstance.getId());
