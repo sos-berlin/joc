@@ -200,7 +200,11 @@ public class JOCResourceImpl {
     }
 
     public String getBasicAuthorization() {
-        return dbItemInventoryInstance.getAuth();
+        try {
+            return dbItemInventoryInstance.getAuth();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public String retrySchedulerInstance() throws JocException {

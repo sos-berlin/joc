@@ -9,6 +9,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.ws.rs.core.UriBuilder;
 
+import org.apache.http.HttpEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +88,15 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     
     public void setUriBuilderForJobs(String url) {
         setUriBuilder(url, MASTER_API_PATH + "job");
+    }
+    
+    public void setUriBuilderForMainLog() {
+        setUriBuilder(jocResourceImpl.getUrl(), "/jobscheduler/engine-cpp/show_log");
+        uriBuilder.queryParam("main", "");
+    }
+    
+    public void setUriBuilderForMainLog(String logFileBaseName) {
+        setUriBuilder(jocResourceImpl.getUrl(), "/jobscheduler/joc/scheduler_data/logs/" + logFileBaseName);
     }
     
     public void setUriBuilder(String path) {
@@ -235,6 +245,62 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
             throw e;
         }
     }
+    
+    public String getHtmlFromGet(String csrfToken) throws JocException {
+        return getAcceptTypeFromGet(csrfToken, "text/html");
+    }
+    
+    
+    
+    public String getHtmlFromGet(URI uri, String csrfToken) throws JocException {
+        return getAcceptTypeFromGet(uri, csrfToken, "text/html");
+    }
+    
+    public String getPlainFromGet(String csrfToken) throws JocException {
+        return getAcceptTypeFromGet(csrfToken, "text/plain");
+    }
+    
+    public String getPlainFromGet(URI uri, String csrfToken) throws JocException {
+        return getAcceptTypeFromGet(uri, csrfToken, "text/plain");
+    }
+    
+    public HttpEntity getInCompleteHtmlEntityFromGet(String csrfToken) throws JocException {
+        try {
+            return getInCompleteHtmlEntityFromGet(getURI(), csrfToken);
+        } catch (JocException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(e);
+        }
+    }
+    
+    public HttpEntity getInCompleteHtmlEntityFromGet(URI uri, String csrfToken) throws JocException {
+        addHeader("Accept", "text/html");
+        addHeader("Accept-Encoding", "gzip");
+        addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
+        JocError jocError = new JocError();
+        jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
+        try {
+            HttpEntity response = getInCompleteHttpEntityByRestService(uri);
+            return getHtmlFromResponse(response, uri, jocError);
+        } catch (ConnectionRefusedException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerConnectionRefusedException(jocError, e);
+            }
+        } catch (NoResponseException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerNoResponseException(jocError, e);
+            }
+        } catch (JocException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(jocError, e);
+        }
+    }
 
     public JsonObject getJsonObjectFromGet(String csrfToken) throws JocException {
         try {
@@ -254,6 +320,37 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = getRestService(uri);
             return getJsonObjectFromResponse(response, uri, jocError);
+        } catch (ConnectionRefusedException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerConnectionRefusedException(jocError, e);
+            }
+        } catch (NoResponseException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerNoResponseException(jocError, e);
+            }
+        } catch (JocException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new JobSchedulerBadRequestException(jocError, e);
+        }
+    }
+    
+    public String getAcceptTypeFromGet(String csrfToken, String acceptHeader) throws JocException {
+        return getAcceptTypeFromGet(getURI(), csrfToken, acceptHeader);
+    }
+    
+    public String getAcceptTypeFromGet(URI uri, String csrfToken, String acceptHeader) throws JocException {
+        addHeader("Accept", acceptHeader);
+        addHeader("X-CSRF-Token", getCsrfToken(csrfToken));
+        JocError jocError = new JocError();
+        jocError.appendMetaInfo("JS-URL: " + (uri == null ? "null" : uri.toString()));
+        try {
+            String response = getRestService(uri);
+            return getStringFromResponse(response, uri, jocError, acceptHeader);
         } catch (ConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
@@ -344,6 +441,57 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                 }
             default:
                 throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase());
+            }
+        } catch (JocException e) {
+            e.addErrorMetaInfo(jocError);
+            throw e;
+        }
+    }
+    
+    private HttpEntity getHtmlFromResponse(HttpEntity response, URI uri, JocError jocError) throws JocException {
+        int httpReplyCode = statusCode();
+        String contentType = getResponseHeader("Content-Type");
+        try {
+            switch (httpReplyCode) {
+            case 200:
+                if (contentType.contains("text/html")) {
+                    if (response == null || response.getContentLength() == 0) {
+                        throw new JobSchedulerNoResponseException("Unexpected empty response");
+                    }
+                    return response;
+                } else {
+                    throw new JobSchedulerInvalidResponseDataException(String.format("Unexpected content type '%1$s'. Response: %2$s", contentType,
+                            response));
+                }
+            default:
+                throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase());
+            }
+        } catch (JocException e) {
+            e.addErrorMetaInfo(jocError);
+            throw e;
+        }
+    }
+    
+    private String getStringFromResponse(String response, URI uri, JocError jocError, String acceptHeader) throws JocException {
+        int httpReplyCode = statusCode();
+        String contentType = getResponseHeader("Content-Type");
+        try {
+            switch (httpReplyCode) {
+            case 200:
+                if (acceptHeader.contains(contentType)) {
+                    if (response == null || response.isEmpty()) {
+                        throw new JobSchedulerNoResponseException("Unexpected empty response");
+                    }
+                    return response;
+                } else {
+                    throw new JobSchedulerInvalidResponseDataException(String.format("Unexpected content type '%1$s'. Response: %2$s", contentType,
+                            response));
+                }
+            default:
+                if (response == null) {
+                    response = "";
+                }
+                throw new JobSchedulerBadRequestException(httpReplyCode + " " + getHttpResponse().getStatusLine().getReasonPhrase() + " " + response);
             }
         } catch (JocException e) {
             e.addErrorMetaInfo(jocError);

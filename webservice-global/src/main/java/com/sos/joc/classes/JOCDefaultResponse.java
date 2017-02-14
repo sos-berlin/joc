@@ -67,6 +67,13 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     public static JOCDefaultResponse responseHtmlStatus200(Object entity) {
         return responseStatus200(entity, MediaType.TEXT_HTML + "; charset=UTF-8");
     }
+    
+    public static JOCDefaultResponse responseTxtDownloadStatus200(Object entity, String filename) {
+        Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", MediaType.TEXT_HTML + "; charset=UTF-8").header(
+                "Content-Disposition", "attachment; filename=" + filename).cacheControl(setNoCaching());
+        responseBuilder.entity(entity);
+        return new JOCDefaultResponse(responseBuilder.build());
+    }
 
     public static JOCDefaultResponse responseStatus200WithHeaders(Object entity, String accessToken, long timeout) {
         Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", MediaType.APPLICATION_JSON).cacheControl(setNoCaching());
