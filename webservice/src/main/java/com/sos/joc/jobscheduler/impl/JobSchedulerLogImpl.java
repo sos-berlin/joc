@@ -11,7 +11,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerLogResource;
-import com.sos.joc.model.jobscheduler.TimeoutParameter;
+import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 
 @Path("jobscheduler")
 public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedulerLogResource {
@@ -19,26 +19,20 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
     private static final String API_CALL = "./jobscheduler/log";
 
     @Override
-    public JOCDefaultResponse getMainLog(String accessToken, String queryAccessToken, String jobschedulerId) throws Exception {
+    public JOCDefaultResponse getMainLog(String accessToken, HostPortTimeOutParameter hostPortParamSchema) throws Exception {
 
 //        InputStream in = null;
 //        InputStreamReader inReader = null;
 //        BufferedReader inBufferedReader = null;
         try {
-            TimeoutParameter timeOutParam = new TimeoutParameter();
-            timeOutParam.setJobschedulerId(jobschedulerId);
-
-            if (accessToken == null) {
-                accessToken = queryAccessToken;
-            }
-
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, timeOutParam, accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken)
-                    .getJobschedulerMaster().getView().isMainlog());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, hostPortParamSchema, accessToken, hostPortParamSchema.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isMainlog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
-            checkRequiredParameter("jobschedulerId", jobschedulerId);
+            checkRequiredParameter("jobschedulerId", hostPortParamSchema.getJobschedulerId());
+            getJobSchedulerInstanceByHostPort(hostPortParamSchema.getHost(), hostPortParamSchema.getPort(), hostPortParamSchema.getJobschedulerId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String xmlCommand = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders", "/does/not/exist");
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(xmlCommand, accessToken);

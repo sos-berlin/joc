@@ -297,19 +297,25 @@ public class JOCResourceImpl {
             SOSHibernateConnection connection = null;
 
             try {
-                connection = Globals.createSosHibernateStatelessConnection("getJobSchedulerInstanceByHostPort");
+                try {
+                    connection = Globals.createSosHibernateStatelessConnection("getJobSchedulerInstanceByHostPort");
+                } catch (Exception e) {
+                    throw new DBConnectionRefusedException(e);
+                }
+
+                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+                dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(jobSchedulerIdentifier);
+
+                if (dbItemInventoryInstance == null) {
+                    String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
+                            jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
+                            DBLayer.TABLE_INVENTORY_INSTANCES);
+                    throw new DBInvalidDataException(errMessage);
+                }
             } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
-            }
-
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
-            dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(jobSchedulerIdentifier);
-
-            if (dbItemInventoryInstance == null) {
-                String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
-                        jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
-                        DBLayer.TABLE_INVENTORY_INSTANCES);
-                throw new DBInvalidDataException(errMessage);
+                throw e;
+            } finally {
+                Globals.disconnect(connection);
             }
         }
     }
