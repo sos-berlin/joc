@@ -15,14 +15,16 @@ import com.sos.joc.model.order.OrderType;
 
 
 public class OrderPermanent {
-    private static SOSHibernateConnection connection = null;
 
-    public static List<OrderP> fillOutputOrders (List<DBItemInventoryOrder> ordersFromDB, InventoryOrdersDBLayer dbLayer, Boolean compact)
+    public static List<OrderP> fillOutputOrders(List<DBItemInventoryOrder> ordersFromDB, InventoryOrdersDBLayer dbLayer, Boolean compact)
             throws Exception {
         List<OrderP> listOfOutputOrders = new ArrayList<OrderP>();
+        SOSHibernateConnection connection = null;
 
         try {
             connection = Globals.createSosHibernateStatelessConnection("fillOutputOrders");
+            DBLayerReporting dbLayerReporting = new DBLayerReporting(connection);
+            int limit = Globals.sosShiroProperties.getProperty("limit_for_average_calculation", WebserviceConstants.DEFAULT_LIMIT);
 
             Globals.beginTransaction(connection);
 
@@ -32,38 +34,29 @@ public class OrderPermanent {
                 order.setPath(inventoryOrder.getName());
                 order.setOrderId(inventoryOrder.getOrderId());
                 order.setJobChain(inventoryOrder.getJobChainName());
-                Integer estimatedDuration = getEstimatedDurationInSeconds(inventoryOrder);
-                if (estimatedDuration != null) {
-                order.setEstimatedDuration(estimatedDuration);
-            } else {
-                order.setEstimatedDuration(0);
-            }
-            if (compact == null || !compact) {
-                Date configDate = dbLayer.getOrderConfigurationDate(inventoryOrder.getId());
-                if(configDate != null) {
-                    order.setConfigurationDate(new Date());
+                Long estimatedDurationInMillis = dbLayerReporting.getOrderEstimatedDuration(inventoryOrder, limit);
+                if (estimatedDurationInMillis != null) {
+                    order.setEstimatedDuration((estimatedDurationInMillis.intValue() / 1000));
+                } else {
+                    order.setEstimatedDuration(0);
                 }
-                order.setEndState(inventoryOrder.getEndState());
-                order.setInitialState(inventoryOrder.getInitialState());
-                order.setTitle(inventoryOrder.getTitle());
-                order.set_type(OrderType.PERMANENT);
-                order.setPriority(inventoryOrder.getPriority());
+                if (compact == null || !compact) {
+                    Date configDate = dbLayer.getOrderConfigurationDate(inventoryOrder.getId());
+                    if (configDate != null) {
+                        order.setConfigurationDate(new Date());
+                    }
+                    order.setEndState(inventoryOrder.getEndState());
+                    order.setInitialState(inventoryOrder.getInitialState());
+                    order.setTitle(inventoryOrder.getTitle());
+                    order.set_type(OrderType.PERMANENT);
+                    order.setPriority(inventoryOrder.getPriority());
+                }
+                listOfOutputOrders.add(order);
             }
-            listOfOutputOrders.add(order);
-        }
-        return listOfOutputOrders;
-        }finally{
+            return listOfOutputOrders;
+        } finally {
             Globals.disconnect(connection);
         }
-    }
-    
-    private static Integer getEstimatedDurationInSeconds(DBItemInventoryOrder order) throws Exception {
-        DBLayerReporting dbLayer = new DBLayerReporting(connection);
-        Long estimatedDurationInMillis = dbLayer.getOrderEstimatedDuration(order,Globals.sosShiroProperties.getProperty("limit_for_average_calculation",WebserviceConstants.DEFAULT_LIMIT));
-        if (estimatedDurationInMillis != null) {
-            return estimatedDurationInMillis.intValue()/1000;
-        }
-        return null;
     }
 
 }
