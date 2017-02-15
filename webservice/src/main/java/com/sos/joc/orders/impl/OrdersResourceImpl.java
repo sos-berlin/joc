@@ -80,12 +80,12 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             if (!ordersLists.isEmpty()) {
                 for (OrdersPerJobChain opj : ordersLists.values()) {
-                    tasks.add(new OrdersVCallable(opj, ordersBody.getCompact(), command, accessToken));
+                    tasks.add(new OrdersVCallable(opj, ordersBody.getCompact(), new JOCJsonCommand(command), accessToken));
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
-                    tasks.add(new OrdersVCallable(folder, ordersBody, command, accessToken));
+                    tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken));
                 }
             } else {
                 Folder rootFolder = new Folder();

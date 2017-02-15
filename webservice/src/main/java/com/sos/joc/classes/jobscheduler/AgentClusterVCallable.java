@@ -132,7 +132,7 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         agentClusterV.setAgentClusterPath();
         List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
         for (String agent :  agentClusterV.getAgentSet()) {
-            tasks.add(new AgentVCallable(agent, jocJsonCommand, accessToken));
+            tasks.add(new AgentVCallable(agent, new JOCJsonCommand(jocJsonCommand), accessToken));
         }
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();

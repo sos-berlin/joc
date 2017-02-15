@@ -44,11 +44,11 @@ public class Orders {
 
         if (jobChains.size() > 0) {
             for (String jobChain : jobChains) {
-                tasks.add(new OrdersSnapshotCallable(jobChain, command, accessToken));
+                tasks.add(new OrdersSnapshotCallable(jobChain, new JOCJsonCommand(command), accessToken));
             }
         } else if (folders.size() > 0) {
             for (String folder : folders) {
-                tasks.add(new OrdersSnapshotCallable(folder, command, accessToken));
+                tasks.add(new OrdersSnapshotCallable(folder, new JOCJsonCommand(command), accessToken));
             }
         } else {
             tasks.add(new OrdersSnapshotCallable("/", command, accessToken));

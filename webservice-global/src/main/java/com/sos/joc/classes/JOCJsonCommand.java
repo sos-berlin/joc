@@ -49,6 +49,13 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         setProperties();
         setUriBuilder(jocResourceImpl.getUrl(), path);
     }
+    
+    public JOCJsonCommand(JOCJsonCommand jocJsonCommand) {
+        this.jocResourceImpl = jocJsonCommand.getJOCResourceImpl();
+        setBasicAuthorization(jocResourceImpl.getBasicAuthorization());
+        setProperties();
+        this.uriBuilder = jocJsonCommand.getUriBuilder();
+    }
 
     public void setJOCResourceImpl(JOCResourceImpl jocResourceImpl) {
         this.jocResourceImpl = jocResourceImpl;
