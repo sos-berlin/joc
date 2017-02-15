@@ -24,6 +24,9 @@ import com.sos.joc.model.order.OrderHistoryItem;
 @Path("job_chain")
 public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJobChainResourceHistory {
 
+    private static final int STATUS_SUCCESS = 0;
+    private static final int STATUS_HAVE_ERROR = 2;
+    private static final int STATUS_INCOMPLETE = 1;
     private static final int DEFAULT_MAX_HISTORY_ITEMS = 25;
     private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
     private static final String API_CALL = "./job_chain/history";
@@ -73,24 +76,39 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 history.setPath(jocXmlCommand.getAttribute("path"));
                 history.setStartTime(jocXmlCommand.getAttributeAsDate("start_time"));
 
-                if (history.getEndTime() != null) {
+                reportTriggerDBLayer.getFilter().clearOrderPath();
+                reportTriggerDBLayer.getFilter().addOrderPath(jobChainHistoryFilter.getJobChain(), history.getOrderId());
+                if (jocXmlCommand.getAttributeAsDate("end_time") != null) {
 
-                    reportTriggerDBLayer.getFilter().clearOrderPath();
-                    reportTriggerDBLayer.getFilter().addOrderPath(jobChainHistoryFilter.getJobChain(), history.getOrderId());
-                    if (isError(reportTriggerDBLayer)) {
-                        state.setSeverity(2);
-                        state.set_text(HistoryStateText.FAILED);
-                    } else {
-                        state.setSeverity(0);
-                        state.set_text(HistoryStateText.SUCCESSFUL);
+                    int status = getStatus(reportTriggerDBLayer);
+                    switch (status) {
+                        case STATUS_HAVE_ERROR: {
+                            state.setSeverity(STATUS_HAVE_ERROR);
+                            state.set_text(HistoryStateText.FAILED);
+                            break;
+                        }
+                        case STATUS_SUCCESS: {
+                            state.setSeverity(STATUS_SUCCESS);
+                            state.set_text(HistoryStateText.SUCCESSFUL);
+                            break;
+                        }
+                        case STATUS_INCOMPLETE: {
+                            state.setSeverity(STATUS_INCOMPLETE);
+                            state.set_text(HistoryStateText.INCOMPLETE);
+                            break;
+                        }
+                        default: {
+                            state.setSeverity(STATUS_INCOMPLETE);
+                            state.set_text(HistoryStateText.INCOMPLETE);
+                            break;
+                        }
                     }
-                    history.setState(state);
                 } else {
-                    state.setSeverity(1);
+                    state.setSeverity(STATUS_INCOMPLETE);
                     state.set_text(HistoryStateText.INCOMPLETE);
-                    history.setState(state);
-
                 }
+
+                history.setState(state);
 
                 listOfHistory.add(history);
             }
@@ -111,7 +129,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
     }
 
-    private boolean isError(ReportTriggerDBLayer reportTriggerDBLayer) throws Exception {
+    private int getStatus(ReportTriggerDBLayer reportTriggerDBLayer) throws Exception {
 
         reportTriggerDBLayer.getFilter().setLimit(1);
         List<DBItemReportTriggerWithResult> listOfReportTriggerWithResultDBItems = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
@@ -119,14 +137,17 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         if (listOfReportTriggerWithResultDBItems.size() > 0) {
             dbItemReportTriggerWithResult = listOfReportTriggerWithResultDBItems.get(0);
         } else {
-            return false;
+            return STATUS_INCOMPLETE;
         }
 
         if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null) {
-            return false;
+            return STATUS_INCOMPLETE;
         } else {
-            return dbItemReportTriggerWithResult.haveError();
+            if (dbItemReportTriggerWithResult.haveError()) {
+                return STATUS_HAVE_ERROR;
+            } else {
+                return STATUS_SUCCESS;
+            }
         }
-
     }
 }
