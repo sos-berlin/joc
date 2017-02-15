@@ -3,14 +3,11 @@ package com.sos.joc.db.configuration;
 import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateConnection;
-import com.sos.hibernate.classes.SOSHibernateFactory.Dbms;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
-import com.sos.jitl.reporting.db.DBItemReportTrigger;
 
 /** @author Uwe Risse */
 public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
@@ -99,7 +96,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return where;
     }
 
-    private void bindParameters(Query query) {
+    private void bindParameters(Query<JocConfigurationDbItem> query) {
         if (filter.getInstanceId() != null) {
             query.setParameter("instanceId", filter.getInstanceId());
         }
