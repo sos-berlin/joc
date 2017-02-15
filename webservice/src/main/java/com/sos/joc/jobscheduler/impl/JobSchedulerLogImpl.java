@@ -85,9 +85,9 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             return JOCDefaultResponse.responseTxtDownloadStatus200(logTxt, logFileName);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseHTMLStatusJSError(e);
+            return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
-            return JOCDefaultResponse.responseHTMLStatusJSError(e, getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
 //        } finally {
 //            try {
 //                if (inBufferedReader != null) {
