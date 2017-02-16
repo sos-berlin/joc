@@ -103,7 +103,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
     
     public void setUriBuilderForMainLog(String logFileBaseName) {
-        setUriBuilder(jocResourceImpl.getUrl(), "/jobscheduler/joc/scheduler_data/logs/" + logFileBaseName);
+        setUriBuilder(jocResourceImpl.getUrl(), "/jobscheduler/engine-cpp/scheduler_data/logs/" + logFileBaseName);
     }
     
     public void setUriBuilder(String path) {

@@ -1446,10 +1446,14 @@ function scheduler_extras__onclick( elt )
     if( typeof window.parent.left_frame._response != 'object' ) throw new Error("Please wait until the window is completly loaded.");
     
     var popup_builder   = new Popup_menu_builder();
+    var docLocation  = "scheduler_home/doc/reference/index.xml";
+    if (parent._scheduler._base_url.toLowerCase().indexOf("/jobscheduler/joc/") >= 0) {
+      docLocation = "../engine-cpp/scheduler_home/doc/reference/index.xml";
+    }
     
     //popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(en)")     , "open_url( 'scheduler_home/doc/en/reference/index.xml', 'scheduler_documentation' )" );
     //popup_builder.add_entry( parent.getTranslation("Documentation") + ' ' + parent.getTranslation("(de)")     , "open_url( 'scheduler_home/doc/de/reference/index.xml', 'scheduler_documentation' )" );
-    popup_builder.add_entry( parent.getTranslation("Documentation"), "open_url( 'scheduler_home/doc/reference/index.xml', 'scheduler_documentation' )" );
+    popup_builder.add_entry( parent.getTranslation("Documentation"), "open_url( '"+docLocation+"', 'scheduler_documentation' )" );
 	popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("FAQ"), "open_url( 'https://kb.sos-berlin.com/x/JoBB', 'scheduler_wiki' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Forum"), "open_url( 'https://sourceforge.net/p/jobscheduler/discussion/', 'scheduler_forum' )" );
     popup_builder.add_entry( parent.getTranslation("JobScheduler") + ' ' + parent.getTranslation("Downloads"), "open_url( 'http://sourceforge.net/projects/jobscheduler/files/', 'scheduler_download' )" );

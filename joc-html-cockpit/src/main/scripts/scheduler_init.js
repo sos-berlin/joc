@@ -115,9 +115,14 @@ var _confirm                    = {
 
 //--------------------------------------------------------------------------custom.js per hash  
 var _server_settings            = ( location.hash && location.hash.length > 1 && (location.hash.substr(1).replace(/[_a-zA-Z0-9.~()-]/g,'').length == 0));
-document.writeln('<script type="text/javascript" src="scheduler_data/custom/custom.js"></sc'+'ript>');
+var base_url                    = ( location.href + "" ).replace( /\/[^\/]*$/, "/" );
+var customJsPath                = "";
+if (base_url.toLowerCase().indexOf("/jobscheduler/joc/") >= 0) {
+   customJsPath = "../engine-cpp/"; 
+}
+document.writeln('<script type="text/javascript" src="'+customJsPath+'scheduler_data/custom/custom.js"></sc'+'ript>');
 if( _server_settings && location.hash.substr(1) != 'custom') {
-  document.writeln('<script type="text/javascript" src="scheduler_data/custom/'+encodeURIComponent(location.hash.substr(1))+'.js"></sc'+'ript>');
+  document.writeln('<script type="text/javascript" src="'+customJsPath+'scheduler_data/custom/'+encodeURIComponent(location.hash.substr(1))+'.js"></sc'+'ript>');
 }
 
 
@@ -137,4 +142,3 @@ function getTranslation( s, args )
     }
     return s;
 }
-

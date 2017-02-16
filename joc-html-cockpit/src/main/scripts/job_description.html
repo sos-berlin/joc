@@ -92,15 +92,19 @@ function showJobDescription( job_name )
       var response = null;
       
       try {
-      	response         = _scheduler.executeSynchron( '<show_job job="' + job_name + '" what="source"/>', false, false, true );
+        response         = _scheduler.executeSynchron( '<show_job job="' + job_name + '" what="source"/>', false, false, true );
         var job_elem     = response.selectSingleNode( "/spooler/answer/job" );
         var job_dir      = ( job_elem.getAttribute('path') ) ? job_elem.getAttribute('path').replace(/[^\/]+$/,'') : '/';
         var include_elem = job_elem.selectSingleNode( "source/job/description/include" );
         var include_file_attribute = include_elem.getAttribute( "file" );
+        var jobLocation  = "";
+        if (_scheduler._base_url.toLowerCase().indexOf("/jobscheduler/joc/") >= 0) {
+          jobLocation = "../engine-cpp/";
+        }
         if( include_file_attribute ) {
           include_file_attribute   = include_file_attribute.replace(/\\/g,'/');
           if( path_is_relative( include_file_attribute ) ) {
-            desc_frame_href = 'scheduler_data/'+include_file_attribute;
+            desc_frame_href = jobLocation + 'scheduler_data/'+include_file_attribute;
           }
           try {
             if( desc_frame_href ) _scheduler.executeGet(desc_frame_href);
