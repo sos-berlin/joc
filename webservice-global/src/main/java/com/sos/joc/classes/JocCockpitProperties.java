@@ -2,6 +2,8 @@ package com.sos.joc.classes;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -185,14 +187,29 @@ public class JocCockpitProperties {
     }
 
     private void readProperties() {
-        final InputStream stream = this.getClass().getResourceAsStream(propertiesFile);
-
-        if (stream != null) {
-            try {
-                properties.load(stream);
+        InputStream stream = null;
+        InputStreamReader streamReader = null;
+        try {
+            stream = this.getClass().getResourceAsStream(propertiesFile);
+            if (stream != null) {
+                streamReader = new InputStreamReader(stream, "UTF-8");
+                properties.load(streamReader);
                 substituteProperties();
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage()); 
+            }
+        } catch (Exception e) {
+            LOGGER.error(String.format("Error while reading %1$s:", propertiesFile), e);
+        } finally {
+            try {
+                if(stream != null) {
+                    stream.close();
+                }
+            } catch (Exception e) {
+            }
+            try {
+                if(streamReader != null) {
+                    streamReader.close();
+                }
+            } catch (Exception e) {
             }
         }
     }

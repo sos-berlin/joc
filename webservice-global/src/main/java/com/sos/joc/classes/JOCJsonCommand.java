@@ -481,19 +481,13 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     
     private String getStringFromResponse(String response, URI uri, JocError jocError, String acceptHeader) throws JocException {
         int httpReplyCode = statusCode();
-        String contentType = getResponseHeader("Content-Type");
         try {
             switch (httpReplyCode) {
             case 200:
-                if (acceptHeader.contains(contentType)) {
-                    if (response == null || response.isEmpty()) {
-                        throw new JobSchedulerNoResponseException("Unexpected empty response");
-                    }
-                    return response;
-                } else {
-                    throw new JobSchedulerInvalidResponseDataException(String.format("Unexpected content type '%1$s'. Response: %2$s", contentType,
-                            response));
+                if (response == null || response.isEmpty()) {
+                    throw new JobSchedulerNoResponseException("Unexpected empty response");
                 }
+                return response;
             default:
                 if (response == null) {
                     response = "";

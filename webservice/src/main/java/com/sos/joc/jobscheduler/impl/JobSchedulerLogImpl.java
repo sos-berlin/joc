@@ -44,6 +44,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             JOCJsonCommand jocJsonCommand = new JOCJsonCommand(this);
             jocJsonCommand.setUriBuilderForMainLog(logFileName);
             String logTxt = jocJsonCommand.getAcceptTypeFromGet(jocJsonCommand.getURI(), accessToken, "application/octet-stream,text/plain");
+            //String contentType = jocJsonCommand.getResponseHeader("Content-Type");
 
 //            JOCJsonCommand jocJsonCommand = new JOCJsonCommand(this);
 //            jocJsonCommand.setUriBuilderForMainLog();
@@ -82,7 +83,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
 //                    strBuilder.append(m.group(1)+"\n");  
 //                }
 //            }
-            return JOCDefaultResponse.responseTxtDownloadStatus200(logTxt, logFileName);
+            return JOCDefaultResponse.responseOctetStreamDownloadStatus200(logTxt, logFileName);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
