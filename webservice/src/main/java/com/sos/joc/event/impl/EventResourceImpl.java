@@ -69,8 +69,6 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 if (session != null) {
                     session.setAttribute(SESSION_KEY, threadName);
                 }
-            } catch (StoppedSessionException e1) {
-                throw new SessionNotExistException(e1);
             } catch (InvalidSessionException e1) {
                 throw new SessionNotExistException(e1);
             }

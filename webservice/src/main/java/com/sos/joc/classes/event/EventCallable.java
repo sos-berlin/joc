@@ -10,7 +10,6 @@ import javax.json.JsonObjectBuilder;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.UnknownSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -215,7 +214,12 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                                 JsonObject nodeTrans = event.getJsonObject("nodeTransition");
                                 if (nodeTrans != null) {
                                     NodeTransition nodeTransition = new NodeTransition();
-                                    nodeTransition.setType(NodeTransitionType.fromValue(nodeTrans.getString("TYPE", "SUCCESS").toUpperCase()));
+                                    try {
+                                        nodeTransition.setType(NodeTransitionType.fromValue(nodeTrans.getString("TYPE", "SUCCESS").toUpperCase()));
+                                    } catch (IllegalArgumentException e) {
+                                        LOGGER.warn("unknown event transition type", e);
+                                        nodeTransition.setType(NodeTransitionType.SUCCESS);
+                                    }
                                     nodeTransition.setReturnCode(nodeTrans.getInt("returnCode", 0));
                                     eventSnapshot.setNodeTransition(nodeTransition); 
                                 }
@@ -242,9 +246,15 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     }
     
     private long getSessionTimeout() throws SessionNotExistException {
-        if (session == null) {
-            throw new SessionNotExistException("session is invalid");
+        try {
+            if (session == null) {
+                throw new SessionNotExistException("session is invalid");
+            }
+            return session.getTimeout();
+        } catch (SessionNotExistException e) {
+            throw e;
+        } catch (InvalidSessionException e) {
+            throw new SessionNotExistException(e);
         }
-        return session.getTimeout();
     }
 }

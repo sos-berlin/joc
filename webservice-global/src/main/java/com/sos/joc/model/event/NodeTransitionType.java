@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum NodeTransitionType {
 
     SUCCESS("SUCCESS"),
+    KEEP("KEEP"),
+    PROCEEDING("PROCEEDING"),
     ERROR("ERROR");
     private final String value;
     private final static Map<String, NodeTransitionType> CONSTANTS = new HashMap<String, NodeTransitionType>();
