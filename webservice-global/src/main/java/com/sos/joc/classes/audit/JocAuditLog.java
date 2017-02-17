@@ -20,11 +20,20 @@ public class JocAuditLog {
     private String request;
 
     public JocAuditLog(String user, String request) {
+        if (user == null || user.isEmpty()) {
+            user = "-";
+        }
         this.user = user;
+        if (request == null || request.isEmpty()) {
+            request = "-";
+        }
         this.request = request;
     }
     
     public void setUser(String user) {
+        if (user == null || user.isEmpty()) {
+            user = "-";
+        }
         this.user = user;
     }
 
@@ -57,8 +66,12 @@ public class JocAuditLog {
     }
 
     public void storeAuditLogEntry(IAuditLog body) {
+        String jobSchedulerId = body.getJobschedulerId();
+        if (jobSchedulerId == null || jobSchedulerId.isEmpty()) {
+            jobSchedulerId = "-";
+        }
         DBItemAuditLog auditLogToDb = new DBItemAuditLog();
-        auditLogToDb.setSchedulerId(body.getJobschedulerId());
+        auditLogToDb.setSchedulerId(jobSchedulerId);
         auditLogToDb.setAccount(user);
         auditLogToDb.setRequest(request);
         auditLogToDb.setParameters(getJsonString(body));
