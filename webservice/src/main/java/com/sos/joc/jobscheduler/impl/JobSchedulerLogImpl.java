@@ -17,9 +17,25 @@ import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedulerLogResource {
 
     private static final String API_CALL = "./jobscheduler/log";
+    
+    @Override
+    public JOCDefaultResponse getMainLogWithGet(String accessToken, String queryAccessToken, String jobschedulerId, String host, Integer port)
+            throws Exception {
+        
+        HostPortTimeOutParameter hostPortParams = new HostPortTimeOutParameter();
+        hostPortParams.setJobschedulerId(jobschedulerId);
+        hostPortParams.setHost(host);
+        hostPortParams.setPort(port);
+        
+        if (accessToken == null) {
+            accessToken = queryAccessToken;
+        }
+        
+        return getMainLogWithPost(accessToken, hostPortParams);
+    }
 
     @Override
-    public JOCDefaultResponse getMainLog(String accessToken, HostPortTimeOutParameter hostPortParamSchema) throws Exception {
+    public JOCDefaultResponse getMainLogWithPost(String accessToken, HostPortTimeOutParameter hostPortParamSchema) throws Exception {
 
 //        InputStream in = null;
 //        InputStreamReader inReader = null;
@@ -110,4 +126,5 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
 //            }
         }
     }
+
 }
