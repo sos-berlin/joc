@@ -36,8 +36,8 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
         SOSHibernateConnection connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainHistoryFilter, accessToken, jobChainHistoryFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getJobChain().getView().isHistory());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainHistoryFilter, accessToken, jobChainHistoryFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobChain().getView().isHistory());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -53,8 +53,8 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
             // TODO nested job chains have to consider too
-            String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0, jobChainHistoryFilter
-                    .getMaxLastHistoryItems());
+            String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
+                    jobChainHistoryFilter.getMaxLastHistoryItems());
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
 
             jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
@@ -82,26 +82,26 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
                     int status = getStatus(reportTriggerDBLayer);
                     switch (status) {
-                        case STATUS_HAVE_ERROR: {
-                            state.setSeverity(STATUS_HAVE_ERROR);
-                            state.set_text(HistoryStateText.FAILED);
-                            break;
-                        }
-                        case STATUS_SUCCESS: {
-                            state.setSeverity(STATUS_SUCCESS);
-                            state.set_text(HistoryStateText.SUCCESSFUL);
-                            break;
-                        }
-                        case STATUS_INCOMPLETE: {
-                            state.setSeverity(STATUS_INCOMPLETE);
-                            state.set_text(HistoryStateText.INCOMPLETE);
-                            break;
-                        }
-                        default: {
-                            state.setSeverity(STATUS_INCOMPLETE);
-                            state.set_text(HistoryStateText.INCOMPLETE);
-                            break;
-                        }
+                    case STATUS_HAVE_ERROR: {
+                        state.setSeverity(STATUS_HAVE_ERROR);
+                        state.set_text(HistoryStateText.FAILED);
+                        break;
+                    }
+                    case STATUS_SUCCESS: {
+                        state.setSeverity(STATUS_SUCCESS);
+                        state.set_text(HistoryStateText.SUCCESSFUL);
+                        break;
+                    }
+                    case STATUS_INCOMPLETE: {
+                        state.setSeverity(STATUS_INCOMPLETE);
+                        state.set_text(HistoryStateText.INCOMPLETE);
+                        break;
+                    }
+                    default: {
+                        state.setSeverity(STATUS_INCOMPLETE);
+                        state.set_text(HistoryStateText.INCOMPLETE);
+                        break;
+                    }
                     }
                 } else {
                     state.setSeverity(STATUS_INCOMPLETE);
@@ -140,7 +140,8 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             return STATUS_INCOMPLETE;
         }
 
-        if (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null) {
+        if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null || (dbItemReportTriggerWithResult.getDbItemReportTrigger()
+                .getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
             return STATUS_INCOMPLETE;
         } else {
             if (dbItemReportTriggerWithResult.haveError()) {
