@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 
 import javax.ws.rs.Path;
 
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -19,7 +20,7 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
     private static final String API_CALL = "./jobscheduler/log";
     
     @Override
-    public JOCDefaultResponse getMainLogWithGet(String accessToken, String queryAccessToken, String jobschedulerId, String host, Integer port)
+    public JOCDefaultResponse getMainLog(String accessToken, String queryAccessToken, String jobschedulerId, String host, Integer port)
             throws Exception {
         
         HostPortTimeOutParameter hostPortParams = new HostPortTimeOutParameter();
@@ -31,11 +32,11 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             accessToken = queryAccessToken;
         }
         
-        return getMainLogWithPost(accessToken, hostPortParams);
+        return getMainLog(accessToken, hostPortParams);
     }
 
     @Override
-    public JOCDefaultResponse getMainLogWithPost(String accessToken, HostPortTimeOutParameter hostPortParamSchema) throws Exception {
+    public JOCDefaultResponse getMainLog(String accessToken, HostPortTimeOutParameter hostPortParamSchema) throws Exception {
 
 //        InputStream in = null;
 //        InputStreamReader inReader = null;
@@ -58,6 +59,9 @@ public class JobSchedulerLogImpl extends JOCResourceImpl implements IJobSchedule
             }
             logFileName = Paths.get(logFileName).getFileName().toString();
             JOCJsonCommand jocJsonCommand = new JOCJsonCommand(this);
+            // increase timeout for large log files 
+            int socketTimeout = Math.max(Globals.httpSocketTimeout, 10000);
+            jocJsonCommand.setSocketTimeout(socketTimeout);
             jocJsonCommand.setUriBuilderForMainLog(logFileName);
             String logTxt = jocJsonCommand.getAcceptTypeFromGet(jocJsonCommand.getURI(), accessToken, "application/octet-stream,text/plain");
             //String contentType = jocJsonCommand.getResponseHeader("Content-Type");
