@@ -75,8 +75,11 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
                 configuration.setConfigurationType(ConfigurationType.fromValue(jocConfigurationDbItem.getConfigurationType()));
                 configuration.setJobschedulerId(configurationsFilter.getJobschedulerId());
                 configuration.setName(jocConfigurationDbItem.getName());
-                configuration.setObjectType(ConfigurationObjectType.fromValue(jocConfigurationDbItem.getObjectType()));
+                if (jocConfigurationDbItem.getObjectType() != null) {
+                    configuration.setObjectType(ConfigurationObjectType.fromValue(jocConfigurationDbItem.getObjectType()));
+                }
                 configuration.setShared(jocConfigurationDbItem.getShared());
+                configuration.setId(jocConfigurationDbItem.getId().intValue());
                 if (!jocConfigurationDbItem.getShared() || getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView()) {
                     listOfConfigurations.add(configuration);
                 }
