@@ -20,6 +20,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "jobschedulerId",
+    "id",
     "account",
     "configurationType",
     "objectType",
@@ -29,18 +30,17 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class Configuration {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
+     * non negative integer
+     * <p>
      * 
      * (Required)
      * 
      */
+    @JsonProperty("id")
+    private Integer id;
     @JsonProperty("account")
     private String account;
     /**
@@ -76,8 +76,6 @@ public class Configuration {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
      *     The jobschedulerId
      */
@@ -88,8 +86,6 @@ public class Configuration {
 
     /**
      * 
-     * (Required)
-     * 
      * @param jobschedulerId
      *     The jobschedulerId
      */
@@ -99,8 +95,34 @@ public class Configuration {
     }
 
     /**
+     * non negative integer
+     * <p>
      * 
      * (Required)
+     * 
+     * @return
+     *     The id
+     */
+    @JsonProperty("id")
+    public Integer getId() {
+        return id;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * (Required)
+     * 
+     * @param id
+     *     The id
+     */
+    @JsonProperty("id")
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    /**
      * 
      * @return
      *     The account
@@ -111,8 +133,6 @@ public class Configuration {
     }
 
     /**
-     * 
-     * (Required)
      * 
      * @param account
      *     The account
@@ -245,7 +265,7 @@ public class Configuration {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(account).append(configurationType).append(objectType).append(name).append(shared).append(configurationItem).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(id).append(account).append(configurationType).append(objectType).append(name).append(shared).append(configurationItem).toHashCode();
     }
 
     @Override
@@ -257,7 +277,7 @@ public class Configuration {
             return false;
         }
         Configuration rhs = ((Configuration) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(account, rhs.account).append(configurationType, rhs.configurationType).append(objectType, rhs.objectType).append(name, rhs.name).append(shared, rhs.shared).append(configurationItem, rhs.configurationItem).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(id, rhs.id).append(account, rhs.account).append(configurationType, rhs.configurationType).append(objectType, rhs.objectType).append(name, rhs.name).append(shared, rhs.shared).append(configurationItem, rhs.configurationItem).isEquals();
     }
 
 }
