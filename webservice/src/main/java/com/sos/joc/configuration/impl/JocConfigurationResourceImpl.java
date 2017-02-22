@@ -89,7 +89,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             }
             
             /** check id from parameters if DBItem is new (id==0) or has to be updated (id != 0) */
-            if(configuration.getId() == 0) {
+            if(configuration.getId() == null || configuration.getId() == 0) {
                 dbItem.setId(null);
             } else {
                 dbItem.setId(configuration.getId().longValue());
@@ -97,7 +97,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             
             /** save item to DB */
             Long id = jocConfigurationDBLayer.saveConfiguration(dbItem);
-            if (dbItem.getId() == null || dbItem.getId() == 0) {
+            if (dbItem.getId() == null) {
                 dbItem.setId(id);
             }
             ConfigurationOk ok = new ConfigurationOk();

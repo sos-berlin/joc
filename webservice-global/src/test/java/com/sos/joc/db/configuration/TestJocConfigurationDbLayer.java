@@ -74,9 +74,9 @@ public class TestJocConfigurationDbLayer {
         jocConfigurationDbItem.setObjectType("profil");
         jocConfigurationDbItem.setInstanceId(61L);
         jocConfigurationDbItem.setShared(true);
-
+        jocConfigurationDbItem.setConfigurationItem("myNewConfiguration");
         initFilter();
-        jocConfigurationDBLayer.saveConfiguration(jocConfigurationDbItem,null,"myNewConfiguration"); 
+        jocConfigurationDBLayer.saveConfiguration(jocConfigurationDbItem); 
         sosHibernateFactory.close();
 
     }
