@@ -93,7 +93,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            connection.disconnect();
+            Globals.disconnect(connection);
         }
     }
 

@@ -87,9 +87,10 @@ public class JocAuditLog {
         try {
             connection = Globals.createSosHibernateStatelessConnection("storeAuditLogEntry");
             connection.save(auditLogToDb);
-            connection.disconnect();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
+        } finally {
+            Globals.disconnect(connection); 
         }
     }
 
