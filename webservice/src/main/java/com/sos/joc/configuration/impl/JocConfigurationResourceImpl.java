@@ -65,7 +65,9 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             JocConfigurationDbItem dbItem = new JocConfigurationDbItem(); 
             dbItem.setAccount(configuration.getAccount());
             dbItem.setConfigurationType(configuration.getConfigurationType().name());
-            dbItem.setObjectType(configuration.getObjectType().name());
+            if(configuration.getObjectType() != null) { 
+                dbItem.setObjectType(configuration.getObjectType().name());
+            }
             dbItem.setName(configuration.getName());
             dbItem.setShared(configuration.getShared());
             dbItem.setConfigurationItem(configuration.getConfigurationItem());
@@ -260,9 +262,13 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         Configuration config = new Configuration();
         config.setId(dbItem.getId().intValue());
         config.setAccount(dbItem.getAccount());
-        config.setConfigurationType(ConfigurationType.fromValue(dbItem.getConfigurationType()));
+        if (dbItem.getConfigurationType() != null) {
+            config.setConfigurationType(ConfigurationType.fromValue(dbItem.getConfigurationType()));
+        }
         config.setConfigurationItem(dbItem.getConfigurationItem());
-        config.setObjectType(ConfigurationObjectType.fromValue(dbItem.getObjectType()));
+        if (dbItem.getObjectType() != null) {
+            config.setObjectType(ConfigurationObjectType.fromValue(dbItem.getObjectType()));
+        }
         config.setShared(dbItem.getShared());
         config.setName(dbItem.getName());
         config.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
