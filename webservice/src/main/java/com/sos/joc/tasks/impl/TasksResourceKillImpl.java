@@ -113,7 +113,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             jocXmlCommand.executePostWithThrowBadRequest(command, getAccessToken());
 
             List<TaskId> taskIds = new ArrayList<TaskId>();
-            NodeList tasks = jocXmlCommand.getSosxml().selectNodeList("//tasks/tasks/@id");
+            NodeList tasks = jocXmlCommand.getSosxml().selectNodeList("//tasks/task/@id");
             for (int i = 0; i < tasks.getLength(); i++) {
                 TaskId taskId = new TaskId();
                 taskId.setTaskId(tasks.item(i).getNodeValue());
