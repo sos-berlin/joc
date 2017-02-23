@@ -107,12 +107,26 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static JOCDefaultResponse responseStatusJSError(SessionNotExistException e, String mediaType) {
-        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
-        sosShiroCurrentUserAnswer.setHasRole(false); 
-        sosShiroCurrentUserAnswer.setIsAuthenticated(false);
-        sosShiroCurrentUserAnswer.setIsPermitted(false);
-        sosShiroCurrentUserAnswer.setMessage(getErrorMessage(e));
-        return responseStatus440(sosShiroCurrentUserAnswer, mediaType);
+        String errorOutput = "";
+        if (e.getCause() != null) {
+            errorOutput = e.getCause().getClass().getSimpleName() + ": " + e.getCause().getMessage();
+        } else {
+            errorOutput = e.getClass().getSimpleName() + ": " + e.getMessage();
+        }
+        Response.ResponseBuilder responseBuilder = Response.status(440).header("Content-Type", mediaType).cacheControl(setNoCaching());
+        LOGGER.info(errorOutput);
+        if (mediaType.contains(MediaType.TEXT_HTML)) {
+            String entityStr = String.format(ERROR_HTML, "JOC-440", StringEscapeUtils.escapeHtml4(errorOutput));
+            responseBuilder.entity(entityStr);
+        } else {
+            SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer();
+            sosShiroCurrentUserAnswer.setHasRole(false); 
+            sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+            sosShiroCurrentUserAnswer.setIsPermitted(false);
+            sosShiroCurrentUserAnswer.setMessage(errorOutput);
+            responseBuilder.entity(sosShiroCurrentUserAnswer);
+        }
+        return new JOCDefaultResponse(responseBuilder.build());
     }
     
     public static JOCDefaultResponse responseStatusJSError(SessionNotExistException e) {
