@@ -122,8 +122,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
             query.setParameter("account", filter.getAccount());
         }
         if (filter.isShared() != null) {
-            query.setParameter("shared", filter.isShared(), BooleanType.INSTANCE);
-//            query.setBoolean("shared", filter.isShared());
+            query.setBoolean("shared", filter.isShared());
         }
     }
 
