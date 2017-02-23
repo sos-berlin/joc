@@ -44,7 +44,7 @@ public class UsedJobs {
                 for (JsonObject obstacle : obstacles.getValuesAs(JsonObject.class)) {
                     switch(obstacle.getString("TYPE","")) {
                     case "NoRuntime":
-                        nextPeriodBeginsAt = obstacle.getString("plannedAt");
+                        nextPeriodBeginsAt = obstacle.getString("plannedAt", Instant.EPOCH.toString());
                         state = OrderStateText.JOB_NOT_IN_PERIOD;
                         stateIsSet = true;
                         break;
