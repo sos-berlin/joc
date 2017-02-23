@@ -23,6 +23,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.order.OrderFilter;
+import com.sos.joc.model.order.OrderState;
 import com.sos.joc.model.order.OrderStateFilter;
 import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderV;
@@ -121,18 +122,18 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
     }
     
     private Map<String,OrderVolatile> getOrders(OrdersPerJobChain orders, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders), accessToken), orders.getJobChain(), compact, null);
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders), accessToken), orders.getJobChain(), compact, null, null);
     }
     
     private Map<String,OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), null, compact, null);
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), null, compact, null, null);
     }
     
     private Map<String,OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), null, ordersBody.getCompact(), ordersBody.getRegex());
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), null, ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates());
     }
     
-    private Map<String,OrderVolatile> getOrders(JsonObject json, String origJobChain, boolean compact, String regex) throws JobSchedulerInvalidResponseDataException {
+    private Map<String,OrderVolatile> getOrders(JsonObject json, String origJobChain, boolean compact, String regex, List<OrderStateFilter> processingStates) throws JobSchedulerInvalidResponseDataException {
         UsedNodes usedNodes = new UsedNodes();
         UsedJobs usedJobs = new UsedJobs();
         UsedJobChains usedJobChains = new UsedJobChains();
@@ -159,11 +160,20 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
                 usedJobChains.addEntries(json.getJsonArray("usedJobChains"));
                 order.readJobChainObstacles(usedJobChains.get(order.getJobChain()));
             }
-            listOrderQueue.put(order.getPath(), order);
+            if (checkSuspendedOrdersWithFilter(order.getProcessingFilterState(), processingStates)) {
+                listOrderQueue.put(order.getPath(), order); 
+            }
         }
         return listOrderQueue;
     }
     
+    private boolean checkSuspendedOrdersWithFilter(OrderStateFilter processingState, List<OrderStateFilter> processingStates) {
+        if (processingState == null || processingStates == null) {
+            return true;
+        }
+        return FilterAfterResponse.filterStateHasState(processingStates, processingState);
+    }
+
     private String getServiceBody(OrdersPerJobChain orders) throws JocMissingRequiredParameterException {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         String jobChain = orders.getJobChain();

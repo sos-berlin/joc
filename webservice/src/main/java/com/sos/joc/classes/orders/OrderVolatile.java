@@ -18,6 +18,7 @@ import com.sos.joc.classes.parameters.Parameters;
 import com.sos.joc.classes.orders.UsedJobChains.JobChain;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.model.order.OrderState;
+import com.sos.joc.model.order.OrderStateFilter;
 import com.sos.joc.model.order.OrderStateText;
 import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderV;
@@ -33,6 +34,8 @@ public class OrderVolatile extends OrderV {
     private boolean isWaitingForJob = false;
     @JsonIgnore
     private String origJobChain;
+    @JsonIgnore
+    private OrderStateFilter processingFilterState;
     
     public OrderVolatile(JsonObject order) {
         this.order = order;
@@ -214,22 +217,38 @@ public class OrderVolatile extends OrderV {
         getProcessingState().set_text(text);
         switch (text) {
         case PENDING:
+            processingFilterState = OrderStateFilter.PENDING;
             getProcessingState().setSeverity(1);
             break;
         case RUNNING:
+            processingFilterState = OrderStateFilter.RUNNING;
             getProcessingState().setSeverity(0);
             break;
         case SETBACK:
+            processingFilterState = OrderStateFilter.SETBACK;
+            getProcessingState().setSeverity(5);
+            break;
         case SUSPENDED:
+            processingFilterState = OrderStateFilter.SUSPENDED;
             getProcessingState().setSeverity(5);
             break;
         case WAITING_FOR_AGENT:
         case JOB_CHAIN_STOPPED:
         case JOB_STOPPED:
         case NODE_STOPPED:
+            processingFilterState = OrderStateFilter.WAITINGFORRESOURCE;
             getProcessingState().setSeverity(2);
             break;
-        default:
+        case JOB_NOT_IN_PERIOD:
+        case NODE_DELAY:
+        case WAITING_FOR_LOCK:
+        case WAITING_FOR_PROCESS:
+        case WAITING_FOR_TASK:
+            processingFilterState = OrderStateFilter.WAITINGFORRESOURCE;
+            getProcessingState().setSeverity(3);
+            break;
+        case BLACKLIST:
+            processingFilterState = OrderStateFilter.BLACKLIST;
             getProcessingState().setSeverity(3);
             break;
         }
@@ -285,6 +304,11 @@ public class OrderVolatile extends OrderV {
         default:
             return OrderType.PERMANENT;
         }
+    }
+    
+    @JsonIgnore
+    public OrderStateFilter getProcessingFilterState() {
+        return processingFilterState;
     }
 
 }

@@ -97,7 +97,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
             sql.append(" where jobChainName = :jobChainName");
             sql.append(" and instanceId = :instanceId");
             if (orderId != null) {
-                sql.append("and orderId = :orderId");
+                sql.append(" and orderId = :orderId");
             }
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("jobChainName", jobChainName);
