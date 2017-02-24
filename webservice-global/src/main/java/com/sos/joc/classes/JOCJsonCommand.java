@@ -22,6 +22,7 @@ import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
@@ -442,8 +443,15 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                 if (contentType.contains("application/json") && !response.isEmpty()) {
                     JsonReader rdr = Json.createReader(new StringReader(response));
                     JsonObject json = rdr.readObject();
-                    throw new JobSchedulerBadRequestException(json.getString("message", response));
+                    String msg = json.getString("message", response);
+                    if (msg.contains("SCHEDULER-161")) {
+                        throw new JobSchedulerObjectNotExistException(msg);
+                    }
+                    throw new JobSchedulerBadRequestException(msg);
                 } else {
+                    if (response.contains("SCHEDULER-161")) {
+                        throw new JobSchedulerObjectNotExistException(response);
+                    }
                     throw new JobSchedulerBadRequestException(response);
                 }
             default:

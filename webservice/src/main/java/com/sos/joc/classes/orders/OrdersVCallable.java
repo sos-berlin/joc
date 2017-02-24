@@ -19,11 +19,11 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.order.OrderFilter;
-import com.sos.joc.model.order.OrderState;
 import com.sos.joc.model.order.OrderStateFilter;
 import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderV;
@@ -38,6 +38,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
     private final Boolean compact;
     private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
+    private final Boolean suppressJobSchedulerObjectNotExistException;
     
     public OrdersVCallable(String job, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.orders = null;
@@ -47,6 +48,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         this.compact = compact;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.suppressJobSchedulerObjectNotExistException = true;
     }
     
     public OrdersVCallable(OrdersPerJobChain orders, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -57,6 +59,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         this.compact = compact;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.suppressJobSchedulerObjectNotExistException = true;
     }
     
     public OrdersVCallable(JobChainV jobChain, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -69,6 +72,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         this.compact = compact;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.suppressJobSchedulerObjectNotExistException = true;
     }
     
     public OrdersVCallable(OrderFilter order, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -82,6 +86,7 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         this.compact = order.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.suppressJobSchedulerObjectNotExistException = order.getSuppressNotExistException();
     }
     
     public OrdersVCallable(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -92,25 +97,43 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         this.compact = ordersBody.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
+        this.suppressJobSchedulerObjectNotExistException = true;
     }
     
     @Override
     public Map<String,OrderVolatile> call() throws Exception {
-        if(orders != null) {
-            return getOrders(orders, compact, jocJsonCommand, accessToken);
-        } else if(job != null) { 
-            return getOrders(job, compact, jocJsonCommand, accessToken);
-        } else {
-            return getOrders(folder, ordersBody, jocJsonCommand, accessToken);
+        try {
+            if(orders != null) {
+                return getOrders(orders, compact, jocJsonCommand, accessToken);
+            } else if(job != null) { 
+                return getOrders(job, compact, jocJsonCommand, accessToken);
+            } else {
+                return getOrders(folder, ordersBody, jocJsonCommand, accessToken);
+            }
+        } catch (JobSchedulerObjectNotExistException e) {
+            if (suppressJobSchedulerObjectNotExistException) {
+                return new HashMap<String,OrderVolatile>();
+            }
+            throw e;
         }
     }
     
     public OrderV getOrder() throws Exception {
-        Map<String,OrderVolatile> orderMap = getOrders(orders, compact, jocJsonCommand, accessToken);
-        if (orderMap == null || orderMap.isEmpty()) {
-            throw new JobSchedulerInvalidResponseDataException(String.format("Order doesn't exist: %1$s,%2$s", orders.getJobChain(), orders.getOrders().get(0)));
+        Map<String, OrderVolatile> orderMap;
+        OrderV o = new OrderV();
+        o.setParams(null);
+        try {
+            orderMap = getOrders(orders, compact, jocJsonCommand, accessToken);
+            if (orderMap == null || orderMap.isEmpty()) {
+                return o;
+            }
+            return orderMap.values().iterator().next();
+        } catch (JobSchedulerObjectNotExistException e) {
+            if (suppressJobSchedulerObjectNotExistException) {
+                return o;
+            }
+            throw e;
         }
-        return orderMap.values().iterator().next();
     }
     
     public List<OrderV> getOrdersOfJob() throws Exception {
@@ -125,12 +148,14 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders), accessToken), orders.getJobChain(), compact, null, null);
     }
     
-    private Map<String,OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
+    private Map<String, OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
         return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), null, compact, null, null);
     }
-    
-    private Map<String,OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), null, ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates());
+
+    private Map<String, OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken)
+            throws Exception {
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), null, ordersBody
+                .getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates());
     }
     
     private Map<String,OrderVolatile> getOrders(JsonObject json, String origJobChain, boolean compact, String regex, List<OrderStateFilter> processingStates) throws JobSchedulerInvalidResponseDataException {
@@ -179,9 +204,11 @@ public class OrdersVCallable implements Callable<Map<String,OrderVolatile>> {
         String jobChain = orders.getJobChain();
         jobChain = ("/"+jobChain.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
         builder.add("path", jobChain);
-        for (String order : orders.getOrders()) {
+        if (orders.getOrders().size() > 0) {
             JsonArrayBuilder ordersArray = Json.createArrayBuilder();
-            ordersArray.add(order);
+            for (String order : orders.getOrders()) {
+                ordersArray.add(order);
+            } 
             builder.add("orderIds", ordersArray);
         }
         return builder.build().toString();
