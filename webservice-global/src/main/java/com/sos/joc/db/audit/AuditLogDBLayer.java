@@ -114,8 +114,7 @@ public class AuditLogDBLayer extends DBLayer {
                     } else if(i != 0 && i != jobs.size()) {
                         sql.append(" or");
                     }
-                    sql.append(" (job = :job").append(i);
-                    sql.append(" and folder = :folder").append(i).append(")");
+                    sql.append(" (job = :job").append(i).append(")");
                     if(i == jobs.size() -1) {
                         sql.append(")");
                     }
@@ -134,9 +133,7 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (jobs != null && !jobs.isEmpty()) {
                 for (int i = 0; i < jobs.size(); i++) {
-                    String job = jobs.get(i).getJob().substring(jobs.get(i).getJob().lastIndexOf("/") + 1);
-                    String folder = jobs.get(i).getJob().substring(0, jobs.get(i).getJob().lastIndexOf("/"));;
-                    query.setParameter("folder" + i, folder);
+                    String job = jobs.get(i).getJob();
                     query.setParameter("job" + i, job);
                 }
             }
