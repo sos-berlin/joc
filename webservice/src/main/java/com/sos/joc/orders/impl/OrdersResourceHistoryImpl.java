@@ -16,6 +16,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
+import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
@@ -127,7 +128,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                     add = regExMatcher.find();
                 }
 
-                if (add) {
+                if (add && FilterAfterResponse.filterStateHasState(ordersFilter.getHistoryStates(), history.getState().get_text())) {
                     listHistory.add(history);
                 }
 
