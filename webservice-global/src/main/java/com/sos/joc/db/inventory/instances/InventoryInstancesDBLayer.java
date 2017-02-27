@@ -2,8 +2,8 @@ package com.sos.joc.db.inventory.instances;
 
 import java.util.List;
 
-import org.hibernate.query.Query;
 import org.hibernate.SessionException;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +11,6 @@ import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
@@ -49,28 +48,27 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     @SuppressWarnings("unchecked")
-    public DBItemInventoryInstance getInventoryInstanceByHostPort(JobSchedulerIdentifier jobSchedulerIdentifier) throws DBMissingDataException, DBInvalidDataException, DBConnectionRefusedException {
+    public DBItemInventoryInstance getInventoryInstanceByHostPort(String host, Integer port, String schedulerId) throws DBMissingDataException, DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where hostname = :hostname and port = :port", DBITEM_INVENTORY_INSTANCES);
             LOGGER.debug(sql);
             Query query = getConnection().createQuery(sql.toString());
-            query.setParameter("hostname", jobSchedulerIdentifier.getHost());
-            query.setParameter("port", jobSchedulerIdentifier.getPort());
+            query.setParameter("hostname", host);
+            query.setParameter("port", port);
 
             List<DBItemInventoryInstance> result = query.list();
             if (result != null && !result.isEmpty()) {
                 DBItemInventoryInstance dbItemInventoryInstance = result.get(0);
-                if (!dbItemInventoryInstance.getSchedulerId().equals(jobSchedulerIdentifier.getSchedulerId())) {
-                    String errMessage = String.format("jobschedulerId %s not assigned for %s:%s in table %s", jobSchedulerIdentifier.getSchedulerId(),
-                            jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(), DBLayer.TABLE_INVENTORY_INSTANCES);
+                if (!dbItemInventoryInstance.getSchedulerId().equals(schedulerId)) {
+                    String errMessage = String.format("jobschedulerId %s not assigned for %s:%s in table %s", schedulerId, host, port,
+                            DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 } else {
                     return result.get(0);
                 }
             } else {
-                String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
-                        jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
-                        DBLayer.TABLE_INVENTORY_INSTANCES);
+                String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s", schedulerId,
+                        host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
                 throw new DBMissingDataException(errMessage);
             }
         } catch (DBMissingDataException e){

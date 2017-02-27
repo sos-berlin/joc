@@ -41,15 +41,15 @@ public class JobSchedulerUser {
         return accessToken;
     }
 
-    public DBItemInventoryInstance getSchedulerInstance(JobSchedulerIdentifier jobSchedulerIdentifier) throws JocException  {
-        if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier) == null) {
+    public DBItemInventoryInstance getSchedulerInstance(String jobSchedulerId) throws JocException  {
+        if (getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerId) == null) {
             SOSHibernateConnection connection = Globals.createSosHibernateStatelessConnection("getSchedulerInstance");
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
             Globals.beginTransaction(connection);
-            getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerIdentifier, dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerIdentifier.getSchedulerId(), getAccessToken()));
+            getSosShiroCurrentUser().addSchedulerInstanceDBItem(jobSchedulerId, dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerId, getAccessToken()));
             Globals.rollback(connection);
         }
-        return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerIdentifier);
+        return getSosShiroCurrentUser().getSchedulerInstanceDBItem(jobSchedulerId);
     }
 
     public boolean resetTimeOut() {

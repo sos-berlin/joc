@@ -218,7 +218,7 @@ public class JOCResourceImpl {
         String url = dbItemInventoryInstance.getUrl();
         if (schedulerId != null) {
             jobschedulerUser.getSosShiroCurrentUser().getMapOfSchedulerInstances().remove(jobschedulerId);
-            dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
+            dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(schedulerId);
         } else {
             return null;
         }
@@ -260,7 +260,7 @@ public class JOCResourceImpl {
             jobschedulerId = schedulerId;
         }
         if (!"".equals(schedulerId)) {
-            dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(new JobSchedulerIdentifier(schedulerId));
+            dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(schedulerId);
         }
         return jocDefaultResponse;
     }
@@ -290,10 +290,6 @@ public class JOCResourceImpl {
             DBMissingDataException, DBInvalidDataException {
         if (host != null && !host.isEmpty() && port != null && port > 0) {
 
-            JobSchedulerIdentifier jobSchedulerIdentifier = new JobSchedulerIdentifier(schedulerId);
-            jobSchedulerIdentifier.setHost(host);
-            jobSchedulerIdentifier.setPort(port);
-
             SOSHibernateConnection connection = null;
 
             try {
@@ -304,12 +300,11 @@ public class JOCResourceImpl {
                 }
 
                 InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
-                dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(jobSchedulerIdentifier);
+                dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(host, port, schedulerId);
 
                 if (dbItemInventoryInstance == null) {
                     String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
-                            jobSchedulerIdentifier.getId(), jobSchedulerIdentifier.getHost(), jobSchedulerIdentifier.getPort(),
-                            DBLayer.TABLE_INVENTORY_INSTANCES);
+                            schedulerId, host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
                     throw new DBInvalidDataException(errMessage);
                 }
             } catch (Exception e) {

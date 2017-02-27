@@ -18,6 +18,7 @@ import org.apache.shiro.session.StoppedSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
@@ -26,6 +27,7 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.event.EventCallable;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.event.resource.IEventResource;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
@@ -63,9 +65,11 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            SOSShiroCurrentUser shiroUser = null;
             connection = Globals.createSosHibernateStatelessConnection("postEvent");
             try {
-                session = getJobschedulerUser().getSosShiroCurrentUser().getCurrentSubject().getSession(false);
+                shiroUser = getJobschedulerUser().getSosShiroCurrentUser();
+                session = shiroUser.getCurrentSubject().getSession(false);
                 if (session != null) {
                     session.setAttribute(SESSION_KEY, threadName);
                 }
@@ -91,9 +95,11 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             List<JOCJsonCommand> jocJsonCommands = new ArrayList<JOCJsonCommand>();
 
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
+            InventoryJobChainsDBLayer jobChainsLayer = new InventoryJobChainsDBLayer(connection);
 
             Globals.beginTransaction(connection);
-
+            
+            Boolean isCurrentJobScheduler = true;
             for (JobSchedulerObjects jsObject : eventBody.getJobscheduler()) {
                 if (jsObject.getEventId() == null || jsObject.getEventId().isEmpty()) {
                     jsObject.setEventId(defaultEventId.toString());
@@ -115,7 +121,8 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 command.setAutoCloseHttpClient(false);
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
-                tasks.add(new EventCallable(command, jsEvent, instance.getId(), accessToken, session, EVENT_TIMEOUT));
+                tasks.add(new EventCallable(command, jsEvent, instance.getId(), accessToken, session, EVENT_TIMEOUT, isCurrentJobScheduler, shiroUser, jobChainsLayer, instanceLayer));
+                isCurrentJobScheduler = false;
                 if (urlOfCurrentJs == null) {
                     urlOfCurrentJs = instance.getUrl();
                 }

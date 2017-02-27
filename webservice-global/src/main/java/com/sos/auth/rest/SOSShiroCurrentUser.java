@@ -9,7 +9,6 @@ import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCPreferences;
-import com.sos.joc.classes.JobSchedulerIdentifier;
 import com.sos.joc.classes.WebserviceConstants;
 
 public class SOSShiroCurrentUser {
@@ -125,12 +124,16 @@ public class SOSShiroCurrentUser {
         return listOfSchedulerInstances;
     }
 
-    public DBItemInventoryInstance getSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier) {
-        return listOfSchedulerInstances.get(jobSchedulerIdentifier.getId());
+    public DBItemInventoryInstance getSchedulerInstanceDBItem(String jobSchedulerId) {
+        return listOfSchedulerInstances.get(jobSchedulerId);
     }
     
-    public void addSchedulerInstanceDBItem(JobSchedulerIdentifier jobSchedulerIdentifier, DBItemInventoryInstance schedulerInstancesDBItem) {
-        listOfSchedulerInstances.put(jobSchedulerIdentifier.getId(), schedulerInstancesDBItem);
+    public DBItemInventoryInstance removeSchedulerInstanceDBItem(String jobSchedulerId) {
+        return listOfSchedulerInstances.remove(jobSchedulerId);
+    }
+    
+    public void addSchedulerInstanceDBItem(String jobSchedulerId, DBItemInventoryInstance schedulerInstancesDBItem) {
+        listOfSchedulerInstances.put(jobSchedulerId, schedulerInstancesDBItem);
     }
 
     public DBItemInventoryInstance getSchedulerInstanceByKey(Long id) {
