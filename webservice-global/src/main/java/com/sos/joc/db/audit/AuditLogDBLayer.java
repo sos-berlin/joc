@@ -59,6 +59,7 @@ public class AuditLogDBLayer extends DBLayer {
                     }
                 }
             }
+            sql.append(" order by created desc");
             Query query = getConnection().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
