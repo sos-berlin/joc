@@ -93,4 +93,9 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
     public String getOrderId() {
         return orderId;
     }
+    
+    @JsonIgnore
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
 }

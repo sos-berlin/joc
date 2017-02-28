@@ -111,6 +111,12 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            if (order.getOrderId() == null || order.getOrderId().isEmpty()) {
+                String orderId = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ok/order/@id");
+                if (orderId != null && !orderId.isEmpty()) {
+                    orderAudit.setOrderId(orderId); 
+                }
+            }
             storeAuditLogEntry(orderAudit);
 
             return jocXmlCommand.getSurveyDate();
