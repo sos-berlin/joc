@@ -4,7 +4,7 @@ package com.sos.joc.exceptions;
 public class UnknownJobSchedulerAgentException extends JocException {
     
     private static final long serialVersionUID = 1L;
-    private static final String ERROR_CODE = "JOC-408";
+    private static final String ERROR_CODE = "JOC-403";
 
     public UnknownJobSchedulerAgentException() {
     }

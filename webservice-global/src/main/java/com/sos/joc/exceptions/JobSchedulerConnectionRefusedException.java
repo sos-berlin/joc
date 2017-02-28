@@ -4,7 +4,7 @@ package com.sos.joc.exceptions;
 public class JobSchedulerConnectionRefusedException extends JocException {
     
     private static final long serialVersionUID = 1L;
-    private static final String ERROR_CODE = "JOC-500";
+    private static final String ERROR_CODE = "JOC-402";
 
     public JobSchedulerConnectionRefusedException() {
     }
