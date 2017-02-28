@@ -121,6 +121,7 @@ public class UsedJobs {
     
     public void addEntries(JsonArray jobs){
         if (this.jobs == null){
+            this.jobs  = new HashMap<String, Job>();
             for (JsonObject job : jobs.getValuesAs(JsonObject.class)) {
                 this.put(job);
             }

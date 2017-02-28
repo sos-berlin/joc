@@ -133,17 +133,19 @@ public class OrderVolatile extends OrderV {
             case "OccupiedByClusterMember":
                 setSeverity(OrderStateText.RUNNING);
             case "WaitingInTask":
-                if (usedTasks.isWaitingForAgent(getTaskId())) {
-                    setSeverity(OrderStateText.WAITING_FOR_AGENT); 
-                } else if (usedTasks.isWaitingForProcessClass(getTaskId())) {
-                    setSeverity(OrderStateText.WAITING_FOR_PROCESS); 
+                if (usedTasks != null) {
+                    if (usedTasks.isWaitingForAgent(getTaskId())) {
+                        setSeverity(OrderStateText.WAITING_FOR_AGENT); 
+                    } else if (usedTasks.isWaitingForProcessClass(getTaskId())) {
+                        setSeverity(OrderStateText.WAITING_FOR_PROCESS); 
+                    }
                 }
                 break;
             case "Pending":
             case "Due":
             case "WaitingForResource":
             case "WaitingForOther":
-                if (!processingStateIsSet()) {
+                if (!processingStateIsSet() && usedNodes != null && usedNodes.getNode(getJobChain(), getState()) != null) {
                     if (usedNodes.getNode(getJobChain(), getState()).isStopped()) {
                         setSeverity(OrderStateText.NODE_STOPPED); 
                     } else if (usedNodes.getNode(getJobChain(), getState()).isWaitingForJob()) {
@@ -165,26 +167,28 @@ public class OrderVolatile extends OrderV {
     }
     
     public void readJobObstacles(Job job) {
-        OrderStateText text = job.getState();
-        if (text != null) {
-            setSeverity(text);
-            if (text == OrderStateText.JOB_NOT_IN_PERIOD) {
-                setNextStartTime(JobSchedulerDate.getDateFromISO8601String(job.nextPeriodBeginsAt()));
+        if (job != null) {
+            OrderStateText text = job.getState();
+            if (text != null) {
+                setSeverity(text);
+                if (text == OrderStateText.JOB_NOT_IN_PERIOD) {
+                    setNextStartTime(JobSchedulerDate.getDateFromISO8601String(job.nextPeriodBeginsAt()));
+                }
+                if (text == OrderStateText.WAITING_FOR_LOCK) {
+                    setLock(job.getLock());
+                } 
             }
-            if (text == OrderStateText.WAITING_FOR_LOCK) {
-                setLock(job.getLock());
-            } 
         }
     }
     
     public void readJobChainObstacles(JobChain jobChain) {
-        if (jobChain.isStopped()) {
+        if (jobChain != null && jobChain.isStopped()) {
             setSeverity(OrderStateText.JOB_CHAIN_STOPPED);
         }
     }
     
     public void readTaskObstacles(Task task) {
-        if (task.isWaitingForAgent()) {
+        if (task != null && task.isWaitingForAgent()) {
             setSeverity(OrderStateText.WAITING_FOR_AGENT);
         }
     }

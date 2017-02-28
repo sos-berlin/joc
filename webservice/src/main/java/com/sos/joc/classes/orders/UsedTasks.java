@@ -39,6 +39,7 @@ public class UsedTasks {
 
     public void addEntries(JsonArray tasks) {
         if (this.tasks == null){
+            this.tasks = new HashMap<String, Task>();
             for (JsonObject task : tasks.getValuesAs(JsonObject.class)) {
                 this.put(task);
             }

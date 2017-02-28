@@ -32,6 +32,7 @@ public class UsedJobChains {
 
     public void addEntries(JsonArray jobChains) {
         if (this.jobChains == null){
+            this.jobChains = new HashMap<String, JobChain>();
             for (JsonObject jobChain : jobChains.getValuesAs(JsonObject.class)) {
                 this.put(jobChain);
             }
