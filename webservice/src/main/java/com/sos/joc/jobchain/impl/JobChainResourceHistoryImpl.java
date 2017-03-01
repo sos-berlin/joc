@@ -98,7 +98,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
     }
     
-    private int getSeverityFromHistoryStateText(HistoryStateText status) {
+    private Integer getSeverityFromHistoryStateText(HistoryStateText status) {
         switch (status) {
         case FAILED: 
             return 2;

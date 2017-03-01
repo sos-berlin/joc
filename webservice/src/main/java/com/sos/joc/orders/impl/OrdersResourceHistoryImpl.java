@@ -59,14 +59,14 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 
             if (ordersFilter.getOrders().size() > 0) {
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
-                    reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(), orderPath.getOrderId());
+                    reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
                 }
                 ordersFilter.setRegex("");
             } else {
                 
                 if (ordersFilter.getExcludeOrders().size() > 0) {
                     for (OrderPath orderPath : ordersFilter.getExcludeOrders()) {
-                        reportTriggerDBLayer.getFilter().addIgnoreItems(orderPath.getJobChain(), orderPath.getOrderId());
+                        reportTriggerDBLayer.getFilter().addIgnoreItems(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
                     }
                 }
                 
@@ -77,7 +77,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 }
                 if (ordersFilter.getFolders().size() > 0) {
                     for (Folder folder : ordersFilter.getFolders()) {
-                        reportTriggerDBLayer.getFilter().addFolderPath(folder.getFolder(), folder.getRecursive());
+                        reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
                     }
                 }
             }

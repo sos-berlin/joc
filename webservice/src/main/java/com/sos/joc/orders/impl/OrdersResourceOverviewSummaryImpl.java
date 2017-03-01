@@ -49,7 +49,7 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 
             if (ordersFilter.getOrders().size() > 0) {
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
-                    reportTriggerDBLayer.getFilter().addOrderPath(orderPath.getJobChain(), orderPath.getOrderId());
+                    reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
                 }
             }
 
