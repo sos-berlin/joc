@@ -72,6 +72,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             dbItem.setShared(configuration.getShared());
             dbItem.setConfigurationItem(configuration.getConfigurationItem());
             dbItem.setInstanceId(dbItemInventoryInstance.getId());
+            dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
             
             /** check permissions */
             boolean shareStatusMakePrivate = (dbItem != null && dbItem.getShared() && !configuration.getShared());
@@ -98,7 +99,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             }
             
             /** save item to DB */
-            Long id = jocConfigurationDBLayer.saveConfiguration(dbItem);
+            Long id = jocConfigurationDBLayer.saveOrUpdateConfiguration(dbItem);
             if (dbItem.getId() == null) {
                 dbItem.setId(id);
             }
@@ -209,7 +210,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             /** set shared */
             dbItem.setShared(true);
             /** save item to DB */
-            jocConfigurationDBLayer.saveConfiguration(dbItem);
+            jocConfigurationDBLayer.saveOrUpdateConfiguration(dbItem);
             ConfigurationOk ok = new ConfigurationOk();
             ok.setId(dbItem.getId().intValue());
             ok.setDeliveryDate(Date.from(Instant.now()));
@@ -242,7 +243,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             /** set private */
             dbItem.setShared(false);
             /** save item to DB */
-            jocConfigurationDBLayer.saveConfiguration(dbItem);
+            jocConfigurationDBLayer.saveOrUpdateConfiguration(dbItem);
 
             ConfigurationOk ok = new ConfigurationOk();
             ok.setId(dbItem.getId().intValue());
@@ -271,7 +272,11 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
         }
         config.setShared(dbItem.getShared());
         config.setName(dbItem.getName());
-        config.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
+        if (dbItem.getSchedulerId() != null && !dbItem.getSchedulerId().isEmpty()) {
+            config.setJobschedulerId(dbItem.getSchedulerId());
+        } else {
+            config.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
+        }
         return config;
     }
     

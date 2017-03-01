@@ -171,25 +171,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return query.getResultList();
     }
 
-//    public int saveConfiguration(JocConfigurationDbItem jocConfigurationDbItem, Boolean shared, String configurationItem) throws Exception {
-//
-//        List<JocConfigurationDbItem> l = getJocConfigurationList(1);
-//        if (l.size() > 0) {
-//            jocConfigurationDbItem = l.get(0);
-//        }
-//
-//        if (configurationItem != null) {
-//            jocConfigurationDbItem.setConfigurationItem(configurationItem);
-//        }
-//        if (shared != null) {
-//            jocConfigurationDbItem.setShared(shared);
-//        }
-//        jocConfigurationDbItem.setModified(new Date());
-//        connection.saveOrUpdate(jocConfigurationDbItem);
-//        return l.size();
-//    }
-
-    public Long saveConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws Exception {
+    public Long saveOrUpdateConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws Exception {
         jocConfigurationDbItem.setModified(new Date());
         if(jocConfigurationDbItem.getId() == null) {
             connection.save(jocConfigurationDbItem);

@@ -80,6 +80,9 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
                 }
                 configuration.setShared(jocConfigurationDbItem.getShared());
                 configuration.setId(jocConfigurationDbItem.getId().intValue());
+                if(jocConfigurationDbItem.getConfigurationItem() != null && !jocConfigurationDbItem.getConfigurationItem().isEmpty()) {
+                    configuration.setConfigurationItem(jocConfigurationDbItem.getConfigurationItem());
+                }
                 if (!jocConfigurationDbItem.getShared() || getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView()) {
                     listOfConfigurations.add(configuration);
                 }

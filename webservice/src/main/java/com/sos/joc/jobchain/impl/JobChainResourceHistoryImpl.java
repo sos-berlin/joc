@@ -82,26 +82,18 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
                     int status = getStatus(reportTriggerDBLayer);
                     switch (status) {
-                    case STATUS_HAVE_ERROR: {
+                    case STATUS_HAVE_ERROR: 
                         state.setSeverity(STATUS_HAVE_ERROR);
                         state.set_text(HistoryStateText.FAILED);
                         break;
-                    }
-                    case STATUS_SUCCESS: {
+                    case STATUS_SUCCESS:
                         state.setSeverity(STATUS_SUCCESS);
                         state.set_text(HistoryStateText.SUCCESSFUL);
                         break;
-                    }
-                    case STATUS_INCOMPLETE: {
+                    case STATUS_INCOMPLETE:
                         state.setSeverity(STATUS_INCOMPLETE);
                         state.set_text(HistoryStateText.INCOMPLETE);
                         break;
-                    }
-                    default: {
-                        state.setSeverity(STATUS_INCOMPLETE);
-                        state.set_text(HistoryStateText.INCOMPLETE);
-                        break;
-                    }
                     }
                 } else {
                     state.setSeverity(STATUS_INCOMPLETE);

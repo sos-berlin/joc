@@ -76,7 +76,7 @@ public class TestJocConfigurationDbLayer {
         jocConfigurationDbItem.setShared(true);
         jocConfigurationDbItem.setConfigurationItem("myNewConfiguration");
         initFilter();
-        jocConfigurationDBLayer.saveConfiguration(jocConfigurationDbItem); 
+        jocConfigurationDBLayer.saveOrUpdateConfiguration(jocConfigurationDbItem); 
         sosHibernateFactory.close();
 
     }
