@@ -13,6 +13,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceHistory;
 import com.sos.joc.model.common.HistoryState;
@@ -24,9 +25,6 @@ import com.sos.joc.model.order.OrderHistoryItem;
 @Path("job_chain")
 public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJobChainResourceHistory {
 
-    private static final int STATUS_SUCCESS = 0;
-    private static final int STATUS_HAVE_ERROR = 2;
-    private static final int STATUS_INCOMPLETE = 1;
     private static final int DEFAULT_MAX_HISTORY_ITEMS = 25;
     private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
     private static final String API_CALL = "./job_chain/history";
@@ -47,6 +45,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
             ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(jobChainHistoryFilter.getJobschedulerId());
+            InventoryJobChainsDBLayer jobChainsLayer = new InventoryJobChainsDBLayer(connection);
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
             if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
@@ -76,32 +75,10 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 history.setPath(jocXmlCommand.getAttribute("path"));
                 history.setStartTime(jocXmlCommand.getAttributeAsDate("start_time"));
 
-                reportTriggerDBLayer.getFilter().clearOrderPath();
-                reportTriggerDBLayer.getFilter().addOrderPath(jobChainHistoryFilter.getJobChain(), history.getOrderId());
-                if (jocXmlCommand.getAttributeAsDate("end_time") != null) {
-
-                    int status = getStatus(reportTriggerDBLayer);
-                    switch (status) {
-                    case STATUS_HAVE_ERROR: 
-                        state.setSeverity(STATUS_HAVE_ERROR);
-                        state.set_text(HistoryStateText.FAILED);
-                        break;
-                    case STATUS_SUCCESS:
-                        state.setSeverity(STATUS_SUCCESS);
-                        state.set_text(HistoryStateText.SUCCESSFUL);
-                        break;
-                    case STATUS_INCOMPLETE:
-                        state.setSeverity(STATUS_INCOMPLETE);
-                        state.set_text(HistoryStateText.INCOMPLETE);
-                        break;
-                    }
-                } else {
-                    state.setSeverity(STATUS_INCOMPLETE);
-                    state.set_text(HistoryStateText.INCOMPLETE);
-                }
-
+                HistoryStateText status = getStatus(reportTriggerDBLayer, jobChainsLayer, history);
+                state.setSeverity(getSeverityFromHistoryStateText(status));
+                state.set_text(status);
                 history.setState(state);
-
                 listOfHistory.add(history);
             }
 
@@ -120,26 +97,45 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         }
 
     }
+    
+    private int getSeverityFromHistoryStateText(HistoryStateText status) {
+        switch (status) {
+        case FAILED: 
+            return 2;
+        case SUCCESSFUL:
+            return 0;
+        default:
+            return 1;
+        } 
+    }
 
-    private int getStatus(ReportTriggerDBLayer reportTriggerDBLayer) throws Exception {
-
+    private HistoryStateText getStatus(ReportTriggerDBLayer reportTriggerDBLayer, InventoryJobChainsDBLayer jobChainsLayer, OrderHistoryItem history) throws Exception {
+        
+        if (history.getEndTime() == null) {
+            return HistoryStateText.INCOMPLETE;
+        }
+        reportTriggerDBLayer.getFilter().clearReportItems();
         reportTriggerDBLayer.getFilter().setLimit(1);
+        reportTriggerDBLayer.getFilter().addOrderHistoryId(new Long(history.getHistoryId()));
         List<DBItemReportTriggerWithResult> listOfReportTriggerWithResultDBItems = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
         DBItemReportTriggerWithResult dbItemReportTriggerWithResult = null;
         if (listOfReportTriggerWithResultDBItems.size() > 0) {
             dbItemReportTriggerWithResult = listOfReportTriggerWithResultDBItems.get(0);
         } else {
-            return STATUS_INCOMPLETE;
+            if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
+                return HistoryStateText.SUCCESSFUL;
+            }
+            return HistoryStateText.FAILED;
         }
 
         if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null || (dbItemReportTriggerWithResult.getDbItemReportTrigger()
                 .getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
-            return STATUS_INCOMPLETE;
+            return HistoryStateText.INCOMPLETE;
         } else {
             if (dbItemReportTriggerWithResult.haveError()) {
-                return STATUS_HAVE_ERROR;
+                return HistoryStateText.FAILED;
             } else {
-                return STATUS_SUCCESS;
+                return HistoryStateText.SUCCESSFUL;
             }
         }
     }
