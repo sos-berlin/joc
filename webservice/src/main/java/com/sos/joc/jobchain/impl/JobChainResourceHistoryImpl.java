@@ -121,22 +121,24 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         DBItemReportTriggerWithResult dbItemReportTriggerWithResult = null;
         if (listOfReportTriggerWithResultDBItems.size() > 0) {
             dbItemReportTriggerWithResult = listOfReportTriggerWithResultDBItems.get(0);
+        } else if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
+            return HistoryStateText.SUCCESSFUL;
         } else {
-            if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
-                return HistoryStateText.SUCCESSFUL;
-            }
             return HistoryStateText.FAILED;
         }
 
-        if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null || (dbItemReportTriggerWithResult.getDbItemReportTrigger()
-                .getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
-            return HistoryStateText.INCOMPLETE;
-        } else {
-            if (dbItemReportTriggerWithResult.haveError()) {
-                return HistoryStateText.FAILED;
-            } else {
+        if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null 
+                || (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null
+                    && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
+            if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
                 return HistoryStateText.SUCCESSFUL;
+            } else {
+                return HistoryStateText.FAILED;
             }
+        } else if (dbItemReportTriggerWithResult.haveError()) {
+            return HistoryStateText.FAILED;
+        } else {
+            return HistoryStateText.SUCCESSFUL;
         }
     }
 }
