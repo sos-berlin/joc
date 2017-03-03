@@ -121,10 +121,12 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         DBItemReportTriggerWithResult dbItemReportTriggerWithResult = null;
         if (listOfReportTriggerWithResultDBItems.size() > 0) {
             dbItemReportTriggerWithResult = listOfReportTriggerWithResultDBItems.get(0);
-        } else if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
-            return HistoryStateText.SUCCESSFUL;
         } else {
-            return HistoryStateText.FAILED;
+            if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
+                return HistoryStateText.SUCCESSFUL;
+            } else {
+                return HistoryStateText.FAILED;
+            }
         }
 
         if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null 
