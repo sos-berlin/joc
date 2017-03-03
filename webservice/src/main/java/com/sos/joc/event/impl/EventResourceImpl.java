@@ -26,8 +26,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.event.EventCallable;
+import com.sos.joc.classes.event.EventCallableOfCurrentJobScheduler;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.event.resource.IEventResource;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
@@ -95,7 +95,6 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             List<JOCJsonCommand> jocJsonCommands = new ArrayList<JOCJsonCommand>();
 
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
-            InventoryJobChainsDBLayer jobChainsLayer = new InventoryJobChainsDBLayer(connection);
 
             Globals.beginTransaction(connection);
             
@@ -121,12 +120,17 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 command.setAutoCloseHttpClient(false);
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
-                tasks.add(new EventCallable(command, jsEvent, instance.getId(), accessToken, session, EVENT_TIMEOUT, isCurrentJobScheduler, shiroUser, jobChainsLayer, instanceLayer));
+                if (isCurrentJobScheduler) {
+                    tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, shiroUser));
+                } else {
+                    tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId()));
+                }
                 isCurrentJobScheduler = false;
                 if (urlOfCurrentJs == null) {
                     urlOfCurrentJs = instance.getUrl();
                 }
             }
+            Globals.disconnect(connection);
             try {
                 session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
             } catch (Exception e1) {

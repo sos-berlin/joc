@@ -90,19 +90,21 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                 }
             } else {
                 List<DBItemInventoryJobChain> jobChainsFromDb = dbLayer.getJobChains(instanceId);
-                for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
-                    JobChainP jobChain = null;
-                    if (regex != null && !regex.isEmpty()) {
-                        Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
-                        if (regExMatcher.find()) {
+                if (jobChainsFromDb != null) {
+                    for (DBItemInventoryJobChain jobChainFromDb : jobChainsFromDb) {
+                        JobChainP jobChain = null;
+                        if (regex != null && !regex.isEmpty()) {
+                            Matcher regExMatcher = Pattern.compile(regex).matcher(jobChainFromDb.getName());
+                            if (regExMatcher.find()) {
+                                jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
+                            }
+                        } else {
                             jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                         }
-                    } else {
-                        jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
-                    }
-                    if (jobChain != null) {
-                        jobChains.add(jobChain);
-                        initNestedJobChainsIfExists(dbLayer, jobChain);
+                        if (jobChain != null) {
+                            jobChains.add(jobChain);
+                            initNestedJobChainsIfExists(dbLayer, jobChain);
+                        }
                     }
                 }
             }
