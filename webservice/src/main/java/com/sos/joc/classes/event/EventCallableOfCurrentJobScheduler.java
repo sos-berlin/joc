@@ -1,6 +1,5 @@
 package com.sos.joc.classes.event;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,8 +107,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setEventType("JobChainStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
                     } else if (eventType.startsWith("Order")) {
-                        //eventSnapshot.setEventType("OrderStateChanged");
-                        eventSnapshot.setEventType("OrderStarted");
+                        eventSnapshot.setEventType("OrderStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
                         eventSnapshots.putAll(createJobChainEvent(eventSnapshot));
                     } else if (eventType.startsWith("Scheduler")) {
@@ -147,7 +145,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 break;
             case "NonEmpty":
                 eventSnapshots.putAll(nonEmptyEvent(newEventId, json));
-                try { //collect further events after 2sec to minimize the num of responses 
+                try { //collect further events after 2sec to minimize the number of responses 
                     int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
                     Thread.sleep(delay);
                 } catch (InterruptedException e1) {
