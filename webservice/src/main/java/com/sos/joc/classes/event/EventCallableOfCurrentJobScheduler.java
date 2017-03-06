@@ -82,6 +82,9 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             EventSnapshot eventSnapshot = new EventSnapshot();
             String eventType = event.getString("TYPE", null);
             eventSnapshot.setEventType(eventType);
+            if (eventType.startsWith("File")) {
+                continue;
+            }
             if (eventType.startsWith("Task")) {
                 eventSnapshot.setEventType("JobStateChanged");
                 JsonObject eventKeyO = event.getJsonObject("key");
@@ -93,11 +96,18 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
             } else {
                 String eventKey = event.getString("key", null);
-                if (eventType.startsWith("File")) { //consider instead inventory custom events if implemented
-                    eventSnapshot.setEventType("FileBasedActivated");
-                    String[] eventKeyParts = eventKey.split(":", 2);
-                    eventSnapshot.setPath(eventKeyParts[1]);
-                    eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
+                if (eventType.equals("VariablesCustomEvent")) {
+                    JsonObject variables = event.getJsonObject("variables");
+                    boolean isInventoryEvent = false;
+                    if (variables != null) {
+                        isInventoryEvent = variables.getString("InventoryEventUpdateFinished", null) != null; 
+                    }
+                    if (isInventoryEvent) {
+                        eventSnapshot.setEventType("FileBasedActivated");
+                        String[] eventKeyParts = eventKey.split(":", 2);
+                        eventSnapshot.setPath(eventKeyParts[1]);
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", ""))); 
+                    }
                 } else {
                     eventSnapshot.setPath(eventKey);
                     if (eventType.startsWith("JobState")) {
@@ -145,12 +155,16 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 break;
             case "NonEmpty":
                 eventSnapshots.putAll(nonEmptyEvent(newEventId, json));
-                try { //collect further events after 2sec to minimize the number of responses 
-                    int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
-                    Thread.sleep(delay);
-                } catch (InterruptedException e1) {
+                if (eventSnapshots.isEmpty()) {
+                    eventSnapshots.putAll(getEventSnapshotsMap(newEventId.toString())); 
+                } else {
+                    try { //collect further events after 2sec to minimize the number of responses 
+                        int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
+                        Thread.sleep(delay);
+                    } catch (InterruptedException e1) {
+                    }
+                    eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
                 }
-                eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
                 break;
             case "Torn":
                 eventSnapshots.putAll(getEventSnapshotsMap(newEventId.toString()));

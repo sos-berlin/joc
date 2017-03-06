@@ -159,22 +159,28 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                 eventSnapshot.setEventId(eId.toString());
                 String eventType = event.getString("TYPE", null);
                 eventSnapshot.setEventType(eventType);
+                if (eventType.startsWith("File")) {
+                    continue;
+                }
                 if (eventType.startsWith("Task")) {
-                    JsonObject eventKeyO = event.getJsonObject("key");
-                    String jobPath = eventKeyO.getString("jobPath", null);
-                    if (jobPath == null || "/scheduler_file_order_sink".equals(jobPath)) {
-                        continue;
-                    }
-                    eventSnapshot.setPath(jobPath);
-                    eventSnapshot.setTaskId(eventKeyO.getString("taskId", null));
-                    eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
-                } else {
+                    continue;
+                }
+//                if (eventType.startsWith("Task")) {
+//                    JsonObject eventKeyO = event.getJsonObject("key");
+//                    String jobPath = eventKeyO.getString("jobPath", null);
+//                    if (jobPath == null || "/scheduler_file_order_sink".equals(jobPath)) {
+//                        continue;
+//                    }
+//                    eventSnapshot.setPath(jobPath);
+//                    eventSnapshot.setTaskId(eventKeyO.getString("taskId", null));
+//                    eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
+//                } else {
                     String eventKey = event.getString("key", null);
-                    if (eventType.startsWith("File")) {
-                        String[] eventKeyParts = eventKey.split(":", 2);
-                        eventSnapshot.setPath(eventKeyParts[1]);
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
-                    } else {
+//                    if (eventType.startsWith("File")) {
+//                        String[] eventKeyParts = eventKey.split(":", 2);
+//                        eventSnapshot.setPath(eventKeyParts[1]);
+//                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
+//                    } else {
                         eventSnapshot.setPath(eventKey);
                         if (eventType.startsWith("JobState")) {
                             eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
@@ -235,8 +241,8 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                             eventSnapshot.setState(event.getString("state", null));
                             eventSnapshot.setPath(command.getSchemeAndAuthority());
                         }
-                    }
-                }
+//                    }
+//                }
 
                 eventSnapshots.add(eventSnapshot);
             }
@@ -245,6 +251,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             } catch (Exception e) {
             } finally {
                 json = null;
+            }
+            if (eventSnapshots.isEmpty()) {
+                eventSnapshots.addAll(getEventSnapshots(newEventId.toString())); 
             }
             break;
         case "Torn":
