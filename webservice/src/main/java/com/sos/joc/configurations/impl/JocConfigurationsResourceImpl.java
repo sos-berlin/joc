@@ -1,10 +1,13 @@
 package com.sos.joc.configurations.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.Path;
+
 import com.sos.hibernate.classes.SOSHibernateConnection;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
@@ -64,11 +67,12 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
             jocConfigurationDBLayer.getFilter().setConfigurationType(configurationType);
             jocConfigurationDBLayer.getFilter().setAccount(configurationsFilter.getAccount());
             jocConfigurationDBLayer.getFilter().setShared(configurationsFilter.getShared());
-
+            
             List<JocConfigurationDbItem> listOfJocConfigurationDbItem = jocConfigurationDBLayer.getJocConfigurationList(0);
             Configurations configurations = new Configurations();
             ArrayList<Configuration> listOfConfigurations = new ArrayList<Configuration>();
-
+            // cleanup wrongfully duplicated Profile entries
+            listOfJocConfigurationDbItem = cleanupProfileDuplicates(listOfJocConfigurationDbItem);
             for (JocConfigurationDbItem jocConfigurationDbItem : listOfJocConfigurationDbItem) {
                 Configuration configuration = new Configuration();
                 configuration.setAccount(jocConfigurationDbItem.getAccount());
@@ -102,7 +106,34 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
         } finally {
             Globals.disconnect(connection);
         }
-
+    }
+    
+    private List<JocConfigurationDbItem> cleanupProfileDuplicates(List<JocConfigurationDbItem> configurationDbItems) {
+        Comparator<JocConfigurationDbItem> itemComparator = new Comparator<JocConfigurationDbItem>() {
+            @Override
+            public int compare(JocConfigurationDbItem o1, JocConfigurationDbItem o2) {
+                if (o1.getId() < o2.getId()) {
+                    return -1;
+                } else if (o1.getId() == o2.getId()) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            }
+        };
+        configurationDbItems.sort(itemComparator);
+        Iterator<JocConfigurationDbItem> iterator = configurationDbItems.iterator();
+        int count = 0;
+        while (iterator.hasNext()) {
+            if(iterator.next().getConfigurationType().equals(ConfigurationType.PROFILE.name())) {
+                if(count == 0) {
+                    count++;
+                } else {
+                    iterator.remove();
+                }
+            }
+        }
+        return configurationDbItems;
     }
 
 }
