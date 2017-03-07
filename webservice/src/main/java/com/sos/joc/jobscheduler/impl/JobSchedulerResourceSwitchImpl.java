@@ -3,6 +3,8 @@ package com.sos.joc.jobscheduler.impl;
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.SOSServicePermissionShiro;
+import com.sos.auth.rest.SOSShiroCurrentUser;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -25,14 +27,19 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            JOCPreferences jocPreferences = new JOCPreferences(jobschedulerUser.getSosShiroCurrentUser().getUsername());
+            SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
+            JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
             String selectedInstance = jobSchedulerId.getJobschedulerId();
             jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, selectedInstance);
-            jobschedulerUser.getSosShiroCurrentUser().setSelectedInstance(selectedInstance);
+            shiroUser.setSelectedInstance(selectedInstance);
 
             SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-            jocDefaultResponse = sosServicePermissionShiro.getJocCockpitPermissions(accessToken, jobschedulerUser.getSosShiroCurrentUser()
-                    .getUsername(), jobschedulerUser.getSosShiroCurrentUser().getPassword());
+            jocDefaultResponse = sosServicePermissionShiro.getJocCockpitPermissions(accessToken, shiroUser.getUsername(), shiroUser.getPassword());
+
+            try {
+                Globals.forceClosingHttpClients(shiroUser.getCurrentSubject().getSession(false));
+            } catch (Exception e) {
+            }
 
             return jocDefaultResponse;
 
