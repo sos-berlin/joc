@@ -88,7 +88,7 @@ public class Globals {
             getHibernateFactory();
         }
         SOSHibernateSession connection = new SOSHibernateStatelessSession(sosHibernateFactory);
-        connection.setConnectionIdentifier(identifier);
+        connection.setIdentifier(identifier);
         try {
             connection.connect();
             return connection;
