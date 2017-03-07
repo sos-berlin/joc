@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -32,7 +32,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 
     @Override
     public JOCDefaultResponse postLocksP(String accessToken, LocksFilter locksFilter) throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(

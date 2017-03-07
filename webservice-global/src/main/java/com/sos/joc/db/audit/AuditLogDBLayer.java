@@ -9,7 +9,7 @@ import javax.persistence.TemporalType;
 import org.hibernate.SessionException;
 import org.hibernate.query.Query;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -22,7 +22,7 @@ import com.sos.joc.model.order.OrderPath;
 @SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
 public class AuditLogDBLayer extends DBLayer {
 
-    public AuditLogDBLayer(SOSHibernateConnection connection) {
+    public AuditLogDBLayer(SOSHibernateSession connection) {
         super(connection);
     }
     
@@ -88,7 +88,7 @@ public class AuditLogDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         } 
     }
 
@@ -146,7 +146,7 @@ public class AuditLogDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         } 
     }
 
@@ -184,7 +184,7 @@ public class AuditLogDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         } 
     }
 
@@ -236,7 +236,7 @@ public class AuditLogDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         } 
     }
 }

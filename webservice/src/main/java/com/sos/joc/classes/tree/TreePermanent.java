@@ -13,7 +13,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.exceptions.JocException;
@@ -103,7 +103,7 @@ public class TreePermanent {
             }
         }
 
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
 

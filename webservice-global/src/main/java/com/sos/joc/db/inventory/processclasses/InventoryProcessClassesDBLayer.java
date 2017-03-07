@@ -8,7 +8,7 @@ import org.hibernate.SessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -18,7 +18,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryProcessClassesDBLayer.class);
 
-    public InventoryProcessClassesDBLayer(SOSHibernateConnection connection) {
+    public InventoryProcessClassesDBLayer(SOSHibernateSession connection) {
         super(connection);
     }
 
@@ -38,7 +38,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -74,7 +74,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -97,7 +97,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -119,7 +119,7 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 

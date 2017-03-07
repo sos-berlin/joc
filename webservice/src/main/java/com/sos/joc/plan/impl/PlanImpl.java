@@ -12,7 +12,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem;
@@ -99,7 +99,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
     @Override
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             LOGGER.debug("Reading the daily plan");

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
@@ -19,7 +19,7 @@ public class OrderPermanent {
     public static List<OrderP> fillOutputOrders(List<DBItemInventoryOrder> ordersFromDB, InventoryOrdersDBLayer dbLayer, Boolean compact)
             throws Exception {
         List<OrderP> listOfOutputOrders = new ArrayList<OrderP>();
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             connection = Globals.createSosHibernateStatelessConnection("fillOutputOrders");

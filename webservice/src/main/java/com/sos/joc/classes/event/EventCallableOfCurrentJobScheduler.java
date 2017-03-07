@@ -11,7 +11,7 @@ import javax.json.JsonObject;
 import org.apache.shiro.session.Session;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -178,7 +178,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 Thread.sleep(delay);
             } catch (InterruptedException e1) {
             }
-            SOSHibernateConnection connection = null;
+            SOSHibernateSession connection = null;
             DBItemInventoryInstance inventoryInstance = null;
             InventoryInstancesDBLayer instanceLayer = null;
             try {

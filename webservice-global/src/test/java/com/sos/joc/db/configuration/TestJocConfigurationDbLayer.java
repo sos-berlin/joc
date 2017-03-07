@@ -9,9 +9,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SOSHibernateFactory;
-import com.sos.hibernate.classes.SOSHibernateStatelessConnection;
+import com.sos.hibernate.classes.SOSHibernateStatelessSession;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JobSchedulerDate;
@@ -20,7 +20,7 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 public class TestJocConfigurationDbLayer {
     private static final String HIBERNATE_CONFIG_FILE = "C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_joc_cockpit/config/hibernate.cfg.xml";
     private SOSHibernateFactory sosHibernateFactory;
-    private SOSHibernateConnection sosHibernateConnection;
+    private SOSHibernateSession sosHibernateConnection;
     JocConfigurationDbLayer jocConfigurationDBLayer;
 
     @BeforeClass
@@ -38,7 +38,7 @@ public class TestJocConfigurationDbLayer {
         sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
         sosHibernateFactory.setAutoCommit(true);
         sosHibernateFactory.build();
-        sosHibernateConnection = new SOSHibernateStatelessConnection(sosHibernateFactory);
+        sosHibernateConnection = new SOSHibernateStatelessSession(sosHibernateFactory);
         sosHibernateConnection.connect();
         jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateConnection);
     }

@@ -9,7 +9,7 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -33,7 +33,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     private static String API_CALL = "./orders/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
-    private SOSHibernateConnection connection = null;
+    private SOSHibernateSession connection = null;
 
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {

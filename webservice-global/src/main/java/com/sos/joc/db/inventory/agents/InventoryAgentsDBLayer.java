@@ -8,7 +8,7 @@ import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentCluster;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -21,7 +21,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
     private static final String AGENT_CLUSTER_MEMBER = AgentClusterMember.class.getName();
     private static final String AGENT_CLUSTER_P = AgentClusterPermanent.class.getName();
 
-    public InventoryAgentsDBLayer(SOSHibernateConnection connection) {
+    public InventoryAgentsDBLayer(SOSHibernateSession connection) {
         super(connection);
     }
 
@@ -44,7 +44,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -65,7 +65,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -93,7 +93,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -114,7 +114,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -150,7 +150,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -189,7 +189,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 
@@ -220,7 +220,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateConnection.getException(ex));
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
 }

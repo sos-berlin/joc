@@ -5,7 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -25,7 +25,7 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
 
     @Override
     public JOCDefaultResponse postScheduleP(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleFilter, accessToken, scheduleFilter.getJobschedulerId(),

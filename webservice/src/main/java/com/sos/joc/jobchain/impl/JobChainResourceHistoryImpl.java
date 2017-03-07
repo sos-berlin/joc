@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemReportTriggerWithResult;
 import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
@@ -32,7 +32,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     @Override
     public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
 
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainHistoryFilter, accessToken, jobChainHistoryFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getJobChain().getView().isHistory());

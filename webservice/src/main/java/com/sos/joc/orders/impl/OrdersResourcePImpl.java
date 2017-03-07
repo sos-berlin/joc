@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -34,7 +34,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
 
     @Override
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilter ordersFilter) throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken, ordersFilter.getJobschedulerId(),

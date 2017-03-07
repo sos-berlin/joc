@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.WebserviceConstants;
@@ -83,7 +83,7 @@ public class JocAuditLog {
         auditLogToDb.setTicketLink(body.getTicketLink());
         auditLogToDb.setTimeSpent(body.getTimeSpent());
         auditLogToDb.setCreated(Date.from(Instant.now()));
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
         try {
             connection = Globals.createSosHibernateStatelessConnection("storeAuditLogEntry");
             connection.save(auditLogToDb);

@@ -3,7 +3,7 @@ package com.sos.joc.db.history.task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jitl.schedulerhistory.db.SchedulerTaskHistoryDBItem;
 import com.sos.jitl.schedulerhistory.db.SchedulerTaskHistoryLogDBItemPostgres;
@@ -13,7 +13,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerTaskHistoryDBLayer.class);
 
-    public JobSchedulerTaskHistoryDBLayer(SOSHibernateConnection conn) {
+    public JobSchedulerTaskHistoryDBLayer(SOSHibernateSession conn) {
         super(conn);
     }
 

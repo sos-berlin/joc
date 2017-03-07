@@ -8,7 +8,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -26,7 +26,7 @@ import com.sos.joc.model.configuration.ConfigurationsFilter;
 public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJocConfigurationsResource {
 
     private static final String API_CALL = "./configurations";
-    private SOSHibernateConnection connection = null;
+    private SOSHibernateSession connection = null;
 
     @Override
     public JOCDefaultResponse postConfigurations(String accessToken, ConfigurationsFilter configurationsFilter) throws Exception {

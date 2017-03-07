@@ -14,7 +14,7 @@ import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
@@ -40,7 +40,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     private final Integer eventTimeout;
     private final Long instanceId;
     private Long startTime = 0L;
-    private SOSHibernateConnection connection = null;
+    private SOSHibernateSession connection = null;
 
     public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session, Integer eventTimeout,
             Long instanceId) {

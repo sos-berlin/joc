@@ -3,7 +3,7 @@ package com.sos.joc.classes.jobscheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -24,7 +24,7 @@ public class JobSchedulerPermanent {
 
     public static JobSchedulerP getJobScheduler(DBItemInventoryInstance dbItemInventoryInstance, boolean isSupervisorCall) throws JocException {
 
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             connection = Globals.createSosHibernateStatelessConnection("getJobScheduler");

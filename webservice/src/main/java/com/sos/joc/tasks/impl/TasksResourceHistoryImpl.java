@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemReportExecution;
 import com.sos.jitl.reporting.db.ReportExecutionsDBLayer;
 import com.sos.joc.Globals;
@@ -34,7 +34,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
     @Override
     public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), 

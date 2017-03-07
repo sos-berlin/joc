@@ -11,9 +11,9 @@ import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SOSHibernateFactory;
-import com.sos.hibernate.classes.SOSHibernateStatelessConnection;
+import com.sos.hibernate.classes.SOSHibernateStatelessSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -83,11 +83,11 @@ public class Globals {
         return sosHibernateFactory;
     }
 
-    public static SOSHibernateConnection createSosHibernateStatelessConnection(String identifier) throws JocException {
+    public static SOSHibernateSession createSosHibernateStatelessConnection(String identifier) throws JocException {
         if (sosHibernateFactory == null) {
             getHibernateFactory();
         }
-        SOSHibernateConnection connection = new SOSHibernateStatelessConnection(sosHibernateFactory);
+        SOSHibernateSession connection = new SOSHibernateStatelessSession(sosHibernateFactory);
         connection.setConnectionIdentifier(identifier);
         try {
             connection.connect();
@@ -112,7 +112,7 @@ public class Globals {
         setTrustStore();
     }
 
-    public static void beginTransaction(SOSHibernateConnection connection) {
+    public static void beginTransaction(SOSHibernateSession connection) {
         try {
             if (connection != null) {
                 connection.beginTransaction();
@@ -121,7 +121,7 @@ public class Globals {
         }
     }
 
-    public static void rollback(SOSHibernateConnection connection) {
+    public static void rollback(SOSHibernateSession connection) {
         try {
             if (connection != null) {
                 connection.rollback();
@@ -130,7 +130,7 @@ public class Globals {
         }
     }
 
-    public static void commit(SOSHibernateConnection connection) {
+    public static void commit(SOSHibernateSession connection) {
         try {
             if (connection != null) {
                 connection.commit();
@@ -259,7 +259,7 @@ public class Globals {
     public static void forceRollback(Object object) {
     }
 
-    public static void disconnect(SOSHibernateConnection connection) {
+    public static void disconnect(SOSHibernateSession connection) {
         if (connection != null) {
             connection.disconnect();
         }

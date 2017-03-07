@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
@@ -19,7 +19,7 @@ import com.sos.joc.model.job.LockUseP;
 public class JobPermanent {
 
     public static Integer getEstimatedDurationInSeconds(DBItemInventoryJob job) throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             connection = Globals.createSosHibernateStatelessConnection("getEstimatedDurationInSeconds");

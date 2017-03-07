@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
@@ -24,7 +24,7 @@ public class InventoryOrdersDBLayerTest {
 
     @Test
     public void getOrderschedulerOrders() throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
         connection = Globals.createSosHibernateStatelessConnection("getOrderschedulerOrders");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
@@ -38,7 +38,7 @@ public class InventoryOrdersDBLayerTest {
 
     @Test
     public void getOrderschedulerOrder() throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
         connection = Globals.createSosHibernateStatelessConnection("getOrderschedulerOrder");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
@@ -56,7 +56,7 @@ public class InventoryOrdersDBLayerTest {
 
     @Test
     public void getAgentCluster() throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
         connection = Globals.createSosHibernateStatelessConnection("getAgentCluster");
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
@@ -74,7 +74,7 @@ public class InventoryOrdersDBLayerTest {
 
     @Test
     public void isEndNode() throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
         connection = Globals.createSosHibernateStatelessConnection("isEndNode");
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();

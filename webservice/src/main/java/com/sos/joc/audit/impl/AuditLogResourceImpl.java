@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.joc.Globals;
 import com.sos.joc.audit.resource.IAuditLogResource;
@@ -33,7 +33,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
 
     @Override
     public JOCDefaultResponse postAuditLog(String accessToken, AuditLogFilter auditLogFilter) throws Exception {
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL,auditLogFilter,accessToken, auditLogFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getAuditLog().getView().isStatus());

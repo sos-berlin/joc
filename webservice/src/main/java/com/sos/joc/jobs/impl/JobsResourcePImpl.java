@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -36,7 +36,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
     @Override
     public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter) {
 
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(

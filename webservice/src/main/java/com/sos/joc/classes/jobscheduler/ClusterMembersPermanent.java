@@ -3,7 +3,7 @@ package com.sos.joc.classes.jobscheduler;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -20,7 +20,7 @@ public class ClusterMembersPermanent {
 
     public static List<JobSchedulerP> getClusterMembers(String jobschedulerId) throws Exception {
 
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
 
         try {
             connection = Globals.createSosHibernateStatelessConnection("getClusterMembers");

@@ -8,7 +8,7 @@ import org.hibernate.query.Query;
 import org.hibernate.type.BooleanType;
 import org.hibernate.type.Type;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 
@@ -19,7 +19,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
     private static final Logger LOGGER = Logger.getLogger(JocConfigurationDbLayer.class);
     private JocConfigurationFilter filter = null;
 
-    public JocConfigurationDbLayer(SOSHibernateConnection connection) throws Exception {
+    public JocConfigurationDbLayer(SOSHibernateSession connection) throws Exception {
         super();
         this.connection = connection;
         resetFilter();

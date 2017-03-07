@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
@@ -290,7 +290,7 @@ public class JOCResourceImpl {
             DBMissingDataException, DBInvalidDataException {
         if (host != null && !host.isEmpty() && port != null && port > 0) {
 
-            SOSHibernateConnection connection = null;
+            SOSHibernateSession connection = null;
 
             try {
                 try {

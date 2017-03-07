@@ -5,7 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBLayerReporting;
 import com.sos.joc.Globals;
@@ -24,7 +24,7 @@ import com.sos.joc.order.resource.IOrderPResource;
 public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResource {
 
     private static final String API_CALL = "./order/p";
-    private SOSHibernateConnection connection = null;
+    private SOSHibernateSession connection = null;
 
     @Override
     public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {

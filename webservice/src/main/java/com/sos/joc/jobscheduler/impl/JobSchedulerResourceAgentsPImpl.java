@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
 import com.sos.joc.Globals;
@@ -29,7 +29,7 @@ import com.sos.joc.model.jobscheduler.OperatingSystem;
 public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentsP {
 
     private static final String API_CALL = "./jobscheduler/agents/p";
-    private SOSHibernateConnection connection = null;
+    private SOSHibernateSession connection = null;
 
     @Override
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {

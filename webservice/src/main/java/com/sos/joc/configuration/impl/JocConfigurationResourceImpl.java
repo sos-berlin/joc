@@ -5,7 +5,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -27,7 +27,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
     private static final String API_CALL_DELETE = "./configuration/delete";
     private static final String API_CALL_SHARE = "./configuration/share";
     private static final String API_CALL_PRIVATE = "./configuration/make_private";
-    private SOSHibernateConnection connection = null;
+    private SOSHibernateSession connection = null;
     private JocConfigurationDbLayer jocConfigurationDBLayer;
 
     private void init(Configuration configuration) throws Exception {

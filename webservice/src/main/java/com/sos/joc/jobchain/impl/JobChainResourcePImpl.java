@@ -7,7 +7,7 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateConnection;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
@@ -30,7 +30,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
     @Override
     public JOCDefaultResponse postJobChainP(String accessToken, JobChainFilter jobChainFilter) {
 
-        SOSHibernateConnection connection = null;
+        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainFilter, accessToken, jobChainFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getJobChain().getView().isStatus());
