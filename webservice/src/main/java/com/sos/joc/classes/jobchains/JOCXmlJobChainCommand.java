@@ -41,17 +41,17 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         this.accessToken = accessToken;
     }
     
-    public JobChainV getJobChain(String jobChain, Boolean compact) throws Exception {
+    public JobChainV getJobChain(String jobChain, Boolean compact, Integer maxOrders) throws Exception {
         executePostWithThrowBadRequestAfterRetry(createShowJobChainPostCommand(jobChain, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job_chain");
         JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this);
         jobChainV.setFields(compact);
         nestedJobChains.addAll(jobChainV.getNestedJobChains());
         if ((compact == null || !compact) && jobChainV.hasJobNodes() && jobChainV.getNumOfOrders() > 0) {
-            OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, false, setUriForOrdersJsonCommand(), accessToken);
+            OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken);
             Map<String, OrderVolatile> orders = ordersVCallable.call();
             if (orders != null && orders.size() > 0) {
-                jobChainV.setOrders(orders);
+                jobChainV.setOrders(orders, maxOrders);
             }
         }
         jobChainV.setOrdersSummary(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken).getOrdersSummary());
@@ -168,7 +168,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            nestedJobChains.addAll(jobChainV.getNestedJobChains());
            summaryTasks.add(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken));
            if (!jobChainsFilter.getCompact() && jobChainV.hasJobNodes()) {
-               orderTasks.add(new OrdersVCallable(jobChainV, false, setUriForOrdersJsonCommand(), accessToken)); 
+               orderTasks.add(new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken)); 
            }
         }
         
@@ -192,7 +192,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                     if (orders.size() > 0) {
                         JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
                         if (j != null) {
-                            j.setOrders(orders);
+                            j.setOrders(orders, jobChainsFilter.getMaxOrders());
                         }
                     }
                 } catch (ExecutionException e) {

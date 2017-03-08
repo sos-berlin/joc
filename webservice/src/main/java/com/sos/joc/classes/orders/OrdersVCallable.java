@@ -63,14 +63,14 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.suppressJobSchedulerObjectNotExistException = true;
     }
 
-    public OrdersVCallable(JobChainV jobChain, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public OrdersVCallable(JobChainV jobChain, JOCJsonCommand jocJsonCommand, String accessToken) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(jobChain.getPath());
         this.orders = o;
         this.job = null;
         this.folder = null;
         this.ordersBody = null;
-        this.compact = compact;
+        this.compact = false;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
@@ -183,7 +183,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         usedTasks.addEntries(json.getJsonArray("usedTasks"));
         Date surveyDate = JobSchedulerDate.getDateFromEventId(json.getJsonNumber("eventId").longValue());
         Map<String, OrderVolatile> listOrderQueue = new HashMap<String, OrderVolatile>();
-
+        
         for (JsonObject ordersItem : json.getJsonArray("orders").getValuesAs(JsonObject.class)) {
             OrderVolatile order = new OrderVolatile(ordersItem, origJobChain);
             order.setPathJobChainAndOrderId();

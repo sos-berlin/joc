@@ -28,7 +28,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "regex",
     "folders",
     "states",
-    "close"
+    "close",
+    "maxOrders"
 })
 public class JobChainsFilter {
 
@@ -73,6 +74,14 @@ public class JobChainsFilter {
      */
     @JsonProperty("close")
     private Boolean close = false;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("maxOrders")
+    private Integer maxOrders;
 
     /**
      * 
@@ -238,6 +247,32 @@ public class JobChainsFilter {
         this.close = close;
     }
 
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The maxOrders
+     */
+    @JsonProperty("maxOrders")
+    public Integer getMaxOrders() {
+        return maxOrders;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param maxOrders
+     *     The maxOrders
+     */
+    @JsonProperty("maxOrders")
+    public void setMaxOrders(Integer maxOrders) {
+        this.maxOrders = maxOrders;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -245,7 +280,7 @@ public class JobChainsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobChains).append(compact).append(regex).append(folders).append(states).append(close).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobChains).append(compact).append(regex).append(folders).append(states).append(close).append(maxOrders).toHashCode();
     }
 
     @Override
@@ -257,7 +292,7 @@ public class JobChainsFilter {
             return false;
         }
         JobChainsFilter rhs = ((JobChainsFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChains, rhs.jobChains).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).append(states, rhs.states).append(close, rhs.close).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChains, rhs.jobChains).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).append(states, rhs.states).append(close, rhs.close).append(maxOrders, rhs.maxOrders).isEquals();
     }
 
 }

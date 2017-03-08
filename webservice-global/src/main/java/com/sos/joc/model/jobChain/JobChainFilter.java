@@ -1,8 +1,6 @@
 
 package com.sos.joc.model.jobChain;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,8 +21,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "jobschedulerId",
     "jobChain",
-    "orders",
-    "compact"
+    "compact",
+    "maxOrders"
 })
 public class JobChainFilter {
 
@@ -44,8 +42,6 @@ public class JobChainFilter {
      */
     @JsonProperty("jobChain")
     private String jobChain;
-    @JsonProperty("orders")
-    private List<String> orders = new ArrayList<String>();
     /**
      * compact parameter
      * <p>
@@ -54,6 +50,14 @@ public class JobChainFilter {
      */
     @JsonProperty("compact")
     private Boolean compact = false;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("maxOrders")
+    private Integer maxOrders;
 
     /**
      * 
@@ -108,26 +112,6 @@ public class JobChainFilter {
     }
 
     /**
-     * 
-     * @return
-     *     The orders
-     */
-    @JsonProperty("orders")
-    public List<String> getOrders() {
-        return orders;
-    }
-
-    /**
-     * 
-     * @param orders
-     *     The orders
-     */
-    @JsonProperty("orders")
-    public void setOrders(List<String> orders) {
-        this.orders = orders;
-    }
-
-    /**
      * compact parameter
      * <p>
      * controls if the object view is compact or detailed
@@ -153,6 +137,32 @@ public class JobChainFilter {
         this.compact = compact;
     }
 
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The maxOrders
+     */
+    @JsonProperty("maxOrders")
+    public Integer getMaxOrders() {
+        return maxOrders;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param maxOrders
+     *     The maxOrders
+     */
+    @JsonProperty("maxOrders")
+    public void setMaxOrders(Integer maxOrders) {
+        this.maxOrders = maxOrders;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -160,7 +170,7 @@ public class JobChainFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(jobChain).append(orders).append(compact).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(jobChain).append(compact).append(maxOrders).toHashCode();
     }
 
     @Override
@@ -172,7 +182,7 @@ public class JobChainFilter {
             return false;
         }
         JobChainFilter rhs = ((JobChainFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChain, rhs.jobChain).append(orders, rhs.orders).append(compact, rhs.compact).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(jobChain, rhs.jobChain).append(compact, rhs.compact).append(maxOrders, rhs.maxOrders).isEquals();
     }
 
 }
