@@ -31,6 +31,7 @@ public class SchedulePermanent {
                 Substitute substitute = new Substitute();
                 substitute.setValidFrom(scheduleFromDb.getSubstituteValidFrom());
                 substitute.setValidTo(scheduleFromDb.getSubstituteValidTo());
+                substitute.setPath(scheduleFromDb.getSubstitute());
                 schedule.setSubstitute(substitute);
             } else {
                 schedule.setSubstitute(null);
