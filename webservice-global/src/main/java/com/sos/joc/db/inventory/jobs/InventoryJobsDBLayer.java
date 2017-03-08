@@ -36,7 +36,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append(" where instanceId = :instanceId");
             sql.append(" and name  = :name");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("name", name);
             List<DBItemInventoryJob> result = query.list();
@@ -57,7 +57,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOBS);
             sql.append(" where instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             return query.list();
         } catch (SessionException ex) {
@@ -78,7 +78,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
             }
@@ -100,7 +100,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append(" where ifile.id = ij.fileId");
             sql.append(" and ij.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {
@@ -123,7 +123,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append(" where il.id = ial.lockId");
             sql.append(" and ial.jobId = :id");
             sql.append(" and il.instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryLock> result = query.list();
@@ -147,7 +147,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append("where ijc.id = ijcn.jobChainId ");
             sql.append("and ijcn.jobId = :id ");
             sql.append("and ijc.instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
@@ -173,7 +173,7 @@ public class InventoryJobsDBLayer extends DBLayer {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
             sql.append(" and instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("jobPath", jobPath);
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
@@ -211,7 +211,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (isOrderJob != null) {
                 sql.append(" and isOrderJob = :isOrderJob");
             }
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             if (recursive) {
                 query.setParameter("folderName", folderName + "%");
             } else {

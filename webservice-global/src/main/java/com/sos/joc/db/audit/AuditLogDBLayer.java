@@ -60,7 +60,7 @@ public class AuditLogDBLayer extends DBLayer {
                 }
             }
             sql.append(" order by created desc");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
@@ -121,7 +121,7 @@ public class AuditLogDBLayer extends DBLayer {
                     }
                 }
             }
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
@@ -165,7 +165,7 @@ public class AuditLogDBLayer extends DBLayer {
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
             }
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
@@ -210,7 +210,7 @@ public class AuditLogDBLayer extends DBLayer {
                     sql.append(" and folder in (:folder)");
                 }
             }
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);

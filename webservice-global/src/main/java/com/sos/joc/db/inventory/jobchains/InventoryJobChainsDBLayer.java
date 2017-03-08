@@ -31,7 +31,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where name = :name");
             sql.append(" and instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("name", jobChainPath);
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
@@ -53,7 +53,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where baseName = :name");
             sql.append(" and instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("name", jobChainName);
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
@@ -76,7 +76,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" where ifile.id = ijc.fileId");
             sql.append(" and ijc.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             Object result = query.uniqueResult();
             if (result != null) {
@@ -98,7 +98,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" where jobChainId = :id");
             sql.append(" and instanceId = :instanceId");
             LOGGER.debug(sql.toString());
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChainNode> result = query.list();
@@ -129,7 +129,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
                 sql.append(" and ifile.fileDirectory = :name");
                 sql.append(" and ijc.instanceId = :instanceId");
             }
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             if (recursive) {
                 query.setParameter("name", folderPath + "%");
             } else {
@@ -154,7 +154,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -178,7 +178,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" and ijcn.nodeType = 5");
             sql.append(" and ijcn.instanceId = :instanceId");
             sql.append(" and ijc.name = :jobChain");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("nodeName", node);
             query.setParameter("jobChain", jobChain);
             query.setParameter("instanceId", instanceId);
@@ -203,7 +203,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" and ijcn.errorState = :nodeName");
             sql.append(" and ijcn.instanceId = :instanceId");
             sql.append(" and ijc.name = :jobChain");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("nodeName", node);
             query.setParameter("jobChain", jobChain);
             query.setParameter("instanceId", instanceId);

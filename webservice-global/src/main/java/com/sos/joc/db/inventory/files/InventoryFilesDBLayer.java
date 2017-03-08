@@ -25,7 +25,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryFile> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -46,7 +46,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
             sql.append(" and fileType = :fileType");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("fileType", fileType);
             List<DBItemInventoryFile> result = query.list();
@@ -67,7 +67,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("select fileDirectory from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             List<String> result = query.list();
             if (result != null && !result.isEmpty()) {
@@ -98,7 +98,7 @@ public class InventoryFilesDBLayer extends DBLayer {
                     sql.append(" and fileType in (:fileType)");
                 }
             }
-            Query query = getConnection().createQuery(sql.toString());
+            Query query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (folderName != null) {
                 query.setParameter("folderName", folderName + "%");
