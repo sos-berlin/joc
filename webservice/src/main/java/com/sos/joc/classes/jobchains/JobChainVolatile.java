@@ -109,20 +109,24 @@ public class JobChainVolatile extends JobChainV {
     
     public void setOrders(Map<String, OrderVolatile> orders, Integer maxOrders) {
         Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
+        Map<String,Integer> nodeMapCounter = new HashMap<String,Integer>();
         for (OrderV order : orders.values()) {
             String node = order.getState();
             if (!nodeMap.containsKey(node)) {
-                nodeMap.put(node, new ArrayList<OrderV>()); 
+                nodeMap.put(node, new ArrayList<OrderV>());
+                nodeMapCounter.put(node, 0);
             }
-            if (maxOrders != null && nodeMap.get(node).size() >= maxOrders) {
-                continue;
+            int incrementCounter = nodeMapCounter.get(node)+1;
+            nodeMapCounter.put(node, incrementCounter);
+            if (maxOrders == null || nodeMap.get(node).size() < maxOrders) {
+                nodeMap.get(node).add(order);
             }
-            nodeMap.get(node).add(order);
         }
         for (JobChainNodeV node : getNodes()) {
             List<OrderV> o = nodeMap.get(node.getName());
+            Integer num = nodeMapCounter.get(node.getName());
             node.setOrders(o);
-            node.setNumOfOrders(o == null ? 0 : o.size());
+            node.setNumOfOrders(num == null ? 0 : num);
         }
     }
 
