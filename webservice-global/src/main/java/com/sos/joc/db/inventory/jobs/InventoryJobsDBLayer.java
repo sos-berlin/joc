@@ -216,7 +216,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             }
             Query query = getSession().createQuery(sql.toString());
             if (recursive) {
-                query.setParameter("folderName", folderName + "/%");
+                query.setParameter("folderName", (folderName + "/%").replaceAll("//+","/"));
             } else {
                 query.setParameter("folderName", folderName);
             }
