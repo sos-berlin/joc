@@ -63,7 +63,14 @@ public class UsedJobs {
 //                        stateIsSet = true;
 //                        break;
                     case "ProcessClassObstacles":
-                        processLimit = obstacle.getJsonObject("processClassObstacles").getInt("limit");
+                        //{"processClassObstacles":[{"limit":1,"TYPE":"ProcessLimitReached"}],"TYPE":"ProcessClassObstacles"}
+                        JsonArray processClassObstacles = obstacle.getJsonArray("processClassObstacles");
+                        for (JsonObject processClassObstacle : processClassObstacles.getValuesAs(JsonObject.class)) {
+                           if (processClassObstacle.getString("TYPE","").equals("ProcessLimitReached")) {
+                               processLimit = processClassObstacle.getInt("limit");
+                               break;
+                           }
+                        }
                         state = OrderStateText.WAITING_FOR_PROCESS;
                         stateIsSet = true;
                         break;

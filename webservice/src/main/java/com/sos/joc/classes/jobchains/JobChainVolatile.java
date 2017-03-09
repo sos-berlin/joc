@@ -114,7 +114,7 @@ public class JobChainVolatile extends JobChainV {
             if (!nodeMap.containsKey(node)) {
                 nodeMap.put(node, new ArrayList<OrderV>()); 
             }
-            if (nodeMap.get(node).size() >= maxOrders) {
+            if (maxOrders != null && nodeMap.get(node).size() >= maxOrders) {
                 continue;
             }
             nodeMap.get(node).add(order);
