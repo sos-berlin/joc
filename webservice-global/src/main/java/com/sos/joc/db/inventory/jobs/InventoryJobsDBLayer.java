@@ -200,6 +200,9 @@ public class InventoryJobsDBLayer extends DBLayer {
                 sql.append("from ").append(DBITEM_INVENTORY_JOBS);
                 sql.append(" where name like :folderName");
                 sql.append(" and instanceId = :instanceId");
+                if (isOrderJob != null) {
+                    sql.append(" and isOrderJob = :isOrderJob");
+                }
             } else {
                 sql.append("select ij from ");
                 sql.append(DBITEM_INVENTORY_JOBS).append(" ij, ");
@@ -207,13 +210,13 @@ public class InventoryJobsDBLayer extends DBLayer {
                 sql.append(" where ij.fileId = ifile.id");
                 sql.append(" and ifile.fileDirectory = :folderName");
                 sql.append(" and ij.instanceId = :instanceId");
-            }
-            if (isOrderJob != null) {
-                sql.append(" and isOrderJob = :isOrderJob");
+                if (isOrderJob != null) {
+                    sql.append(" and ij.isOrderJob = :isOrderJob");
+                }
             }
             Query query = getSession().createQuery(sql.toString());
             if (recursive) {
-                query.setParameter("folderName", folderName + "%");
+                query.setParameter("folderName", folderName + "/%");
             } else {
                 query.setParameter("folderName", folderName);
             }
