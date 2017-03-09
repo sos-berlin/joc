@@ -13,6 +13,8 @@ import org.apache.shiro.session.Session;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventType;
+import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventTypeValue;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
@@ -98,16 +100,43 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 String eventKey = event.getString("key", null);
                 if (eventType.equals("VariablesCustomEvent")) {
                     JsonObject variables = event.getJsonObject("variables");
-                    boolean isInventoryEvent = false;
-                    if (variables != null) {
-                        isInventoryEvent = variables.getString("InventoryEventUpdateFinished", null) != null; 
+                    if (variables == null) {
+                        continue;
                     }
-                    if (isInventoryEvent) {
+                    if (variables.containsKey("InventoryEventUpdateFinished")) {
                         eventSnapshot.setEventType("FileBasedActivated");
                         String[] eventKeyParts = eventKey.split(":", 2);
                         eventSnapshot.setPath(eventKeyParts[1]);
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", ""))); 
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
+                        
+                    } else if (variables.containsKey(CustomEventType.DailyPlanChanged.name())) {
+                        eventSnapshot.setEventType(CustomEventType.DailyPlanChanged.name());
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
+                        eventSnapshot.setPath(eventSnapshot.getEventType());
+                        
+                    } else if (variables.containsKey(CustomEventType.ReportingChanged.name())) {
+                        switch (CustomEventTypeValue.valueOf(variables.getString(CustomEventType.ReportingChanged.name(), null))) {
+                        case order: 
+                            eventSnapshot.setEventType(CustomEventType.ReportingChanged.name()+"Order");
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
+                            break;
+                        case standalone:
+                            eventSnapshot.setEventType(CustomEventType.ReportingChanged.name()+"Job");
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
+                            break;
+                        case order_standalone: 
+                            eventSnapshot.setEventType(CustomEventType.ReportingChanged.name()+"Order");
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
+                            EventSnapshot eventSnapshot2 = new EventSnapshot();
+                            eventSnapshot2.setEventType(CustomEventType.ReportingChanged.name()+"Job");
+                            eventSnapshot2.setObjectType(JobSchedulerObjectType.JOB);
+                            eventSnapshot2.setPath(eventSnapshot2.getEventType());
+                            eventSnapshots.put(eventSnapshot2.getPath(), eventSnapshot2);
+                            break;
+                        }
+                        eventSnapshot.setPath(eventSnapshot.getEventType());
                     }
+                    
                 } else {
                     eventSnapshot.setPath(eventKey);
                     if (eventType.startsWith("JobState")) {
