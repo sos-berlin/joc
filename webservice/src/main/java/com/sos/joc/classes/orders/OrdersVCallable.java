@@ -1,5 +1,6 @@
 package com.sos.joc.classes.orders;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -149,8 +150,20 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
 
     private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken)
             throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders, null), accessToken), orders.getJobChain(), compact,
-                null, null);
+        JsonObject json = null;
+        try {
+            json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders, null), accessToken);
+        } catch (JobSchedulerObjectNotExistException e) {
+            // fix for nested job chains
+            if (orders.getOrders().size() > 0) {
+                OrdersPerJobChain onlyJobChain = new OrdersPerJobChain(); 
+                onlyJobChain.setJobChain(orders.getJobChain());
+                json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(onlyJobChain, null), accessToken);
+            } else {
+                throw e;
+            }
+        }
+        return getOrders(json, compact, null, null);
     }
 
     private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken)
@@ -159,21 +172,33 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
             ordersBody.setRegex(null);
             ordersBody.setProcessingStates(null);
         }
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders, ordersBody), accessToken), orders.getJobChain(),
-                ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates());
+        JsonObject json = null;
+        try {
+            json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders, null), accessToken);
+        } catch (JobSchedulerObjectNotExistException e) {
+            // fix for nested job chains
+            if (orders.getOrders().size() > 0) {
+                OrdersPerJobChain onlyJobChain = new OrdersPerJobChain(); 
+                onlyJobChain.setJobChain(orders.getJobChain());
+                json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(onlyJobChain, null), accessToken);
+            } else {
+                throw e;
+            }
+        }
+        return getOrders(json, ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates());
     }
 
     private Map<String, OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), null, compact, null, null);
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), compact, null, null);
     }
 
     private Map<String, OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken)
             throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), null, ordersBody
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), ordersBody
                 .getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates());
     }
 
-    private Map<String, OrderVolatile> getOrders(JsonObject json, String origJobChain, boolean compact, String regex,
+    private Map<String, OrderVolatile> getOrders(JsonObject json, boolean compact, String regex,
             List<OrderStateFilter> processingStates) throws JobSchedulerInvalidResponseDataException {
         UsedNodes usedNodes = new UsedNodes();
         UsedJobs usedJobs = new UsedJobs();
@@ -182,11 +207,18 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         usedNodes.addEntries(json.getJsonArray("usedNodes"));
         usedTasks.addEntries(json.getJsonArray("usedTasks"));
         Date surveyDate = JobSchedulerDate.getDateFromEventId(json.getJsonNumber("eventId").longValue());
+        String origJobChain = orders == null ? null : orders.getJobChain();
         Map<String, OrderVolatile> listOrderQueue = new HashMap<String, OrderVolatile>();
         
         for (JsonObject ordersItem : json.getJsonArray("orders").getValuesAs(JsonObject.class)) {
             OrderVolatile order = new OrderVolatile(ordersItem, origJobChain);
             order.setPathJobChainAndOrderId();
+            if (orders != null && !orders.getOrders().isEmpty() && !orders.containsOrder(order.getOrderId())) {
+                continue;
+            }
+            if (!checkOrderPathIsInFolder(order.getPath())) {
+                continue;
+            }
             if (!FilterAfterResponse.matchRegex(regex, order.getPath())) {
                 LOGGER.debug("...processing skipped caused by 'regex=" + regex + "'");
                 continue;
@@ -206,6 +238,14 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
             }
         }
         return listOrderQueue;
+    }
+    
+    private boolean checkOrderPathIsInFolder(String orderPath) {
+        try {
+            return Paths.get(orderPath).startsWith(Paths.get(folder.getFolder()));
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     private boolean checkSuspendedOrdersWithFilter(OrderStateFilter processingState, List<OrderStateFilter> processingStates) {

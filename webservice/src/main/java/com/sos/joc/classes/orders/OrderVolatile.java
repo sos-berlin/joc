@@ -204,7 +204,11 @@ public class OrderVolatile extends OrderV {
             throw new JobSchedulerInvalidResponseDataException(String.format("Invalid resonsed data: path ('%1$s') doesn't contain the orderId",path));
         }
         setPath(path);
-        setJobChain(pathParts[0]);
+        String jobChainPath = overview.getString("jobChainPath", null);
+        if (jobChainPath == null) {
+            jobChainPath = pathParts[0];
+        }
+        setJobChain(jobChainPath);
         setOrderId(pathParts[1]);
         if (origJobChain == null) {
             origJobChain = pathParts[0];  
