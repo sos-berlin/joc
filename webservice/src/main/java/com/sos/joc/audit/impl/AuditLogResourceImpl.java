@@ -80,7 +80,8 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             } else {
                 auditLogs = dbLayer.getAllAuditLogs(schedulerId, filterLimit, filterFrom, filterTo, filterTicketLink, filterAccount);
             }
-            if (filterRegex != null && !filterRegex.isEmpty()) {
+            if (filterRegex != null && !filterRegex.isEmpty() && 
+                    (filterOrders == null || filterOrders.isEmpty()) && (filterJobs == null || filterJobs.isEmpty())) {
                 auditLogs = filterComment(auditLogs, filterRegex);
             }
             AuditLog entity = new AuditLog();
