@@ -26,8 +26,8 @@ public class AuditLogDBLayer extends DBLayer {
         super(connection);
     }
     
-    public List<DBItemAuditLog> getAuditLogByOrders(String schedulerId, List<OrderPath> orders, Integer limit, Date from, Date to, String ticketLink)
-            throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<DBItemAuditLog> getAuditLogByOrders(String schedulerId, List<OrderPath> orders, Integer limit, Date from, Date to, String ticketLink,
+            String account) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_AUDIT_LOG);
@@ -40,6 +40,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
+            }
+            if (account != null && !account.isEmpty()) {
+                sql.append(" and account = :account");
             }
             if (orders != null && !orders.isEmpty()) {
                 sql.append(" and");
@@ -71,6 +74,9 @@ public class AuditLogDBLayer extends DBLayer {
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 query.setParameter("ticketLink", ticketLink);
             }
+            if (account != null && !account.isEmpty()) {
+                query.setParameter("account", account);
+            }
             if (orders != null && !orders.isEmpty()) {
                 for (int i = 0; i < orders.size(); i++) {
                     String jobChain = orders.get(i).getJobChain();
@@ -92,7 +98,7 @@ public class AuditLogDBLayer extends DBLayer {
         } 
     }
 
-    public List<DBItemAuditLog> getAuditLogByJobs(String schedulerId, List<JobPath> jobs, Integer limit, Date from, Date to, String ticketLink)
+    public List<DBItemAuditLog> getAuditLogByJobs(String schedulerId, List<JobPath> jobs, Integer limit, Date from, Date to, String ticketLink, String account)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -106,6 +112,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
+            }
+            if (account != null && !account.isEmpty()) {
+                sql.append(" and account = :account");
             }
             if (jobs != null && !jobs.isEmpty()) {
                 sql.append(" and");
@@ -132,6 +141,9 @@ public class AuditLogDBLayer extends DBLayer {
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 query.setParameter("ticketLink", ticketLink);
             }
+            if (account != null && !account.isEmpty()) {
+                query.setParameter("account", account);
+            }
             if (jobs != null && !jobs.isEmpty()) {
                 for (int i = 0; i < jobs.size(); i++) {
                     String job = jobs.get(i).getJob();
@@ -150,7 +162,7 @@ public class AuditLogDBLayer extends DBLayer {
         } 
     }
 
-    public List<DBItemAuditLog> getAllAuditLogs(String schedulerId, Integer limit, Date from, Date to, String ticketLink)
+    public List<DBItemAuditLog> getAllAuditLogs(String schedulerId, Integer limit, Date from, Date to, String ticketLink, String account)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -165,6 +177,9 @@ public class AuditLogDBLayer extends DBLayer {
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
             }
+            if (account != null && !account.isEmpty()) {
+                sql.append(" and account = :account");
+            }
             Query query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
@@ -175,6 +190,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 query.setParameter("ticketLink", ticketLink);
+            }
+            if (account != null && !account.isEmpty()) {
+                query.setParameter("account", account);
             }
             if (limit != null) {
                 query.setMaxResults(limit);
@@ -188,8 +206,8 @@ public class AuditLogDBLayer extends DBLayer {
         } 
     }
 
-    public List<DBItemAuditLog> getAuditLogByFolders(String schedulerId, Set<String> folders, Integer limit, Date from, Date to, String ticketLink)
-            throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<DBItemAuditLog> getAuditLogByFolders(String schedulerId, Set<String> folders, Integer limit, Date from, Date to, String ticketLink,
+            String account) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_AUDIT_LOG);
@@ -202,6 +220,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
+            }
+            if (account != null && !account.isEmpty()) {
+                sql.append(" and account = :account");
             }
             if (folders != null && !folders.isEmpty()) {
                 if (folders.size() == 1) {
@@ -220,6 +241,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 query.setParameter("ticketLink", ticketLink);
+            }
+            if (account != null && !account.isEmpty()) {
+                query.setParameter("account", account);
             }
             if (folders != null && !folders.isEmpty()) {
                 if (folders.size() == 1) {
