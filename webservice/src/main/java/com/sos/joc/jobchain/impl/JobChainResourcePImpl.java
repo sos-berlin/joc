@@ -1,5 +1,6 @@
 package com.sos.joc.jobchain.impl;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,11 +56,9 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
                     List<JobChainP> nestedJobChains = new ArrayList<JobChainP>();
                     for (String nestedJobChainName : JobChainPermanent.NESTED_JOB_CHAIN_NAMES) {
                         DBItemInventoryJobChain nestedJobChain = null;
-                        if (nestedJobChainName.contains("/")) {
-                            nestedJobChain = dbLayer.getJobChainByPath(normalizePath(nestedJobChainName), instanceId);
-                        } else {
-                            nestedJobChain = dbLayer.getJobChainByName(normalizePath(nestedJobChainName), instanceId);
-                        }
+//                        java.nio.file.Path path = Paths.get(inventoryJobChain.getName()).getParent().resolve(nestedJobChainName).normalize();
+//                        nestedJobChainName = path.toString().replace("\\", "/");
+                        nestedJobChain = dbLayer.getJobChainByPath(normalizePath(nestedJobChainName), instanceId);
                         if (nestedJobChain != null) {
                             JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, jobChainFilter.getCompact(),
                                     instanceId);
