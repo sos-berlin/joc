@@ -27,40 +27,18 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
     private static final int DEFAULT_MAX_HISTORY_ITEMS = 25;
     private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
+    private static final String XPATH_FOR_REQUISITES = "/spooler/answer/job_chain/file_based/requisites/requisite";
     private static final String API_CALL = "./job_chain/history";
+    private ReportTriggerDBLayer reportTriggerDBLayer;
+    private InventoryJobChainsDBLayer jobChainsLayer;
+   
+    private List<OrderHistoryItem> handleJobChain(String accessToken, JOCXmlCommand jocXmlCommand, JobChainHistoryFilter jobChainHistoryFilter, List<OrderHistoryItem> listOfHistory) throws Exception {
 
-    @Override
-    public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
-
-        SOSHibernateSession connection = null;
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainHistoryFilter, accessToken, jobChainHistoryFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getJobChain().getView().isHistory());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Globals.beginTransaction(connection);
-
-            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
-            reportTriggerDBLayer.getFilter().setSchedulerId(jobChainHistoryFilter.getJobschedulerId());
-            InventoryJobChainsDBLayer jobChainsLayer = new InventoryJobChainsDBLayer(connection);
-
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
-                jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
-            }
-            // TODO nested job chains have to consider too
-            String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
-                    jobChainHistoryFilter.getMaxLastHistoryItems());
-            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
-
+        if (listOfHistory.size() < jobChainHistoryFilter.getMaxLastHistoryItems()) {
+            
             jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
 
             int count = jocXmlCommand.getNodeList().getLength();
-
-            List<OrderHistoryItem> listOfHistory = new ArrayList<OrderHistoryItem>();
 
             for (int i = 0; i < count; i++) {
                 HistoryState state = new HistoryState();
@@ -79,9 +57,67 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
                 state.setSeverity(getSeverityFromHistoryStateText(status));
                 state.set_text(status);
                 history.setState(state);
-                listOfHistory.add(history);
+                if (listOfHistory.size() < jobChainHistoryFilter.getMaxLastHistoryItems()) {
+                    listOfHistory.add(history);
+                }
+            }
+        }
+        return listOfHistory;
+
+    }
+
+    @Override
+    public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
+
+        SOSHibernateSession connection = null;
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainHistoryFilter, accessToken, jobChainHistoryFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobChain().getView().isHistory());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
             }
 
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            Globals.beginTransaction(connection);
+
+            reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
+            reportTriggerDBLayer.getFilter().setSchedulerId(jobChainHistoryFilter.getJobschedulerId());
+            jobChainsLayer = new InventoryJobChainsDBLayer(connection);
+            
+            if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
+                jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
+            }
+
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+
+            String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
+                    jobChainHistoryFilter.getMaxLastHistoryItems());
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
+            
+            
+            //nested Job chains ermitteln
+            jocXmlCommand.createNodeList(XPATH_FOR_REQUISITES);
+            int count = jocXmlCommand.getNodeList().getLength();
+        
+            List<OrderHistoryItem> listOfHistory = new ArrayList<OrderHistoryItem>();
+
+            if (count > 0){
+                for (int i = 0; i < count; i++) {
+                    jocXmlCommand.getElementFromList(i);              
+                    
+                    jobChainHistoryFilter.setJobChain(normalizePath(jocXmlCommand.getAttribute("path")));
+                    JOCXmlCommand jocXmlCommand2 = new JOCXmlCommand(this);
+
+                    jobChainCommand = jocXmlCommand2.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
+                            jobChainHistoryFilter.getMaxLastHistoryItems());
+                    jocXmlCommand2.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
+                    
+                    listOfHistory = handleJobChain(accessToken,jocXmlCommand2,jobChainHistoryFilter,listOfHistory);
+                }
+            }else{
+                 listOfHistory = handleJobChain(accessToken,jocXmlCommand,jobChainHistoryFilter,listOfHistory);
+            }
+            
             OrderHistory entity = new OrderHistory();
             entity.setDeliveryDate(new Date());
             entity.setHistory(listOfHistory);
@@ -97,20 +133,20 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         }
 
     }
-    
+
     private Integer getSeverityFromHistoryStateText(HistoryStateText status) {
         switch (status) {
-        case FAILED: 
+        case FAILED:
             return 2;
         case SUCCESSFUL:
             return 0;
         default:
             return 1;
-        } 
+        }
     }
 
     private HistoryStateText getStatus(ReportTriggerDBLayer reportTriggerDBLayer, InventoryJobChainsDBLayer jobChainsLayer, OrderHistoryItem history) throws Exception {
-        
+
         if (history.getEndTime() == null) {
             return HistoryStateText.INCOMPLETE;
         }
@@ -129,9 +165,8 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             }
         }
 
-        if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null 
-                || (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null
-                    && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
+        if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null || (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null
+                && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
             if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
                 return HistoryStateText.SUCCESSFUL;
             } else {
