@@ -27,7 +27,7 @@ import com.sos.xml.SOSXmlCommand;
 public class JOCXmlCommand extends SOSXmlCommand {
 
     public static final String XML_COMMAND_API_PATH = "/jobscheduler/master/api/command";
-    private static final Logger LOGGER = LoggerFactory.getLogger(JOCJsonCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlCommand.class);
     private Date surveyDate;
     private Map<String, NodeList> listOfNodeLists = new HashMap<String, NodeList>();;
     private URI uriForJsonCommand;
@@ -214,6 +214,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
     
     public String executePostWithThrowBadRequestAfterRetry(String xmlCommand, String accessToken) throws JocException {
         String s = executePostWithRetry(xmlCommand, accessToken);
+        LOGGER.debug(s);
         throwJobSchedulerError();
         return s;
     }
@@ -255,9 +256,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
         if (maxTaskHistory == null) {
             maxTaskHistory = 0; 
         }
-        if (maxTaskHistory != null) {
-            showjob.addAttribute("max_task_history", maxTaskHistory.toString());
-        }
+        showjob.addAttribute("max_task_history", maxTaskHistory.toString());
         if (maxOrders != null) {
             showjob.addAttribute("max_orders", maxOrders.toString());
         }
@@ -284,9 +283,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
         if (maxOrderHistory == null) {
             maxOrderHistory = 0; 
         }
-        if (maxOrderHistory != null) {
-            showjobChain.addAttribute("max_order_history", maxOrderHistory.toString());
-        }
+        showjobChain.addAttribute("max_order_history", maxOrderHistory.toString());
         return showjobChain.asXML();
     }
     
