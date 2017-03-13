@@ -1,10 +1,18 @@
 package com.sos.joc.jobchain.impl;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.ws.rs.Path;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemReportTriggerWithResult;
@@ -27,42 +35,56 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
     private static final int DEFAULT_MAX_HISTORY_ITEMS = 25;
     private static final String XPATH_FOR_ORDER_HISTORY = "/spooler/answer/job_chain/order_history/order";
-    private static final String XPATH_FOR_REQUISITES = "/spooler/answer/job_chain/file_based/requisites/requisite";
     private static final String API_CALL = "./job_chain/history";
     private ReportTriggerDBLayer reportTriggerDBLayer;
     private InventoryJobChainsDBLayer jobChainsLayer;
-   
-    private List<OrderHistoryItem> handleJobChain(String accessToken, JOCXmlCommand jocXmlCommand, JobChainHistoryFilter jobChainHistoryFilter, List<OrderHistoryItem> listOfHistory) throws Exception {
 
-        if (listOfHistory.size() < jobChainHistoryFilter.getMaxLastHistoryItems()) {
-            
-            jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
+    private Set<OrderHistoryItem> handleJobChain(JOCXmlCommand jocXmlCommand, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
 
-            int count = jocXmlCommand.getNodeList().getLength();
+        SortedSet<OrderHistoryItem> orderHistoryItems = new TreeSet<OrderHistoryItem>(new Comparator<OrderHistoryItem>() {
 
-            for (int i = 0; i < count; i++) {
-                HistoryState state = new HistoryState();
-                jocXmlCommand.getElementFromList(i);
-                String node = jocXmlCommand.getAttribute("state");
-                OrderHistoryItem history = new OrderHistoryItem();
-                history.setEndTime(jocXmlCommand.getAttributeAsDate("end_time"));
-                history.setHistoryId(jocXmlCommand.getAttribute("history_id"));
-                history.setJobChain(normalizePath(jocXmlCommand.getAttribute("job_chain")));
-                history.setNode(node);
-                history.setOrderId(jocXmlCommand.getAttribute("id"));
-                history.setPath(jocXmlCommand.getAttribute("path"));
-                history.setStartTime(jocXmlCommand.getAttributeAsDate("start_time"));
-
-                HistoryStateText status = getStatus(reportTriggerDBLayer, jobChainsLayer, history);
-                state.setSeverity(getSeverityFromHistoryStateText(status));
-                state.set_text(status);
-                history.setState(state);
-                if (listOfHistory.size() < jobChainHistoryFilter.getMaxLastHistoryItems()) {
-                    listOfHistory.add(history);
+            public int compare(OrderHistoryItem a, OrderHistoryItem b) {
+                if (b.getEndTime() != null && a.getEndTime() != null) {
+                    return b.getEndTime().compareTo(a.getEndTime());
+                } else if (b.getEndTime() == null && a.getEndTime() != null) {
+                    return 1;
+                } else if (b.getEndTime() != null && a.getEndTime() == null) {
+                    return -1;
+                } else if (b.getStartTime() != null && a.getStartTime() != null) {
+                    return b.getStartTime().compareTo(a.getStartTime());
                 }
+                return 0; // this case should not happens
             }
+        });
+
+        jocXmlCommand.createNodeList(XPATH_FOR_ORDER_HISTORY);
+
+        int count = jocXmlCommand.getNodeList().getLength();
+
+        for (int i = 0; i < count; i++) {
+            HistoryState state = new HistoryState();
+            jocXmlCommand.getElementFromList(i);
+            String node = jocXmlCommand.getAttribute("state");
+            OrderHistoryItem history = new OrderHistoryItem();
+            history.setEndTime(jocXmlCommand.getAttributeAsDate("end_time"));
+            history.setHistoryId(jocXmlCommand.getAttribute("history_id"));
+            history.setJobChain(normalizePath(jocXmlCommand.getAttribute("job_chain")));
+            history.setNode(node);
+            history.setOrderId(jocXmlCommand.getAttribute("id"));
+            history.setPath(jocXmlCommand.getAttribute("path"));
+            history.setStartTime(jocXmlCommand.getAttributeAsDate("start_time"));
+
+            HistoryStateText status = getStatus(reportTriggerDBLayer, jobChainsLayer, history);
+            state.setSeverity(getSeverityFromHistoryStateText(status));
+            state.set_text(status);
+            history.setState(state);
+            orderHistoryItems.add(history);
+            if (orderHistoryItems.size() >= jobChainHistoryFilter.getMaxLastHistoryItems()) {
+                break;
+            }
+
         }
-        return listOfHistory;
+        return orderHistoryItems;
 
     }
 
@@ -83,7 +105,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(jobChainHistoryFilter.getJobschedulerId());
             jobChainsLayer = new InventoryJobChainsDBLayer(connection);
-            
+
             if (jobChainHistoryFilter.getMaxLastHistoryItems() == null) {
                 jobChainHistoryFilter.setMaxLastHistoryItems(DEFAULT_MAX_HISTORY_ITEMS);
             }
@@ -93,31 +115,36 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
                     jobChainHistoryFilter.getMaxLastHistoryItems());
             jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
-            
-            
-            //nested Job chains ermitteln
-            jocXmlCommand.createNodeList(XPATH_FOR_REQUISITES);
-            int count = jocXmlCommand.getNodeList().getLength();
-        
+
+            // nested Job chains ermitteln
+            Node jobChain = jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/job_chain");
+            NodeList jobChainNodes = jocXmlCommand.getSosxml().selectNodeList(jobChain, "job_chain_node/@job_chain | job_chain_node.job_chain/@job_chain");
+
             List<OrderHistoryItem> listOfHistory = new ArrayList<OrderHistoryItem>();
 
-            if (count > 0){
-                for (int i = 0; i < count; i++) {
-                    jocXmlCommand.getElementFromList(i);              
-                    
-                    jobChainHistoryFilter.setJobChain(normalizePath(jocXmlCommand.getAttribute("path")));
-                    JOCXmlCommand jocXmlCommand2 = new JOCXmlCommand(this);
-
-                    jobChainCommand = jocXmlCommand2.getShowJobChainCommand(normalizePath(jobChainHistoryFilter.getJobChain()), "order_history", 0,
-                            jobChainHistoryFilter.getMaxLastHistoryItems());
-                    jocXmlCommand2.executePostWithThrowBadRequestAfterRetry(jobChainCommand, accessToken);
-                    
-                    listOfHistory = handleJobChain(accessToken,jocXmlCommand2,jobChainHistoryFilter,listOfHistory);
+            if (jobChainNodes.getLength() > 0) {
+                boolean validInnerChainExist = false;
+                StringBuilder str = new StringBuilder();
+                str.append("<commands>");
+                for (int i = 0; i < jobChainNodes.getLength(); i++) {
+                    String innerChainPath = normalizePath(jobChainNodes.item(i).getNodeValue());
+                    if (jocXmlCommand.getSosxml().selectSingleNode(jobChain, "file_based/requisites/requisite[@path='" + innerChainPath.toLowerCase()
+                            + "' and @is_missing='yes']") != null) {
+                        continue;
+                    }
+                    validInnerChainExist = true;
+                    str.append(jocXmlCommand.getShowJobChainCommand(innerChainPath, "order_history", 0, jobChainHistoryFilter
+                            .getMaxLastHistoryItems()));
                 }
-            }else{
-                 listOfHistory = handleJobChain(accessToken,jocXmlCommand,jobChainHistoryFilter,listOfHistory);
+                str.append("</commands>");
+                if (validInnerChainExist) {
+                    jocXmlCommand.executePostWithThrowBadRequestAfterRetry(str.toString(), accessToken); 
+                    listOfHistory.addAll(handleJobChain(jocXmlCommand, jobChainHistoryFilter));
+                }
+            } else {
+                listOfHistory.addAll(handleJobChain(jocXmlCommand, jobChainHistoryFilter));
             }
-            
+
             OrderHistory entity = new OrderHistory();
             entity.setDeliveryDate(new Date());
             entity.setHistory(listOfHistory);
@@ -145,7 +172,8 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         }
     }
 
-    private HistoryStateText getStatus(ReportTriggerDBLayer reportTriggerDBLayer, InventoryJobChainsDBLayer jobChainsLayer, OrderHistoryItem history) throws Exception {
+    private HistoryStateText getStatus(ReportTriggerDBLayer reportTriggerDBLayer, InventoryJobChainsDBLayer jobChainsLayer, OrderHistoryItem history)
+            throws Exception {
 
         if (history.getEndTime() == null) {
             return HistoryStateText.INCOMPLETE;
@@ -165,8 +193,8 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             }
         }
 
-        if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null || (dbItemReportTriggerWithResult.getDbItemReportTrigger().getStartTime() != null
-                && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
+        if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null || (dbItemReportTriggerWithResult.getDbItemReportTrigger()
+                .getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
             if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
                 return HistoryStateText.SUCCESSFUL;
             } else {
