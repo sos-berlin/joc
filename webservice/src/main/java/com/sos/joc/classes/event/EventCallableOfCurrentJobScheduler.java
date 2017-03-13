@@ -142,6 +142,9 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                     
                 } else {
                     eventSnapshot.setPath(eventKey);
+                    if (eventSnapshots.containsKey(eventKey)) {
+                        continue;
+                    }
                     if (eventType.startsWith("JobState")) {
                         eventSnapshot.setEventType("JobStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
@@ -153,12 +156,13 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
                         eventSnapshots.putAll(createJobChainEvent(eventSnapshot));
                         //add event for outerJobChain if exist
-                        if (nestedJobChains.containsKey(eventKey)) {
-                            for (String outerJobChain : nestedJobChains.get(eventKey)) {
+                        String[] eventKeyParts = eventKey.split(",",2);
+                        if (nestedJobChains.containsKey(eventKeyParts[0])) {
+                            for (String outerJobChain : nestedJobChains.get(eventKeyParts[0])) {
                                 EventSnapshot eventSnapshot2 = new EventSnapshot();
                                 eventSnapshot2.setEventType("OrderStateChanged");
                                 eventSnapshot2.setObjectType(JobSchedulerObjectType.ORDER);
-                                eventSnapshot2.setPath(outerJobChain);
+                                eventSnapshot2.setPath(outerJobChain+","+eventKeyParts[1]);
                                 eventSnapshots.put(eventSnapshot2.getPath(), eventSnapshot2);
                             }
                         }
