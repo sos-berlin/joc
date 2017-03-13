@@ -10,6 +10,8 @@ import java.util.concurrent.Callable;
 import javax.json.JsonObject;
 
 import org.apache.shiro.session.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -28,6 +30,7 @@ import com.sos.joc.model.event.JobSchedulerEvent;
 
 public class EventCallableOfCurrentJobScheduler extends EventCallable implements Callable<JobSchedulerEvent> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventCallableOfCurrentJobScheduler.class);
     private final String accessToken;
     private final JobSchedulerEvent jobSchedulerEvent;
     private final JOCJsonCommand command;
@@ -157,13 +160,14 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshots.putAll(createJobChainEvent(eventSnapshot));
                         //add event for outerJobChain if exist
                         String[] eventKeyParts = eventKey.split(",",2);
-                        if (nestedJobChains.containsKey(eventKeyParts[0])) {
+                        if (nestedJobChains != null && nestedJobChains.containsKey(eventKeyParts[0])) {
                             for (String outerJobChain : nestedJobChains.get(eventKeyParts[0])) {
                                 EventSnapshot eventSnapshot2 = new EventSnapshot();
                                 eventSnapshot2.setEventType("OrderStateChanged");
                                 eventSnapshot2.setObjectType(JobSchedulerObjectType.ORDER);
                                 eventSnapshot2.setPath(outerJobChain+","+eventKeyParts[1]);
                                 eventSnapshots.put(eventSnapshot2.getPath(), eventSnapshot2);
+                                eventSnapshots.putAll(createJobChainEvent(eventSnapshot2));
                             }
                         }
                     } else if (eventType.startsWith("Scheduler")) {
@@ -204,12 +208,18 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 if (eventSnapshots.isEmpty()) {
                     eventSnapshots.putAll(getEventSnapshotsMap(newEventId.toString())); 
                 } else {
-                    try { //collect further events after 2sec to minimize the number of responses 
-                        int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
-                        Thread.sleep(delay);
-                    } catch (InterruptedException e1) {
+                    for (int i=0; i < 8; i++) {
+                        if (!Globals.sendEventImmediately.get(jobSchedulerEvent.getJobschedulerId())) {
+                            try { //collect further events after 2sec to minimize the number of responses 
+                                int delay = Math.min(250, new Long(getSessionTimeout()).intValue());
+                                Thread.sleep(delay);
+                            } catch (InterruptedException e1) {
+                            } 
+                        }
                     }
-                    eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
+                    if (!Globals.sendEventImmediately.get(jobSchedulerEvent.getJobschedulerId())) {
+                        eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
+                    }
                 }
                 break;
             case "Torn":
@@ -221,6 +231,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             removeSavedInventoryInstance();
             try {
                 int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
+                LOGGER.info(command.getSchemeAndAuthority() + ": connection refused; retray after" + delay + "ms");
                 Thread.sleep(delay);
             } catch (InterruptedException e1) {
             }

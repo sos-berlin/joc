@@ -5,14 +5,15 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SOSHibernateFactory;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SOSHibernateStatelessSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -40,6 +41,7 @@ public class Globals {
     public static boolean withHostnameVerification = false;
     public static boolean auditLogCommentsAreRequired = false;
     public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
+    public static Map<String, Boolean> sendEventImmediately = new HashMap<String, Boolean>();
 
     public static SOSHibernateFactory getHibernateFactory() throws JocException {
         if (sosHibernateFactory == null) {

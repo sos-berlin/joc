@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.ws.rs.Path;
 
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -39,7 +37,7 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     private ReportTriggerDBLayer reportTriggerDBLayer;
     private InventoryJobChainsDBLayer jobChainsLayer;
 
-    private Set<OrderHistoryItem> handleJobChain(JOCXmlCommand jocXmlCommand, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
+    private SortedSet<OrderHistoryItem> handleJobChain(JOCXmlCommand jocXmlCommand, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
 
         SortedSet<OrderHistoryItem> orderHistoryItems = new TreeSet<OrderHistoryItem>(new Comparator<OrderHistoryItem>() {
 

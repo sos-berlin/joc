@@ -151,109 +151,17 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             eventSnapshots.addAll(getEventSnapshots(newEventId.toString()));
             break;
         case "NonEmpty":
-            // boolean isOrderStarted = false;
-            jobSchedulerEvent.setEventId(newEventId.toString());
-            for (JsonObject event : json.getJsonArray("eventSnapshots").getValuesAs(JsonObject.class)) {
-                EventSnapshot eventSnapshot = new EventSnapshot();
-                Long eId = event.getJsonNumber("eventId").longValue();
-                eventSnapshot.setEventId(eId.toString());
-                String eventType = event.getString("TYPE", null);
-                eventSnapshot.setEventType(eventType);
-                if (eventType.startsWith("File")) {
-                    continue;
-                }
-                if (eventType.startsWith("Task")) {
-                    continue;
-                }
-//                if (eventType.startsWith("Task")) {
-//                    JsonObject eventKeyO = event.getJsonObject("key");
-//                    String jobPath = eventKeyO.getString("jobPath", null);
-//                    if (jobPath == null || "/scheduler_file_order_sink".equals(jobPath)) {
-//                        continue;
-//                    }
-//                    eventSnapshot.setPath(jobPath);
-//                    eventSnapshot.setTaskId(eventKeyO.getString("taskId", null));
-//                    eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
-//                } else {
-                    String eventKey = event.getString("key", null);
-//                    if (eventType.startsWith("File")) {
-//                        String[] eventKeyParts = eventKey.split(":", 2);
-//                        eventSnapshot.setPath(eventKeyParts[1]);
-//                        eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
-//                    } else {
-                        eventSnapshot.setPath(eventKey);
-                        if (eventType.startsWith("JobState")) {
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
-                            eventSnapshot.setState(event.getString("state", null));
-                        } else if (eventType.startsWith("JobChainState")) {
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
-                            eventSnapshot.setState(event.getString("state", null));
-                        } else if (eventType.startsWith("JobChainNode")) {
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
-                            eventSnapshot.setNodeId(event.getString("nodeId", null));
-                            String action = event.getString("action", null);
-                            if (action != null) {
-                                switch (action) {
-                                case "stop":
-                                    eventSnapshot.setState("stopped");
-                                    break;
-                                case "next_state":
-                                    eventSnapshot.setState("skipped");
-                                    break;
-                                case "process":
-                                    eventSnapshot.setState("active");
-                                    break;
-                                }
-                            }
-                        } else if (eventType.startsWith("Order")) {
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
-                            if ("OrderNodeChanged".equals(eventType)) {
-                                eventSnapshot.setNodeId(event.getString("nodeId", null));
-                                eventSnapshot.setFromNodeId(event.getString("fromNodeId", null));
-                            } else if ("OrderStepStarted".equals(eventType)) {
-                                eventSnapshot.setNodeId(event.getString("nodeId", null));
-                                eventSnapshot.setTaskId(event.getString("taskId", null));
-                            } else if ("OrderFinished".equals(eventType)) {
-                                String node = event.getString("nodeId", null);
-                                eventSnapshot.setNodeId(node);
-                                eventSnapshot.setState("successful");
-                                String[] pathParts = eventSnapshot.getPath().split(",", 2);
-                                String jobChain = pathParts[0];
-                                if (isOrderFinishedWithError(jobChain, node, instanceId)) {
-                                    eventSnapshot.setState("failed");
-                                }
-                            } else if ("OrderStepEnded".equals(eventType)) {
-                                JsonObject nodeTrans = event.getJsonObject("nodeTransition");
-                                if (nodeTrans != null) {
-                                    NodeTransition nodeTransition = new NodeTransition();
-                                    try {
-                                        nodeTransition.setType(NodeTransitionType.fromValue(nodeTrans.getString("TYPE", "SUCCESS").toUpperCase()));
-                                    } catch (IllegalArgumentException e) {
-                                        LOGGER.warn("unknown event transition type", e);
-                                        nodeTransition.setType(NodeTransitionType.SUCCESS);
-                                    }
-                                    nodeTransition.setReturnCode(nodeTrans.getInt("returnCode", 0));
-                                    eventSnapshot.setNodeTransition(nodeTransition);
-                                }
-                            }
-                        } else if (eventType.startsWith("Scheduler")) {
-                            eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
-                            eventSnapshot.setState(event.getString("state", null));
-                            eventSnapshot.setPath(command.getSchemeAndAuthority());
-                        }
-//                    }
-//                }
-
-                eventSnapshots.add(eventSnapshot);
-            }
-            try {
-                json.clear();
-            } catch (Exception e) {
-            } finally {
-                json = null;
-            }
+            nonEmptyEvent(newEventId, json);
+            eventSnapshots.addAll(nonEmptyEvent(newEventId, json));
             if (eventSnapshots.isEmpty()) {
                 eventSnapshots.addAll(getEventSnapshots(newEventId.toString())); 
+            } else {
+                try { //collect further events after 2sec to minimize the number of responses 
+                    int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
+                    Thread.sleep(delay);
+                } catch (InterruptedException e1) {
+                }
+                eventSnapshots.addAll(getEventSnapshotsFromNextResponse(newEventId.toString()));
             }
             break;
         case "Torn":
@@ -293,5 +201,131 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         } catch (Exception e) {
             return false;
         }
+    }
+    
+    private List<EventSnapshot> getEventSnapshotsFromNextResponse(String eventId) throws JocException {
+        List<EventSnapshot> eventSnapshots = new ArrayList<EventSnapshot>();
+        JsonObject json = getJsonObject(eventId, 0);
+        Long newEventId = json.getJsonNumber("eventId").longValue();
+        String type = json.getString("TYPE", "Empty");
+        switch (type) {
+        case "Empty":
+            break;
+        case "NonEmpty":
+            eventSnapshots.addAll(nonEmptyEvent(newEventId, json));
+            break;
+        case "Torn":
+            break;
+        }
+        return eventSnapshots;
+    }
+
+    private List<EventSnapshot> nonEmptyEvent(Long newEventId, JsonObject json) {
+        List<EventSnapshot> eventSnapshots = new ArrayList<EventSnapshot>();
+        // boolean isOrderStarted = false;
+        jobSchedulerEvent.setEventId(newEventId.toString());
+        for (JsonObject event : json.getJsonArray("eventSnapshots").getValuesAs(JsonObject.class)) {
+            EventSnapshot eventSnapshot = new EventSnapshot();
+            Long eId = event.getJsonNumber("eventId").longValue();
+            eventSnapshot.setEventId(eId.toString());
+            String eventType = event.getString("TYPE", null);
+            eventSnapshot.setEventType(eventType);
+            if (eventType.startsWith("File")) {
+                continue;
+            }
+            if (eventType.startsWith("Custom")) {
+                continue;
+            }
+            if (eventType.startsWith("Task")) {
+                continue;
+            }
+//            if (eventType.startsWith("Task")) {
+//                JsonObject eventKeyO = event.getJsonObject("key");
+//                String jobPath = eventKeyO.getString("jobPath", null);
+//                if (jobPath == null || "/scheduler_file_order_sink".equals(jobPath)) {
+//                    continue;
+//                }
+//                eventSnapshot.setPath(jobPath);
+//                eventSnapshot.setTaskId(eventKeyO.getString("taskId", null));
+//                eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
+//            } else {
+                String eventKey = event.getString("key", null);
+//                if (eventType.startsWith("File")) {
+//                    String[] eventKeyParts = eventKey.split(":", 2);
+//                    eventSnapshot.setPath(eventKeyParts[1]);
+//                    eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
+//                } else {
+                    eventSnapshot.setPath(eventKey);
+                    if (eventType.startsWith("JobState")) {
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
+                        eventSnapshot.setState(event.getString("state", null));
+                    } else if (eventType.startsWith("JobChainState")) {
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
+                        eventSnapshot.setState(event.getString("state", null));
+                    } else if (eventType.startsWith("JobChainNode")) {
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
+                        eventSnapshot.setNodeId(event.getString("nodeId", null));
+                        String action = event.getString("action", null);
+                        if (action != null) {
+                            switch (action) {
+                            case "stop":
+                                eventSnapshot.setState("stopped");
+                                break;
+                            case "next_state":
+                                eventSnapshot.setState("skipped");
+                                break;
+                            case "process":
+                                eventSnapshot.setState("active");
+                                break;
+                            }
+                        }
+                    } else if (eventType.startsWith("Order")) {
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
+                        if ("OrderNodeChanged".equals(eventType)) {
+                            eventSnapshot.setNodeId(event.getString("nodeId", null));
+                            eventSnapshot.setFromNodeId(event.getString("fromNodeId", null));
+                        } else if ("OrderStepStarted".equals(eventType)) {
+                            eventSnapshot.setNodeId(event.getString("nodeId", null));
+                            eventSnapshot.setTaskId(event.getString("taskId", null));
+                        } else if ("OrderFinished".equals(eventType)) {
+                            String node = event.getString("nodeId", null);
+                            eventSnapshot.setNodeId(node);
+                            eventSnapshot.setState("successful");
+                            String[] pathParts = eventSnapshot.getPath().split(",", 2);
+                            String jobChain = pathParts[0];
+                            if (isOrderFinishedWithError(jobChain, node, instanceId)) {
+                                eventSnapshot.setState("failed");
+                            }
+                        } else if ("OrderStepEnded".equals(eventType)) {
+                            JsonObject nodeTrans = event.getJsonObject("nodeTransition");
+                            if (nodeTrans != null) {
+                                NodeTransition nodeTransition = new NodeTransition();
+                                try {
+                                    nodeTransition.setType(NodeTransitionType.fromValue(nodeTrans.getString("TYPE", "SUCCESS").toUpperCase()));
+                                } catch (IllegalArgumentException e) {
+                                    LOGGER.warn("unknown event transition type", e);
+                                    nodeTransition.setType(NodeTransitionType.SUCCESS);
+                                }
+                                nodeTransition.setReturnCode(nodeTrans.getInt("returnCode", 0));
+                                eventSnapshot.setNodeTransition(nodeTransition);
+                            }
+                        }
+                    } else if (eventType.startsWith("Scheduler")) {
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+                        eventSnapshot.setState(event.getString("state", null));
+                        eventSnapshot.setPath(command.getSchemeAndAuthority());
+                    }
+//                }
+//            }
+
+            eventSnapshots.add(eventSnapshot);
+        }
+        try {
+            json.clear();
+        } catch (Exception e) {
+        } finally {
+            json = null;
+        }
+        return eventSnapshots;
     }
 }

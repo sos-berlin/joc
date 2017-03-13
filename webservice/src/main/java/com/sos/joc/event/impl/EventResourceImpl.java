@@ -44,7 +44,7 @@ import com.sos.joc.model.event.RegisterEvent;
 @Path("events")
 public class EventResourceImpl extends JOCResourceImpl implements IEventResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JOCDefaultResponse.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventResourceImpl.class);
     private static final String API_CALL = "./events";
     private static final Integer EVENT_TIMEOUT = 90;
     private static final String SESSION_KEY = "EventsStarted";
@@ -125,7 +125,13 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
                 if (isCurrentJobScheduler) {
-                    Map<String, Set<String>> nestedJobChains = jobChainLayer.getMapOfOuterJobChains(instance.getId());
+                    Map<String, Set<String>> nestedJobChains = null;
+                    try {
+                        nestedJobChains = jobChainLayer.getMapOfOuterJobChains(instance.getId());
+                    } catch (JocException e) {
+                        LOGGER.warn("cannot determine nested job chains: " + e.getCause().getMessage());
+                    }
+                    Globals.sendEventImmediately.put(jsEvent.getJobschedulerId(), false);
                     tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, shiroUser, nestedJobChains));
                 } else {
                     tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId()));

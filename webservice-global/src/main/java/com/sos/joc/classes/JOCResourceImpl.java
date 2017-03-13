@@ -188,6 +188,7 @@ public class JOCResourceImpl {
     }
 
     public void storeAuditLogEntry(IAuditLog body) {
+        Globals.sendEventImmediately.put(jobschedulerId, true);
         jocAuditLog.storeAuditLogEntry(body);
     }
 
