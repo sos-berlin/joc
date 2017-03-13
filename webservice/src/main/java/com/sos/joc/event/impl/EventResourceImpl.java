@@ -101,7 +101,6 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             InventoryJobChainsDBLayer jobChainLayer = new InventoryJobChainsDBLayer(connection);
 
             Globals.beginTransaction(connection);
-            Map<String, Set<String>> nestedJobChains = jobChainLayer.getMapOfOuterJobChains(dbItemInventoryInstance.getId());
             
             Boolean isCurrentJobScheduler = true;
             for (JobSchedulerObjects jsObject : eventBody.getJobscheduler()) {
@@ -126,6 +125,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
                 if (isCurrentJobScheduler) {
+                    Map<String, Set<String>> nestedJobChains = jobChainLayer.getMapOfOuterJobChains(instance.getId());
                     tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, shiroUser, nestedJobChains));
                 } else {
                     tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId()));
