@@ -444,12 +444,12 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                     JsonReader rdr = Json.createReader(new StringReader(response));
                     JsonObject json = rdr.readObject();
                     String msg = json.getString("message", response);
-                    if (msg.contains("SCHEDULER-161")) {
+                    if (msg.contains("SCHEDULER-161") || msg.contains("SCHEDULER-162")) {
                         throw new JobSchedulerObjectNotExistException(msg);
                     }
                     throw new JobSchedulerBadRequestException(msg);
                 } else {
-                    if (response.contains("SCHEDULER-161")) {
+                    if (response.contains("SCHEDULER-161") || response.contains("SCHEDULER-162")) {
                         throw new JobSchedulerObjectNotExistException(response);
                     }
                     throw new JobSchedulerBadRequestException(response);

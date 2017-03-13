@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,6 +29,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.event.EventCallable;
 import com.sos.joc.classes.event.EventCallableOfCurrentJobScheduler;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.event.resource.IEventResource;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
@@ -96,8 +98,10 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             List<JOCJsonCommand> jocJsonCommands = new ArrayList<JOCJsonCommand>();
 
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
+            InventoryJobChainsDBLayer jobChainLayer = new InventoryJobChainsDBLayer(connection);
 
             Globals.beginTransaction(connection);
+            Map<String, Set<String>> nestedJobChains = jobChainLayer.getMapOfOuterJobChains(dbItemInventoryInstance.getId());
             
             Boolean isCurrentJobScheduler = true;
             for (JobSchedulerObjects jsObject : eventBody.getJobscheduler()) {
@@ -122,7 +126,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
                 jocJsonCommands.add(command);
                 if (isCurrentJobScheduler) {
-                    tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, shiroUser));
+                    tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, shiroUser, nestedJobChains));
                 } else {
                     tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId()));
                 }

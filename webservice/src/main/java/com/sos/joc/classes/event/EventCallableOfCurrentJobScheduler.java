@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.json.JsonObject;
@@ -31,14 +32,16 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     private final JobSchedulerEvent jobSchedulerEvent;
     private final JOCJsonCommand command;
     private final SOSShiroCurrentUser shiroUser;
+    private final Map<String, Set<String>> nestedJobChains;
     
     public EventCallableOfCurrentJobScheduler(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
-            Integer eventTimeout, SOSShiroCurrentUser shiroUser) {
+            Integer eventTimeout, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
         super(command, jobSchedulerEvent, accessToken, session, eventTimeout);
         this.accessToken = accessToken;
         this.command = command;
         this.jobSchedulerEvent = jobSchedulerEvent;
         this.shiroUser = shiroUser;
+        this.nestedJobChains = nestedJobChains;
     }
 
     @Override
@@ -149,6 +152,16 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setEventType("OrderStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
                         eventSnapshots.putAll(createJobChainEvent(eventSnapshot));
+                        //add event for outerJobChain if exist
+                        if (nestedJobChains.containsKey(eventKey)) {
+                            for (String outerJobChain : nestedJobChains.get(eventKey)) {
+                                EventSnapshot eventSnapshot2 = new EventSnapshot();
+                                eventSnapshot2.setEventType("OrderStateChanged");
+                                eventSnapshot2.setObjectType(JobSchedulerObjectType.ORDER);
+                                eventSnapshot2.setPath(outerJobChain);
+                                eventSnapshots.put(eventSnapshot2.getPath(), eventSnapshot2);
+                            }
+                        }
                     } else if (eventType.startsWith("Scheduler")) {
                         eventSnapshot.setEventType("SchedulerStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);

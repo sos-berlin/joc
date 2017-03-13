@@ -1,5 +1,6 @@
 package com.sos.joc.classes.orders;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,11 +20,11 @@ import org.slf4j.LoggerFactory;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.filters.FilterAfterResponse;
+import com.sos.joc.classes.jobchains.JobChainVolatile;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderStateFilter;
 import com.sos.joc.model.order.OrderType;
@@ -36,45 +37,53 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
     private final String job;
     private final OrdersPerJobChain orders;
     private final Folder folder;
+    private final Path folderPath;
     private final OrdersFilter ordersBody;
     private final Boolean compact;
     private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
     private final Boolean suppressJobSchedulerObjectNotExistException;
+    private final Boolean checkOrderPathIsInFolder;
 
     public OrdersVCallable(String job, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.orders = null;
         this.job = ("/" + job.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
         this.folder = null;
+        this.folderPath = null;
         this.ordersBody = null;
         this.compact = compact;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
+        this.checkOrderPathIsInFolder = false;
     }
 
     public OrdersVCallable(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.orders = orders;
         this.job = null;
         this.folder = null;
+        this.folderPath = Paths.get(orders.getJobChain()).getParent();
         this.ordersBody = ordersBody;
         this.compact = ordersBody.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
+        this.checkOrderPathIsInFolder = null;
     }
 
-    public OrdersVCallable(JobChainV jobChain, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public OrdersVCallable(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, String accessToken) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(jobChain.getPath());
         this.orders = o;
         this.job = null;
         this.folder = null;
+        this.folderPath = Paths.get(jobChain.getPath()).getParent();
         this.ordersBody = null;
         this.compact = false;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
+        this.checkOrderPathIsInFolder = jobChain.hasJobChainNodes();
     }
 
     public OrdersVCallable(OrderFilter order, JOCJsonCommand jocJsonCommand, String accessToken) {
@@ -84,35 +93,39 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.orders = o;
         this.job = null;
         this.folder = null;
+        this.folderPath = Paths.get(order.getJobChain()).getParent();
         this.ordersBody = null;
         this.compact = order.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = order.getSuppressNotExistException();
+        this.checkOrderPathIsInFolder = null;
     }
 
     public OrdersVCallable(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) {
         this.orders = null;
         this.job = null;
         this.folder = folder;
+        this.folderPath = Paths.get(folder.getFolder());
         this.ordersBody = ordersBody;
         this.compact = ordersBody.getCompact();
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
+        this.checkOrderPathIsInFolder = !("/".equals(folder.getFolder()));
     }
 
     @Override
     public Map<String, OrderVolatile> call() throws Exception {
         try {
             if (orders != null && ordersBody == null) {
-                return getOrders(orders, compact, jocJsonCommand, accessToken);
+                return getOrders(orders, compact, jocJsonCommand);
             } else if (orders != null && ordersBody != null) {
-                return getOrders(orders, ordersBody, jocJsonCommand, accessToken);
+                return getOrders(orders, ordersBody, jocJsonCommand);
             } else if (job != null) {
-                return getOrders(job, compact, jocJsonCommand, accessToken);
+                return getOrders(job, compact, jocJsonCommand);
             } else {
-                return getOrders(folder, ordersBody, jocJsonCommand, accessToken);
+                return getOrders(folder, ordersBody, jocJsonCommand);
             }
         } catch (JobSchedulerObjectNotExistException e) {
             if (suppressJobSchedulerObjectNotExistException) {
@@ -127,7 +140,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         OrderV o = new OrderV();
         o.setParams(null);
         try {
-            orderMap = getOrders(orders, compact, jocJsonCommand, accessToken);
+            orderMap = getOrders(orders, compact, jocJsonCommand);
             if (orderMap == null || orderMap.isEmpty()) {
                 return o;
             }
@@ -141,65 +154,73 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
     }
 
     public List<OrderV> getOrdersOfJob() throws Exception {
-        Map<String, OrderVolatile> orderMap = getOrders(job, compact, jocJsonCommand, accessToken);
+        Map<String, OrderVolatile> orderMap = getOrders(job, compact, jocJsonCommand);
         if (orderMap == null || orderMap.isEmpty()) {
             return null;
         }
         return new ArrayList<OrderV>(orderMap.values());
     }
 
-    private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken)
-            throws Exception {
+    private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, boolean compact, JOCJsonCommand jocJsonCommand) throws Exception {
         JsonObject json = null;
+        Boolean chckOrderPathIsInFolder = false;
         try {
             json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders, null), accessToken);
         } catch (JobSchedulerObjectNotExistException e) {
             // fix for nested job chains
             if (orders.getOrders().size() > 0) {
-                OrdersPerJobChain onlyJobChain = new OrdersPerJobChain(); 
+                chckOrderPathIsInFolder = true;
+                OrdersPerJobChain onlyJobChain = new OrdersPerJobChain();
                 onlyJobChain.setJobChain(orders.getJobChain());
                 json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(onlyJobChain, null), accessToken);
             } else {
                 throw e;
             }
         }
-        return getOrders(json, compact, null, null);
+        if (checkOrderPathIsInFolder != null) {
+            chckOrderPathIsInFolder = checkOrderPathIsInFolder;
+        }
+        return getOrders(json, compact, null, null, chckOrderPathIsInFolder);
     }
 
-    private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken)
-            throws Exception {
+    private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand) throws Exception {
         if (orders.getOrders().size() > 0) {
             ordersBody.setRegex(null);
             ordersBody.setProcessingStates(null);
         }
         JsonObject json = null;
+        Boolean chckOrderPathIsInFolder = orders.isOuterJobChain();
         try {
             json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(orders, null), accessToken);
         } catch (JobSchedulerObjectNotExistException e) {
             // fix for nested job chains
             if (orders.getOrders().size() > 0) {
-                OrdersPerJobChain onlyJobChain = new OrdersPerJobChain(); 
+                chckOrderPathIsInFolder = true;
+                OrdersPerJobChain onlyJobChain = new OrdersPerJobChain();
                 onlyJobChain.setJobChain(orders.getJobChain());
                 json = jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(onlyJobChain, null), accessToken);
             } else {
                 throw e;
             }
         }
-        return getOrders(json, ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates());
+        if (checkOrderPathIsInFolder != null) {
+            chckOrderPathIsInFolder = checkOrderPathIsInFolder;
+        }
+        return getOrders(json, ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates(), chckOrderPathIsInFolder);
     }
 
-    private Map<String, OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), compact, null, null);
+    private Map<String, OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand) throws Exception {
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), compact, null, null,
+                checkOrderPathIsInFolder);
     }
 
-    private Map<String, OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken)
-            throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), ordersBody
-                .getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates());
+    private Map<String, OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand) throws Exception {
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), ordersBody.getCompact(),
+                ordersBody.getRegex(), ordersBody.getProcessingStates(), checkOrderPathIsInFolder);
     }
 
-    private Map<String, OrderVolatile> getOrders(JsonObject json, boolean compact, String regex,
-            List<OrderStateFilter> processingStates) throws JobSchedulerInvalidResponseDataException {
+    private Map<String, OrderVolatile> getOrders(JsonObject json, boolean compact, String regex, List<OrderStateFilter> processingStates,
+            Boolean checkOrderPathIsInFolder) throws JobSchedulerInvalidResponseDataException {
         UsedNodes usedNodes = new UsedNodes();
         UsedJobs usedJobs = new UsedJobs();
         UsedJobChains usedJobChains = new UsedJobChains();
@@ -209,16 +230,22 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         Date surveyDate = JobSchedulerDate.getDateFromEventId(json.getJsonNumber("eventId").longValue());
         String origJobChain = orders == null ? null : orders.getJobChain();
         Map<String, OrderVolatile> listOrderQueue = new HashMap<String, OrderVolatile>();
-        
+
         for (JsonObject ordersItem : json.getJsonArray("orders").getValuesAs(JsonObject.class)) {
             OrderVolatile order = new OrderVolatile(ordersItem, origJobChain);
             order.setPathJobChainAndOrderId();
             if (orders != null && !orders.getOrders().isEmpty() && !orders.containsOrder(order.getOrderId())) {
                 continue;
             }
-            if (!checkOrderPathIsInFolder(order.getPath())) {
+            // necessary for nested job chains but only for outer job chain and
+            // for folder filter
+            //TODO order.isOuterJobChain() or checkOrderPathIsInFolder
+            if (checkOrderPathIsInFolder && !checkOrderPathIsInFolder(order.getPath())) {
                 continue;
             }
+//            if (order.isOuterJobChain()) {
+//                continue;
+//            }
             if (!FilterAfterResponse.matchRegex(regex, order.getPath())) {
                 LOGGER.debug("...processing skipped caused by 'regex=" + regex + "'");
                 continue;
@@ -239,10 +266,10 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         }
         return listOrderQueue;
     }
-    
+
     private boolean checkOrderPathIsInFolder(String orderPath) {
         try {
-            return Paths.get(orderPath).startsWith(Paths.get(folder.getFolder()));
+            return Paths.get(orderPath).startsWith(folderPath);
         } catch (Exception e) {
             return true;
         }

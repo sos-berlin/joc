@@ -47,14 +47,20 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         JobChainVolatile jobChainV = new JobChainVolatile(jobElem, this);
         jobChainV.setFields(compact);
         nestedJobChains.addAll(jobChainV.getNestedJobChains());
-        if ((compact == null || !compact) && jobChainV.hasJobNodes() && jobChainV.getNumOfOrders() > 0) {
+        if (((compact == null || !compact) && jobChainV.getNumOfOrders() > 0) || jobChainV.hasJobChainNodes()) {
             OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken);
             Map<String, OrderVolatile> orders = ordersVCallable.call();
             if (orders != null && orders.size() > 0) {
-                jobChainV.setOrders(orders, maxOrders);
+                if (jobChainV.hasJobChainNodes()) {
+                    jobChainV.setOuterOrdersAndSummary(orders, maxOrders, compact);
+                } else {
+                    jobChainV.setOrders(orders, maxOrders);
+                }
             }
         }
-        jobChainV.setOrdersSummary(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken).getOrdersSummary());
+        if (!jobChainV.hasJobChainNodes()) {
+            jobChainV.setOrdersSummary(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken).getOrdersSummary()); 
+        }
         return jobChainV;
     }
     
@@ -142,10 +148,8 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     
     private List<JobChainV> getJobChains(String command, JobChainsFilter jobChainsFilter, String xPath) throws Exception {
         executePostWithThrowBadRequestAfterRetry(command, accessToken);
-        StringBuilder x = new StringBuilder();
-        x.append(xPath);
-        NodeList jobChainNodes = getSosxml().selectNodeList(x.toString());
-        LOGGER.debug("..." + jobChainNodes.getLength() + " jobChains found");
+        NodeList jobChainNodes = getSosxml().selectNodeList(xPath);
+        LOGGER.debug("..." + jobChainNodes.getLength() + " job chains found");
         
         Map<String, JobChainVolatile> jobChainMap = new HashMap<String, JobChainVolatile>();
         List<OrdersSummaryCallable> summaryTasks = new ArrayList<OrdersSummaryCallable>();
@@ -167,7 +171,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            jobChainV.setFields(jobChainsFilter.getCompact());
            nestedJobChains.addAll(jobChainV.getNestedJobChains());
            summaryTasks.add(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken));
-           if (!jobChainsFilter.getCompact() && jobChainV.hasJobNodes()) {
+           if (!jobChainsFilter.getCompact() || jobChainV.hasJobChainNodes()) {
                orderTasks.add(new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken)); 
            }
         }
@@ -185,14 +189,18 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                 }
             }
         }
-        if (!jobChainsFilter.getCompact() && !orderTasks.isEmpty()) {
+        if (!orderTasks.isEmpty()) {
             for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(orderTasks)) {
                 try {
                     Map<String, OrderVolatile> orders = result.get();
                     if (orders.size() > 0) {
                         JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
                         if (j != null) {
-                            j.setOrders(orders, jobChainsFilter.getMaxOrders());
+                            if (j.hasJobChainNodes()) {
+                                j.setOuterOrdersAndSummary(orders, jobChainsFilter.getMaxOrders(), jobChainsFilter.getCompact());
+                            } else {
+                                j.setOrders(orders, jobChainsFilter.getMaxOrders());
+                            }
                         }
                     }
                 } catch (ExecutionException e) {

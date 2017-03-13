@@ -1,10 +1,15 @@
 package com.sos.joc.db.inventory.jobchains;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.hibernate.query.Query;
 import org.hibernate.SessionException;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +24,7 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 public class InventoryJobChainsDBLayer extends DBLayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InventoryJobChainsDBLayer.class);
+    private static final String NESTED_JOB_CHAIN = NestedJobChain.class.getName();
 
     public InventoryJobChainsDBLayer(SOSHibernateSession connection) {
         super(connection);
@@ -212,6 +218,56 @@ public class InventoryJobChainsDBLayer extends DBLayer {
                 return false;
             }
             return result > 0;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+        }
+    }
+    
+    public List<String> getOuterJobChains(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ijc.name from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
+            sql.append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn");
+            sql.append(" where ijc.id = ijcn.jobChainId and ijcn.nodeType = 2 and ijc.instanceId = :instanceId");
+            Query query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<String> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return new ArrayList<String>();
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+        }
+    }
+    
+    public Map<String, Set<String>> getMapOfOuterJobChains(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            Map<String, Set<String>> nestedJobChains = new HashMap<String, Set<String>>();
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new ").append(NESTED_JOB_CHAIN);
+            sql.append("(ijc.name, ijcn.nestedJobChainName) from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
+            sql.append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn");
+            sql.append(" where ijc.id = ijcn.jobChainId and ijcn.nodeType = 2 and ijc.instanceId = :instanceId");
+            Query query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<NestedJobChain> result = query.list();
+            if (result != null) {
+                for (NestedJobChain item : result) {
+                   if (nestedJobChains.containsKey(item.getInnerJobChain())) {
+                       nestedJobChains.get(item.getInnerJobChain()).add(item.getOuterJobChain());
+                   } else {
+                       Set<String> outerJobChains = new HashSet<String>();
+                       outerJobChains.add(item.getOuterJobChain());
+                       nestedJobChains.put(item.getInnerJobChain(), outerJobChains);
+                   }
+                }
+            }
+            return nestedJobChains;
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

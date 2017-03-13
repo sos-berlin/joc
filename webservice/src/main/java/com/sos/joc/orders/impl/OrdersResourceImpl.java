@@ -13,12 +13,15 @@ import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -35,7 +38,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
     @Override
     public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
-
+        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken, ordersBody.getJobschedulerId(), 
                     getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
@@ -55,6 +58,10 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
             if (orders != null && !orders.isEmpty()) {
+                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
+                Globals.beginTransaction(connection);
+                List<String> outerJobChains = dbLayer.getOuterJobChains(dbItemInventoryInstance.getId());
                 for (OrderPath order : orders) {
                     if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
                         throw new JocMissingRequiredParameterException("jobChain");
@@ -72,6 +79,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                     } else {
                         opj = new OrdersPerJobChain();
                         opj.setJobChain(order.getJobChain());
+                        opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain())); 
                         opj.addOrder(order.getOrderId());
                     }
                     ordersLists.put(order.getJobChain(), opj);
@@ -122,6 +130,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
     }
 }

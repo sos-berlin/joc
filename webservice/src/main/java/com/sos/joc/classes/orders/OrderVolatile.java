@@ -61,7 +61,7 @@ public class OrderVolatile extends OrderV {
         }
         return origJobChain;
     }
-
+    
     public void setFields(UsedNodes usedNodes, UsedTasks usedTasks, boolean compact) throws JobSchedulerInvalidResponseDataException {
         if (compact) {
             setCompactFields(usedNodes, usedTasks);
@@ -210,9 +210,9 @@ public class OrderVolatile extends OrderV {
         }
         setJobChain(jobChainPath);
         setOrderId(pathParts[1]);
-        if (origJobChain == null) {
-            origJobChain = pathParts[0];  
-        }
+//        if (origJobChain == null) {
+//            origJobChain = pathParts[0];  
+//        }
     }
     
     private void cleanArrays() {

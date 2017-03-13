@@ -33,6 +33,7 @@ import com.sos.joc.model.order.OrderState;
 import com.sos.joc.model.order.OrderStateText;
 import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderV;
+import com.sos.joc.model.order.OrdersSummary;
 
 
 public class JobChainVolatile extends JobChainV {
@@ -91,6 +92,10 @@ public class JobChainVolatile extends JobChainV {
         return jobNodes.getLength() > 0;
     }
     
+    public boolean hasJobChainNodes() {
+        return jobChainNodes.getLength() > 0;
+    }
+    
     public void setOrders(List<OrderV> orders) {
         Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
         for (OrderV order : orders) {
@@ -129,10 +134,103 @@ public class JobChainVolatile extends JobChainV {
             node.setNumOfOrders(num == null ? 0 : num);
         }
     }
+    
+    public void setOuterOrdersAndSummary(Map<String, OrderVolatile> orders, Integer maxOrders, Boolean compact) {
+        Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
+        Map<String,Integer> nodeMapCounter = new HashMap<String,Integer>();
+        OrdersSummary summary = new OrdersSummary();
+        summary.setBlacklist(0);
+        summary.setPending(0);
+        summary.setRunning(0);
+        summary.setSetback(0);
+        summary.setSuspended(0);
+        summary.setWaitingForResource(0);
+        setNumOfOrders(orders.size());
+        for (OrderV order : orders.values()) {
+            switch (order.getProcessingState().get_text()) {
+            case BLACKLIST:
+                summary.setBlacklist(summary.getBlacklist() + 1);
+                break;
+            case JOB_CHAIN_STOPPED:
+            case JOB_NOT_IN_PERIOD:
+            case JOB_STOPPED:
+            case NODE_DELAY:
+            case NODE_STOPPED:
+            case WAITING_FOR_AGENT:
+            case WAITING_FOR_LOCK:
+            case WAITING_FOR_PROCESS:
+            case WAITING_FOR_TASK:
+                summary.setWaitingForResource(summary.getWaitingForResource() + 1);
+                break;
+            case PENDING:
+                summary.setPending(summary.getPending() + 1);
+                break;
+            case RUNNING:
+                summary.setRunning(summary.getRunning() + 1);
+                break;
+            case SETBACK:
+                summary.setSetback(summary.getSetback() + 1);
+                break;
+            case SUSPENDED:
+                summary.setSuspended(summary.getSuspended() + 1);
+                break;
+            }
+            if (compact != null && compact) {
+                continue;
+            }
+            String node = order.getJobChain();
+            if (!nodeMap.containsKey(node)) {
+                nodeMap.put(node, new ArrayList<OrderV>());
+                nodeMapCounter.put(node, 0);
+            }
+            int incrementCounter = nodeMapCounter.get(node)+1;
+            nodeMapCounter.put(node, incrementCounter);
+            if (maxOrders == null || nodeMap.get(node).size() < maxOrders) {
+                nodeMap.get(node).add(order);
+            }
+        }
+        setOrdersSummary(summary);
+        if (compact == null || !compact) {
+            for (JobChainNodeV node : getNodes()) {
+                List<OrderV> o = nodeMap.get(node.getJobChain().getPath());
+                Integer num = nodeMapCounter.get(node.getJobChain().getPath());
+                node.setOrders(o);
+                node.setNumOfOrders(num == null ? 0 : num);
+            }
+        }
+    }
+    
+    public void getProcessingStateText(OrderV order) {
+        switch (order.getProcessingState().get_text()) {
+        case BLACKLIST:
+            break;
+        case JOB_CHAIN_STOPPED:
+        case JOB_NOT_IN_PERIOD:
+        case JOB_STOPPED:
+        case NODE_DELAY:
+        case NODE_STOPPED:
+        case WAITING_FOR_AGENT:
+        case WAITING_FOR_LOCK:
+        case WAITING_FOR_PROCESS:
+        case WAITING_FOR_TASK:
+            break;
+        case PENDING:
+            break;
+        case RUNNING:
+            break;
+        case SETBACK:
+            break;
+        case SUSPENDED:
+            break;
+        }
+    }
 
     private void cleanArrays() {
         setNodes(null);
         setFileOrderSources(null);
+        if (getBlacklist() != null && getBlacklist().size() == 0) {
+            setBlacklist(null);
+        }
     }
 
     private void setDetailedFields() throws Exception {
