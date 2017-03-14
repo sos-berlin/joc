@@ -75,6 +75,8 @@ public class ClusterMembersPermanent {
                 }
             }
             return masters;
+        } catch (Exception e) {
+            throw e;
         } finally {
             Globals.disconnect(connection);
         }

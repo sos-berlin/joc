@@ -231,7 +231,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             removeSavedInventoryInstance();
             try {
                 int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
-                LOGGER.info(command.getSchemeAndAuthority() + ": connection refused; retray after" + delay + "ms");
+                LOGGER.info(command.getSchemeAndAuthority() + ": connection refused; retry after " + delay + "ms");
                 Thread.sleep(delay);
             } catch (InterruptedException e1) {
             }

@@ -17,6 +17,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.filters.FilterAfterResponse;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.HistoryState;
@@ -58,8 +59,17 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             }
 
             if (ordersFilter.getOrders().size() > 0) {
+                InventoryJobChainsDBLayer jobChainDbLayer = new InventoryJobChainsDBLayer(connection);
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
-                    reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
+                    String normalizeJobChain = normalizePath(orderPath.getJobChain());
+                    List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, dbItemInventoryInstance.getId());
+                    if (innerChains == null) {
+                        reportTriggerDBLayer.getFilter().addOrderPath(normalizeJobChain, orderPath.getOrderId());
+                    } else {
+                        for (String innerChain : innerChains) {
+                            reportTriggerDBLayer.getFilter().addOrderPath(innerChain, orderPath.getOrderId());
+                        }
+                    }
                 }
                 ordersFilter.setRegex("");
             } else {
