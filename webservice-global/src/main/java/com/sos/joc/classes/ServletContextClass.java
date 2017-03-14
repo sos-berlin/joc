@@ -3,7 +3,6 @@ package com.sos.joc.classes;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.sos.JSHelper.Exceptions.JobSchedulerException;
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.joc.Globals;
 
@@ -14,7 +13,7 @@ public class ServletContextClass implements ServletContextListener {
         try {
             Globals.getHibernateFactory();
         } catch (Exception e) {
-            throw new JobSchedulerException(e);
+            throw new RuntimeException(e);
         }
     }
 

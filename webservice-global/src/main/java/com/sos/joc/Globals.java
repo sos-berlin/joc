@@ -53,8 +53,10 @@ public class Globals {
                 sosHibernateFactory.setAutoCommit(true);
                 sosHibernateFactory.build();
             } catch (JocException e) {
+                sosHibernateFactory = null;
                 throw e;
             } catch (Exception e) {
+                sosHibernateFactory = null;
                 throw new DBConnectionRefusedException(e);
             }
         }
