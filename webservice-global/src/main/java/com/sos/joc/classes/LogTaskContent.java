@@ -26,7 +26,7 @@ public class LogTaskContent extends LogContent {
         Globals.beginTransaction(connection);
         try {
             JobSchedulerTaskHistoryDBLayer jobSchedulerTaskHistoryDBLayer = new JobSchedulerTaskHistoryDBLayer(connection);
-            String log = jobSchedulerTaskHistoryDBLayer.getLogAsString(taskFilter.getTaskId());
+            String log = jobSchedulerTaskHistoryDBLayer.getLogAsString(taskFilter);
             if (log == null) {
                 log = getTaskLogFromXmlCommand();
             }

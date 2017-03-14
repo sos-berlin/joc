@@ -120,7 +120,6 @@ public class LogContent {
     protected DBItemInventoryInstance dbItemInventoryInstance; 
     
     public LogContent(DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
-        super();
         this.dbItemInventoryInstance = dbItemInventoryInstance;
         this.accessToken = accessToken;
     }

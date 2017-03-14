@@ -27,7 +27,7 @@ public class LogOrderContent extends LogContent {
         Globals.beginTransaction(connection);
         try {
             JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(connection);
-            String log = jobSchedulerOrderHistoryDBLayer.getLogAsString(orderHistoryFilter.getHistoryId());
+            String log = jobSchedulerOrderHistoryDBLayer.getLogAsString(orderHistoryFilter);
             if (log == null) {
                 log = getOrderLogFromXmlCommand();
             }

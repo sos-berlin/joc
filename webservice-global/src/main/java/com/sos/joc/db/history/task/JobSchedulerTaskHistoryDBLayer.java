@@ -7,8 +7,9 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.jitl.schedulerhistory.db.SchedulerTaskHistoryDBItem;
 import com.sos.jitl.schedulerhistory.db.SchedulerTaskHistoryLogDBItemPostgres;
+import com.sos.joc.model.job.TaskFilter;
 
-/** @author Uwe Risse */
+/* @author Uwe Risse */
 public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerTaskHistoryDBLayer.class);
@@ -17,20 +18,31 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
         super(conn);
     }
 
-    public String getLogAsString(String taskHistoryId) throws Exception {
+    public String getLogAsString(TaskFilter taskFilter) throws Exception {
         String log = null;
         try {
             if (this.getSession().getFactory().dbmsIsPostgres()) {
-                SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem =
-                        (SchedulerTaskHistoryLogDBItemPostgres) this.getSession().get(SchedulerTaskHistoryLogDBItemPostgres.class,
-                                Long.parseLong(taskHistoryId));
-                if (schedulerHistoryDBItem != null && schedulerHistoryDBItem.getLog() != null) {
+                SchedulerTaskHistoryLogDBItemPostgres schedulerHistoryDBItem = (SchedulerTaskHistoryLogDBItemPostgres) this.getSession().get(
+                        SchedulerTaskHistoryLogDBItemPostgres.class, Long.parseLong(taskFilter.getTaskId()));
+                if (schedulerHistoryDBItem == null) {
+                    return null;
+                }
+                if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
+                    return null;
+                }
+                if (schedulerHistoryDBItem.getLog() != null) {
                     log = schedulerHistoryDBItem.getLogAsString();
                 }
             } else {
-                SchedulerTaskHistoryDBItem schedulerHistoryDBItem =
-                        (SchedulerTaskHistoryDBItem) this.getSession().get(SchedulerTaskHistoryDBItem.class, Long.parseLong(taskHistoryId));
-                if (schedulerHistoryDBItem != null && schedulerHistoryDBItem.getLog() != null) {
+                SchedulerTaskHistoryDBItem schedulerHistoryDBItem = (SchedulerTaskHistoryDBItem) this.getSession().get(
+                        SchedulerTaskHistoryDBItem.class, Long.parseLong(taskFilter.getTaskId()));
+                if (schedulerHistoryDBItem == null) {
+                    return null;
+                }
+                if (taskFilter.getJobschedulerId() != null && !taskFilter.getJobschedulerId().equals(schedulerHistoryDBItem.getSchedulerId())) {
+                    return null;
+                }
+                if (schedulerHistoryDBItem.getLog() != null) {
                     log = schedulerHistoryDBItem.getLogAsString();
                 }
             }
