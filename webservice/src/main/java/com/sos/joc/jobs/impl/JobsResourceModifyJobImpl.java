@@ -117,7 +117,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             }
 
             XMLBuilder xml = new XMLBuilder("modify_job");
-            xml.addAttribute("job", normalizePath(modifyJob.getJob())).addAttribute("cmd", command);
+            xml.addAttribute("job", normalizePath(modifyJob.getJob()));
             if (SET_RUN_TIME.equals(command)) {
                 try {
                     ValidateXML.validateRunTimeAgainstJobSchedulerSchema(modifyJob.getRunTime());
@@ -127,6 +127,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 } catch (Exception e) {
                     throw new JobSchedulerInvalidResponseDataException(modifyJob.getRunTime());
                 }
+            } else {
+                xml.addAttribute("cmd", command);
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());

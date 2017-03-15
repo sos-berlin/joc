@@ -228,9 +228,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         } catch (Exception e) {
             throw e;
         } finally {
-            if ("set_state".equals(command)) {
-                Globals.disconnect(connection);;
-            }
+            Globals.disconnect(connection);;
         }
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);
