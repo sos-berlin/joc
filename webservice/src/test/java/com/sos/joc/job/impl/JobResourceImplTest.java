@@ -22,6 +22,7 @@ public class JobResourceImplTest {
     @Test
     public void postJobTest() throws Exception {
 
+        LOGGER.info("postJobTest start");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobFilter jobFilterSchema = new JobFilter();

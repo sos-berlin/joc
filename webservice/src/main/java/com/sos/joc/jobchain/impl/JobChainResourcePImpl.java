@@ -1,6 +1,5 @@
 package com.sos.joc.jobchain.impl;
 
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;

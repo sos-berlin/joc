@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.query.Query;
-import org.hibernate.type.BooleanType;
-import org.hibernate.type.Type;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
@@ -21,12 +19,12 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
 
     public JocConfigurationDbLayer(SOSHibernateSession connection) throws Exception {
         super();
-        this.connection = connection;
+        this.sosHibernateSession = connection;
         resetFilter();
     }
 
     public JocConfigurationDbItem getJocConfigurationDbItem(final Long id) throws Exception {
-        return (JocConfigurationDbItem) (connection.get(JocConfigurationDbItem.class, id));
+        return (JocConfigurationDbItem) (sosHibernateSession.get(JocConfigurationDbItem.class, id));
     }
 
     public void resetFilter() {
@@ -44,7 +42,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         String hql = "delete from " + JOC_CONFIGURATION_DB_ITEM + " " + getWhere();
         Query query = null;
         int row = 0;
-        query = connection.createQuery(hql);
+        query = sosHibernateSession.createQuery(hql);
         if (filter.getName() != null && !"".equals(filter.getName())) {
             query.setParameter("name", filter.getName());
         }
@@ -132,7 +130,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         List<JocConfigurationDbItem> configurationsList = null;
 
         String sql = "from " + JOC_CONFIGURATION_DB_ITEM + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode();
-        Query<JocConfigurationDbItem> query = connection.createQuery(sql);
+        Query<JocConfigurationDbItem> query = sosHibernateSession.createQuery(sql);
         bindParameters(query);
         if (limit > 0) {
             query.setMaxResults(limit);
@@ -149,7 +147,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         sql.append("from ")
             .append(JOC_CONFIGURATION_DB_ITEM)
             .append(" where id = :id");
-        Query<JocConfigurationDbItem> query = connection.createQuery(sql.toString());
+        Query<JocConfigurationDbItem> query = sosHibernateSession.createQuery(sql.toString());
         query.setParameter("id", id);
         return query.getSingleResult();
     }
@@ -163,7 +161,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
             .append(getWhere())
             .append(filter.getOrderCriteria())
             .append(filter.getSortMode());
-        Query<JocConfigurationDbItem> query = connection.createQuery(sql.toString());
+        Query<JocConfigurationDbItem> query = sosHibernateSession.createQuery(sql.toString());
         bindParameters(query);
         if (limit > 0) {
             query.setMaxResults(limit);
@@ -174,9 +172,9 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
     public Long saveOrUpdateConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws Exception {
         jocConfigurationDbItem.setModified(new Date());
         if(jocConfigurationDbItem.getId() == null) {
-            connection.save(jocConfigurationDbItem);
+            sosHibernateSession.save(jocConfigurationDbItem);
         } else {
-            connection.update(jocConfigurationDbItem);
+            sosHibernateSession.update(jocConfigurationDbItem);
         }
         return jocConfigurationDbItem.getId();
     }
@@ -185,13 +183,13 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         List<JocConfigurationDbItem> l = getJocConfigurationList(1);
         if (l.size() > 0) {
             JocConfigurationDbItem jocConfigurationDbItem = l.get(0);
-            connection.delete(jocConfigurationDbItem);
+            sosHibernateSession.delete(jocConfigurationDbItem);
         }
         return l.size();
     }
 
     public void deleteConfiguration(JocConfigurationDbItem dbItem) throws Exception {
-        connection.delete(dbItem);
+        sosHibernateSession.delete(dbItem);
     }
 
     public JocConfigurationFilter getFilter() {

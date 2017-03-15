@@ -99,7 +99,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
     @Override
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
-        SOSHibernateSession connection = null;
+        SOSHibernateSession sosHibernateSession = null;
 
         try {
             LOGGER.debug("Reading the daily plan");
@@ -109,10 +109,10 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            connection = Globals.createSosHibernateStatelessConnection("postPlan");
-            DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(connection);
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("postPlan");
+            DailyPlanDBLayer dailyPlanDBLayer = new DailyPlanDBLayer(sosHibernateSession);
 
-            Globals.beginTransaction(connection);
+            Globals.beginTransaction(sosHibernateSession);
 
             dailyPlanDBLayer.getFilter().setSchedulerId(planFilter.getJobschedulerId());
             dailyPlanDBLayer.getFilter().setJob(planFilter.getJob());
@@ -242,7 +242,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             e.printStackTrace();
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.disconnect(connection);
+            Globals.disconnect(sosHibernateSession);
         }
     }
 }

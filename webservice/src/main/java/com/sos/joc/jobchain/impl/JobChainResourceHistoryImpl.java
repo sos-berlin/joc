@@ -13,7 +13,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemReportTriggerWithResult;
+import com.sos.jitl.reporting.db.DBItemReportTrigger;
 import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -179,10 +179,10 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         reportTriggerDBLayer.getFilter().clearReportItems();
         reportTriggerDBLayer.getFilter().setLimit(1);
         reportTriggerDBLayer.getFilter().addOrderHistoryId(new Long(history.getHistoryId()));
-        List<DBItemReportTriggerWithResult> listOfReportTriggerWithResultDBItems = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
-        DBItemReportTriggerWithResult dbItemReportTriggerWithResult = null;
-        if (listOfReportTriggerWithResultDBItems.size() > 0) {
-            dbItemReportTriggerWithResult = listOfReportTriggerWithResultDBItems.get(0);
+        List<DBItemReportTrigger> listOfReportTriggerDBItems = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
+        DBItemReportTrigger dbItemReportTrigger = null;
+        if (listOfReportTriggerDBItems.size() > 0) {
+            dbItemReportTrigger = listOfReportTriggerDBItems.get(0);
         } else {
             if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
                 return HistoryStateText.SUCCESSFUL;
@@ -191,14 +191,13 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             }
         }
 
-        if (dbItemReportTriggerWithResult.getDbItemReportTrigger() == null || (dbItemReportTriggerWithResult.getDbItemReportTrigger()
-                .getStartTime() != null && dbItemReportTriggerWithResult.getDbItemReportTrigger().getEndTime() == null)) {
+        if (dbItemReportTrigger == null || (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null)) {
             if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
                 return HistoryStateText.SUCCESSFUL;
             } else {
                 return HistoryStateText.FAILED;
             }
-        } else if (dbItemReportTriggerWithResult.haveError()) {
+        } else if (dbItemReportTrigger.getResultError()) {
             return HistoryStateText.FAILED;
         } else {
             return HistoryStateText.SUCCESSFUL;

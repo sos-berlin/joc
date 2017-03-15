@@ -20,13 +20,14 @@ public class JobResourceOrderQueueImplTest {
     @Test
     public void postJobOrderQueueTest() throws Exception {
 
+        LOGGER.info("postJobOrderQueueTest start");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = (SOSShiroCurrentUserAnswer) sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
         JobFilter jobFilterSchema = new JobFilter();
         jobFilterSchema.setJobschedulerId(SCHEDULER_ID);
         jobFilterSchema.setJob("check_history/check");
         JobResourceOrderQueueImpl jobOrderQueueImpl = new JobResourceOrderQueueImpl();
-        JOCDefaultResponse jobsResponse = jobOrderQueueImpl.postJobOrderQueue(sosShiroCurrentUserAnswer.getAccessToken(), jobFilterSchema);
+        jobOrderQueueImpl.postJobOrderQueue(sosShiroCurrentUserAnswer.getAccessToken(), jobFilterSchema);
         assertEquals("postJobOrderQueueTest", "check", jobFilterSchema.getJob());
     }
 

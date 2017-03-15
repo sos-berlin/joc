@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
@@ -14,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.classes.SOSHibernateStatelessSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -91,11 +89,9 @@ public class Globals {
         if (sosHibernateFactory == null) {
             getHibernateFactory();
         }
-        SOSHibernateSession connection = new SOSHibernateStatelessSession(sosHibernateFactory);
-        connection.setIdentifier(identifier);
         try {
-            connection.connect();
-            return connection;
+            SOSHibernateSession sosHibernateSession = sosHibernateFactory.openStatelessSession(identifier);
+            return sosHibernateSession;
         } catch (Exception e) {
             throw new DBConnectionRefusedException(e);
         }
@@ -177,7 +173,7 @@ public class Globals {
         if (schedulerId != null) {
             propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
             confFile = sosShiroProperties.getProperty(propertyKey);
-            
+
             if (confFile == null) {
                 propertyKey = HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE;
                 confFile = sosShiroProperties.getProperty(propertyKey);
@@ -188,11 +184,11 @@ public class Globals {
             propertyKey = HIBERNATE_CONFIGURATION_FILE;
             confFile = sosShiroProperties.getProperty(propertyKey, "reporting.hibernate.cfg.xml");
         }
-        
+
         if (confFile != null) {
-            confFile = confFile.trim(); 
+            confFile = confFile.trim();
         }
-        
+
         Path p = sosShiroProperties.resolvePath(confFile);
         if (p != null) {
             if (!Files.exists(p)) {
@@ -263,9 +259,9 @@ public class Globals {
     public static void forceRollback(Object object) {
     }
 
-    public static void disconnect(SOSHibernateSession connection) {
-        if (connection != null) {
-            connection.disconnect();
+    public static void disconnect(SOSHibernateSession sosHibernateSession) {
+        if (sosHibernateSession != null) {
+            sosHibernateSession.close();
         }
     }
 }

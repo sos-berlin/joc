@@ -12,7 +12,6 @@ import com.sos.joc.classes.JobSchedulerCommandFactory;
 import com.sos.joc.classes.audit.JobSchedulerCommandAudit;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceCommand;
-import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.commands.JobschedulerCommands;
 
 @Path("jobscheduler")

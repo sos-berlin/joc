@@ -24,30 +24,30 @@ public class InventoryOrdersDBLayerTest {
 
     @Test
     public void getOrderschedulerOrders() throws Exception {
-        SOSHibernateSession connection = null;
-        connection = Globals.createSosHibernateStatelessConnection("getOrderschedulerOrders");
+        SOSHibernateSession sosHibernateSession = null;
+        sosHibernateSession = Globals.createSosHibernateStatelessConnection("getOrderschedulerOrders");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
+        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(sosHibernateSession);
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
-        InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
+        InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosHibernateSession);
         List<DBItemInventoryOrder> listOfOrders = dbLayer.getInventoryOrders(instance.getId());
         assertEquals("getOrderschedulerOrders", "dod_tools/active_ftp_accounts,set_ftp_passwords", listOfOrders.get(0).getName());
-        connection.disconnect();
+        sosHibernateSession.close();
     }
 
     @Test
     public void getOrderschedulerOrder() throws Exception {
-        SOSHibernateSession connection = null;
-        connection = Globals.createSosHibernateStatelessConnection("getOrderschedulerOrder");
+        SOSHibernateSession sosHibernateSession = null;
+        sosHibernateSession = Globals.createSosHibernateStatelessConnection("getOrderschedulerOrder");
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
+        InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(sosHibernateSession);
         DBItemInventoryInstance instance = instanceLayer.getInventoryInstanceBySchedulerId("scheduler_current", getAccessToken());
-        InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
+        InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(sosHibernateSession);
         DBItemInventoryOrder order = dbLayer.getInventoryOrderByOrderId("dod_tools/active_ftp_accounts", "set_ftp_passwords", instance.getId());
         assertEquals("getOrderschedulerOrder", "active_ftp_accounts,set_ftp_passwords", order.getBaseName());
-        connection.disconnect();
+        sosHibernateSession.close();
     }
 
     private String getAccessToken() {
@@ -56,15 +56,15 @@ public class InventoryOrdersDBLayerTest {
 
     @Test
     public void getAgentCluster() throws Exception {
-        SOSHibernateSession connection = null;
-        connection = Globals.createSosHibernateStatelessConnection("getAgentCluster");
+        SOSHibernateSession sosHibernateSession = null;
+        sosHibernateSession = Globals.createSosHibernateStatelessConnection("getAgentCluster");
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        InventoryAgentsDBLayer layer = new InventoryAgentsDBLayer(connection);
-        connection.beginTransaction();
+        InventoryAgentsDBLayer layer = new InventoryAgentsDBLayer(sosHibernateSession);
+        sosHibernateSession.beginTransaction();
         List<AgentClusterPermanent> result = layer.getInventoryAgentClusters(12L, null);
-        connection.disconnect();
+        sosHibernateSession.close();
         ObjectMapper mapper = new ObjectMapper();
         for (AgentClusterPermanent row : result) {
             System.out.println(row.getSurveyDate());
@@ -74,15 +74,15 @@ public class InventoryOrdersDBLayerTest {
 
     @Test
     public void isEndNode() throws Exception {
-        SOSHibernateSession connection = null;
-        connection = Globals.createSosHibernateStatelessConnection("isEndNode");
+        SOSHibernateSession sosHibernateSession = null;
+        sosHibernateSession = Globals.createSosHibernateStatelessConnection("isEndNode");
 
         SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
         sosServicePermissionShiro.loginPost("", LDAP_USER, LDAP_PASSWORD).getEntity();
-        InventoryJobChainsDBLayer layer = new InventoryJobChainsDBLayer(connection);
-        connection.beginTransaction();
+        InventoryJobChainsDBLayer layer = new InventoryJobChainsDBLayer(sosHibernateSession);
+        sosHibernateSession.beginTransaction();
         boolean result = layer.isEndNode("/reporting/Reporting", "success", 12L);
-        connection.disconnect();
+        sosHibernateSession.close();
         System.out.println(result);
     }
 }

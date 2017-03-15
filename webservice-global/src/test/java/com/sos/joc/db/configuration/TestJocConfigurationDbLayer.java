@@ -20,7 +20,7 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 public class TestJocConfigurationDbLayer {
     private static final String HIBERNATE_CONFIG_FILE = "C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_joc_cockpit/config/hibernate.cfg.xml";
     private SOSHibernateFactory sosHibernateFactory;
-    private SOSHibernateSession sosHibernateConnection;
+    private SOSHibernateSession sosHibernateSession;
     JocConfigurationDbLayer jocConfigurationDBLayer;
 
     @BeforeClass
@@ -38,9 +38,8 @@ public class TestJocConfigurationDbLayer {
         sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
         sosHibernateFactory.setAutoCommit(true);
         sosHibernateFactory.build();
-        sosHibernateConnection = new SOSHibernateStatelessSession(sosHibernateFactory);
-        sosHibernateConnection.connect();
-        jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateConnection);
+        sosHibernateSession = sosHibernateFactory.openStatelessSession();
+        jocConfigurationDBLayer = new JocConfigurationDbLayer(sosHibernateSession);
     }
 
     private void initFilter() {

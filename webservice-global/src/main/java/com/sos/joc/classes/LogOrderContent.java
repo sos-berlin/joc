@@ -2,7 +2,6 @@ package com.sos.joc.classes;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SOSHibernateFactory;
-import com.sos.hibernate.classes.SOSHibernateStatelessSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
@@ -21,22 +20,21 @@ public class LogOrderContent extends LogContent {
     public String getLog() throws Exception {
  
         SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
-        SOSHibernateSession connection = new SOSHibernateStatelessSession(sosHibernateFactory);
-        connection.connect();
+        SOSHibernateSession sosHibernateSession = sosHibernateFactory.openStatelessSession();
 
-        Globals.beginTransaction(connection);
+        Globals.beginTransaction(sosHibernateSession);
         try {
-            JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(connection);
+            JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateSession);
             String log = jobSchedulerOrderHistoryDBLayer.getLogAsString(orderHistoryFilter);
             if (log == null) {
                 log = getOrderLogFromXmlCommand();
             }
             return log;
         } catch (Exception e) {
-            connection.rollback();
+            sosHibernateSession.rollback();
             throw e;
         } finally {
-            Globals.disconnect(connection);
+            Globals.disconnect(sosHibernateSession);
         }
     }
 
