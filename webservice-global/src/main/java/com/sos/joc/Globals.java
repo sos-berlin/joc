@@ -148,10 +148,11 @@ public class Globals {
         try {
             if (session != null && session.getAttribute(sessionKey) != null) {
                 try {
-                    for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(sessionKey)) {
+                    List<JOCJsonCommand> commands = (List<JOCJsonCommand>) session.getAttribute(sessionKey);
+                    session.removeAttribute(sessionKey);
+                    for (JOCJsonCommand command : commands) {
                         command.forcedClosingHttpClient();
                     }
-                    session.removeAttribute(sessionKey);
                 } catch (Exception e) {
                 }
             }

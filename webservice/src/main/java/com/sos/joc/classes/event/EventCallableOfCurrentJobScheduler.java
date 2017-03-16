@@ -260,7 +260,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 if (eventSnapshots.isEmpty()) {
                     eventSnapshots.putAll(getEventSnapshotsMap(newEventId.toString())); 
                 } else {
-                    for (int i=0; i < 8; i++) {
+                    for (int i=0; i < 7; i++) {
                         if (!Globals.sendEventImmediately.get(jobSchedulerEvent.getJobschedulerId())) {
                             try { //collect further events after 2sec to minimize the number of responses 
                                 int delay = Math.min(250, new Long(getSessionTimeout()).intValue());
@@ -271,6 +271,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                     }
                     if (!Globals.sendEventImmediately.get(jobSchedulerEvent.getJobschedulerId())) {
                         eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
+                        try { //collect further events after 2sec to minimize the number of responses 
+                            int delay = Math.min(250, new Long(getSessionTimeout()).intValue());
+                            Thread.sleep(delay);
+                        } catch (InterruptedException e1) {
+                        }
                     }
                 }
                 break;
