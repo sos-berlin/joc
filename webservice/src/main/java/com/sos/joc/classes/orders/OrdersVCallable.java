@@ -26,7 +26,6 @@ import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderFilter;
-import com.sos.joc.model.order.OrderState;
 import com.sos.joc.model.order.OrderStateFilter;
 import com.sos.joc.model.order.OrderStateText;
 import com.sos.joc.model.order.OrderType;
@@ -241,13 +240,9 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
             }
             // necessary for nested job chains but only for outer job chain and
             // for folder filter
-            //TODO order.isOuterJobChain() or checkOrderPathIsInFolder
             if (checkOrderPathIsInFolder && !checkOrderPathIsInFolder(order.getPath())) {
                 continue;
             }
-//            if (order.isOuterJobChain()) {
-//                continue;
-//            }
             if (!FilterAfterResponse.matchRegex(regex, order.getPath())) {
                 LOGGER.debug("...processing skipped caused by 'regex=" + regex + "'");
                 continue;
@@ -262,7 +257,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
                 usedJobChains.addEntries(json.getJsonArray("usedJobChains"));
                 order.readJobChainObstacles(usedJobChains.get(order.getJobChain()));
             }
-            if (!order.processingStateIsSet() && order.getTaskId() == null) {
+            if (!order.processingStateIsSet() && order.getTaskId() != null) {
                 //it's very special situation of nested order while changing the job chain
                 order.setSeverity(OrderStateText.RUNNING);
             }
