@@ -50,12 +50,10 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         if (((compact == null || !compact) && jobChainV.getNumOfOrders() > 0) || jobChainV.hasJobChainNodes()) {
             OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken);
             Map<String, OrderVolatile> orders = ordersVCallable.call();
-            if (orders != null && orders.size() > 0) {
-                if (jobChainV.hasJobChainNodes()) {
-                    jobChainV.setOuterOrdersAndSummary(orders, maxOrders, compact);
-                } else {
-                    jobChainV.setOrders(orders, maxOrders);
-                }
+            if (jobChainV.hasJobChainNodes()) {
+                jobChainV.setOuterOrdersAndSummary(orders, maxOrders, compact);
+            } else if (orders != null && orders.size() > 0) {
+                jobChainV.setOrders(orders, maxOrders);
             }
         }
         if (!jobChainV.hasJobChainNodes()) {

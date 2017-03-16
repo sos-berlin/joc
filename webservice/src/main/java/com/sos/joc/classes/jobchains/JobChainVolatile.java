@@ -64,6 +64,7 @@ public class JobChainVolatile extends JobChainV {
         if (getPath() == null) {
             setPath(jobChain.getAttribute(WebserviceConstants.PATH));
             LOGGER.debug("...processing jobChain: " + getPath());
+            setInitialOrdersSummary();
         }
     }
 
@@ -138,13 +139,7 @@ public class JobChainVolatile extends JobChainV {
     public void setOuterOrdersAndSummary(Map<String, OrderVolatile> orders, Integer maxOrders, Boolean compact) {
         Map<String,List<OrderV>> nodeMap = new HashMap<String,List<OrderV>>();
         Map<String,Integer> nodeMapCounter = new HashMap<String,Integer>();
-        OrdersSummary summary = new OrdersSummary();
-        summary.setBlacklist(0);
-        summary.setPending(0);
-        summary.setRunning(0);
-        summary.setSetback(0);
-        summary.setSuspended(0);
-        summary.setWaitingForResource(0);
+        OrdersSummary summary = setInitialOrdersSummary();
         if (orders == null) {
             setNumOfOrders(0);
         } else {
@@ -210,6 +205,18 @@ public class JobChainVolatile extends JobChainV {
                 node.setNumOfOrders(num == null ? 0 : num);
             }
         }
+    }
+    
+    public OrdersSummary setInitialOrdersSummary() {
+        OrdersSummary summary = new OrdersSummary();
+        summary.setBlacklist(0);
+        summary.setPending(0);
+        summary.setRunning(0);
+        summary.setSetback(0);
+        summary.setSuspended(0);
+        summary.setWaitingForResource(0);
+        setOrdersSummary(summary);
+        return summary;       
     }
     
     public void getProcessingStateText(OrderV order) {
