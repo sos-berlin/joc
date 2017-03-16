@@ -36,6 +36,7 @@ import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
+import com.sos.joc.model.event.EventSnapshot;
 import com.sos.joc.model.event.JobSchedulerEvent;
 import com.sos.joc.model.event.JobSchedulerEvents;
 import com.sos.joc.model.event.JobSchedulerObjects;
@@ -50,7 +51,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
     private static final String SESSION_KEY = "EventsStarted";
     private String threadName = "";
     private String urlOfCurrentJs = null;
-
+    
     @Override
     public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) {
 
@@ -110,6 +111,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 JobSchedulerEvent jsEvent = new JobSchedulerEvent();
                 jsEvent.setEventId(jsObject.getEventId());
                 jsEvent.setJobschedulerId(jsObject.getJobschedulerId());
+                jsEvent.setEventSnapshots(new ArrayList<EventSnapshot>());
                 eventList.put(jsObject.getJobschedulerId(), jsEvent);
                 DBItemInventoryInstance instance = Globals.urlFromJobSchedulerId.get(jsObject.getJobschedulerId());
                 if (instance == null) {
@@ -132,7 +134,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                         LOGGER.warn("cannot determine nested job chains: " + e.getCause().getMessage());
                     }
                     Globals.sendEventImmediately.put(jsEvent.getJobschedulerId(), false);
-                    tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, shiroUser, nestedJobChains));
+                    tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId(), shiroUser, nestedJobChains));
                 } else {
                     tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId()));
                 }

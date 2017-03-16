@@ -220,7 +220,7 @@ public class OrderVolatile extends OrderV {
         setPriority(null);
     }
     
-    private void setSeverity(OrderStateText text) {
+    public void setSeverity(OrderStateText text) {
         setProcessingState(new OrderState());
         getProcessingState().set_text(text);
         switch (text) {

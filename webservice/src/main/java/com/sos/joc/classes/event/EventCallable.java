@@ -52,20 +52,11 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         this.instanceId = instanceId;
     }
 
-    public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session, Integer eventTimeout) {
-        this.accessToken = accessToken;
-        this.command = command;
-        this.jobSchedulerEvent = jobSchedulerEvent;
-        this.session = session;
-        this.eventTimeout = eventTimeout;
-        this.instanceId = null;
-    }
-
     @Override
     public JobSchedulerEvent call() throws JocException {
         try {
             startTime = Instant.now().getEpochSecond();
-            jobSchedulerEvent.setEventSnapshots(getEventSnapshots(jobSchedulerEvent.getEventId()));
+            jobSchedulerEvent.getEventSnapshots().addAll(getEventSnapshots(jobSchedulerEvent.getEventId()));
             Globals.jobSchedulerIsRunning.put(command.getSchemeAndAuthority(), true);
         } catch (ForcedClosingHttpClientException e) {
             LOGGER.debug("Connection force close: " + command.getSchemeAndAuthority());
@@ -151,7 +142,6 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             eventSnapshots.addAll(getEventSnapshots(newEventId.toString()));
             break;
         case "NonEmpty":
-            nonEmptyEvent(newEventId, json);
             eventSnapshots.addAll(nonEmptyEvent(newEventId, json));
             if (eventSnapshots.isEmpty()) {
                 eventSnapshots.addAll(getEventSnapshots(newEventId.toString())); 
@@ -176,7 +166,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             if (session == null) {
                 throw new SessionNotExistException("session is invalid");
             }
-            return session.getTimeout();
+            return session.getTimeout()-1000;
         } catch (SessionNotExistException e) {
             throw e;
         } catch (InvalidSessionException e) {
@@ -184,7 +174,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         }
     }
     
-    private boolean isOrderFinishedWithError(String jobChain, String node, Long instanceId) {
+    public boolean isOrderFinishedWithError(String jobChain, String node) {
         InventoryJobChainsDBLayer jobChainsLayer = null;
         try {
             if (jobChain != null && node != null && instanceId != null) {
@@ -239,6 +229,15 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             if (eventType.startsWith("Task")) {
                 continue;
             }
+            if (eventType.startsWith("Scheduler")) {
+                continue;
+            }
+            if (eventType.startsWith("JobChainNode")) {
+                continue;
+            }
+            if (eventType.startsWith("OrderNested")) {
+                continue;
+            }
 //            if (eventType.startsWith("Task")) {
 //                JsonObject eventKeyO = event.getJsonObject("key");
 //                String jobPath = eventKeyO.getString("jobPath", null);
@@ -262,58 +261,63 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                     } else if (eventType.startsWith("JobChainState")) {
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
                         eventSnapshot.setState(event.getString("state", null));
-                    } else if (eventType.startsWith("JobChainNode")) {
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
-                        eventSnapshot.setNodeId(event.getString("nodeId", null));
-                        String action = event.getString("action", null);
-                        if (action != null) {
-                            switch (action) {
-                            case "stop":
-                                eventSnapshot.setState("stopped");
-                                break;
-                            case "next_state":
-                                eventSnapshot.setState("skipped");
-                                break;
-                            case "process":
-                                eventSnapshot.setState("active");
-                                break;
-                            }
-                        }
+//                    } else if (eventType.startsWith("JobChainNode")) {
+//                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
+//                        eventSnapshot.setNodeId(event.getString("nodeId", null));
+//                        String action = event.getString("action", null);
+//                        if (action != null) {
+//                            switch (action) {
+//                            case "stop":
+//                                eventSnapshot.setState("stopped");
+//                                break;
+//                            case "next_state":
+//                                eventSnapshot.setState("skipped");
+//                                break;
+//                            case "process":
+//                                eventSnapshot.setState("active");
+//                                break;
+//                            }
+//                        }
                     } else if (eventType.startsWith("Order")) {
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
-                        if ("OrderNodeChanged".equals(eventType)) {
+                        switch (eventType) {
+                        case "OrderNodeChanged":
                             eventSnapshot.setNodeId(event.getString("nodeId", null));
                             eventSnapshot.setFromNodeId(event.getString("fromNodeId", null));
-                        } else if ("OrderStepStarted".equals(eventType)) {
+                            break;
+                        case "OrderStepStarted":
                             eventSnapshot.setNodeId(event.getString("nodeId", null));
                             eventSnapshot.setTaskId(event.getString("taskId", null));
-                        } else if ("OrderFinished".equals(eventType)) {
+                            break;
+                        case "OrderFinished":
                             String node = event.getString("nodeId", null);
                             eventSnapshot.setNodeId(node);
                             eventSnapshot.setState("successful");
                             String[] pathParts = eventSnapshot.getPath().split(",", 2);
                             String jobChain = pathParts[0];
-                            if (isOrderFinishedWithError(jobChain, node, instanceId)) {
+                            if (isOrderFinishedWithError(jobChain, node)) {
                                 eventSnapshot.setState("failed");
                             }
-                        } else if ("OrderStepEnded".equals(eventType)) {
+                        case "OrderStepEnded":
                             JsonObject nodeTrans = event.getJsonObject("nodeTransition");
                             if (nodeTrans != null) {
                                 NodeTransition nodeTransition = new NodeTransition();
                                 try {
                                     nodeTransition.setType(NodeTransitionType.fromValue(nodeTrans.getString("TYPE", "SUCCESS").toUpperCase()));
                                 } catch (IllegalArgumentException e) {
-                                    LOGGER.warn("unknown event transition type", e);
+                                    //LOGGER.warn("unknown event transition type", e);
                                     nodeTransition.setType(NodeTransitionType.SUCCESS);
                                 }
                                 nodeTransition.setReturnCode(nodeTrans.getInt("returnCode", 0));
                                 eventSnapshot.setNodeTransition(nodeTransition);
                             }
+                            break;
                         }
-                    } else if (eventType.startsWith("Scheduler")) {
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
-                        eventSnapshot.setState(event.getString("state", null));
-                        eventSnapshot.setPath(command.getSchemeAndAuthority());
+                        
+//                    } else if (eventType.startsWith("Scheduler")) {
+//                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+//                        eventSnapshot.setState(event.getString("state", null));
+//                        eventSnapshot.setPath(command.getSchemeAndAuthority());
                     }
 //                }
 //            }

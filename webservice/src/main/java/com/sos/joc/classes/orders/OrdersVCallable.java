@@ -26,7 +26,9 @@ import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderFilter;
+import com.sos.joc.model.order.OrderState;
 import com.sos.joc.model.order.OrderStateFilter;
+import com.sos.joc.model.order.OrderStateText;
 import com.sos.joc.model.order.OrderType;
 import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrdersFilter;
@@ -259,6 +261,10 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
             if (!order.processingStateIsSet()) {
                 usedJobChains.addEntries(json.getJsonArray("usedJobChains"));
                 order.readJobChainObstacles(usedJobChains.get(order.getJobChain()));
+            }
+            if (!order.processingStateIsSet() && order.getTaskId() == null) {
+                //it's very special situation of nested order while changing the job chain
+                order.setSeverity(OrderStateText.RUNNING);
             }
             if (checkSuspendedOrdersWithFilter(order.getProcessingFilterState(), processingStates)) {
                 listOrderQueue.put(order.getPath(), order);
