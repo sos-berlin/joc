@@ -189,7 +189,6 @@ public class JOCResourceImpl {
     }
 
     public void storeAuditLogEntry(IAuditLog body) {
-        //Globals.sendEventImmediately.put(jobschedulerId, true);
         try {
             jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession().setAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY,
                     true);

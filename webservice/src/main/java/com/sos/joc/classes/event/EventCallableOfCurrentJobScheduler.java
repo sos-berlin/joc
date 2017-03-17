@@ -19,6 +19,7 @@ import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventTypeValue;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
@@ -38,6 +39,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     private final Map<String, Set<String>> nestedJobChains;
     private final Long instanceId;
     private final Session session;
+    private SOSHibernateSession connection = null;
     
     public EventCallableOfCurrentJobScheduler(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
             Integer eventTimeout, Long instanceId, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
@@ -69,15 +71,43 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
         }
     }
     
-    private EventSnapshot createJobChainEvent(EventSnapshot orderEventSnapshot) {
+    private EventSnapshot createJobChainEventOfOrder(EventSnapshot orderEventSnapshot) {
         String[] pathParts = orderEventSnapshot.getPath().split(",", 2);
         String jobChain = pathParts[0];
         EventSnapshot jobChainEventSnapshot = new EventSnapshot();
-//        jobChainEventSnapshot.setEventId(orderEventSnapshot.getEventId());
         jobChainEventSnapshot.setEventType("JobChainStateChanged");
         jobChainEventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
         jobChainEventSnapshot.setPath(jobChain);
         return jobChainEventSnapshot;
+    }
+    
+    private Events createJobChainEventsOfJob(String job) {
+        InventoryJobChainsDBLayer jobChainsLayer = null;
+        List<String> jobChains = null;
+        Events events = new Events();
+        try {
+            if (job != null && instanceId != null) {
+                if (connection == null) {
+                    connection = Globals.createSosHibernateStatelessConnection("eventCallable"+jobSchedulerEvent.getJobschedulerId());
+                    Globals.beginTransaction(connection);
+                }
+                jobChainsLayer = new InventoryJobChainsDBLayer(connection);
+                if (jobChainsLayer!= null) {
+                    jobChains = jobChainsLayer.getJobChainsOfJob(job, instanceId);
+                }
+                if (jobChains != null) {
+                    for (String jobChain : jobChains) {
+                        EventSnapshot jobChainEventSnapshot = new EventSnapshot();
+                        jobChainEventSnapshot.setEventType("JobChainStateChanged");
+                        jobChainEventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
+                        jobChainEventSnapshot.setPath(jobChain);
+                        events.put(jobChainEventSnapshot);
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return events;
     }
 
     @Override
@@ -165,6 +195,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                     if (eventType.startsWith("JobState")) {
                         eventSnapshot.setEventType("JobStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
+                        eventSnapshots.putAll(createJobChainEventsOfJob(eventSnapshot.getPath()));
                         eventNotification.setObjectType(JobSchedulerObjectType.JOB);
                         eventNotification.setState(event.getString("state", null));
                     } else if (eventType.startsWith("JobChainNode")) {
@@ -179,7 +210,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                     } else if (eventType.startsWith("Order")) {
                         eventSnapshot.setEventType("OrderStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
-                        eventSnapshots.put(createJobChainEvent(eventSnapshot));
+                        eventSnapshots.put(createJobChainEventOfOrder(eventSnapshot));
                         //add event for outerJobChain if exist
                         String[] eventKeyParts = eventKey.split(",",2);
                         if (nestedJobChains != null && nestedJobChains.containsKey(eventKeyParts[0])) {
@@ -189,7 +220,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                                 eventSnapshot2.setObjectType(JobSchedulerObjectType.ORDER);
                                 eventSnapshot2.setPath(outerJobChain+","+eventKeyParts[1]);
                                 eventSnapshots.put(eventSnapshot2);
-                                eventSnapshots.put(createJobChainEvent(eventSnapshot2));
+                                eventSnapshots.put(createJobChainEventOfOrder(eventSnapshot2));
                             }
                         }
                         eventNotification.setObjectType(JobSchedulerObjectType.ORDER);
@@ -266,7 +297,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 if (eventSnapshots.isEmpty()) {
                     eventSnapshots.putAll(getEventSnapshotsMap(newEventId.toString())); 
                 } else {
-                    for (int i=0; i < 7; i++) {
+                    for (int i=0; i < 6; i++) {
                         if (!(Boolean) session.getAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY)) {
                             try { //collect further events after 2sec to minimize the number of responses 
                                 int delay = Math.min(250, new Long(getSessionTimeout()).intValue());
@@ -278,15 +309,15 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         }
                     }
                     eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
-                    if (!(Boolean) session.getAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY)) {
-                        try { //a small delay because events comes earlier then the JobScheduler has update its objects in some requests 
-                            int delay = Math.min(1000, new Long(getSessionTimeout()).intValue());
-                            if (delay > 0) {
-                                Thread.sleep(delay);
-                            }
-                        } catch (InterruptedException e1) {
-                        }
-                    } else {
+//                    if (!(Boolean) session.getAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY)) {
+//                        try { //a small delay because events comes earlier then the JobScheduler has update its objects in some requests 
+//                            int delay = Math.min(1000, new Long(getSessionTimeout()).intValue());
+//                            if (delay > 0) {
+//                                Thread.sleep(delay);
+//                            }
+//                        } catch (InterruptedException e1) {
+//                        }
+//                    } else {
                         try { //a small delay because events comes earlier then the JobScheduler has update its objects in some requests 
                             int delay = Math.min(500, new Long(getSessionTimeout()).intValue());
                             if (delay > 0) {
@@ -294,7 +325,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             }
                         } catch (InterruptedException e1) {
                         }
-                    }
+//                    }
                 }
                 break;
             case "Torn":

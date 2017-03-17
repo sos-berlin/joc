@@ -134,7 +134,6 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     } catch (JocException e) {
                         LOGGER.warn("cannot determine nested job chains: " + e.getCause().getMessage());
                     }
-                    //Globals.sendEventImmediately.put(jsEvent.getJobschedulerId(), false);
                     tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId(), shiroUser, nestedJobChains));
                 } else {
                     tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId()));

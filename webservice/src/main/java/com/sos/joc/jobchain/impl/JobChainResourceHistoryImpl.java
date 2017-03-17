@@ -86,6 +86,9 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
             state.setSeverity(getSeverityFromHistoryStateText(status));
             state.set_text(status);
             history.setState(state);
+            if (status == HistoryStateText.INCOMPLETE) {
+                history.setEndTime(null);
+            }
             orderHistoryItems.add(history);
             if (orderHistoryItems.size() >= jobChainHistoryFilter.getMaxLastHistoryItems()) {
                 break;
@@ -194,19 +197,21 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
         if (listOfReportTriggerDBItems.size() > 0) {
             dbItemReportTrigger = listOfReportTriggerDBItems.get(0);
         } else {
-            if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
-                return HistoryStateText.SUCCESSFUL;
-            } else {
-                return HistoryStateText.FAILED;
-            }
+            return HistoryStateText.INCOMPLETE;
+//            if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
+//                return HistoryStateText.SUCCESSFUL;
+//            } else {
+//                return HistoryStateText.FAILED;
+//            }
         }
 
         if (dbItemReportTrigger == null || (dbItemReportTrigger.getStartTime() != null && dbItemReportTrigger.getEndTime() == null)) {
-            if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
-                return HistoryStateText.SUCCESSFUL;
-            } else {
-                return HistoryStateText.FAILED;
-            }
+            return HistoryStateText.INCOMPLETE;
+//            if (!jobChainsLayer.isErrorNode(history.getJobChain(), history.getNode(), dbItemInventoryInstance.getId())) {
+//                return HistoryStateText.SUCCESSFUL;
+//            } else {
+//                return HistoryStateText.FAILED;
+//            }
         } else if (dbItemReportTrigger.getResultError()) {
             return HistoryStateText.FAILED;
         } else {
