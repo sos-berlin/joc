@@ -43,15 +43,25 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
 
             public int compare(OrderHistoryItem a, OrderHistoryItem b) {
                 if (b.getEndTime() != null && a.getEndTime() != null) {
-                    return b.getEndTime().compareTo(a.getEndTime());
+                    int comp = b.getEndTime().compareTo(a.getEndTime());
+                    if (comp == 0 && b.getStartTime() != null && a.getStartTime() != null) {
+                        comp = b.getStartTime().compareTo(a.getStartTime()); 
+                    }
+                    if (comp == 0) {
+                       comp = 1; 
+                    }
+                    return comp;
                 } else if (b.getEndTime() == null && a.getEndTime() != null) {
                     return 1;
                 } else if (b.getEndTime() != null && a.getEndTime() == null) {
                     return -1;
                 } else if (b.getStartTime() != null && a.getStartTime() != null) {
-                    return b.getStartTime().compareTo(a.getStartTime());
+                    int comp = b.getStartTime().compareTo(a.getStartTime());
+                    if (comp == 0) {
+                        comp = 1; 
+                    }
                 }
-                return 0; // this case should not happens
+                return 1; // this case should not happens
             }
         });
 

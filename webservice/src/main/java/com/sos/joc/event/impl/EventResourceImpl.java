@@ -75,6 +75,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 session = shiroUser.getCurrentSubject().getSession(false);
                 if (session != null) {
                     session.setAttribute(SESSION_KEY, threadName);
+                    session.setAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY, false);
                 }
             } catch (InvalidSessionException e1) {
                 throw new SessionNotExistException(e1);
@@ -133,7 +134,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     } catch (JocException e) {
                         LOGGER.warn("cannot determine nested job chains: " + e.getCause().getMessage());
                     }
-                    Globals.sendEventImmediately.put(jsEvent.getJobschedulerId(), false);
+                    //Globals.sendEventImmediately.put(jsEvent.getJobschedulerId(), false);
                     tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId(), shiroUser, nestedJobChains));
                 } else {
                     tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId()));

@@ -36,6 +36,8 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     private final JOCJsonCommand command;
     private final SOSShiroCurrentUser shiroUser;
     private final Map<String, Set<String>> nestedJobChains;
+    private final Long instanceId;
+    private final Session session;
     
     public EventCallableOfCurrentJobScheduler(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
             Integer eventTimeout, Long instanceId, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
@@ -45,6 +47,8 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
         this.jobSchedulerEvent = jobSchedulerEvent;
         this.shiroUser = shiroUser;
         this.nestedJobChains = nestedJobChains;
+        this.instanceId = instanceId;
+        this.session = session;
     }
 
     @Override
@@ -78,7 +82,9 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
 
     @Override
     protected List<EventSnapshot> getEventSnapshots(String eventId) throws JocException {
-        return getEventSnapshotsMap(eventId).values();
+        List<EventSnapshot> events = getEventSnapshotsMap(eventId).values();
+        session.setAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY, false);
+        return events;
     }
     
     private Events nonEmptyEvent(Long newEventId, JsonObject json) {
@@ -261,19 +267,31 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                     eventSnapshots.putAll(getEventSnapshotsMap(newEventId.toString())); 
                 } else {
                     for (int i=0; i < 7; i++) {
-                        if (!Globals.sendEventImmediately.get(jobSchedulerEvent.getJobschedulerId())) {
+                        if (!(Boolean) session.getAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY)) {
                             try { //collect further events after 2sec to minimize the number of responses 
                                 int delay = Math.min(250, new Long(getSessionTimeout()).intValue());
-                                Thread.sleep(delay);
+                                if (delay > 0) {
+                                    Thread.sleep(delay);
+                                }
                             } catch (InterruptedException e1) {
                             } 
                         }
                     }
-                    if (!Globals.sendEventImmediately.get(jobSchedulerEvent.getJobschedulerId())) {
-                        eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
-                        try { //collect further events after 2sec to minimize the number of responses 
-                            int delay = Math.min(250, new Long(getSessionTimeout()).intValue());
-                            Thread.sleep(delay);
+                    eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
+                    if (!(Boolean) session.getAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY)) {
+                        try { //a small delay because events comes earlier then the JobScheduler has update its objects in some requests 
+                            int delay = Math.min(1000, new Long(getSessionTimeout()).intValue());
+                            if (delay > 0) {
+                                Thread.sleep(delay);
+                            }
+                        } catch (InterruptedException e1) {
+                        }
+                    } else {
+                        try { //a small delay because events comes earlier then the JobScheduler has update its objects in some requests 
+                            int delay = Math.min(500, new Long(getSessionTimeout()).intValue());
+                            if (delay > 0) {
+                                Thread.sleep(delay);
+                            }
                         } catch (InterruptedException e1) {
                         }
                     }
@@ -288,7 +306,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             removeSavedInventoryInstance();
             try {
                 int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
-                LOGGER.info(command.getSchemeAndAuthority() + ": connection refused; retry after " + delay + "ms");
+                LOGGER.debug(command.getSchemeAndAuthority() + ": connection refused; retry after " + delay + "ms");
                 Thread.sleep(delay);
             } catch (InterruptedException e1) {
             }
@@ -306,10 +324,17 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 Globals.disconnect(connection);
             }
             if (inventoryInstance != null) {
-                Globals.urlFromJobSchedulerId.put(jobSchedulerEvent.getJobschedulerId(), inventoryInstance);
-                command.setUriBuilderForEvents(inventoryInstance.getUrl());
-                command.setBasicAuthorization(inventoryInstance.getAuth());
-                command.createHttpClient();
+                if (instanceId != inventoryInstance.getId()) {
+                    Globals.urlFromJobSchedulerId.put(jobSchedulerEvent.getJobschedulerId(), inventoryInstance);
+                    command.setUriBuilderForEvents(inventoryInstance.getUrl());
+                    command.setBasicAuthorization(inventoryInstance.getAuth());
+                    command.createHttpClient();
+                    EventSnapshot eventSnapshot = new EventSnapshot();
+                    eventSnapshot.setEventType("SchedulerStateChanged");
+                    eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+                    eventSnapshot.setPath(command.getSchemeAndAuthority());
+                    eventSnapshots.put(eventSnapshot);
+                }
                 eventSnapshots.putAll(getEventSnapshotsMap(eventId));   
             } else {
                 throw e;

@@ -148,7 +148,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             } else {
                 try { //collect further events after 2sec to minimize the number of responses 
                     int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
-                    Thread.sleep(delay);
+                    if (delay > 0) {
+                        Thread.sleep(delay);
+                    }
                 } catch (InterruptedException e1) {
                 }
                 eventSnapshots.addAll(getEventSnapshotsFromNextResponse(newEventId.toString()));
@@ -166,7 +168,11 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             if (session == null) {
                 throw new SessionNotExistException("session is invalid");
             }
-            return session.getTimeout()-1000;
+            long l = session.getTimeout()-1000;
+            if (l < 0) {
+                l = 0;
+            }
+            return l;
         } catch (SessionNotExistException e) {
             throw e;
         } catch (InvalidSessionException e) {

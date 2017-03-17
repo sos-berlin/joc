@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.apache.shiro.session.InvalidSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,7 +189,12 @@ public class JOCResourceImpl {
     }
 
     public void storeAuditLogEntry(IAuditLog body) {
-        Globals.sendEventImmediately.put(jobschedulerId, true);
+        //Globals.sendEventImmediately.put(jobschedulerId, true);
+        try {
+            jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession().setAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY,
+                    true);
+        } catch (Exception e) {
+        }
         jocAuditLog.storeAuditLogEntry(body);
     }
 

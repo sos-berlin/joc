@@ -1,5 +1,6 @@
 package com.sos.joc.db.inventory.instances;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.SessionException;
@@ -138,6 +139,28 @@ public class InventoryInstancesDBLayer extends DBLayer {
                 return result.get(0);
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public long getInventoryMods() throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            String sql = String.format("select modified from %s", DBITEM_INVENTORY_INSTANCES);
+            LOGGER.debug(sql);
+            Query query = getSession().createQuery(sql);
+            List<Date> result = query.list();
+            if (result != null && !result.isEmpty()) {
+                long mods = 0L;
+                for (Date mod : result) {
+                    mods += mod.getTime()/1000;
+                }
+                return mods;
+            }
+            return 0L;
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

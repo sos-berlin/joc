@@ -28,6 +28,7 @@ public class Globals {
     private static final String HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE = "hibernate_configuration_scheduler_default_file";
     private static final Logger LOGGER = LoggerFactory.getLogger(Globals.class);
     public static final String SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS = "event_http_clients";
+    public static final String SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY = "send_events_immediatly";
     public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
     public static SOSHibernateFactory sosHibernateFactory;
     public static Map<String, SOSHibernateFactory> sosSchedulerHibernateFactories;
@@ -148,11 +149,10 @@ public class Globals {
         try {
             if (session != null && session.getAttribute(sessionKey) != null) {
                 try {
-                    List<JOCJsonCommand> commands = (List<JOCJsonCommand>) session.getAttribute(sessionKey);
-                    session.removeAttribute(sessionKey);
-                    for (JOCJsonCommand command : commands) {
+                    for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(sessionKey)) {
                         command.forcedClosingHttpClient();
                     }
+                    //session.removeAttribute(sessionKey);
                 } catch (Exception e) {
                 }
             }
