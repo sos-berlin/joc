@@ -1,5 +1,6 @@
 package com.sos.joc.classes.event;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,10 +41,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     private final Long instanceId;
     private final Session session;
     private SOSHibernateSession connection = null;
+    private Set<String> removedObjects = new HashSet<String>();
     
     public EventCallableOfCurrentJobScheduler(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
-            Integer eventTimeout, Long instanceId, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
-        super(command, jobSchedulerEvent, accessToken, session, eventTimeout, instanceId);
+            Long instanceId, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
+        super(command, jobSchedulerEvent, accessToken, session, instanceId);
         this.accessToken = accessToken;
         this.command = command;
         this.jobSchedulerEvent = jobSchedulerEvent;
@@ -88,7 +90,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
         try {
             if (job != null && instanceId != null) {
                 if (connection == null) {
-                    connection = Globals.createSosHibernateStatelessConnection("eventCallable"+jobSchedulerEvent.getJobschedulerId());
+                    connection = Globals.createSosHibernateStatelessConnection("eventCallable-"+jobSchedulerEvent.getJobschedulerId());
                     Globals.beginTransaction(connection);
                 }
                 jobChainsLayer = new InventoryJobChainsDBLayer(connection);
@@ -106,15 +108,16 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 }
             }
         } catch (Exception e) {
+        } finally {
+            Globals.disconnect(connection);
+            connection = null;
         }
         return events;
     }
 
     @Override
     protected List<EventSnapshot> getEventSnapshots(String eventId) throws JocException {
-        List<EventSnapshot> events = getEventSnapshotsMap(eventId).values();
-        session.setAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY, false);
-        return events;
+        return getEventSnapshotsMap(eventId).values(removedObjects);
     }
     
     private Events nonEmptyEvent(Long newEventId, JsonObject json) {
@@ -153,10 +156,19 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         continue;
                     }
                     if (variables.containsKey("InventoryEventUpdateFinished")) {
-                        eventSnapshot.setEventType("FileBasedActivated");
                         String[] eventKeyParts = eventKey.split(":", 2);
                         eventSnapshot.setPath(eventKeyParts[1]);
                         eventSnapshot.setObjectType(JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")));
+                        String FileBasedEventType = variables.getString("InventoryEventUpdateFinished", "FileBasedUpdated");
+                        switch (FileBasedEventType) {
+                        case "FileBasedUpdated":
+                            eventSnapshot.setEventType("FileBasedActivated");
+                            break;
+                        case "FileBasedRemoved":
+                            eventSnapshot.setEventType(FileBasedEventType);
+                            removedObjects.add(eventSnapshot.getPath() + "." + eventSnapshot.getEventType());
+                            break;
+                        }
                         
                     } else if (variables.containsKey(CustomEventType.DailyPlanChanged.name())) {
                         eventSnapshot.setEventType(CustomEventType.DailyPlanChanged.name());
@@ -345,7 +357,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             DBItemInventoryInstance inventoryInstance = null;
             InventoryInstancesDBLayer instanceLayer = null;
             try {
-                connection = Globals.createSosHibernateStatelessConnection("eventCallable"+jobSchedulerEvent.getJobschedulerId());
+                connection = Globals.createSosHibernateStatelessConnection("eventCallable-"+jobSchedulerEvent.getJobschedulerId());
                 Globals.beginTransaction(connection);
                 instanceLayer = new InventoryInstancesDBLayer(connection);
                 inventoryInstance = instanceLayer.getInventoryInstanceBySchedulerId(jobSchedulerEvent.getJobschedulerId(), accessToken);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.sos.joc.model.event.EventSnapshot;
 
@@ -51,6 +52,21 @@ public class Events {
     public List<EventSnapshot> values() {
         List<EventSnapshot> eventSnapshots = this.notifications;
         eventSnapshots.addAll(0, events.values());
+        return eventSnapshots;
+    }
+    
+    public List<EventSnapshot> values(Set<String> removedObjects) {
+        List<EventSnapshot> eventSnapshots = this.notifications;
+        List<EventSnapshot> eventSnapshotsForUpdate = new ArrayList<EventSnapshot>();
+        for (String eventKey : events.keySet()) {
+            EventSnapshot e = events.get(eventKey);
+            if (!removedObjects.contains(eventKey)) {
+                eventSnapshotsForUpdate.add(e);  
+            } else if (e.getEventType().startsWith("FileBased")) {
+                eventSnapshotsForUpdate.add(e);
+            }
+        }
+        eventSnapshots.addAll(0, eventSnapshotsForUpdate);
         return eventSnapshots;
     }
 }

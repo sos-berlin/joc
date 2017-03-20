@@ -31,6 +31,9 @@ import com.sos.joc.classes.event.EventCallableOfCurrentJobScheduler;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.event.resource.IEventResource;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
@@ -47,10 +50,10 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventResourceImpl.class);
     private static final String API_CALL = "./events";
-    private static final Integer EVENT_TIMEOUT = 90;
     private static final String SESSION_KEY = "EventsStarted";
     private String threadName = "";
     private String urlOfCurrentJs = null;
+    public static final Integer EVENT_TIMEOUT = 90;
     
     @Override
     public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) {
@@ -104,39 +107,26 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 
             Globals.beginTransaction(connection);
             
+//            Long mods = getInstancesHash(instanceLayer);
+            
             Boolean isCurrentJobScheduler = true;
             for (JobSchedulerObjects jsObject : eventBody.getJobscheduler()) {
-                if (jsObject.getEventId() == null || jsObject.getEventId().isEmpty()) {
-                    jsObject.setEventId(defaultEventId.toString());
-                }
-                JobSchedulerEvent jsEvent = new JobSchedulerEvent();
-                jsEvent.setEventId(jsObject.getEventId());
-                jsEvent.setJobschedulerId(jsObject.getJobschedulerId());
-                jsEvent.setEventSnapshots(new ArrayList<EventSnapshot>());
+                JobSchedulerEvent jsEvent = initEvent(jsObject, defaultEventId);
                 eventList.put(jsObject.getJobschedulerId(), jsEvent);
-                DBItemInventoryInstance instance = Globals.urlFromJobSchedulerId.get(jsObject.getJobschedulerId());
-                if (instance == null) {
-                    instance = instanceLayer.getInventoryInstanceBySchedulerId(jsObject.getJobschedulerId(), accessToken);
-                    Globals.urlFromJobSchedulerId.put(jsObject.getJobschedulerId(), instance);
-                }
-                JOCJsonCommand command = new JOCJsonCommand();
-                command.setUriBuilderForEvents(instance.getUrl());
-                command.setBasicAuthorization(instance.getAuth());
-                command.setSocketTimeout((EVENT_TIMEOUT + 5) * 1000);
-                command.createHttpClient();
-                command.setAutoCloseHttpClient(false);
-                command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
+                DBItemInventoryInstance instance = getJobSchedulerInstance(jsObject, instanceLayer, accessToken);
+                JOCJsonCommand command = initJocJsonCommand(jsObject, instance);
                 jocJsonCommands.add(command);
                 if (isCurrentJobScheduler) {
-                    Map<String, Set<String>> nestedJobChains = null;
-                    try {
-                        nestedJobChains = jobChainLayer.getMapOfOuterJobChains(instance.getId());
-                    } catch (JocException e) {
-                        LOGGER.warn("cannot determine nested job chains: " + e.getCause().getMessage());
-                    }
-                    tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId(), shiroUser, nestedJobChains));
+                    tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, instance.getId(), shiroUser, getNestedJobChains(jobChainLayer, instance)));
+//                    if (mods != null) {
+//                        JobSchedulerEvent jsEvent2 = new JobSchedulerEvent();
+//                        jsEvent2.setEventId(jsEvent.getEventId());
+//                        jsEvent2.setJobschedulerId(jsEvent.getJobschedulerId());
+//                        jsEvent2.setEventSnapshots(new ArrayList<EventSnapshot>());
+//                        tasks.add(new EventCallableJobSchedulerStateChanged(jsEvent2, session, mods));
+//                    }
                 } else {
-                    tasks.add(new EventCallable(command, jsEvent, accessToken, session, EVENT_TIMEOUT, instance.getId()));
+                    tasks.add(new EventCallable(command, jsEvent, accessToken, session, instance.getId()));
                 }
                 isCurrentJobScheduler = false;
                 if (urlOfCurrentJs == null) {
@@ -215,4 +205,57 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         }
         return concurrentEventsCallIsStarted;
     }
+    
+    private JobSchedulerEvent initEvent(JobSchedulerObjects jsObject, Long defaultEventId) {
+        if (jsObject.getEventId() == null || jsObject.getEventId().isEmpty()) {
+            jsObject.setEventId(defaultEventId.toString());
+        }
+        JobSchedulerEvent jsEvent = new JobSchedulerEvent();
+        jsEvent.setEventId(jsObject.getEventId());
+        jsEvent.setJobschedulerId(jsObject.getJobschedulerId());
+        jsEvent.setEventSnapshots(new ArrayList<EventSnapshot>());
+        return jsEvent;
+    }
+    
+    private JOCJsonCommand initJocJsonCommand(JobSchedulerObjects jsObject, DBItemInventoryInstance instance) {
+        JOCJsonCommand command = new JOCJsonCommand();
+        command.setUriBuilderForEvents(instance.getUrl());
+        command.setBasicAuthorization(instance.getAuth());
+        command.setSocketTimeout((EVENT_TIMEOUT + 5) * 1000);
+        command.createHttpClient();
+        command.setAutoCloseHttpClient(false);
+        command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
+        return command;
+    }
+    
+//    private Long getInstancesHash(InventoryInstancesDBLayer instanceLayer) {
+//        Long mods = null;
+//        try {
+//            mods = instanceLayer.getInventoryMods();
+//        } catch (Exception e) {
+//            LOGGER.warn("",e);
+//        }
+//        return mods;
+//    }
+    
+    private Map<String, Set<String>> getNestedJobChains(InventoryJobChainsDBLayer jobChainLayer, DBItemInventoryInstance instance) {
+        Map<String, Set<String>> nestedJobChains = null;
+        try {
+            nestedJobChains = jobChainLayer.getMapOfOuterJobChains(instance.getId());
+        } catch (JocException e) {
+            LOGGER.warn("cannot determine nested job chains: " + e.getCause().getMessage());
+        }
+        return nestedJobChains;
+    }
+    
+    private DBItemInventoryInstance getJobSchedulerInstance(JobSchedulerObjects jsObject, InventoryInstancesDBLayer instanceLayer, String accessToken)
+            throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
+        DBItemInventoryInstance instance = Globals.urlFromJobSchedulerId.get(jsObject.getJobschedulerId());
+        if (instance == null) {
+            instance = instanceLayer.getInventoryInstanceBySchedulerId(jsObject.getJobschedulerId(), accessToken);
+            Globals.urlFromJobSchedulerId.put(jsObject.getJobschedulerId(), instance);
+        }
+        return instance;
+    }
+    
 }

@@ -18,6 +18,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
+import com.sos.joc.event.impl.EventResourceImpl;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
@@ -37,25 +38,34 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     private final JobSchedulerEvent jobSchedulerEvent;
     private final JOCJsonCommand command;
     private final Session session;
-    private final Integer eventTimeout;
     private final Long instanceId;
     private Long startTime = 0L;
     private SOSHibernateSession connection = null;
 
-    public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session, Integer eventTimeout,
-            Long instanceId) {
+    public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session, Long instanceId) {
         this.accessToken = accessToken;
         this.command = command;
         this.jobSchedulerEvent = jobSchedulerEvent;
         this.session = session;
-        this.eventTimeout = eventTimeout;
         this.instanceId = instanceId;
+    }
+    
+    public EventCallable(JobSchedulerEvent jobSchedulerEvent, Session session) {
+        this.accessToken = null;
+        this.command = null;
+        this.jobSchedulerEvent = jobSchedulerEvent;
+        this.session = session;
+        this.instanceId = null;
+    }
+    
+    public void setStartTime() {
+        startTime = Instant.now().getEpochSecond(); 
     }
 
     @Override
     public JobSchedulerEvent call() throws JocException {
         try {
-            startTime = Instant.now().getEpochSecond();
+            setStartTime();
             jobSchedulerEvent.getEventSnapshots().addAll(getEventSnapshots(jobSchedulerEvent.getEventId()));
             Globals.jobSchedulerIsRunning.put(command.getSchemeAndAuthority(), true);
         } catch (ForcedClosingHttpClientException e) {
@@ -113,7 +123,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     }
 
     protected JsonObject getJsonObject(String eventId) throws JocException {
-        return getJsonObject(eventId, eventTimeout);
+        return getJsonObject(eventId, EventResourceImpl.EVENT_TIMEOUT);
     }
     
     protected JsonObject getJsonObject(String eventId, Integer evtTimeout) throws JocException {
@@ -127,7 +137,8 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     protected void checkTimeout() throws ForcedClosingHttpClientException {
         Long curTime = Instant.now().getEpochSecond();
         if (curTime - startTime > 6 * 60) {  // general timeout 6min
-            throw new ForcedClosingHttpClientException(command.getSchemeAndAuthority());
+            String msg = command != null ? command.getSchemeAndAuthority() : jobSchedulerEvent.getJobschedulerId();
+            throw new ForcedClosingHttpClientException(msg);
         }
     }
 
@@ -185,7 +196,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
         try {
             if (jobChain != null && node != null && instanceId != null) {
                 if (connection == null) {
-                    connection = Globals.createSosHibernateStatelessConnection("eventCallable"+jobSchedulerEvent.getJobschedulerId());
+                    connection = Globals.createSosHibernateStatelessConnection("eventCallable-"+jobSchedulerEvent.getJobschedulerId());
                     Globals.beginTransaction(connection);
                 }
                 jobChainsLayer = new InventoryJobChainsDBLayer(connection);
@@ -196,6 +207,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             return false;
         } catch (Exception e) {
             return false;
+        } finally {
+            Globals.disconnect(connection);
+            connection = null;
         }
     }
     
