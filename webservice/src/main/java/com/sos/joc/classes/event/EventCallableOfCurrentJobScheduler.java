@@ -134,9 +134,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             Long eId = event.getJsonNumber("eventId").longValue();
             eventNotification.setEventId(eId.toString());
             
-            if (eventType.startsWith("File")) {
-                continue;
-            }
+            
             if (eventType.startsWith("Task")) {
                 eventNotification = null;
                 eventSnapshot.setEventType("JobStateChanged");
@@ -149,7 +147,16 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
             } else {
                 String eventKey = event.getString("key", null);
-                if (eventType.equals("VariablesCustomEvent")) {
+                if (eventKey == null) {
+                    continue;
+                }
+                if (eventType.startsWith("File")) {
+                    if ("FileBasedRemoved".equals(eventType)) {
+                        String[] eventKeyParts = eventKey.split(":", 2);
+                        removedObjects.add(eventKeyParts[1] + "." + JobSchedulerObjectType.fromValue(eventKeyParts[0].toUpperCase().replaceAll("_", "")).name());
+                    }
+                    continue;
+                } else if (eventType.equals("VariablesCustomEvent")) {
                     eventNotification = null;
                     JsonObject variables = event.getJsonObject("variables");
                     if (variables == null) {
@@ -166,7 +173,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             break;
                         case "FileBasedRemoved":
                             eventSnapshot.setEventType(FileBasedEventType);
-                            removedObjects.add(eventSnapshot.getPath() + "." + eventSnapshot.getEventType());
+                            removedObjects.add(eventSnapshot.getPath() + "." + eventSnapshot.getObjectType().name());
                             break;
                         }
                         
@@ -209,7 +216,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
                         eventSnapshots.putAll(createJobChainEventsOfJob(eventSnapshot.getPath()));
                         eventNotification.setObjectType(JobSchedulerObjectType.JOB);
-                        eventNotification.setState(event.getString("state", null));
+                        String jobState = event.getString("state", null);
+                        eventNotification.setState(jobState);
+                        if ("closed,initialized,loaded".contains(jobState)) {
+                            continue; 
+                        }
                     } else if (eventType.startsWith("JobChainNode")) {
                         eventNotification = null;
                         eventSnapshot.setEventType("JobChainStateChanged");
@@ -218,7 +229,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setEventType("JobChainStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
                         eventNotification.setObjectType(JobSchedulerObjectType.JOBCHAIN);
-                        eventNotification.setState(event.getString("state", null));
+                        String jobChainState = event.getString("state", null);
+                        eventNotification.setState(jobChainState);
+                        if ("closed,initialized,loaded".contains(jobChainState)) {
+                            continue; 
+                        }
                     } else if (eventType.startsWith("Order")) {
                         eventSnapshot.setEventType("OrderStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
@@ -282,7 +297,9 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             if (eventNotification != null) {
                 eventSnapshots.add(eventNotification);
             }
-            eventSnapshots.put(eventSnapshot);
+            if (eventSnapshot != null) {
+                eventSnapshots.put(eventSnapshot);
+            }
         }
         try {
             json.clear();

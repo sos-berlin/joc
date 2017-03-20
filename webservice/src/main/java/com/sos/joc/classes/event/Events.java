@@ -38,7 +38,7 @@ public class Events {
     }
     
     public void put(EventSnapshot event) {
-        this.events.put(event.getPath() + "." + event.getEventType(), event);
+        this.events.put(event.getPath() + "." + event.getObjectType().name(), event);
     }
     
     public void add(EventSnapshot event) {
@@ -50,23 +50,29 @@ public class Events {
     }
     
     public List<EventSnapshot> values() {
-        List<EventSnapshot> eventSnapshots = this.notifications;
-        eventSnapshots.addAll(0, events.values());
+        List<EventSnapshot> eventSnapshots = new ArrayList<EventSnapshot>();
+        eventSnapshots.addAll(this.notifications);
+        eventSnapshots.addAll(events.values());
         return eventSnapshots;
     }
     
     public List<EventSnapshot> values(Set<String> removedObjects) {
-        List<EventSnapshot> eventSnapshots = this.notifications;
-        List<EventSnapshot> eventSnapshotsForUpdate = new ArrayList<EventSnapshot>();
+        List<EventSnapshot> eventSnapshots = new ArrayList<EventSnapshot>();
         for (String eventKey : events.keySet()) {
             EventSnapshot e = events.get(eventKey);
             if (!removedObjects.contains(eventKey)) {
-                eventSnapshotsForUpdate.add(e);  
+                eventSnapshots.add(e);  
             } else if (e.getEventType().startsWith("FileBased")) {
-                eventSnapshotsForUpdate.add(e);
+                eventSnapshots.add(e);
             }
         }
-        eventSnapshots.addAll(0, eventSnapshotsForUpdate);
+        for (EventSnapshot e : notifications) {
+            if (!removedObjects.contains(e.getPath()+"."+e.getObjectType().name())) {
+                eventSnapshots.add(e);  
+            } else if (e.getEventType().startsWith("FileBased")) {
+                eventSnapshots.add(e);
+            }
+        }
         return eventSnapshots;
     }
 }
