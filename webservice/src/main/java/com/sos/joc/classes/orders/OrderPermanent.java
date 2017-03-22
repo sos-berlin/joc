@@ -40,14 +40,16 @@ public class OrderPermanent {
                 } else {
                     order.setEstimatedDuration(0);
                 }
-                if (compact == null || !compact) {
+                if (compact != null && compact) {
+                    order.setTitle(inventoryOrder.getTitle());
+                } else {
                     Date configDate = dbLayer.getOrderConfigurationDate(inventoryOrder.getId());
                     if (configDate != null) {
                         order.setConfigurationDate(new Date());
                     }
+                    order.setTitle(inventoryOrder.getTitle());
                     order.setEndState(inventoryOrder.getEndState());
                     order.setInitialState(inventoryOrder.getInitialState());
-                    order.setTitle(inventoryOrder.getTitle());
                     order.set_type(OrderType.PERMANENT);
                     order.setPriority(inventoryOrder.getPriority());
                 }
