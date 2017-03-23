@@ -92,7 +92,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "addOrderOrCheckFoldersOrKillTask"
 })
-@XmlRootElement(name = "jobscheduler_commands", namespace = "http://www.sos-berlin.com/scheduler")
+@XmlRootElement(name = "jobscheduler_commands")
 public class JobschedulerCommands {
 
     @XmlElementRefs({
