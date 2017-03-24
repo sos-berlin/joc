@@ -157,6 +157,9 @@
 							<includes>
 								<include>**/*.json</include>
 							</includes>
+                            <excludes>
+								<exclude>user/*.json</exclude>
+							</excludes>
 						</configuration>
 						<executions>
 							<execution>
