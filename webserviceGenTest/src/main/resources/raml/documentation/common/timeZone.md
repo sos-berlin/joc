@@ -1,0 +1,1 @@
+<tr><td>``timeZone``</td><td>optional, string</td><td><ul><li>If this parameter is set then it beats the time offset in ``dateFrom`` and ``dateTo``</li><li>See here the list for <a href="https://en.wikipedia.org/wiki/List_of_tz_database_timeZones">available time zones</a>.</li></ul></td><td>Berlin/Europe</td><td></td></tr>

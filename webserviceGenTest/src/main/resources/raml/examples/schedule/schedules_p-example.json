@@ -1,0 +1,56 @@
+{
+    "schedules":  [
+                      {
+                          "path":  "/examples/20_SchedulingJobChains/MonthlySchedule",
+                          "title":  "Run at Ultimo",
+                          "configurationDate":  "2016-09-14T00:44:12Z",
+                          "name":  "MonthlySchedule",
+                          "usedByOrders":  [
+                                               {
+                                                   "jobChain":  "/examples/20_SchedulingJobChains/01_JobChainMonthly",
+                                                   "orderId":  "MonthlyOrder"
+                                               }
+                                           ],
+                          "surveyDate":  "2016-09-14T00:44:12Z"
+                      },
+                      {
+                          "path":  "/examples/10_RemoteExecutionUniversalAgent/schedule1",
+                          "configurationDate":  "2016-09-14T00:44:13Z",
+                          "name":  "schedule1",
+                          "usedByOrders":  [
+                                               {
+                                                   "jobChain":  "/examples/10_RemoteExecutionUniversalAgent/01_JobChainA",
+                                                   "orderId":  "first_monday_of_month"
+                                               }
+                                           ],
+                          "surveyDate":  "2016-09-14T00:44:13Z"
+                      },
+                      {
+                          "path":  "/examples/20_SchedulingJobChains/DailySchedule",
+                          "title":  "daily at fixed  starttime",
+                          "configurationDate":  "2016-09-14T00:44:13Z",
+                          "name":  "DailySchedule",
+                          "usedByOrders":  [
+                                               {
+                                                   "jobChain":  "/examples/20_SchedulingJobChains/01_JobChainDaily",
+                                                   "orderId":  "DailyOrder"
+                                               }
+                                           ],
+                          "surveyDate":  "2016-09-14T00:44:13Z"
+                      },
+                      {
+                          "path":  "/examples/20_SchedulingJobChains/WeeklySchedule",
+                          "title":  "every friday",
+                          "configurationDate":  "2016-09-14T00:44:13Z",
+                          "name":  "WeeklySchedule",
+                          "usedByOrders":  [
+                                               {
+                                                   "jobChain":  "/examples/20_SchedulingJobChains/01_JobChainWeekly",
+                                                   "orderId":  "WeeklyOrder"
+                                               }
+                                           ],
+                          "surveyDate":  "2016-09-14T00:44:13Z"
+                      }
+                  ],
+    "deliveryDate":  "2016-09-14T00:44:12Z"
+}

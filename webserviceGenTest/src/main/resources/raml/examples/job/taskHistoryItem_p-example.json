@@ -1,0 +1,15 @@
+{
+    "deliveryDate":  "2016-09-14T00:46:00Z",
+    "task":  {
+                 "taskId":  3875120,
+                 "job":  "examples/55_JobSchedulerLaunchQueue/01_JobSchedulerLaunchQueue/launch_job_chain",
+                 "startTime":  "2016-08-23 11:18:35",
+                 "endTime":  "2016-08-23 11:18:42Z",
+                 "steps":  1,
+                 "exitCode":  0,
+                 "state":  {
+                               "_text":  "successful",
+                               "severity":  0
+                           }
+             }
+}

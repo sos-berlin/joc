@@ -1,0 +1,20 @@
+{
+  "title": "schedule state",
+  "id": "schemas/plan/scheduleState",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.schedule.ScheduleState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "0=active; 1=inactive",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "scheduleStateText-schema.json"
+    }
+  }
+}

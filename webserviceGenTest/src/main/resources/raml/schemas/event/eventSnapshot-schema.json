@@ -1,0 +1,69 @@
+{
+  "title": "event snapshot",
+  "id": "schemas/event/eventSnapshot",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.EventSnapshot",
+  "type": "object",
+  "required": [
+    "eventId",
+    "path",
+    "eventType",
+    "objectType"
+  ],
+  "properties": {
+    "eventId": {
+      "description": "unique id of an event, monoton increasing, id/1000=milliseconds of UTC time",
+      "type": "string"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "eventType": {
+      "description": "FileBasedAdded, FileBasedRemoved, FileBasedReplaced, FileBasedActivated, OrderStarted, OrderStepStarted, OrderStepEnded, OrderNodeChanged, OrderFinished, OrderSetback, OrderSuspended, OrderResumed",
+      "type": "string"
+    },
+    "objectType": {
+      "$ref": "../common/type-schema.json"
+    },
+    "nodeId": {
+      "description": "comes with events OrderNodeChanged, OrderStepStarted, OrderFinished",
+      "type": "string"
+    },
+    "fromNodeId": {
+      "description": "comes with event OrderNodeChanged",
+      "type": "string"
+    },
+    "taskId": {
+      "description": "comes with event OrderStepStarted",
+      "type": "string"
+    },
+    "state": {
+      "description": "comes with event ...State",
+      "type": "string"
+    },
+    "nodeTransition": {
+      "description": "comes with event OrderStepEnded",
+      "javaType": "com.sos.joc.model.event.NodeTransition",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "javaType": "com.sos.joc.model.event.NodeTransitionType",
+          "type": "string",
+          "enum": [
+            "SUCCESS",
+            "KEEP",
+            "PROCEEDING",
+            "ERROR"
+          ]
+        },
+        "returnCode": {
+          "description": "if type=ERROR",
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

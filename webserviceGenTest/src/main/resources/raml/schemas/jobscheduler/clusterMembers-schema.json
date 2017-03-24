@@ -1,0 +1,33 @@
+{
+  "title": "JobScheduler cluster members",
+  "id": "schemas/jobscheduler/clusterMembers",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "javaType": "com.sos.joc.model.jobscheduler.ClusterMembers",
+  "required": [
+    "jobschedulerId",
+    "_type",
+    "members"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "description": "JobScheduler id of all cluster member",
+      "type": "string"
+    },
+    "_type": {
+      "description": "Possible values are: 'standalone','active','passive'; JobScheduler doesn't run in a cluster (standalone) or is member of an active (distributed orders) or passive cluster (backup)",
+      "type": "string",
+      "enum": [
+        "standalone",
+        "active",
+        "passive"
+      ]
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "$ref": "clusterMember-schema.json"
+      }
+    }
+  }
+}

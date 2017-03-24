@@ -1,0 +1,20 @@
+{
+  "title": "jobChainNode state",
+  "id": "schemas/jobChain/jobChainNodeState",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainNodeState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "5=skipped, 4=active, 2=stopped",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "jobChainNodeStateText-schema.json"
+    }
+  }
+}

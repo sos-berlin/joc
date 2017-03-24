@@ -1,0 +1,13 @@
+{
+  "title": "agent cluster type",
+  "id": "schemas/jobscheduler/agentClusterType",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentClusterType",
+  "type": "string",
+  "description": "the type of agent cluster",
+  "enum": [
+    "SINGLE_AGENT",
+    "FIX_PRIORITY",
+    "ROUND_ROBIN"
+  ]
+}

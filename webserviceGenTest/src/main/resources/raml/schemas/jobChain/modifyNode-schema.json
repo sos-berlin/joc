@@ -1,0 +1,39 @@
+{
+  "title": "modify job chain node",
+  "id": "schemas/jobChain/modifyNode",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "the command is part of the web servive url",
+  "javaType": "com.sos.joc.model.jobChain.ModifyJobChainNodes",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "nodes"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.jobChain.ModifyJobChainNode",
+        "type" : "object",
+        "required": [
+          "jobChain",
+          "node"
+        ],
+        "properties": {
+          "jobChain": {
+            "$ref": "../common/path-schema.json"
+          },
+          "node": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

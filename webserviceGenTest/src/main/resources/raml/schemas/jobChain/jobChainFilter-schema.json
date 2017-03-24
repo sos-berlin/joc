@@ -1,0 +1,26 @@
+{
+  "title": "jobChainFilter",
+  "id": "schemas/jobChain/jobChainFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "jobChain"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "maxOrders": {
+      "description": "limits number of orders for each node if compact=false",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

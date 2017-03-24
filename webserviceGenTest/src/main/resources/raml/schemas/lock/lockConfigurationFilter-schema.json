@@ -1,0 +1,22 @@
+{
+  "title": "lockConfigurationFilter",
+  "id": "schemas/job/lockConfigurationFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.lock.LockConfigurationFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "lock"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "lock": {
+      "$ref": "../common/path-schema.json"
+    },
+    "mime": {
+      "$ref": "../common/configurationMimeFilter-schema.json"
+    }
+  }
+}

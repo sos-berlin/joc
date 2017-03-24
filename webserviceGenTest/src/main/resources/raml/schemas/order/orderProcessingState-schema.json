@@ -1,0 +1,20 @@
+{
+  "title": "jobChain state",
+  "id": "schemas/jobChain/jobChainState",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "0=running, 4=active, 3=initialized, 2=under_construction/stopped/not_initialized",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "../order/orderProcessingStateText-schema.json"
+    }
+  }
+}

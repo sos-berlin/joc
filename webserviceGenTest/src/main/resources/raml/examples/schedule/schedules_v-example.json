@@ -1,0 +1,37 @@
+{
+    "schedules":  [
+                      {
+                          "path":  "/examples/20_SchedulingJobChains/MonthlySchedule",
+                          "state":  {
+                                        "_text":  "ACTIVE",
+                                        "severity":  0
+                                    },
+                          "name":  "MonthlySchedule"
+                      },
+                      {
+                          "path":  "/examples/10_RemoteExecutionUniversalAgent/schedule1",
+                          "state":  {
+                                        "_text":  "ACTIVE",
+                                        "severity":  0
+                                    },
+                          "name":  "schedule1"
+                      },
+                      {
+                          "path":  "/examples/20_SchedulingJobChains/DailySchedule",
+                          "state":  {
+                                        "_text":  "ACTIVE",
+                                        "severity":  0
+                                    },
+                          "name":  "DailySchedule"
+                      },
+                      {
+                          "path":  "/examples/20_SchedulingJobChains/WeeklySchedule",
+                          "state":  {
+                                        "_text":  "ACTIVE",
+                                        "severity":  0
+                                    },
+                          "name":  "WeeklySchedule"
+                      }
+                  ],
+    "deliveryDate":  "2016-09-14T00:44:13Z"
+}

@@ -1,0 +1,26 @@
+{
+  "title": "order conf filter",
+  "id": "schemas/order/orderConfigurationFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderConfigurationFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "jobChain",
+    "orderId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "mime": {
+      "$ref": "../common/configurationMimeFilter-schema.json"
+    }
+  }
+}

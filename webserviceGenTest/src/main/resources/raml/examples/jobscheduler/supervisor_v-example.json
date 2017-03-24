@@ -1,0 +1,19 @@
+{
+  "deliveryDate": "2016-05-05T21:13:45Z",
+  "jobscheduler": {
+    "surveyDate": "2016-05-05T21:13:45Z",
+    "jobschedulerId": "supervisor",
+    "version" : "1.11.0",
+    "host": "super.sos",
+    "port": 4444,
+    "timeZone": "Europe/Berlin",
+    "clusterType": {
+      "type": "standalone"
+    },
+    "state": {
+      "severity": 0,
+      "_text": "running"
+    },
+    "startedAt": "2016-05-03T14:48:01Z"
+  }
+}

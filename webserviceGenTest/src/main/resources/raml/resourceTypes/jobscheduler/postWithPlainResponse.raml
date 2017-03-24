@@ -1,0 +1,75 @@
+type: error
+get:
+  is: [accessToken, jobschedulerMaster]
+  queryParameters:
+    host:
+      required: false
+      type: string
+      description: |
+        host of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b>
+      example: localhost
+    port:
+      required: false
+      type: integer
+      description: |
+        port of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b>
+      example: 4444
+  description: |
+    <h2><<description>></h2>
+  responses:
+    200:
+      description: Content of main log for download
+      headers:
+        Content-Disposition:
+          type: string
+          required: true
+          example: attachment;filename=main.log
+        Content-Type:
+          type: string
+          required: true
+          default: text/plain
+      body:
+        application/octet-stream:
+        text/plain:
+post:
+  description: |
+    <h2><<description>></h2>
+    ___
+    <h4>Parameters in the POST body schema</h4>
+    <table class="params" style="table-layout:auto;">
+    <colgroup>
+      <col width="10%"/>
+      <col width="10%"/>
+      <col width="*"/>
+      <col width="20%"/>
+      <col width="10%"/>
+    </colgroup>
+    <thead>
+    <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
+    </thead><tbody>
+    <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
+    <tr><td>``host``</td><td>optional, string</td><td>host of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>localhost</td><td></td></tr>
+    <tr><td>``port``</td><td>optional, string</td><td>port of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>4444</td><td></td></tr>
+    </tbody></table>
+  body:
+    application/json:
+      schema: jsFilterWithUrl
+      example: |
+        {
+          "jobschedulerId": "scheduler"
+        }
+  responses:
+    200:
+      description: Content of main log for download
+      headers:
+        Content-Disposition:
+          type: string
+          required: true
+          example: attachment;filename=main.log
+        Content-Type:
+          type: string
+          required: true
+          default: text/plain
+      body:
+        application/octet-stream:
+        text/plain:

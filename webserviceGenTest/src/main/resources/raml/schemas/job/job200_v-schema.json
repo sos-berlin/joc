@@ -1,0 +1,15 @@
+{
+  "title": "job with delivery date (volatile part)",
+  "id": "schemas/job/job200_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobV200",
+  "type": "object",
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "job": {
+      "$ref": "job_v-schema.json"
+    }
+  }
+}

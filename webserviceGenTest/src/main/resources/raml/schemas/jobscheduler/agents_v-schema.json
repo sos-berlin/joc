@@ -1,0 +1,22 @@
+{
+  "title": "agents with delivery date (volatile part)",
+  "id": "schemas/jobscheduler/agents_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentsV",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "agents"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "$ref": "agentOfCluster_p-schema.json"
+      }
+    }
+  }
+}

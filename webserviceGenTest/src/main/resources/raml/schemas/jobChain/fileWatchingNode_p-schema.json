@@ -1,0 +1,22 @@
+{
+  "title": "fileOrderSource (permanent part)",
+  "id": "schemas/jobchain/fileWatchingNode_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.FileWatchingNodeP",
+  "type": "object",
+  "required": [
+    "directory",
+    "regex"
+  ],
+  "properties": {
+    "directory": {
+      "type": "string"
+    },
+    "nextNode": {
+      "type": "string"
+    },
+    "regex": {
+      "type": "string"
+    }
+  }
+}

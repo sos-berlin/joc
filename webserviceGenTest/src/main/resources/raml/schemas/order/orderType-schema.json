@@ -1,0 +1,13 @@
+{
+  "title": "order type",
+  "id": "schemas/order/orderType",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderType",
+  "type": "string",
+  "description": "the type of the order",
+  "enum": [
+    "PERMANENT",
+    "AD_HOC",
+    "FILE_ORDER"
+  ]
+}

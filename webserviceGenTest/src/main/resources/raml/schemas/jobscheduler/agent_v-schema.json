@@ -1,0 +1,33 @@
+{
+  "title": "jobscheduler agent (volatile part)",
+  "id": "schemas/jobscheduler/agent_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentV",
+  "type": "object",
+  "required": [
+    "surveyDate",
+    "url",
+    "state"
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "url": {
+      "description": "url can be different against host/port if agent behind a proxy",
+      "type": "string",
+      "pattern": "https?://.+"
+    },
+    "state": {
+      "$ref": "state-schema.json"
+    },
+    "startedAt": {
+      "description": "this is empty iff state.text=unreachable",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "runningTasks": {
+      "description": "number of tasks which are currently running at the Agent.",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

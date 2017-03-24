@@ -1,0 +1,61 @@
+type: error
+post:
+  description: |
+    <h2>Register JobScheduler objects for collecting events</h2>
+    <p>Events can be sent for multiple JobScheduler.
+    The request remains open until a requested event has been received or a timeout of ~6min is reached.
+    Only one ./event request should be active per browser tab.
+    </p>
+    ___
+    <h4>Parameters in the POST body schema</h4>
+    <table class="params" style="table-layout:auto;">
+    <colgroup>
+      <col width="10%"/>
+      <col width="10%"/>
+      <col width="*"/>
+      <col width="20%"/>
+      <col width="10%"/>
+    </colgroup>
+    <thead>
+    <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
+    </thead><tbody>
+    <tr><td>``jobscheduler``</td><td>required, array</td>
+    <td>This collection contains a required ``jobschedulerId`` and its objects of interest<br/>
+    The first item of the collection has to be the current jobschedulerId.</td>
+    <td> [{
+      <div style="padding-left:10px;">"jobschedulerId":"scheduler.1.11",</div>
+      <div style="padding-left:10px;">"eventId":1480088631000000,</div>
+      <div style="padding-left:10px;">"objects":[{...objects...}]</div>
+      }]</td><td></td></tr>
+    <tr><td>``objects``</td><td>optional, array</td>
+    <td>Contains the objects of interest where each object has a ``path``and a ``type``.<br/>
+    If no objects are specified then all event are responsed.<br/>
+    The path can specify only a folder then the optional ``recursive`` can be set (default true).
+    Note that the path of an order contains the job chain path and the orderId with a comma as separator<br/>
+    <span style="color:red;font-weight:bold">This parameter is not yet considered by the web service.<br/>
+    We are not sure if this parameter make sense.</span></td>
+    <td> [{
+      <div style="padding-left:10px;">"path":"/sos/reporting,Reporting",</div>
+      <div style="padding-left:10px;">"type":"ORDER"</div>
+      }]</td><td></td></tr>
+    <tr><td>``close``</td><td>optional, boolean</td>
+    <td>This parameter finished a still unresponsed previous request of ./event<br/>
+    It has to be called together with ./logout</td>
+    <td>"close":false</td><td>false</td></tr>
+    <tr><td>``eventId``</td><td>optional, string</td>
+    <td>Every response except ``close``=true contains for each jobScheduler a new eventId for the next call.<br/>
+    If the eventId is empty then the web service calculates the eventId.</td>
+    <td>"eventId":"1480088631000000"</td><td>false</td></tr>
+    </tbody></table>
+  body:
+    application/json:
+      schema: <<schema>>
+      example: <<example>>
+  responses:
+    200:
+      description: <<description200>>
+      body:
+        application/json:
+          example: <<example200>>
+          schema: <<schema200>>
+    434:

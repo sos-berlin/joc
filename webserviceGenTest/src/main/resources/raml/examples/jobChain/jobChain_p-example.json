@@ -1,0 +1,97 @@
+{
+    "jobChain":  {
+                     "path":  "/examples/56_NestedJobChains/JobChainB",
+                     "name":  "JobChainB",
+                     "numOfNodes":  4,
+                     "configurationDate":  "2016-09-23T11:13:48Z",
+                     "title":  "JobChainB",
+                     "endNodes":  [
+                                      {
+                                          "name":  "Success"
+                                      },
+                                      {
+                                          "name":  "Error"
+                                      }
+                                  ],
+                     "nodes":  [
+                                   {
+                                       "nextNode":  "2",
+                                       "name":  "1",
+                                       "job":  {
+                                                   "jobChains":  [
+                                                                     "/examples/56_NestedJobChains/JobChainB"
+                                                                 ],
+                                                   "name":  "JobB100",
+                                                   "isOrderJob":  true,
+                                                   "maxTasks":  1,
+                                                   "configurationDate":  "2016-09-23T11:13:48Z",
+                                                   "title":  "Shell Job",
+                                                   "usedInJobChains":  1,
+                                                   "path":  "/examples/56_NestedJobChains/JobB100",
+                                                   "surveyDate":  "2016-09-23T11:13:48Z",
+                                                   "estimatedDuration":  2
+                                               },
+                                       "errorNode":  "Error"
+                                   },
+                                   {
+                                       "nextNode":  "3",
+                                       "name":  "2",
+                                       "job":  {
+                                                   "jobChains":  [
+                                                                     "/examples/56_NestedJobChains/JobChainB"
+                                                                 ],
+                                                   "name":  "JobB200",
+                                                   "isOrderJob":  true,
+                                                   "maxTasks":  1,
+                                                   "configurationDate":  "2016-09-23T11:13:48Z",
+                                                   "title":  "Shell Job",
+                                                   "usedInJobChains":  1,
+                                                   "path":  "/examples/56_NestedJobChains/JobB200",
+                                                   "surveyDate":  "2016-09-23T11:13:48Z",
+                                                   "estimatedDuration":  2
+                                               },
+                                       "errorNode":  "Error"
+                                   },
+                                   {
+                                       "nextNode":  "4",
+                                       "name":  "3",
+                                       "job":  {
+                                                   "jobChains":  [
+                                                                     "/examples/56_NestedJobChains/JobChainB"
+                                                                 ],
+                                                   "name":  "JobB300",
+                                                   "isOrderJob":  true,
+                                                   "maxTasks":  1,
+                                                   "configurationDate":  "2016-09-23T11:13:48Z",
+                                                   "title":  "Shell Job",
+                                                   "usedInJobChains":  1,
+                                                   "path":  "/examples/56_NestedJobChains/JobB300",
+                                                   "surveyDate":  "2016-09-23T11:13:48Z",
+                                                   "estimatedDuration":  2
+                                               },
+                                       "errorNode":  "Error"
+                                   },
+                                   {
+                                       "nextNode":  "Success",
+                                       "name":  "4",
+                                       "job":  {
+                                                   "jobChains":  [
+                                                                     "/examples/56_NestedJobChains/JobChainB"
+                                                                 ],
+                                                   "name":  "JobB400",
+                                                   "isOrderJob":  true,
+                                                   "maxTasks":  1,
+                                                   "configurationDate":  "2016-09-23T11:13:48Z",
+                                                   "title":  "Shell Job",
+                                                   "usedInJobChains":  1,
+                                                   "path":  "/examples/56_NestedJobChains/JobB400",
+                                                   "surveyDate":  "2016-09-23T11:13:48Z",
+                                                   "estimatedDuration":  2
+                                               },
+                                       "errorNode":  "Error"
+                                   }
+                               ],
+                     "surveyDate":  "2016-09-23T11:13:48Z"
+                 },
+    "deliveryDate":  "2016-09-23T11:13:47Z"
+}

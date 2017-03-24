@@ -1,0 +1,28 @@
+{
+  "title": "job chains with delivery date (permanent part)",
+  "id": "schemas/jobChain/jobChains_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainsP",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "jobChains"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "jobChains": {
+      "type": "array",
+      "items": {
+        "$ref": "jobChain_p-schema.json"
+      }
+    },
+    "nestedJobChains": {
+      "type": "array",
+      "items": {
+        "$ref": "jobChain_p-schema.json"
+      }
+    }
+  }
+}

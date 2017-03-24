@@ -1,0 +1,42 @@
+{
+  "title": "agent cluster filter",
+  "id": "schemas/jobscheduler/agentClusterFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentClusterFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "agentClusters": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.jobscheduler.AgentClusterPath",
+        "type": "object",
+        "required": [
+          "agentCluster"
+        ],
+        "properties": {
+          "agentCluster": {
+            "$ref": "../common/path-schema.json"
+          }
+        }
+      }
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "state": {
+      "type": "integer"
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "folders": {
+      "$ref": "../common/folders-schema.json"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "task with delivery date",
+  "id": "schemas/job/task200",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.Task200",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "surveyDate",
+    "task"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "task": {
+      "$ref": "task-schema.json"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "title": "save and response configuration",
+  "id": "schemas/configuration/configuration200",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.configuration.Configuration200",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "configuration"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "configuration": {
+      "$ref": "configuration-schema.json"
+    }
+  }
+}

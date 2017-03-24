@@ -1,0 +1,29 @@
+{
+  "title": "job chain order summary",
+  "id": "schemas/order/ordersSummary",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "only relevant for order jobs and is empty if job's order queue is empty",
+  "javaType": "com.sos.joc.model.order.OrdersSummary",
+  "type": "object",
+  "properties": {
+    "pending": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "running": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "suspended": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "setback": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "waitingForResource": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "blacklist": {
+      "description": "only for job chains available",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

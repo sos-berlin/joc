@@ -1,0 +1,8 @@
+{
+  "deliveryDate": "2016-05-05T20:34:51Z",
+  "jobschedulerIds": [
+    "scheduler",
+    "scheduler.test"
+  ],
+  "selected": "scheduler"
+}

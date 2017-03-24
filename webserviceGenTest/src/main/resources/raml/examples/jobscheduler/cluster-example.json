@@ -1,0 +1,8 @@
+{
+  "deliveryDate": "2016-05-05T21:13:35Z",
+  "cluster": {
+    "surveyDate": "2016-05-05T21:11:25Z",
+    "jobschedulerId": "schedulerId",
+    "type": "passive"
+  }
+}

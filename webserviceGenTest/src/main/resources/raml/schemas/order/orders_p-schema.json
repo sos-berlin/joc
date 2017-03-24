@@ -1,0 +1,22 @@
+{
+  "title": "orders with delivery date (permant part)",
+  "id": "schemas/order/orders_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrdersP",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "orders"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "orders": {
+      "type": "array",
+      "items": {
+        "$ref": "order_p-schema.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "title": "schedulesFilter",
+  "id": "schemas/schedule/schedulesFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.schedule.SchedulesFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "schedules": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.schedule.SchedulePath",
+        "type": "object",
+        "required": [
+          "schedule"
+        ],
+        "properties": {
+          "schedule": {
+            "$ref": "../common/path-schema.json"
+          }
+        }
+      }
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "folders": {
+      "$ref": "../common/folders-schema.json"
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "$ref": "scheduleStateText-schema.json"
+      }
+    }
+  }
+}

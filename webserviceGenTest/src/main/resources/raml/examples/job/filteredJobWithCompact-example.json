@@ -1,0 +1,5 @@
+{
+  "jobschedulerId":"scheduler",
+  "compact": true,
+  "job": "/sos/housekeeping/scheduler_restart"
+}

@@ -1,0 +1,25 @@
+{
+  "title": "modify order commands",
+  "id": "schemas/order/modifyOrders",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.ModifyOrders",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "orders"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "orders": {
+      "type": "array",
+      "items": {
+        "$ref": "modifyOrder-schema.json"
+      }
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

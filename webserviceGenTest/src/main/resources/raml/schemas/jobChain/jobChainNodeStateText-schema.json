@@ -1,0 +1,12 @@
+{
+  "title": "jobChainNode state text",
+  "id": "schemas/jobChain/jobChainNodeStateText",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainNodeStateText",
+  "type": "string",
+  "enum": [
+    "ACTIVE",
+    "SKIPPED",
+    "STOPPED"
+  ]
+}

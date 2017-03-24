@@ -1,0 +1,19 @@
+{
+    "jobschedulerId": "schedulerId",
+    "version": "1.11.0",
+    "host": "test2.sos",
+    "port": 4444,
+    "platform": {
+      "os": "linux",
+      "bit": 64,
+      "distribution": "CentOS Linux release 7.2.1511"
+    },
+    "state": "waiting_for_activation",
+    "pid": 5156,
+    "startedAt": "2016-04-21T14:54:32Z",
+    "timeZone": "Europe/Berlin",
+    "clusterType": {
+      "type": "passive",
+      "precedence": 1
+    }
+}
