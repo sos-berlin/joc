@@ -1,0 +1,20 @@
+{
+  "deliveryDate": "2016-05-05T21:13:45Z",
+  "jobscheduler": {
+    "surveyDate": "2016-05-05T21:13:45Z",
+    "jobschedulerId": "schedulerId",
+    "version" : "1.11.0",
+    "host": "test.sos",
+    "port": 4444,
+    "timeZone": "Europe/Berlin",
+    "clusterType": {
+      "type": "passive",
+      "precedence": 0
+    },
+    "state": {
+      "severity": 0,
+      "_text": "running"
+    },
+    "startedAt": "2016-04-21T14:52:09Z"
+  }
+}

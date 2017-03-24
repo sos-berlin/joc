@@ -1,0 +1,28 @@
+{
+  "title": "job chains with delivery date (volatile part)",
+  "id": "schemas/jobChain/jobChains_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainsV",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "jobChains"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "jobChains": {
+      "type": "array",
+      "items": {
+        "$ref": "jobChain_v-schema.json"
+      }
+    },
+    "nestedJobChains": {
+      "type": "array",
+      "items": {
+        "$ref": "jobChain_v-schema.json"
+      }
+    }
+  }
+}

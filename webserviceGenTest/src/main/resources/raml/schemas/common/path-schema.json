@@ -1,0 +1,8 @@
+{
+  "title": "path",
+  "id": "schemas/common/path",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "absolute path based on live folder of a JobScheduler object.",
+  "type": "string",
+  "pattern": "/([^/]+/)*[^/]+"
+}

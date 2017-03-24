@@ -1,0 +1,19 @@
+{
+  "title": "order with delivray date (permanent part)",
+  "id": "schemas/order/order200_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderP200",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "order"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "order": {
+      "$ref": "order_p-schema.json"
+    }
+  }
+}

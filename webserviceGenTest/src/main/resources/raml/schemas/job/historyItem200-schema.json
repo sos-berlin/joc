@@ -1,0 +1,19 @@
+{
+  "title": "task history",
+  "id": "schemas/job/historyItem200",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.TaskHistoryItem200",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "task"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "task": {
+      "$ref": "historyItem-schema.json"
+    }
+  }
+}

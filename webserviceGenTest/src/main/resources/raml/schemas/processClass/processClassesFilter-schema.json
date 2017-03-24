@@ -1,0 +1,41 @@
+{
+  "title": "process class filter",
+  "id": "schemas/order/processClassFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.processClass.ProcessClassesFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "processClasses": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.processClass.ProcessClassPath",
+        "type": "object",
+        "required": [
+          "processClass"
+        ],
+        "properties": {
+          "processClass": {
+            "$ref": "../common/path-schema.json"
+          }
+        }
+      }
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "folders": {
+      "$ref": "../common/folders-schema.json"
+    },
+    "isAgentCluster": {
+      "description" : "only relevant for volatile request",
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

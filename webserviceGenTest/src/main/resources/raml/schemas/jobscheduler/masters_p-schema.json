@@ -1,0 +1,22 @@
+{
+  "title": "jobscheduler masters (permanent part)",
+  "id": "schemas/jobscheduler/masters_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.MastersP",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "masters"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "masters": {
+      "type": "array",
+      "items": {
+        "$ref": "jobscheduler_p-schema.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+type: error
+post:
+  description: |
+    <h2>modify the state (node) or end state</h2>
+    <p>parameters can be modified and suspended orders can be resumed at the same time</p>
+    ___
+    <h4>Parameters in the POST body schema</h4>
+    <table class="params" style="table-layout:auto;">
+    <colgroup>
+      <col width="10%"/>
+      <col width="16%"/>
+      <col width="*"/>
+      <col width="20%"/>
+      <col width="10%"/>
+    </colgroup>
+    <thead>
+    <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
+    </thead><tbody>
+    <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
+    <tr><td>``orders``</td><td>required, array</td>
+    <td>Specified the orders which should be modified.</td>
+    <td> [{
+      <div style="padding-left:10px;">"jobChain":"/sos/reporting/Inventory",</div>
+      <div style="padding-left:10px;">"orderId":"Inventory"</div>
+      <div style="padding-left:10px;">"state":"secondStep"</div>
+      <div style="padding-left:10px;">"endState":"nothingToDo"</div>
+      <div style="padding-left:10px;">"resume":true</div>
+      }]</td>
+    <td></td></tr>
+    <tr><td>``state``</td><td>optional, string<br/>field of each ``orders`` item</td><td>Name of the desired job chain node</td><td></td><td></td></tr>
+    <tr><td>``endState``</td><td>optional, string<br/>field of each ``orders`` item</td><td>Name of the desired job chain end node</td><td></td><td></td></tr>
+    <tr><td>``params``</td><td>optional, array<br/>field of each ``orders`` item</td><td>Parameter</td><td>params:[{"name":"...","value":"..."}]</td><td></td></tr>
+    <tr><td>``resume``</td><td>optional, boolean<br/>field of each ``orders`` item</td><td>resumes a suspended order iff true</td><td></td><td>false</td></tr>
+    <<audit>>
+    </tbody></table>
+
+  body:
+    application/json:
+      schema: modifyOrders
+      example: |
+        {
+          "jobschedulerId": "scheduler",
+          "orders": [{
+            "orderId": "order1",
+            "jobChain": "/test/testJobChain",
+            "state": "step4"
+          }, {
+            "orderId": "order2",
+            "jobChain": "/test/testJobChain",
+            "state": "step4"
+          }, {
+            "orderId": "order3",
+            "jobChain": "/test/testJobChain",
+            "state": "step5",
+            "params": [
+              {
+                "name": "step5_param_name",
+                "value": "step5_param_value"
+              }
+            ]
+          }, {
+            "orderId": "order4",
+            "jobChain": "/test/testJobChain",
+            "state": "step4",
+            "resume": true
+          }, {
+            "orderId": "order5",
+            "jobChain": "/test/testJobChain",
+            "state": "step4"
+          }]
+        }
+  responses:
+    200:
+      description: It returns an _ok_. This reply code comes only for bulk operations if all commands were successful.
+      body:
+        application/json:
+          schema: ok
+          example: |
+            {
+              "deliveryDate":"2016-05-05T21:13:35Z",
+              "surveyDate":"2016-05-05T21:13:34Z",
+              "ok":true
+            }
+    419:

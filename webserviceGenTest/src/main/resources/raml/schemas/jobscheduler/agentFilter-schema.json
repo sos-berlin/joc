@@ -1,0 +1,29 @@
+{
+  "title": "agents filter",
+  "id": "schemas/jobscheduler/agentFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.jobscheduler.AgentUrl",
+        "type": "object",
+        "properties": {
+          "agent": {
+            "description": "Url of an Agent",
+            "type": "string",
+            "pattern": "https?://.+"
+          }
+        }
+      }
+    }
+  }
+}

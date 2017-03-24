@@ -1,0 +1,5 @@
+{
+  "jobschedulerId":"scheduler",
+  "schedule": "/test/weekday",
+  "runTime": "<schedule><weekdays><day day='1 2 3 4 5'><period begin='10:30' end='24:00' repeat='02:00'/></day></weekdays></schedule>"
+}

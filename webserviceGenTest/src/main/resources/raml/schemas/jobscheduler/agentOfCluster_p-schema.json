@@ -1,0 +1,45 @@
+{
+  "title": "agent of cluster (permanent part)",
+  "id": "schemas/jobscheduler/agentOfCluster_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentOfCluster",
+  "type": "object",
+  "required": [
+    "surveyDate",
+    "version",
+    "host",
+    "url",
+    "os",
+    "state",
+    "startedAt"
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "version": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "url": {
+      "description": "url can be different against host/port if agent behind a proxy",
+      "type": "string",
+      "pattern": "https?://.+"
+    },
+    "os": {
+      "$ref": "os-schema.json"
+    },
+    "state": {
+      "$ref": "state-schema.json"
+    },
+    "startedAt": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "runningTasks": {
+      "description": "ONLY volatile: number of tasks which are currently running at the Agent.",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

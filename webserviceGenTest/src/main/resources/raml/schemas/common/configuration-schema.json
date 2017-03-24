@@ -1,0 +1,43 @@
+{
+  "title": "configuration",
+  "id": "schemas/common/configuration",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.common.Configuration200",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "configuration"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "configuration": {
+      "javaType": "com.sos.joc.model.common.Configuration",
+      "type": "object",
+      "required": [
+        "surveyDate",
+        "path",
+        "configurationDate",
+        "content"
+      ],
+      "properties": {
+        "surveyDate": {
+          "$ref": "surveyDate_v-schema.json"
+        },
+        "path": {
+          "$ref": "../common/path-schema.json"
+        },
+        "type": {
+          "$ref": "../common/type-schema.json"
+        },
+        "configurationDate": {
+          "$ref": "timestamp-schema.json"
+        },
+        "content": {
+          "$ref": "configurationContent-schema.json"
+        }
+      }
+    }
+  }
+}

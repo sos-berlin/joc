@@ -1,0 +1,20 @@
+{
+  "title": "agent cluster state",
+  "id": "schemas/jobscheduler/agentClusterState",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentClusterState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "0=all Agents are running, 1=some Agents are unreachable but not all, 2=all Agents are unreachable",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "agentClusterStateText-schema.json"
+    }
+  }
+}

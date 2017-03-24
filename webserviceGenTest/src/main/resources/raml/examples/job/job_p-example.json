@@ -1,0 +1,17 @@
+{
+    "deliveryDate":  "2016-09-23T11:13:05Z",
+    "job":  {
+                "jobChains":  [
+                                  "/examples/55_JobSchedulerLaunchQueue/01_JQLJobChain1/JobChain100"
+                              ],
+                "name":  "JobA",
+                "isOrderJob":  true,
+                "maxTasks":  1,
+                "configurationDate":  "2016-09-23T11:13:14Z",
+                "title":  "Simple Shell Job",
+                "usedInJobChains":  1,
+                "path":  "/examples/55_JobSchedulerLaunchQueue/01_JQLJobChain1/JobA",
+                "surveyDate":  "2016-09-23T11:13:14Z",
+                "estimatedDuration":  2
+            }
+}

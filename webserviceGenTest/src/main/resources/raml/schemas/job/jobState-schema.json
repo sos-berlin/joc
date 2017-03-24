@@ -1,0 +1,20 @@
+{
+  "title": "job state",
+  "id": "schemas/job/jobState",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "jobStateText-schema.json"
+    }
+  }
+}

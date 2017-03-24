@@ -1,0 +1,52 @@
+{
+  "title": "task",
+  "id": "schemas/job/task",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.Task",
+  "type": "object",
+  "required": [
+    "taskId",
+    "state"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string"
+    },
+    "pid": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "state": {
+      "$ref": "taskState-schema.json"
+    },
+    "plannedStart": {
+      "description": "The time at which the task should be started",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "startedAt": {
+      "description": "The time when the task was loaded or started",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "enqueued": {
+      "description": "The time when the task entered the task queue.",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "idleSince": {
+      "description": "The time at which the task state changed to waiting_for_order.",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "inProcessSince": {
+      "description": "The time when at which the current active job step started.",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "steps": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "_cause": {
+      "$ref": "taskCause-schema.json"
+    },
+    "order": {
+      "$ref": "../order/order_v-schema.json"
+    }
+  }
+}

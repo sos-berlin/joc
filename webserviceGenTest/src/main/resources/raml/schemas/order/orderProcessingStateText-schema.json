@@ -1,0 +1,23 @@
+{
+  "title": "order state text",
+  "id": "schemas/order/orderProcessingStateText",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderStateText",
+  "type": "string",
+  "enum": [
+    "PENDING",
+    "RUNNING",
+    "SUSPENDED",
+    "SETBACK",
+    "BLACKLIST",
+    "JOB_NOT_IN_PERIOD",
+    "NODE_DELAY",
+    "WAITING_FOR_LOCK",
+    "WAITING_FOR_PROCESS",
+    "WAITING_FOR_AGENT",
+    "JOB_CHAIN_STOPPED",
+    "NODE_STOPPED",
+    "JOB_STOPPED",
+    "WAITING_FOR_TASK"
+  ]
+}

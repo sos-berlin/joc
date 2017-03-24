@@ -1,0 +1,12 @@
+{
+  "deliveryDate": "2016-05-05T21:13:45Z",
+  "configuration": {
+    "surveyDate": "2016-05-05T21:13:45Z",
+    "path": "/sos/reporting/Inventory",
+    "configurationDate": "2015-12-11T10:06:39Z",
+    "content": {
+      "xml": "&lt;job_chain orders_recoverable=\"no\" visible=\"yes\" title=\"Inventory of existing jobs, job chains and orders\"&gt;\n    &lt;job_chain_node  state=\"inventory\" job=\"Inventory\" next_state=\"success\" error_state=\"error\"/&gt;\n    &lt;job_chain_node  state=\"success\"/&gt;\n    &lt;job_chain_node  state=\"error\"/&gt;\n&lt;/job_chain&gt;",
+      "html": "&lt;span class=\"bracket\" style=\"padding-left:20px;\">&amp;lt;&lt;/span>&lt;span class=\"element_name\">job_chain&lt;/span> &lt;span class=\"attribute_name\">orders_recoverable=&lt;/span>&lt;span class=\"attribute_val\">\"no\"&lt;/span> &lt;span class=\"attribute_name\">title=&lt;/span>&lt;span class=\"attribute_val\">\"Inventory of existing jobs, job chains and orders\"&lt;/span> &lt;span class=\"attribute_name\">visible=&lt;/span>&lt;span class=\"attribute_val\">\"yes\"&lt;/span>&lt;span class=\"bracket\">&gt;&lt;/span>&lt;br>&lt;span class=\"bracket\" style=\"padding-left:40px;\">&amp;lt;&lt;/span>&lt;span class=\"element_name\">job_chain_node&lt;/span> &lt;span class=\"attribute_name\">error_state=&lt;/span>&lt;span class=\"attribute_val\">\"error\"&lt;/span> &lt;span class=\"attribute_name\">job=&lt;/span>&lt;span class=\"attribute_val\">\"Inventory\"&lt;/span> &lt;span class=\"attribute_name\">next_state=&lt;/span>&lt;span class=\"attribute_val\">\"success\"&lt;/span> &lt;span class=\"attribute_name\">state=&lt;/span>&lt;span class=\"attribute_val\">\"inventory\"&lt;/span>&lt;span class=\"bracket\">/&gt;&lt;/span>&lt;br>&lt;span class=\"bracket\" style=\"padding-left:40px;\">&amp;lt;&lt;/span>&lt;span class=\"element_name\">job_chain_node&lt;/span> &lt;span class=\"attribute_name\">state=&lt;/span>&lt;span class=\"attribute_val\">\"success\"&lt;/span>&lt;span class=\"bracket\">/&gt;&lt;/span>&lt;br>&lt;span class=\"bracket\" style=\"padding-left:40px;\">&amp;lt;&lt;/span>&lt;span class=\"element_name\">job_chain_node&lt;/span> &lt;span class=\"attribute_name\">state=&lt;/span>&lt;span class=\"attribute_val\">\"error\"&lt;/span>&lt;span class=\"bracket\">/&gt;&lt;/span>&lt;br>&lt;span class=\"bracket\" style=\"padding-left:20px;\">&lt;/&lt;/span>&lt;span class=\"element_name\">job_chain&lt;/span>&lt;span class=\"bracket\">&gt;&lt;/span>"
+    }
+  }
+}

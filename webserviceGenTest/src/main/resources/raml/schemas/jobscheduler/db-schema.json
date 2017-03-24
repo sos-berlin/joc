@@ -1,0 +1,61 @@
+{
+  "title": "database",
+  "id": "schemas/jobscheduler/database",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.DB",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "database"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "database": {
+      "type": "object",
+      "required": [
+        "dbms",
+        "state",
+        "surveyDate"
+      ],
+      "properties": {
+        "dbms": {
+          "description": "Possible values are MySQL,Oracle,Postgres,Sybase,DB2,MS SQL Server",
+          "type": "string"
+        },
+        "surveyDate": {
+          "$ref": "../common/surveyDate_p-schema.json"
+        },
+        "version": {
+          "type": "string"
+        },
+        "state": {
+          "javaType": "com.sos.joc.model.jobscheduler.DBState",
+          "type": "object",
+          "required": [
+            "severity",
+            "_text"
+          ],
+          "properties": {
+            "severity": {
+              "description": "0=running; 2=unreachable",
+              "type": "integer"
+            },
+            "_text": {
+              "javaType": "com.sos.joc.model.jobscheduler.DBStateText",
+              "type": "string",
+              "enum": [
+                "RUNNING",
+                "UNREACHABLE"
+              ]
+            }
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

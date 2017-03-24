@@ -1,0 +1,76 @@
+{
+  "title": "agent cluster",
+  "id": "schemas/jobscheduler/agentCluster",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentCluster",
+  "type": "object",
+  "oneOf": [
+    {
+      "description": "if parameter compact=false or undefined",
+      "required": [
+        "surveyDate",
+        "path",
+        "name",
+        "state",
+        "numOfAgents",
+        "maxProcesses",
+        "_type",
+        "agents"
+      ]
+    },
+    {
+      "description": "response without agents collection if parameter compact=true, configurationStatus optional",
+      "required": [
+        "surveyDate",
+        "path",
+        "name",
+        "state",
+        "numOfAgents",
+        "maxProcesses",
+        "_type"
+      ]
+    }
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "path": {
+      "description": "Agent cluster name: path of the process class which represents the agent cluster",
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "maxProcesses": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "_type": {
+      "$ref": "agentClusterType-schema.json"
+    },
+    "state": {
+      "$ref": "agentClusterState-schema.json"
+    },
+    "numOfAgents": {
+      "$ref": "numOfAgents-schema.json"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "$ref": "agentOfCluster_p-schema.json"
+      }
+    },
+    "numOfProcesses": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "processes": {
+      "type": "array",
+      "items": {
+        "$ref": "../processClass/process-schema.json"
+      }
+    },
+    "configurationStatus": {
+      "$ref": "../common/configurationStatus-schema.json"
+    }
+  }
+}

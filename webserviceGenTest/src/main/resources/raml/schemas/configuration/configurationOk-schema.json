@@ -1,0 +1,24 @@
+{
+  "title": "feedback after save, delete configuration",
+  "id": "schemas/configuration/configurationOk",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.configuration.ConfigurationOk",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "id"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "surveyDate": {
+      "description": "is also required for permanent or volatile requests",
+      "type": "string",
+      "format": "date-time"
+    },
+    "id": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

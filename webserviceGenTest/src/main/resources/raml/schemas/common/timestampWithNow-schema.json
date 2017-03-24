@@ -1,0 +1,15 @@
+{
+  "title": "timestamp with now",
+  "id": "schemas/common/timestampWithNow",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "ISO format yyyy-mm-dd HH:MM[:SS] or now or now + HH:MM[:SS] or now + SECONDS",
+  "type": "string",
+  "oneOf": [
+    {
+      "pattern": "now(\\s*\\+\\s*(\\d+|\\d{1,2}:\\d{1,2}(:\\d{1,2})?))?"
+    },
+    {
+      "format": "date-time"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "title": "jobscheduler cluster member type",
+  "id": "schemas/jobscheduler/clusterMemberType",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.ClusterMemberType",
+  "type": "object",
+  "required": [
+    "_type"
+  ],
+  "properties": {
+    "_type": {
+      "$ref": "clusterType-schema.json"
+    },
+    "precedence": {
+      "description": "primary (0), secondary (1), ...only relevant for passive cluster",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

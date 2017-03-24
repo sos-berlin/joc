@@ -1,0 +1,29 @@
+{
+  "title": "order filter",
+  "id": "schemas/order/orderFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "jobChain",
+    "orderId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "suppressNotExistException": {
+      "$ref": "../common/suppressNotExistExceptionParam-schema.json"
+    }
+  }
+}

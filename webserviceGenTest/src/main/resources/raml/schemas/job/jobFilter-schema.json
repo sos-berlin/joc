@@ -1,0 +1,22 @@
+{
+  "title": "jobFilter",
+  "id": "schemas/job/jobFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "job"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    }
+  }
+}

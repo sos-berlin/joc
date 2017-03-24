@@ -1,0 +1,28 @@
+{
+  "title": "configuration content",
+  "id": "schemas/common/configurationContent",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.common.ConfigurationContent",
+  "type": "object",
+  "description": "A parameter can specify if the content is xml or html. Either 'xml' or 'html' is required",
+  "oneOf": [
+    {
+      "required": [
+        "xml"
+      ]
+    },
+    {
+      "required": [
+        "html"
+      ]
+    }
+  ],
+  "properties": {
+    "xml": {
+      "type": "string"
+    },
+    "html": {
+      "type": "string"
+    }
+  }
+}

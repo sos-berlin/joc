@@ -1,0 +1,20 @@
+{
+  "title": "plan state",
+  "id": "schemas/plan/planState",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.plan.PlanState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "0=SUCCESSFUL, 1=INCOMPLETE, 2=FAILED, 4=PLANNED",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "planStateText-schema.json"
+    }
+  }
+}

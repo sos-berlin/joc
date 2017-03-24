@@ -1,0 +1,24 @@
+{
+  "title": "start job command",
+  "id": "schemas/job/startJob",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.StartJob",
+  "type": "object",
+  "required": [
+    "job"
+  ],
+  "properties": {
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "at": {
+      "$ref": "../common/timestampWithNow-schema.json"
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    },
+    "environment": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    }
+  }
+}

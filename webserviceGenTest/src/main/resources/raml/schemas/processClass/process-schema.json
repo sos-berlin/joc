@@ -1,0 +1,33 @@
+{
+  "title": "process",
+  "id": "schemas/processClass/process",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.processClass.Process",
+  "type": "object",
+  "required": [
+    "job",
+    "taskId",
+    "pid",
+    "runningSince"
+  ],
+  "type": "object",
+  "properties": {
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "pid": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "runningSince": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "agent": {
+      "description": "url",
+      "type": "string",
+      "pattern": "https?://.+"
+    }
+  }
+}

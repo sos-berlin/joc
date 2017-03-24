@@ -1,0 +1,99 @@
+{
+  "title": "dailyPlanItem",
+  "id": "schemas/plan/planItem",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "oneOf": [
+    {
+      "required": [
+        "surveyDate",
+        "jobChain",
+        "orderId",
+        "plannedStartTime",
+        "expectedEndTime",
+        "startMode"
+      ]
+    },
+    {
+      "required": [
+        "surveyDate",
+        "job",
+        "plannedStartTime",
+        "expectedEndTime",
+        "startMode"
+      ]
+    }
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "plannedStartTime": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "expectedEndTime": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "startTime": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "endTime": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "historyId": {
+      "type": "string"
+    },
+    "node": {
+      "description": "only for orders",
+      "type": "string"
+    },
+    "exitCode": {
+      "description": "only for standalone jobs",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "error": {
+      "$ref": "../common/error-schema.json"
+    },
+    "startMode": {
+      "description": "0=single_start, 1=start_start_repeat, 2=start_end_repeat",
+      "type": "integer",
+      "default": 0
+    },
+    "period": {
+      "description": "undefined for startMode=0",
+      "required": [
+        "begin",
+        "end",
+        "repeat"
+      ],
+      "type": "object",
+      "properties": {
+        "begin": {
+          "$ref": "../common/timestamp-schema.json"
+        },
+        "end": {
+          "$ref": "../common/timestamp-schema.json"
+        },
+        "repeat": {
+          "$ref": "../common/nonNegativeInteger-schema.json"
+        }
+      }
+
+    },
+    "late": {
+      "type": "boolean"
+    },
+    "state": {
+      "$ref": "planState-schema.json"
+    }
+  }
+}

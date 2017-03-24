@@ -1,0 +1,77 @@
+type: error
+post:
+  description: |
+    <h2>Starts jobs</h2>
+    <p>this resource can be used in the GUI for three functions
+    <ul>
+    <li><i>start task immediatly</i></li>
+    <li><i>start task at</i> (with ``at``)</li>
+    <li><i>start task at parametrised</i> (with ``at`` and ``params``)</li>
+    </ul>
+    <span style="color:red;">This is only available for standalone jobs.</span>
+    </p>
+    ___
+    <h4>Parameters in the POST body schema</h4>
+    <table class="params" style="table-layout:auto;">
+    <colgroup>
+      <col width="10%"/>
+      <col width="16%"/>
+      <col width="*"/>
+      <col width="20%"/>
+      <col width="10%"/>
+    </colgroup>
+    <thead>
+    <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
+    </thead><tbody>
+    <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
+    <tr><td>``jobs``</td><td>required, array</td>
+    <td>Specified the jobs which should be modified and the modification.</td>
+    <td> [{
+      <div style="padding-left:10px;">"job":"/sos/reporting/Inventory",</div>
+      <div style="padding-left:10px;">"at":"now+10"</div>
+      }]</td>
+    <td></td></tr>
+    <tr><td>``at``</td><td>optional, string<br/>field of each ``jobs`` item</td>
+    <td>start time in ISO format yyyy-mm-dd HH:MM[:SS] or now or now + HH:MM[:SS] or now + SECONDS</td>
+    <td>now+10</td><td>now</td></tr>
+    <tr><td>``params``</td><td>optional, array<br/>field of each ``jobs`` item</td><td>Parameters</td><td>params:[{"name":"...","value":"..."}]</td><td></td></tr>
+    <tr><td>``environment``</td><td>optional, array<br/>field of each ``jobs`` item</td><td>Environment variables</td><td>environment:[{"name":"...","value":"..."}]</td><td></td></tr>
+    <<audit>>
+    </tbody></table>
+
+  body:
+    application/json:
+      schema: startJobs
+      example: |
+        {
+          "jobschedulerId": "scheduler",
+          "jobs": [{
+            "job": "/test/testJob1",
+            "at": "now"
+          }, {
+            "job": "/sos/housekeeping/scheduler_rotate_log",
+            "at": "now + 60",
+            "params": {
+              "file_age": "7"
+            }
+          }, {
+            "job": "/test/testJob2",
+            "at": "now"
+          }, {
+            "job": "/test/testJob3",
+            "at": "now"
+          }]
+        }
+  responses:
+    200:
+      description: It returns an _ok_. This reply code comes only for bulk operations if all commands were successful.
+      body:
+        application/json:
+          schema: ok
+          example: |
+            {
+              "deliveryDate":"2016-05-05T21:13:35Z",
+              "surveyDate":"2016-05-05T21:13:34Z",
+              "ok":true
+            }
+    419:

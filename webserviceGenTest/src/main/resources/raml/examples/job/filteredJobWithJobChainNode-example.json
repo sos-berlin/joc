@@ -1,0 +1,6 @@
+{
+  "jobschedulerId":"scheduler",
+  "job": "/sos/reporting/Inventory",
+  "jobChain": "/sos/reporting/Inventory",
+  "orderId": "Inventory"
+}

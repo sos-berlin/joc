@@ -1,0 +1,6 @@
+{
+  "jobschedulerId":"scheduler",
+  "compact": true,
+  "jobChain": "/test/foo/bar1",
+  "orderId": "order1"
+}

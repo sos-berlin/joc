@@ -1,0 +1,1696 @@
+#%RAML 0.8
+title: JOC API
+version: 1.11.0
+protocols: [ HTTP, HTTPS ]
+baseUri: http://test.sos-berlin.com:3001/joc/api
+#mediaType: application/json
+
+documentation:
+  - title: VERSIONS
+    content: !include documentation/common/versions.md
+
+
+schemas:
+  - errors: !include schemas/common/errors-schema.json
+  - error420: !include schemas/common/error420-schema.json
+  - ok: !include schemas/common/ok-schema.json
+  - errorXML: !include schemas/common/error-schema.xsd
+  - answerXML: !include schemas/common/answer-schema.xsd
+  - okXML: !include schemas/common/ok-schema.xsd
+  - jobs: !include schemas/job/jobs_v-schema.json
+  - orders: !include schemas/order/orders_v-schema.json
+  - jsFilter: !include schemas/common/jobSchedulerId-schema.json
+  - jsFilterWithTimeout: !include schemas/jobscheduler/timeoutParam-schema.json
+  - jsFilterWithUrl: !include schemas/jobscheduler/urlParam-schema.json
+  - jsFilterWithUrlTimeout: !include schemas/jobscheduler/urlTimeoutParam-schema.json
+  #- jsObjectFilter: !include schemas/common/jobSchedulerObjectFilter-schema.json
+  - taskFilter: !include schemas/job/taskFilter-schema.json
+  - startJobs: !include schemas/job/startJobs-schema.json
+  - modifyJobs: !include schemas/job/modifyJobs-schema.json
+  - modifyTasks: !include schemas/job/modifyTasks-schema.json
+  - modifyOrders: !include schemas/order/modifyOrders-schema.json
+  - modifyJobChains: !include schemas/jobChain/modifyJobChains-schema.json
+  - modifyNode: !include schemas/jobChain/modifyNode-schema.json
+  - logContent: !include schemas/common/logContent200-schema.json
+  - security: !include schemas/user/security-schema.json
+
+
+resourceTypes:
+  - error: !include resourceTypes/common/error.raml
+  - postTaskWithOkResponse: !include resourceTypes/job/postWithOkResponse.raml
+  - postTaskAndTimeoutWithOkResponse: !include resourceTypes/job/postTimeoutWithOkResponse.raml
+  - postTimeoutWithOkResponse: !include resourceTypes/common/postTimeoutWithOkResponse.raml
+  - postURLAndTimeoutWithOkResponse: !include resourceTypes/jobscheduler/postTimeoutWithOkResponse.raml
+  - postURLWithOkResponse: !include resourceTypes/jobscheduler/postWithOkResponse.raml
+  - postURLWithPlainResponse: !include resourceTypes/jobscheduler/postWithPlainResponse.raml
+  - postURLWithOkResponseAfterModify: !include resourceTypes/jobscheduler/postWithOkResponseAfterModify.raml
+  - postXMLWithOkResponse: !include resourceTypes/jobscheduler/postXMLWithOkResponse.raml
+  - postJSON: !include resourceTypes/common/postJSON.raml
+  - postOnlyAccessToken: !include resourceTypes/common/postOnlyAccessToken.raml
+  - postOnlyId: !include resourceTypes/common/postOnlyId.raml
+  - postJSONWithOkResponse: !include resourceTypes/common/postJSONWithOkResponse.raml
+  - postJSONWithoutExample: !include resourceTypes/common/postJSONWithoutExample.raml
+  - login: !include resourceTypes/user/login.raml
+  - logout: !include resourceTypes/user/logout.raml
+  - postEvent: !include resourceTypes/common/postEvent.raml
+  - modifyJob: !include resourceTypes/job/modify.raml
+  - startJob: !include resourceTypes/job/start.raml
+  - setRunTimeJob: !include resourceTypes/job/setRunTime.raml
+  - modifyTasks: !include resourceTypes/job/modifyTasks.raml
+  - modifyOrder: !include resourceTypes/order/modify.raml
+  - addOrder: !include resourceTypes/order/add.raml
+  - startOrder: !include resourceTypes/order/start.raml
+  - resumeOrder: !include resourceTypes/order/resume.raml
+  - setStateOrder: !include resourceTypes/order/setState.raml
+  - setRunTimeOrder: !include resourceTypes/order/setRunTime.raml
+  - modifyJobChain: !include resourceTypes/jobChain/modify.raml
+  - modifyJobChainNode: !include resourceTypes/jobChain/modifyNode.raml
+
+traits:
+  - jobschedulerMaster: !include traits/jobschedulerMaster.raml
+  - filteredByJob: !include ./traits/filteredByJob.raml
+  - accessToken: !include ./traits/accessToken.raml
+
+
+/security/login:
+  type: login
+
+/security/joc_cockpit_permissions:
+  type:
+    postOnlyId:
+      description: Returns list of user's permissions
+      description200: " "
+      example200: !include examples/user/permissions-example.json
+      schema200: !include schemas/user/permissions-schema.json
+
+/security/logout:
+  type: logout
+
+#TODO settings on server, not in cookies
+#/settings:
+#  /update:
+
+/events:
+  type:
+    postEvent:
+      description200: TODO
+      schema: !include schemas/event/register-schema.json
+      schema200: !include schemas/event/events-schema.json
+      example: TODO
+      example200: TODO
+/touch:
+  type: error
+  post:
+    description: |
+      <h2>Refesh the session timeout</h2>
+    responses:
+      200:
+        description: |
+          **Confirm 'Touch' successfully**
+        body:
+          application/json:
+            example: |
+              {
+                "deliveryDate":"2016-05-05T21:13:35Z",
+                "ok":true
+              }
+            schema: ok
+/jobscheduler:
+  type:
+    postURLWithOkResponseAfterModify:
+      description: Volatile JobScheduler information such as its status
+      description200: !include documentation/jobscheduler/jobscheduler_v.md
+      schema200: !include schemas/jobscheduler/jobscheduler200_v-schema.json
+      example200: !include examples/jobscheduler/primary_v-example.json
+  /p:
+    type:
+      postOnlyId:
+        description: General permanent JobScheduler information
+        description200: !include documentation/jobscheduler/jobscheduler_p.md
+        schema200: !include schemas/jobscheduler/jobscheduler200_p-schema.json
+        example200: !include examples/jobscheduler/primary_p-example.json
+  /ids:
+    type: error
+    post:
+      description: |
+        <h2>Returns collection of all available JobScheduler Ids</h2>
+      responses:
+        200:
+          description: |
+            * The collection of all available JobScheduler Ids can be used for a
+            selectbox in which the user can change the Id.
+            * The Id which is specified in the selected field will be used for
+            all following requests
+          body:
+            application/json:
+              schema: !include schemas/jobscheduler/jobschedulerIds-schema.json
+              example: !include examples/jobscheduler/ids-example.json
+#  /statistics:
+#    type:
+#      postOnlyId:
+#        description: JobScheduler statistics
+#        description200: !include documentation/jobscheduler/statistics.md
+#        schema200: !include schemas/jobscheduler/statistics-schema.json
+#        example200: !include examples/jobscheduler/statistics-example.json
+  /supervisor:
+    type:
+      postOnlyId:
+        description: Volatile information of the supervisor such as its status
+        description200: !include documentation/jobscheduler/supervisor_v.md
+        schema200: !include schemas/jobscheduler/jobscheduler200_v-schema.json
+        example200: !include examples/jobscheduler/supervisor_v-example.json
+    /p:
+      type:
+        postOnlyId:
+          description: General permanent Supervisor information
+          description200: !include documentation/jobscheduler/supervisor_p.md
+          schema200: !include schemas/jobscheduler/jobscheduler200_p-schema.json
+          example200: !include examples/jobscheduler/supervisor_p-example.json
+  /db:
+    type:
+      postOnlyId:
+        description: JobScheduler database information
+        description200: " "
+        schema200: !include schemas/jobscheduler/db-schema.json
+        example200: !include examples/jobscheduler/db-example.json
+  /agents:
+    type:
+      postJSON:
+        description: Collection of JobScheduler Agents with volatile information.
+        description1: !include documentation/jobscheduler/agentsParam.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        schema: !include schemas/jobscheduler/agentFilter-schema.json
+        description200: !include documentation/jobscheduler/agents_v.md
+        schema200: !include schemas/jobscheduler/agents_v-schema.json
+        example: !include examples/jobscheduler/jobschedulerParam-example.json
+        example200: !include examples/jobscheduler/agents_v-example.json
+    /p:
+      type:
+        postJSON:
+          description: Collection of JobScheduler Agents with general permanent information
+          description1: !include documentation/jobscheduler/agentsParam.md
+          description2: " "
+          description3: " "
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          schema: !include schemas/jobscheduler/agentFilter-schema.json
+          description200: !include documentation/jobscheduler/agents_p.md
+          schema200: !include schemas/jobscheduler/agents_p-schema.json
+          example: !include examples/jobscheduler/jobschedulerParam-example.json
+          example200: !include examples/jobscheduler/agents_p-example.json
+  /agent_clusters:
+    type:
+      postJSON:
+        description: Collection of JobScheduler Agent Clusters with volatile information
+        description1: !include documentation/common/compact.md
+        description2: !include documentation/jobscheduler/agentClustersParam.md
+        description3: !include documentation/jobscheduler/state.md
+        description4: !include documentation/jobscheduler/regex.md
+        description5: !include documentation/common/folders.md
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/jobscheduler/agentCluster_v.md
+        schema: !include schemas/jobscheduler/agentClusterFilter-schema.json
+        schema200: !include schemas/jobscheduler/agentClusters-schema.json
+        example: !include examples/jobscheduler/filteredByAgentCluster-example.json
+        example200: !include examples/jobscheduler/agentClusters_v-example.json
+#    /p:
+#      type:
+#        postJSON:
+#          description: Collection of JobScheduler Agent Clusters with general permanent information
+#          description1: !include documentation/common/compact.md
+#          description2: !include documentation/jobscheduler/agentClustersParam.md
+#          description3: !include documentation/jobscheduler/state.md
+#          description4: !include documentation/jobscheduler/regex.md
+#          description5: " "
+#          description6: " "
+#          description7: " "
+#          description8: " "
+#          description9: " "
+#          description10: " "
+#          description200: !include documentation/jobscheduler/agentCluster_p.md
+#          schema: !include schemas/jobscheduler/agentClusterFilter-schema.json
+#          schema200: !include schemas/jobscheduler/agentClusters-schema.json
+#          example: !include examples/jobscheduler/filteredByAgentCluster-example.json
+#          example200: !include examples/jobscheduler/agentClusters_p-example.json
+  /cluster:
+    type:
+      postOnlyId:
+        description: Id and type of the cluster
+        description200: |
+          Returns only the JobScheduler Id and the Cluster type such as
+          * active (distributed orders cluster)
+          * passive (backup cluster)
+          * standalone (without cluster)
+        schema200: !include schemas/jobscheduler/clusters-schema.json
+        example200: !include examples/jobscheduler/cluster-example.json
+    /members:
+      type:
+        postOnlyId:
+          description: Collection of JobScheduler cluster members' status
+          description200: !include documentation/jobscheduler/jobscheduler_v.md
+          schema200: !include schemas/jobscheduler/masters_v-schema.json
+          example200: !include examples/jobscheduler/clusterMembers_v-example.json
+      /p:
+        type:
+          postOnlyId:
+            description: Collection of JobScheduler cluster members' general information
+            description200: !include documentation/jobscheduler/jobscheduler_p.md
+            schema200: !include schemas/jobscheduler/masters_p-schema.json
+            example200: !include examples/jobscheduler/clusterMembers_p-example.json
+    /terminate:
+      # TODO ok response is not enough in case of still running task
+      type:
+        postTimeoutWithOkResponse:
+          description: Terminate JobScheduler Cluster with optional timeout
+          audit: !include documentation/audit/auditLog.md
+    /terminate_failsafe:
+      # TODO ok response is not enough in case of still running task
+      type:
+        postTimeoutWithOkResponse:
+          description: Terminate JobScheduler Cluster fail safe with optional timeout
+          audit: !include documentation/audit/auditLog.md
+    /restart:
+      # TODO ok response is not enough in case of still running task
+      type:
+        postTimeoutWithOkResponse:
+          description: Restart JobScheduler Cluster with optional timeout
+          audit: !include documentation/audit/auditLog.md
+#  /command:
+#    type:
+#      postXMLWithOkResponse:
+#        schema: !include schemas/jobscheduler/command-schema.xsd
+#        example: |
+#          <param.get name=''/>
+  /switch:
+    type:
+      postOnlyId:
+        description: Send a JobScheduler Id when the user switches the JobScheduler
+        description200: " "
+        example200: !include examples/user/permissions-example.json
+        schema200: !include schemas/user/permissions-schema.json
+  /terminate:
+    type:
+      postURLAndTimeoutWithOkResponse:
+        description: Terminate JobScheduler Master with optional timeout
+        audit: !include documentation/audit/auditLog.md
+  /restart:
+    type:
+      postURLAndTimeoutWithOkResponse:
+        description: Restart JobScheduler Master with optional timeout
+        audit: !include documentation/audit/auditLog.md
+  /abort:
+    type:
+      postURLWithOkResponse:
+        description: Abort JobScheduler Master
+        audit: !include documentation/audit/auditLog.md
+  /abort_and_restart:
+    type:
+      postURLWithOkResponse:
+        description: Abort and restart JobScheduler Master
+        audit: !include documentation/audit/auditLog.md
+  /pause:
+    type:
+      postURLWithOkResponse:
+        description: Pause JobScheduler Master
+        audit: !include documentation/audit/auditLog.md
+  /continue:
+    type:
+      postURLWithOkResponse:
+        description: Continue paused JobScheduler Master
+        audit: !include documentation/audit/auditLog.md
+  /log:
+    type:
+      postURLWithPlainResponse:
+        description: Provides JobScheduler main log as download
+
+/orders:
+  type:
+    postJSON:
+      description: Returns a collection of orders (volatile part) filtered by a period, job chains or order state
+      description1: !include documentation/common/compact.md
+      description2: " "
+      description3: !include documentation/common/dateFrom.md
+      description4: !include documentation/common/dateTo.md
+      description5: !include documentation/common/timeZone.md
+      description6: !include documentation/common/regex.md
+      description7: !include documentation/order/filteredByOrders.md
+      description8: !include documentation/order/state.md
+      description9: !include documentation/order/type.md
+      description10: !include documentation/common/folders.md
+      description200: !include documentation/order/orders_v.md
+      schema: !include schemas/order/ordersFilter-schema.json
+      schema200: !include schemas/order/orders_v-schema.json
+      example: !include examples/order/filteredOrders-example.json
+      example200: !include examples/order/orders_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: Returns a collection of orders (permanent part) filtered by a period or job chains
+        description1: !include documentation/common/compact.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: !include documentation/common/regex.md
+        description6: !include documentation/order/filteredByOrders.md
+        description7: !include documentation/common/folders.md
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/order/orders_p.md
+        schema: !include schemas/order/ordersFilter-schema.json
+        schema200: !include schemas/order/orders_p-schema.json
+        example: !include examples/order/filteredOrders-example.json
+        example200: !include examples/order/orders_p-example.json
+  /overview/summary:
+      type:
+        postJSON:
+          description: |
+            Summary with number of<h5>
+            * successful orders
+            * failed orders
+
+            filtered by <code>dateFrom</code> parameter until now
+            </h5>
+          description1: !include documentation/common/dateFrom.md
+          description2: !include documentation/common/dateTo.md
+          description3: !include documentation/common/timeZone.md
+          description4: " "
+          description5: !include documentation/order/filteredByOrders.md
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: " "
+          schema200: !include schemas/order/summary-schema.json
+          schema: !include schemas/order/ordersFilter-schema.json
+          example: |
+            {
+              "dateFrom": "1d"
+            }
+          example200: !include examples/order/summary-example.json
+  /overview/snapshot:
+      type:
+        postJSON:
+          description: |
+            Summary with number of<h5>
+            * pending orders
+            * running orders
+            * suspended orders
+            * orders with setback
+            * waiting for resource orders
+            * blacklist orders
+            </h5>
+          description1: " "
+          description2: !include documentation/jobChain/filteredByJobChains.md
+          description3: !include documentation/common/folders.md
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: " "
+          schema: !include schemas/jobChain/jobChainsFilter-schema.json
+          example: TODO
+          schema200: !include schemas/order/snapshot-schema.json
+          example200: !include examples/order/snapshot-example.json
+  /overview/snapshot/event:
+      type:
+        postJSON:
+          description: |
+            Summary with number of<h5>
+            * pending orders
+            * running orders
+            * suspended orders
+            * orders with setback
+            * waiting for resource orders
+            * blacklist orders
+            </h5>
+            <h5>NOTE<br/>
+            The response comes not immediatly.<br/>
+            It comes when a value has changed but the latest after one minute.<br/>
+            It uses the envent from the JobScheduler.<br/></h5>
+          description1: " "
+          description2: !include documentation/jobChain/filteredByJobChains.md
+          description3: !include documentation/common/folders.md
+          description4: !include documentation/order/close.md
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: " "
+          schema: !include schemas/jobChain/jobChainsFilter-schema.json
+          example: TODO
+          schema200: !include schemas/order/snapshot-schema.json
+          example200: !include examples/order/snapshot-example.json
+  /history:
+    type:
+      postJSON:
+        description: Order history from _reporting_
+        description1: !include documentation/order/filteredByOrders.md
+        description2: !include documentation/order/excludeOrders.md
+        description3: !include documentation/common/dateFrom.md
+        description4: !include documentation/common/dateTo.md
+        description5: !include documentation/common/timeZone.md
+        description6: !include documentation/common/regex.md
+        description7: !include documentation/common/folders.md
+        description8: !include documentation/common/limit.md
+        description9: !include documentation/common/historyStates.md
+        description10: " "
+        description200: TODO
+        schema: !include schemas/order/ordersFilter-schema.json
+        schema200: !include schemas/order/history-schema.json
+        example: !include examples/order/filteredOrders-example.json
+        example200: !include examples/order/orderHistory_p-example.json
+    #/group:
+    #  is: [ limitableByTime ]
+    #  type:
+    #    getBaseWithoutExample:
+    #      description: TODO post body, query parameter
+    #      description200: " "
+    #      schema200: !include schemas/order/groupedHistory-schema.json
+  /start:
+    type:
+      startOrder:
+        audit: !include documentation/audit/auditLog.md
+  /add:
+    type:
+      addOrder:
+        audit: !include documentation/audit/auditLog.md
+  /suspend:
+    type:
+      modifyOrder:
+        description: Suspend orders
+        audit: !include documentation/audit/auditLog.md
+  /resume:
+    type:
+      resumeOrder:
+        audit: !include documentation/audit/auditLog.md
+  /reset:
+    type:
+      modifyOrder:
+        description: Reset orders
+        audit: !include documentation/audit/auditLog.md
+  /remove_setback:
+    type:
+      modifyOrder:
+        description: Remove the setback of the orders
+        audit: !include documentation/audit/auditLog.md
+  /delete:
+    type:
+      modifyOrder:
+        description: Delete temporary orders
+        audit: !include documentation/audit/auditLog.md
+  /set_state:
+    type:
+      setStateOrder:
+        audit: !include documentation/audit/auditLog.md
+  /set_run_time:
+    type:
+      setRunTimeOrder:
+        audit: !include documentation/audit/auditLog.md
+
+/order:
+  type:
+    postJSON:
+      description: order (volatile part)
+      description1: !include documentation/order/jobChain.md
+      description2: !include documentation/order/orderIdRequired.md
+      description3: !include documentation/common/compact.md
+      description4: !include documentation/common/suppressObjectNotExistException.md
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: !include documentation/order/orders_v.md
+      schema: !include schemas/order/orderFilter-schema.json
+      schema200: !include schemas/order/order200_v-schema.json
+      example: !include examples/order/filteredOrderWithCompact-example.json
+      example200: !include examples/order/order_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: order (permanent part)
+        description1: !include documentation/order/jobChain.md
+        description2: !include documentation/order/orderIdRequired.md
+        description3: !include documentation/common/compact.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/order/orders_p.md
+        schema: !include schemas/order/orderFilter-schema.json
+        schema200: !include schemas/order/order200_p-schema.json
+        example: !include examples/order/filteredOrderWithCompact-example.json
+        example200: !include examples/order/order_p-example.json
+  /history:
+    type:
+      postJSON:
+        description: Order step history of the specified history id  from _reporting_
+        description1: !include documentation/order/jobChain.md
+        description2: !include documentation/order/orderIdRequired.md
+        description3: !include documentation/order/historyId.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: TODO
+        schema: !include schemas/order/orderFilterWithHistoryId-schema.json
+        schema200: !include schemas/order/stepHistory-schema.json
+        example: !include examples/order/filteredOrderWithHistoryId-example.json
+        example200: !include examples/order/orderStepHistory_p-example.json
+  /log:
+    type:
+      postJSON:
+        description: Log (plain text or html)
+        description1: !include documentation/order/jobChain.md
+        description2: !include documentation/order/orderIdRequired.md
+        description3: !include documentation/order/historyId.md
+        description4: !include documentation/common/logMimeParam.md
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: TODO
+        schema: !include schemas/order/orderFilterWithHistoryId-schema.json
+        schema200: logContent
+        example: !include examples/order/filteredOrderWithHistoryId-example.json
+        example200: !include examples/order/log-example.json
+    /html:
+      is: [accessToken, jobschedulerMaster]
+      type: error
+      get:
+        description: |
+          <h2>sends log as a complete HTML incl. header to open in a new window</h2>
+          TODO:
+          * queryParameter orderId, jobChain, historyId
+          * how we get a rolling log?
+        responses:
+          200:
+            body:
+              text/html:
+                example: !include examples/order/log-example.html
+  /configuration:
+    type:
+      postJSON:
+        description: !include documentation/common/configuration.md
+        description1: !include documentation/order/jobChain.md
+        description2: !include documentation/order/orderIdRequired.md
+        description3: !include documentation/common/configurationFileMimeParam.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: Returns the order configuration in XML or HTML format
+        schema: !include schemas/order/orderConfigurationFilter-schema.json
+        schema200: !include schemas/common/configuration-schema.json
+        example: !include examples/order/filteredOrder-example.json
+        example200: !include examples/order/configuration-example.json
+  /run_time:
+    type:
+      postJSON:
+        description: run time as XML string embedded in JSON
+        description1: !include documentation/order/jobChain.md
+        description2: !include documentation/order/orderIdRequired.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: returns the run time as XML string in the JSON content field
+        schema: !include schemas/order/orderFilter-schema.json
+        schema200: !include schemas/common/runtime200-schema.json
+        example: !include examples/order/filteredOrder-example.json
+        example200: !include examples/common/runtime-example.json
+
+/jobs:
+  type:
+    postJSON:
+      description: Returns a collection of jobs (volatile part) filtered by a period or job state
+      description1: !include documentation/common/compact.md
+      description2: " "
+      description3: !include documentation/common/dateFrom.md
+      description4: !include documentation/common/dateTo.md
+      description5: !include documentation/common/timeZone.md
+      description6: !include documentation/common/regex.md
+      description7: !include documentation/common/folders.md
+      description8: !include documentation/job/filteredByJobs.md
+      description9: !include documentation/job/orderJob.md
+      description10: !include documentation/job/state.md
+      description200: !include documentation/job/jobs_v.md
+      schema: !include schemas/job/jobsFilter-schema.json
+      schema200: jobs
+      example: TODO
+      example200: !include examples/job/jobs_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: Returns a collection of jobs (permanent part) filtered by a period
+        description1: !include documentation/common/compact.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: !include documentation/common/regex.md
+        description6: !include documentation/common/folders.md
+        description7: !include documentation/job/filteredByJobs.md
+        description8: !include documentation/job/orderJob.md
+        description9: " "
+        description10: " "
+        description200: !include documentation/job/jobs_p.md
+        schema: !include schemas/job/jobsFilter-schema.json
+        schema200: !include schemas/job/jobs_p-schema.json
+        example: TODO
+        example200: !include examples/job/jobs_p-example.json
+#  /tree:
+#    type:
+#      postJSON:
+#        description: This is not a real API Url. Only for mock data. Please use ./tree later with "types":["JOB"]
+#        description1: " "
+#        description2: " "
+#        description3: " "
+#        description4: " "
+#        description5: " "
+#        description6: " "
+#        description7: " "
+#        description8: " "
+#        description9: " "
+#        description10: " "
+#        description200: " "
+#        schema: !include schemas/tree/treeFilter-schema.json
+#        schema200: !include schemas/tree/treeView-schema.json
+#        example: !include examples/tree/filteredtree-example.json
+#        example200: !include examples/tree/tree_jobs-example.json
+  /start:
+    type:
+      startJob:
+        audit: !include documentation/audit/auditLog.md
+  /stop:
+    type:
+      modifyJob:
+        description: Stops jobs
+        audit: !include documentation/audit/auditLog.md
+  /unstop:
+    type:
+      modifyJob:
+        description: Unstops jobs
+        audit: !include documentation/audit/auditLog.md
+  /set_run_time:
+    type:
+      setRunTimeJob:
+        audit: !include documentation/audit/auditLog.md
+  # TODO /end_, /suspend_ and /continueAllTasks supported or not?
+  /end_all_tasks:
+    type:
+      modifyJob:
+        description: |
+          End all tasks of the jobs
+          <h5 style="color:red;">Only for API Jobs!</h5>
+        audit: !include documentation/audit/auditLog.md
+  /suspend_all_tasks:
+    type:
+      modifyJob:
+        description: |
+          Suspend all tasks of the jobs
+          <h5 style="color:red;">Only for API Jobs!</h5>
+        audit: !include documentation/audit/auditLog.md
+  /continue_all_tasks:
+    type:
+      modifyJob:
+        description: |
+          Continue all tasks of the jobs
+          <h5 style="color:red;">Only for API Jobs!</h5>
+        audit: !include documentation/audit/auditLog.md
+
+/job:
+  type:
+    postJSON:
+      description: job (volatile part)
+      description1: !include documentation/common/compact.md
+      description2: " "
+      description3: !include documentation/job/jobRequired.md
+      description4: " "
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: !include documentation/job/jobs_v.md
+      schema: !include schemas/job/jobFilter-schema.json
+      schema200: !include schemas/job/job200_v-schema.json
+      example: !include examples/job/filteredJobWithCompact-example.json
+      example200: !include examples/job/job_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: job (permanent part)
+        description1: !include documentation/common/compact.md
+        description2: !include documentation/job/jobRequired.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/job/jobs_p.md
+        schema: !include schemas/job/jobFilter-schema.json
+        schema200: !include schemas/job/job200_p-schema.json
+        example: !include examples/job/filteredJobWithCompact-example.json
+        example200: !include examples/job/job_p-example.json
+  /order_queue:
+    type:
+      postJSON:
+        description: This resource is only relevant for order jobs
+        description1: !include documentation/common/compact.md
+        description2: " "
+        description3: !include documentation/job/jobRequired.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/job/jobOrderQueue.md
+        schema: !include schemas/job/jobFilter-schema.json
+        schema200: !include schemas/job/job200_v-schema.json
+        example: !include examples/job/filteredJobWithJobChainNode-example.json
+        example200: !include examples/job/job_v-example.json
+  /history:
+    type:
+      postJSON:
+        description: Last 25 task history item of the job from _JobScheduler_
+        description1: !include documentation/job/jobRequired.md
+        description2: !include documentation/common/maxLastHistoryItems.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: TODO
+        schema: !include schemas/job/jobHistoryFilter-schema.json
+        schema200: !include schemas/job/history-schema.json
+        example: TODO
+        example200: !include examples/job/taskHistoryItems-example.json
+  /configuration:
+    type:
+      postJSON:
+        description: !include documentation/common/configuration.md
+        description1: !include documentation/job/jobRequired.md
+        description2: !include documentation/common/configurationFileMimeParam.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: Returns the job configuration in XML or HTML format
+        schema: !include schemas/job/jobConfigurationFilter-schema.json
+        schema200: !include schemas/common/configuration-schema.json
+        example: " "
+        example200: !include examples/job/configuration-example.json
+  /description:
+    is: [ accessToken, jobschedulerMaster, filteredByJob ]
+    type: error
+    get:
+      responses:
+        200:
+          body:
+            text/html:
+  /run_time:
+    type:
+      postJSON:
+        description: run time as XML string embedded in JSON
+        description1: !include documentation/job/jobRequired.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: returns the run time as XML string in the JSON content field
+        schema: !include schemas/job/jobFilter-schema.json
+        schema200: !include schemas/common/runtime200-schema.json
+        example: TODO
+        example200: !include examples/common/runtime-example.json
+
+/tasks:
+  description: |
+    This is not an API call. Use its children!!
+  /history:
+    type:
+      postJSON:
+        description: Task history from _reporting_ (permanent)
+        description1: !include documentation/job/filteredByJobs.md
+        description2: !include documentation/job/excludeJobs.md
+        description3: !include documentation/common/dateFrom.md
+        description4: !include documentation/common/dateTo.md
+        description5: !include documentation/common/timeZone.md
+        description6: !include documentation/common/regex.md
+        description7: !include documentation/common/folders.md
+        description8: !include documentation/common/limit.md
+        description9: !include documentation/common/historyStates.md
+        description10: " "
+        description200: TODO
+        schema: !include schemas/job/jobsFilter-schema.json
+        schema200: !include schemas/job/history-schema.json
+        example: TODO
+        example200: !include examples/job/taskHistory_p-example.json
+  /terminate:
+    type:
+      modifyTasks:
+        description: Terminate tasks (by SIGTERM) - Only for Unix
+        description1: " "
+        audit: !include documentation/audit/auditLog.md
+  /terminate_within:
+    type:
+      modifyTasks:
+        description: Terminate task with timeout (sends first SIGTERM and later SIGKILL) - Only for Unix
+        description1: !include documentation/common/timeout.md
+        audit: !include documentation/audit/auditLog.md
+  /kill:
+    type:
+      modifyTasks:
+        description: Kill task (sends SIGKILL)
+        description1: " "
+        audit: !include documentation/audit/auditLog.md
+  /end:
+    type:
+      modifyTasks:
+        description: End task - Only for API Jobs
+        description1: " "
+        audit: !include documentation/audit/auditLog.md
+
+/task:
+  type:
+    postJSON:
+      description: Task information
+      description1: !include documentation/job/task.md
+      description2: " "
+      description3: " "
+      description4: " "
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: TODO
+      schema: !include schemas/job/taskFilter-schema.json
+      schema200: !include schemas/job/task200-schema.json
+      example: TODO
+      example200: TODO
+  #/history: see /tasks/history
+  #  type:
+  #    postJSON:
+  #      description: Task history information
+  #      description1: !include documentation/job/task.md
+  #      description2: " "
+  #      description3: " "
+  #      description4: " "
+  #      description5: " "
+  #      description6: " "
+  #      description7: " "
+  #      description8: " "
+  #      description9: " "
+  #      description200: TODO
+  #      schema: !include schemas/job/taskFilter-schema.json
+  #      schema200: !include schemas/job/historyItem200-schema.json
+  #      example: TODO
+  #      example200: !include examples/job/taskHistoryItem_p-example.json
+  /log:
+    type:
+      postJSON:
+        description: Log (plain text or html)
+        description1: !include documentation/job/task.md
+        description2: !include documentation/common/logMimeParam.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: TODO
+        schema: !include schemas/job/taskFilter-schema.json
+        schema200: logContent
+        example: TODO
+        example200: !include examples/order/log-example.json
+    /html:
+      is: [accessToken, jobschedulerMaster]
+      type: error
+      get:
+        description: |
+          <h2>sends log as a complete HTML incl. header to open in a new window</h2>
+          TODO:
+          * queryParameter taskId
+          * how we get a rolling log?
+        responses:
+          200:
+            body:
+              text/html:
+                example: !include examples/order/log-example.html
+
+/job_chains:
+  type:
+    postJSON:
+      description: Collection of job chains (volatile part)
+      description1: !include documentation/common/compact.md
+      description2: " "
+      description3: !include documentation/common/regex.md
+      description4: !include documentation/common/folders.md
+      description5: !include documentation/jobChain/filteredByJobChains.md
+      description6: !include documentation/jobChain/filteredByJobChainState.md
+      description7: !include documentation/jobChain/maxOrders.md
+      description8: " "
+      description9: " "
+      description10: " "
+      schema: !include schemas/jobChain/jobChainsFilter-schema.json
+      description200: !include documentation/jobChain/jobChains_v.md
+      schema200: !include schemas/jobChain/jobChains_v-schema.json
+      example: TODO
+      example200: !include examples/jobChain/jobChains_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: Collection of job chains (permant part)
+        description1: !include documentation/common/compact.md
+        description2: !include documentation/common/regex.md
+        description3: !include documentation/common/folders.md
+        description4: !include documentation/jobChain/filteredByJobChains.md
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        schema: !include schemas/jobChain/jobChainsFilter-schema.json
+        description200: !include documentation/jobChain/jobChains_p.md
+        schema200: !include schemas/jobChain/jobChains_p-schema.json
+        example: TODO
+        example200: !include examples/jobChain/jobChains_p-example.json
+  /tree:
+    type:
+       postJSON:
+         description: This is not a real API Url. Only for mock data. Please use ./tree later with "types":["JOBCHAIN"]
+         description1: " "
+         description2: " "
+         description3: " "
+         description4: " "
+         description5: " "
+         description6: " "
+         description7: " "
+         description8: " "
+         description9: " "
+         description10: " "
+         description200: " "
+         schema: !include schemas/tree/treeFilter-schema.json
+         schema200: !include schemas/tree/treeView-schema.json
+         example: !include examples/tree/filteredtree-example.json
+         example200: !include examples/tree/tree_jobChains-example.json
+  /stop:
+    type:
+      modifyJobChain:
+        description: Not available for distributed job chains
+        audit: !include documentation/audit/auditLog.md
+  /unstop:
+    type:
+      modifyJobChain:
+        description : Not available for distributed job chains
+        audit: !include documentation/audit/auditLog.md
+  #/delete_temp_orders:
+  #  type: { modifyOrder: {description : "Delete temporary orders"} }
+
+/job_chain:
+  type:
+    postJSON:
+      description: job chain (volatile part)
+      description1: !include documentation/common/compact.md
+      description2: " "
+      description3: !include documentation/jobChain/filteredByJobChain.md
+      description4: " "
+      description5: !include documentation/jobChain/maxOrders.md
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: !include documentation/jobChain/jobChains_v.md
+      schema: !include schemas/jobChain/jobChainFilter-schema.json
+      schema200: !include schemas/jobChain/jobChain200_v-schema.json
+      example: TODO
+      example200: !include examples/jobChain/jobChain_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: job chain (permanent part)
+        description1: !include documentation/common/compact.md
+        description2: !include documentation/jobChain/filteredByJobChain.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/jobChain/jobChains_p.md
+        schema: !include schemas/jobChain/jobChainFilter-schema.json
+        schema200: !include schemas/jobChain/jobChain200_p-schema.json
+        example: TODO
+        example200: !include examples/jobChain/jobChain_p-example.json
+  /history:
+    type:
+      postJSON:
+        description: Last 25 order history item of the job chain from _JobScheduler_
+        description1: !include documentation/jobChain/filteredByJobChain.md
+        description2: !include documentation/common/maxLastHistoryItems.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: TODO
+        schema: !include schemas/jobChain/jobChainHistoryFilter-schema.json
+        schema200: !include schemas/order/history-schema.json
+        example: TODO
+        example200: !include examples/jobChain/orderHistory-example.json
+  /configuration:
+    type:
+      postJSON:
+        description: !include documentation/common/configuration.md
+        description1: !include documentation/jobChain/filteredByJobChain.md
+        description2: !include documentation/common/configurationFileMimeParam.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: Returns the job chain configuration in XML or HTML format
+        schema: !include schemas/jobChain/jobChainConfigurationFilter-schema.json
+        schema200: !include schemas/common/configuration-schema.json
+        example: TODO
+        example200: !include examples/jobChain/configuration-example.json
+
+/job_chain_nodes:
+  description: This resource doesn't have a response. Use ./skip, ./stop, ./activate
+  /skip:
+    type:
+      modifyJobChainNode:
+        description: "skip job chain nodes"
+        audit: !include documentation/audit/auditLog.md
+  /stop:
+    type:
+      modifyJobChainNode:
+        description: "stop job chain nodes"
+        audit: !include documentation/audit/auditLog.md
+  /activate:
+    type:
+      modifyJobChainNode:
+        description: This service unstops and unskips stopped and/or skipped nodes.
+        audit: !include documentation/audit/auditLog.md
+
+/locks:
+  type:
+    postJSON:
+      description: Collection of lock objects
+      description1: !include documentation/lock/filteredByLocks.md
+      description2: !include documentation/common/regex.md
+      description3: !include documentation/common/folders.md
+      description4: " "
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: TODO
+      schema: !include schemas/lock/locksFilter-schema.json
+      schema200: !include schemas/lock/locks_v-schema.json
+      example: TODO
+      example200: !include examples/lock/locks_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: Collection of lock objects
+        description1: !include documentation/lock/filteredByLocks.md
+        description2: !include documentation/common/regex.md
+        description3: !include documentation/common/folders.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/lock/locks_p.md
+        schema: !include schemas/lock/locksFilter-schema.json
+        schema200: !include schemas/lock/locks_p-schema.json
+        example: TODO
+        example200: !include examples/lock/locks_p-example.json
+/lock/configuration:
+    type:
+      postJSON:
+        description: !include documentation/common/configuration.md
+        description1: include documentation/lock/lockRequired.md
+        description2: !include documentation/common/configurationFileMimeParam.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: Returns the lock configuration in XML or HTML format
+        schema: !include schemas/lock/lockConfigurationFilter-schema.json
+        schema200: !include schemas/common/configuration-schema.json
+        example: !include examples/lock/filteredLock-example.json
+        example200: !include examples/lock/configuration-example.json
+
+# entfaellt
+#/log:
+#  /categories:
+#    type:
+#      getBaseWithoutExample:
+#        description: " "
+#        description200: " "
+#        schema200: !include schemas/log/categories-schema.json
+#    /set:
+#      type:
+#        postJSONWithOkResponse:
+#          description: " "
+#          schema: !include schemas/log/setCategories-schema.json
+#          example: "TODO"
+#    /reset:
+#      type:
+#        postJSONWithOkResponse:
+#          description: "A delay in seconds is optional"
+#          schema: !include schemas/log/resetCategories-schema.json
+#          example: 60
+
+/schedules:
+  type:
+    postJSON:
+      description: Schedules (volatile part)
+      description1: " "
+      description2: !include documentation/common/regex.md
+      description3: !include documentation/schedule/filteredBySchedules.md
+      description4: !include documentation/schedule/filteredByScheduleState.md
+      description5: !include documentation/common/folders.md
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: !include documentation/schedule/schedules_v.md
+      schema: !include schemas/schedule/schedulesFilter-schema.json
+      schema200: !include schemas/schedule/schedules_v-schema.json
+      example: !include examples/schedule/filteredSchedules-example.json
+      example200: !include examples/schedule/schedules_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: Schedules (permanent part)
+        description1: " "
+        description2: !include documentation/common/regex.md
+        description3: !include documentation/schedule/filteredBySchedules.md
+        description4: " "
+        description5: !include documentation/common/folders.md
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/schedule/schedules_p.md
+        schema: !include schemas/schedule/schedulesFilter-schema.json
+        schema200: !include schemas/schedule/schedules_p-schema.json
+        example: !include examples/schedule/filteredSchedules-example.json
+        example200: !include examples/schedule/schedules_p-example.json
+  #/tree:
+#    type:
+#      postOnlyId:
+#        description: This is not a real API Url. Only for mock data. Please use ./tree later with "types":["SCHEDULE"]
+#        description200: " "
+#        example200: TODO
+#        schema200: !include schemas/tree/treeView-schema.json
+
+/schedule:
+  type:
+    postJSON:
+      description: schedule (volatile part)
+      description1: " "
+      description2: !include documentation/schedule/scheduleRequired.md
+      description3: " "
+      description4: " "
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: !include documentation/schedule/schedules_v.md
+      schema: !include schemas/schedule/scheduleFilter-schema.json
+      schema200: !include schemas/schedule/schedule200_v-schema.json
+      example: !include examples/schedule/filteredScheduleWithCompact-example.json
+      example200: !include examples/schedule/schedule_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: schedule (permanent part)
+        description1: " "
+        description2: !include documentation/schedule/scheduleRequired.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/schedule/schedules_p.md
+        schema: !include schemas/schedule/scheduleFilter-schema.json
+        schema200: !include schemas/schedule/schedule200_p-schema.json
+        example: !include examples/schedule/filteredScheduleWithCompact-example.json
+        example200: !include examples/schedule/schedule_p-example.json
+  #/run_time:
+  #  type:
+  #    postJSON:
+  #      description: run time as XML string embedded in JSON
+  #      description1: !include documentation/schedule/scheduleRequired.md
+  #      description2: " "
+  #      description3: " "
+  #      description4: " "
+  #      description5: " "
+  #      description6: " "
+  #      description7: " "
+  #      description8: " "
+  #      description9: " "
+  #      description200: returns the run time as XML string in the JSON content field
+  #      schema: !include schemas/schedule/scheduleFilter-schema.json
+  #      schema200: !include schemas/common/runtime200-schema.json
+  #      example: TODO
+  #      example200: !include examples/common/runtime-example.json
+  /configuration:
+    type:
+      postJSON:
+        description: !include documentation/common/configuration.md
+        description1: !include documentation/schedule/scheduleRequired.md
+        description2: !include documentation/common/configurationFileMimeParam.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: Returns the schedule configuration in XML or HTML format
+        schema: !include schemas/schedule/scheduleConfigurationFilter-schema.json
+        schema200: !include schemas/common/configuration-schema.json
+        example: !include examples/schedule/filteredSchedule-example.json
+        example200: !include examples/schedule/configuration-example.json
+  /set_run_time:
+    type:
+      postJSON:
+        description: edit schedule
+        description1: !include documentation/schedule/scheduleRequired.md
+        description2: !include documentation/schedule/runTime.md
+        description3: !include documentation/audit/auditLog.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: It returns an _ok_.
+        schema: !include schemas/schedule/modifyRuntime-schema.json
+        schema200: ok
+        example: !include examples/schedule/scheduleWithRunTime-example.json
+        example200: |
+            {
+              "deliveryDate":"2016-05-05T21:13:35Z",
+              "surveyDate":"2016-05-05T21:13:34Z",
+              "ok":true
+            }
+
+/process_classes:
+  type:
+    postJSON:
+      description: process classes (volatile part)
+      description1: !include documentation/processClass/filteredByProcessClasses.md
+      description2: !include documentation/common/regex.md
+      description3: " "
+      description4: " "
+      description5: !include documentation/common/folders.md
+      description6: !include documentation/processClass/filteredByHasAgent.md
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: !include documentation/processClass/processClass_v.md
+      schema: !include schemas/processClass/processClassesFilter-schema.json
+      schema200: !include schemas/processClass/processClasses_v-schema.json
+      example: TODO
+      example200: !include examples/processClass/processClasses_v-example.json
+  /p:
+    type:
+      postJSON:
+        description: process classes (permanent part)
+        description1: !include documentation/processClass/filteredByProcessClasses.md
+        description2: !include documentation/common/regex.md
+        description3: " "
+        description4: " "
+        description5: !include documentation/common/folders.md
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/processClass/processClass_p.md
+        schema: !include schemas/processClass/processClassesFilter-schema.json
+        schema200: !include schemas/processClass/processClasses_p-schema.json
+        example: TODO
+        example200: !include examples/processClass/processClasses_p-example.json
+/process_class:
+  /configuration:
+    type:
+      postJSON:
+        description: !include documentation/common/configuration.md
+        description1: !include documentation/processClass/processClassRequired.md
+        description2: !include documentation/common/configurationFileMimeParam.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: Returns the process class configuration in XML or HTML format
+        schema: !include schemas/processClass/processClassConfigurationFilter-schema.json
+        schema200: !include schemas/common/configuration-schema.json
+        example: TODO
+        example200: !include examples/processClass/configuration-example.json
+
+/plan:
+  type:
+    postJSON:
+      description: daily plan
+      description1: " "
+      description2: !include documentation/common/dateFrom.md
+      description3: !include documentation/common/dateTo.md
+      description4: !include documentation/common/timeZone.md
+      description5: !include documentation/common/regex.md
+      description6: !include documentation/plan/state.md
+      description7: !include documentation/plan/late.md
+      description8: !include documentation/jobChain/jobChain.md
+      description9: !include documentation/order/orderId.md
+      description10: !include documentation/job/job.md
+      description200: " "
+      schema: !include schemas/plan/planFilter-schema.json
+      schema200: !include schemas/plan/plan-schema.json
+      example: TODO
+      example200: !include examples/plan/plan-example.json
+
+/tree:
+  type:
+    postJSON:
+      description: Collections of specified object with folders information in a tree structure
+      description1: !include documentation/common/compact.md
+      description2: " "
+      description3: " "
+      description4: " "
+      description5: " "
+      description6: !include documentation/common/folders.md
+      description7: !include documentation/common/typesParam.md
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: !include documentation/tree/tree.md
+      schema: !include schemas/tree/treeFilter-schema.json
+      schema200: !include schemas/tree/treeView-schema.json
+      example: !include examples/tree/filteredtree-example.json
+      example200: !include examples/tree/tree-example.json
+
+/configuration:
+  type:
+     postJSON:
+       description: Responds a configuration from the server (database)
+#       description1: !include documentation/configuration/userRequiredParam.md
+#       description2: !include documentation/configuration/configurationTypeRequiredParam.md
+#       description3: !include documentation/configuration/objectTypeRequiredParam.md
+#       description4: !include documentation/configuration/nameParam.md
+       description1: " "
+       description2: " "
+       description3: " "
+       description4: " "
+       description5: !include documentation/configuration/configurationIdRequiredParam.md
+       description6: " "
+       description7: " "
+       description8: " "
+       description9: " "
+       description10: " "
+       description200: " "
+       schema: !include schemas/configuration/configuration-schema.json
+       schema200: !include schemas/configuration/configuration200-schema.json
+       example: " "
+       example200: " "
+  /save:
+    type:
+       postJSON:
+         description: Stores a configuration on the server (database)
+         description1: !include documentation/configuration/userRequiredParam.md
+         description2: !include documentation/configuration/configurationTypeRequiredParam.md
+         description3: !include documentation/configuration/objectTypeRequiredParam.md
+         description4: !include documentation/configuration/nameParam.md
+         description5: !include documentation/configuration/sharedParam.md
+         description6: !include documentation/configuration/itemParam.md
+         description7: !include documentation/configuration/configurationIdRequiredParam.md
+         description8: " "
+         description9: " "
+         description10: " "
+         description200: |
+             *Response contains the ``id`` of the customization.*<br/>
+             It seems to be unnecessary but if a new customization is saved
+             (with ``id=0`` in the request) then you get the new id.
+         schema: !include schemas/configuration/configuration-schema.json
+         schema200: !include schemas/configuration/configurationOk-schema.json
+         example: " "
+         example200: |
+           {
+             "deliveryDate":"2016-05-05T21:13:35Z",
+             "id":4711
+           }
+  /delete:
+    type:
+       postJSON:
+         description: Deletes a configuration on the server (database)
+#         description1: !include documentation/configuration/userRequiredParam.md
+#         description2: !include documentation/configuration/configurationTypeRequiredParam.md
+#         description3: !include documentation/configuration/objectTypeRequiredParam.md
+#         description4: !include documentation/configuration/nameParam.md
+         description1: " "
+         description2: " "
+         description3: " "
+         description4: " "
+         description5: !include documentation/configuration/configurationIdRequiredParam.md
+         description6: " "
+         description7: " "
+         description8: " "
+         description9: " "
+         description10: " "
+         description200: " "
+         schema: !include schemas/configuration/configuration-schema.json
+         schema200: !include schemas/configuration/configurationOk-schema.json
+         example: " "
+         example200: |
+           {
+             "deliveryDate":"2016-05-05T21:13:35Z",
+             "id":4711
+           }
+  /share:
+    type:
+       postJSON:
+         description: set a configuration as shared
+#         description1: !include documentation/configuration/userRequiredParam.md
+#         description2: !include documentation/configuration/configurationTypeRequiredParam.md
+#         description3: !include documentation/configuration/objectTypeRequiredParam.md
+#         description4: !include documentation/configuration/nameParam.md
+         description1: " "
+         description2: " "
+         description3: " "
+         description4: " "
+         description5: !include documentation/configuration/configurationIdRequiredParam.md
+         description6: " "
+         description7: " "
+         description8: " "
+         description9: " "
+         description10: " "
+         description200: " "
+         schema: !include schemas/configuration/configuration-schema.json
+         schema200: !include schemas/configuration/configurationOk-schema.json
+         example: " "
+         example200: |
+           {
+             "deliveryDate":"2016-05-05T21:13:35Z",
+             "id":4711
+           }
+  /make_private:
+    type:
+       postJSON:
+         description: set a configuration as unshared
+#         description1: !include documentation/configuration/userRequiredParam.md
+#         description2: !include documentation/configuration/configurationTypeRequiredParam.md
+#         description3: !include documentation/configuration/objectTypeRequiredParam.md
+#         description4: !include documentation/configuration/nameParam.md
+         description1: " "
+         description2: " "
+         description3: " "
+         description4: " "
+         description5: !include documentation/configuration/configurationIdRequiredParam.md
+         description6: " "
+         description7: " "
+         description8: " "
+         description9: " "
+         description10: " "
+         description200: " "
+         schema: !include schemas/configuration/configuration-schema.json
+         schema200: !include schemas/configuration/configurationOk-schema.json
+         example: " "
+         example200: |
+           {
+             "deliveryDate":"2016-05-05T21:13:35Z",
+             "id":4711
+           }
+/configurations:
+  type:
+     postJSON:
+       description: Sends collection of configuration items
+       description1: !include documentation/configuration/userParam.md
+       description2: !include documentation/configuration/configurationTypeParam.md
+       description3: !include documentation/configuration/objectTypeParam.md
+       description4: !include documentation/configuration/sharedParam.md
+       description5: " "
+       description6: " "
+       description7: " "
+       description8: " "
+       description9: " "
+       description10: " "
+       description200: " "
+       schema: !include schemas/configuration/configurationsFilter-schema.json
+       schema200: !include schemas/configuration/configurations-schema.json
+       example: " "
+       example200: " "
+#  /shared:
+#    type:
+#       postOnlyId:
+#         description: Sends collection of all shared configuration items
+#         description200: " "
+#         schema200: !include schemas/configuration/configurations-schema.json
+#         example200: " "
+
+/audit_log:
+  type:
+    postJSON:
+      description: Responds the audit log
+      description1: !include documentation/common/dateFrom.md
+      description2: !include documentation/common/dateTo.md
+      description3: !include documentation/common/timeZone.md
+      description4: !include documentation/common/regex.md
+      description5: !include documentation/common/folders.md
+      description6: !include documentation/job/filteredByJobs.md
+      description7: !include documentation/order/filteredByOrders.md
+      description8: !include documentation/audit/ticketLink.md
+      description9: !include documentation/configuration/userParam.md
+      description10: !include documentation/common/limit.md
+      description200: !include documentation/audit/audit.md
+      schema: !include schemas/audit/auditLogFilter-schema.json
+      schema200: !include schemas/audit/auditLog-schema.json
+      example: " "
+      example200: " "
+  /comments:
+    type:
+      postOnlyAccessToken:
+        description: Response contains pre-defined comments and force_comments_for_audit_log settings from joc.properties file
+        description200: " "
+        schema200: !include schemas/audit/comments-schema.json
+        example200: !include examples/audit/comments-example.json
+
+# TODO calendar
+#/calendar:
+#  is: [ jobschedulerObject, limitedByCalendarPeriod ]
+#  type:
+#    getBaseWithoutExample:
+#      description: "A calendar view of history and plan"
+#      description200: " "
+#      schema200: !include schemas/calendar/days-schema.json
+
+# TODO actions
+#/actions:
+#  is: [ jobschedulerObject, limitableByTime ]
+#  type:
+#    getBaseWithoutExample:
+#      description: |
+#        Returns a collection of user actions of a JobScheduler object such as
+#        * modify job chain
+#        * modify job
+#        * suspend order
+#        * ...
+#      description200: " "
+#      schema200: !include schemas/action/actions-schema.json

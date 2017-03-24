@@ -1,0 +1,1580 @@
+{
+    "folders":  {
+                    "path":  "/",
+                    "name":  "",
+                    "folders":  [
+                                    {
+                                        "path":  "/Support",
+                                        "name":  "Support",
+                                        "folders":  [
+                                                        {
+                                                            "path":  "/Support/Ticket#2016030910000028",
+                                                            "name":  "Ticket#2016030910000028"
+                                                        },
+                                                        {
+                                                            "path":  "/Support/Ticket#2016050410000015",
+                                                            "name":  "Ticket#2016050410000015"
+                                                        },
+                                                        {
+                                                            "path":  "/Support/Ticket#2016070710000015",
+                                                            "name":  "Ticket#2016070710000015"
+                                                        },
+                                                        {
+                                                            "path":  "/Support/Ticket#2016080410000019",
+                                                            "name":  "Ticket#2016080410000019"
+                                                        },
+                                                        {
+                                                            "path":  "/Support/Ticket#2016090210000011",
+                                                            "name":  "Ticket#2016090210000011"
+                                                        }
+                                                    ]
+                                    },
+                                    {
+                                        "path":  "/sos",
+                                        "name":  "sos",
+                                        "folders":  [
+                                                        {
+                                                            "path":  "/sos/housekeeping",
+                                                            "name":  "housekeeping"
+                                                        },
+                                                        {
+                                                            "path":  "/sos/operations",
+                                                            "name":  "operations",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/sos/operations/criticalpath",
+                                                                                "name":  "criticalpath"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/sos/jade",
+                                                            "name":  "jade"
+                                                        },
+                                                        {
+                                                            "path":  "/sos/dailyschedule",
+                                                            "name":  "dailyschedule"
+                                                        },
+                                                        {
+                                                            "path":  "/sos/notification",
+                                                            "name":  "notification"
+                                                        },
+                                                        {
+                                                            "path":  "/sos/events",
+                                                            "name":  "events"
+                                                        },
+                                                        {
+                                                            "path":  "/sos/jitl",
+                                                            "name":  "jitl"
+                                                        },
+                                                        {
+                                                            "path":  "/sos/reporting",
+                                                            "name":  "reporting"
+                                                        }
+                                                    ]
+                                    },
+                                    {
+                                        "path":  "/examples",
+                                        "name":  "examples",
+                                        "folders":  [
+                                                        {
+                                                            "path":  "/examples/37_JobChainExitCodeHandling",
+                                                            "name":  "37_JobChainExitCodeHandling"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/common_settings",
+                                                            "name":  "common_settings",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/common_settings/database",
+                                                                                "name":  "database"
+                                                                            },
+                                                                            {
+                                                                                "path":  "/examples/common_settings/lib",
+                                                                                "name":  "lib",
+                                                                                "folders":  [
+                                                                                                {
+                                                                                                    "path":  "/examples/common_settings/lib/javascripts",
+                                                                                                    "name":  "javascripts"
+                                                                                                }
+                                                                                            ]
+                                                                            },
+                                                                            {
+                                                                                "path":  "/examples/common_settings/jade_conf",
+                                                                                "name":  "jade_conf"
+                                                                            },
+                                                                            {
+                                                                                "path":  "/examples/common_settings/credential_store",
+                                                                                "name":  "credential_store"
+                                                                            },
+                                                                            {
+                                                                                "path":  "/examples/common_settings/ssh_connection",
+                                                                                "name":  "ssh_connection"
+                                                                            },
+                                                                            {
+                                                                                "path":  "/examples/common_settings/email_settings",
+                                                                                "name":  "email_settings"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/exec",
+                                                            "name":  "exec"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/49_CriticalPath",
+                                                            "name":  "49_CriticalPath"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/19_NonExclusiveLocks",
+                                                            "name":  "19_NonExclusiveLocks"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/56_NestedJobChains",
+                                                            "name":  "56_NestedJobChains"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/30_OrderManagement",
+                                                            "name":  "30_OrderManagement"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/15_Setback",
+                                                            "name":  "15_Setback",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/15_Setback/15_helper",
+                                                                                "name":  "15_helper"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/47_SyncJobChainExecution",
+                                                            "name":  "47_SyncJobChainExecution"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/57_BankCalendar",
+                                                            "name":  "57_BankCalendar"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/Holidays",
+                                                            "name":  "Holidays"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/10_RemoteExecutionUniversalAgent",
+                                                            "name":  "10_RemoteExecutionUniversalAgent",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/10_RemoteExecutionUniversalAgent/10_03_helper",
+                                                                                "name":  "10_03_helper"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/17_DynamicProcessRouting",
+                                                            "name":  "17_DynamicProcessRouting"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/include_files",
+                                                            "name":  "include_files"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/58_MultipleParametersOrders",
+                                                            "name":  "58_MultipleParametersOrders"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/params",
+                                                            "name":  "params"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/55_JobSchedulerLaunchQueue",
+                                                            "name":  "55_JobSchedulerLaunchQueue",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/55_JobSchedulerLaunchQueue/01_JQLJobChain1",
+                                                                                "name":  "01_JQLJobChain1"
+                                                                            },
+                                                                            {
+                                                                                "path":  "/examples/55_JobSchedulerLaunchQueue/01_JQLJobChain2",
+                                                                                "name":  "01_JQLJobChain2"
+                                                                            },
+                                                                            {
+                                                                                "path":  "/examples/55_JobSchedulerLaunchQueue/common_jobs",
+                                                                                "name":  "common_jobs"
+                                                                            },
+                                                                            {
+                                                                                "path":  "/examples/55_JobSchedulerLaunchQueue/01_JobSchedulerLaunchQueue",
+                                                                                "name":  "01_JobSchedulerLaunchQueue"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/34_ParameterFile",
+                                                            "name":  "34_ParameterFile"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/08_FileWatchingRemoteFileProcessing",
+                                                            "name":  "08_FileWatchingRemoteFileProcessing"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/23_SchedulingOrder",
+                                                            "name":  "23_SchedulingOrder"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/18_ExclusiveLockJobChains",
+                                                            "name":  "18_ExclusiveLockJobChains"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/02_FileWatcher",
+                                                            "name":  "02_FileWatcher",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/02_FileWatcher/02_helper",
+                                                                                "name":  "02_helper"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/09_VersionControl",
+                                                            "name":  "09_VersionControl",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/09_VersionControl/01_Process01",
+                                                                                "name":  "01_Process01"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/03_DatabaseStatement",
+                                                            "name":  "03_DatabaseStatement"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/51_SendEmails",
+                                                            "name":  "51_SendEmails",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/51_SendEmails/helper",
+                                                                                "name":  "helper"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/52_JavaScriptAPI",
+                                                            "name":  "52_JavaScriptAPI"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/20_SchedulingJobChains",
+                                                            "name":  "20_SchedulingJobChains"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/11_RemoteExecutionSSH",
+                                                            "name":  "11_RemoteExecutionSSH"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/06_YADEFileTransfer",
+                                                            "name":  "06_YADEFileTransfer",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/06_YADEFileTransfer/06_05_helper",
+                                                                                "name":  "06_05_helper"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/59_ParallelTableExport",
+                                                            "name":  "59_ParallelTableExport"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/50_ResourcePoolManagement",
+                                                            "name":  "50_ResourcePoolManagement",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/50_ResourcePoolManagement/helper",
+                                                                                "name":  "helper"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/examples/48_JobChainReturnCodeHandling",
+                                                            "name":  "48_JobChainReturnCodeHandling"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/04_ExecuteOraclePLSQL",
+                                                            "name":  "04_ExecuteOraclePLSQL"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/14_JobChainsEvents",
+                                                            "name":  "14_JobChainsEvents"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/01_JobChainShellJobs",
+                                                            "name":  "01_JobChainShellJobs"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/16_SplitAndSync",
+                                                            "name":  "16_SplitAndSync"
+                                                        },
+                                                        {
+                                                            "path":  "/examples/31_Monitoring",
+                                                            "name":  "31_Monitoring",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/examples/31_Monitoring/31_01_helper",
+                                                                                "name":  "31_01_helper"
+                                                                            }
+                                                                        ]
+                                                        }
+                                                    ]
+                                    },
+                                    {
+                                        "path":  "/Demo",
+                                        "name":  "Demo",
+                                        "folders":  [
+                                                        {
+                                                            "path":  "/Demo/HPCC",
+                                                            "name":  "HPCC"
+                                                        },
+                                                        {
+                                                            "path":  "/Demo/HMRC",
+                                                            "name":  "HMRC",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/Demo/HMRC/SchedulerManagedMailExample",
+                                                                                "name":  "SchedulerManagedMailExample"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/Demo/Rosenberger",
+                                                            "name":  "Rosenberger",
+                                                            "folders":  [
+                                                                            {
+                                                                                "path":  "/Demo/Rosenberger/InboundFileInterfaceWorkflow",
+                                                                                "name":  "InboundFileInterfaceWorkflow"
+                                                                            }
+                                                                        ]
+                                                        },
+                                                        {
+                                                            "path":  "/Demo/RBCCM",
+                                                            "name":  "RBCCM"
+                                                        },
+                                                        {
+                                                            "path":  "/Demo/Accenture",
+                                                            "name":  "Accenture"
+                                                        },
+                                                        {
+                                                            "path":  "/Demo/Quanam",
+                                                            "name":  "Quanam"
+                                                        },
+                                                        {
+                                                            "path":  "/Demo/MCEBankEU",
+                                                            "name":  "MCEBankEU"
+                                                        },
+                                                        {
+                                                            "path":  "/Demo/Airbus",
+                                                            "name":  "Airbus"
+                                                        }
+                                                    ]
+                                    },
+                                    {
+                                        "path":  "/test",
+                                        "name":  "test"
+                                    }
+                                ]
+                },
+    "deliveryDate":  "2016-09-23T11:13:41Z",
+    "orders":  [
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/49_CriticalPath/02_JobChainB",
+                       "path":  "/examples/49_CriticalPath/02_JobChainB,02_Every_Saturday",
+                       "title":  "Repeating order every Saturday 10:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "02_Every_Saturday"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/56_NestedJobChains/JobChainA",
+                       "path":  "/examples/56_NestedJobChains/DailyProcess,EOD",
+                       "title":  "Daily Processing of data",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "EOD"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/09_VersionControl/01_Process01/01_JobChainA",
+                       "path":  "/examples/09_VersionControl/01_Process01/01_JobChainA,01_daily_morning",
+                       "title":  "Repeating order every morning 08:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "01_daily_morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/31_Monitoring/03_JobChainMonMax",
+                       "path":  "/examples/31_Monitoring/03_JobChainMonMax,03_Start",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "03_Start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "touch /var/tmp/FileMove.txt",
+                                          "name":  "command"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/31_Monitoring/31_01_helper/ErrorRecoveryHelper",
+                       "path":  "/examples/31_Monitoring/31_01_helper/ErrorRecoveryHelper,CreateFile",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "CreateFile"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/20_SchedulingJobChains/01_JobChainDaily",
+                       "path":  "/examples/20_SchedulingJobChains/01_JobChainDaily,DailyOrder",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "DailyOrder"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "select \"SCHEDULER_ID\", \"HOSTNAME\", \"TCP_PORT\" from SCHEDULER_INSTANCES;",
+                                          "name":  "command"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/03_DatabaseStatement/02_DatabaseStatments",
+                       "path":  "/examples/03_DatabaseStatement/02_DatabaseStatments,02_execute_database_statement",
+                       "title":  "Execute database statement",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "02_execute_database_statement"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/Demo/RBCCM/DailyBatchProcessing",
+                       "path":  "/Demo/RBCCM/DailyBatchProcessing,daily_evening",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "daily_evening"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "/home/sos/data/to_galadriel/archive/outbound",
+                                          "name":  "archive_dir"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/Demo/MCEBankEU/OutboundFileWorkflow",
+                       "path":  "/Demo/MCEBankEU/OutboundFileWorkflow,OutboundFile",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "OutboundFile"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/57_BankCalendar/hello",
+                       "path":  "/examples/57_BankCalendar/hello,hello",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "hello"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "invalid command",
+                                          "name":  "command"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/31_Monitoring/02_ErrorSuccess",
+                       "path":  "/examples/31_Monitoring/02_ErrorSuccess,Error",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "Error"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "invalid command",
+                                          "name":  "command"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/31_Monitoring/02_ErrorSuccess",
+                       "path":  "/examples/31_Monitoring/02_ErrorSuccess,02_Error",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "02_Error"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "echo \u0027hello word\u0027",
+                                          "name":  "command"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/31_Monitoring/02_ErrorSuccess",
+                       "path":  "/examples/31_Monitoring/02_ErrorSuccess,02_Success",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "02_Success"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CopyLocalhost2RemoteServer",
+                                          "name":  "profile"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer",
+                       "path":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer,01_01_CopyLocahost2RemoteServer",
+                       "title":  "Transfer file from localhost to remote server using SFTP",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "01_01_CopyLocahost2RemoteServer"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CopyRemoteServer2Localhost",
+                                          "name":  "profile"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer",
+                       "path":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer,01_02_CopyRemoteServer2Localhost",
+                       "title":  "Transfer file from remote server to localhost using SFTP",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "01_02_CopyRemoteServer2Localhost"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CopyRenameLocalhost2RemoteServer",
+                                          "name":  "profile"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer",
+                       "path":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer,01_03_CopyAndRenameLocahost2RemoteServer",
+                       "title":  "Transfer and rename file from localhost to remote server using SFTP",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "01_03_CopyAndRenameLocahost2RemoteServer"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CopyServer2Server",
+                                          "name":  "profile"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer",
+                       "path":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer,01_04_CopyServer2Server",
+                       "title":  "Transfer files Point-to-Point or SFTPServer-to-SFTPServer",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "01_04_CopyServer2Server"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "PollingCopyRemoteServer2Localhost",
+                                          "name":  "profile"
+                                      },
+                                      {
+                                          "value":  "true",
+                                          "name":  "remove_files"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer",
+                       "path":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer,01_05_PollingCopyRemoteServer2Localhost",
+                       "title":  "Poll for incoming file and transfer the files to localhost",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "01_05_PollingCopyRemoteServer2Localhost"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CopyWebDAV2LocalServer",
+                                          "name":  "profile"
+                                      },
+                                      {
+                                          "value":  "false",
+                                          "name":  "remove_files"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer",
+                       "path":  "/examples/06_YADEFileTransfer/01_YADEFileTransfer,01_06_CopyWebDAV2LocalServer",
+                       "title":  "Poll for incoming file and transfer the files to localhost",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "01_06_CopyWebDAV2LocalServer"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/20_SchedulingJobChains/01_JobChainWeekly",
+                       "path":  "/examples/20_SchedulingJobChains/01_JobChainWeekly,WeeklyOrder",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "WeeklyOrder"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CRM001",
+                                          "name":  "OP_SYSTEM_BATCH_CODE"
+                                      },
+                                      {
+                                          "value":  "FULL",
+                                          "name":  "OP_SYSTEM_BACKUP_MODE"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:41Z",
+                       "jobChain":  "/examples/01_JobChainShellJobs/03_JobChainB",
+                       "path":  "/examples/01_JobChainShellJobs/03_JobChainB,03_daily_morning_parameters",
+                       "title":  "Repeating order with parameters every morning 06:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:41Z",
+                       "orderId":  "03_daily_morning_parameters"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/01_JobChainShellJobs/03_JobChainB",
+                       "path":  "/examples/01_JobChainShellJobs/03_JobChainB,02_every_first_of_month",
+                       "title":  "Every First Day of the Month",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "02_every_first_of_month"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/01_JobChainShellJobs/03_JobChainB",
+                       "path":  "/examples/01_JobChainShellJobs/03_JobChainB,02_quarterly",
+                       "title":  "Quarter End Batch",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "02_quarterly"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "config/hibernate.cfg.xml",
+                                          "name":  "hibernate_configuration_file"
+                                      },
+                                      {
+                                          "value":  "1440",
+                                          "name":  "age"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/sos/notification/CleanupNotifications",
+                       "path":  "/sos/notification/CleanupNotifications,Cleanup",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "Cleanup"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/sos/reporting/Reporting",
+                       "path":  "/sos/reporting/Reporting,Reporting",
+                       "title":  "Collect and aggregation of facts",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "Reporting"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/10_RemoteExecutionUniversalAgent/01_JobChainA",
+                       "path":  "/examples/10_RemoteExecutionUniversalAgent/01_JobChainA,01_daily_morning",
+                       "title":  "Repeating order every morning 08:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "01_daily_morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/10_RemoteExecutionUniversalAgent/01_JobChainA",
+                       "path":  "/examples/10_RemoteExecutionUniversalAgent/01_JobChainA,first_monday_of_month",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "first_monday_of_month"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/47_SyncJobChainExecution/01_JobChainA",
+                       "path":  "/examples/47_SyncJobChainExecution/01_JobChainA,01_Every_Wednesday",
+                       "title":  "Repeating order every Wednesday 08:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "01_Every_Wednesday"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "/home/sos/data/to_galadriel/archive/inbound",
+                                          "name":  "archive_dir"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/Demo/MCEBankEU/InboundFileWorkflow",
+                       "path":  "/Demo/MCEBankEU/InboundFileWorkflow,InboundFiles",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "InboundFiles"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/57_BankCalendar/DailyProcessing",
+                       "path":  "/examples/57_BankCalendar/DailyProcessing,daily_morning",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "daily_morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/57_BankCalendar/DailyProcessing",
+                       "path":  "/examples/57_BankCalendar/DailyProcessing,7_14_21_28_th_last_day_of_the_month",
+                       "title":  "Ultimo",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "7_14_21_28_th_last_day_of_the_month"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CRM001",
+                                          "name":  "OP_SYSTEM_BATCH_CODE"
+                                      },
+                                      {
+                                          "value":  "FULL",
+                                          "name":  "OP_SYSTEM_BACKUP_MODE"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/10_RemoteExecutionUniversalAgent/02_JobChainB",
+                       "path":  "/examples/10_RemoteExecutionUniversalAgent/02_JobChainB,02_daily_morning",
+                       "title":  "Repeating order every morning 08:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "02_daily_morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CALL JOB_EXECUTION_RESULTS(@job_success, @job_error); SELECT @job_success AS JOB_SUCCESS, @job_error AS JOB_ERROR;",
+                                          "name":  "command"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/03_DatabaseStatement/03_DatabaseProcedure",
+                       "path":  "/examples/03_DatabaseStatement/03_DatabaseProcedure,03_execute_database_procedure",
+                       "title":  "Execute database procedure",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "03_execute_database_procedure"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/47_SyncJobChainExecution/02_JobChainB",
+                       "path":  "/examples/47_SyncJobChainExecution/02_JobChainB,02_Every_Saturday",
+                       "title":  "Repeating order every Saturday 10:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "02_Every_Saturday"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/31_Monitoring/05_JobChainWarnMax",
+                       "path":  "/examples/31_Monitoring/05_JobChainWarnMax,05_Start",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "05_Start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/Demo/Accenture/job_chain1",
+                       "path":  "/Demo/Accenture/job_chain1,daily_morning",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "daily_morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "config/hibernate.cfg.xml",
+                                          "name":  "hibernate_configuration_file"
+                                      },
+                                      {
+                                          "value":  "acknowledge",
+                                          "name":  "operation"
+                                      },
+                                      {
+                                          "value":  "MonitorSystem",
+                                          "name":  "system_id"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/sos/notification/ResetNotifications",
+                       "path":  "/sos/notification/ResetNotifications,AcknowledgeMonitorSystem",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "AcknowledgeMonitorSystem"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CopyToInternetViaDMZ",
+                                          "name":  "profile"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/02_YADEFIleTransferDMZ",
+                       "path":  "/examples/06_YADEFileTransfer/02_YADEFIleTransferDMZ,02_01_CopyLocalhost2RemoteViaDMZ",
+                       "title":  "Transfer files from Localhost to Remote server via DMZ",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "02_01_CopyLocalhost2RemoteViaDMZ"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CopyFromInternetViaDMZ",
+                                          "name":  "profile"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/02_YADEFIleTransferDMZ",
+                       "path":  "/examples/06_YADEFileTransfer/02_YADEFIleTransferDMZ,02_02_CopyRemote2LocalhostViaDMZ",
+                       "title":  "Transfer files from Remote server to LocalHost via DMZ",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "02_02_CopyRemote2LocalhostViaDMZ"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/50_ResourcePoolManagement/helper/GenerateInvoiceMetaFiles",
+                       "path":  "/examples/50_ResourcePoolManagement/helper/GenerateInvoiceMetaFiles,start",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/20_SchedulingJobChains/01_JobChainMonthly",
+                       "path":  "/examples/20_SchedulingJobChains/01_JobChainMonthly,MonthlyOrder",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "MonthlyOrder"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/sos/reporting/Inventory",
+                       "path":  "/sos/reporting/Inventory,Inventory",
+                       "title":  "Inventory of existing jobs, job chains and orders",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "Inventory"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/23_SchedulingOrder/01_JobChainOrderSchedule",
+                       "path":  "/examples/23_SchedulingOrder/01_JobChainOrderSchedule,OrderMonthly",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "OrderMonthly"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "config/hibernate.cfg.xml",
+                                          "name":  "hibernate_configuration_file"
+                                      },
+                                      {
+                                          "value":  "config/notification/SystemMonitorNotification_v1.0.xsd",
+                                          "name":  "schema_configuration_file"
+                                      },
+                                      {
+                                          "value":  "config/notification/SystemMonitorNotification_MonitorSystem.xml",
+                                          "name":  "system_configuration_file"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/sos/notification/SystemNotifier",
+                       "path":  "/sos/notification/SystemNotifier,MonitorSystem",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "MonitorSystem"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/Support/Ticket#2016050410000015/job_chain1",
+                       "path":  "/Support/Ticket#2016050410000015/job_chain1,Every_Hour",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "Every_Hour"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/Demo/Quanam/FTPFileCheck",
+                       "path":  "/Demo/Quanam/FTPFileCheck,FileCheck",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "FileCheck"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "DEV",
+                                          "name":  "system_type"
+                                      },
+                                      {
+                                          "value":  "pre_prod_v1",
+                                          "name":  "db_settings"
+                                      },
+                                      {
+                                          "value":  "rollback",
+                                          "name":  "commit_level"
+                                      },
+                                      {
+                                          "value":  "info",
+                                          "name":  "log_level"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:42Z",
+                       "jobChain":  "/examples/52_JavaScriptAPI/01_MorningLoad",
+                       "path":  "/examples/52_JavaScriptAPI/01_MorningLoad,morning_load",
+                       "surveyDate":  "2016-09-23T11:13:42Z",
+                       "orderId":  "morning_load"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "/var/tmp/FileMove.txt",
+                                          "name":  "source_file"
+                                      },
+                                      {
+                                          "value":  "/var/tmp/FileMoveMoved.txt",
+                                          "name":  "target_file"
+                                      },
+                                      {
+                                          "value":  "^.*\\.txt$",
+                                          "name":  "file_spec"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/31_Monitoring/01_ErrorRecovery",
+                       "path":  "/examples/31_Monitoring/01_ErrorRecovery,01_FileMoveWithSetback",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "01_FileMoveWithSetback"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/02_FileWatcher/02_helper/GenerateTRXFiles",
+                       "path":  "/examples/02_FileWatcher/02_helper/GenerateTRXFiles,start",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/31_Monitoring/04_JobChainMonMin",
+                       "path":  "/examples/31_Monitoring/04_JobChainMonMin,04_Start",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "04_Start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "config/hibernate.cfg.xml",
+                                          "name":  "hibernate_configuration_file"
+                                      },
+                                      {
+                                          "value":  "config/notification/SystemMonitorNotification_v1.0.xsd",
+                                          "name":  "schema_configuration_file"
+                                      },
+                                      {
+                                          "value":  "60",
+                                          "name":  "max_history_age"
+                                      },
+                                      {
+                                          "value":  "true",
+                                          "name":  "allow_db_dependent_queries"
+                                      },
+                                      {
+                                          "value":  "com.sos.scheduler.notification.plugins.history.CheckHistoryTimerPlugin",
+                                          "name":  "plugins"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/sos/notification/CheckHistory",
+                       "path":  "/sos/notification/CheckHistory,Check",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "Check"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/Demo/Airbus/SplitSyncDependencies",
+                       "path":  "/Demo/Airbus/SplitSyncDependencies,WeekdaysMorningSchedule",
+                       "title":  "Schedule Every Week day Mon-Fri ( Morning at 08:00 AM )",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "WeekdaysMorningSchedule"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/Demo/Airbus/SplitSyncDependencies",
+                       "path":  "/Demo/Airbus/SplitSyncDependencies,WeekendsMorningSchedule",
+                       "title":  "Schedule Every Weekend Sat-Son ( Morning at 10:00 AM )",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "WeekendsMorningSchedule"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "mail body set by order",
+                                          "name":  "body"
+                                      }
+                                  ],
+                       "initialState":  "StartJobChain",
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/34_ParameterFile/01_JobChainUsingParameterFile",
+                       "path":  "/examples/34_ParameterFile/01_JobChainUsingParameterFile,01_MailOrder",
+                       "title":  "Set Mail body by order parameter",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "01_MailOrder"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "EVENING",
+                                          "name":  "RUN_TYPE"
+                                      },
+                                      {
+                                          "value":  "FULL",
+                                          "name":  "RUN_CONTROL"
+                                      },
+                                      {
+                                          "value":  "COMMIT",
+                                          "name":  "TRANSACTION"
+                                      },
+                                      {
+                                          "value":  "VALUE1",
+                                          "name":  "EXTRA_P1"
+                                      },
+                                      {
+                                          "value":  "VALUE2",
+                                          "name":  "EXTRA_P2"
+                                      },
+                                      {
+                                          "value":  "VALUE3",
+                                          "name":  "EXTRA_P3"
+                                      },
+                                      {
+                                          "value":  "VALUE4",
+                                          "name":  "EXTRA_P4"
+                                      },
+                                      {
+                                          "value":  "VALUE5",
+                                          "name":  "EXTRA_P5"
+                                      },
+                                      {
+                                          "value":  "VALUE6",
+                                          "name":  "EXTRA_P6"
+                                      },
+                                      {
+                                          "value":  "VALUE7",
+                                          "name":  "EXTRA_P7"
+                                      },
+                                      {
+                                          "value":  "VALUE8",
+                                          "name":  "EXTRA_P8"
+                                      },
+                                      {
+                                          "value":  "VALUE9",
+                                          "name":  "EXTRA_P9"
+                                      },
+                                      {
+                                          "value":  "VALUE10",
+                                          "name":  "EXTRA_P10"
+                                      },
+                                      {
+                                          "value":  "VALUE11",
+                                          "name":  "EXTRA_P11"
+                                      },
+                                      {
+                                          "value":  "VALUE12",
+                                          "name":  "EXTRA_P12"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/58_MultipleParametersOrders/JobChain100",
+                       "path":  "/examples/58_MultipleParametersOrders/JobChain100,evening",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "evening"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "MORNING",
+                                          "name":  "RUN_TYPE"
+                                      },
+                                      {
+                                          "value":  "FULL",
+                                          "name":  "RUN_CONTROL"
+                                      },
+                                      {
+                                          "value":  "ROLLBACK",
+                                          "name":  "TRANSACTION"
+                                      },
+                                      {
+                                          "value":  "VALUE1",
+                                          "name":  "EXTRA_P1"
+                                      },
+                                      {
+                                          "value":  "VALUE2",
+                                          "name":  "EXTRA_P2"
+                                      },
+                                      {
+                                          "value":  "VALUE3",
+                                          "name":  "EXTRA_P3"
+                                      },
+                                      {
+                                          "value":  "VALUE4",
+                                          "name":  "EXTRA_P4"
+                                      },
+                                      {
+                                          "value":  "VALUE5",
+                                          "name":  "EXTRA_P5"
+                                      },
+                                      {
+                                          "value":  "VALUE6",
+                                          "name":  "EXTRA_P6"
+                                      },
+                                      {
+                                          "value":  "VALUE7",
+                                          "name":  "EXTRA_P7"
+                                      },
+                                      {
+                                          "value":  "VALUE8",
+                                          "name":  "EXTRA_P8"
+                                      },
+                                      {
+                                          "value":  "VALUE9",
+                                          "name":  "EXTRA_P9"
+                                      },
+                                      {
+                                          "value":  "VALUE10",
+                                          "name":  "EXTRA_P10"
+                                      },
+                                      {
+                                          "value":  "VALUE11",
+                                          "name":  "EXTRA_P11"
+                                      },
+                                      {
+                                          "value":  "VALUE12",
+                                          "name":  "EXTRA_P12"
+                                      },
+                                      {
+                                          "value":  "VALUE13",
+                                          "name":  "EXTRA_P13"
+                                      },
+                                      {
+                                          "value":  "VALUE14",
+                                          "name":  "EXTRA_P14"
+                                      },
+                                      {
+                                          "value":  "VALUE15",
+                                          "name":  "EXTRA_P15"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/58_MultipleParametersOrders/JobChain100",
+                       "path":  "/examples/58_MultipleParametersOrders/JobChain100,morning",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "MORNING",
+                                          "name":  "RUN_TYPE"
+                                      },
+                                      {
+                                          "value":  "FULL",
+                                          "name":  "RUN_CONTROL"
+                                      },
+                                      {
+                                          "value":  "ROLLBACK",
+                                          "name":  "TRANSACTION"
+                                      },
+                                      {
+                                          "value":  "VALUE1",
+                                          "name":  "EXTRA_P1"
+                                      },
+                                      {
+                                          "value":  "VALUE2",
+                                          "name":  "EXTRA_P2"
+                                      },
+                                      {
+                                          "value":  "VALUE3",
+                                          "name":  "EXTRA_P3"
+                                      },
+                                      {
+                                          "value":  "VALUE4",
+                                          "name":  "EXTRA_P4"
+                                      },
+                                      {
+                                          "value":  "VALUE5",
+                                          "name":  "EXTRA_P5"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/58_MultipleParametersOrders/JobChain100",
+                       "path":  "/examples/58_MultipleParametersOrders/JobChain100,Monthaly",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "Monthaly"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "unskip",
+                                          "name":  "operation"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/sos/operations/criticalpath/UncriticalJobNodes",
+                       "path":  "/sos/operations/criticalpath/UncriticalJobNodes,Unskip",
+                       "title":  "Unskip uncritical job nodes",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "Unskip"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "skip",
+                                          "name":  "operation"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/sos/operations/criticalpath/UncriticalJobNodes",
+                       "path":  "/sos/operations/criticalpath/UncriticalJobNodes,Skip",
+                       "title":  "Skip uncritical job nodes",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "Skip"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/06_YADEFileTransfer/06_05_helper/GenerateXLSFile",
+                       "path":  "/examples/06_YADEFileTransfer/06_05_helper/GenerateXLSFile,start",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CRM002",
+                                          "name":  "OP_SYSTEM_BATCH_CODE"
+                                      },
+                                      {
+                                          "value":  "FULL",
+                                          "name":  "OP_SYSTEM_BACKUP_MODE"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/17_DynamicProcessRouting/01_JobChainB",
+                       "path":  "/examples/17_DynamicProcessRouting/01_JobChainB,02_daily_morning_parameters",
+                       "title":  "Morning Order for CRM002",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "02_daily_morning_parameters"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "CRM001",
+                                          "name":  "OP_SYSTEM_BATCH_CODE"
+                                      },
+                                      {
+                                          "value":  "FULL",
+                                          "name":  "OP_SYSTEM_BACKUP_MODE"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/17_DynamicProcessRouting/01_JobChainB",
+                       "path":  "/examples/17_DynamicProcessRouting/01_JobChainB,01_daily_morning_parameters",
+                       "title":  "Morning Order for CRM001",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "01_daily_morning_parameters"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/31_Monitoring/06_JobChainWarnMin",
+                       "path":  "/examples/31_Monitoring/06_JobChainWarnMin,06_Start",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "06_Start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/48_JobChainReturnCodeHandling/01_JobChainA",
+                       "path":  "/examples/48_JobChainReturnCodeHandling/01_JobChainA,02_daily_morning",
+                       "title":  "Repeating order every morning 08:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "02_daily_morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "process",
+                                          "name":  "action"
+                                      },
+                                      {
+                                          "value":  "\\.xsl$",
+                                          "name":  "event_handler_filespec"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/sos/events/scheduler_event_service",
+                       "path":  "/sos/events/scheduler_event_service,event_processor",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "event_processor"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/10_RemoteExecutionUniversalAgent/10_03_helper/GenerateTRXFiles",
+                       "path":  "/examples/10_RemoteExecutionUniversalAgent/10_03_helper/GenerateTRXFiles,start",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/55_JobSchedulerLaunchQueue/01_JobSchedulerLaunchQueue/LaunchJobChains",
+                       "path":  "/examples/55_JobSchedulerLaunchQueue/01_JobSchedulerLaunchQueue/LaunchJobChains,Start",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "Start"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/49_CriticalPath/01_JobChainA",
+                       "path":  "/examples/49_CriticalPath/01_JobChainA,01_Every_Wednesday",
+                       "title":  "Repeating order every Wednesday 08:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "01_Every_Wednesday"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/01_JobChainShellJobs/01_JobChainA",
+                       "path":  "/examples/01_JobChainShellJobs/01_JobChainA,02_repeat_every_4h",
+                       "title":  "Every 4 hour reports",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "02_repeat_every_4h"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "daily",
+                                          "name":  "backup_type"
+                                      },
+                                      {
+                                          "value":  "all",
+                                          "name":  "backup_tables"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/01_JobChainShellJobs/01_JobChainA",
+                       "path":  "/examples/01_JobChainShellJobs/01_JobChainA,01_daily_morning",
+                       "title":  "Repeating order every morning 08:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "01_daily_morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:43Z",
+                       "jobChain":  "/examples/01_JobChainShellJobs/01_JobChainA",
+                       "path":  "/examples/01_JobChainShellJobs/01_JobChainA,02_daily_morning",
+                       "title":  "Repeating order every morning 08:00 AM",
+                       "surveyDate":  "2016-09-23T11:13:43Z",
+                       "orderId":  "02_daily_morning"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:44Z",
+                       "jobChain":  "/examples/01_JobChainShellJobs/01_JobChainA",
+                       "path":  "/examples/01_JobChainShellJobs/01_JobChainA,02_Weekly_Sunday",
+                       "title":  "Every Sunday",
+                       "surveyDate":  "2016-09-23T11:13:44Z",
+                       "orderId":  "02_Weekly_Sunday"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "0",
+                                          "name":  "order_param_exit_code"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:44Z",
+                       "jobChain":  "/examples/37_JobChainExitCodeHandling/01_JobChainA",
+                       "path":  "/examples/37_JobChainExitCodeHandling/01_JobChainA,ExitCode_0",
+                       "title":  "Exit Code 0 : Success",
+                       "surveyDate":  "2016-09-23T11:13:44Z",
+                       "orderId":  "ExitCode_0"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "3",
+                                          "name":  "order_param_exit_code"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:44Z",
+                       "jobChain":  "/examples/37_JobChainExitCodeHandling/01_JobChainA",
+                       "path":  "/examples/37_JobChainExitCodeHandling/01_JobChainA,ExitCode_3",
+                       "title":  "Exit Code 3 : Skip Node 400",
+                       "surveyDate":  "2016-09-23T11:13:44Z",
+                       "orderId":  "ExitCode_3"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "2",
+                                          "name":  "order_param_exit_code"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:44Z",
+                       "jobChain":  "/examples/37_JobChainExitCodeHandling/01_JobChainA",
+                       "path":  "/examples/37_JobChainExitCodeHandling/01_JobChainA,ExitCode_2",
+                       "title":  "Exit Code 2 : Setback order 1 Hour",
+                       "surveyDate":  "2016-09-23T11:13:44Z",
+                       "orderId":  "ExitCode_2"
+                   },
+                   {
+                       "estimatedDuration":  2,
+                       "params":  [
+                                      {
+                                          "value":  "1",
+                                          "name":  "order_param_exit_code"
+                                      }
+                                  ],
+                       "_type":  "permanent",
+                       "configurationDate":  "2016-09-23T11:13:44Z",
+                       "jobChain":  "/examples/37_JobChainExitCodeHandling/01_JobChainA",
+                       "path":  "/examples/37_JobChainExitCodeHandling/01_JobChainA,ExitCode_1",
+                       "title":  "Exit Code 1 : Suspend order",
+                       "surveyDate":  "2016-09-23T11:13:44Z",
+                       "orderId":  "ExitCode_1"
+                   }
+               ]
+}

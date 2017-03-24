@@ -1,0 +1,116 @@
+{
+    "jobChain":  {
+                     "path":  "/examples/56_NestedJobChains/JobChainB",
+                     "numOfNodes":  4,
+                     "ordersSummary":  {
+                                           "suspended":  0,
+                                           "running":  0,
+                                           "blacklist":  0,
+                                           "waitingForResource":  0,
+                                           "setback":  0,
+                                           "pending":  0
+                                       },
+                     "numOfOrders":  0,
+                     "state":  {
+                                   "_text":  "ACTIVE",
+                                   "severity":  4
+                               },
+                     "name":  "JobChainB",
+                     "nodes":  [
+                                   {
+                                       "job":  {
+                                                   "nextPeriodBegin":  "",
+                                                   "name":  "JobB100",
+                                                   "numOfQueuedTasks":  0,
+                                                   "allTasks":  78,
+                                                   "stateText":  "JobB100 : job starting",
+                                                   "state":  {
+                                                                 "_text":  "PENDING",
+                                                                 "severity":  1
+                                                             },
+                                                   "numOfRunningTasks":  0,
+                                                   "path":  "/examples/56_NestedJobChains/JobB100",
+                                                   "surveyDate":  "2016-09-23T11:14:00Z",
+                                                   "allSteps":  78
+                                               },
+                                       "numOfOrders":  0,
+                                       "name":  "1",
+                                       "state":  {
+                                                     "_text":  "ACTIVE",
+                                                     "severity":  4
+                                                 }
+                                   },
+                                   {
+                                       "job":  {
+                                                   "nextPeriodBegin":  "",
+                                                   "name":  "JobB200",
+                                                   "numOfQueuedTasks":  0,
+                                                   "allTasks":  78,
+                                                   "stateText":  "JobB200 : job starting",
+                                                   "state":  {
+                                                                 "_text":  "PENDING",
+                                                                 "severity":  1
+                                                             },
+                                                   "numOfRunningTasks":  0,
+                                                   "path":  "/examples/56_NestedJobChains/JobB200",
+                                                   "surveyDate":  "2016-09-23T11:14:00Z",
+                                                   "allSteps":  78
+                                               },
+                                       "numOfOrders":  0,
+                                       "name":  "2",
+                                       "state":  {
+                                                     "_text":  "ACTIVE",
+                                                     "severity":  4
+                                                 }
+                                   },
+                                   {
+                                       "job":  {
+                                                   "nextPeriodBegin":  "",
+                                                   "name":  "JobB300",
+                                                   "numOfQueuedTasks":  0,
+                                                   "allTasks":  78,
+                                                   "stateText":  "JobB300 : job starting",
+                                                   "state":  {
+                                                                 "_text":  "PENDING",
+                                                                 "severity":  1
+                                                             },
+                                                   "numOfRunningTasks":  0,
+                                                   "path":  "/examples/56_NestedJobChains/JobB300",
+                                                   "surveyDate":  "2016-09-23T11:14:00Z",
+                                                   "allSteps":  78
+                                               },
+                                       "numOfOrders":  0,
+                                       "name":  "3",
+                                       "state":  {
+                                                     "_text":  "ACTIVE",
+                                                     "severity":  4
+                                                 }
+                                   },
+                                   {
+                                       "job":  {
+                                                   "nextPeriodBegin":  "",
+                                                   "name":  "JobB400",
+                                                   "numOfQueuedTasks":  0,
+                                                   "allTasks":  78,
+                                                   "stateText":  "JobB400 : job starting",
+                                                   "state":  {
+                                                                 "_text":  "PENDING",
+                                                                 "severity":  1
+                                                             },
+                                                   "numOfRunningTasks":  0,
+                                                   "path":  "/examples/56_NestedJobChains/JobB400",
+                                                   "surveyDate":  "2016-09-23T11:14:01Z",
+                                                   "allSteps":  78
+                                               },
+                                       "numOfOrders":  0,
+                                       "name":  "4",
+                                       "state":  {
+                                                     "_text":  "ACTIVE",
+                                                     "severity":  4
+                                                 }
+                                   }
+                               ],
+                     "surveyDate":  "2016-09-23T11:14:00Z"
+                 },
+    "deliveryDate":  "2016-09-23T11:14:00Z"
+}

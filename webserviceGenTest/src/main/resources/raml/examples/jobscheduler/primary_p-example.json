@@ -1,0 +1,26 @@
+{
+  "deliveryDate": "2016-05-05T21:13:35Z",
+  "jobscheduler": {
+    "surveyDate": "2016-05-05T20:34:51Z",
+    "jobschedulerId": "schedulerId",
+    "version" : "1.11.0",
+    "host": "test.sos",
+    "port": 4444,
+    "os": {
+      "name": "linux",
+      "architecture": 64,
+      "distribution": "CentOS Linux release 7.2.1511"
+    },
+    "startedAt": "2016-05-05T20:34:18Z",
+    "timeZone": "Europe/Berlin",
+    "clusterType": {
+      "type": "passive",
+      "precedence": 0
+    },
+    "supervisor": {
+      "jobschedulerId": "supervisor",
+      "host": "super.sos",
+      "port": 4444
+    }
+  }
+}

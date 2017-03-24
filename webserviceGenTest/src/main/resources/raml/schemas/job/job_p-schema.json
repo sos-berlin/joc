@@ -1,0 +1,75 @@
+{
+  "title": "job object (permanent part)",
+  "id": "schemas/job/job_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobP",
+  "type": "object",
+  "oneOf": [
+    {
+      "description": "as child of nodes only path is required and nothing optional",
+      "required": [
+        "path"
+      ]
+    },
+    {
+      "description": "compact=true then ONLY required fields are responded and title is optional",
+      "required": [
+        "surveyDate",
+        "path",
+        "name",
+        "isOrderJob",
+        "usedInJobChains",
+        "estimatedDuration",
+        "maxTasks",
+        "hasDescription"
+      ]
+    }
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "isOrderJob": {
+      "type": "boolean"
+    },
+    "name": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "estimatedDuration": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "processClass": {
+      "$ref": "../common/path-schema.json"
+    },
+    "maxTasks": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 1
+    },
+    "locks": {
+      "$ref": "locks_p-schema.json"
+    },
+    "usedInJobChains": {
+      "description": "Only relevant for order jobs",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "jobChains": {
+      "description": "Only relevant for order jobs when called /jobs/p/... or job/p/...",
+      "type": "array",
+      "items": {
+        "$ref": "../common/path-schema.json"
+      }
+    },
+    "hasDescription": {
+      "type": "boolean"
+    },
+    "configurationDate": {
+      "$ref": "../common/timestamp-schema.json"
+    }
+  }
+}

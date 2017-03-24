@@ -1,0 +1,12 @@
+{
+  "title": "agent cluster state text",
+  "id": "schemas/jobscheduler/agentClusterStateText",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentClusterStateText",
+  "type": "string",
+  "enum": [
+    "ALL_AGENTS_ARE_RUNNING",
+    "ONLY_SOME_AGENTS_ARE_RUNNING",
+    "ALL_AGENTS_ARE_UNREACHABLE"
+  ]
+}

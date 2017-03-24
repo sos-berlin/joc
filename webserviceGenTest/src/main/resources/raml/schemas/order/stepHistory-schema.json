@@ -1,0 +1,34 @@
+{
+  "title": "step history collection of one order run",
+  "id": "schemas/order/stepHistory",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderStepHistory",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "history"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "history": {
+      "type": "object",
+      "required": [
+        "historyId",
+        "steps"
+      ],
+      "properties": {
+        "historyId": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "stepHistoryItem-schema.json"
+          }
+        }
+      }
+    }
+  }
+}

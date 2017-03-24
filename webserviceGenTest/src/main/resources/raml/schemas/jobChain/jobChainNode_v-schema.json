@@ -1,0 +1,91 @@
+{
+  "title": "jobChainNode (volatile part)",
+  "id": "schemas/jobchain/jobChainNode_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainNodeV",
+  "type": "object",
+  "oneOf": [
+    {
+      "description": "job chain node object with assigned a job and parameter compact=true",
+      "required": [
+        "name",
+        "state",
+        "job",
+        "level",
+        "numOfOrders"
+      ]
+    },
+    {
+      "description": "job chain node object with assigned a job and parameter compact=false",
+      "required": [
+        "name",
+        "state",
+        "job",
+        "level",
+        "numOfOrders",
+        "orders"
+      ]
+    },
+    {
+      "description": "job chain node object with assigned a job chain",
+      "required": [
+        "name",
+        "state",
+        "jobChain",
+        "numOfOrders"
+      ]
+    }
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "state": {
+      "$ref": "jobChainNodeState-schema.json"
+    },
+    "job": {
+      "javaType": "com.sos.joc.model.jobChain.JobChainNodeJobV",
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "../common/path-schema.json"
+        },
+        "state": {
+          "$ref": "../job/jobState-schema.json"
+        },
+        "configurationStatus": {
+          "$ref": "../common/configurationStatus-schema.json"
+        }
+      }
+    },
+    "level": {
+      "description": "Only relevant for job chain with splits and syncs. For example to imagine splits/sync in the job chain list view with different indents",
+      "type": "integer"
+    },
+    "jobChain": {
+      "description": "job chain object is included in nestedJobChains collection",
+      "javaType": "com.sos.joc.model.jobChain.JobChainNodeJobChainV",
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "../common/path-schema.json"
+        }
+      }
+    },
+    "numOfOrders": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "orders": {
+      "type": "array",
+      "items": {
+        "$ref": "../order/order_v-schema.json"
+      }
+    }
+  }
+}

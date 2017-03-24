@@ -1,0 +1,22 @@
+{
+  "title": "register event",
+  "id": "schemas/event/register",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.RegisterEvent",
+  "type": "object",
+  "required": [
+    "jobscheduler"
+  ],
+  "properties": {
+    "jobscheduler": {
+      "type": "array",
+      "items": {
+        "$ref": "jobSchedulerObjectFilter-schema.json"
+      }
+    },
+    "close": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

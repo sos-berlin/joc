@@ -1,0 +1,53 @@
+{
+  "title": "order (permanent part)",
+  "id": "schemas/order/order_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderP",
+  "type": "object",
+  "description": "compact=true then ONLY surveyDate, path, id, jobChain and _type are responded, title is optional",
+  "required": [
+    "surveyDate",
+    "path",
+    "orderId",
+    "jobChain",
+    "estimatedDuration"
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "priority": {
+      "$ref": "../common/nonNegativeInteger-schema.json",
+      "default": 0
+    },
+    "_type": {
+      "$ref": "orderType-schema.json"
+    },
+    "title": {
+      "type": "string"
+    },
+    "initialState": {
+      "description": "the name of the start node",
+      "type": "string"
+    },
+    "endState": {
+      "description": "the name of the end node",
+      "type": "string"
+    },
+    "estimatedDuration": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "configurationDate": {
+      "$ref": "../common/timestamp-schema.json"
+    }
+  }
+}

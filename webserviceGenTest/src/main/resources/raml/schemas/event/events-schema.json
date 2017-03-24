@@ -1,0 +1,41 @@
+{
+  "title": "events",
+  "id": "schemas/event/events",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.JobSchedulerEvents",
+  "type": "object",
+  "required": [
+    "events",
+    "deliveryDate"
+  ],
+  "properties": {
+    "events": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.event.JobSchedulerEvent",
+        "type": "object",
+        "properties": {
+          "jobschedulerId": {
+            "type": "string"
+          },
+          "error": {
+            "description": "contains error message",
+            "$ref": "../common/error-schema.json"
+          },
+          "eventId": {
+            "type": "string"
+          },
+          "eventSnapshots": {
+            "type": "array",
+            "items": {
+              "$ref": "eventSnapshot-schema.json"
+            }
+          }
+        }
+      }
+    },
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    }
+  }
+}

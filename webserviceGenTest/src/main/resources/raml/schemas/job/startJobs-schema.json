@@ -1,0 +1,25 @@
+{
+  "title": "start job commands",
+  "id": "schemas/job/startJobs",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.StartJobs",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "jobs"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "$ref": "startJob-schema.json"
+      }
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

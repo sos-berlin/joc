@@ -1,0 +1,22 @@
+{
+  "title": "jobConfigurationFilter",
+  "id": "schemas/job/jobConfigurationFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobConfigurationFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "job"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "mime": {
+      "$ref": "../common/configurationMimeFilter-schema.json"
+    }
+  }
+}
