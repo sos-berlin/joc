@@ -21,6 +21,8 @@ import com.sos.joc.model.commands.ObjectFactory;
 import com.sos.joc.model.commands.Order;
 import com.sos.joc.model.commands.ParamGet;
 import com.sos.joc.model.commands.Params;
+import com.sos.joc.model.commands.ParamsGet;
+import com.sos.joc.model.commands.ProcessClass;
 import com.sos.joc.model.commands.ProcessClassRemove;
 import com.sos.joc.model.commands.RemoveJobChain;
 import com.sos.joc.model.commands.RemoveOrder;
@@ -196,6 +198,10 @@ public class JobSchedulerCommandFactory {
         if (command instanceof ParamGet){
             return permissions.getJobschedulerMaster().getView().isParameter();
         }
+
+        if (command instanceof ParamsGet){
+        	return permissions.getJobschedulerMaster().getView().isParameter();
+        }
         
         if (command instanceof Params){
             return permissions.getJobschedulerMaster().getView().isParameter();
@@ -205,8 +211,8 @@ public class JobSchedulerCommandFactory {
             return permissions.getProcessClass().isRemove();
         }
 
-        if (command instanceof ProcessClassRemove){
-            return permissions.getProcessClass().isRemove();
+        if (command instanceof ProcessClass){
+            return permissions.getProcessClass().getView().isStatus();
         }
 
         if (command instanceof RemoveJobChain){
@@ -314,11 +320,15 @@ public class JobSchedulerCommandFactory {
                 jaxbElement = objectFactory.createAddOrder((Order) jaxbElement.getValue());
                 command = (Order) jaxbElement.getValue();
             }
+            if ("process_class".equals(jaxbElement.getName().getLocalPart().toString())) {
+                jaxbElement = objectFactory.createProcessClass((ProcessClass) jaxbElement.getValue());
+                command = (ProcessClass) jaxbElement.getValue();
+            }
             if ("lock.remove".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createLockRemove((LockRemove) jaxbElement.getValue());
                 command = (LockRemove) jaxbElement.getValue();
             }
-            if ("modif_hot_folder".equals(jaxbElement.getName().getLocalPart().toString())) {
+            if ("modify_hot_folder".equals(jaxbElement.getName().getLocalPart().toString())) {
                 jaxbElement = objectFactory.createModifyHotFolder((ModifyHotFolder) jaxbElement.getValue());
                 command = (ModifyHotFolder) jaxbElement.getValue();
             }
@@ -334,10 +344,10 @@ public class JobSchedulerCommandFactory {
                 jaxbElement = objectFactory.createScheduleRemove((ScheduleRemove) jaxbElement.getValue());
                 command = (ScheduleRemove) jaxbElement.getValue();
             }
-            if ("show_schedulers".equals(jaxbElement.getName().getLocalPart().toString())) {
-                jaxbElement = objectFactory.createShowSchedulers((ShowState) jaxbElement.getValue());
-                command = (ShowState) jaxbElement.getValue();
+            if ("params.get".equals(jaxbElement.getName().getLocalPart().toString())) {
+                command = (ParamsGet) objectFactory.createParamsGet();
             }
+        
             
         }
 

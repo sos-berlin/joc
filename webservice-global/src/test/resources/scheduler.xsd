@@ -850,7 +850,12 @@
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
-    <xsd:element name="params.get"/>
+    <xsd:element name="params.get">
+         <xsd:complexType>
+            <xsd:attribute name="name" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    
     <xsd:element name="period">
         <xsd:complexType>
             <xsd:attribute name="single_start" type="Time_of_day"/>
