@@ -14,7 +14,7 @@
       "type": "integer"
     },
     "_text": {
-      "$ref": "HistoryStateText-schema.json"
+      "$ref": "historyStateText-schema.json"
     }
   }
 }
