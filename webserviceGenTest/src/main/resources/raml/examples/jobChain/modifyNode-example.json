@@ -1,0 +1,8 @@
+{
+  "nodes": [
+    {
+      "jobChain": "/sos/reporting/Inventory",
+      "node": "inventory"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "title": "order in task",
+  "id": "schemas/job/orderOfTask",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Only relevant for order jobs; cause=order resp.",
+  "javaType": "com.sos.joc.model.job.OrderOfTask",
+  "type": "object",
+  "required": [
+    "path",
+    "orderId",
+    "jobChain",
+    "state"
+  ],
+  "properties": {
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "title": {
+      "type": "string"
+    },
+    "state": {
+      "description": "name of the current node",
+      "type": "string"
+    },
+    "inProcessSince": {
+      "$ref": "../common/timestamp-schema.json"
+    }
+  }
+}

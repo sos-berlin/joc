@@ -1,0 +1,43 @@
+{
+  "title": "JobScheduler objects filter",
+  "id": "schemas/event/jobSchedulerObjectFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.JobSchedulerObjects",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "eventId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "eventId": {
+      "type": "string"
+    },
+    "objects": {
+      "description": "collection of JobScheduler object with path and type",
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.event.JobSchedulerObject",
+        "type": "object",
+        "required": [
+          "path",
+          "type"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "../common/path-schema.json"
+          },
+          "type": {
+            "$ref": "../common/type-schema.json"
+          },
+          "recursive": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    }
+  }
+}

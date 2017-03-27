@@ -1,0 +1,12 @@
+{
+  "deliveryDate": "2016-05-05T21:13:35Z",
+  "surveyDate": "2016-05-05T21:13:35Z",
+  "orders": {
+    "pending": 58,
+    "running": 4,
+    "suspended": 1,
+    "setback": 0,
+    "waitingForResource": 1,
+    "blacklist": 0
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "title": "configurations",
+  "id": "schemas/configuration/configurations",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.configuration.Configurations",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "configurations"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "configurations": {
+      "type": "array",
+      "items": {
+        "$ref": "configuration-schema.json"
+      }
+    }
+  }
+}

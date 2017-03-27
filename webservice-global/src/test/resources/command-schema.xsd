@@ -5,9 +5,9 @@
 		<xsd:complexType>
 			<xsd:choice maxOccurs="unbounded">
 				<xsd:element ref="add_order"/>
-				<xsd:element name="check_folders" type="check_folders"/>
+				<xsd:element name="check_folders"/>
 				<xsd:element ref="kill_task"/>
-				<xsd:element name="lock.remove" type="lock.remove"/>
+				<xsd:element name="lock.remove"/>
 				<xsd:element ref="modify_job"/>
 				<xsd:element ref="modify_order"/>
 				<xsd:element ref="modify_spooler"/>
@@ -19,8 +19,8 @@
 				<xsd:element ref="param.get"/>
 				<xsd:element ref="params.get"/>
 				<xsd:element ref="plugin.command"/>
-				<xsd:element name="process_class" type="process_class"/>
-				<xsd:element name="process_class.remove" type="process_class.remove"/>
+				<xsd:element name="process_class"/>
+				<xsd:element name="process_class.remove"/>
 				<xsd:element ref="job_chain.check_distributed"/>
 				<xsd:element ref="register_remote_scheduler"/>
 				<xsd:element ref="remove_job_chain"/>
@@ -53,7 +53,7 @@
 			<xsd:attribute name="url" type="xsd:string"/>
 			<xsd:attribute name="jobschedulerId" type="xsd:string"/>
 			<xsd:attribute name="comment" type="xsd:string"/>
-			<xsd:attribute name="timeSpent" type="xsd:integer"/>
+			<xsd:attribute name="timeSpent" type="xsd:int"/>
 			<xsd:attribute name="ticketLink" type="xsd:string"/>
 		</xsd:complexType>
 	</xsd:element>

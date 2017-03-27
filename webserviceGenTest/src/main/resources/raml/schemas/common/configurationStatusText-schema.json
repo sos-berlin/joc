@@ -1,0 +1,15 @@
+{
+  "title": "configuration status",
+  "id": "schemas/common/configurationStatusText",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.common.ConfigurationStateText",
+  "type": "string",
+  "enum": [
+    "ERROR_IN_CONFIGURATION_FILE",
+    "CHANGED_FILE_NOT_LOADED",
+    "REMOVING_DELAYED",
+    "RESOURCE_IS_MISSING",
+    "REPLACEMENT_IS_STANDING_BY",
+    "OK"
+  ]
+}

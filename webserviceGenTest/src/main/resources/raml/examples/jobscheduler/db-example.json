@@ -1,0 +1,12 @@
+{
+  "deliveryDate": "2016-05-05T21:13:35Z",
+  "database": {
+    "dbms": "MySQL",
+    "surveyDate": "2016-05-05T20:30:00Z",
+    "version" : "5.6.28",
+    "state": {
+      "severity": 0,
+      "_text": "running"
+    }
+  }
+}

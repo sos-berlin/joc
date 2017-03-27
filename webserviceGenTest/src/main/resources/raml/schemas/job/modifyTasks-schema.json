@@ -1,0 +1,46 @@
+{
+  "title": "task modify",
+  "id": "schemas/job/modifyTasks",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "the command is part of the web servive url",
+  "javaType": "com.sos.joc.model.job.ModifyTasks",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobs": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.job.TasksFilter",
+        "type": "object",
+        "properties": {
+          "job": {
+            "$ref": "../common/path-schema.json"
+          },
+          "taskIds": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "taskId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "timeout": {
+      "description": "only relevant for termintate_within",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "title": "folder",
+  "id": "schemas/tree/tree",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.tree.Tree",
+  "type": "object",
+  "properties": {
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "folders": {
+      "type": "array",
+      "items": {
+        "$ref": "tree-schema.json"
+      }
+    }
+  },
+  "required": [
+    "path",
+    "name"
+  ]
+
+}

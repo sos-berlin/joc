@@ -1,0 +1,37 @@
+{
+  "title": "JobScheduler cluster member",
+  "id": "schemas/jobscheduler/clusterMember",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.ClusterMember",
+  "type": "object",
+  "required": [
+    "version",
+    "host",
+    "port",
+    "state",
+    "startedAt"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "port": {
+      "$ref": "../common/port-schema.json"
+    },
+    "state": {
+      "$ref": "state-schema.json"
+    },
+    "startedAt": {
+      "description": "Is empty if state.text equals unreachable",
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "precedence": {
+      "description": "Only defined for passive cluster (0=primary, 1=secondary, ...)",
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

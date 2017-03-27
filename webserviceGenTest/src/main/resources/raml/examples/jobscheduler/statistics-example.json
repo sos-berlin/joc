@@ -1,0 +1,23 @@
+{
+  "deliveryDate": "2016-05-05T21:13:35Z",
+  "surveyDate": "2016-05-05T21:13:35Z",
+  "jobs": {
+    "any": 100,
+    "running": 5,
+    "stopped" : 3,
+    "needProcess": 0
+  },
+  "tasks": {
+    "any": 5,
+    "running": 5
+  },
+  "jobChains": {
+    "any": 100,
+    "stopped": 3
+  },
+  "orders": {
+    "any": 25,
+    "clustered": 0,
+    "suspended": 3
+  }
+}

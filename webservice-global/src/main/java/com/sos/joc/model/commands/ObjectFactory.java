@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.01.11 um 11:41:39 AM CET 
+// Generiert: 2017.03.24 um 02:41:35 PM CET 
 //
 
 
@@ -39,7 +39,6 @@ public class ObjectFactory {
     private final static QName _SubsystemShow_QNAME = new QName("", "subsystem.show");
     private final static QName _AddOrder_QNAME = new QName("", "add_order");
     private final static QName _Schedule_QNAME = new QName("", "schedule");
-    private final static QName _ParamsGet_QNAME = new QName("", "params.get");
     private final static QName _S_QNAME = new QName("", "s");
     private final static QName _ShowState_QNAME = new QName("", "show_state");
     private final static QName _LockRemove_QNAME = new QName("", "lock.remove");
@@ -183,6 +182,22 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ProcessClass }
+     * 
+     */
+    public ProcessClass createProcessClass() {
+        return new ProcessClass();
+    }
+
+    /**
+     * Create an instance of {@link ProcessClass.RemoteSchedulers }
+     * 
+     */
+    public ProcessClass.RemoteSchedulers createProcessClassRemoteSchedulers() {
+        return new ProcessClass.RemoteSchedulers();
+    }
+
+    /**
      * Create an instance of {@link Job.Login }
      * 
      */
@@ -239,22 +254,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ProcessClass }
-     * 
-     */
-    public ProcessClass createProcessClass() {
-        return new ProcessClass();
-    }
-
-    /**
-     * Create an instance of {@link ProcessClass.RemoteSchedulers }
-     * 
-     */
-    public ProcessClass.RemoteSchedulers createProcessClassRemoteSchedulers() {
-        return new ProcessClass.RemoteSchedulers();
-    }
-
-    /**
      * Create an instance of {@link RunTime }
      * 
      */
@@ -279,27 +278,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CheckFolders }
-     * 
-     */
-    public CheckFolders createCheckFolders() {
-        return new CheckFolders();
-    }
-
-    /**
      * Create an instance of {@link KillTask }
      * 
      */
     public KillTask createKillTask() {
         return new KillTask();
-    }
-
-    /**
-     * Create an instance of {@link LockRemove }
-     * 
-     */
-    public LockRemove createLockRemove() {
-        return new LockRemove();
     }
 
     /**
@@ -399,19 +382,19 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ParamsGet }
+     * 
+     */
+    public ParamsGet createParamsGet() {
+        return new ParamsGet();
+    }
+
+    /**
      * Create an instance of {@link PluginCommand }
      * 
      */
     public PluginCommand createPluginCommand() {
         return new PluginCommand();
-    }
-
-    /**
-     * Create an instance of {@link ProcessClassRemove }
-     * 
-     */
-    public ProcessClassRemove createProcessClassRemove() {
-        return new ProcessClassRemove();
     }
 
     /**
@@ -639,6 +622,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ProcessClassRemove }
+     * 
+     */
+    public ProcessClassRemove createProcessClassRemove() {
+        return new ProcessClassRemove();
+    }
+
+    /**
      * Create an instance of {@link SupervisorRemoteSchedulerConfigurationFetchUpdatedFiles }
      * 
      */
@@ -847,6 +838,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link CheckFolders }
+     * 
+     */
+    public CheckFolders createCheckFolders() {
+        return new CheckFolders();
+    }
+
+    /**
      * Create an instance of {@link ShowProcessClasses }
      * 
      */
@@ -868,6 +867,14 @@ public class ObjectFactory {
      */
     public ClusterMemberCommand.Terminate createClusterMemberCommandTerminate() {
         return new ClusterMemberCommand.Terminate();
+    }
+
+    /**
+     * Create an instance of {@link LockRemove }
+     * 
+     */
+    public LockRemove createLockRemove() {
+        return new LockRemove();
     }
 
     /**
@@ -999,6 +1006,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link ProcessClass.RemoteSchedulers.RemoteScheduler }
+     * 
+     */
+    public ProcessClass.RemoteSchedulers.RemoteScheduler createProcessClassRemoteSchedulersRemoteScheduler() {
+        return new ProcessClass.RemoteSchedulers.RemoteScheduler();
+    }
+
+    /**
      * Create an instance of {@link Job.Login.PasswordPlain }
      * 
      */
@@ -1052,14 +1067,6 @@ public class ObjectFactory {
      */
     public Environment.Variable createEnvironmentVariable() {
         return new Environment.Variable();
-    }
-
-    /**
-     * Create an instance of {@link ProcessClass.RemoteSchedulers.RemoteScheduler }
-     * 
-     */
-    public ProcessClass.RemoteSchedulers.RemoteScheduler createProcessClassRemoteSchedulersRemoteScheduler() {
-        return new ProcessClass.RemoteSchedulers.RemoteScheduler();
     }
 
     /**
@@ -1167,15 +1174,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "", name = "params.get")
-    public JAXBElement<Object> createParamsGet(Object value) {
-        return new JAXBElement<Object>(_ParamsGet_QNAME, Object.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ShowState }{@code >}}
      * 
      */
@@ -1257,39 +1255,39 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClass }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class", scope = JobschedulerCommands.class)
-    public JAXBElement<ProcessClass> createJobschedulerCommandsProcessClass(ProcessClass value) {
-        return new JAXBElement<ProcessClass>(_JobschedulerCommandsProcessClass_QNAME, ProcessClass.class, JobschedulerCommands.class, value);
+    public JAXBElement<Object> createJobschedulerCommandsProcessClass(Object value) {
+        return new JAXBElement<Object>(_JobschedulerCommandsProcessClass_QNAME, Object.class, JobschedulerCommands.class, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link CheckFolders }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "check_folders", scope = JobschedulerCommands.class)
-    public JAXBElement<CheckFolders> createJobschedulerCommandsCheckFolders(CheckFolders value) {
-        return new JAXBElement<CheckFolders>(_JobschedulerCommandsCheckFolders_QNAME, CheckFolders.class, JobschedulerCommands.class, value);
+    public JAXBElement<Object> createJobschedulerCommandsCheckFolders(Object value) {
+        return new JAXBElement<Object>(_JobschedulerCommandsCheckFolders_QNAME, Object.class, JobschedulerCommands.class, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link LockRemove }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "lock.remove", scope = JobschedulerCommands.class)
-    public JAXBElement<LockRemove> createJobschedulerCommandsLockRemove(LockRemove value) {
-        return new JAXBElement<LockRemove>(_JobschedulerCommandsLockRemove_QNAME, LockRemove.class, JobschedulerCommands.class, value);
+    public JAXBElement<Object> createJobschedulerCommandsLockRemove(Object value) {
+        return new JAXBElement<Object>(_JobschedulerCommandsLockRemove_QNAME, Object.class, JobschedulerCommands.class, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ProcessClassRemove }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link Object }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://www.sos-berlin.com/scheduler", name = "process_class.remove", scope = JobschedulerCommands.class)
-    public JAXBElement<ProcessClassRemove> createJobschedulerCommandsProcessClassRemove(ProcessClassRemove value) {
-        return new JAXBElement<ProcessClassRemove>(_JobschedulerCommandsProcessClassRemove_QNAME, ProcessClassRemove.class, JobschedulerCommands.class, value);
+    public JAXBElement<Object> createJobschedulerCommandsProcessClassRemove(Object value) {
+        return new JAXBElement<Object>(_JobschedulerCommandsProcessClassRemove_QNAME, Object.class, JobschedulerCommands.class, value);
     }
 
     /**

@@ -1,0 +1,22 @@
+{
+  "title": "task object which is enqueued",
+  "id": "schemas/job/queuedTask",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.QueuedTask",
+  "type": "object",
+  "required": [
+    "taskId",
+    "enqueued"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string"
+    },
+    "enqueued": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "plannedStart": {
+      "$ref": "../common/timestamp-schema.json"
+    }
+  }
+}

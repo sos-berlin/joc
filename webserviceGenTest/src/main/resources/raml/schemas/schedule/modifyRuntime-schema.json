@@ -1,0 +1,27 @@
+{
+  "title": "schedule modify",
+  "id": "schemas/schedule/modifyRuntime",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.schedule.ModifyRunTime",
+  "type": "array",
+  "required": [
+    "jobschedulerId",
+    "schedule",
+    "runTime"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "schedule": {
+      "$ref": "../common/path-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    },
+    "runTime": {
+      "description": "A run_time xml is expected which is specified in the <xsd:complexType name='run_time'> element of  http://www.sos-berlin.com/schema/scheduler.xsd",
+      "type": "string"
+    }
+  }
+}

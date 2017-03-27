@@ -1,0 +1,20 @@
+{
+  "deliveryDate": "2016-05-05T21:13:35Z",
+  "jobscheduler": {
+    "surveyDate": "2016-05-05T20:34:51Z",
+    "jobschedulerId": "supervisor",
+    "version" : "1.11.0",
+    "host": "super.sos",
+    "port": 4444,
+    "os": {
+      "name": "linux",
+      "architecture": 64,
+      "distribution": "CentOS Linux release 7.2.1511"
+    },
+    "startedAt": "2016-05-03T14:48:01Z",
+    "timeZone": "Europe/Berlin",
+    "clusterType": {
+      "type": "standalone"
+    }
+  }
+}

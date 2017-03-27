@@ -1,0 +1,31 @@
+{
+    "deliveryDate":  "2016-09-23T11:13:44Z",
+    "order":  {
+                  "processedBy":  "",
+                  "job":  "/sos/jitl/JobChainStart",
+                  "jobChain":  "/examples/37_JobChainExitCodeHandling/01_JobChainA",
+                  "orderId":  "ExitCode_3",
+                  "lock":  "",
+                  "endState":  "",
+                  "nextStartTime":  "2016-07-20T06:00:00.000Z",
+                  "processClass":  "",
+                  "stateText":  "",
+                  "inProcessSince":  "",
+                  "processingState":  {
+                                          "_text":  "PENDING",
+                                          "severity":  1
+                                      },
+                  "taskId":  0,
+                  "state":  "Start",
+                  "setback":  "",
+                  "path":  "/examples/37_JobChainExitCodeHandling/01_JobChainA,ExitCode_3",
+                  "surveyDate":  "2016-09-23T11:13:47Z",
+                  "_type":  "permanent",
+                  "params":  [
+                                 {
+                                     "value":  "3",
+                                     "name":  "order_param_exit_code"
+                                 }
+                             ]
+              }
+}

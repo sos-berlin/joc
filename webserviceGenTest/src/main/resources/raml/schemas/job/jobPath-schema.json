@@ -1,0 +1,15 @@
+{
+  "title": "jobPath",
+  "id": "schemas/job/jobPath",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.JobPath",
+  "type": "object",
+  "required": [
+    "job"
+  ],
+  "properties": {
+    "job": {
+      "$ref": "../common/path-schema.json"
+    }
+  }
+}

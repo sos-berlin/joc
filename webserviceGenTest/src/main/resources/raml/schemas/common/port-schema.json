@@ -1,0 +1,8 @@
+{
+  "title": "port",
+  "id": "schemas/common/port",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "integer",
+  "minimum": 0,
+  "maximum": 65535
+}

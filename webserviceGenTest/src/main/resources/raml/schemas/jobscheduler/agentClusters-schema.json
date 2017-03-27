@@ -1,0 +1,22 @@
+{
+  "title": "agent clusters",
+  "id": "schemas/jobscheduler/agentClusters",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentClusters",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "agentClusters"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "agentClusters": {
+      "type": "array",
+      "items": {
+        "$ref": "agentCluster-schema.json"
+      }
+    }
+  }
+}

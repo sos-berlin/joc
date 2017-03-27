@@ -1,0 +1,9 @@
+{
+  "jobschedulerId":"scheduler",
+  "folders": [
+    {
+      "path": "/",
+      "recursive": true
+    }
+  ]
+}

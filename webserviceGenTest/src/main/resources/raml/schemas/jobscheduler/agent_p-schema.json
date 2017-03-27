@@ -1,0 +1,49 @@
+{
+  "title": "jobscheduler agent (permanent part)",
+  "id": "schemas/jobscheduler/agent_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.AgentP",
+  "type": "object",
+  "required": [
+    "surveyDate",
+    "version",
+    "host",
+    "url",
+    "os",
+    "state",
+    "startedAt",
+    "clusters"
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "version": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "url": {
+      "description": "url can be different against host/port if agent behind a proxy",
+      "type": "string",
+      "pattern": "https?://.+"
+    },
+    "os": {
+      "$ref": "os-schema.json"
+    },
+    "state": {
+      "$ref": "state-schema.json"
+    },
+    "startedAt": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "clusters": {
+      "description": "Collection of process class' paths",
+      "type": "array",
+      "items": {
+        "$ref": "../common/path-schema.json"
+      }
+    }
+  }
+}

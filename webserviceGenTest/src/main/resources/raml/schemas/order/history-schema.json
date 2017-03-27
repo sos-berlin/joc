@@ -1,0 +1,23 @@
+{
+  "title": "history collection of orders",
+  "id": "schemas/order/history",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "one item per started order",
+  "javaType": "com.sos.joc.model.order.OrderHistory",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "history"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "$ref": "historyItem-schema.json"
+      }
+    }
+  }
+}

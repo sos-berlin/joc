@@ -1,0 +1,54 @@
+{
+  "title": "jobChainsFilter",
+  "id": "schemas/jobChain/jobChainsFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainsFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "jobChains": {
+      "type": "array",
+      "items": {
+        "javaType": "com.sos.joc.model.jobChain.JobChainPath",
+        "type": "object",
+        "required": [
+          "jobChain"
+        ],
+        "properties": {
+          "jobChain": {
+            "$ref": "../common/path-schema.json"
+          }
+        }
+      }
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "folders": {
+      "$ref": "../common/folders-schema.json"
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "$ref": "jobChainStateText-schema.json"
+      }
+    },
+    "close": {
+      "description": "concerns only events",
+      "type": "boolean",
+      "default": false
+    },
+    "maxOrders": {
+      "description": "limits number of orders for each node if compact=false",
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

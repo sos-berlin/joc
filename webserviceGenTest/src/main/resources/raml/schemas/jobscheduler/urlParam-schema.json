@@ -1,0 +1,21 @@
+{
+  "title": "hostPortParam",
+  "id": "schemas/jobscheduler/urlParam",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.HostPortParameter",
+  "type": "object",
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "port": {
+      "$ref": "../common/port-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

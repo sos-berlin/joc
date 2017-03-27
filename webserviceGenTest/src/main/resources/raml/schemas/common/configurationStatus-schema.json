@@ -1,0 +1,24 @@
+{
+  "title": "configuration status",
+  "id": "schemas/common/configurationStatus",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.common.ConfigurationState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "4=ok; 5=replacement_is_standing_by,removing_delayed; 2=error_in_configuration_file,changed_file_not_loaded,resource_is_missing",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "configurationStatusText-schema.json"
+    },
+    "message": {
+      "description": "contains e.g. error message",
+      "type": "string"
+    }
+  }
+}

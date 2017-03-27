@@ -1,0 +1,9 @@
+{
+  "jobschedulerId":"scheduler",
+  "compact": true,
+  "agentClusters": [
+    {
+      "agentCluster": "/agents/galadriel-4445"
+    }
+  ]
+}

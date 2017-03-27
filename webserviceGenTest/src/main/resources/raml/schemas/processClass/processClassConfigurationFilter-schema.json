@@ -1,0 +1,22 @@
+{
+  "title": "process class conf filter",
+  "id": "schemas/order/processClassConfigurationFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.processClass.ProcessClassConfigurationFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "processClass"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "processClass": {
+      "$ref": "../common/path-schema.json"
+    },
+    "mime": {
+      "$ref": "../common/configurationMimeFilter-schema.json"
+    }
+  }
+}

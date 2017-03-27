@@ -1,0 +1,22 @@
+{
+  "title": "plan",
+  "id": "schemas/order/plan",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.plan.Plan",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "planItems"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "planItems": {
+      "type": "array",
+      "items": {
+        "$ref": "planItem-schema.json"
+      }
+    }
+  }
+}

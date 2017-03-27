@@ -1,0 +1,22 @@
+{
+  "title": "params or environment variables",
+  "id": "schemas/common/nameValuePairs",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "javaType": "com.sos.joc.model.common.NameValuePair",
+    "type": "object",
+    "required": [
+      "name",
+      "value"
+    ],
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "type": "string"
+      }
+    }
+  }
+}

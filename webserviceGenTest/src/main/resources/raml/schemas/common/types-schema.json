@@ -1,0 +1,9 @@
+{
+  "title": "JobScheduler object types",
+  "id": "schemas/common/type",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "$ref": "../common/type-schema.json"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "title": "clusterMemberTimeoutParam",
+  "id": "schemas/jobscheduler/urlTimeoutParam",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.HostPortTimeOutParameter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "host": {
+      "type": "string"
+    },
+    "port": {
+      "$ref": "../common/port-schema.json"
+    },
+    "timeout": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "title": "log content with delivery date",
+  "id": "schemas/common/logContent",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.common.LogContent200",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "surveyDate",
+    "log"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "log": {
+      "$ref": "../common/logContent-schema.json"
+    }
+  }
+}

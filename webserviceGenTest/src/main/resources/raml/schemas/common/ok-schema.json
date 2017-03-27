@@ -1,0 +1,24 @@
+{
+  "title": "ok answer",
+  "id": "schemas/common/ok",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.common.Ok",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "ok"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "surveyDate": {
+      "description": "is also required for permanent or volatile requests",
+      "type": "string",
+      "format": "date-time"
+    },
+    "ok": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "title": "job chain (volatile part)",
+  "id": "schemas/jobChain/jobChain_v",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobChain.JobChainV",
+  "type": "object",
+  "oneOf": [
+    {
+      "description": "parameter compact=true",
+      "required": [
+        "surveyDate",
+        "path",
+        "name",
+        "state",
+        "numOfOrders",
+        "numOfNodes",
+        "ordersSummary"
+      ]
+    },
+    {
+      "description": "parameter compact=false or unset",
+      "required": [
+        "surveyDate",
+        "path",
+        "name",
+        "state",
+        "numOfOrders",
+        "numOfNodes",
+        "nodes",
+        "ordersSummary"
+      ]
+    }
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "state": {
+      "$ref": "jobChainState-schema.json"
+    },
+    "numOfNodes": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "jobChainNode_v-schema.json"
+      }
+    },
+    "fileOrderSources": {
+      "type": "array",
+      "items": {
+        "$ref": "fileWatchingNode_v-schema.json"
+      }
+    },
+    "blacklist": {
+      "type": "array",
+      "items": {
+        "$ref": "../order/order_v-schema.json"
+      }
+    },
+    "numOfOrders": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "configurationStatus": {
+      "$ref": "../common/configurationStatus-schema.json"
+    },
+    "ordersSummary": {
+      "$ref": "../order/ordersSummary-schema.json"
+    }
+  }
+}

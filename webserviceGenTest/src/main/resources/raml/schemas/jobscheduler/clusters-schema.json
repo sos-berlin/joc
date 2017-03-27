@@ -1,0 +1,37 @@
+{
+  "title": "jobscheduler clusters",
+  "id": "schemas/jobscheduler/clusters",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.jobscheduler.Clusters",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "cluster"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "cluster": {
+      "type": "object",
+      "javaType": "com.sos.joc.model.jobscheduler.Cluster",
+      "required": [
+        "surveyDate",
+        "jobschedulerId",
+        "_type"
+      ],
+      "properties": {
+        "surveyDate": {
+          "$ref": "../common/surveyDate_p-schema.json"
+        },
+        "jobschedulerId": {
+          "description": "JobScheduler id of all cluster member",
+          "type": "string"
+        },
+        "_type": {
+          "$ref": "clusterType-schema.json"
+        }
+      }
+    }
+  }
+}

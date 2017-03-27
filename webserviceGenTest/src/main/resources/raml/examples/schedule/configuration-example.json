@@ -1,0 +1,11 @@
+{
+  "deliveryDate": "2016-05-05T21:13:45Z",
+  "configuration": {
+    "surveyDate": "2016-05-05T21:13:45Z",
+    "path": "/test/weekdays",
+    "configurationDate": "2015-12-11T10:06:39Z",
+    "content": {
+      "xml": "<schedule><weekdays><day day='1 2 3 4 5'><period begin='10:30' end='24:00' repeat='02:00'/></day></weekdays></schedule>",
+    }
+  }
+}

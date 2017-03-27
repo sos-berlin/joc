@@ -206,7 +206,7 @@ public class Globals {
         if (sosShiroProperties != null) {
             int seconds = sosShiroProperties.getProperty("jobscheduler_connection_timeout", defaultSeconds);
             httpConnectionTimeout = seconds * 1000;
-            LOGGER.info("HTTP(S) connection timeout = " + seconds);
+            LOGGER.info("HTTP(S) connection timeout = " + seconds + "s");
         }
     }
 
@@ -215,7 +215,7 @@ public class Globals {
         if (sosShiroProperties != null) {
             int seconds = sosShiroProperties.getProperty("jobscheduler_socket_timeout", defaultSeconds);
             httpSocketTimeout = seconds * 1000;
-            LOGGER.info("HTTP(S) socket timeout = " + seconds);
+            LOGGER.info("HTTP(S) socket timeout = " + seconds + "s");
         }
     }
 

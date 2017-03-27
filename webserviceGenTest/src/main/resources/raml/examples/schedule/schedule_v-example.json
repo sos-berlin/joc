@@ -1,0 +1,11 @@
+{
+    "deliveryDate":  "2016-09-14T00:44:13Z",
+    "schedule":  {
+                     "path":  "/examples/20_SchedulingJobChains/WeeklySchedule",
+                     "state":  {
+                                   "_text":  "ACTIVE",
+                                   "severity":  0
+                               },
+                     "name":  "WeeklySchedule"
+                 }
+}

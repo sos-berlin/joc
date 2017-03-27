@@ -1,0 +1,20 @@
+{
+  "title": "task cause",
+  "id": "schemas/job/taskCause",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "For order jobs only cause=order possible",
+  "javaType": "com.sos.joc.model.job.TaskCause",
+  "type": "string",
+  "enum": [
+    "NONE",
+    "MIN_TASKS",
+    "PERIOD_ONCE",
+    "PERIOD_SINGLE",
+    "PERIOD_REPEAT",
+    "QUEUE",
+    "QUEUE_AT",
+    "DIRECTORY",
+    "DELAY_AFTER_ERROR",
+    "ORDER"
+  ]
+}

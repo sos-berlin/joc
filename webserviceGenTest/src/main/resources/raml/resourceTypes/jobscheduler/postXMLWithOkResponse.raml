@@ -1,0 +1,28 @@
+type: error
+post:
+  is: [ jobschedulerMaster ]
+  headers:
+    access_token:
+      description: Request requires authentication!
+      type: string
+      required: true
+      example: 550e8400-e29b-11d4-a716-446655440000
+  description: |
+      <h2>This service expects xml commands of the already existing JobScheduler API.<br/>
+      <span style="color:red;">It is not relevant for the JOC client!</span></h2>
+      Response depends on the command.<br/>
+      Modifying commands have an ok element
+  body:
+    application/xml:
+      schema: <<schema>>
+      example: <<example>>
+  responses:
+    200:
+      description: |
+        **Confirm <span style="text-transform: capitalize;"><<resourcePathName>></span> successfully**
+      body:
+        application/xml:
+          schema: answerXML
+          example: |
+            <spooler><answer time="2016-06-15T13:49:02.869Z"><ok/></answer></spooler>
+  

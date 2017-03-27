@@ -1,0 +1,18 @@
+{
+    "deliveryDate":  "2016-09-23T11:13:22Z",
+    "job":  {
+                "nextPeriodBegin":  "",
+                "name":  "JobA",
+                "numOfQueuedTasks":  0,
+                "allTasks":  0,
+                "stateText":  "",
+                "state":  {
+                              "_text":  "PENDING",
+                              "severity":  1
+                          },
+                "numOfRunningTasks":  0,
+                "path":  "/examples/55_JobSchedulerLaunchQueue/01_JQLJobChain1/JobA",
+                "surveyDate":  "2016-09-23T11:13:32Z",
+                "allSteps":  0
+            }
+}

@@ -1,0 +1,22 @@
+{
+  "title": "process classes (permanent part)",
+  "id": "schemas/processClass/processClasses_p",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.processClass.ProcessClassesP",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "processClasses"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "processClasses": {
+      "type": "array",
+      "items": {
+        "$ref": "processClass_p-schema.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+    "deliveryDate":  "2016-09-14T00:46:01Z",
+    "historyId":  1003322,
+    "steps":  [
+                  {
+                      "node":  "CheckDBTbl",
+                      "step":  1,
+                      "job":  "examples/55_JobSchedulerLaunchQueue/01_JobSchedulerLaunchQueue/check_jobchain_launch_queue",
+                      "startTime":  "2016-08-17 10:40:21Z",
+                      "endTime":  "2016-08-17 10:40:28Z",
+                      "taskId":  3861156,
+                      "exitCode":  0
+                  },
+                  {
+                      "node":  "DispatchOrder",
+                      "step":  2,
+                      "job":  "examples/55_JobSchedulerLaunchQueue/01_JobSchedulerLaunchQueue/launch_job_chain",
+                      "startTime":  "2016-08-17 10:40:28Z",
+                      "endTime":  "2016-08-17 10:40:30Z",
+                      "taskId":  3861157,
+                      "exitCode":  0
+                  }
+              ]
+}

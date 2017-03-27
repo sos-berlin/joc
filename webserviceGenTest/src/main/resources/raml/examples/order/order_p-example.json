@@ -1,0 +1,19 @@
+{
+    "deliveryDate":  "2016-09-23T11:13:41Z",
+    "order":  {
+                  "estimatedDuration":  2,
+                  "params":  [
+                                 {
+                                     "value":  "3",
+                                     "name":  "order_param_exit_code"
+                                 }
+                             ],
+                  "_type":  "permanent",
+                  "configurationDate":  "2016-09-23T11:13:44Z",
+                  "jobChain":  "/examples/37_JobChainExitCodeHandling/01_JobChainA",
+                  "path":  "/examples/37_JobChainExitCodeHandling/01_JobChainA,ExitCode_3",
+                  "title":  "Exit Code 3 : Skip Node 400",
+                  "surveyDate":  "2016-09-23T11:13:44Z",
+                  "orderId":  "ExitCode_3"
+              }
+}
