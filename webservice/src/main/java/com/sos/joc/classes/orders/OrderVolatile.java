@@ -80,6 +80,7 @@ public class OrderVolatile extends OrderV {
         //setSurveyDate(null);
         //setPathJobChainAndOrderId();
         setState(overview.getString("nodeId", null));
+        setTitle(overview.getString("title", null));
         setHistoryId(getStringFromIntField(overview, "historyId"));
         setStartedAt(JobSchedulerDate.getDateFromISO8601String(overview.getString("startedAt", Instant.EPOCH.toString())));
         if (overview.containsKey("orderSourceType")) {

@@ -22,6 +22,7 @@ It depends on the parameter ``compact``.
     * lock (for *waiting_for_lock* orders)
     * processClass (for *waiting_for_process*, *waiting_for_agent* orders)
 * The compact view has the following optional fields
+    * title
     * processedBy (for *running*, *blacklist* orders)
     * configurationStatus
 * The detailed view has the following optional fields in addition to the compact view
