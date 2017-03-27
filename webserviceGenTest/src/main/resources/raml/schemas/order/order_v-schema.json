@@ -6,7 +6,7 @@
   "type": "object",
   "allOf": [
     {
-      "description": "compact=true then ONLY path, id, jobChain, _type, surveyDate, state, processingState, job(except blacklisted orders) are required and only processedBy, configurationStatus are optional",
+      "description": "compact=true then ONLY path, id, jobChain, _type, surveyDate, state, processingState, job(except blacklisted orders) are required and only title, processedBy, configurationStatus are optional",
       "required": [
         "path",
         "orderId",
@@ -77,6 +77,9 @@
     },
     "state": {
       "description": "the name of the node",
+      "type": "string"
+    },
+    "title": {
       "type": "string"
     },
     "job": {
