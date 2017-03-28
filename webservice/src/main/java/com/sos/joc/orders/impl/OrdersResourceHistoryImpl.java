@@ -98,6 +98,11 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             reportTriggerDBLayer.getFilter().setLimit(ordersFilter.getLimit());
             List<DBItemReportTrigger> listOfDBItemReportTrigger = reportTriggerDBLayer.getSchedulerOrderHistoryListFromTo();
 
+            Matcher regExMatcher=null;
+            if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
+                regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher("");
+            }
+
             for (DBItemReportTrigger dbItemReportTrigger : listOfDBItemReportTrigger) {
 
                 boolean add = true;
@@ -132,8 +137,8 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 history.setState(state);
                 history.setSurveyDate(dbItemReportTrigger.getCreated());
 
-                if (ordersFilter.getRegex() != null && !ordersFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(ordersFilter.getRegex()).matcher(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName());
+                if (regExMatcher != null) {
+                    regExMatcher.reset(dbItemReportTrigger.getParentName() + "," + dbItemReportTrigger.getName());
                     add = regExMatcher.find();
                 }
 

@@ -262,6 +262,7 @@ public class JobChainVolatile extends JobChainV {
             JobChainNodeV node = new JobChainNodeV();
             node.setName(jobNodeElem.getAttribute("state"));
             node.setLevel(jobNodeElem.getAttribute("state").replaceAll("[^:]", "").length());
+            NodeList ordersOfCurrentNode = jocXmlCommand.getSosxml().selectNodeList(jobNodeElem, "order_queue/order");
             
             //jocXmlCommand.getSosxml().selectSingleNode(jobNodeElem, "order_queue/order");
             //node.setOrders(orders);
@@ -271,7 +272,8 @@ public class JobChainVolatile extends JobChainV {
                 JobChainNodeJobV job = new JobChainNodeJobV();
                 job.setPath(jobElem.getAttribute(WebserviceConstants.PATH));
                 job.setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(jobElem));
-                jobV.setState();
+                //JOC-89
+                jobV.setState(hasRunningOrWaitingOrder(ordersOfCurrentNode));
                 job.setState(jobV.getState());
                 node.setJob(job);
             } else {
@@ -299,6 +301,28 @@ public class JobChainVolatile extends JobChainV {
             node.setState(getNodeState(jobChainNodeElem));
             getNodes().add(node);
         }
+    }
+    
+    private boolean hasRunningOrWaitingOrder(NodeList orders) throws Exception {
+
+        // TODO maybe use JsonApi
+        if (orders == null) {
+            return false;
+        }
+        for (int i = 0; i < orders.getLength(); i++) {
+            Element order = (Element) orders.item(i);
+            if (order.hasAttribute("task")) {
+                return true;
+            }
+            if (order.hasAttribute("setback") || order.hasAttribute("suspended") || !order.hasAttribute("touched")) {
+                // that's not exact, orders are untouched too, if they
+                // waitingForResource at the first node
+                continue;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<OrderV> getBlacklist(NodeList blacklist) {

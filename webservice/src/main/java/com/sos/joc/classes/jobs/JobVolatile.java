@@ -98,6 +98,31 @@ public class JobVolatile extends JobV {
         }
     }
     
+    //JOC-89, order job is pending for some states if node doesn't have a running order
+    public void setState(boolean hasRunningOrWaitingOrder) throws Exception {
+        if (getState() == null) {
+            setState();
+        }
+        if (!hasRunningOrWaitingOrder) {
+            switch (getState().get_text()) {
+            case NOT_IN_PERIOD:
+            case RUNNING:
+            case WAITING_FOR_AGENT:
+            case WAITING_FOR_LOCK:
+            case WAITING_FOR_PROCESS:
+            case WAITING_FOR_TASK:
+                JobState state = new JobState();
+                state.set_text(JobStateText.PENDING);
+                state.setSeverity(1);
+                setState(state);
+                //setRunningTasks(null);
+                //setNumOfRunningTasks(0);
+            default:
+                break;
+            }
+        }
+    }
+    
     public void setFields(boolean compact, String accessToken) throws Exception {
         this.accessToken = accessToken;
         if (compact) {
