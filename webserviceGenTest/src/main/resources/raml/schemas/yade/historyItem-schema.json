@@ -1,0 +1,59 @@
+{
+  "title": "save and response configuration",
+  "id": "schemas/yade/historyItem",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.yade.HistoryItem",
+  "type": "object",
+  "description": "compact=true -> possibly additional fields are mandator, transferStart, transferEnd, target.protocol, target.filename, filesize, source.host, target.host",
+  "required": [
+    "surveyDate",
+    "id",
+    "state",
+    "_operation"
+  ],
+  "properties": {
+    "surveyDate": {
+      "$ref": "../common/surveyDate_p-schema.json"
+    },
+    "id": {
+      "description": "GUID in table JADE_FILES_HISTORY",
+      "type": "string"
+    },
+    "mandator": {
+      "type": "string"
+    },
+    "state": {
+      "$ref": "transferState-schema.json"
+    },
+    "_operation": {
+      "$ref": "operation-schema.json"
+    },
+    "transferStart": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "transferEnd": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "integrityHash": {
+      "type": "string"
+    },
+    "fileSize": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "pid": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "errorMsg": {
+      "type": "string"
+    },
+    "source": {
+      "$ref": "yadeFile-schema.json"
+    },
+    "target": {
+      "$ref": "yadeFile-schema.json"
+    },
+    "jump": {
+      "$ref": "yadeFile-schema.json"
+    }
+  }
+}

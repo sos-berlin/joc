@@ -1672,25 +1672,23 @@ traits:
         schema200: !include schemas/audit/comments-schema.json
         example200: !include examples/audit/comments-example.json
 
-# TODO calendar
-#/calendar:
-#  is: [ jobschedulerObject, limitedByCalendarPeriod ]
-#  type:
-#    getBaseWithoutExample:
-#      description: "A calendar view of history and plan"
-#      description200: " "
-#      schema200: !include schemas/calendar/days-schema.json
 
-# TODO actions
-#/actions:
-#  is: [ jobschedulerObject, limitableByTime ]
-#  type:
-#    getBaseWithoutExample:
-#      description: |
-#        Returns a collection of user actions of a JobScheduler object such as
-#        * modify job chain
-#        * modify job
-#        * suspend order
-#        * ...
-#      description200: " "
-#      schema200: !include schemas/action/actions-schema.json
+/yade/history:
+  type:
+    postJSON:
+      description: Responds YADE history
+      description1: !include documentation/common/compact.md
+      description2: !include documentation/common/dateFrom.md
+      description3: !include documentation/common/dateTo.md
+      description4: !include documentation/common/timeZone.md
+      description5: !include documentation/yade/operations.md
+      description6: !include documentation/yade/states.md
+      description7: !include documentation/yade/mandator.md
+      description8: !include documentation/yade/source.md
+      description9: !include documentation/yade/target.md
+      description10: !include documentation/common/limit.md
+      description200: " "
+      schema: !include schemas/yade/yadeFilter-schema.json
+      schema200: !include schemas/yade/history-schema.json
+      example: " "
+      example200: " "

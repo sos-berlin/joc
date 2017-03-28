@@ -1,0 +1,37 @@
+{
+  "title": "jobChain state",
+  "id": "schemas/yade/yadeState",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.yade.YadeState",
+  "type": "object",
+  "required": [
+    "severity",
+    "_text"
+  ],
+  "properties": {
+    "severity": {
+      "description": "0=transferred,compressed,remaned,success 1=skipped,ignored_due_to_zerobyte_contraint,not_overwritten, 3=undefined, 2=failed,aborted,deleted, 5=waiting,transferring,in_progress,setback,polling",
+      "type": "integer"
+    },
+    "_text": {
+      "$ref": "transferStateText-schema.json",
+      "enum": [
+        "UNDEFINED",
+        "WAITING",
+        "TRANSFERRING",
+        "IN_PROGRESS",
+        "TRANSFERRED",
+        "SKIPPED",
+        "FAILED",
+        "ABORTED",
+        "COMPRESSED",
+        "NOT_OVERWRITTEN",
+        "DELETED",
+        "RENAMED",
+        "IGNORED_DUE_TO_ZEROBYTE_CONSTRAINT",
+        "SETBACK",
+        "POLLING"
+      ]
+    }
+  }
+}

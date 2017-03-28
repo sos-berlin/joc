@@ -1,0 +1,22 @@
+{
+  "title": "yade history",
+  "id": "schemas/yade/history",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.yade.History",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "yadeHistory"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "yadeHistory": {
+      "type": "array",
+      "items": {
+        "$ref": "historyItem-schema.json"
+      }
+    }
+  }
+}

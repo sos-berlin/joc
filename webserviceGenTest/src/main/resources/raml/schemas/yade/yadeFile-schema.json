@@ -1,0 +1,37 @@
+{
+  "title": "filename, host, port etc.",
+  "id": "schemas/yade/yadeFile",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.yade.YadeFile",
+  "type": "object",
+  "required": [
+    "host",
+    "ip",
+    "directory",
+    "filename"
+  ],
+  "properties": {
+    "host": {
+      "type": "string"
+    },
+    "ip": {
+      "type": "string",
+      "pattern": "(\\d{1,3}\\.){3}\\d{1,3}"
+    },
+    "account": {
+      "type": "string"
+    },
+    "port": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "protocol": {
+      "$ref": "protocol-schema.json"
+    },
+    "directory": {
+      "type": "string"
+    },
+    "filename": {
+      "type": "string"
+    }
+  }
+}
