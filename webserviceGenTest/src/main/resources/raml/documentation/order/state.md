@@ -1,4 +1,4 @@
-<tr><td>``processingState``</td><td>optional, array</td>
+<tr><td>``processingStates``</td><td>optional, array</td>
 <td>Filtered all orders with states such as
 <ul>
 <li>SUSPENDED</li>

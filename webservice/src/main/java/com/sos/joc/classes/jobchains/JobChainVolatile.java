@@ -322,9 +322,7 @@ public class JobChainVolatile extends JobChainV {
                 return true;
             }
         }
-
         return false;
-
     }
 
     private List<OrderV> getBlacklist(NodeList blacklist) {
