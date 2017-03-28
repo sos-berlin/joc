@@ -89,6 +89,11 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
             List<DBItemReportExecution> listOfDBItemReportExecutionDBItems = reportExecutionsDBLayer.getSchedulerHistoryListFromTo();
 
+            Matcher regExMatcher = null;
+            if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {
+                regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher("");
+            }
+
             for (DBItemReportExecution dbItemReportExecution : listOfDBItemReportExecutionDBItems) {
                 boolean add = true;
                 TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
@@ -125,8 +130,8 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
                 taskHistoryItem.setTaskId(dbItemReportExecution.getHistoryIdAsString());
 
-                if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher(dbItemReportExecution.getName());
+                if (regExMatcher != null) {
+                    regExMatcher.reset(dbItemReportExecution.getName());
                     add = regExMatcher.find();
                 }
 
