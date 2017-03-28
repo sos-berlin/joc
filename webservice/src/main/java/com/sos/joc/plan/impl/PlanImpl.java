@@ -130,6 +130,11 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 dailyPlanDBLayer.getFilter().addState(state.name());
             }
 
+            Matcher regExMatcher=null;
+            if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
+                regExMatcher = Pattern.compile(planFilter.getRegex()).matcher("");
+            }
+            
             List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(0);
             List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(0);
             List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
@@ -144,8 +149,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
                 p.setStartMode(dailyPlanDBItem.getStartMode());
 
-                if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                if (regExMatcher != null) {
+                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                     add = regExMatcher.find();
                 }
                 p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJob());
@@ -162,8 +167,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
                 p.setStartMode(dailyPlanDBItem.getStartMode());
 
-                if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
+                if (regExMatcher != null) {
+                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
                             .getDailyPlanDbItem().getOrderId());
                     add = regExMatcher.find();
                 }
@@ -183,8 +188,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
                 Err err = new Err();
 
-                if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                if (regExMatcher != null) {
+                	regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                     add = regExMatcher.find();
                 }
                 p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJob());
@@ -210,8 +215,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
                 p.setStartMode(dailyPlanDBItem.getStartMode());
 
-                if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(planFilter.getRegex()).matcher(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
+                if (regExMatcher != null) {
+                	regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
                             .getDailyPlanDbItem().getOrderId());
                     add = regExMatcher.find();
                 }
