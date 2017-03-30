@@ -3,6 +3,7 @@ package com.sos.joc.plan.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -140,6 +141,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
             List<DailyPlanWithReportExecutionDBItem> listOfDailyPlanStandaloneDBItems = dailyPlanDBLayer.getDailyPlanListStandalone(0);
             ArrayList<PlanItem> result = new ArrayList<PlanItem>();
+            HashMap<Long,String>plan = new HashMap<Long,String>();
 
             Plan entity = new Plan();
 
@@ -155,7 +157,15 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 }
                 p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJob());
 
-                if (add) {
+                if (dailyPlanDBItem.getDbItemReportTask() != null) {
+                    p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
+                    p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
+                    p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
+                }
+                
+                
+                if (add && plan.get(dailyPlanDBItem.getDailyPlanDbItem().getId()) == null) {
+                	plan.put(dailyPlanDBItem.getDailyPlanDbItem().getId(),dailyPlanDBItem.getDailyPlanDbItem().getTitle());
                     result.add(p);
                 }
             }
@@ -175,7 +185,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChain());
                 p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
 
-                if (add) {
+                if (add && plan.get(dailyPlanDBItem.getDailyPlanDbItem().getId()) == null) {
+                	plan.put(dailyPlanDBItem.getDailyPlanDbItem().getId(),dailyPlanDBItem.getDailyPlanDbItem().getTitle());
                     result.add(p);
                 }
             }
@@ -194,16 +205,17 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 }
                 p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJob());
 
-                if (dailyPlanDBItem.getDbItemReportExecution() != null) {
-                    p.setEndTime(dailyPlanDBItem.getDbItemReportExecution().getEndTime());
-                    p.setHistoryId(dailyPlanDBItem.getDbItemReportExecution().getHistoryIdAsString());
-                    p.setStartTime(dailyPlanDBItem.getDbItemReportExecution().getStartTime());
-                    p.setExitCode(dailyPlanDBItem.getDbItemReportExecution().getExitCode());
-                    err.setCode(dailyPlanDBItem.getDbItemReportExecution().getErrorCode());
-                    err.setMessage(dailyPlanDBItem.getDbItemReportExecution().getErrorText());
+                if (dailyPlanDBItem.getDbItemReportTask() != null) {
+                    p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
+                    p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
+                    p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
+                    p.setExitCode(dailyPlanDBItem.getDbItemReportTask().getExitCode());
+                    err.setCode(dailyPlanDBItem.getDbItemReportTask().getErrorCode());
+                    err.setMessage(dailyPlanDBItem.getDbItemReportTask().getErrorText());
                     p.setError(err);
                 }
-                if (add) {
+                if (add && plan.get(dailyPlanDBItem.getDailyPlanDbItem().getId()) == null) {
+                	plan.put(dailyPlanDBItem.getDailyPlanDbItem().getId(),dailyPlanDBItem.getDailyPlanDbItem().getTitle());
                     result.add(p);
                 }
             }
@@ -231,7 +243,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getName());
                 }
 
-                if (add) {
+                if (add && plan.get(dailyPlanDBItem.getDailyPlanDbItem().getId()) == null) {
+                	plan.put(dailyPlanDBItem.getDailyPlanDbItem().getId(),dailyPlanDBItem.getDailyPlanDbItem().getTitle());
                     result.add(p);
                 }
             }
