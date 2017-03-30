@@ -54,7 +54,9 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 }
 
             }
-            xml = "<commands>" + xml + "</commands>";
+            if (!xml.startsWith("<params.get") && ! xml.contains("param.get")){
+                 xml = "<commands>" + xml + "</commands>";
+            }
 
             JobSchedulerCommandAudit jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
             logAuditMessage(jobschedulerAudit);
