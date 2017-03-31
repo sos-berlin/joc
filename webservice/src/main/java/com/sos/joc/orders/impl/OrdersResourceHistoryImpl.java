@@ -52,10 +52,10 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
             ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
             if (ordersFilter.getDateFrom() != null) {
-                reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDate(ordersFilter.getDateFrom(), ordersFilter.getTimeZone()));
+                reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter.getTimeZone()));
             }
             if (ordersFilter.getDateTo() != null) {
-                reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDate(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
+                reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
             }
 
             if (ordersFilter.getOrders().size() > 0) {

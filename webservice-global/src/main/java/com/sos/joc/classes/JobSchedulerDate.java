@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,12 +60,20 @@ public class JobSchedulerDate {
         return Date.from(fromEpochMilli);
     }
     
-    public static Date getDate(String date, String timeZone) throws JobSchedulerInvalidResponseDataException {
+    public static Date getDateTo(String date, String timeZone) throws JobSchedulerInvalidResponseDataException {
+        return getDate(date, true, timeZone);
+    }
+    
+    public static Date getDateFrom(String date, String timeZone) throws JobSchedulerInvalidResponseDataException {
+        return getDate(date, false, timeZone);
+    }
+    
+    public static Date getDate(String date, boolean dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
         if (date == null || date.isEmpty()) {
             return null;
         }
         try {
-            return Date.from(getInstantFromDateStr(date, timeZone));
+            return Date.from(getInstantFromDateStr(date, dateTo, timeZone));
         } catch (JobSchedulerInvalidResponseDataException e) {
             throw e;
         } catch (Exception e) {
@@ -72,7 +81,7 @@ public class JobSchedulerDate {
         }
     }
    
-    private static Instant getInstantFromDateStr(String dateStr, String timeZone) throws JobSchedulerInvalidResponseDataException {
+    private static Instant getInstantFromDateStr(String dateStr, boolean dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
         Pattern offsetPattern = Pattern.compile("(\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(?:\\.\\d+)?|(?:\\s*-?\\d+\\s*[smhdwMy])+)([+-][0-9:]+|Z)?$");
         Pattern dateTimePattern = Pattern.compile("(?:(-?\\d+)\\s*([smhdwMy])\\s*)");
         Matcher m = offsetPattern.matcher(dateStr);
@@ -95,7 +104,20 @@ public class JobSchedulerDate {
             while (m.find()) {
                 dateTimeIsRelative = true;
                 if (zdt == null) {
-                    zdt = ZonedDateTime.ofInstant(Instant.now(), zoneId);
+                    Instant instant = Instant.now();
+                    if (Pattern.compile("[dwMy]").matcher(dateStr).find()) {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(Date.from(instant));
+                        calendar.set(Calendar.HOUR_OF_DAY, 0);
+                        calendar.set(Calendar.MINUTE, 0);
+                        calendar.set(Calendar.SECOND, 0);
+                        calendar.set(Calendar.MILLISECOND, 0);
+                        if (dateTo) {
+                            calendar.add(Calendar.DATE, 1);
+                        }
+                        instant = calendar.getTime().toInstant();
+                    }
+                    zdt = ZonedDateTime.ofInstant(instant, zoneId);
                 }
                 Long number = Long.valueOf(m.group(1));
                 
