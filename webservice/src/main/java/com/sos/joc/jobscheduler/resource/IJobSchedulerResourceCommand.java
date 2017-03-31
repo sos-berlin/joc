@@ -18,7 +18,7 @@ public interface IJobSchedulerResourceCommand {
     @POST
     @Path("commands")
     @Consumes(MediaType.APPLICATION_XML)
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public JOCDefaultResponse postJobschedulerCommands(
             @HeaderParam("access_token") String accessToken, JobschedulerCommands jobschedulerCommands) throws Exception;
 
