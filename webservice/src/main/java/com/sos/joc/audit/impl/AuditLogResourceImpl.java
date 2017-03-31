@@ -60,10 +60,10 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             Date filterFrom = null;
             Date filterTo = null;
             if (auditLogFilter.getDateFrom() != null && !auditLogFilter.getDateFrom().isEmpty()) {
-                filterFrom = JobSchedulerDate.getDate(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
+                filterFrom = JobSchedulerDate.getDateFrom(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
             }
             if (auditLogFilter.getDateTo() != null && !auditLogFilter.getDateTo().isEmpty()) {
-                filterTo = JobSchedulerDate.getDate(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
+                filterTo = JobSchedulerDate.getDateTo(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
             }
             String filterRegex = auditLogFilter.getRegex();
             // processing

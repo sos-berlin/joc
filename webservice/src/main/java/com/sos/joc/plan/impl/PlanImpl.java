@@ -120,10 +120,10 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             dailyPlanDBLayer.getFilter().setJobChain(planFilter.getJobChain());
             dailyPlanDBLayer.getFilter().setOrderId(planFilter.getOrderId());
             if (planFilter.getDateFrom() != null) {
-                dailyPlanDBLayer.getFilter().setPlannedStartFrom(JobSchedulerDate.getDate(planFilter.getDateFrom(), planFilter.getTimeZone()));
+                dailyPlanDBLayer.getFilter().setPlannedStartFrom(JobSchedulerDate.getDateFrom(planFilter.getDateFrom(), planFilter.getTimeZone()));
             }
             if (planFilter.getDateTo() != null) {
-                dailyPlanDBLayer.getFilter().setPlannedStartTo(JobSchedulerDate.getDate(planFilter.getDateTo(), planFilter.getTimeZone()));
+                dailyPlanDBLayer.getFilter().setPlannedStartTo(JobSchedulerDate.getDateTo(planFilter.getDateTo(), planFilter.getTimeZone()));
             }
             dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
 
