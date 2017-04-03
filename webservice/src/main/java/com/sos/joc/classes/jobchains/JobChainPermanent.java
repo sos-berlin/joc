@@ -1,8 +1,10 @@
 package com.sos.joc.classes.jobchains;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
@@ -27,15 +29,6 @@ public class JobChainPermanent {
         jobChain.setPath(inventoryJobChain.getName());
         jobChain.setName(inventoryJobChain.getBaseName());
         List<DBItemInventoryJobChainNode> jobChainNodesFromDb = dbLayer.getJobChainNodesByJobChainId(inventoryJobChain.getId(), instanceId);
-        if (jobChainNodesFromDb != null) {
-            int numOfNodes = 0;
-            for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
-                if (node.getNodeType() < 3) { //JobNode and JobChainNode
-                    numOfNodes += 1;  
-                }
-            }
-            jobChain.setNumOfNodes(numOfNodes);
-        }
         jobChain.setTitle(inventoryJobChain.getTitle());
         jobChain.setMaxOrders(inventoryJobChain.getMaxOrders());
         jobChain.setDistributed(inventoryJobChain.getDistributed());
@@ -55,13 +48,16 @@ public class JobChainPermanent {
             List<JobChainNodeP> jobChainNodes = new ArrayList<JobChainNodeP>();
             List<EndNode> jobChainEndNodes = new ArrayList<EndNode>();
             List<FileWatchingNodeP> jobChainFileOrderSources = new ArrayList<FileWatchingNodeP>();
+            Map<String,Integer> levels = new HashMap<String,Integer>();
             if (jobChainNodesFromDb != null) {
+                int numOfNodes = 0;
                 for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
                     switch (node.getNodeType()) {
                     case 1:
                         // JobNode -> Nodes
                     case 2:
                         // JobChainNode -> Nodes
+                        numOfNodes += 1;
                         JobChainNodeP jobChainNode = new JobChainNodeP();
                         jobChainNode.setDelay(node.getDelay());
                         jobChainNode.setErrorNode(node.getErrorState());
@@ -82,8 +78,15 @@ public class JobChainPermanent {
                         jobChainNode.setName(node.getState());
                         //TODO jobChainNode.setLevel(???);
                         //for now the colons in the node name are counted
-                        jobChainNode.setLevel(node.getState().replaceAll("[^:]", "").length());
+                        if (levels.containsKey(jobChainNode.getName())) {
+                            jobChainNode.setLevel(levels.get(jobChainNode.getName())); 
+                        } else {
+                            jobChainNode.setLevel(node.getState().replaceAll("[^:]", "").length());
+                        }
                         jobChainNode.setNextNode(node.getNextState());
+                        if (!levels.containsKey(jobChainNode.getNextNode())) {
+                            levels.put(jobChainNode.getNextNode(), jobChainNode.getLevel()); 
+                        }
                         jobChainNode.setOnError(node.getOnError());
                         jobChainNodes.add(jobChainNode);
                         if (node.getNestedJobChainName() != null && !node.getNestedJobChainName().equalsIgnoreCase(DBLayer.DEFAULT_NAME)) {
@@ -120,6 +123,7 @@ public class JobChainPermanent {
                         break;
                     }
                 }
+                jobChain.setNumOfNodes(numOfNodes);
             }
             if (!jobChainNodes.isEmpty()) {
                 jobChain.setNodes(jobChainNodes);
@@ -137,6 +141,15 @@ public class JobChainPermanent {
                 jobChain.setEndNodes(null);
             }
         } else {
+            if (jobChainNodesFromDb != null) {
+                int numOfNodes = 0;
+                for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
+                    if (node.getNodeType() < 3) { //JobNode and JobChainNode
+                        numOfNodes += 1;  
+                    }
+                }
+                jobChain.setNumOfNodes(numOfNodes);
+            }
             jobChain.setNodes(null);
             jobChain.setFileOrderSources(null);
             jobChain.setEndNodes(null);

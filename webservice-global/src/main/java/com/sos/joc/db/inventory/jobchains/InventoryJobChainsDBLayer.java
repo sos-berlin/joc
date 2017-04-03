@@ -103,6 +103,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES);
             sql.append(" where jobChainId = :id");
             sql.append(" and instanceId = :instanceId");
+            sql.append(" order by ordering");
             LOGGER.debug(sql.toString());
             Query query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
