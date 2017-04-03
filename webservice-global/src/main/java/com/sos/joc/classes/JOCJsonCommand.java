@@ -142,7 +142,9 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
     }
 
     public void addOrderCompactQuery(boolean compact) {
-        String returnQuery = (compact) ? "OrdersComplemented/OrderOverview" : "OrdersComplemented/OrderDetailed";
+        //String returnQuery = (compact) ? "OrdersComplemented/OrderOverview" : "OrdersComplemented/OrderDetailed";
+        //Workaround: JOC-84 
+        String returnQuery = "OrdersComplemented/OrderDetailed";
         uriBuilder.queryParam("return", returnQuery);
     }
 
