@@ -1,24 +1,22 @@
 package com.sos.joc.db.configuration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.classes.SOSHibernateFactory;
-import com.sos.hibernate.classes.SOSHibernateStatelessSession;
+import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 
 public class TestJocConfigurationDbLayer {
-    private static final String HIBERNATE_CONFIG_FILE = "C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_joc_cockpit/config/hibernate.cfg.xml";
+
+    private static final String HIBERNATE_CONFIG_FILE =
+            "C:/Users/ur/Documents/sos-berlin.com/jobscheduler/scheduler_joc_cockpit/config/hibernate.cfg.xml";
     private SOSHibernateFactory sosHibernateFactory;
     private SOSHibernateSession sosHibernateSession;
     JocConfigurationDbLayer jocConfigurationDBLayer;
@@ -75,7 +73,7 @@ public class TestJocConfigurationDbLayer {
         jocConfigurationDbItem.setShared(true);
         jocConfigurationDbItem.setConfigurationItem("myNewConfiguration");
         initFilter();
-        jocConfigurationDBLayer.saveOrUpdateConfiguration(jocConfigurationDbItem); 
+        jocConfigurationDBLayer.saveOrUpdateConfiguration(jocConfigurationDbItem);
         sosHibernateFactory.close();
 
     }
@@ -88,8 +86,8 @@ public class TestJocConfigurationDbLayer {
         jocConfigurationDBLayer.getFilter().setConfigurationType("profil");
         jocConfigurationDBLayer.getFilter().setName("profil");
         jocConfigurationDBLayer.getFilter().setObjectType("profil");
-      jocConfigurationDBLayer.deleteConfiguration();
-        
+        jocConfigurationDBLayer.deleteConfiguration();
+
         sosHibernateFactory.close();
 
     }
