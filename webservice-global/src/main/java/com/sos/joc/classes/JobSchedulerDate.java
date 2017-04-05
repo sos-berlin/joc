@@ -1,16 +1,14 @@
 package com.sos.joc.classes;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,29 +83,37 @@ public class JobSchedulerDate {
         Pattern offsetPattern = Pattern.compile("(\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(?:\\.\\d+)?|(?:\\s*-?\\d+\\s*[smhdwMy])+)([+-][0-9:]+|Z)?$");
         Pattern dateTimePattern = Pattern.compile("(?:(-?\\d+)\\s*([smhdwMy])\\s*)");
         Matcher m = offsetPattern.matcher(dateStr);
+        Calendar calendar = null;
         ZonedDateTime zdt = null;
-        ZoneId zoneId = null;
+        //ZoneId zoneId = null;
+        TimeZone timeZ = null;
         boolean dateTimeIsRelative = false;
         try {
             if (timeZone != null && !timeZone.isEmpty()) {
-                zoneId = ZoneId.of(timeZone);
+                //zoneId = ZoneId.of(timeZone);
+                timeZ = TimeZone.getTimeZone(timeZone);
             }
             if (m.find()) {
-                if (zoneId == null) {
-                    zoneId = (m.group(2) != null) ? ZoneOffset.of(m.group(2)) : ZoneOffset.UTC;
+//                if (zoneId == null) {
+//                    zoneId = (m.group(2) != null) ? ZoneOffset.of(m.group(2)) : ZoneOffset.UTC;
+//                }
+                if (timeZ == null) {
+                    timeZ = (m.group(2) != null) ? TimeZone.getTimeZone("GMT"+m.group(2)) : TimeZone.getTimeZone(ZoneOffset.UTC);
                 }
                 dateStr = m.group(1);
-            } else if (zoneId == null) {
-                zoneId = ZoneOffset.UTC;
+            } else if (timeZ == null) {
+//                zoneId = ZoneOffset.UTC;
+                timeZ = TimeZone.getTimeZone(ZoneOffset.UTC);
             }
             m = dateTimePattern.matcher(dateStr.replaceAll("([smhdwMy])", "$1 "));
             while (m.find()) {
                 dateTimeIsRelative = true;
-                if (zdt == null) {
+                if (calendar == null) {
                     Instant instant = Instant.now();
+                    calendar = Calendar.getInstance();
                     if (Pattern.compile("[dwMy]").matcher(dateStr).find()) {
-                        Calendar calendar = Calendar.getInstance();
                         calendar.setTime(Date.from(instant));
+                        calendar.setTimeZone(timeZ);
                         calendar.set(Calendar.HOUR_OF_DAY, 0);
                         calendar.set(Calendar.MINUTE, 0);
                         calendar.set(Calendar.SECOND, 0);
@@ -115,9 +121,10 @@ public class JobSchedulerDate {
                         if (dateTo) {
                             calendar.add(Calendar.DATE, 1);
                         }
-                        instant = calendar.getTime().toInstant();
+                        zdt = ZonedDateTime.ofInstant(calendar.toInstant(), timeZ.toZoneId());
+                    } else {
+                        zdt = ZonedDateTime.ofInstant(instant, timeZ.toZoneId());
                     }
-                    zdt = ZonedDateTime.ofInstant(instant, zoneId);
                 }
                 Long number = Long.valueOf(m.group(1));
                 
@@ -146,8 +153,11 @@ public class JobSchedulerDate {
                 }
             }
             if (!dateTimeIsRelative) {
-                zdt = ZonedDateTime.ofInstant(Instant.parse(dateStr+"Z"), zoneId);
-                return Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateStr+zdt.getOffset().toString()).getTimeInMillis());
+                Instant instant = Instant.parse(dateStr+"Z");
+                int offset = timeZ.getOffset(instant.toEpochMilli());
+                return instant.plusMillis(-1*offset);
+//                zdt = ZonedDateTime.ofInstant(Instant.parse(dateStr+"Z"), timeZ.toZoneId());
+//                return Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateStr+zdt.getOffset().toString()).getTimeInMillis());
             } else {
                 return zdt.toInstant();
             }
