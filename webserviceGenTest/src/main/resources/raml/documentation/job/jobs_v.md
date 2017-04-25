@@ -9,6 +9,7 @@ It depends on the parameter ``compact``.<br/>
     * ordersSummary (only for order jobs)
     * numOfRunningTasks
     * numOfQueuedTasks
+    * runTimeIsTemporary (default:false)
 * The compact view have further optional fields
     * locks
     * configurationStatus

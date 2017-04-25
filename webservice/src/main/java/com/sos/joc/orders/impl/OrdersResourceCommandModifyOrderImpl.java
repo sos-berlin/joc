@@ -106,6 +106,18 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
+    
+    @Override
+    public JOCDefaultResponse postOrdersResetRunTime(String accessToken, ModifyOrders modifyOrders) {
+        try {
+            return postOrdersCommand(accessToken, "reset_run_time", getPermissonsJocCockpit(accessToken).getOrder().isSetRunTime(), modifyOrders);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
 
     @Override
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
@@ -191,6 +203,17 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
                 }
                 break;
+            case "reset_run_time":
+                try {
+                    //TODO get permanent runtime and update dirty flag in INVENTORY_RUN_TIME
+                    order.setRunTime("");
+                    xml.add(XMLBuilder.parse(order.getRunTime()));
+//                } catch (JocException e) {
+//                    throw e;
+                } catch (Exception e) {
+                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
+                }
+                break;
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
@@ -219,7 +242,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         try {
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             
-            if ("set_state".equals(command)) {
+            if ("set_state".equals(command) || "reset_run_time".equals(command)) {
                 Globals.beginTransaction(connection);
             }
             for (ModifyOrder order : modifyOrders.getOrders()) {

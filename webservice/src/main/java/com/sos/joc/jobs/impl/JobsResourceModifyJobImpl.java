@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -20,6 +22,7 @@ import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
+import com.sos.joc.model.order.ModifyOrder;
 
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
@@ -29,9 +32,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private static final String SUSPEND = "suspend";
     private static final String STOP = "stop";
     private static final String SET_RUN_TIME = "set_run_time";
+    private static final String RESET_RUN_TIME = "reset_run_time";
     private static final String UNSTOP = "unstop";
     private static String API_CALL = "./jobs/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
+    private SOSHibernateSession connection = null;
 
     @Override
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
@@ -61,6 +66,18 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
         try {
             return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().isSetRunTime(), modifyJobs);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
+    
+    @Override
+    public JOCDefaultResponse postJobsResetRunTime(String accessToken, ModifyJobs modifyJobs) {
+        try {
+            return postJobsCommand(accessToken, RESET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().isSetRunTime(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -118,7 +135,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
             XMLBuilder xml = new XMLBuilder("modify_job");
             xml.addAttribute("job", normalizePath(modifyJob.getJob()));
-            if (SET_RUN_TIME.equals(command)) {
+            switch (command) {
+            case SET_RUN_TIME:
                 try {
                     ValidateXML.validateRunTimeAgainstJobSchedulerSchema(modifyJob.getRunTime());
                     xml.add(XMLBuilder.parse(modifyJob.getRunTime()));
@@ -127,8 +145,21 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 } catch (Exception e) {
                     throw new JobSchedulerInvalidResponseDataException(modifyJob.getRunTime());
                 }
-            } else {
+                break;
+            case RESET_RUN_TIME:
+                try {
+                    //TODO get permanent runtime and update dirty flag in INVENTORY_RUN_TIME
+                    modifyJob.setRunTime("");
+                    xml.add(XMLBuilder.parse(modifyJob.getRunTime()));
+//                } catch (JocException e) {
+//                    throw e;
+                } catch (Exception e) {
+                    throw new JobSchedulerInvalidResponseDataException(modifyJob.getRunTime());
+                }
+                break;
+            default:
                 xml.addAttribute("cmd", command);
+                break;
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
@@ -153,8 +184,19 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             throw new JocMissingRequiredParameterException("undefined 'jobs'");
         }
         Date surveyDate = new Date();
-        for (ModifyJob job : modifyJobs.getJobs()) {
-            surveyDate = executeModifyJobCommand(job, modifyJobs, command);
+        try {
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            
+            if (RESET_RUN_TIME.equals(command)) {
+                Globals.beginTransaction(connection);
+            }
+            for (ModifyJob job : modifyJobs.getJobs()) {
+                surveyDate = executeModifyJobCommand(job, modifyJobs, command);
+            }
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            Globals.disconnect(connection);;
         }
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);

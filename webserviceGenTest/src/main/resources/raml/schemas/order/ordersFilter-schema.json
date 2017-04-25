@@ -66,6 +66,9 @@
       "items": {
         "$ref": "../common/historyStateText-schema.json"
       }
+    },
+    "runTimeIsTemporary": {
+      "type": "boolean"
     }
   }
 }

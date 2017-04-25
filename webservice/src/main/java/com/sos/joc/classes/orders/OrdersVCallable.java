@@ -181,13 +181,14 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         if (checkOrderPathIsInFolder != null) {
             chckOrderPathIsInFolder = checkOrderPathIsInFolder;
         }
-        return getOrders(json, compact, null, null, chckOrderPathIsInFolder);
+        return getOrders(json, compact, null, null, null, chckOrderPathIsInFolder);
     }
 
     private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand) throws Exception {
         if (orders.getOrders().size() > 0) {
             ordersBody.setRegex(null);
             ordersBody.setProcessingStates(null);
+            ordersBody.setRunTimeIsTemporary(null);
         }
         JsonObject json = null;
         Boolean chckOrderPathIsInFolder = orders.isOuterJobChain();
@@ -207,21 +208,21 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         if (checkOrderPathIsInFolder != null) {
             chckOrderPathIsInFolder = checkOrderPathIsInFolder;
         }
-        return getOrders(json, ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates(), chckOrderPathIsInFolder);
+        return getOrders(json, ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates(), ordersBody.getRunTimeIsTemporary(), chckOrderPathIsInFolder);
     }
 
     private Map<String, OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand) throws Exception {
-        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), compact, null, null,
+        return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), compact, null, null, null,
                 checkOrderPathIsInFolder);
     }
 
     private Map<String, OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand) throws Exception {
         return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), ordersBody.getCompact(),
-                ordersBody.getRegex(), ordersBody.getProcessingStates(), checkOrderPathIsInFolder);
+                ordersBody.getRegex(), ordersBody.getProcessingStates(), ordersBody.getRunTimeIsTemporary(), checkOrderPathIsInFolder);
     }
 
     private Map<String, OrderVolatile> getOrders(JsonObject json, boolean compact, String regex, List<OrderStateFilter> processingStates,
-            Boolean checkOrderPathIsInFolder) throws JobSchedulerInvalidResponseDataException {
+            Boolean filterByRunTimeIsTemporary, Boolean checkOrderPathIsInFolder) throws JobSchedulerInvalidResponseDataException {
         UsedNodes usedNodes = new UsedNodes();
         UsedJobs usedJobs = new UsedJobs();
         UsedJobChains usedJobChains = new UsedJobChains();
@@ -246,6 +247,12 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
             if (!FilterAfterResponse.matchRegex(regex, order.getPath())) {
                 LOGGER.debug("...processing skipped caused by 'regex=" + regex + "'");
                 continue;
+            }
+            Boolean runTimeIsTemporary = false; //TODO get runTimeIsTemporary from DB
+            order.setRunTimeIsTemporary(runTimeIsTemporary);
+            if (filterByRunTimeIsTemporary != null && order.getRunTimeIsTemporary() != filterByRunTimeIsTemporary) {
+                LOGGER.debug("...processing skipped caused by 'runTimeIsTemporary=" + filterByRunTimeIsTemporary + "'");
+                continue; 
             }
             order.setSurveyDate(surveyDate);
             order.setFields(usedNodes, usedTasks, compact);

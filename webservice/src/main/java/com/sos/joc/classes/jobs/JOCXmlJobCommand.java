@@ -168,6 +168,12 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
                LOGGER.debug("...processing skipped caused by 'regex=" + jobsFilter.getRegex() + "'");
                continue; 
            }
+           Boolean runTimeIsTemporary = false; //TODO get runTimeIsTemporary from DB
+           jobV.setRunTimeIsTemporary(runTimeIsTemporary);
+           if (jobsFilter.getRunTimeIsTemporary() != null && jobsFilter.getRunTimeIsTemporary() != jobV.getRunTimeIsTemporary()) {
+               LOGGER.debug("...processing skipped caused by 'runTimeIsTemporary=" + jobsFilter.getRunTimeIsTemporary() + "'");
+               continue; 
+           }
            jobV.setState();
            if (!FilterAfterResponse.filterStateHasState(filterStates, jobV.getState().get_text())) {
                LOGGER.debug(String.format("...processing skipped because job's state '%1$s' doesn't contain in state filter '%2$s'", jobV.getState().get_text().name(),jobsFilter.getStates().toString()));
