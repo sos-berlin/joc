@@ -208,7 +208,7 @@ public class OrderV {
     @JsonProperty("processClass")
     private String processClass;
     @JsonProperty("runTimeIsTemporary")
-    private Boolean runTimeIsTemporary;
+    private Boolean runTimeIsTemporary = false;
 
     /**
      * path

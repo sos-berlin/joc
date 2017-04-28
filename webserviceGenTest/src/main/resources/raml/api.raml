@@ -660,7 +660,9 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: returns the run time as XML string in the JSON content field
+        description200: |
+          Returns the run time as XML string in the JSON content field
+          If the run time is temporary changed then the response contains original permament run time too
         schema: !include schemas/order/orderFilter-schema.json
         schema200: !include schemas/common/runtime200-schema.json
         example: !include examples/order/filteredOrder-example.json
@@ -885,7 +887,9 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: returns the run time as XML string in the JSON content field
+        description200: |
+          Returns the run time as XML string in the JSON content field
+          If the run time is temporary changed then the response contains original permament run time too
         schema: !include schemas/job/jobFilter-schema.json
         schema200: !include schemas/common/runtime200-schema.json
         example: TODO

@@ -137,7 +137,8 @@
       "$ref": "../common/path-schema.json"
     },
     "runTimeIsTemporary": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": false
     }
   }
 }

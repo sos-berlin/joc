@@ -21,7 +21,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "surveyDate",
-    "runTime"
+    "runTime",
+    "permanentRunTime",
+    "runTimeIsTemporary"
 })
 public class RunTime {
 
@@ -29,17 +31,37 @@ public class RunTime {
      * survey date of the JobScheduler Master/Agent
      * <p>
      * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
      * 
      */
     @JsonProperty("surveyDate")
     private Date surveyDate;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("runTime")
     private String runTime;
+    /**
+     * is required iff runTimeIsTemporary = true
+     * 
+     */
+    @JsonProperty("permanentRunTime")
+    private String permanentRunTime;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("runTimeIsTemporary")
+    private Boolean runTimeIsTemporary = false;
 
     /**
      * survey date of the JobScheduler Master/Agent
      * <p>
      * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
      * 
      * @return
      *     The surveyDate
@@ -53,6 +75,7 @@ public class RunTime {
      * survey date of the JobScheduler Master/Agent
      * <p>
      * Current date of the JobScheduler Master/Agent. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
+     * (Required)
      * 
      * @param surveyDate
      *     The surveyDate
@@ -64,6 +87,8 @@ public class RunTime {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The runTime
      */
@@ -74,12 +99,60 @@ public class RunTime {
 
     /**
      * 
+     * (Required)
+     * 
      * @param runTime
      *     The runTime
      */
     @JsonProperty("runTime")
     public void setRunTime(String runTime) {
         this.runTime = runTime;
+    }
+
+    /**
+     * is required iff runTimeIsTemporary = true
+     * 
+     * @return
+     *     The permanentRunTime
+     */
+    @JsonProperty("permanentRunTime")
+    public String getPermanentRunTime() {
+        return permanentRunTime;
+    }
+
+    /**
+     * is required iff runTimeIsTemporary = true
+     * 
+     * @param permanentRunTime
+     *     The permanentRunTime
+     */
+    @JsonProperty("permanentRunTime")
+    public void setPermanentRunTime(String permanentRunTime) {
+        this.permanentRunTime = permanentRunTime;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @return
+     *     The runTimeIsTemporary
+     */
+    @JsonProperty("runTimeIsTemporary")
+    public Boolean getRunTimeIsTemporary() {
+        return runTimeIsTemporary;
+    }
+
+    /**
+     * 
+     * (Required)
+     * 
+     * @param runTimeIsTemporary
+     *     The runTimeIsTemporary
+     */
+    @JsonProperty("runTimeIsTemporary")
+    public void setRunTimeIsTemporary(Boolean runTimeIsTemporary) {
+        this.runTimeIsTemporary = runTimeIsTemporary;
     }
 
     @Override
@@ -89,7 +162,7 @@ public class RunTime {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(runTime).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(runTime).append(permanentRunTime).append(runTimeIsTemporary).toHashCode();
     }
 
     @Override
@@ -101,7 +174,7 @@ public class RunTime {
             return false;
         }
         RunTime rhs = ((RunTime) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(runTime, rhs.runTime).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(runTime, rhs.runTime).append(permanentRunTime, rhs.permanentRunTime).append(runTimeIsTemporary, rhs.runTimeIsTemporary).isEquals();
     }
 
 }

@@ -170,7 +170,7 @@ public class JobV {
     @JsonProperty("delayUntil")
     private Date delayUntil;
     @JsonProperty("runTimeIsTemporary")
-    private Boolean runTimeIsTemporary;
+    private Boolean runTimeIsTemporary = false;
 
     /**
      * survey date of the JobScheduler Master/Agent

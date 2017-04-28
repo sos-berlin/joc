@@ -113,7 +113,8 @@
       "$ref": "../common/timestamp-schema.json"
     },
     "runTimeIsTemporary": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": false
     }
   }
 }
