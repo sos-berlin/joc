@@ -46,7 +46,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
                 checkFoldersFilterParam(treeBody.getFolders());
             }
             SortedSet<String> folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId());
-            Tree root = TreePermanent.getTree(folders);
+            Tree root = TreePermanent.getTree(folders,this.getJobschedulerUser().getSosShiroCurrentUser().getSosShiroFolderPermissions());
 
             TreeView entity = new TreeView();
             if (root != null) {

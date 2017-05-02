@@ -1,5 +1,6 @@
 package com.sos.auth.rest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,147 +14,168 @@ import com.sos.joc.classes.WebserviceConstants;
 
 public class SOSShiroCurrentUser {
 
-    private Subject currentSubject;
-    private String username;
-    private String password;
-    private String accessToken;
-    private String authorization;
-    private String selectedInstance;
+	public SOSShiroFolderPermissions getSosShiroFolderPermissions() {
+		return sosShiroFolderPermissions;
+	}
 
-    private SOSPermissionJocCockpit sosPermissionJocCockpit;
-    private SOSPermissionCommands sosPermissionCommands;
-    private Map<String, DBItemInventoryInstance> listOfSchedulerInstances;
+	private Subject currentSubject;
+	private String username;
+	private String password;
+	private String accessToken;
+	private String authorization;
+	private String selectedInstance;
 
-    public SOSShiroCurrentUser(String username, String password) {
-        super();
-        this.listOfSchedulerInstances = new HashMap<String, DBItemInventoryInstance>();
-        this.username = username;
-        this.password = password;
-    }
+	private SOSPermissionJocCockpit sosPermissionJocCockpit;
+	private SOSPermissionCommands sosPermissionCommands;
+	private Map<String, DBItemInventoryInstance> listOfSchedulerInstances;
+	private SOSShiroFolderPermissions sosShiroFolderPermissions;
 
-    public SOSShiroCurrentUser(String username, String password, String authorization) {
-        super();
-        this.listOfSchedulerInstances = new HashMap<String, DBItemInventoryInstance>();
-        this.username = username;
-        this.authorization = authorization;
-        this.password = password;
-    }
-    public SOSPermissionJocCockpit getSosPermissionJocCockpit() {
-        return sosPermissionJocCockpit;
-    }
+	public SOSShiroCurrentUser(String username, String password) {
+		super();
+		initFolders();
+		this.listOfSchedulerInstances = new HashMap<String, DBItemInventoryInstance>();
+		this.username = username;
+		this.password = password;
+	}
 
-    public void setSosPermissionJocCockpit(SOSPermissionJocCockpit sosPermissionJocCockpit) {
-        this.sosPermissionJocCockpit = sosPermissionJocCockpit;
-    }
+	public SOSShiroCurrentUser(String username, String password, String authorization) {
+		super();
+		this.listOfSchedulerInstances = new HashMap<String, DBItemInventoryInstance>();
+		this.username = username;
+		this.authorization = authorization;
+		this.password = password;
+	}
 
-    public SOSPermissionCommands getSosPermissionCommands() {
-        return sosPermissionCommands;
-    }
+	public SOSPermissionJocCockpit getSosPermissionJocCockpit() {
+		return sosPermissionJocCockpit;
+	}
 
-    public void setSosPermissionCommands(SOSPermissionCommands sosPermissionCommands) {
-        this.sosPermissionCommands = sosPermissionCommands;
-    }
-    
-    public String getAccessToken() {
-        return accessToken;
-    }
+	public void setSosPermissionJocCockpit(SOSPermissionJocCockpit sosPermissionJocCockpit) {
+		this.sosPermissionJocCockpit = sosPermissionJocCockpit;
+	}
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
+	public SOSPermissionCommands getSosPermissionCommands() {
+		return sosPermissionCommands;
+	}
 
-    public Subject getCurrentSubject() {
-        return currentSubject;
-    }
+	public void setSosPermissionCommands(SOSPermissionCommands sosPermissionCommands) {
+		this.sosPermissionCommands = sosPermissionCommands;
+	}
 
-    public String getUsername() {
-        return username;
-    }
+	public String getAccessToken() {
+		return accessToken;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
 
-    public void setCurrentSubject(Subject currentSubject) {
-        this.currentSubject = currentSubject;
-    }
+	public Subject getCurrentSubject() {
+		return currentSubject;
+	}
 
-    public boolean hasRole(String role) {
-        if (currentSubject != null) {
-            return currentSubject.hasRole(role);
-        } else {
-            return false;
-        }
-    }
-    
-    private boolean getPermissionFromSubject(String permission,String permissionMaster){
-        boolean excluded = currentSubject.isPermitted("-" + permission) || currentSubject.isPermitted("-" + permissionMaster);
-        return (currentSubject.isPermitted(permission) || currentSubject.isPermitted(permissionMaster))  && !excluded;
-    }
-    
-    private boolean getPermissionFromMaster(String permission){
-        if (selectedInstance == null) {
-            JOCPreferences jocPreferences = new JOCPreferences(username);
-            selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
-        }
-        String permissionMaster = selectedInstance + ":" + permission;
-        return getPermissionFromSubject(permission,permissionMaster);
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    public void setSelectedInstance(String selectedInstance) {
-        this.selectedInstance = selectedInstance;
-    }
+	public String getPassword() {
+		return password;
+	}
 
-    public boolean isPermitted(String permission) {
-        if (currentSubject != null) {
-            return getPermissionFromMaster(permission);
-        } else {
-            return false;
-        }
-    }
+	public void setCurrentSubject(Subject currentSubject) {
+		this.currentSubject = currentSubject;
+	}
 
-    public boolean isAuthenticated() {
-        if (currentSubject != null) {
-            return currentSubject.isAuthenticated();
-        } else {
-            return false;
-        }
-    }
-    
-    public Map<String, DBItemInventoryInstance> getMapOfSchedulerInstances() {
-        return listOfSchedulerInstances;
-    }
+	public boolean hasRole(String role) {
+		if (currentSubject != null) {
+			return currentSubject.hasRole(role);
+		} else {
+			return false;
+		}
+	}
 
-    public DBItemInventoryInstance getSchedulerInstanceDBItem(String jobSchedulerId) {
-        return listOfSchedulerInstances.get(jobSchedulerId);
-    }
-    
-    public DBItemInventoryInstance removeSchedulerInstanceDBItem(String jobSchedulerId) {
-        return listOfSchedulerInstances.remove(jobSchedulerId);
-    }
-    
-    public void addSchedulerInstanceDBItem(String jobSchedulerId, DBItemInventoryInstance schedulerInstancesDBItem) {
-        listOfSchedulerInstances.put(jobSchedulerId, schedulerInstancesDBItem);
-    }
+	private boolean getPermissionFromSubject(String permission, String permissionMaster) {
+		boolean excluded = currentSubject.isPermitted("-" + permission)
+				|| currentSubject.isPermitted("-" + permissionMaster);
+		return (currentSubject.isPermitted(permission) || currentSubject.isPermitted(permissionMaster)) && !excluded;
+	}
 
-    public DBItemInventoryInstance getSchedulerInstanceByKey(Long id) {
-        for (Map.Entry<String, DBItemInventoryInstance> entry : listOfSchedulerInstances.entrySet()) {
-            DBItemInventoryInstance instance = entry.getValue();
-            if (instance.getId() == id) {
-                return instance;
-            }
-        }
-        return null;
+	private boolean getPermissionFromMaster(String permission) {
+		if (selectedInstance == null) {
+			JOCPreferences jocPreferences = new JOCPreferences(username);
+			selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
+		}
+		String permissionMaster = selectedInstance + ":" + permission;
+		return getPermissionFromSubject(permission, permissionMaster);
+	}
 
-    }
+	public void setSelectedInstance(String selectedInstance) {
+		this.selectedInstance = selectedInstance;
+	}
 
-    public String getAuthorization() {
-        return authorization;
-    }
+	public boolean isPermitted(String permission) {
+		if (currentSubject != null) {
+			return getPermissionFromMaster(permission);
+		} else {
+			return false;
+		}
+	}
 
-    public void setAuthorization(String authorization) {
-        this.authorization = authorization;
-    }
+	public boolean isAuthenticated() {
+		if (currentSubject != null) {
+			return currentSubject.isAuthenticated();
+		} else {
+			return false;
+		}
+	}
 
+	public Map<String, DBItemInventoryInstance> getMapOfSchedulerInstances() {
+		return listOfSchedulerInstances;
+	}
+
+	public DBItemInventoryInstance getSchedulerInstanceDBItem(String jobSchedulerId) {
+		return listOfSchedulerInstances.get(jobSchedulerId);
+	}
+
+	public DBItemInventoryInstance removeSchedulerInstanceDBItem(String jobSchedulerId) {
+		return listOfSchedulerInstances.remove(jobSchedulerId);
+	}
+
+	public void addSchedulerInstanceDBItem(String jobSchedulerId, DBItemInventoryInstance schedulerInstancesDBItem) {
+		listOfSchedulerInstances.put(jobSchedulerId, schedulerInstancesDBItem);
+	}
+
+	public DBItemInventoryInstance getSchedulerInstanceByKey(Long id) {
+		for (Map.Entry<String, DBItemInventoryInstance> entry : listOfSchedulerInstances.entrySet()) {
+			DBItemInventoryInstance instance = entry.getValue();
+			if (instance.getId() == id) {
+				return instance;
+			}
+		}
+		return null;
+
+	}
+
+	public void initFolders() {
+		sosShiroFolderPermissions = new SOSShiroFolderPermissions();
+	}
+
+	public void addFolder(String role, String folders) {
+		if (sosShiroFolderPermissions == null) {
+			this.initFolders();
+		}
+
+		if (hasRole(role)) {
+			sosShiroFolderPermissions.setFolders(folders);
+		}
+	}
+
+	public String getAuthorization() {
+		return authorization;
+	}
+
+	public void setAuthorization(String authorization) {
+		this.authorization = authorization;
+	}
 
 }
