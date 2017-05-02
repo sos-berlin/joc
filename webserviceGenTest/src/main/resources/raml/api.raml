@@ -56,6 +56,7 @@ resourceTypes:
   - modifyJob: !include resourceTypes/job/modify.raml
   - startJob: !include resourceTypes/job/start.raml
   - setRunTimeJob: !include resourceTypes/job/setRunTime.raml
+  - resetRunTimeJob: !include resourceTypes/job/resetRunTime.raml
   - modifyTasks: !include resourceTypes/job/modifyTasks.raml
   - modifyOrder: !include resourceTypes/order/modify.raml
   - addOrder: !include resourceTypes/order/add.raml
@@ -63,6 +64,7 @@ resourceTypes:
   - resumeOrder: !include resourceTypes/order/resume.raml
   - setStateOrder: !include resourceTypes/order/setState.raml
   - setRunTimeOrder: !include resourceTypes/order/setRunTime.raml
+  - resetRunTimeOrder: !include resourceTypes/order/resetRunTime.raml
   - modifyJobChain: !include resourceTypes/jobChain/modify.raml
   - modifyJobChainNode: !include resourceTypes/jobChain/modifyNode.raml
 
@@ -345,15 +347,15 @@ traits:
     postJSON:
       description: Returns a collection of orders (volatile part) filtered by a period, job chains or order state
       description1: !include documentation/common/compact.md
-      description2: " "
-      description3: !include documentation/common/dateFrom.md
-      description4: !include documentation/common/dateTo.md
-      description5: !include documentation/common/timeZone.md
-      description6: !include documentation/common/regex.md
-      description7: !include documentation/order/filteredByOrders.md
-      description8: !include documentation/order/state.md
-      description9: !include documentation/order/type.md
-      description10: !include documentation/common/folders.md
+      description2: !include documentation/common/dateFrom.md
+      description3: !include documentation/common/dateTo.md
+      description4: !include documentation/common/timeZone.md
+      description5: !include documentation/common/regex.md
+      description6: !include documentation/order/filteredByOrders.md
+      description7: !include documentation/order/state.md
+      description8: !include documentation/order/type.md
+      description9: !include documentation/common/folders.md
+      description10: !include documentation/order/runTimeIsTemporary.md
       description200: !include documentation/order/orders_v.md
       schema: !include schemas/order/ordersFilter-schema.json
       schema200: !include schemas/order/orders_v-schema.json
@@ -530,6 +532,10 @@ traits:
     type:
       setRunTimeOrder:
         audit: !include documentation/audit/auditLog.md
+  /reset_run_time:
+    type:
+      resetRunTimeOrder:
+        audit: !include documentation/audit/auditLog.md
 
 /order:
   type:
@@ -654,7 +660,9 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: returns the run time as XML string in the JSON content field
+        description200: |
+          Returns the run time as XML string in the JSON content field
+          If the run time is temporary changed then the response contains original permament run time too
         schema: !include schemas/order/orderFilter-schema.json
         schema200: !include schemas/common/runtime200-schema.json
         example: !include examples/order/filteredOrder-example.json
@@ -665,15 +673,15 @@ traits:
     postJSON:
       description: Returns a collection of jobs (volatile part) filtered by a period or job state
       description1: !include documentation/common/compact.md
-      description2: " "
-      description3: !include documentation/common/dateFrom.md
-      description4: !include documentation/common/dateTo.md
-      description5: !include documentation/common/timeZone.md
-      description6: !include documentation/common/regex.md
-      description7: !include documentation/common/folders.md
-      description8: !include documentation/job/filteredByJobs.md
-      description9: !include documentation/job/orderJob.md
-      description10: !include documentation/job/state.md
+      description2: !include documentation/common/dateFrom.md
+      description3: !include documentation/common/dateTo.md
+      description4: !include documentation/common/timeZone.md
+      description5: !include documentation/common/regex.md
+      description6: !include documentation/common/folders.md
+      description7: !include documentation/job/filteredByJobs.md
+      description8: !include documentation/job/orderJob.md
+      description9: !include documentation/job/state.md
+      description10: !include documentation/job/runTimeIsTemporary.md
       description200: !include documentation/job/jobs_v.md
       schema: !include schemas/job/jobsFilter-schema.json
       schema200: jobs
@@ -734,6 +742,10 @@ traits:
   /set_run_time:
     type:
       setRunTimeJob:
+        audit: !include documentation/audit/auditLog.md
+  /reset_run_time:
+    type:
+      resetRunTimeJob:
         audit: !include documentation/audit/auditLog.md
   # TODO /end_, /suspend_ and /continueAllTasks supported or not?
   /end_all_tasks:
@@ -875,7 +887,9 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: returns the run time as XML string in the JSON content field
+        description200: |
+          Returns the run time as XML string in the JSON content field
+          If the run time is temporary changed then the response contains original permament run time too
         schema: !include schemas/job/jobFilter-schema.json
         schema200: !include schemas/common/runtime200-schema.json
         example: TODO

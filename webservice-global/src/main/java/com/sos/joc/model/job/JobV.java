@@ -44,7 +44,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "configurationStatus",
     "ordersSummary",
     "nextStartTime",
-    "delayUntil"
+    "delayUntil",
+    "runTimeIsTemporary"
 })
 public class JobV {
 
@@ -168,6 +169,8 @@ public class JobV {
      */
     @JsonProperty("delayUntil")
     private Date delayUntil;
+    @JsonProperty("runTimeIsTemporary")
+    private Boolean runTimeIsTemporary = false;
 
     /**
      * survey date of the JobScheduler Master/Agent
@@ -629,6 +632,26 @@ public class JobV {
         this.delayUntil = delayUntil;
     }
 
+    /**
+     * 
+     * @return
+     *     The runTimeIsTemporary
+     */
+    @JsonProperty("runTimeIsTemporary")
+    public Boolean getRunTimeIsTemporary() {
+        return runTimeIsTemporary;
+    }
+
+    /**
+     * 
+     * @param runTimeIsTemporary
+     *     The runTimeIsTemporary
+     */
+    @JsonProperty("runTimeIsTemporary")
+    public void setRunTimeIsTemporary(Boolean runTimeIsTemporary) {
+        this.runTimeIsTemporary = runTimeIsTemporary;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -636,7 +659,7 @@ public class JobV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(orderQueue).append(allTasks).append(allSteps).append(state).append(stateText).append(locks).append(temporary).append(numOfRunningTasks).append(runningTasks).append(numOfQueuedTasks).append(taskQueue).append(params).append(configurationStatus).append(ordersSummary).append(nextStartTime).append(delayUntil).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(orderQueue).append(allTasks).append(allSteps).append(state).append(stateText).append(locks).append(temporary).append(numOfRunningTasks).append(runningTasks).append(numOfQueuedTasks).append(taskQueue).append(params).append(configurationStatus).append(ordersSummary).append(nextStartTime).append(delayUntil).append(runTimeIsTemporary).toHashCode();
     }
 
     @Override
@@ -648,7 +671,7 @@ public class JobV {
             return false;
         }
         JobV rhs = ((JobV) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(orderQueue, rhs.orderQueue).append(allTasks, rhs.allTasks).append(allSteps, rhs.allSteps).append(state, rhs.state).append(stateText, rhs.stateText).append(locks, rhs.locks).append(temporary, rhs.temporary).append(numOfRunningTasks, rhs.numOfRunningTasks).append(runningTasks, rhs.runningTasks).append(numOfQueuedTasks, rhs.numOfQueuedTasks).append(taskQueue, rhs.taskQueue).append(params, rhs.params).append(configurationStatus, rhs.configurationStatus).append(ordersSummary, rhs.ordersSummary).append(nextStartTime, rhs.nextStartTime).append(delayUntil, rhs.delayUntil).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(orderQueue, rhs.orderQueue).append(allTasks, rhs.allTasks).append(allSteps, rhs.allSteps).append(state, rhs.state).append(stateText, rhs.stateText).append(locks, rhs.locks).append(temporary, rhs.temporary).append(numOfRunningTasks, rhs.numOfRunningTasks).append(runningTasks, rhs.runningTasks).append(numOfQueuedTasks, rhs.numOfQueuedTasks).append(taskQueue, rhs.taskQueue).append(params, rhs.params).append(configurationStatus, rhs.configurationStatus).append(ordersSummary, rhs.ordersSummary).append(nextStartTime, rhs.nextStartTime).append(delayUntil, rhs.delayUntil).append(runTimeIsTemporary, rhs.runTimeIsTemporary).isEquals();
     }
 
 }

@@ -9,7 +9,9 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
+import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -17,8 +19,11 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
+import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
+import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -34,6 +39,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private static String API_CALL = "./orders/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private SOSHibernateSession connection = null;
+    private InventoryOrdersDBLayer dbOrderLayer = null;
+    private InventoryJobChainsDBLayer dbJobChainLayer = null;
 
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {
@@ -106,6 +113,18 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
+    
+    @Override
+    public JOCDefaultResponse postOrdersResetRunTime(String accessToken, ModifyOrders modifyOrders) {
+        try {
+            return postOrdersCommand(accessToken, "reset_run_time", getPermissonsJocCockpit(accessToken).getOrder().isSetRunTime(), modifyOrders);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
 
     @Override
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
@@ -134,8 +153,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 checkRequiredParameter("runTime", order.getRunTime()); 
             }
             
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             XMLBuilder xml = new XMLBuilder("modify_order");
-            xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", normalizePath(order.getJobChain()));
+            String jobChainPath = normalizePath(order.getJobChain());
+            xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", jobChainPath);
             switch (command) {
             case "start":
                 if (order.getAt() == null || "".equals(order.getAt())) {
@@ -160,8 +181,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 if (order.getResume() != null && order.getResume()) {
                     xml.addAttribute("suspended", "no");
                 } else {
-                    InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
-                    if (dbLayer.isEndNode(normalizePath(order.getJobChain()), order.getState(), dbItemInventoryInstance.getId())) {
+                    if (isEndNode(jobChainPath, order.getState())) {
                         xml.addAttribute("suspended", "no");
                     }
                 }
@@ -191,10 +211,37 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
                 }
                 break;
+            case "reset_run_time":
+                try {
+                    DBItemInventoryOrder dbItem = getDBItem(jobChainPath, order.getOrderId());
+                    if (dbItem.getRunTimeIsTemporary() == null) {
+                        dbItem.setRunTimeIsTemporary(false); 
+                    }
+                    if (dbItem.getRunTimeIsTemporary()) {
+                        String runTimeCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, order.getOrderId(), "source");
+                        String runTime = RunTime.getRuntimeXmlString(jobChainPath, jocXmlCommand, runTimeCommand, "//source/order/run_time", getAccessToken());
+                        xml.add(XMLBuilder.parse(runTime));
+                        jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+                        updateRunTimeIsTemporary(dbItem, false);
+                        storeAuditLogEntry(orderAudit);
+                    } else {
+                        //nothing to do
+                    }
+                } catch (JocException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
+                }
+                break;
             }
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-            storeAuditLogEntry(orderAudit);
+            
+            if (!"reset_run_time".equals(command)) {
+                jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+                if ("set_run_time".equals(command)) {
+                    updateRunTimeIsTemporary(jobChainPath, order.getOrderId(), true);
+                }
+                storeAuditLogEntry(orderAudit);
+            }
             
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
@@ -216,20 +263,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
         Date surveyDate = Date.from(Instant.now());
 
-        try {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
-            if ("set_state".equals(command)) {
-                Globals.beginTransaction(connection);
-            }
-            for (ModifyOrder order : modifyOrders.getOrders()) {
-                surveyDate = executeModifyOrderCommand(order, modifyOrders, command);
-            }
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            Globals.disconnect(connection);;
+        for (ModifyOrder order : modifyOrders.getOrders()) {
+            surveyDate = executeModifyOrderCommand(order, modifyOrders, command);
         }
+        Globals.disconnect(connection);
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);
         }
@@ -242,5 +279,43 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
         }
         return paramsElem;
+    }
+    
+    private DBItemInventoryOrder getDBItem(String jobChainPath, String orderId) throws JocException {
+        if (connection == null) {
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+        }
+        if (dbOrderLayer == null) {
+            dbOrderLayer = new InventoryOrdersDBLayer(connection);
+        }
+        return dbOrderLayer.getInventoryOrderByOrderId(jobChainPath, orderId, dbItemInventoryInstance.getId());
+    }
+    
+    private boolean isEndNode(String jobChainPath, String orderState) throws JocException {
+        if (connection == null) {
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+        }
+        if (dbJobChainLayer == null) {
+            dbJobChainLayer = new InventoryJobChainsDBLayer(connection);
+        }
+        if (dbJobChainLayer.isEndNode(jobChainPath, orderState, dbItemInventoryInstance.getId())) {
+            return true;
+        }
+        return false;
+    }
+    
+    private void updateRunTimeIsTemporary(String jobChainPath, String orderId, boolean value) throws JocException {
+        updateRunTimeIsTemporary(getDBItem(jobChainPath, orderId), value);
+    }
+    
+    private void updateRunTimeIsTemporary(DBItemInventoryOrder dbItem, boolean value) throws JocException {
+        dbItem.setRunTimeIsTemporary(value);
+        try {
+            connection.update(dbItem);
+        } catch (SOSException e) {
+            throw new DBInvalidDataException(e);
+        } catch (Exception e) {
+            throw new DBInvalidDataException(SOSHibernateSession.getException(e));
+        }
     }
 }

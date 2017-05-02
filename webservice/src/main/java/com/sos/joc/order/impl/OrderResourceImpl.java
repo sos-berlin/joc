@@ -2,13 +2,17 @@ package com.sos.joc.order.impl;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrdersVCallable;
+import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderV200;
@@ -21,6 +25,7 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
 
     @Override
     public JOCDefaultResponse postOrder(String accessToken, OrderFilter orderBody) throws Exception {
+        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderBody, accessToken, orderBody.getJobschedulerId(), getPermissonsJocCockpit(
                     accessToken).getOrder().getView().isStatus());
@@ -34,8 +39,12 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             OrderV200 entity = new OrderV200();
 
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
-                orderBody.setJobChain(normalizePath(orderBody.getJobChain()));
-                OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken);
+                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
+                String jobChainPath = normalizePath(orderBody.getJobChain());
+                List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId(), jobChainPath, orderBody.getOrderId());
+                orderBody.setJobChain(jobChainPath);
+                OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken, ordersWithTempRunTime);
                 entity.setOrder(o.getOrder());
                 entity.setDeliveryDate(Date.from(Instant.now()));
             }
@@ -46,6 +55,8 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
 
     }

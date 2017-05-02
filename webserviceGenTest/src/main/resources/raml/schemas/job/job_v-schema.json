@@ -22,7 +22,8 @@
         "stateText",
         "ordersSummary",
         "numOfRunningTasks",
-        "numOfQueuedTasks"
+        "numOfQueuedTasks",
+        "runTimeIsTemporary"
       ]
     },
     {
@@ -36,6 +37,7 @@
         "ordersSummary",
         "numOfRunningTasks",
         "numOfQueuedTasks",
+        "runTimeIsTemporary",
         "allTasks",
         "allSteps"
       ]
@@ -109,6 +111,10 @@
     "delayUntil": {
       "description": "Only relevant for standalone jobs with a delay_after_error configuration.",
       "$ref": "../common/timestamp-schema.json"
+    },
+    "runTimeIsTemporary": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

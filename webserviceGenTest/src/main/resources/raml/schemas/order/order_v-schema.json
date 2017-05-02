@@ -6,7 +6,7 @@
   "type": "object",
   "allOf": [
     {
-      "description": "compact=true then ONLY path, id, jobChain, _type, surveyDate, state, processingState, job(except blacklisted orders) are required and only title, processedBy, configurationStatus are optional",
+      "description": "compact=true then ONLY path, id, jobChain, _type, surveyDate, state, processingState, runTimeIsTemporary, job(except blacklisted orders) are required and only title, processedBy, configurationStatus are optional",
       "required": [
         "path",
         "orderId",
@@ -14,7 +14,8 @@
         "surveyDate",
         "state",
         "processingState",
-        "_type"
+        "_type",
+        "runTimeIsTemporary"
       ]
     },
     {
@@ -134,6 +135,10 @@
     "processClass": {
       "desciption": "process class path; ONLY for waitingForResource order if processingState = waiting_for_process or waiting_for_agent",
       "$ref": "../common/path-schema.json"
+    },
+    "runTimeIsTemporary": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
