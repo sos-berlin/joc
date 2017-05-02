@@ -45,8 +45,9 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
     private final String accessToken;
     private final Boolean suppressJobSchedulerObjectNotExistException;
     private final Boolean checkOrderPathIsInFolder;
+    private List<String> ordersWithTempRunTime;
 
-    public OrdersVCallable(String job, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public OrdersVCallable(String job, Boolean compact, JOCJsonCommand jocJsonCommand, String accessToken, List<String> ordersWithTempRunTime) {
         this.orders = null;
         this.job = ("/" + job.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
         this.folder = null;
@@ -57,9 +58,10 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = false;
+        this.ordersWithTempRunTime = ordersWithTempRunTime;
     }
 
-    public OrdersVCallable(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public OrdersVCallable(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken, List<String> ordersWithTempRunTime) {
         this.orders = orders;
         this.job = null;
         this.folder = null;
@@ -70,9 +72,10 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = null;
+        this.ordersWithTempRunTime = ordersWithTempRunTime;
     }
 
-    public OrdersVCallable(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public OrdersVCallable(JobChainVolatile jobChain, JOCJsonCommand jocJsonCommand, String accessToken, List<String> ordersWithTempRunTime) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(jobChain.getPath());
         this.orders = o;
@@ -85,9 +88,10 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = jobChain.hasJobChainNodes();
+        this.ordersWithTempRunTime = ordersWithTempRunTime;
     }
 
-    public OrdersVCallable(OrderFilter order, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public OrdersVCallable(OrderFilter order, JOCJsonCommand jocJsonCommand, String accessToken, List<String> ordersWithTempRunTime) {
         OrdersPerJobChain o = new OrdersPerJobChain();
         o.setJobChain(order.getJobChain());
         o.addOrder(order.getOrderId());
@@ -101,9 +105,10 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = order.getSuppressNotExistException();
         this.checkOrderPathIsInFolder = null;
+        this.ordersWithTempRunTime = ordersWithTempRunTime;
     }
 
-    public OrdersVCallable(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public OrdersVCallable(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand, String accessToken, List<String> ordersWithTempRunTime) {
         this.orders = null;
         this.job = null;
         this.folder = folder;
@@ -114,6 +119,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         this.accessToken = accessToken;
         this.suppressJobSchedulerObjectNotExistException = true;
         this.checkOrderPathIsInFolder = !("/".equals(folder.getFolder()));
+        this.ordersWithTempRunTime = ordersWithTempRunTime;
     }
 
     @Override
@@ -248,8 +254,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
                 LOGGER.debug("...processing skipped caused by 'regex=" + regex + "'");
                 continue;
             }
-            Boolean runTimeIsTemporary = false; //TODO get runTimeIsTemporary from DB
-            order.setRunTimeIsTemporary(runTimeIsTemporary);
+            order.setRunTimeIsTemporary(ordersWithTempRunTime.contains(order.getPath()));
             if (filterByRunTimeIsTemporary != null && order.getRunTimeIsTemporary() != filterByRunTimeIsTemporary) {
                 LOGGER.debug("...processing skipped caused by 'runTimeIsTemporary=" + filterByRunTimeIsTemporary + "'");
                 continue; 

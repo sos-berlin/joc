@@ -22,6 +22,7 @@ import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
+import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -55,13 +56,15 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             List<OrderPath> orders = ordersBody.getOrders();
             List<Folder> folders = ordersBody.getFolders();
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
-
+            
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
+            List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId());
+            
             Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
             if (orders != null && !orders.isEmpty()) {
-                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-                InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
-                Globals.beginTransaction(connection);
-                List<String> outerJobChains = dbLayer.getOuterJobChains(dbItemInventoryInstance.getId());
+                InventoryJobChainsDBLayer dbJCLayer = new InventoryJobChainsDBLayer(connection);
+                List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
                 for (OrderPath order : orders) {
                     if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
                         throw new JocMissingRequiredParameterException("jobChain");
@@ -88,18 +91,18 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             if (!ordersLists.isEmpty()) {
                 for (OrdersPerJobChain opj : ordersLists.values()) {
-                    tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken));
+                    tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken, ordersWithTempRunTime));
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
-                    tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken));
+                    tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken, ordersWithTempRunTime));
                 }
             } else {
                 Folder rootFolder = new Folder();
                 rootFolder.setFolder("/");
                 rootFolder.setRecursive(true);
-                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken);
+                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken, ordersWithTempRunTime);
                 listOrders.putAll(callable.call());
             }
 

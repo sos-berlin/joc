@@ -1,5 +1,6 @@
 package com.sos.joc.db.inventory.orders;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -146,6 +147,42 @@ public class InventoryOrdersDBLayer extends DBLayer {
                 return result;
             }
             return null;
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+        }
+    }
+    
+    public List<String> getOrdersWithTemporaryRuntime(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        return getOrdersWithTemporaryRuntime(instanceId, null, null);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<String> getOrdersWithTemporaryRuntime(Long instanceId, String jobChainPath, String orderId) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select name from ").append(DBITEM_INVENTORY_ORDERS);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and runTimeIsTemporary = :runTimeIsTemporary");
+            if (jobChainPath != null && orderId != null) {
+                sql.append(" and name = :orderPath");
+            } else if (jobChainPath != null && orderId == null) {
+                sql.append(" and jobChainName = :jobChainPath");
+            }
+            Query query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("runTimeIsTemporary", true);
+            if (jobChainPath != null && orderId != null) {
+                query.setParameter("orderPath", jobChainPath+","+orderId);
+            } else if (jobChainPath != null && orderId == null) {
+                query.setParameter("jobChainPath", jobChainPath);
+            }
+            List<String> result = query.list();
+            if (result != null) {
+                return result;
+            }
+            return new ArrayList<String>();
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

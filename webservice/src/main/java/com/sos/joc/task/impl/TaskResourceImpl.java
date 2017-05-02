@@ -2,17 +2,21 @@ package com.sos.joc.task.impl;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.orders.OrdersVCallable;
+import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -33,8 +37,8 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
     @Override
     public JOCDefaultResponse postTask(String accessToken, TaskFilter taskFilter) throws Exception {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken, taskFilter.getJobschedulerId(), 
-                    getPermissonsJocCockpit(accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken, taskFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -63,9 +67,15 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
 
             Element orderElem = (Element) jocXmlCommand.getSosxml().selectSingleNode(taskElem, "order");
             if (orderElem != null) {
+                SOSHibernateSession connection = null;
                 try {
                     checkRequiredParameter("order", orderElem.getAttribute("order"));
                     checkRequiredParameter("job_chain", orderElem.getAttribute("job_chain"));
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                    InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
+                    List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId(), orderElem
+                            .getAttribute("job_chain"), orderElem.getAttribute("order"));
+
                     JOCJsonCommand command = new JOCJsonCommand(this);
                     command.setUriBuilderForOrders();
                     OrderFilter orderBody = new OrderFilter();
@@ -73,10 +83,12 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
                     orderBody.setJobChain(orderElem.getAttribute("job_chain"));
                     orderBody.setOrderId(orderElem.getAttribute("order"));
                     command.addOrderCompactQuery(orderBody.getCompact());
-                    OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken);
+                    OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken, ordersWithTempRunTime);
                     task.setOrder(o.getOrder());
                 } catch (JocMissingRequiredParameterException e) {
                     throw new JobSchedulerBadRequestException("missing attributes in order element", e);
+                } finally {
+                    Globals.disconnect(connection);
                 }
             }
 

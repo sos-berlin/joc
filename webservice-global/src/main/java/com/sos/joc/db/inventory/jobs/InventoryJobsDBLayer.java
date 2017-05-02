@@ -1,7 +1,12 @@
 package com.sos.joc.db.inventory.jobs;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.SessionException;
@@ -15,6 +20,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.db.inventory.jobchains.NestedJobChain;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 
@@ -235,4 +241,36 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
+    
+    public List<String> getJobsWithTemporaryRuntime(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        return getJobsWithTemporaryRuntime(instanceId, null);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<String> getJobsWithTemporaryRuntime(Long instanceId, String jobPath) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select name from ").append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and runTimeIsTemporary = :runTimeIsTemporary");
+            if (jobPath != null) {
+                sql.append(" and name = :jobPath");
+            }
+            Query query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("runTimeIsTemporary", true);
+            if (jobPath != null) {
+                query.setParameter("jobPath", jobPath);
+            }
+            List<String> result = query.list();
+            if (result != null) {
+                return result;
+            }
+            return new ArrayList<String>();
+        } catch (SessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+        }
+    } 
 }

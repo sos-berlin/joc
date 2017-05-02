@@ -33,10 +33,11 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
             RunTime200 runTimeAnswer = new RunTime200();
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
-            DBItemInventoryJob dbItem = dbLayer.getInventoryJobByName(normalizePath(jobFilter.getJob()), dbItemInventoryInstance.getId());
+            String jobPath = normalizePath(jobFilter.getJob());
+            DBItemInventoryJob dbItem = dbLayer.getInventoryJobByName(jobPath, dbItemInventoryInstance.getId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            String runTimeCommand = jocXmlCommand.getShowJobCommand(normalizePath(jobFilter.getJob()), "source run_time", 0, 0);
-            runTimeAnswer = RunTime.set(jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, dbItem.getRunTimeIsTemporary());
+            String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "source run_time", 0, 0);
+            runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, dbItem.getRunTimeIsTemporary());
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

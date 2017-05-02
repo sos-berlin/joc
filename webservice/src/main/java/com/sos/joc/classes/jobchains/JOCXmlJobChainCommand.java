@@ -35,10 +35,17 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlJobChainCommand.class);
     private Set<String> nestedJobChains = new HashSet<String>();
     private String accessToken;
+    private List<String> ordersWithTempRunTime;
     
     public JOCXmlJobChainCommand(JOCResourceImpl jocResourceImpl, String accessToken) {
         super(jocResourceImpl);
         this.accessToken = accessToken;
+    }
+    
+    public JOCXmlJobChainCommand(JOCResourceImpl jocResourceImpl, String accessToken, List<String> ordersWithTempRunTime) {
+        super(jocResourceImpl);
+        this.accessToken = accessToken;
+        this.ordersWithTempRunTime = ordersWithTempRunTime;
     }
     
     public JobChainV getJobChain(String jobChain, Boolean compact, Integer maxOrders) throws Exception {
@@ -48,7 +55,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         jobChainV.setFields(compact);
         nestedJobChains.addAll(jobChainV.getNestedJobChains());
         if (((compact == null || !compact) && jobChainV.getNumOfOrders() > 0) || jobChainV.hasJobChainNodes()) {
-            OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken);
+            OrdersVCallable ordersVCallable = new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken, ordersWithTempRunTime);
             Map<String, OrderVolatile> orders = ordersVCallable.call();
             if (jobChainV.hasJobChainNodes()) {
                 jobChainV.setOuterOrdersAndSummary(orders, maxOrders, compact);
@@ -170,7 +177,7 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            nestedJobChains.addAll(jobChainV.getNestedJobChains());
            summaryTasks.add(new OrdersSummaryCallable(jobChainV, setUriForOrdersSummaryJsonCommand(), accessToken));
            if (!jobChainsFilter.getCompact() || jobChainV.hasJobChainNodes()) {
-               orderTasks.add(new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken)); 
+               orderTasks.add(new OrdersVCallable(jobChainV, setUriForOrdersJsonCommand(), accessToken, ordersWithTempRunTime)); 
            }
         }
         

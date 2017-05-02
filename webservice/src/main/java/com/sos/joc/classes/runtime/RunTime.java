@@ -1,6 +1,8 @@
 package com.sos.joc.classes.runtime;
 
 import java.io.StringWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 
@@ -12,6 +14,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -21,7 +24,7 @@ import com.sos.joc.model.common.RunTime200;
 
 public class RunTime {
 
-    public static RunTime200 set(JOCXmlCommand jocXmlCommand, String postCommand, String xPath, String accessToken, Boolean runTimeIsTemporary) throws Exception {
+    public static RunTime200 set(String path, JOCXmlCommand jocXmlCommand, String postCommand, String xPath, String accessToken, Boolean runTimeIsTemporary) throws Exception {
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
         RunTime200 runTimeAnswer = new RunTime200();
         if (runTimeIsTemporary == null) {
@@ -30,14 +33,15 @@ public class RunTime {
         NodeList runtimeNodes = jocXmlCommand.getSosxml().selectNodeList(xPath);
         com.sos.joc.model.common.RunTime runTime = new com.sos.joc.model.common.RunTime();
         runTime.setRunTimeIsTemporary(runTimeIsTemporary);
+        Path parent = Paths.get(path).getParent();
         for (int i=0; i < runtimeNodes.getLength(); i++) {
             Node runtimeNode = runtimeNodes.item(i);
             if ("source".equals(runtimeNode.getParentNode().getParentNode().getNodeName())) {
                 if (runTimeIsTemporary) {
-                    runTime.setPermanentRunTime(getRuntimeXmlString(runtimeNode));
+                    runTime.setPermanentRunTime(getRuntimeXmlString(parent, runtimeNode));
                 }
             } else {
-                runTime.setRunTime(getRuntimeXmlString(runtimeNode));
+                runTime.setRunTime(getRuntimeXmlString(parent, runtimeNode));
             }
         }
         runTimeAnswer.setRunTime(runTime);
@@ -45,19 +49,25 @@ public class RunTime {
         return runTimeAnswer;
     }
     
-    public static String getRuntimeXmlString(JOCXmlCommand jocXmlCommand, String postCommand, String xPath, String accessToken) throws Exception {
+    public static String getRuntimeXmlString(String path, JOCXmlCommand jocXmlCommand, String postCommand, String xPath, String accessToken) throws Exception {
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
         Node runtimeNode = jocXmlCommand.getSosxml().selectSingleNode(xPath);
-        return getRuntimeXmlString(runtimeNode);
+        Path parent = Paths.get(path).getParent();
+        return getRuntimeXmlString(parent, runtimeNode);
     }
     
-    public static String getRuntimeXmlString(Node runtimeNode) throws Exception {
+    public static String getRuntimeXmlString(Path path, Node runtimeNode) throws Exception {
         if (runtimeNode == null) {
             return "<run_time/>";
         }
         StringWriter writer = new StringWriter();
         try {
-            Source source = new DOMSource(runtimeNode);
+            Element runtimeElem = (Element) runtimeNode;
+            String schedule = runtimeElem.getAttribute("schedule");
+            if (schedule != null && !schedule.isEmpty() && path != null) {
+                runtimeElem.setAttribute("schedule", path.resolve(schedule).normalize().toString().replace('\\', '/')); 
+            }
+            Source source = new DOMSource(runtimeElem);
             Result result = new StreamResult(writer);
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");

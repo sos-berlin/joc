@@ -14,6 +14,7 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
+import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
@@ -26,35 +27,54 @@ import com.sos.joc.model.job.JobsFilter;
 public class JOCXmlJobCommand extends JOCXmlCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCXmlJobCommand.class);
     private String accessToken;
+    private List<String> jobsWithTempRunTime;
     
     public JOCXmlJobCommand(String url, String accessToken) {
         super(url);
         this.accessToken = accessToken;
+        this.jobsWithTempRunTime = new ArrayList<String>();
+    }
+    
+    public JOCXmlJobCommand(String url, String accessToken, List<String> jobsWithTempRunTime) {
+        super(url);
+        this.accessToken = accessToken;
+        this.jobsWithTempRunTime = jobsWithTempRunTime;
     }
     
     public JOCXmlJobCommand(DBItemInventoryInstance dbItemInventoryInstance, String accessToken) {
         super(dbItemInventoryInstance);
         this.accessToken = accessToken;
+        this.jobsWithTempRunTime = new ArrayList<String>();
+    }
+    
+    public JOCXmlJobCommand(DBItemInventoryInstance dbItemInventoryInstance, String accessToken, List<String> jobsWithTempRunTime) {
+        super(dbItemInventoryInstance);
+        this.accessToken = accessToken;
+        this.jobsWithTempRunTime = jobsWithTempRunTime;
     }
     
     public JOCXmlJobCommand(JOCResourceImpl jocResourceImpl, String accessToken) {
         super(jocResourceImpl);
         this.accessToken = accessToken;
+        this.jobsWithTempRunTime = new ArrayList<String>();
     }
     
-    public JobV getJob(String job, Boolean compact) throws Exception {
-        return getJob(job, compact, false);
+    public JOCXmlJobCommand(JOCResourceImpl jocResourceImpl, String accessToken, List<String> jobsWithTempRunTime) {
+        super(jocResourceImpl);
+        this.accessToken = accessToken;
+        this.jobsWithTempRunTime = jobsWithTempRunTime;
     }
     
-    public JobV getJobWithOrderQueue(String job, Boolean compact) throws Exception {
-        return getJob(job, compact, true);
+    public JobV getJobWithOrderQueue(String job, Boolean compact, List<String> ordersWithTempRunTime) throws Exception {
+        return getJob(job, compact, true, ordersWithTempRunTime);
     }
     
-    public JobV getJob(String job, Boolean compact, Boolean withOrderQueue) throws Exception {
+    public JobV getJob(String job, Boolean compact, Boolean withOrderQueue, List<String> ordersWithTempRunTime) throws Exception {
         executePostWithThrowBadRequestAfterRetry(createShowJobPostCommand(job, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job");
-        JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue);
+        JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue, ordersWithTempRunTime);
         jobV.setFields(compact, accessToken);
+        jobV.setRunTimeIsTemporary(jobsWithTempRunTime.contains(jobV.getPath()));
         return jobV;
     }
     
@@ -168,8 +188,7 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
                LOGGER.debug("...processing skipped caused by 'regex=" + jobsFilter.getRegex() + "'");
                continue; 
            }
-           Boolean runTimeIsTemporary = false; //TODO get runTimeIsTemporary from DB
-           jobV.setRunTimeIsTemporary(runTimeIsTemporary);
+           jobV.setRunTimeIsTemporary(jobsWithTempRunTime.contains(jobV.getPath()));
            if (jobsFilter.getRunTimeIsTemporary() != null && jobsFilter.getRunTimeIsTemporary() != jobV.getRunTimeIsTemporary()) {
                LOGGER.debug("...processing skipped caused by 'runTimeIsTemporary=" + jobsFilter.getRunTimeIsTemporary() + "'");
                continue; 

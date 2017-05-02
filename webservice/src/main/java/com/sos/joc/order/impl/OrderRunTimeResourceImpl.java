@@ -39,7 +39,7 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
                 InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
                 DBItemInventoryOrder dbItem = dbLayer.getInventoryOrderByOrderId(jobChainPath, orderFilter.getOrderId(), dbItemInventoryInstance
                         .getId());
-                runTimeAnswer = RunTime.set(jocXmlCommand, orderCommand, "//order/run_time", accessToken, dbItem.getRunTimeIsTemporary());
+                runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken, dbItem.getRunTimeIsTemporary());
             }
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {

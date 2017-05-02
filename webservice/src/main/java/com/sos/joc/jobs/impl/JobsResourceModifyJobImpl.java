@@ -164,7 +164,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     }
                     if (dbItem.getRunTimeIsTemporary()) {
                         String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "source", 0, 0);
-                        String runTime = RunTime.getRuntimeXmlString(jocXmlCommand, runTimeCommand, "//source/job/run_time", getAccessToken());
+                        String runTime = RunTime.getRuntimeXmlString(jobPath, jocXmlCommand, runTimeCommand, "//source/job/run_time", getAccessToken());
                         xml.add(XMLBuilder.parse(runTime));
                         jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                         updateRunTimeIsTemporary(dbItem, false);

@@ -219,7 +219,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     }
                     if (dbItem.getRunTimeIsTemporary()) {
                         String runTimeCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, order.getOrderId(), "source");
-                        String runTime = RunTime.getRuntimeXmlString(jocXmlCommand, runTimeCommand, "//source/order/run_time", getAccessToken());
+                        String runTime = RunTime.getRuntimeXmlString(jobChainPath, jocXmlCommand, runTimeCommand, "//source/order/run_time", getAccessToken());
                         xml.add(XMLBuilder.parse(runTime));
                         jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                         updateRunTimeIsTemporary(dbItem, false);
