@@ -147,7 +147,7 @@ public class TreePermanent {
 	public static Tree getTree(SortedSet<String> folders, SOSShiroFolderPermissions sosShiroFolderPermissions) {
 		Map<Path, TreeModel> treeMap = new HashMap<Path, TreeModel>();
 		for (String folder : folders) {
-			if (sosShiroFolderPermissions.isPermittedForFolder(folder)) {
+			if (sosShiroFolderPermissions != null && sosShiroFolderPermissions.isPermittedForFolder(folder)) {
 
 				Path pFolder = Paths.get(folder);
 				TreeModel tree = new TreeModel();

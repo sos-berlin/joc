@@ -43,6 +43,10 @@ public class SOSShiroFolderPermissions {
 	}
 
 	public boolean isPermittedForFolder(String folder) {
+		if (listOfFolders == null || listOfFolders.size() == 0){
+			return true;
+		}
+		
 		for (int i = 0; i < listOfFolders.size(); i++) {
 			FolderItem f = listOfFolders.get(i);
 			if (f.recursive) {
