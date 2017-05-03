@@ -5,7 +5,7 @@ import com.sos.hibernate.classes.SOSHibernateFilter;
 public class JocConfigurationFilter extends SOSHibernateFilter{
 
     private Long id;
-    private Long instanceId;
+    private String schedulerId;
     private String account;
     private String objectType;
     private String configurationType;
@@ -28,13 +28,13 @@ public class JocConfigurationFilter extends SOSHibernateFilter{
     }
 
 
-    public Long getInstanceId() {
-        return instanceId;
+    public String getSchedulerId() {
+        return schedulerId;
     }
 
 
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
+    public void setSchedulerId(String schedulerId) {
+        this.schedulerId = schedulerId;
     }
 
 

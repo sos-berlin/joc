@@ -43,7 +43,7 @@ public class TestJocConfigurationDbLayer {
     private void initFilter() {
         jocConfigurationDBLayer.getFilter().setObjectType("customization");
         jocConfigurationDBLayer.getFilter().setConfigurationType("job_chain");
-        jocConfigurationDBLayer.getFilter().setInstanceId(61L);
+        jocConfigurationDBLayer.getFilter().setSchedulerId("scheduler_joc_cockpit");
         jocConfigurationDBLayer.getFilter().setName("test");
         jocConfigurationDBLayer.getFilter().setAccount("root");
     }
@@ -81,7 +81,7 @@ public class TestJocConfigurationDbLayer {
     @Test
     public void testJocConfigurationDeleteRecord() throws Exception {
         initConnection();
-        jocConfigurationDBLayer.getFilter().setInstanceId(61L);
+        jocConfigurationDBLayer.getFilter().setSchedulerId("scheduler_joc_cockpit");
         jocConfigurationDBLayer.getFilter().setAccount("root");
         jocConfigurationDBLayer.getFilter().setConfigurationType("profil");
         jocConfigurationDBLayer.getFilter().setName("profil");
