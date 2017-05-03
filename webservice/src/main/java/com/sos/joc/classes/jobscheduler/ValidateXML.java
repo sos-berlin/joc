@@ -29,7 +29,7 @@ public class ValidateXML {
     
     public static boolean validateAgainstJobSchedulerSchema(String xml, String expectedRootElement) throws JobSchedulerBadRequestException{
         
-        String rootElement = xml.trim().replaceFirst(".*</?([^>/]+)/?>$", "$1");
+        String rootElement = xml.trim().replaceFirst(".*</?([^>/\\s]+)[^>]*>$", "$1");
         if (!expectedRootElement.equals(rootElement)) {
             throw new JobSchedulerBadRequestException("Expected root element is '"+ expectedRootElement +"' instead of " + rootElement);
         }
