@@ -1,1 +1,1 @@
-<tr><td>``transferIds``</td><td>required; string</td><td>The id of a YADE transfer </td><td></td><td></td></tr>
+<tr><td>``transferIds``</td><td>optional; array</td><td>The ids of YADE transfers </td><td>[4711]</td><td></td></tr>

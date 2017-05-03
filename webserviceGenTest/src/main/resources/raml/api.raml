@@ -47,6 +47,7 @@ resourceTypes:
   - postXMLWithOkResponse: !include resourceTypes/jobscheduler/postXMLWithOkResponse.raml
   - postJSON: !include resourceTypes/common/postJSON.raml
   - postYADEJSON15: !include resourceTypes/yade/postJSON15.raml
+  - postYADEJSONWithOkResponse: !include resourceTypes/yade/postJSONWithOkResponse.raml
   - postOnlyAccessToken: !include resourceTypes/common/postOnlyAccessToken.raml
   - postOnlyId: !include resourceTypes/common/postOnlyId.raml
   - postJSONWithOkResponse: !include resourceTypes/common/postJSONWithOkResponse.raml
@@ -1692,39 +1693,39 @@ traits:
   description: |
     This is not an API call. Use its children!!
     
-  #/summary:
-  #  type:
-  #    postYADEJSON15:
-  #      description: |
-  #          Summary with number of<h5>
-  #          * successful transferred files
-  #          * failed transferred files
-  #
-  #          filtered by <code>dateFrom</code> parameter until now
-  #          </h5>
-  #      description1: !include documentation/common/dateFrom.md
-  #      description2: !include documentation/common/dateTo.md
-  #      description3: !include documentation/common/timeZone.md
-  #      description4: " "
-  #      description5: " "
-  #      description6: " "
-  #      description7: " "
-  #      description8: " "
-  #      description9: " "
-  #      description10: " "
-  #      description11: " "
-  #      description12: " "
-  #      description13: " "
-  #      description14: " "
-  #      description15: " "
-  #      description200: " "
-  #      schema200: !include schemas/order/summary-schema.json
-  #      schema: !include schemas/order/ordersFilter-schema.json
-  #      example: |
-  #          {
-  #            "dateFrom": "1d"
-  #          }
-  #      example200: !include examples/order/summary-example.json
+  /summary:
+    type:
+      postYADEJSON15:
+        description: |
+            Summary with number of<h5>
+            * successful transferred files
+            * failed transferred files
+  
+            filtered by <code>dateFrom</code> parameter until now
+            </h5>
+        description1: !include documentation/common/dateFrom.md
+        description2: !include documentation/common/dateTo.md
+        description3: !include documentation/common/timeZone.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description11: " "
+        description12: " "
+        description13: " "
+        description14: " "
+        description15: " "
+        description200: " "
+        schema200: !include schemas/yade/summary-schema.json
+        schema: !include schemas/yade/transfers-schema.json
+        example: |
+            {
+              "dateFrom": "1d"
+            }
+        example200: !include examples/yade/summary-example.json
   
   /transfers:
     type:
@@ -1751,6 +1752,14 @@ traits:
         example: " "
         example200: " "
 
+    /restart:
+      type:
+        postYADEJSONWithOkResponse:
+          description: Restarts YADE transfers for some failed files
+          audit: !include documentation/audit/auditLog.md
+          schema: !include schemas/yade/modifyTransfers-schema.json
+          example: " "
+        
   /files:
     type:
       postYADEJSON15:

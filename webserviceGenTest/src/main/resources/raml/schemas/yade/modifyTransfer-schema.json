@@ -1,0 +1,21 @@
+{
+  "title": "modify transfer",
+  "id": "schemas/order/modifyTransfer",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.yade.ModifyTransfer",
+  "type": "object",
+  "required": [
+    "jobChain"
+  ],
+  "properties": {
+    "transferId": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "fileIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeInteger-schema.json"
+      }
+    }
+  }
+}

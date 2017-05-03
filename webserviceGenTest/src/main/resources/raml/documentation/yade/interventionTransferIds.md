@@ -1,1 +1,1 @@
-<tr><td>``interventionTransferIds``</td><td>required; string</td><td>The id of a intervened YADE transfer </td><td></td><td></td></tr>
+<tr><td>``interventionTransferIds``</td><td>optional; string</td><td>The id of a intervened YADE transfer </td><td>[4711]</td><td></td></tr>
