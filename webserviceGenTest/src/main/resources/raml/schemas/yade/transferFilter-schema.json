@@ -1,16 +1,14 @@
 {
   "title": "yade filter",
-  "id": "schemas/order/yadeFilter",
+  "id": "schemas/order/transferFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.yade.YadeFilter",
+  "javaType": "com.sos.joc.model.yade.TransferFilter",
   "type": "object",
   "properties": {
-    "ids": {
+    "transferIds": {
       "type": "array",
       "items": {
-        "id": {
-          "type": "string"
-        }
+        "$ref": "../common/nonNegativeInteger-schema.json"
       }
     },
     "compact": {
@@ -18,6 +16,15 @@
     },
     "regex": {
       "$ref": "../common/regexFilter-schema.json"
+    },
+    "profiles": {
+      "type": "array",
+      "item": {
+        "type":"string"
+      }
+    },
+    "mandator": {
+      "type": "string"
     },
     "states": {
       "type": "array",
@@ -47,6 +54,34 @@
       "description": "only for db history urls to restrict the number of responsed records; -1=unlimited",
       "type": "integer",
       "default": 10000
+    },
+    "hasIntervention": {
+      "type": "boolean"
+    },
+    "isIntervention": {
+      "type": "boolean"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type":"object",
+        "properties": {
+          "host": {
+            "type":"string"
+          }
+        }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type":"object",
+        "properties": {
+          "host": {
+            "type":"string"
+          }
+        }
+      }
     }
   }
 }

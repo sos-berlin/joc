@@ -1,8 +1,8 @@
 {
-  "title": "transfer state",
-  "id": "schemas/yade/transferState",
+  "title": "state for each transferred file",
+  "id": "schemas/yade/fileTransferState",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.yade.TransferState",
+  "javaType": "com.sos.joc.model.yade.FileTransferState",
   "type": "object",
   "required": [
     "severity",
@@ -14,7 +14,7 @@
       "type": "integer"
     },
     "_text": {
-      "$ref": "transferStateText-schema.json"
+      "$ref": "fileTransferStateText-schema.json"
     }
   }
 }

@@ -1,19 +1,19 @@
 {
-  "title": "yade history item",
-  "id": "schemas/yade/historyItem200",
+  "title": "yade file",
+  "id": "schemas/yade/file200",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.yade.HistoryItem200",
+  "javaType": "com.sos.joc.model.yade.TransferFile200",
   "type": "object",
   "required": [
     "deliveryDate",
-    "item"
+    "file"
   ],
   "properties": {
     "deliveryDate": {
       "$ref": "../common/deliveryDate-schema.json"
     },
-    "item": {
-      "$ref": "historyItem-schema.json"
+    "file": {
+      "$ref": "file-schema.json"
     }
   }
 }

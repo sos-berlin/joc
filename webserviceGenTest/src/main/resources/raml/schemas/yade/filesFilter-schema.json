@@ -1,0 +1,61 @@
+{
+  "title": "yade filter",
+  "id": "schemas/order/transferFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.yade.TransferFilter",
+  "type": "object",
+  "properties": {
+    "fileIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeInteger-schema.json"
+      }
+    },
+    "transferIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeInteger-schema.json"
+      }
+    },
+    "interventionTransferIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeInteger-schema.json"
+      }
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "states": {
+      "type": "array",
+      "items": {
+        "$ref": "fileTransferStateText-schema.json"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type":"object",
+        "properties": {
+          "path": {
+            "type":"string"
+          }
+        }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type":"object",
+        "properties": {
+          "path": {
+            "type":"string"
+          }
+        }
+      }
+    }
+  }
+}

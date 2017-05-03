@@ -46,6 +46,7 @@ resourceTypes:
   - postURLWithOkResponseAfterModify: !include resourceTypes/jobscheduler/postWithOkResponseAfterModify.raml
   - postXMLWithOkResponse: !include resourceTypes/jobscheduler/postXMLWithOkResponse.raml
   - postJSON: !include resourceTypes/common/postJSON.raml
+  - postYADEJSON15: !include resourceTypes/yade/postJSON15.raml
   - postOnlyAccessToken: !include resourceTypes/common/postOnlyAccessToken.raml
   - postOnlyId: !include resourceTypes/common/postOnlyId.raml
   - postJSONWithOkResponse: !include resourceTypes/common/postJSONWithOkResponse.raml
@@ -71,6 +72,7 @@ resourceTypes:
 traits:
   - jobschedulerMaster: !include traits/jobschedulerMaster.raml
   - filteredByJob: !include ./traits/filteredByJob.raml
+  - filteredByTransferFileId: !include ./traits/filteredByTransferFileId.raml
   - accessToken: !include ./traits/accessToken.raml
 
 
@@ -435,37 +437,37 @@ traits:
           example: TODO
           schema200: !include schemas/order/snapshot-schema.json
           example200: !include examples/order/snapshot-example.json
-  /overview/snapshot/event:
-      type:
-        postJSON:
-          description: |
-            Summary with number of<h5>
-            * pending orders
-            * running orders
-            * suspended orders
-            * orders with setback
-            * waiting for resource orders
-            * blacklist orders
-            </h5>
-            <h5>NOTE<br/>
-            The response comes not immediatly.<br/>
-            It comes when a value has changed but the latest after one minute.<br/>
-            It uses the envent from the JobScheduler.<br/></h5>
-          description1: " "
-          description2: !include documentation/jobChain/filteredByJobChains.md
-          description3: !include documentation/common/folders.md
-          description4: !include documentation/order/close.md
-          description5: " "
-          description6: " "
-          description7: " "
-          description8: " "
-          description9: " "
-          description10: " "
-          description200: " "
-          schema: !include schemas/jobChain/jobChainsFilter-schema.json
-          example: TODO
-          schema200: !include schemas/order/snapshot-schema.json
-          example200: !include examples/order/snapshot-example.json
+ # /overview/snapshot/event:
+ #     type:
+ #       postJSON:
+ #         description: |
+ #           Summary with number of<h5>
+ #           * pending orders
+ #           * running orders
+ #           * suspended orders
+ #           * orders with setback
+ #           * waiting for resource orders
+ #           * blacklist orders
+ #           </h5>
+ #           <h5>NOTE<br/>
+ #           The response comes not immediatly.<br/>
+ #           It comes when a value has changed but the latest after one minute.<br/>
+ #           It uses the envent from the JobScheduler.<br/></h5>
+ #         description1: " "
+ #         description2: !include documentation/jobChain/filteredByJobChains.md
+ #         description3: !include documentation/common/folders.md
+ #         description4: !include documentation/order/close.md
+ #         description5: " "
+ #         description6: " "
+ #         description7: " "
+ #         description8: " "
+ #         description9: " "
+ #         description10: " "
+ #         description200: " "
+ #         schema: !include schemas/jobChain/jobChainsFilter-schema.json
+ #         example: TODO
+ #         schema200: !include schemas/order/snapshot-schema.json
+ #         example200: !include examples/order/snapshot-example.json
   /history:
     type:
       postJSON:
@@ -1686,23 +1688,151 @@ traits:
         schema200: !include schemas/audit/comments-schema.json
         example200: !include examples/audit/comments-example.json
 
+/yade:
+  description: |
+    This is not an API call. Use its children!!
+    
+  #/summary:
+  #  type:
+  #    postYADEJSON15:
+  #      description: |
+  #          Summary with number of<h5>
+  #          * successful transferred files
+  #          * failed transferred files
+  #
+  #          filtered by <code>dateFrom</code> parameter until now
+  #          </h5>
+  #      description1: !include documentation/common/dateFrom.md
+  #      description2: !include documentation/common/dateTo.md
+  #      description3: !include documentation/common/timeZone.md
+  #      description4: " "
+  #      description5: " "
+  #      description6: " "
+  #      description7: " "
+  #      description8: " "
+  #      description9: " "
+  #      description10: " "
+  #      description11: " "
+  #      description12: " "
+  #      description13: " "
+  #      description14: " "
+  #      description15: " "
+  #      description200: " "
+  #      schema200: !include schemas/order/summary-schema.json
+  #      schema: !include schemas/order/ordersFilter-schema.json
+  #      example: |
+  #          {
+  #            "dateFrom": "1d"
+  #          }
+  #      example200: !include examples/order/summary-example.json
+  
+  /transfers:
+    type:
+      postYADEJSON15:
+        description: Responds YADE transfers
+        description1: !include documentation/common/compact.md
+        description2: !include documentation/common/dateFrom.md
+        description3: !include documentation/common/dateTo.md
+        description4: !include documentation/common/timeZone.md
+        description5: !include documentation/yade/operations.md
+        description6: !include documentation/yade/states.md
+        description7: !include documentation/yade/mandator.md
+        description8: !include documentation/yade/source.md
+        description9: !include documentation/yade/target.md
+        description10: !include documentation/yade/hasIntervention.md
+        description11: !include documentation/yade/isIntervention.md
+        description12: !include documentation/yade/profile.md
+        description13: " "
+        description14: " "
+        description15: !include documentation/common/limit.md
+        description200: " "
+        schema: !include schemas/yade/transferFilter-schema.json
+        schema200: !include schemas/yade/transfers-schema.json
+        example: " "
+        example200: " "
 
-/yade/history:
-  type:
-    postJSON:
-      description: Responds YADE history
-      description1: !include documentation/common/compact.md
-      description2: !include documentation/common/dateFrom.md
-      description3: !include documentation/common/dateTo.md
-      description4: !include documentation/common/timeZone.md
-      description5: !include documentation/yade/operations.md
-      description6: !include documentation/yade/states.md
-      description7: !include documentation/yade/mandator.md
-      description8: !include documentation/yade/source.md
-      description9: !include documentation/yade/target.md
-      description10: !include documentation/common/limit.md
-      description200: " "
-      schema: !include schemas/yade/yadeFilter-schema.json
-      schema200: !include schemas/yade/history-schema.json
-      example: " "
-      example200: " "
+  /files:
+    type:
+      postYADEJSON15:
+        description: Responds transferred files
+        description1: !include documentation/common/compact.md
+        description2: " "
+        description3: !include documentation/yade/transferIds.md
+        description4: !include documentation/yade/interventionTransferIds.md
+        description5: " "
+        description6: !include documentation/yade/fileStates.md
+        description7: " "
+        description8: !include documentation/yade/sourcePath.md
+        description9: !include documentation/yade/targetPath.md
+        description10: " "
+        description11: " "
+        description12: " "
+        description13: " "
+        description14: " "
+        description15: " "
+        description200: " "
+        schema: !include schemas/yade/filesFilter-schema.json
+        schema200: !include schemas/yade/files-schema.json
+        example: " "
+        example200: " "
+
+  /file:
+    type:
+      postYADEJSON15:
+        description: Responds transferred file
+        description1: !include documentation/common/compact.md
+        description2: !include documentation/yade/fileId.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description11: " "
+        description12: " "
+        description13: " "
+        description14: " "
+        description15: " "
+        description200: " "
+        schema: !include schemas/yade/fileFilter-schema.json
+        schema200: !include schemas/yade/file200-schema.json
+        example: " "
+        example200: " "
+
+  /log:
+    type:
+      postYADEJSON15:
+        description: Log (plain text or html)
+        description1: !include documentation/yade/fileId.md
+        description2: !include documentation/common/logMimeParam.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description11: " "
+        description12: " "
+        description13: " "
+        description14: " "
+        description15: " "
+        description200: " "
+        schema: !include schemas/yade/fileFilter-schema.json
+        schema200: logContent
+        example: TODO
+        example200: " "
+    /html:
+      is: [accessToken, filteredByTransferFileId]
+      type: error
+      get:
+        description: |
+          <h2>sends log as a complete HTML incl. header to open in a new window</h2>
+        responses:
+          200:
+            body:
+              text/html:
+  

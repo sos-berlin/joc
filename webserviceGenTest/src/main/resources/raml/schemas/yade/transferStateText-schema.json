@@ -1,25 +1,12 @@
 {
-  "title": "jobChain state text",
+  "title": "transfer state text",
   "id": "schemas/yade/transferStateText",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.yade.TransferStateText",
   "type": "string",
   "enum": [
-    "UNDEFINED",
-    "WAITING",
-    "TRANSFERRING",
-    "IN_PROGRESS",
-    "TRANSFERRED",
-    "SUCCESS",
-    "SKIPPED",
+    "SUCCESSFUL",
     "FAILED",
-    "ABORTED",
-    "COMPRESSED",
-    "NOT_OVERWRITTEN",
-    "DELETED",
-    "RENAMED",
-    "IGNORED_DUE_TO_ZEROBYTE_CONSTRAINT",
-    "SETBACK",
-    "POLLING"
+    "INCOMPLETE"
   ]
 }

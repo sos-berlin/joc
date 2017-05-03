@@ -12,6 +12,7 @@
     "HTTP",
     "HTTPS",
     "WEBDAV",
+    "WEBDAVS",
     "SMB"
   ]
 }
