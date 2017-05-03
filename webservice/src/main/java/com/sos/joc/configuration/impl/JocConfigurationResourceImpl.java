@@ -38,7 +38,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
         /** set general filter */
         jocConfigurationDBLayer.getFilter().setId(configuration.getId().longValue());
-        jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
+        jocConfigurationDBLayer.getFilter().setSchedulerId(configuration.getJobschedulerId());
     }
 
     @Override

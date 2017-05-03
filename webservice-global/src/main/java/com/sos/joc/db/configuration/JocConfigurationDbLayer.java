@@ -29,7 +29,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
 
     public void resetFilter() {
         filter = new JocConfigurationFilter();
-        filter.setInstanceId(null);
+        filter.setSchedulerId(null);
         filter.setName("");
         filter.setConfigurationType("");
         filter.setObjectType("");
@@ -70,8 +70,8 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
             where += and + " name = :name";
             and = " and ";
         }
-        if (filter.getInstanceId() != null) {
-            where += and + " instanceId = :instanceId ";
+        if (filter.getSchedulerId() != null) {
+            where += and + " schedulerId = :schedulerId ";
             and = " and ";
         }
         if (filter.getId() != null) {
@@ -104,8 +104,8 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         if (filter.getName() != null && !"".equals(filter.getName())) {
             query.setParameter("name", filter.getName());
         }
-        if (filter.getInstanceId() != null) {
-            query.setParameter("instanceId", filter.getInstanceId());
+        if (filter.getSchedulerId() != null) {
+            query.setParameter("schedulerId", filter.getSchedulerId());
         }
         if (filter.getId() != null) {
             query.setParameter("id", filter.getId());
@@ -124,7 +124,6 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<JocConfigurationDbItem> getJocConfigurationList(final int limit) throws Exception {
 
         List<JocConfigurationDbItem> configurationsList = null;
@@ -141,7 +140,6 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
 
     }
 
-    @SuppressWarnings("unchecked")
     public JocConfigurationDbItem getJocConfiguration(Long id) throws Exception {
         StringBuilder sql = new StringBuilder();
         sql.append("from ")
@@ -152,7 +150,6 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return query.getSingleResult();
     }
 
-    @SuppressWarnings("unchecked")
     public List<JocConfigurationDbItem> getJocConfigurations(final int limit) throws Exception {
         StringBuilder sql = new StringBuilder();
         sql.append("from ")

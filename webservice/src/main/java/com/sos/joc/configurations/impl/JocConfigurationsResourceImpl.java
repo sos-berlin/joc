@@ -63,7 +63,7 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
             JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
 
             jocConfigurationDBLayer.getFilter().setObjectType(objectType);
-            jocConfigurationDBLayer.getFilter().setInstanceId(dbItemInventoryInstance.getId());
+            jocConfigurationDBLayer.getFilter().setSchedulerId(configurationsFilter.getJobschedulerId());
             jocConfigurationDBLayer.getFilter().setConfigurationType(configurationType);
             jocConfigurationDBLayer.getFilter().setAccount(configurationsFilter.getAccount());
             jocConfigurationDBLayer.getFilter().setShared(configurationsFilter.getShared());
