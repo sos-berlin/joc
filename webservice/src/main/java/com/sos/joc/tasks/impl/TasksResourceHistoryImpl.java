@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemReportTask;
 import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -86,6 +87,13 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             }
             
             reportTaskExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
+            
+			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+					reportTaskExecutionsDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),folder.isRecursive());
+				}
+			}
 
             List<DBItemReportTask> listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
 

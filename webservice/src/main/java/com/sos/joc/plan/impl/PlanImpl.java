@@ -18,6 +18,7 @@ import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanWithReportTriggerDBItem;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -130,6 +131,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             for (PlanStateText state : planFilter.getStates()) {
                 dailyPlanDBLayer.getFilter().addState(state.name());
             }
+            
+			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+					dailyPlanDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),folder.isRecursive());
+				}
+			}
 
             Matcher regExMatcher=null;
             if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {

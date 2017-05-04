@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.apache.shiro.subject.Subject;
 
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
@@ -13,6 +14,8 @@ import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.WebserviceConstants;
 
 public class SOSShiroCurrentUser {
+
+	private static final Logger LOGGER = Logger.getLogger(SOSShiroCurrentUser.class);
 
 	public SOSShiroFolderPermissions getSosShiroFolderPermissions() {
 		return sosShiroFolderPermissions;
@@ -166,6 +169,7 @@ public class SOSShiroCurrentUser {
 		}
 
 		if (hasRole(role)) {
+			LOGGER.debug(String.format("Adding folders %s for role %s", folders,role));
 			sosShiroFolderPermissions.setFolders(folders);
 		}
 	}
