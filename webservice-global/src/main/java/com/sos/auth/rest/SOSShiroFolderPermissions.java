@@ -22,8 +22,10 @@ public class SOSShiroFolderPermissions {
 			listOfFolders = new ArrayList<FilterFolder>();
 		}
 		ArrayList<FilterFolder> listOfFoldersDefault = listOfFoldersForInstance.get("");
-		for (int i = 0; i < listOfFoldersDefault.size(); i++) {
-			listOfFolders.add(listOfFoldersDefault.get(i));
+		if (listOfFoldersDefault != null) {
+			for (int i = 0; i < listOfFoldersDefault.size(); i++) {
+				listOfFolders.add(listOfFoldersDefault.get(i));
+			}
 		}
 
 		return listOfFolders;
