@@ -1,6 +1,5 @@
 package com.sos.auth.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -168,9 +167,18 @@ public class SOSShiroCurrentUser {
 			this.initFolders();
 		}
 
+		String jobSchedulerId = "";
+		if (role.contains("|")) {
+			String[] s = role.split("\\|");
+			if (s.length > 1) {
+				jobSchedulerId = s[0];
+				role = s[1];
+			}
+		}
+
 		if (hasRole(role)) {
-			LOGGER.debug(String.format("Adding folders %s for role %s", folders,role));
-			sosShiroFolderPermissions.setFolders(folders);
+			LOGGER.debug(String.format("Adding folders %s for role %s", folders, role));
+			sosShiroFolderPermissions.setFolders(jobSchedulerId, folders);
 		}
 	}
 

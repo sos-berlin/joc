@@ -28,7 +28,7 @@ public class TreePermanent {
 	public static List<JobSchedulerObjectType> getAllowedTypes(TreeFilter treeBody,
 			SOSPermissionJocCockpit sosPermission) {
 		List<JobSchedulerObjectType> types = new ArrayList<JobSchedulerObjectType>();
-
+		
 		for (JobSchedulerObjectType type : treeBody.getTypes()) {
 			switch (type) {
 			case JOB:

@@ -263,6 +263,7 @@ public class JOCResourceImpl {
             throw new JocMissingRequiredParameterException("undefined 'jobschedulerId'");
         } else {
             jobschedulerId = schedulerId;
+            jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().setSchedulerId(schedulerId);
         }
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(schedulerId);
