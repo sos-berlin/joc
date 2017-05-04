@@ -2,27 +2,17 @@ package com.sos.auth.rest;
 
 import java.util.ArrayList;
 
+import com.sos.jitl.reporting.db.filter.FilterFolder;
+
 public class SOSShiroFolderPermissions {
 
-	public class FolderItem{
-		protected boolean recursive;
-		protected String folder;
-		
-		public boolean isRecursive() {
-			return recursive;
-		}
-		public String getFolder() {
-			return folder;
-		}
-	
-	}
-	
-	private ArrayList<FolderItem> listOfFolders;
+
+	private ArrayList<FilterFolder> listOfFolders;
 
 	public SOSShiroFolderPermissions() {
 		super();
 
-		listOfFolders = new ArrayList<FolderItem>();
+		listOfFolders = new ArrayList<FilterFolder>();
 	}
 
 	public void setFolders(String folders) {
@@ -30,15 +20,15 @@ public class SOSShiroFolderPermissions {
 
 		for (int i = 0; i < stringlistOfFolders.length; i++) {
 			String f = stringlistOfFolders[i].trim();
-			FolderItem folderItem = new FolderItem();
-			if (f.endsWith("*")){
-			   	folderItem.recursive = true;
-			   	folderItem.folder=f.replace("*", "");
+			FilterFolder filterFolder = new FilterFolder();
+			if (f.endsWith("/*")){
+			   	filterFolder.setRecursive(true);
+			   	filterFolder.setFolder(("/" + f.trim()).replaceAll("//+", "/").replaceFirst("/\\*$", ""));
 			}else{
-			   	folderItem.recursive = false;
-			   	folderItem.folder=f;
+			   	filterFolder.setRecursive(false);
+			   	filterFolder.setFolder(f);
 			}
-			listOfFolders.add(folderItem);
+			listOfFolders.add(filterFolder);
 		}
 	}
 
@@ -48,13 +38,13 @@ public class SOSShiroFolderPermissions {
 		}
 		
 		for (int i = 0; i < listOfFolders.size(); i++) {
-			FolderItem f = listOfFolders.get(i);
-			if (f.recursive) {
-				if (folder.startsWith(f.folder)) {
+			FilterFolder f = listOfFolders.get(i);
+			if (f.isRecursive()) {
+				if (folder.startsWith(f.getFolder())) {
 					return true;
 				}
 			} else {
-				if (f.equals(folder)) {
+				if (f.getFolder().equals(folder)) {
 					return true;
 				}
 			}
@@ -66,18 +56,18 @@ public class SOSShiroFolderPermissions {
 		return listOfFolders.size();
 	}
 	
-	public FolderItem get(int i){
+	public FilterFolder get(int i){
 		return listOfFolders.get(i);
 	}
 	
 	public String getFolderPermissionsWhere(String field) {
 		String s = "1=1";
 		for (int i = 0; i < listOfFolders.size(); i++) {
-			FolderItem f = listOfFolders.get(i);
-			if (f.recursive) {
-				s = s + " and " + field + " like " + f.folder;
+			FilterFolder f = listOfFolders.get(i);
+			if (f.isRecursive()) {
+				s = s + " and " + field + " like " + f.getFolder();
 			} else {
-				s = s + " and " + field + " = " + f.folder;
+				s = s + " and " + field + " = " + f.getFolder();
 			}
 		}
 		return s;

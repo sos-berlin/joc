@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -56,6 +57,17 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             List<OrderPath> orders = ordersBody.getOrders();
             List<Folder> folders = ordersBody.getFolders();
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
+            
+    		if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+					com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
+					f.setFolder(folder.getFolder());
+					f.setRecursive(folder.isRecursive());
+					folders.add(f);
+				}
+			}
+            
             
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);

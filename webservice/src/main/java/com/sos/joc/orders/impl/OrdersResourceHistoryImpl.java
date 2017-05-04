@@ -8,10 +8,10 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import com.sos.auth.rest.SOSShiroFolderPermissions;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemReportTrigger;
 import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -100,7 +100,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 
 			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
 				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-					SOSShiroFolderPermissions.FolderItem folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
 					reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),folder.isRecursive());
 				}
 			}
