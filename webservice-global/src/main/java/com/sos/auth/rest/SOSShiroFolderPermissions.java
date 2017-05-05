@@ -17,18 +17,17 @@ public class SOSShiroFolderPermissions {
 	}
 
 	private ArrayList<FilterFolder> getListOfFolders(String jobSchedulerId) {
+        ArrayList<FilterFolder> retListOfFolders = new ArrayList<FilterFolder>();
 		ArrayList<FilterFolder> listOfFolders = listOfFoldersForInstance.get(jobSchedulerId);
-		if (listOfFolders == null) {
-			listOfFolders = new ArrayList<FilterFolder>();
+		if (listOfFolders != null) {
+			retListOfFolders.addAll(listOfFolders);
 		}
 		ArrayList<FilterFolder> listOfFoldersDefault = listOfFoldersForInstance.get("");
 		if (listOfFoldersDefault != null) {
-			for (int i = 0; i < listOfFoldersDefault.size(); i++) {
-				listOfFolders.add(listOfFoldersDefault.get(i));
-			}
+			retListOfFolders.addAll(listOfFoldersDefault);
 		}
 
-		return listOfFolders;
+		return retListOfFolders;
 	}
 
 	public void setFolders(String jobSchedulerId, String folders) {
