@@ -1,6 +1,8 @@
 package com.sos.joc.classes.parameters;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.json.JsonObject;
@@ -14,19 +16,17 @@ import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.model.common.NameValuePair;
 
 public class Parameters {
-
-    public static List<NameValuePair> getParameters(){
-        List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-        NameValuePair param1 = new NameValuePair();
-        NameValuePair param2 = new NameValuePair();
-        param1.setName("param1");
-        param1.setValue("value1");
-        param2.setName("param2");
-        param2.setValue("value2");
-        parameters.add(param1);
-        parameters.add(param1);
-        return parameters;
+    
+    public static void sortParameters(List<NameValuePair> parameters) {
+        Collections.sort(parameters, new Comparator<NameValuePair>() {
+            @Override
+            public int compare(NameValuePair param1, NameValuePair param2)
+            {
+                return  param1.getName().compareTo(param2.getName());
+            }
+        });
     }
+        
 
     public static List<NameValuePair> getParameters(Element elem) throws TransformerException {
         CachedXPathAPI xPath = new CachedXPathAPI();
@@ -40,6 +40,7 @@ public class Parameters {
                 param.setValue(paramElement.getAttribute(WebserviceConstants.VALUE));
                 params.add(param);
             }
+            sortParameters(params);
             return params;
         } else {
             return null;
@@ -56,6 +57,7 @@ public class Parameters {
                 param.setValue(paramList.getString(key, ""));
                 params.add(param);
             }
+            sortParameters(params);
             return params;
         } else {
             return null;
