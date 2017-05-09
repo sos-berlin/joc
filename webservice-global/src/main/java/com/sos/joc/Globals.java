@@ -1,5 +1,7 @@
 package com.sos.joc;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -24,6 +26,7 @@ import com.sos.joc.exceptions.JocException;
 
 public class Globals {
 
+    private static final String SHIRO_INI_FILENAME = "shiro.ini";
     private static final String HIBERNATE_CONFIGURATION_FILE = "hibernate_configuration_file";
     private static final String HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE = "hibernate_configuration_scheduler_default_file";
     private static final Logger LOGGER = LoggerFactory.getLogger(Globals.class);
@@ -99,7 +102,11 @@ public class Globals {
 
     public static String getShiroIniInClassPath() {
         if (sosShiroProperties != null) {
-            return "classpath:" + sosShiroProperties.getPropertiesFileClassPathParent() + "shiro.ini";
+            Path p = sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
+            String s;
+            s = "file:" + p;
+            s = s.replace("\\", "/");
+            return s;
         }
         return DEFAULT_SHIRO_INI_PATH;
     }

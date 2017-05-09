@@ -45,7 +45,10 @@ public class JocCockpitProperties {
     
     public String getPropertiesFileClassPathParent() {
         Path p = Paths.get(propertiesFile).getParent();
-        String parent = (p != null) ? p.toString().replace('\\', '/') + "/" : "";
+        String parent = "";
+        if (p != null){
+             parent =  p.toString().replace('\\', '/') + "/";
+         }
         return parent.replaceFirst("^/", "");
     }
 
