@@ -2,6 +2,7 @@ package com.sos.joc.classes.audit;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
+import com.sos.joc.model.jobscheduler.HostPortParameter;
 import com.sos.joc.model.jobscheduler.HostPortTimeOutParameter;
 
 
@@ -23,6 +24,15 @@ public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements
             setPort(hostPortTimeoutParamSchema.getPort());
             setTimeout(hostPortTimeoutParamSchema.getTimeout());
             setJobschedulerId(hostPortTimeoutParamSchema.getJobschedulerId()); 
+        }
+    }
+    
+    public ModifyJobSchedulerAudit(HostPortParameter hostPortParamSchema) {
+        if (hostPortParamSchema != null) {
+            setAuditParams(hostPortParamSchema.getAuditLog());
+            setHost(hostPortParamSchema.getHost());
+            setPort(hostPortParamSchema.getPort());
+            setJobschedulerId(hostPortParamSchema.getJobschedulerId()); 
         }
     }
 

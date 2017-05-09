@@ -13,8 +13,8 @@ import org.apache.http.HttpEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.exception.ConnectionRefusedException;
-import com.sos.exception.NoResponseException;
+import com.sos.exception.SOSConnectionRefusedException;
+import com.sos.exception.SOSNoResponseException;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
@@ -214,13 +214,13 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = postRestService(uri, postBody);
             return getJsonObjectFromResponse(response, uri, jocError);
-        } catch (ConnectionRefusedException e) {
+        } catch (SOSConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
                 throw new JobSchedulerConnectionRefusedException(jocError, e);
             }
-        } catch (NoResponseException e) {
+        } catch (SOSNoResponseException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
@@ -293,13 +293,13 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             HttpEntity response = getInCompleteHttpEntityByRestService(uri);
             return getHtmlFromResponse(response, uri, jocError);
-        } catch (ConnectionRefusedException e) {
+        } catch (SOSConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
                 throw new JobSchedulerConnectionRefusedException(jocError, e);
             }
-        } catch (NoResponseException e) {
+        } catch (SOSNoResponseException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
@@ -330,13 +330,13 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = getRestService(uri);
             return getJsonObjectFromResponse(response, uri, jocError);
-        } catch (ConnectionRefusedException e) {
+        } catch (SOSConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
                 throw new JobSchedulerConnectionRefusedException(jocError, e);
             }
-        } catch (NoResponseException e) {
+        } catch (SOSNoResponseException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
@@ -361,13 +361,13 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = getRestService(uri);
             return getStringFromResponse(response, uri, jocError, acceptHeader);
-        } catch (ConnectionRefusedException e) {
+        } catch (SOSConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
                 throw new JobSchedulerConnectionRefusedException(jocError, e);
             }
-        } catch (NoResponseException e) {
+        } catch (SOSNoResponseException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
             } else {
