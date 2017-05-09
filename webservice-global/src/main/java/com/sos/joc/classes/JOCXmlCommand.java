@@ -14,7 +14,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sos.exception.NoResponseException;
+import com.sos.exception.SOSNoResponseException;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -175,7 +175,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
         this.xmlCommand = xmlCommand;
         try {
             return executeXMLPost(xmlCommand, accessToken);
-        } catch (NoResponseException e) {
+        } catch (SOSNoResponseException e) {
             JobSchedulerNoResponseException ee = new JobSchedulerNoResponseException(e.getCause());
             ee.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand);
             throw ee;
