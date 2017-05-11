@@ -45,7 +45,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "start", getPermissonsJocCockpit(accessToken).getOrder().isStart(), modifyOrders);
+            return postOrdersCommand(accessToken, "start", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isStart(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -57,7 +57,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "suspend", getPermissonsJocCockpit(accessToken).getOrder().isSuspend(), modifyOrders);
+            return postOrdersCommand(accessToken, "suspend", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isSuspend(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -69,7 +69,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "resume", getPermissonsJocCockpit(accessToken).getOrder().isResume(), modifyOrders);
+            return postOrdersCommand(accessToken, "resume", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isResume(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -81,7 +81,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "reset", getPermissonsJocCockpit(accessToken).getOrder().isReset(), modifyOrders);
+            return postOrdersCommand(accessToken, "reset", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isReset(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -93,7 +93,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "set_state", getPermissonsJocCockpit(accessToken).getOrder().isSetState(), modifyOrders);
+            return postOrdersCommand(accessToken, "set_state", getPermissonsJocCockpit(accessToken).getOrder().getChange().isState(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -105,7 +105,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().isSetRunTime(), modifyOrders);
+            return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -117,7 +117,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersResetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "reset_run_time", getPermissonsJocCockpit(accessToken).getOrder().isSetRunTime(), modifyOrders);
+            return postOrdersCommand(accessToken, "reset_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -129,7 +129,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().isRemoveSetback(), modifyOrders);
+            return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isRemoveSetback(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

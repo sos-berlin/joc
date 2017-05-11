@@ -59,7 +59,7 @@ public class JobSchedulerCommandFactory {
         }
         
         if (command instanceof Order){
-            return permissions.getJobChain().isAddOrder();
+            return permissions.getJobChain().getExecute().isAddOrder();
         }
         
         if (command instanceof ShowJob){
@@ -70,13 +70,13 @@ public class JobSchedulerCommandFactory {
             JobChainNodeModify jobchainNodeModify = (JobChainNodeModify)command;
             
             if ("stop".equalsIgnoreCase(jobchainNodeModify.getAction().value())){
-                return permissions.getJobChain().isStopJobChainNode();
+                return permissions.getJobChain().getExecute().isStopJobChainNode();
             }
             if ("next_state".equalsIgnoreCase(jobchainNodeModify.getAction().value())){
-                return permissions.getJobChain().isSkipJobChainNode();
+                return permissions.getJobChain().getExecute().isSkipJobChainNode();
             }
             if ("process".equalsIgnoreCase(jobchainNodeModify.getAction().value())){
-                return permissions.getJobChain().isProcessJobChainNode();
+                return permissions.getJobChain().getExecute().isProcessJobChainNode();
             }
         }
 
@@ -84,10 +84,10 @@ public class JobSchedulerCommandFactory {
             JobChainModify jobchainModify = (JobChainModify)command;
             
             if ("stopped".equalsIgnoreCase(jobchainModify.getState())){
-                return permissions.getJobChain().isStop();
+                return permissions.getJobChain().getExecute().isStop();
             }
             if ("running".equalsIgnoreCase(jobchainModify.getState())){
-                return permissions.getJobChain().isUnstop();
+                return permissions.getJobChain().getExecute().isUnstop();
             }
         }
             
@@ -96,7 +96,7 @@ public class JobSchedulerCommandFactory {
         }
         
         if (command instanceof KillTask){
-            return permissions.getJob().isKill();
+            return permissions.getJob().getExecute().isKill();
         }
         
         if (command instanceof LockRemove){
@@ -106,47 +106,47 @@ public class JobSchedulerCommandFactory {
         if (command instanceof ModifyHotFolder){
             ModifyHotFolder modifyHotFolder = (ModifyHotFolder)command;
             if (modifyHotFolder.getJob() != null){
-                return permissions.getJob().isModifyHotFolder();
+                return permissions.getJob().getChange().isHotFolder();
             }
             if (modifyHotFolder.getJobChain() != null){
-                return permissions.getJobChain().isModifyHotFolder();
+                return permissions.getJobChain().getChange().isHotFolder();
             }
             if (modifyHotFolder.getLock() != null){
-                return permissions.getLock().isModifyHotFolder();
+                return permissions.getLock().getChange().isHotFolder();
             }
             if (modifyHotFolder.getOrder() != null){
-                return permissions.getOrder().isModifyHotFolder();
+                return permissions.getOrder().getChange().isHotFolder();
             }
             if (modifyHotFolder.getProcessClass() != null){
-                return permissions.getProcessClass().isModifyHotFolder();
+                return permissions.getProcessClass().getChange().isHotFolder();
             }
             if (modifyHotFolder.getSchedule() != null){
-                return permissions.getSchedule().isModifyHotFolder();
+                return permissions.getSchedule().getChange().isHotFolder();
             }
         }
         
         if (command instanceof ModifyJob){
             ModifyJob modifyJob = (ModifyJob)command;
             if ("start".equalsIgnoreCase(modifyJob.getCmd())){
-                return permissions.getJob().isStart();
+                return permissions.getJob().getExecute().isStart();
             }
             if ("wake".equalsIgnoreCase(modifyJob.getCmd())){
-                return permissions.getJob().isStart();
+                return permissions.getJob().getExecute().isStart();
             }
             if ("stop".equalsIgnoreCase(modifyJob.getCmd())){
-                return permissions.getJob().isStop();
+                return permissions.getJob().getExecute().isStop();
             }
             if ("unstop".equalsIgnoreCase(modifyJob.getCmd())){
-                return permissions.getJob().isUnstop();
+                return permissions.getJob().getExecute().isUnstop();
             }
             if ("suspend".equalsIgnoreCase(modifyJob.getCmd())){
-                return permissions.getJob().isSuspendAllTasks();
+                return permissions.getJob().getExecute().isSuspendAllTasks();
             }
             if ("continue".equalsIgnoreCase(modifyJob.getCmd())){
-                return permissions.getJob().isContinueAllTasks();
+                return permissions.getJob().getExecute().isContinueAllTasks();
             }
             if ("end".equalsIgnoreCase(modifyJob.getCmd())){
-                return permissions.getJob().isEndAllTasks();
+                return permissions.getJob().getExecute().isEndAllTasks();
             }
         }
 
@@ -167,31 +167,31 @@ public class JobSchedulerCommandFactory {
         if (command instanceof ModifySpooler){
             ModifySpooler modifySpooler = (ModifySpooler)command;
             if ("pause".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().isPause();
+                return permissions.getJobschedulerMaster().getExecute().isPause();
             }
             if ("continue".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().isContinue();
+                return permissions.getJobschedulerMaster().getExecute().isContinue();
             }
             if ("stop".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().isStop();
+                return permissions.getJobschedulerMaster().getExecute().isStop();
             }
             if ("reload".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().isReload();
+                return permissions.getJobschedulerMaster().getExecute().isReload();
             }
             if ("terminate".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().isTerminate();
+                return permissions.getJobschedulerMaster().getExecute().isTerminate();
             }
             if ("terminate_and_restart".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().getRestart().isTerminate();
+                return permissions.getJobschedulerMaster().getExecute().getRestart().isTerminate();
             }
             if ("let_run_terminate".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().getRestart().isTerminate();
+                return permissions.getJobschedulerMaster().getExecute().getRestart().isTerminate();
             }
             if ("abort_immediately".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().isAbort();
+                return permissions.getJobschedulerMaster().getExecute().isAbort();
             }
             if ("abort_immediately_and_restart".equalsIgnoreCase(modifySpooler.getCmd())){
-                return permissions.getJobschedulerMaster().getRestart().isAbort();
+                return permissions.getJobschedulerMaster().getExecute().getRestart().isAbort();
             }
         }
 
@@ -216,7 +216,7 @@ public class JobSchedulerCommandFactory {
         }
 
         if (command instanceof RemoveJobChain){
-            return permissions.getJobChain().isRemove();
+            return permissions.getJobChain().getExecute().isRemove();
         }
 
         if (command instanceof RemoveOrder){
@@ -228,15 +228,15 @@ public class JobSchedulerCommandFactory {
         }
         
         if (command instanceof SchedulerLogLogCategoriesReset){
-            return permissions.getJobschedulerMaster().isManageCategories();
+            return permissions.getJobschedulerMaster().getAdministration().isManageCategories();
         }
         
         if (command instanceof SchedulerLogLogCategoriesSet){
-            return permissions.getJobschedulerMaster().isManageCategories();
+            return permissions.getJobschedulerMaster().getAdministration().isManageCategories();
         }
 
         if (command instanceof SchedulerLogLogCategoriesShow){
-            return permissions.getJobschedulerMaster().isManageCategories();
+            return permissions.getJobschedulerMaster().getAdministration().isManageCategories();
         }
         
         if (command instanceof ShowCalendar){
@@ -276,11 +276,11 @@ public class JobSchedulerCommandFactory {
         }
         
         if (command instanceof StartJob){
-            return permissions.getJob().isStart();
+            return permissions.getJob().getExecute().isStart();
         }
         
         if (command instanceof Terminate){
-            return permissions.getJobschedulerMaster().isTerminate();
+            return permissions.getJobschedulerMaster().getExecute().isTerminate();
         }
         
       

@@ -22,7 +22,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCDefaultResponse postJobschedulerTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().isTerminate();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getExecute().isTerminate();
             return executeModifyJobSchedulerClusterCommand(TERMINATE, timeoutParameter, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -35,7 +35,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().isRestart();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getExecute().isRestart();
             return executeModifyJobSchedulerClusterCommand(RESTART, timeoutParameter, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -48,7 +48,7 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     @Override
     public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().isTerminateFailSafe();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getExecute().isTerminateFailSafe();
             return executeModifyJobSchedulerClusterCommand(TERMINATE_FAILSAFE, timeoutParameter, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

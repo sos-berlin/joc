@@ -26,7 +26,7 @@ public class JobSchedulerCleanupInventoryImpl extends JOCResourceImpl implements
         try {
             // TODO permission
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, hostPortParameter, accessToken, hostPortParameter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().isAbort());
+                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getAdministration().isRemoveOldInstances());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
