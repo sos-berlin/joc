@@ -344,6 +344,11 @@ traits:
     type:
       postURLWithPlainResponse:
         description: Provides JobScheduler main log as download
+  /cleanup:
+    type:
+      postURLWithOkResponse:
+        description: Clean up inventory tables from the reporting database
+        audit: !include documentation/audit/auditLog.md
 
 /orders:
   type:
