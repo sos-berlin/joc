@@ -31,7 +31,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     @Override
     public JOCDefaultResponse postJobChainNodesStop(String accessToken, ModifyJobChainNodes modifyNodes) {
         try {
-            return postJobChainNodesCommands(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJobChain().isStopJobChainNode(),
+            return postJobChainNodesCommands(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJobChain().getExecute().isStopJobChainNode(),
                     modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -44,7 +44,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     @Override
     public JOCDefaultResponse postJobChainNodesSkip(String accessToken, ModifyJobChainNodes modifyNodes) {
         try {
-            return postJobChainNodesCommands(accessToken, SKIP, getPermissonsJocCockpit(accessToken).getJobChain().isSkipJobChainNode(),
+            return postJobChainNodesCommands(accessToken, SKIP, getPermissonsJocCockpit(accessToken).getJobChain().getExecute().isSkipJobChainNode(),
                     modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -57,8 +57,7 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     @Override
     public JOCDefaultResponse postJobChainNodesActivate(String accessToken, ModifyJobChainNodes modifyNodes) {
         try {
-            return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissonsJocCockpit(accessToken).getJobChain()
-                    .isProcessJobChainNode(), modifyNodes);
+            return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissonsJocCockpit(accessToken).getJobChain().getExecute().isProcessJobChainNode(), modifyNodes);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -35,7 +35,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     @Override
     public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasks modifyTasks) {
         try {
-            return postTasksCommand(accessToken, TERMINATE, getPermissonsJocCockpit(accessToken).getJob().isTerminate(), modifyTasks);
+            return postTasksCommand(accessToken, TERMINATE, getPermissonsJocCockpit(accessToken).getJob().getExecute().isTerminate(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -47,7 +47,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     @Override
     public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasks modifyTasks) {
         try {
-            return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissonsJocCockpit(accessToken).getJob().isTerminate(), modifyTasks);
+            return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissonsJocCockpit(accessToken).getJob().getExecute().isTerminate(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -59,7 +59,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     @Override
     public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasks modifyTasks) {
         try {
-            return postTasksCommand(accessToken, KILL, getPermissonsJocCockpit(accessToken).getJob().isKill(), modifyTasks);
+            return postTasksCommand(accessToken, KILL, getPermissonsJocCockpit(accessToken).getJob().getExecute().isKill(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -71,7 +71,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     @Override
     public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasks modifyTasks) {
         try {
-            return postTasksCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().isKill(), modifyTasks);
+            return postTasksCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().getExecute().isKill(), modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -30,7 +30,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
     public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRunTime modifyRuntime) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken, modifyRuntime.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getSchedule().isEdit());
+                    getPermissonsJocCockpit(accessToken).getSchedule().getChange().isEditContent());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

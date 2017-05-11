@@ -27,7 +27,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCDefaultResponse postJobschedulerTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().isTerminate();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().isTerminate();
             return executeModifyJobSchedulerCommand(TERMINATE, urlTimeoutParamSchema, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -40,7 +40,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getRestart().isTerminate();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().getRestart().isTerminate();
             return executeModifyJobSchedulerCommand(RESTART, urlTimeoutParamSchema, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -53,7 +53,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCDefaultResponse postJobschedulerAbort(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().isAbort();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().isAbort();
             return executeModifyJobSchedulerCommand(ABORT, urlTimeoutParamSchema, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -66,7 +66,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getRestart().isAbort();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().getRestart().isAbort();
             return executeModifyJobSchedulerCommand(ABORT_AND_RESTART, urlTimeoutParamSchema, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -79,7 +79,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCDefaultResponse postJobschedulerPause(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().isPause();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().isPause();
             return executeModifyJobSchedulerCommand(PAUSE, urlTimeoutParamSchema, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -92,7 +92,7 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     @Override
     public JOCDefaultResponse postJobschedulerContinue(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
-            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().isContinue();
+            boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().isContinue();
             return executeModifyJobSchedulerCommand(CONTINUE, urlTimeoutParamSchema, accessToken, permission);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

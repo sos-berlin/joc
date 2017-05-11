@@ -46,7 +46,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJob().isStop(), modifyJobs);
+            return postJobsCommand(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJob().getExecute().isStop(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -58,7 +58,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, UNSTOP, getPermissonsJocCockpit(accessToken).getJob().isUnstop(), modifyJobs);
+            return postJobsCommand(accessToken, UNSTOP, getPermissonsJocCockpit(accessToken).getJob().getExecute().isUnstop(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -70,7 +70,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().isSetRunTime(), modifyJobs);
+            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().getChange().isRunTime(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -82,7 +82,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsResetRunTime(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, RESET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().isSetRunTime(), modifyJobs);
+            return postJobsCommand(accessToken, RESET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().getChange().isRunTime(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -94,7 +94,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().isEndAllTasks(), modifyJobs);
+            return postJobsCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().getExecute().isEndAllTasks(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -106,7 +106,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(accessToken).getJob().isSuspendAllTasks(), modifyJobs);
+            return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(accessToken).getJob().getExecute().isSuspendAllTasks(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -118,7 +118,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(accessToken).getJob().isContinueAllTasks(), modifyJobs);
+            return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(accessToken).getJob().getExecute().isContinueAllTasks(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
