@@ -18,7 +18,7 @@ public class JobSchedulerTaskHistoryDBLayer extends DBLayer {
         super(conn);
     }
 
-    public String getLogAsString(TaskFilter taskFilter) throws Exception {
+    public String getLogAsString(TaskFilter taskFilter) {
         String log = null;
         try {
             if (this.getSession().getFactory().dbmsIsPostgres()) {
