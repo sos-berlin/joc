@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 
@@ -17,13 +18,13 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
     private static final Logger LOGGER = Logger.getLogger(JocConfigurationDbLayer.class);
     private JocConfigurationFilter filter = null;
 
-    public JocConfigurationDbLayer(SOSHibernateSession connection) throws Exception {
+    public JocConfigurationDbLayer(SOSHibernateSession connection)  {
         super();
         this.sosHibernateSession = connection;
         resetFilter();
     }
 
-    public JocConfigurationDbItem getJocConfigurationDbItem(final Long id) throws Exception {
+    public JocConfigurationDbItem getJocConfigurationDbItem(final Long id) throws SOSHibernateException  {
         return (JocConfigurationDbItem) (sosHibernateSession.get(JocConfigurationDbItem.class, id));
     }
 
@@ -38,7 +39,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         filter.setId(null);
     }
 
-    public int delete() throws Exception {
+    public int delete() throws SOSHibernateException {
         String hql = "delete from " + JOC_CONFIGURATION_DB_ITEM + " " + getWhere();
         Query query = null;
         int row = 0;
@@ -59,7 +60,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
             query.setParameter("shared", filter.isShared());
         }
 
-        row = query.executeUpdate();
+        row = sosHibernateSession.executeUpdate(query);
         return row;
     }
 
@@ -124,7 +125,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         }
     }
 
-    public List<JocConfigurationDbItem> getJocConfigurationList(final int limit) throws Exception {
+    public List<JocConfigurationDbItem> getJocConfigurationList(final int limit) throws SOSHibernateException {
 
         List<JocConfigurationDbItem> configurationsList = null;
 
@@ -134,23 +135,23 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         if (limit > 0) {
             query.setMaxResults(limit);
         }
-        configurationsList = query.getResultList();
+        configurationsList = sosHibernateSession.getResultList(query);
 
         return configurationsList;
 
     }
 
-    public JocConfigurationDbItem getJocConfiguration(Long id) throws Exception {
+    public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateException  {
         StringBuilder sql = new StringBuilder();
         sql.append("from ")
             .append(JOC_CONFIGURATION_DB_ITEM)
             .append(" where id = :id");
         Query<JocConfigurationDbItem> query = sosHibernateSession.createQuery(sql.toString());
         query.setParameter("id", id);
-        return query.getSingleResult();
+        return sosHibernateSession.getSingleResult(query);
     }
 
-    public List<JocConfigurationDbItem> getJocConfigurations(final int limit) throws Exception {
+    public List<JocConfigurationDbItem> getJocConfigurations(final int limit) throws SOSHibernateException  {
         StringBuilder sql = new StringBuilder();
         sql.append("from ")
             .append(JOC_CONFIGURATION_DB_ITEM)
@@ -163,10 +164,10 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         if (limit > 0) {
             query.setMaxResults(limit);
         }
-        return query.getResultList();
+        return sosHibernateSession.getResultList(query);
     }
 
-    public Long saveOrUpdateConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws Exception {
+    public Long saveOrUpdateConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws SOSHibernateException  {
         jocConfigurationDbItem.setModified(new Date());
         if(jocConfigurationDbItem.getId() == null) {
             sosHibernateSession.save(jocConfigurationDbItem);
@@ -176,7 +177,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return jocConfigurationDbItem.getId();
     }
 
-    public int deleteConfiguration() throws Exception {
+    public int deleteConfiguration() throws SOSHibernateException  {
         List<JocConfigurationDbItem> l = getJocConfigurationList(1);
         if (l.size() > 0) {
             JocConfigurationDbItem jocConfigurationDbItem = l.get(0);
@@ -185,7 +186,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return l.size();
     }
 
-    public void deleteConfiguration(JocConfigurationDbItem dbItem) throws Exception {
+    public void deleteConfiguration(JocConfigurationDbItem dbItem) throws SOSHibernateException {
         sosHibernateSession.delete(dbItem);
     }
 
