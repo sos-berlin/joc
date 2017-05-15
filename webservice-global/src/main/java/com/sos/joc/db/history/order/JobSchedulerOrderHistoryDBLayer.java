@@ -18,7 +18,7 @@ public class JobSchedulerOrderHistoryDBLayer extends DBLayer {
         super(conn);
     }
 
-    public String getLogAsString(OrderHistoryFilter orderHistoryFilter) throws Exception {
+    public String getLogAsString(OrderHistoryFilter orderHistoryFilter){
         String log = null;
         try {
             if (this.getSession().getFactory().dbmsIsPostgres()) {
