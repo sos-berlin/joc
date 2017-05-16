@@ -61,11 +61,17 @@
 										"type": "object",
 										"javaType": "com.sos.joc.model.security.SecurityConfigurationPermission",
 										"properties": {
-											"path": "string",
-											"excluded": "boolean"
+											"path": {
+												"type": "string"
+											},
+
+											"excluded": {
+												"type": "boolean"
+											}
 										}
 									}
 								},
+
 								"folders": {
 									"type": "array",
 									"items": {
@@ -75,6 +81,7 @@
 											"folder": {
 												"type": "string"
 											},
+
 											"recursive": {
 												"type": "boolean"
 											}

@@ -38,6 +38,7 @@ public class Globals {
     public static final String SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS = "event_http_clients";
     public static final String SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY = "send_events_immediatly";
     public static final String DEFAULT_SHIRO_INI_PATH = "classpath:shiro.ini";
+    public static final String DEFAULT_SHIRO_INI_FILENAME = "shiro.ini";
     public static SOSHibernateFactory sosHibernateFactory;
     public static Map<String, SOSHibernateFactory> sosSchedulerHibernateFactories;
     public static JocCockpitProperties sosShiroProperties;
@@ -116,6 +117,17 @@ public class Globals {
         return DEFAULT_SHIRO_INI_PATH;
     }
 
+    public static String getShiroIniFileName() {
+        if (sosShiroProperties != null) {
+            Path p = sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
+            String s;
+            s = "" + p;
+            s = s.replace("\\", "/");
+            return s;
+        }
+        return DEFAULT_SHIRO_INI_FILENAME;
+    }
+    
     public static void setProperties() throws JocException {
         readVersion();
         setJobSchedulerConnectionTimeout();

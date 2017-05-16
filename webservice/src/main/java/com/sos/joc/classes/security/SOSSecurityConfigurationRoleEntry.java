@@ -9,13 +9,37 @@ public class SOSSecurityConfigurationRoleEntry {
 
     private String[] listOfPermissions;
     private String role;
+    private List<String> listOWritePermissions;
 
     public SOSSecurityConfigurationRoleEntry(String role, String entry) {
         super();
         listOfPermissions = entry.split(",");
+        listOWritePermissions = new ArrayList<String>();
         this.role = role;
     }
 
+    public SOSSecurityConfigurationRoleEntry(String role) {
+        super();
+        listOWritePermissions = new ArrayList<String>();
+        this.role = role;
+    }
+
+    public void addPermission(String permission) {
+        listOWritePermissions.add(permission);
+    }
+
+    public String getIniWriteString(){
+        String s = "";
+        for (int i=0;i<listOWritePermissions.size();i++){
+           s=s +listOWritePermissions.get(i);
+           if (i<listOWritePermissions.size()-1){
+               s=s + ", \\" + "\n" + "                                                                    ".substring(0, role.length()+3);          
+           }else{
+               s = s + "\n";
+           }
+        }
+        return s;
+    }
 
     public void addPermissions() {
         SOSSecurityConfigurationMasters listOfMasters = SOSSecurityConfigurationMasters.getInstance();
@@ -23,36 +47,18 @@ public class SOSSecurityConfigurationRoleEntry {
         for (int i = 0; i < listOfPermissions.length; i++) {
             SecurityConfigurationPermission securityConfigurationPermission = new SecurityConfigurationPermission();
             String permission = listOfPermissions[i];
-            SOSSecurityPermissionEntry sosSecurityPermissionEntry = new SOSSecurityPermissionEntry(permission);
+            SOSSecurityPermissionItem sosSecurityPermissionItem = new SOSSecurityPermissionItem(permission);
 
-            String master = sosSecurityPermissionEntry.getMaster();
+            String master = sosSecurityPermissionItem.getMaster();
             listOfMasters.addMaster(master);
 
             List<SecurityConfigurationPermission> listOfPermissions = listOfMasters.getPermissions(master, role);
 
-            permission = sosSecurityPermissionEntry.getNormalizedPermission();
+            permission = sosSecurityPermissionItem.getNormalizedPermission();
 
-            securityConfigurationPermission.setExcluded(sosSecurityPermissionEntry.isExcluded());
+            securityConfigurationPermission.setExcluded(sosSecurityPermissionItem.isExcluded());
             securityConfigurationPermission.setPath(permission);
             listOfPermissions.add(securityConfigurationPermission);
         }
     }
-
-  /*  public List<SecurityConfigurationPermission> getPermissions() {
-        List<SecurityConfigurationPermission> listOfPermissions = new ArrayList<SecurityConfigurationPermission>();
-        for (int i = 0; i < listOfPermissions.length; i++) {
-            SecurityConfigurationPermission securityConfigurationPermission = new SecurityConfigurationPermission();
-            String path = listOfPermissions[i];
-            boolean excluded = false;
-            if (path.startsWith("-")) {
-                path = listOfPermissions[i].substring(1);
-                excluded = true;
-            }
-            securityConfigurationPermission.setPath(path);
-            securityConfigurationPermission.setExcluded(excluded);
-            listOfPermissions.add(securityConfigurationPermission);
-        }
-        return listOfPermissions;
-    }
-    */
 }

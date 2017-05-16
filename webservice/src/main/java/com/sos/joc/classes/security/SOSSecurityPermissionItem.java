@@ -1,19 +1,39 @@
 package com.sos.joc.classes.security;
 
-public class SOSSecurityPermissionEntry {
+import com.sos.joc.model.security.SecurityConfigurationPermission;
+
+public class SOSSecurityPermissionItem {
 
     private boolean excluded;
     private String permission;
     private String normalizedPermission;
     private String master;
 
-    public SOSSecurityPermissionEntry(String permission) {
+    public SOSSecurityPermissionItem(String permission) {
         super();
         this.permission = permission.trim();
         this.master = extractMaster();
         this.normalizedPermission = normalizePermission();
     }
+    
+    public SOSSecurityPermissionItem(String master, SecurityConfigurationPermission securityConfigurationPermission){
+        super();
+        this.permission = securityConfigurationPermission.getPath();
+        this.master = master;
+        this.normalizedPermission = permission;
+    }
 
+    public String getIniValue(){
+        String s = "";
+        if (isExcluded()){
+            s= "-";
+        }
+        if ("".equals(master)){
+            return s + permission;
+        }else{
+            return s + master + ":" + permission;
+        }
+    }
     
     public String getMaster() {
         return master;
