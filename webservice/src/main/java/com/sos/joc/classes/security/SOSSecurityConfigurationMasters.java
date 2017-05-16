@@ -25,6 +25,10 @@ public class SOSSecurityConfigurationMasters {
         }
         return instance;
     }
+    
+    public static void resetInstance(){
+        instance = null;
+    }
 
     public void createConfigurations(SecurityConfiguration securityConfiguration) {
         for (Map.Entry<String, SecurityConfigurationMaster> entry : listOfMasters.entrySet()) {
@@ -75,6 +79,12 @@ public class SOSSecurityConfigurationMasters {
                 return securityConfigurationRole.getFolders();
             }
         }
-        return null;
+        List<SecurityConfigurationFolder> listOfFolders = new ArrayList<SecurityConfigurationFolder>();
+        SecurityConfigurationRole securityConfigurationRole = new SecurityConfigurationRole();
+        securityConfigurationRole.setRole(role);
+        securityConfigurationRole.setFolders(listOfFolders); 
+        securityConfigurationMaster.getRoles().add(securityConfigurationRole);
+        
+        return listOfFolders;
     }
 }

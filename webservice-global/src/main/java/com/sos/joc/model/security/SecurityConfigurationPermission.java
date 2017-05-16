@@ -18,9 +18,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class SecurityConfigurationPermission {
 
     @JsonProperty("path")
-    private Object path;
+    private String path;
     @JsonProperty("excluded")
-    private Object excluded;
+    private Boolean excluded;
 
     /**
      * 
@@ -28,7 +28,7 @@ public class SecurityConfigurationPermission {
      *     The path
      */
     @JsonProperty("path")
-    public Object getPath() {
+    public String getPath() {
         return path;
     }
 
@@ -38,7 +38,7 @@ public class SecurityConfigurationPermission {
      *     The path
      */
     @JsonProperty("path")
-    public void setPath(Object path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -48,7 +48,7 @@ public class SecurityConfigurationPermission {
      *     The excluded
      */
     @JsonProperty("excluded")
-    public Object getExcluded() {
+    public Boolean getExcluded() {
         return excluded;
     }
 
@@ -58,7 +58,7 @@ public class SecurityConfigurationPermission {
      *     The excluded
      */
     @JsonProperty("excluded")
-    public void setExcluded(Object excluded) {
+    public void setExcluded(Boolean excluded) {
         this.excluded = excluded;
     }
 
