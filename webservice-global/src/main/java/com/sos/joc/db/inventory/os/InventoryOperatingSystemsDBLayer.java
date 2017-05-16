@@ -21,20 +21,16 @@ public class InventoryOperatingSystemsDBLayer extends DBLayer {
         super(connection);
     }
 
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryOperatingSystem getInventoryOperatingSystem(Long osId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public DBItemInventoryOperatingSystem getInventoryOperatingSystem(Long osId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_OPERATING_SYSTEMS);
             sql.append(" where id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryOperatingSystem> query = getSession().createQuery(sql.toString());
             query.setParameter("id", osId);
-            List<DBItemInventoryOperatingSystem> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
+            return query.getSingleResult();
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

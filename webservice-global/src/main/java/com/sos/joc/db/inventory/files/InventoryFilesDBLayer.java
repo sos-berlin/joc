@@ -19,15 +19,14 @@ public class InventoryFilesDBLayer extends DBLayer {
         super(connection);
     }
 
-    @SuppressWarnings("unchecked")
     public List<DBItemInventoryFile> getFiles(Long instanceId) throws DBConnectionRefusedException, DBInvalidDataException  {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryFile> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryFile> result = query.list();
+            List<DBItemInventoryFile> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -39,17 +38,16 @@ public class InventoryFilesDBLayer extends DBLayer {
         }        
     }
     
-    @SuppressWarnings("unchecked")
     public List<DBItemInventoryFile> getFilesByFileType(Long instanceId, String fileType) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
             sql.append(" and fileType = :fileType");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryFile> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("fileType", fileType);
-            List<DBItemInventoryFile> result = query.list();
+            List<DBItemInventoryFile> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -61,15 +59,14 @@ public class InventoryFilesDBLayer extends DBLayer {
         }        
     }
     
-    @SuppressWarnings("unchecked")
     public List<String> getFolders(Long instanceId) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select fileDirectory from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<String> result = query.list();
+            List<String> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -81,8 +78,6 @@ public class InventoryFilesDBLayer extends DBLayer {
         }        
     }
     
-    
-    @SuppressWarnings("unchecked")
     public List<String> getFoldersByFolderAndType(Long instanceId, String folderName, Set<String> types) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -98,7 +93,7 @@ public class InventoryFilesDBLayer extends DBLayer {
                     sql.append(" and fileType in (:fileType)");
                 }
             }
-            Query query = getSession().createQuery(sql.toString());
+            Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (folderName != null) {
                 query.setParameter("folderName", folderName + "%");
@@ -110,7 +105,7 @@ public class InventoryFilesDBLayer extends DBLayer {
                     query.setParameterList("fileType", types);
                 }
             }
-            List<String> result = query.list();
+            List<String> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -121,4 +116,5 @@ public class InventoryFilesDBLayer extends DBLayer {
             throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }        
     }
+    
 }
