@@ -22,15 +22,14 @@ public class InventoryLocksDBLayer extends DBLayer {
         super(connection);
     }
 
-    @SuppressWarnings("unchecked")
     public List<DBItemInventoryLock> getLocks(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
             sql.append(" where instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryLock> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryLock> result = query.list();
+            List<DBItemInventoryLock> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -42,8 +41,8 @@ public class InventoryLocksDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryLock> getLocksByFolders(String folderPath, Long instanceId, boolean recursive) throws DBInvalidDataException,
+    public List<DBItemInventoryLock> getLocksByFolders(String folderPath, Long instanceId, boolean recursive)
+            throws DBInvalidDataException,
             DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -59,14 +58,14 @@ public class InventoryLocksDBLayer extends DBLayer {
                 sql.append(" and ifile.fileDirectory = :folderName");
                 sql.append(" and il.instanceId = :instanceId");
             }
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryLock> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (recursive) {
                 query.setParameter("folderName", folderPath + "%");
             } else {
                 query.setParameter("folderName", folderPath);
             }
-            List<DBItemInventoryLock> result = query.list();
+            List<DBItemInventoryLock> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -78,17 +77,17 @@ public class InventoryLocksDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryLock getLock(String lockPath, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public DBItemInventoryLock getLock(String lockPath, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_LOCKS);
             sql.append(" where instanceId = :instanceId");
             sql.append(" and name = :lockPath");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryLock> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("lockPath", lockPath);
-            List<DBItemInventoryLock> result = query.list();
+            List<DBItemInventoryLock> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
             }
@@ -108,11 +107,11 @@ public class InventoryLocksDBLayer extends DBLayer {
             sql.append(" where files.id = locks.fileId");
             sql.append(" and locks.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<Date> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
-            Object result = query.uniqueResult();
+            Date result = query.getSingleResult();
             if (result != null) {
-                return (Date) result;
+                return result;
             }
             return null;
         } catch (SessionException ex) {

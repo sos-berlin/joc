@@ -22,19 +22,15 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
         super(connection);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryProcessClass> getProcessClasses(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryProcessClass> getProcessClasses(Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
             sql.append(" where instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryProcessClass> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryProcessClass> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
+            return query.getResultList();
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -42,7 +38,6 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<DBItemInventoryProcessClass> getProcessClassesByFolders(String folderName, Long instanceId, boolean recursive)
             throws DBInvalidDataException, DBConnectionRefusedException {
         try {
@@ -59,18 +54,14 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
                 sql.append(" and ifile.fileDirectory = :folderName");
                 sql.append(" and ipc.instanceId = :instanceId");
             }
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryProcessClass> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (recursive) {
                 query.setParameter("folderName", folderName + "%");
             } else {
                 query.setParameter("folderName", folderName);
             }
-            List<DBItemInventoryProcessClass> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-            return null;
+            return query.getResultList();
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -78,18 +69,17 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryProcessClass getProcessClass(String processClassPath, Long instanceId) throws DBInvalidDataException,
-            DBConnectionRefusedException {
+    public DBItemInventoryProcessClass getProcessClass(String processClassPath, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_PROCESS_CLASSES);
             sql.append(" where instanceId = :instanceId");
             sql.append(" and name = :processClassPath");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryProcessClass> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("processClassPath", processClassPath);
-            List<DBItemInventoryProcessClass> result = query.list();
+            List<DBItemInventoryProcessClass> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
             }
@@ -109,11 +99,11 @@ public class InventoryProcessClassesDBLayer extends DBLayer {
             sql.append(" where files.id = pc.fileId");
             sql.append(" and pc.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<Date> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
-            Object result = query.uniqueResult();
+            Date result = query.getSingleResult();
             if (result != null) {
-                return (Date) result;
+                return result;
             }
             return null;
         } catch (SessionException ex) {

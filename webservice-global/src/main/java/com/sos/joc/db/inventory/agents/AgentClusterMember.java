@@ -13,8 +13,8 @@ public class AgentClusterMember extends AgentOfCluster {
     @JsonIgnore
     private Long agentClusterId;
     
-    public AgentClusterMember(Long agentClusterId, String url, Date surveyDate, String version, Integer state, Date startedAt, String hostname, String osName,
-            String osArchitecture, String osDistribution) {
+    public AgentClusterMember(Long agentClusterId, String url, Date surveyDate, String version, Integer state, Date startedAt,
+            String hostname, String osName, String osArchitecture, String osDistribution) {
         this.agentClusterId = agentClusterId;
         JobSchedulerState jsState = new JobSchedulerState();
         if (state != null && state == 0) {

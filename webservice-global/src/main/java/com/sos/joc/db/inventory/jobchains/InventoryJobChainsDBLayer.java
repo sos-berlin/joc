@@ -30,21 +30,17 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         super(connection);
     }
 
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryJobChain getJobChainByPath(String jobChainPath, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public DBItemInventoryJobChain getJobChainByPath(String jobChainPath, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where name = :name");
             sql.append(" and instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryJobChain> query = getSession().createQuery(sql.toString());
             query.setParameter("name", jobChainPath);
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryJobChain> result = query.list();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
+            return query.getSingleResult();
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -52,17 +48,17 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }        
     }
     
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryJobChain getJobChainByName(String jobChainName, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public DBItemInventoryJobChain getJobChainByName(String jobChainName, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where baseName = :name");
             sql.append(" and instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryJobChain> query = getSession().createQuery(sql.toString());
             query.setParameter("name", jobChainName);
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryJobChain> result = query.list();
+            List<DBItemInventoryJobChain> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
             }
@@ -82,13 +78,9 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" where ifile.id = ijc.fileId");
             sql.append(" and ijc.id = :id");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<Date> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
-            Object result = query.uniqueResult();
-            if (result != null) {
-                return (Date)result;
-            }
-            return null;
+            return query.getSingleResult();
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -96,8 +88,8 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }
     }
     
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES);
@@ -105,10 +97,10 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" and instanceId = :instanceId");
             sql.append(" order by ordering");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryJobChainNode> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryJobChainNode> result = query.list();
+            List<DBItemInventoryJobChainNode> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -120,8 +112,8 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }
     }
     
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath, boolean recursive, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryJobChain> getJobChainsByFolder(String folderPath, boolean recursive, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             if (recursive) {
@@ -136,14 +128,14 @@ public class InventoryJobChainsDBLayer extends DBLayer {
                 sql.append(" and ifile.fileDirectory = :name");
                 sql.append(" and ijc.instanceId = :instanceId");
             }
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryJobChain> query = getSession().createQuery(sql.toString());
             if (recursive) {
                 query.setParameter("name", folderPath + "%");
             } else {
                 query.setParameter("name", folderPath);
             }
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryJobChain> result = query.list();
+            List<DBItemInventoryJobChain> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -155,15 +147,14 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }        
     }
     
-    @SuppressWarnings("unchecked")
     public List<DBItemInventoryJobChain> getJobChains(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAINS);
             sql.append(" where instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryJobChain> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryJobChain> result = query.list();
+            List<DBItemInventoryJobChain> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -175,7 +166,8 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }       
     }
     
-    public boolean isEndNode(String jobChain, String node, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public boolean isEndNode(String jobChain, String node, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select count(*) from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn, ");
@@ -185,11 +177,11 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" and ijcn.nodeType = 5");
             sql.append(" and ijcn.instanceId = :instanceId");
             sql.append(" and ijc.name = :jobChain");
-            Query query = getSession().createQuery(sql.toString());
+            Query<Integer> query = getSession().createQuery(sql.toString());
             query.setParameter("nodeName", node);
             query.setParameter("jobChain", jobChain);
             query.setParameter("instanceId", instanceId);
-            Long result = (Long) query.uniqueResult();
+            Integer result = query.getSingleResult();
             if (result == null) {
                 return false;
             }
@@ -201,7 +193,8 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }        
     }
     
-    public boolean isErrorNode(String jobChain, String node, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public boolean isErrorNode(String jobChain, String node, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select count(*) from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn, ");
@@ -210,11 +203,11 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" and ijcn.errorState = :nodeName");
             sql.append(" and ijcn.instanceId = :instanceId");
             sql.append(" and ijc.name = :jobChain");
-            Query query = getSession().createQuery(sql.toString());
+            Query<Integer> query = getSession().createQuery(sql.toString());
             query.setParameter("nodeName", node);
             query.setParameter("jobChain", jobChain);
             query.setParameter("instanceId", instanceId);
-            Long result = (Long) query.uniqueResult();
+            Integer result = query.getSingleResult();
             if (result == null) {
                 return false;
             }
@@ -232,9 +225,9 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append("select ijc.name from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
             sql.append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn");
             sql.append(" where ijc.id = ijcn.jobChainId and ijcn.nodeType = 2 and ijc.instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<String> result = query.list();
+            List<String> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -246,7 +239,8 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }
     }
     
-    public Map<String, Set<String>> getMapOfOuterJobChains(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public Map<String, Set<String>> getMapOfOuterJobChains(Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             Map<String, Set<String>> nestedJobChains = new HashMap<String, Set<String>>();
             StringBuilder sql = new StringBuilder();
@@ -254,9 +248,9 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append("(ijc.name, ijcn.nestedJobChainName) from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
             sql.append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn");
             sql.append(" where ijc.id = ijcn.jobChainId and ijcn.nodeType = 2 and ijc.instanceId = :instanceId");
-            Query query = getSession().createQuery(sql.toString());
+            Query<NestedJobChain> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<NestedJobChain> result = query.list();
+            List<NestedJobChain> result = query.getResultList();
             if (result != null) {
                 for (NestedJobChain item : result) {
                    if (nestedJobChains.containsKey(item.getInnerJobChain())) {
@@ -276,7 +270,8 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }
     }
     
-    public List<String> getInnerJobChains(String outerJobCain, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<String> getInnerJobChains(String outerJobChain, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ijcn.nestedJobChainName from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn, ");
@@ -284,10 +279,10 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" where ijc.id = ijcn.jobChainId and ijcn.nodeType = 2");
             sql.append(" and ijc.instanceId = :instanceId");
             sql.append(" and ijc.name = :jobChain");
-            Query query = getSession().createQuery(sql.toString());
+            Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            query.setParameter("jobChain", outerJobCain);
-            List<String> result = query.list();
+            query.setParameter("jobChain", outerJobChain);
+            List<String> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -307,10 +302,10 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" where ijc.id = ijcn.jobChainId and ijcn.nodeType = 1");
             sql.append(" and ijc.instanceId = :instanceId");
             sql.append(" and ijcn.jobName = :job");
-            Query query = getSession().createQuery(sql.toString());
+            Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("job", job);
-            List<String> result = query.list();
+            List<String> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -321,4 +316,5 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
         }
     }
+    
 }
