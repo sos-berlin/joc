@@ -25,7 +25,7 @@ public class SOSSecurityConfiguration {
     private SecurityConfiguration securityConfiguration = new SecurityConfiguration();
     private SOSSecurityConfigurationMasters listOfMasters;
 
-    public SOSSecurityConfiguration(){
+    public SOSSecurityConfiguration() {
         super();
         securityConfiguration = new SecurityConfiguration();
         ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
@@ -70,6 +70,61 @@ public class SOSSecurityConfiguration {
         }
     }
 
+    private void writeUsers() {
+        writeIni.get("users").clear();
+        for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
+            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser);
+            writeIni.get("users").put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
+        }
+    }
+
+    private void writeMasters() {
+        writeIni.get("roles").clear();
+        writeIni.get("folders").clear();
+
+        Map<String, SOSSecurityConfigurationRoleEntry> roles = new HashMap<String, SOSSecurityConfigurationRoleEntry>();
+        Map<String, SOSSecurityConfigurationFolderEntry> folders = new HashMap<String, SOSSecurityConfigurationFolderEntry>();
+
+        for (SecurityConfigurationMaster securityConfigurationMaster : securityConfiguration.getMasters()) {
+            String master = securityConfigurationMaster.getMaster();
+            for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
+                String role = securityConfigurationRole.getRole();
+                String folderKey = SOSSecurityConfigurationFolderEntry.getFolderKey(master, role);
+                if (roles.get(role) == null) {
+                    SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = new SOSSecurityConfigurationRoleEntry(role);
+                    roles.put(role, sosSecurityConfigurationRoleEntry);
+                }
+
+                if (folders.get(folderKey) == null) {
+                    SOSSecurityConfigurationFolderEntry sosSecurityConfigurationFolderEntry = new SOSSecurityConfigurationFolderEntry(folderKey);
+                    folders.put(folderKey, sosSecurityConfigurationFolderEntry);
+                }
+
+                for (SecurityConfigurationFolder securityConfigurationFolder : securityConfigurationRole.getFolders()) {
+                    SOSSecurityFolderItem sosSecurityFolderItem = new SOSSecurityFolderItem(master, securityConfigurationFolder);
+                    folders.get(folderKey).addFolder(sosSecurityFolderItem.getIniValue());
+                }
+                for (SecurityConfigurationPermission securityConfigurationPermission : securityConfigurationRole.getPermissions()) {
+                    SOSSecurityPermissionItem sosSecurityPermissionItem = new SOSSecurityPermissionItem(master, securityConfigurationPermission);
+                    roles.get(role).addPermission(sosSecurityPermissionItem.getIniValue());
+                }
+            }
+        }
+
+        for (String role : roles.keySet()) {
+            SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = roles.get(role);
+            if (!"".equals(sosSecurityConfigurationRoleEntry.getIniWriteString())){
+                writeIni.get("roles").put(role, sosSecurityConfigurationRoleEntry.getIniWriteString());
+            }
+        }
+        for (String masterAndRole : folders.keySet()) {
+            SOSSecurityConfigurationFolderEntry sosSecurityConfigurationFolderEntry = folders.get(masterAndRole);
+            if (!"".equals(sosSecurityConfigurationFolderEntry.getIniWriteString())){
+                writeIni.get("folders").put(masterAndRole, sosSecurityConfigurationFolderEntry.getIniWriteString());
+            }
+        }
+    }
+
     public SecurityConfiguration readConfiguration() {
         addUsers();
         addRoles();
@@ -79,46 +134,6 @@ public class SOSSecurityConfiguration {
         return this.securityConfiguration;
     }
 
-    private void writeUsers() {
-        writeIni.get("users").clear();
-        for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
-            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser);
-            writeIni.get("users").put(securityConfigurationUser.getUser(),sosSecurityConfigurationUserEntry.getIniWriteString());
-        }
-    }
-
-    private void writeMasters() {
-        writeIni.get("roles").clear();
-//        ini.getSection("folders").clear();
-        
-        
-        Map<String, SOSSecurityConfigurationRoleEntry> roles = new HashMap<String,SOSSecurityConfigurationRoleEntry>();
-        for (SecurityConfigurationMaster securityConfigurationMaster : securityConfiguration.getMasters()) {
-            String master = securityConfigurationMaster.getMaster();
-            for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
-                String role = securityConfigurationRole.getRole();
-                if (roles.get(role) == null){
-                    SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = new SOSSecurityConfigurationRoleEntry(role);
-                    roles.put(role,sosSecurityConfigurationRoleEntry);
-                }
-
-                for (SecurityConfigurationFolder securityConfigurationFolder : securityConfigurationRole.getFolders()) {
-              //      ini.get("folders").put(securityConfigurationMaster.getMaster() + "|" + securityConfigurationRole.getRole(),
-              //              securityConfigurationFolder.getFolder() + "/*, \\");
-                }
-                for (SecurityConfigurationPermission securityConfigurationPermission : securityConfigurationRole.getPermissions()) {
-                    SOSSecurityPermissionItem sosSecurityPermissionItem = new SOSSecurityPermissionItem(master, securityConfigurationPermission);
-                    roles.get(role).addPermission(sosSecurityPermissionItem.getIniValue());
-                }
-            }
-        }
-        
-        for (String role : roles.keySet()) {
-            SOSSecurityConfigurationRoleEntry sosSecurityConfigurationRoleEntry = roles.get(role);
-            writeIni.get("roles").put(role, sosSecurityConfigurationRoleEntry.getIniWriteString());
-        }
-    }
-
     public SecurityConfiguration writeConfiguration(SecurityConfiguration securityConfiguration) throws IOException {
         writeIni = new Wini(new File(Globals.getShiroIniFileName()));
 
@@ -126,7 +141,7 @@ public class SOSSecurityConfiguration {
         writeUsers();
         writeMasters();
         writeIni.store();
-        
+
         return this.securityConfiguration;
     }
 }
