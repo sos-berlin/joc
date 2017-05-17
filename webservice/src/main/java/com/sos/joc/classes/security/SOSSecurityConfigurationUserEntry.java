@@ -7,12 +7,12 @@ import com.sos.joc.model.security.SecurityConfigurationUser;
 
 public class SOSSecurityConfigurationUserEntry {
 
-    private String[] listOfUsers;
+    private String[] listOfRolesAndPassword;
     SecurityConfigurationUser securityConfigurationUser;
 
     public SOSSecurityConfigurationUserEntry(String entry) {
         super();
-        listOfUsers = entry.split(",");
+        listOfRolesAndPassword = entry.split(",");
     }
 
     public SOSSecurityConfigurationUserEntry(SecurityConfigurationUser securityConfigurationUser) {
@@ -21,8 +21,8 @@ public class SOSSecurityConfigurationUserEntry {
     }
 
     public String getPassword() {
-        if (listOfUsers.length > 0) {
-            return listOfUsers[0];
+        if (listOfRolesAndPassword.length > 0) {
+            return listOfRolesAndPassword[0];
         } else {
             return "";
         }
@@ -30,14 +30,14 @@ public class SOSSecurityConfigurationUserEntry {
 
     public List<String> getRoles() {
         List<String> listOfRoles = new ArrayList<String>();
-        for (int i = 1; i < listOfUsers.length; i++) {
-            listOfRoles.add(listOfUsers[i]);
+        for (int i = 1; i < listOfRolesAndPassword.length; i++) {
+            listOfRoles.add(listOfRolesAndPassword[i].trim());
         }
         return listOfRoles;
     }
 
     public String getIniWriteString() {
-        String s = "";
+        String s = securityConfigurationUser.getPassword() + ",";
         for (int i=0;i<securityConfigurationUser.getRoles().size();i++){
             s = s + securityConfigurationUser.getRoles().get(i) + ",";
         }

@@ -1,5 +1,7 @@
 package com.sos.joc.classes.security;
 
+import com.sos.joc.model.security.SecurityConfigurationFolder;
+
 public class SOSSecurityFolderItem {
 
     private boolean recursive;
@@ -12,7 +14,13 @@ public class SOSSecurityFolderItem {
         this.normalizedFolder = normalizeFolder();
     }
 
-    
+    public SOSSecurityFolderItem(String master, SecurityConfigurationFolder securityConfigurationFolder) {
+        super();
+        this.folder = securityConfigurationFolder.getFolder();
+        this.normalizedFolder = this.normalizeFolder();
+        this.recursive = securityConfigurationFolder.getRecursive();
+    }
+
     public boolean isRecursive() {
         return recursive;
     }
@@ -34,5 +42,13 @@ public class SOSSecurityFolderItem {
         return folder;
     }
 
+    public String getIniValue() {
+        String s = folder;
+        if (isRecursive()) {
+            s = s + "/*";
+        }
+        return s;
+
+    }
 
 }
