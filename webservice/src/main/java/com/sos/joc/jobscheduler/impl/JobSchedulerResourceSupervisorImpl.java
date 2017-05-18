@@ -13,7 +13,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobscheduler.JobSchedulerVCallable;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSupervisor;
 import com.sos.joc.model.common.JobSchedulerId;
@@ -48,7 +48,7 @@ public class JobSchedulerResourceSupervisorImpl extends JOCResourceImpl implemen
                 if (dbItemInventorySupervisorInstance == null) {
                     String errMessage = String.format("jobschedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerId
                             .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
-                    throw new DBInvalidDataException(errMessage);
+                    throw new DBMissingDataException(errMessage);
                 }
                 entity.setJobscheduler(new JobSchedulerVCallable(dbItemInventorySupervisorInstance, accessToken).call());
             } else {

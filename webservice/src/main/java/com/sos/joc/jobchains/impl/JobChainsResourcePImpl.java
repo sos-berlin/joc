@@ -60,6 +60,9 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 for (JobChainPath jobChainPath : jobChainPaths) {
                     DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(normalizePath(jobChainPath.getJobChain()), instanceId);
+                    if (jobChainFromDb == null) {
+                        continue;
+                    }
                     JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, compact, instanceId);
                     if (jobChain != null) {
                         jobChains.add(jobChain);

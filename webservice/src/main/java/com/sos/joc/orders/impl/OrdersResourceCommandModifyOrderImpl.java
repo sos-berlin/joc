@@ -25,6 +25,7 @@ import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -215,6 +216,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             case "reset_run_time":
                 try {
                     DBItemInventoryOrder dbItem = getDBItem(jobChainPath, order.getOrderId());
+                    if (dbItem == null) {
+                        throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", jobChainPath, order.getOrderId()));
+                    }
                     if (dbItem.getRunTimeIsTemporary() == null) {
                         dbItem.setRunTimeIsTemporary(false); 
                     }
@@ -306,7 +310,11 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
     
     private void updateRunTimeIsTemporary(String jobChainPath, String orderId, boolean value) throws JocException {
-        updateRunTimeIsTemporary(getDBItem(jobChainPath, orderId), value);
+        DBItemInventoryOrder dbItem = getDBItem(jobChainPath, orderId);
+        if (dbItem == null) {
+            throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", jobChainPath, orderId));
+        }
+        updateRunTimeIsTemporary(dbItem, value);
     }
     
     private void updateRunTimeIsTemporary(DBItemInventoryOrder dbItem, boolean value) throws JocException {

@@ -10,7 +10,7 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.os.InventoryOperatingSystemsDBLayer;
-import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.jobscheduler.ClusterMemberType;
 import com.sos.joc.model.jobscheduler.ClusterType;
@@ -70,7 +70,7 @@ public class JobSchedulerPermanent {
                     InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
                     DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstancesByKey(supervisorId);
                     if (schedulerSupervisorInstancesDBItem == null) {
-                        throw new DBInvalidDataException(String.format("supervisor with Id = %s not found in table INVENTORY_INSTANCES", dbItemInventoryInstance
+                        throw new DBMissingDataException(String.format("supervisor with Id = %s not found in table INVENTORY_INSTANCES", dbItemInventoryInstance
                                 .getSupervisorId()));
                     } else {
                         HostPortParameter supervisor = new HostPortParameter();

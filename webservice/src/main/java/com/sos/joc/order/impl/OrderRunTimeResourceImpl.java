@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.OrderFilter;
@@ -39,7 +40,12 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
                 InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
                 DBItemInventoryOrder dbItem = dbLayer.getInventoryOrderByOrderId(jobChainPath, orderFilter.getOrderId(), dbItemInventoryInstance
                         .getId());
-                runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken, dbItem.getRunTimeIsTemporary());
+                if (dbItem == null) {
+                    throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", orderFilter.getJobChain(), orderFilter
+                            .getOrderId()));
+                }
+                runTimeAnswer = RunTime.set(jobChainPath, jocXmlCommand, orderCommand, "//order/run_time", accessToken, dbItem
+                        .getRunTimeIsTemporary());
             }
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {

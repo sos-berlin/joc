@@ -10,6 +10,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobRunTimeResource;
 import com.sos.joc.model.common.RunTime200;
@@ -35,6 +36,9 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             String jobPath = normalizePath(jobFilter.getJob());
             DBItemInventoryJob dbItem = dbLayer.getInventoryJobByName(jobPath, dbItemInventoryInstance.getId());
+            if (dbItem == null) {
+                throw new DBMissingDataException("no entry found in DB for job: " + jobFilter.getJob());
+            }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "source run_time", 0, 0);
             runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, dbItem.getRunTimeIsTemporary());

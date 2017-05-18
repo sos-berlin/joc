@@ -17,6 +17,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.schedule.ScheduleP;
@@ -58,6 +59,9 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
                 for (SchedulePath schedulePath : schedules) {
                     DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePath(schedulePath.getSchedule()), dbItemInventoryInstance
                             .getId());
+                    if (scheduleFromDb == null) {
+                        continue;
+                    }
                     ScheduleP scheduleP = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
                     if (scheduleP != null) {
                         schedulesToAdd.add(scheduleP);

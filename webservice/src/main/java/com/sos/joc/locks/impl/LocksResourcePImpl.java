@@ -52,6 +52,9 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
                 List<LockP> locksToAdd = new ArrayList<LockP>();
                 for (LockPath lockPath : locks) {
                     DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()), dbItemInventoryInstance.getId());
+                    if (lockFromDb == null) {
+                        continue;
+                    }
                     LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
                     if (lock != null) {
                         locksToAdd.add(lock);
