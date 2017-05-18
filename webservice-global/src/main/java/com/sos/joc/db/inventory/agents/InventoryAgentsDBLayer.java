@@ -25,18 +25,18 @@ public class InventoryAgentsDBLayer extends DBLayer {
         super(connection);
     }
 
-    @SuppressWarnings("unchecked")
-    public DBItemInventoryAgentInstance getInventoryAgentInstances(String url, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public DBItemInventoryAgentInstance getInventoryAgentInstances(String url, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_INSTANCES);
             sql.append(" where url = :url");
             sql.append(" and instanceId = :instanceId");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryAgentInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("url", url);
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentInstance> result = query.list();
+            List<DBItemInventoryAgentInstance> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
             }
@@ -48,16 +48,16 @@ public class InventoryAgentsDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryAgentInstance> getInventoryAgentInstances(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryAgentInstance> getInventoryAgentInstances(Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_INSTANCES);
             sql.append(" where instanceId = :instanceId");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryAgentInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentInstance> result = query.list();
+            List<DBItemInventoryAgentInstance> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -69,8 +69,8 @@ public class InventoryAgentsDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<String> getProcessClassesFromAgentCluster(Long agentId, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<String> getProcessClassesFromAgentCluster(Long agentId, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ipc.name from ");
@@ -82,10 +82,10 @@ public class InventoryAgentsDBLayer extends DBLayer {
             sql.append(" and iacm.agentInstanceId = :agentId");
             sql.append(" and ipc.instanceId = :instanceId");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("agentId", agentId);
             query.setParameter("instanceId", instanceId);
-            List<String> result = query.list();
+            List<String> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -97,16 +97,16 @@ public class InventoryAgentsDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<DBItemInventoryAgentCluster> getAgentClusters(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryAgentCluster> getAgentClusters(Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTER);
             sql.append(" where instanceId = :instanceId");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemInventoryAgentCluster> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentCluster> result = query.list();
+            List<DBItemInventoryAgentCluster> result = query.getResultList();
             if (result != null && !result.isEmpty()) {
                 return result;
             }
@@ -118,8 +118,8 @@ public class InventoryAgentsDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<AgentClusterPermanent> getInventoryAgentClusters(Long instanceId, Set<String> agentClusters) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<AgentClusterPermanent> getInventoryAgentClusters(Long instanceId, Set<String> agentClusters)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_P);
@@ -136,7 +136,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
                 }
             }
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<AgentClusterPermanent> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (agentClusters != null && !agentClusters.isEmpty()) {
                 if (agentClusters.size() == 1) {
@@ -145,7 +145,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
                     query.setParameterList("agentCluster", agentClusters);
                 }
             }
-            List<AgentClusterPermanent> result = query.list();
+            List<AgentClusterPermanent> result = query.getResultList();
             return result;
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -154,13 +154,13 @@ public class InventoryAgentsDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<AgentClusterMember> getInventoryAgentClusterMembers(Long instanceId, Set<Long> agentClusterIds) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<AgentClusterMember> getInventoryAgentClusterMembers(Long instanceId, Set<Long> agentClusterIds)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
-            sql.append(
-                    "(iacm.agentClusterId, iacm.url, iacm.ordering, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
+            sql.append(" (iacm.agentClusterId, iacm.url, iacm.ordering, iacm.modified, iai.version, iai.state, iai.startedAt, ");
+            sql.append("ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
             sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
             sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
             sql.append(DBITEM_INVENTORY_OPERATING_SYSTEMS).append(" ios ");
@@ -175,7 +175,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
                 }
             }
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<AgentClusterMember> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (agentClusterIds != null && !agentClusterIds.isEmpty()) {
                 if (agentClusterIds.size() == 1) {
@@ -184,7 +184,7 @@ public class InventoryAgentsDBLayer extends DBLayer {
                     query.setParameterList("agentClusterId", agentClusterIds);
                 }
             }
-            List<AgentClusterMember> result = query.list();
+            List<AgentClusterMember> result = query.getResultList();
             return result;
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -193,12 +193,13 @@ public class InventoryAgentsDBLayer extends DBLayer {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List<AgentClusterMember> getInventoryAgentClusterMembersById(Long instanceId, Long agentClusterId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<AgentClusterMember> getInventoryAgentClusterMembersById(Long instanceId, Long agentClusterId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_CLUSTER_MEMBER);
-            sql.append("(iacm.agentClusterId, iacm.url, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ios.name, ios.architecture, ios.distribution) from ");
+            sql.append(" (iacm.agentClusterId, iacm.url, iacm.modified, iai.version, iai.state, iai.startedAt, ios.hostname, ");
+            sql.append("ios.name, ios.architecture, ios.distribution) from ");
             sql.append(DBITEM_INVENTORY_AGENT_CLUSTERMEMBERS).append(" iacm, ");
             sql.append(DBITEM_INVENTORY_AGENT_INSTANCES).append(" iai, ");
             sql.append(DBITEM_INVENTORY_OPERATING_SYSTEMS).append(" ios ");
@@ -210,12 +211,12 @@ public class InventoryAgentsDBLayer extends DBLayer {
             }
             sql.append(" order by iacm.ordering");
             LOGGER.debug(sql.toString());
-            Query query = getSession().createQuery(sql.toString());
+            Query<AgentClusterMember> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (agentClusterId != null) {
                 query.setParameter("agentClusterId", agentClusterId);
             }
-            List<AgentClusterMember> result = query.list();
+            List<AgentClusterMember> result = query.getResultList();
             return result;
         } catch (SessionException ex) {
             throw new DBConnectionRefusedException(ex);

@@ -17,7 +17,6 @@ import com.sos.joc.model.schedule.UsedByOrder;
 
 public class SchedulePermanent {
 
-    @SuppressWarnings("unchecked")
     public static ScheduleP initSchedule(InventorySchedulesDBLayer dbLayer, DBItemInventorySchedule scheduleFromDb,
             DBItemInventoryInstance instance) throws Exception {
         ScheduleP schedule = new ScheduleP();
@@ -36,7 +35,8 @@ public class SchedulePermanent {
             } else {
                 schedule.setSubstitute(null);
             }
-            List<DBItemInventoryJob> jobsFromDb = dbLayer.getUsedIn(scheduleFromDb.getId(), instance.getId(), DBLayer.DBITEM_INVENTORY_JOBS);
+            List<DBItemInventoryJob> jobsFromDb =
+                    dbLayer.getUsedIn(scheduleFromDb.getId(), instance.getId(), DBItemInventoryJob.class);
             if (jobsFromDb != null && !jobsFromDb.isEmpty()) {
                 List<UsedByJob> listOfUsesByJob = new ArrayList<UsedByJob>();
                 for (DBItemInventoryJob job : jobsFromDb) {
@@ -49,7 +49,7 @@ public class SchedulePermanent {
                 schedule.setUsedByJobs(null);
             }
             List<DBItemInventoryOrder> ordersFromDb = 
-                    dbLayer.getUsedIn(scheduleFromDb.getId(), instance.getId(), DBLayer.DBITEM_INVENTORY_ORDERS);
+                    dbLayer.getUsedIn(scheduleFromDb.getId(), instance.getId(), DBItemInventoryOrder.class);
             if (ordersFromDb != null && !ordersFromDb.isEmpty()) {
                 List<UsedByOrder> listOfUsesByOrder = new ArrayList<UsedByOrder>();
                 for (DBItemInventoryOrder order : ordersFromDb) {
