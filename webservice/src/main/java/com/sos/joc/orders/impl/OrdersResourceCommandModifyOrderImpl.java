@@ -9,8 +9,8 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
-import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -23,6 +23,7 @@ import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
@@ -312,10 +313,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         dbItem.setRunTimeIsTemporary(value);
         try {
             connection.update(dbItem);
-        } catch (SOSException e) {
-            throw new DBInvalidDataException(e);
-        } catch (Exception e) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(e));
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
         }
     }
 }
