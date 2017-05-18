@@ -7,11 +7,13 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.configuration.resource.IJocConfigurationResource;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.configuration.Configuration;
 import com.sos.joc.model.configuration.Configuration200;
@@ -130,6 +132,9 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
             /** get item from DB with the given id */
             JocConfigurationDbItem dbItem = jocConfigurationDBLayer.getJocConfiguration(configuration.getId().longValue());
+            if (dbItem == null) {
+                throw new DBMissingDataException(String.format("no entry found for configuration id: %d", configuration.getId()));
+            }
             Configuration config = setConfigurationValues(dbItem);
 
             /** check permissions */
@@ -168,6 +173,9 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
             /** get item from DB with the given id */
             JocConfigurationDbItem dbItem = jocConfigurationDBLayer.getJocConfiguration(configuration.getId().longValue());
+            if (dbItem == null) {
+                throw new DBMissingDataException(String.format("no entry found for configuration id: %d", configuration.getId()));
+            }
 
             /** check permissions */
             Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(dbItem.getAccount());
@@ -207,6 +215,9 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
             /** get item from DB with the given id */
             JocConfigurationDbItem dbItem = jocConfigurationDBLayer.getJocConfiguration(configuration.getId().longValue());
+            if (dbItem == null) {
+                throw new DBMissingDataException(String.format("no entry found for configuration id: %d", configuration.getId()));
+            }
             /** set shared */
             dbItem.setShared(true);
             /** save item to DB */
@@ -240,6 +251,10 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
             /** get item from DB with the given id */
             JocConfigurationDbItem dbItem = jocConfigurationDBLayer.getJocConfiguration(configuration.getId().longValue());
+            if (dbItem == null) {
+                throw new DBMissingDataException(String.format("no entry found for configuration id: %d", configuration.getId()));
+            }
+            
             /** set private */
             dbItem.setShared(false);
             /** save item to DB */

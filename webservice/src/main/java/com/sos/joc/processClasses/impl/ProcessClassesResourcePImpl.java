@@ -53,7 +53,6 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                     DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePath(processClassPath.getProcessClass()),
                             dbItemInventoryInstance.getId());
                     if (processClassFromDb == null) {
-
                         continue;
                     }
                     listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));

@@ -40,7 +40,7 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             Long instanceId = dbItemInventoryInstance.getId();
             DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(normalizePath(jobFilter.getJob()), instanceId);
             if (inventoryJob == null) {
-                throw new DBMissingDataException(String.format("API CALL %1$s: no entry found in DB for job: %2$s", API_CALL, jobFilter.getJob()));
+                throw new DBMissingDataException("no entry found in DB for job: " + jobFilter.getJob());
             }
             JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId);
             JobP200 entity = new JobP200();

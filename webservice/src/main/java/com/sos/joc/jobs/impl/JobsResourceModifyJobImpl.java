@@ -6,9 +6,10 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
+import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -19,7 +20,9 @@ import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.BulkError;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -159,6 +162,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             case RESET_RUN_TIME:
                 try {
                     DBItemInventoryJob dbItem = getDBItem(jobPath);
+                    if (dbItem == null) {
+                        throw new DBMissingDataException(String.format("no entry found in DB: %1$s", jobPath));
+                    }
                     if (dbItem.getRunTimeIsTemporary() == null) {
                         dbItem.setRunTimeIsTemporary(false); 
                     }
@@ -225,17 +231,21 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
     
     private void updateRunTimeIsTemporary(String jobPath, boolean value) throws JocException {
-        updateRunTimeIsTemporary(getDBItem(jobPath), value);
+        DBItemInventoryJob dbItem = getDBItem(jobPath);
+        if (dbItem == null) {
+            throw new DBMissingDataException(String.format("no entry found in DB: %1$s", jobPath));
+        }
+        updateRunTimeIsTemporary(dbItem, value);
     }
     
     private void updateRunTimeIsTemporary(DBItemInventoryJob dbItem, boolean value) throws JocException {
         dbItem.setRunTimeIsTemporary(value);
         try {
             connection.update(dbItem);
-        } catch (SOSException e) {
-            throw new DBInvalidDataException(e);
-        } catch (Exception e) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(e));
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
         }
     }
 }

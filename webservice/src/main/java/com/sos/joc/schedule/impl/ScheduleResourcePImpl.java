@@ -7,11 +7,13 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
+import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ScheduleFilter;
 import com.sos.joc.model.schedule.ScheduleP;
@@ -38,6 +40,9 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
             InventorySchedulesDBLayer dbLayer = new InventorySchedulesDBLayer(connection);
             DBItemInventorySchedule scheduleFromDb = dbLayer.getSchedule(normalizePath(scheduleFilter.getSchedule()), dbItemInventoryInstance
                     .getId());
+            if (scheduleFromDb == null) {
+                throw new DBMissingDataException(String.format("no schedule found in DB: %s", scheduleFilter.getSchedule()));
+            }
             ScheduleP schedule = SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, dbItemInventoryInstance);
 
             ScheduleP200 entity = new ScheduleP200();

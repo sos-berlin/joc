@@ -9,8 +9,8 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
-import com.sos.exception.SOSException;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -23,7 +23,9 @@ import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -214,6 +216,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             case "reset_run_time":
                 try {
                     DBItemInventoryOrder dbItem = getDBItem(jobChainPath, order.getOrderId());
+                    if (dbItem == null) {
+                        throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", jobChainPath, order.getOrderId()));
+                    }
                     if (dbItem.getRunTimeIsTemporary() == null) {
                         dbItem.setRunTimeIsTemporary(false); 
                     }
@@ -305,17 +310,21 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
     
     private void updateRunTimeIsTemporary(String jobChainPath, String orderId, boolean value) throws JocException {
-        updateRunTimeIsTemporary(getDBItem(jobChainPath, orderId), value);
+        DBItemInventoryOrder dbItem = getDBItem(jobChainPath, orderId);
+        if (dbItem == null) {
+            throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", jobChainPath, orderId));
+        }
+        updateRunTimeIsTemporary(dbItem, value);
     }
     
     private void updateRunTimeIsTemporary(DBItemInventoryOrder dbItem, boolean value) throws JocException {
         dbItem.setRunTimeIsTemporary(value);
         try {
             connection.update(dbItem);
-        } catch (SOSException e) {
-            throw new DBInvalidDataException(e);
-        } catch (Exception e) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(e));
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
         }
     }
 }

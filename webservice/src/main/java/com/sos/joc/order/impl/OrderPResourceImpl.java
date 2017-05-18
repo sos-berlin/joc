@@ -13,6 +13,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderP;
@@ -42,6 +43,9 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
             DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePath(orderFilter.getJobChain()), orderFilter
                     .getOrderId(), instanceId);
+            if (dbItemInventoryOrder == null) {
+               throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", orderFilter.getJobChain(), orderFilter.getOrderId()));
+            }
             OrderP order = new OrderP();
             order.setSurveyDate(dbItemInventoryOrder.getModified());
             order.setPath(dbItemInventoryOrder.getName());

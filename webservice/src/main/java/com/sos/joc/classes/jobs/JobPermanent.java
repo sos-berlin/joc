@@ -98,10 +98,7 @@ public class JobPermanent {
             } else {
                 job.setJobChains(null);
             }
-            Date configDate = dbLayer.getJobConfigurationDate(inventoryJob.getId());
-            if (configDate != null) {
-                job.setConfigurationDate(configDate);
-            }
+            job.setConfigurationDate(dbLayer.getJobConfigurationDate(inventoryJob.getId()));
         } else {
             job.setLocks(null);
             job.setJobChains(null);

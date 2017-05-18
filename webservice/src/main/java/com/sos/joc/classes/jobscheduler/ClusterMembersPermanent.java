@@ -65,11 +65,13 @@ public class ClusterMembersPermanent {
                     }
                     if (instance.getSupervisorId() != DBLayer.DEFAULT_ID) {
                         DBItemInventoryInstance supervisorFromDb = instanceLayer.getInventoryInstancesByKey(instance.getSupervisorId());
-                        HostPortParameter supervisor = new HostPortParameter();
-                        supervisor.setHost(supervisorFromDb.getHostname());
-                        supervisor.setJobschedulerId(supervisorFromDb.getSchedulerId());
-                        supervisor.setPort(supervisorFromDb.getPort());
-                        jobscheduler.setSupervisor(supervisor);
+                        if (supervisorFromDb != null) {
+                            HostPortParameter supervisor = new HostPortParameter();
+                            supervisor.setHost(supervisorFromDb.getHostname());
+                            supervisor.setJobschedulerId(supervisorFromDb.getSchedulerId());
+                            supervisor.setPort(supervisorFromDb.getPort());
+                            jobscheduler.setSupervisor(supervisor);
+                        }
                     }
                     masters.add(jobscheduler);
                 }
