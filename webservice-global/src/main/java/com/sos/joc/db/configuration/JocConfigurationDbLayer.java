@@ -9,6 +9,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.exceptions.SOSHibernateQueryException;
+import com.sos.hibernate.exceptions.SOSHibernateQueryNonUniqueResultException;
 import com.sos.hibernate.exceptions.SOSHibernateSessionException;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
@@ -136,7 +137,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
 
     }
 
-    public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,SOSHibernateQueryException {
         StringBuilder sql = new StringBuilder();
         sql.append("from ").append(JOC_CONFIGURATION_DB_ITEM).append(" where id = :id");
         Query<JocConfigurationDbItem> query = sosHibernateSession.createQuery(sql.toString());
