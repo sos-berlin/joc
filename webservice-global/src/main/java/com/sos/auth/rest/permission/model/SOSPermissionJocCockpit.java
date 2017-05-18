@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.05.11 um 02:07:24 PM CEST 
+// Generiert: 2017.05.18 um 10:46:58 AM CEST 
 //
 
 
@@ -44,7 +44,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
- *                   &lt;element name="Execute">
+ *                   &lt;element name="execute">
  *                     &lt;complexType>
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -3143,7 +3143,7 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
-     *         &lt;element name="Execute">
+     *         &lt;element name="execute">
      *           &lt;complexType>
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
@@ -3200,7 +3200,7 @@ public class SOSPermissionJocCockpit {
 
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.JobschedulerMaster.View view;
-        @XmlElement(name = "Execute", required = true)
+        @XmlElement(required = true)
         protected SOSPermissionJocCockpit.JobschedulerMaster.Execute execute;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.JobschedulerMaster.Administration administration;
