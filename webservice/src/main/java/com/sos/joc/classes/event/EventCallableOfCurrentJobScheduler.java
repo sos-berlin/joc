@@ -203,6 +203,8 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             break;
                         }
                         eventSnapshot.setPath(eventSnapshot.getEventType());
+                    } else {
+                        continue;
                     }
                     
                 } else {
@@ -291,6 +293,8 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         if (state!= null && (state.contains("stop") || state.contains("waiting"))) {
                             removeSavedInventoryInstance();
                         }
+                    } else {
+                        continue;
                     }
                 }
             }
