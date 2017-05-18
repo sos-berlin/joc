@@ -4,19 +4,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.query.Query;
-import org.hibernate.SessionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class InventoryLocksDBLayer extends DBLayer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryLocksDBLayer.class);
 
     public InventoryLocksDBLayer(SOSHibernateSession connection) {
         super(connection);
@@ -29,15 +25,15 @@ public class InventoryLocksDBLayer extends DBLayer {
             sql.append(" where instanceId = :instanceId");
             Query<DBItemInventoryLock> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryLock> result = query.getResultList();
+            List<DBItemInventoryLock> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -65,15 +61,15 @@ public class InventoryLocksDBLayer extends DBLayer {
             } else {
                 query.setParameter("folderName", folderPath);
             }
-            List<DBItemInventoryLock> result = query.getResultList();
+            List<DBItemInventoryLock> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -87,15 +83,11 @@ public class InventoryLocksDBLayer extends DBLayer {
             Query<DBItemInventoryLock> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("lockPath", lockPath);
-            List<DBItemInventoryLock> result = query.getResultList();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
-        } catch (SessionException ex) {
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -106,18 +98,13 @@ public class InventoryLocksDBLayer extends DBLayer {
             sql.append(DBITEM_INVENTORY_LOCKS).append(" locks ");
             sql.append(" where files.id = locks.fileId");
             sql.append(" and locks.id = :id");
-            LOGGER.debug(sql.toString());
             Query<Date> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
-            Date result = query.getSingleResult();
-            if (result != null) {
-                return result;
-            }
-            return null;
-        } catch (SessionException ex) {
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 

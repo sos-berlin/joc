@@ -3,12 +3,10 @@ package com.sos.joc.db.inventory.agents;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.SessionException;
 import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentCluster;
 import com.sos.jitl.reporting.db.DBItemInventoryAgentInstance;
 import com.sos.jitl.reporting.db.DBLayer;
@@ -17,7 +15,6 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class InventoryAgentsDBLayer extends DBLayer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryAgentsDBLayer.class);
     private static final String AGENT_CLUSTER_MEMBER = AgentClusterMember.class.getName();
     private static final String AGENT_CLUSTER_P = AgentClusterPermanent.class.getName();
 
@@ -32,19 +29,18 @@ public class InventoryAgentsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_INSTANCES);
             sql.append(" where url = :url");
             sql.append(" and instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
             Query<DBItemInventoryAgentInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("url", url);
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentInstance> result = query.getResultList();
+            List<DBItemInventoryAgentInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result.get(0);
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -54,18 +50,17 @@ public class InventoryAgentsDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_INSTANCES);
             sql.append(" where instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
             Query<DBItemInventoryAgentInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentInstance> result = query.getResultList();
+            List<DBItemInventoryAgentInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -81,19 +76,18 @@ public class InventoryAgentsDBLayer extends DBLayer {
             sql.append(" and iac.id = iacm.agentClusterId");
             sql.append(" and iacm.agentInstanceId = :agentId");
             sql.append(" and ipc.instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
             Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("agentId", agentId);
             query.setParameter("instanceId", instanceId);
-            List<String> result = query.getResultList();
+            List<String> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -103,18 +97,17 @@ public class InventoryAgentsDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_AGENT_CLUSTER);
             sql.append(" where instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
             Query<DBItemInventoryAgentCluster> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryAgentCluster> result = query.getResultList();
+            List<DBItemInventoryAgentCluster> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -135,7 +128,6 @@ public class InventoryAgentsDBLayer extends DBLayer {
                     sql.append(" and ipc.name in (:agentCluster)");
                 }
             }
-            LOGGER.debug(sql.toString());
             Query<AgentClusterPermanent> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (agentClusters != null && !agentClusters.isEmpty()) {
@@ -145,12 +137,11 @@ public class InventoryAgentsDBLayer extends DBLayer {
                     query.setParameterList("agentCluster", agentClusters);
                 }
             }
-            List<AgentClusterPermanent> result = query.getResultList();
-            return result;
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -174,7 +165,6 @@ public class InventoryAgentsDBLayer extends DBLayer {
                     sql.append(" and iacm.agentClusterId in (:agentClusterId)");
                 }
             }
-            LOGGER.debug(sql.toString());
             Query<AgentClusterMember> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (agentClusterIds != null && !agentClusterIds.isEmpty()) {
@@ -184,12 +174,11 @@ public class InventoryAgentsDBLayer extends DBLayer {
                     query.setParameterList("agentClusterId", agentClusterIds);
                 }
             }
-            List<AgentClusterMember> result = query.getResultList();
-            return result;
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -210,18 +199,16 @@ public class InventoryAgentsDBLayer extends DBLayer {
                 sql.append(" and iacm.agentClusterId = :agentClusterId");
             }
             sql.append(" order by iacm.ordering");
-            LOGGER.debug(sql.toString());
             Query<AgentClusterMember> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (agentClusterId != null) {
                 query.setParameter("agentClusterId", agentClusterId);
             }
-            List<AgentClusterMember> result = query.getResultList();
-            return result;
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.sos.joc;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
@@ -232,10 +228,7 @@ public class Globals {
         try {
             stream = Globals.class.getResourceAsStream(versionFile);
             if (stream != null) {
-                JsonReader rdr = Json.createReader(stream);
-                JsonObject json = rdr.readObject();
-                json.getString("version", "unknown");
-                LOGGER.info("JOC Cockpit version = " + json.getString("version","unknown"));
+                LOGGER.info("JOC Cockpit version = " + Json.createReader(stream).readObject().getString("version", "unknown"));
             }
         } catch (Exception e) {
             LOGGER.warn(String.format("Error while reading %1$s:", versionFile), e);
