@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SessionException;
 import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
@@ -19,8 +17,6 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 
 /** @author Uwe Risse */
 public class InventoryJobsDBLayer extends DBLayer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryJobsDBLayer.class);
 
     public InventoryJobsDBLayer(SOSHibernateSession conn) {
         super(conn);
@@ -34,15 +30,14 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append(DBITEM_INVENTORY_JOBS);
             sql.append(" where instanceId = :instanceId");
             sql.append(" and name  = :name");
-            LOGGER.debug(sql.toString());
             Query<DBItemInventoryJob> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             query.setParameter("name", name);
-            return query.getSingleResult();
-        } catch (SessionException ex) {
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -54,11 +49,11 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append(" where instanceId = :instanceId");
             Query<DBItemInventoryJob> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            return query.getResultList();
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -77,11 +72,11 @@ public class InventoryJobsDBLayer extends DBLayer {
                 query.setParameter("isOrderJob", isOrderJob);
             }
             query.setParameter("instanceId", instanceId);
-            return query.getResultList();
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -93,14 +88,13 @@ public class InventoryJobsDBLayer extends DBLayer {
             sql.append(DBITEM_INVENTORY_JOBS).append(" ij ");
             sql.append(" where ifile.id = ij.fileId");
             sql.append(" and ij.id = :id");
-            LOGGER.debug(sql.toString());
             Query<Date> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
-            return query.getSingleResult();
-        } catch (SessionException ex) {
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -116,15 +110,15 @@ public class InventoryJobsDBLayer extends DBLayer {
             Query<DBItemInventoryLock> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryLock> result = query.getResultList();
+            List<DBItemInventoryLock> result = getSession().getResultList(query);
             if (result != null) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -140,15 +134,15 @@ public class InventoryJobsDBLayer extends DBLayer {
             Query<DBItemInventoryJobChain> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryJobChain> result = query.getResultList();
+            List<DBItemInventoryJobChain> result = getSession().getResultList(query);
             if (result != null) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -168,15 +162,15 @@ public class InventoryJobsDBLayer extends DBLayer {
                 query.setParameter("isOrderJob", isOrderJob);
             }
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventoryJob> result = query.getResultList();
+            List<DBItemInventoryJob> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -212,15 +206,15 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (isOrderJob != null) {
                 query.setParameter("isOrderJob", isOrderJob);
             }
-            List<DBItemInventoryJob> result = query.getResultList();
+            List<DBItemInventoryJob> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
     
@@ -244,15 +238,15 @@ public class InventoryJobsDBLayer extends DBLayer {
             if (jobPath != null) {
                 query.setParameter("jobPath", jobPath);
             }
-            List<String> result = query.getResultList();
+            List<String> result = getSession().getResultList(query);
             if (result != null) {
                 return result;
             }
             return new ArrayList<String>();
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
     

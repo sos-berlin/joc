@@ -6,10 +6,10 @@ import java.util.Set;
 
 import javax.persistence.TemporalType;
 
-import org.hibernate.SessionException;
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -17,14 +17,12 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.order.OrderPath;
 
-
-@SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
 public class AuditLogDBLayer extends DBLayer {
 
     public AuditLogDBLayer(SOSHibernateSession connection) {
         super(connection);
     }
-    
+
     public List<DBItemAuditLog> getAuditLogByOrders(String schedulerId, List<OrderPath> orders, Integer limit, Date from, Date to, String ticketLink,
             String account) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
@@ -35,7 +33,7 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and created >= :from");
             }
             if (to != null) {
-                sql.append(" and created <= :to");                
+                sql.append(" and created <= :to");
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
@@ -45,24 +43,24 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (orders != null && !orders.isEmpty()) {
                 sql.append(" and");
-                for(int i = 0; i < orders.size(); i++) {
-                    if(i == 0) {
+                for (int i = 0; i < orders.size(); i++) {
+                    if (i == 0) {
                         sql.append(" (");
-                    } else if(i != 0 && i != orders.size()) {
+                    } else if (i != 0 && i != orders.size()) {
                         sql.append(" or");
                     }
                     sql.append(" (jobChain = :jobChain").append(i);
-                    if(orders.get(i).getOrderId() != null && !orders.get(i).getOrderId().isEmpty()) {
+                    if (orders.get(i).getOrderId() != null && !orders.get(i).getOrderId().isEmpty()) {
                         sql.append(" and orderId = :orderId").append(i);
                     }
                     sql.append(")");
-                    if(i == orders.size() -1) {
+                    if (i == orders.size() - 1) {
                         sql.append(")");
                     }
                 }
             }
             sql.append(" order by created desc");
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
@@ -80,7 +78,7 @@ public class AuditLogDBLayer extends DBLayer {
                 for (int i = 0; i < orders.size(); i++) {
                     String jobChain = orders.get(i).getJobChain();
                     query.setParameter("jobChain" + i, jobChain);
-                    if(orders.get(i).getOrderId() != null && !orders.get(i).getOrderId().isEmpty()) {
+                    if (orders.get(i).getOrderId() != null && !orders.get(i).getOrderId().isEmpty()) {
                         query.setParameter("orderId" + i, orders.get(i).getOrderId());
                     }
                 }
@@ -88,17 +86,16 @@ public class AuditLogDBLayer extends DBLayer {
             if (limit != null) {
                 query.setMaxResults(limit);
             }
-            List<DBItemAuditLog> result = query.list();
-            return result;
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
-        } 
+            throw new DBInvalidDataException(ex);
+        }
     }
 
-    public List<DBItemAuditLog> getAuditLogByJobs(String schedulerId, List<JobPath> jobs, Integer limit, Date from, Date to, String ticketLink, String account)
-            throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<DBItemAuditLog> getAuditLogByJobs(String schedulerId, List<JobPath> jobs, Integer limit, Date from, Date to, String ticketLink,
+            String account) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_AUDIT_LOG);
@@ -107,7 +104,7 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and created >= :from");
             }
             if (to != null) {
-                sql.append(" and created <= :to");                
+                sql.append(" and created <= :to");
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
@@ -117,19 +114,19 @@ public class AuditLogDBLayer extends DBLayer {
             }
             if (jobs != null && !jobs.isEmpty()) {
                 sql.append(" and");
-                for(int i = 0; i < jobs.size(); i++) {
-                    if(i == 0) {
+                for (int i = 0; i < jobs.size(); i++) {
+                    if (i == 0) {
                         sql.append(" (");
-                    } else if(i != 0 && i != jobs.size()) {
+                    } else if (i != 0 && i != jobs.size()) {
                         sql.append(" or");
                     }
                     sql.append(" (job = :job").append(i).append(")");
-                    if(i == jobs.size() -1) {
+                    if (i == jobs.size() - 1) {
                         sql.append(")");
                     }
                 }
             }
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
@@ -152,13 +149,12 @@ public class AuditLogDBLayer extends DBLayer {
             if (limit != null) {
                 query.setMaxResults(limit);
             }
-            List<DBItemAuditLog> result = query.list();
-            return result;
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
-        } 
+            throw new DBInvalidDataException(ex);
+        }
     }
 
     public List<DBItemAuditLog> getAllAuditLogs(String schedulerId, Integer limit, Date from, Date to, String ticketLink, String account)
@@ -171,7 +167,7 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and created >= :from");
             }
             if (to != null) {
-                sql.append(" and created <= :to");                
+                sql.append(" and created <= :to");
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
@@ -179,7 +175,7 @@ public class AuditLogDBLayer extends DBLayer {
             if (account != null && !account.isEmpty()) {
                 sql.append(" and account = :account");
             }
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
@@ -196,13 +192,12 @@ public class AuditLogDBLayer extends DBLayer {
             if (limit != null) {
                 query.setMaxResults(limit);
             }
-            List<DBItemAuditLog> result = query.list();
-            return result;
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
-        } 
+            throw new DBInvalidDataException(ex);
+        }
     }
 
     public List<DBItemAuditLog> getAuditLogByFolders(String schedulerId, Set<String> folders, Integer limit, Date from, Date to, String ticketLink,
@@ -215,7 +210,7 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and created >= :from");
             }
             if (to != null) {
-                sql.append(" and created <= :to");                
+                sql.append(" and created <= :to");
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
@@ -230,7 +225,7 @@ public class AuditLogDBLayer extends DBLayer {
                     sql.append(" and folder in (:folder)");
                 }
             }
-            Query query = getSession().createQuery(sql.toString());
+            Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
@@ -254,12 +249,11 @@ public class AuditLogDBLayer extends DBLayer {
             if (limit != null) {
                 query.setMaxResults(limit);
             }
-            List<DBItemAuditLog> result = query.list();
-            return result;
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
-        } 
+            throw new DBInvalidDataException(ex);
+        }
     }
 }

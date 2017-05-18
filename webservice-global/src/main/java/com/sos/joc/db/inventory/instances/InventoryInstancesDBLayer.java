@@ -3,12 +3,10 @@ package com.sos.joc.db.inventory.instances;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.SessionException;
 import org.hibernate.query.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -19,8 +17,6 @@ import com.sos.joc.exceptions.DBMissingDataException;
 /** @author Uwe Risse */
 public class InventoryInstancesDBLayer extends DBLayer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InventoryInstancesDBLayer.class);
-
     public InventoryInstancesDBLayer(SOSHibernateSession conn) {
         super(conn);
     }
@@ -29,10 +25,9 @@ public class InventoryInstancesDBLayer extends DBLayer {
             throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
-            LOGGER.debug(sql);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            List<DBItemInventoryInstance> result = query.getResultList();
+            List<DBItemInventoryInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return getRunningJobSchedulerClusterMember(result, accessToken);
             } else {
@@ -42,10 +37,10 @@ public class InventoryInstancesDBLayer extends DBLayer {
             }
         } catch (DBMissingDataException ex) {
             throw ex;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -53,12 +48,11 @@ public class InventoryInstancesDBLayer extends DBLayer {
             throws DBMissingDataException, DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where hostname = :hostname and port = :port", DBITEM_INVENTORY_INSTANCES);
-            LOGGER.debug(sql);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("hostname", host);
             query.setParameter("port", port);
 
-            List<DBItemInventoryInstance> result = query.getResultList();
+            List<DBItemInventoryInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 DBItemInventoryInstance dbItemInventoryInstance = result.get(0);
                 if (!dbItemInventoryInstance.getSchedulerId().equals(schedulerId)) {
@@ -76,10 +70,12 @@ public class InventoryInstancesDBLayer extends DBLayer {
             }
         } catch (DBMissingDataException e){
             throw e;
-        } catch (SessionException ex) {
+        } catch (DBInvalidDataException e){
+            throw e;
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -87,65 +83,58 @@ public class InventoryInstancesDBLayer extends DBLayer {
             throws DBInvalidDataException, DBConnectionRefusedException   {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
-            LOGGER.debug(sql);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
-            List<DBItemInventoryInstance> result = query.getResultList();
+            List<DBItemInventoryInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
     public List<DBItemInventoryInstance> getInventoryInstances() throws DBInvalidDataException, DBConnectionRefusedException {
         try {
-            String sql = "from " + DBITEM_INVENTORY_INSTANCES;
-            Query<DBItemInventoryInstance> query = getSession().createQuery(sql);
-            return query.getResultList();
-        } catch (SessionException ex) {
+            return getSession().getResultList("from " + DBITEM_INVENTORY_INSTANCES);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
     public List<DBItemInventoryInstance> getJobSchedulerIds() throws DBInvalidDataException, DBConnectionRefusedException {
         try {
-            String sql = String.format("from %1$s order by created desc", DBITEM_INVENTORY_INSTANCES);
-            Query<DBItemInventoryInstance> query = getSession().createQuery(sql);
-            return query.getResultList();
-        } catch (SessionException ex) {
+            return getSession().getResultList(String.format("from %1$s order by created desc", DBITEM_INVENTORY_INSTANCES));
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
     public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_INSTANCES);
-            LOGGER.debug(sql);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql);
             query.setParameter("id", id);
-            return query.getSingleResult();
-        } catch (SessionException ex) {
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
     
     public long getInventoryMods() throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("select modified from %s", DBITEM_INVENTORY_INSTANCES);
-            LOGGER.debug(sql);
             Query<Date> query = getSession().createQuery(sql);
-            List<Date> result = query.getResultList();
+            List<Date> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 long mods = 0L;
                 for (Date mod : result) {
@@ -154,10 +143,10 @@ public class InventoryInstancesDBLayer extends DBLayer {
                 return mods;
             }
             return 0L;
-        } catch (SessionException ex) {
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 

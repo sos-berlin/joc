@@ -4,19 +4,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.query.Query;
-import org.hibernate.SessionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class InventorySchedulesDBLayer extends DBLayer {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(InventorySchedulesDBLayer.class);
 
     public InventorySchedulesDBLayer(SOSHibernateSession connection) {
         super(connection);
@@ -29,11 +25,11 @@ public class InventorySchedulesDBLayer extends DBLayer {
             sql.append(" where instanceId = :instanceId");
             Query<DBItemInventorySchedule> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            return query.getResultList();
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -47,15 +43,11 @@ public class InventorySchedulesDBLayer extends DBLayer {
             Query<DBItemInventorySchedule> query = getSession().createQuery(sql.toString());
             query.setParameter("name", schedulePath);
             query.setParameter("instanceId", instanceId);
-            List<DBItemInventorySchedule> result = query.getResultList();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
-        } catch (SessionException ex) {
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -66,15 +58,11 @@ public class InventorySchedulesDBLayer extends DBLayer {
             sql.append(" where id = :id");
             Query<DBItemInventorySchedule> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
-            List<DBItemInventorySchedule> result = query.getResultList();
-            if (result != null && !result.isEmpty()) {
-                return result.get(0);
-            }
-            return null;
-        } catch (SessionException ex) {
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -86,18 +74,13 @@ public class InventorySchedulesDBLayer extends DBLayer {
             sql.append(DBITEM_INVENTORY_SCHEDULES).append(" schedule ");
             sql.append(" where files.id = schedule.fileId");
             sql.append(" and schedule.id = :id");
-            LOGGER.debug(sql.toString());
             Query<Date> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
-            Date result = query.getSingleResult();
-            if (result != null) {
-                return result;
-            }
-            return null;
-        } catch (SessionException ex) {
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -108,15 +91,14 @@ public class InventorySchedulesDBLayer extends DBLayer {
             sql.append("from ").append(clazz.getSimpleName());
             sql.append(" where scheduleId = :id");
             sql.append(" and instanceId = :instanceId");
-            LOGGER.debug(sql.toString());
             Query<T> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
-            return query.getResultList();
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
 
@@ -143,11 +125,11 @@ public class InventorySchedulesDBLayer extends DBLayer {
             } else {
                 query.setParameter("folderName", folderName);
             }
-            return query.getResultList();
-        } catch (SessionException ex) {
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
-            throw new DBInvalidDataException(SOSHibernateSession.getException(ex));
+            throw new DBInvalidDataException(ex);
         }
     }
     

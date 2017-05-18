@@ -339,8 +339,9 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     }
     
     public static String getErrorMessage(JocException e) {
-        String errorOutput = e.getClass().getSimpleName() + ": " +((e.getCause() != null) ? e.getCause().toString() : e.getMessage());
-        LOGGER.error(errorOutput, e);
+        String errorOutput = e.getClass().getSimpleName() + ": " +((e.getCause() != null) ? e.getCause().getMessage() : e.getMessage());
+        String logOutput = e.getClass().getSimpleName() + ": " +((e.getCause() != null) ? e.getCause().toString() : e.toString());
+        LOGGER.error(logOutput, e);
         return errorOutput;
     }
     
