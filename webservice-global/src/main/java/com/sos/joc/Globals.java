@@ -224,14 +224,16 @@ public class Globals {
     
     private static void readVersion() {
         InputStream stream = null;
-        String versionFile = "version.json";
+        String versionFile = "/version.json";
         try {
-            stream = Globals.class.getResourceAsStream(versionFile);
+            stream = Globals.class.getClassLoader().getResourceAsStream(versionFile);
             if (stream != null) {
                 LOGGER.info("JOC Cockpit version = " + Json.createReader(stream).readObject().getString("version", "unknown"));
+            } else {
+                LOGGER.warn(String.format("Cannot found %1$s in classpath", versionFile));
             }
         } catch (Exception e) {
-            LOGGER.warn(String.format("Error while reading %1$s:", versionFile), e);
+            LOGGER.warn(String.format("Error while reading %1$s from classpath: ", versionFile), e);
         } finally {
             try {
                 if(stream != null) {
