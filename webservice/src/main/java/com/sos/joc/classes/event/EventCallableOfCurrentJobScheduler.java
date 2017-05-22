@@ -145,7 +145,16 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 }
                 eventSnapshot.setPath(jobPath);
                 eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
-            } else {
+            } else if (eventType.startsWith("Scheduler")) {
+                eventNotification = null;
+                eventSnapshot.setEventType("SchedulerStateChanged");
+                eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+                String state = event.getString("state", null);
+                eventSnapshot.setPath(command.getSchemeAndAuthority());
+                if (state!= null && (state.contains("stop") || state.contains("waiting"))) {
+                    removeSavedInventoryInstance();
+                }
+            }  else {
                 String eventKey = event.getString("key", null);
                 if (eventKey == null) {
                     continue;
@@ -283,15 +292,6 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                                 eventNotification.setNodeTransition(nodeTransition);
                             }
                             break;
-                        }
-                    } else if (eventType.startsWith("Scheduler")) {
-                        eventNotification = null;
-                        eventSnapshot.setEventType("SchedulerStateChanged");
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
-                        String state = event.getString("state", null);
-                        eventSnapshot.setPath(command.getSchemeAndAuthority());
-                        if (state!= null && (state.contains("stop") || state.contains("waiting"))) {
-                            removeSavedInventoryInstance();
                         }
                     } else {
                         continue;
