@@ -39,14 +39,20 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
             Set<String> jobSchedulerIds = new HashSet<String>();
             String first = "";
-            for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
-                jobSchedulerIds.add(inventoryInstance.getSchedulerId());
-                if ("".equals(first)) {
-                    first = inventoryInstance.getSchedulerId();
+            if (listOfInstance != null) {
+                for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
+                    jobSchedulerIds.add(inventoryInstance.getSchedulerId());
+                    if ("".equals(first)) {
+                        first = inventoryInstance.getSchedulerId();
+                    }
                 }
             }
             JOCPreferences jocPreferences = new JOCPreferences(jobschedulerUser.getSosShiroCurrentUser().getUsername());
             String selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first);
+            if (!jobSchedulerIds.contains(selectedInstance)) {
+                selectedInstance = first;
+                jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first);
+            }
 
             JobSchedulerIds entity = new JobSchedulerIds();
             entity.getJobschedulerIds().addAll(jobSchedulerIds);
