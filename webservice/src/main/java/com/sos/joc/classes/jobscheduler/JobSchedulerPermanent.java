@@ -29,8 +29,6 @@ public class JobSchedulerPermanent {
         try {
             connection = Globals.createSosHibernateStatelessConnection("getJobScheduler");
 
-            Globals.beginTransaction(connection);
-            
             JobSchedulerP jobscheduler = new JobSchedulerP();
             jobscheduler.setHost(dbItemInventoryInstance.getHostname());
             jobscheduler.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
@@ -68,7 +66,7 @@ public class JobSchedulerPermanent {
                 Long supervisorId = dbItemInventoryInstance.getSupervisorId();
                 if (supervisorId != DBLayer.DEFAULT_ID) {
                     InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
-                    DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstancesByKey(supervisorId);
+                    DBItemInventoryInstance schedulerSupervisorInstancesDBItem = dbLayer.getInventoryInstanceByKey(supervisorId);
                     if (schedulerSupervisorInstancesDBItem == null) {
                         throw new DBMissingDataException(String.format("supervisor with Id = %s not found in table INVENTORY_INSTANCES", dbItemInventoryInstance
                                 .getSupervisorId()));

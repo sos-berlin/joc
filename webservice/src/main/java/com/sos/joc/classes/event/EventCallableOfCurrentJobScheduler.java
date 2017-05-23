@@ -19,7 +19,6 @@ import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventType;
 import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventTypeValue;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
-import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
@@ -34,7 +33,7 @@ import com.sos.joc.model.event.NodeTransitionType;
 public class EventCallableOfCurrentJobScheduler extends EventCallable implements Callable<JobSchedulerEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventCallableOfCurrentJobScheduler.class);
-    private final String accessToken;
+//    private final String accessToken;
     private final JobSchedulerEvent jobSchedulerEvent;
     private final JOCJsonCommand command;
     private final SOSShiroCurrentUser shiroUser;
@@ -47,7 +46,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     public EventCallableOfCurrentJobScheduler(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
             Long instanceId, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
         super(command, jobSchedulerEvent, accessToken, session, instanceId);
-        this.accessToken = accessToken;
+//        this.accessToken = accessToken;
         this.command = command;
         this.jobSchedulerEvent = jobSchedulerEvent;
         this.shiroUser = shiroUser;
@@ -57,7 +56,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     }
 
     @Override
-    public JobSchedulerEvent call() throws JocException {
+    public JobSchedulerEvent call() throws Exception {
         return super.call();
     }
 
@@ -92,7 +91,6 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             if (job != null && instanceId != null) {
                 if (connection == null) {
                     connection = Globals.createSosHibernateStatelessConnection("eventCallable-"+jobSchedulerEvent.getJobschedulerId());
-                    Globals.beginTransaction(connection);
                 }
                 jobChainsLayer = new InventoryJobChainsDBLayer(connection);
                 if (jobChainsLayer!= null) {
@@ -375,35 +373,34 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 Thread.sleep(delay);
             } catch (InterruptedException e1) {
             }
-            SOSHibernateSession connection = null;
-            DBItemInventoryInstance inventoryInstance = null;
-            InventoryInstancesDBLayer instanceLayer = null;
-            try {
-                connection = Globals.createSosHibernateStatelessConnection("eventCallable-"+jobSchedulerEvent.getJobschedulerId());
-                Globals.beginTransaction(connection);
-                instanceLayer = new InventoryInstancesDBLayer(connection);
-                inventoryInstance = instanceLayer.getInventoryInstanceBySchedulerId(jobSchedulerEvent.getJobschedulerId(), accessToken);
-            } catch (Exception e1) {
-                throw e1;
-            } finally {
-                Globals.disconnect(connection);
-            }
-            if (inventoryInstance != null) {
-                if (instanceId != inventoryInstance.getId()) {
-                    Globals.urlFromJobSchedulerId.put(jobSchedulerEvent.getJobschedulerId(), inventoryInstance);
-                    command.setUriBuilderForEvents(inventoryInstance.getUrl());
-                    command.setBasicAuthorization(inventoryInstance.getAuth());
-                    command.createHttpClient();
-                    EventSnapshot eventSnapshot = new EventSnapshot();
-                    eventSnapshot.setEventType("SchedulerStateChanged");
-                    eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
-                    eventSnapshot.setPath(command.getSchemeAndAuthority());
-                    eventSnapshots.put(eventSnapshot);
-                }
+//            SOSHibernateSession connection = null;
+//            DBItemInventoryInstance inventoryInstance = null;
+//            InventoryInstancesDBLayer instanceLayer = null;
+//            try {
+//                connection = Globals.createSosHibernateStatelessConnection("eventCallable-"+jobSchedulerEvent.getJobschedulerId());
+//                instanceLayer = new InventoryInstancesDBLayer(connection);
+//                inventoryInstance = instanceLayer.getInventoryInstanceBySchedulerId(jobSchedulerEvent.getJobschedulerId(), accessToken);
+//            } catch (Exception e1) {
+//                throw e1;
+//            } finally {
+//                Globals.disconnect(connection);
+//            }
+//            if (inventoryInstance != null) {
+//                if (instanceId != inventoryInstance.getId()) {
+//                    Globals.urlFromJobSchedulerId.put(jobSchedulerEvent.getJobschedulerId(), inventoryInstance);
+//                    command.setUriBuilderForEvents(inventoryInstance.getUrl());
+//                    command.setBasicAuthorization(inventoryInstance.getAuth());
+//                    command.createHttpClient();
+//                    EventSnapshot eventSnapshot = new EventSnapshot();
+//                    eventSnapshot.setEventType("SchedulerStateChanged");
+//                    eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+//                    eventSnapshot.setPath(command.getSchemeAndAuthority());
+//                    eventSnapshots.put(eventSnapshot);
+//                }
                 eventSnapshots.putAll(getEventSnapshotsMap(eventId));   
-            } else {
-                throw e;
-            }
+//            } else {
+//                throw e;
+//            }
         } catch (JobSchedulerConnectionResetException e) {
             EventSnapshot eventSnapshot = new EventSnapshot();
             eventSnapshot.setEventType("SchedulerStateChanged");

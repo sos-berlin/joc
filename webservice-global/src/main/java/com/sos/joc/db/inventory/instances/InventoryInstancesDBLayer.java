@@ -121,7 +121,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
     }
 
-    public DBItemInventoryInstance getInventoryInstancesByKey(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
+    public DBItemInventoryInstance getInventoryInstanceByKey(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_INSTANCES);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql);

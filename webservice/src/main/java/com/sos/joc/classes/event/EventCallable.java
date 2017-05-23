@@ -21,6 +21,7 @@ import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.event.impl.EventResourceImpl;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
+import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.SessionNotExistException;
@@ -42,6 +43,14 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     private Long startTime = 0L;
     private SOSHibernateSession connection = null;
 
+    public EventCallable() {
+        this.accessToken = null;
+        this.command = null;
+        this.jobSchedulerEvent = null;
+        this.session = null;
+        this.instanceId = null;
+    }
+    
     public EventCallable(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session, Long instanceId) {
         this.accessToken = accessToken;
         this.command = command;
@@ -63,7 +72,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     }
 
     @Override
-    public JobSchedulerEvent call() throws JocException {
+    public JobSchedulerEvent call() throws Exception {
         try {
             setStartTime();
             jobSchedulerEvent.getEventSnapshots().addAll(getEventSnapshots(jobSchedulerEvent.getEventId()));
@@ -73,7 +82,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             jobSchedulerEvent.setEventSnapshots(null);
             handleError(e.getError().getCode(), e.getClass().getSimpleName());
             throw e;
-        } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException e) {
+        } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException | JobSchedulerConnectionResetException e) {
             // TODO create JobScheduler unreachable event?
             jobSchedulerEvent.setEventSnapshots(null);
             handleError(e.getError().getCode(), e.getClass().getSimpleName());

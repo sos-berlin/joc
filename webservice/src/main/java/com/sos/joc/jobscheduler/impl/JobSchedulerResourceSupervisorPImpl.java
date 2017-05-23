@@ -42,7 +42,7 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
             Long supervisorId = dbItemInventoryInstance.getSupervisorId();
             if (supervisorId != DBLayer.DEFAULT_ID) {
                 InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
-                DBItemInventoryInstance dbItemInventorySupervisorInstance = dbLayer.getInventoryInstancesByKey(supervisorId);
+                DBItemInventoryInstance dbItemInventorySupervisorInstance = dbLayer.getInventoryInstanceByKey(supervisorId);
 
                 if (dbItemInventorySupervisorInstance == null) {
                     String errMessage = String.format("jobschedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerId

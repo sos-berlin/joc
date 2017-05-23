@@ -27,7 +27,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.event.EventCallable;
-import com.sos.joc.classes.event.EventCallableOfCurrentJobScheduler;
+import com.sos.joc.classes.event.EventCallableJobSchedulerStateChanged;
+import com.sos.joc.classes.event.EventCallableOfCurrentCluster;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.event.resource.IEventResource;
@@ -54,7 +55,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
     private String threadName = "";
     private String urlOfCurrentJs = null;
     public static final Integer EVENT_TIMEOUT = 90;
-    
+
     @Override
     public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) {
 
@@ -100,15 +101,13 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 
             Long defaultEventId = Instant.now().toEpochMilli() * 1000;
             List<EventCallable> tasks = new ArrayList<EventCallable>();
+            List<EventCallable> tasksOfClusterMember = new ArrayList<EventCallable>();
             List<JOCJsonCommand> jocJsonCommands = new ArrayList<JOCJsonCommand>();
+            List<JOCJsonCommand> jocJsonCommandsOfClusterMember = new ArrayList<JOCJsonCommand>();
 
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
             InventoryJobChainsDBLayer jobChainLayer = new InventoryJobChainsDBLayer(connection);
 
-            Globals.beginTransaction(connection);
-            
-//            Long mods = getInstancesHash(instanceLayer);
-            
             Boolean isCurrentJobScheduler = true;
             for (JobSchedulerObjects jsObject : eventBody.getJobscheduler()) {
                 JobSchedulerEvent jsEvent = initEvent(jsObject, defaultEventId);
@@ -116,15 +115,34 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 DBItemInventoryInstance instance = getJobSchedulerInstance(jsObject, instanceLayer, accessToken);
                 JOCJsonCommand command = initJocJsonCommand(jsObject, instance);
                 jocJsonCommands.add(command);
+
                 if (isCurrentJobScheduler) {
-                    tasks.add(new EventCallableOfCurrentJobScheduler(command, jsEvent, accessToken, session, instance.getId(), shiroUser, getNestedJobChains(jobChainLayer, instance)));
-//                    if (mods != null) {
-//                        JobSchedulerEvent jsEvent2 = new JobSchedulerEvent();
-//                        jsEvent2.setEventId(jsEvent.getEventId());
-//                        jsEvent2.setJobschedulerId(jsEvent.getJobschedulerId());
-//                        jsEvent2.setEventSnapshots(new ArrayList<EventSnapshot>());
-//                        tasks.add(new EventCallableJobSchedulerStateChanged(jsEvent2, session, mods));
-//                    }
+
+                    jocJsonCommandsOfClusterMember.add(command);
+                    List<DBItemInventoryInstance> jobSchedulerMembers = instanceLayer.getInventoryInstancesBySchedulerId(jsObject
+                            .getJobschedulerId());
+                    if (instance.getSupervisorId() > 0) {
+                        DBItemInventoryInstance supervisor = instanceLayer.getInventoryInstanceByKey(instance.getSupervisorId());
+                        JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, supervisor.getId(), defaultEventId);
+                        JOCJsonCommand commandOfMember = initJocJsonCommand(jsObject, supervisor, "SchedulerEvent");
+                        jocJsonCommandsOfClusterMember.add(commandOfMember);
+                        tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
+                                supervisor.getId()));
+                    }
+
+                    for (DBItemInventoryInstance jobSchedulerMember : jobSchedulerMembers) {
+                        if (jobSchedulerMember.equals(instance)) {
+                            continue;
+                        }
+                        JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, jobSchedulerMember.getId(), defaultEventId);
+                        JOCJsonCommand commandOfMember = initJocJsonCommand(jsObject, jobSchedulerMember, "SchedulerEvent");
+                        jocJsonCommandsOfClusterMember.add(commandOfMember);
+                        tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
+                                jobSchedulerMember.getId()));
+                    }
+                    tasks.add(new EventCallableOfCurrentCluster(command, jsEvent, accessToken, session, instance.getId(), shiroUser,
+                            tasksOfClusterMember, jocJsonCommandsOfClusterMember, getNestedJobChains(jobChainLayer, instance)));
+
                 } else {
                     tasks.add(new EventCallable(command, jsEvent, accessToken, session, instance.getId()));
                 }
@@ -133,13 +151,14 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     urlOfCurrentJs = instance.getUrl();
                 }
             }
+            jocJsonCommands.addAll(jocJsonCommandsOfClusterMember);
             Globals.disconnect(connection);
             try {
                 session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
             } catch (Exception e1) {
             }
 
-            ExecutorService executorService = Executors.newFixedThreadPool(eventBody.getJobscheduler().size());
+            ExecutorService executorService = Executors.newFixedThreadPool(tasks.size());
             try {
                 JobSchedulerEvent evt = executorService.invokeAny(tasks);
                 eventList.put(evt.getJobschedulerId(), evt);
@@ -205,39 +224,50 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         }
         return concurrentEventsCallIsStarted;
     }
-    
-    private JobSchedulerEvent initEvent(JobSchedulerObjects jsObject, Long defaultEventId) {
-        if (jsObject.getEventId() == null || jsObject.getEventId().isEmpty()) {
-            jsObject.setEventId(defaultEventId.toString());
+
+    private JobSchedulerEvent initEvent(JobSchedulerObjects jsObject, Session session, Long instanceId, Long defaultEventId) {
+        String eventId = defaultEventId.toString();
+        String jsId = jsObject.getJobschedulerId();
+
+        if (jsObject.getEventId() != null && !jsObject.getEventId().isEmpty()) {
+            eventId = jsObject.getEventId();
         }
+        if (session != null) {
+            String eventIdOfClusterMembers = (String) session.getAttribute("eventIdOfClusterMembers");
+            if (eventIdOfClusterMembers != null) {
+                eventId = eventIdOfClusterMembers;
+            }
+        }
+        if (instanceId != null) {
+            jsId = "__instance__" + instanceId;
+        }
+        LOGGER.debug("EventId of " + jsId + ": " + eventId);
         JobSchedulerEvent jsEvent = new JobSchedulerEvent();
-        jsEvent.setEventId(jsObject.getEventId());
-        jsEvent.setJobschedulerId(jsObject.getJobschedulerId());
+        jsEvent.setEventId(eventId);
+        jsEvent.setJobschedulerId(jsId);
         jsEvent.setEventSnapshots(new ArrayList<EventSnapshot>());
         return jsEvent;
     }
-    
+
+    private JobSchedulerEvent initEvent(JobSchedulerObjects jsObject, Long defaultEventId) {
+        return initEvent(jsObject, null, null, defaultEventId);
+    }
+
     private JOCJsonCommand initJocJsonCommand(JobSchedulerObjects jsObject, DBItemInventoryInstance instance) {
+        return initJocJsonCommand(jsObject, instance, null);
+    }
+
+    private JOCJsonCommand initJocJsonCommand(JobSchedulerObjects jsObject, DBItemInventoryInstance instance, String event) {
         JOCJsonCommand command = new JOCJsonCommand();
         command.setUriBuilderForEvents(instance.getUrl());
         command.setBasicAuthorization(instance.getAuth());
         command.setSocketTimeout((EVENT_TIMEOUT + 5) * 1000);
         command.createHttpClient();
         command.setAutoCloseHttpClient(false);
-        command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT);
+        command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT, event);
         return command;
     }
-    
-//    private Long getInstancesHash(InventoryInstancesDBLayer instanceLayer) {
-//        Long mods = null;
-//        try {
-//            mods = instanceLayer.getInventoryMods();
-//        } catch (Exception e) {
-//            LOGGER.warn("",e);
-//        }
-//        return mods;
-//    }
-    
+
     private Map<String, Set<String>> getNestedJobChains(InventoryJobChainsDBLayer jobChainLayer, DBItemInventoryInstance instance) {
         Map<String, Set<String>> nestedJobChains = null;
         try {
@@ -247,7 +277,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         }
         return nestedJobChains;
     }
-    
+
     private DBItemInventoryInstance getJobSchedulerInstance(JobSchedulerObjects jsObject, InventoryInstancesDBLayer instanceLayer, String accessToken)
             throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
         DBItemInventoryInstance instance = Globals.urlFromJobSchedulerId.get(jsObject.getJobschedulerId());
@@ -257,5 +287,5 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         }
         return instance;
     }
-    
+
 }
