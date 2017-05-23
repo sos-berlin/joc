@@ -26,8 +26,6 @@ public class OrderPermanent {
             DBLayerReporting dbLayerReporting = new DBLayerReporting(connection);
             int limit = Globals.sosShiroProperties.getProperty("limit_for_average_calculation", WebserviceConstants.DEFAULT_LIMIT);
 
-            Globals.beginTransaction(connection);
-
             for (DBItemInventoryOrder inventoryOrder : ordersFromDB) {
                 OrderP order = new OrderP();
                 order.setSurveyDate(inventoryOrder.getModified());

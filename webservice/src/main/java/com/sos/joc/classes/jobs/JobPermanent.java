@@ -24,8 +24,6 @@ public class JobPermanent {
         try {
             connection = Globals.createSosHibernateStatelessConnection("getEstimatedDurationInSeconds");
 
-            Globals.beginTransaction(connection);
-
             DBLayerReporting dbLayer = new DBLayerReporting(connection);
             Long estimatedDurationInMillis = dbLayer.getTaskEstimatedDuration(job.getName(), Globals.sosShiroProperties.getProperty("limit_for_average_calculation",
                     WebserviceConstants.DEFAULT_LIMIT));

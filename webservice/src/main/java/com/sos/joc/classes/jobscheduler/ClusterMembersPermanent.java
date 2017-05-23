@@ -25,8 +25,6 @@ public class ClusterMembersPermanent {
         try {
             connection = Globals.createSosHibernateStatelessConnection("getClusterMembers");
 
-            Globals.beginTransaction(connection);
-
             List<JobSchedulerP> masters = new ArrayList<JobSchedulerP>();
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
             List<DBItemInventoryInstance> schedulersFromDb = instanceLayer.getInventoryInstancesBySchedulerId(jobschedulerId);
@@ -64,7 +62,7 @@ public class ClusterMembersPermanent {
                         jobscheduler.setOs(os);
                     }
                     if (instance.getSupervisorId() != DBLayer.DEFAULT_ID) {
-                        DBItemInventoryInstance supervisorFromDb = instanceLayer.getInventoryInstancesByKey(instance.getSupervisorId());
+                        DBItemInventoryInstance supervisorFromDb = instanceLayer.getInventoryInstanceByKey(instance.getSupervisorId());
                         if (supervisorFromDb != null) {
                             HostPortParameter supervisor = new HostPortParameter();
                             supervisor.setHost(supervisorFromDb.getHostname());
