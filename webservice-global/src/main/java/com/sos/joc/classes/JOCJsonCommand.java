@@ -14,12 +14,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.exception.SOSConnectionRefusedException;
+import com.sos.exception.SOSConnectionResetException;
 import com.sos.exception.SOSNoResponseException;
 import com.sos.jitl.restclient.JobSchedulerRestApiClient;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.ForcedClosingHttpClientException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
+import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
@@ -214,6 +216,12 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
         try {
             String response = postRestService(uri, postBody);
             return getJsonObjectFromResponse(response, uri, jocError);
+        } catch (SOSConnectionResetException e) {
+            if (isForcedClosingHttpClient()) {
+                throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
+            } else {
+                throw new JobSchedulerConnectionResetException(jocError, e);
+            }
         } catch (SOSConnectionRefusedException e) {
             if (isForcedClosingHttpClient()) {
                 throw new ForcedClosingHttpClientException(uri.getScheme()+"://"+uri.getAuthority(), e);
