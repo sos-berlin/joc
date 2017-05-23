@@ -2,7 +2,6 @@ package com.sos.joc.jobscheduler.impl;
 
 import java.sql.Date;
 import java.time.Instant;
-import java.util.List;
 
 import javax.ws.rs.Path;
 
@@ -10,7 +9,6 @@ import org.apache.shiro.session.InvalidSessionException;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.inventory.db.InventoryCleanup;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -47,8 +45,8 @@ public class JobSchedulerCleanupInventoryImpl extends JOCResourceImpl implements
             ModifyJobSchedulerAudit jobschedulerAudit = new ModifyJobSchedulerAudit(hostPortParameter);
             logAuditMessage(jobschedulerAudit);
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+            
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
-            Globals.beginTransaction(connection);
             DBItemInventoryInstance schedulerInstanceFromDb = instanceLayer.getInventoryInstanceByHostPort(hostPortParameter.getHost(), hostPortParameter.getPort(), hostPortParameter.getJobschedulerId());
             boolean jobSchedulerIsRunning = true;
             try {
@@ -64,8 +62,10 @@ public class JobSchedulerCleanupInventoryImpl extends JOCResourceImpl implements
             if (jobSchedulerIsRunning) {
                 throw new JobSchedulerBadRequestException("Cleanup function is not available when JobScheduler is still running.");
             }
-            new InventoryCleanup().cleanup(schedulerInstanceFromDb);
-            Globals.commit(connection);
+            
+            instanceLayer.cleanUp(schedulerInstanceFromDb);
+            storeAuditLogEntry(jobschedulerAudit);
+            
             if (hostPortParameter.getJobschedulerId().equals(dbItemInventoryInstance.getSchedulerId()) && hostPortParameter.getHost().equals(
                     dbItemInventoryInstance.getHostname()) && hostPortParameter.getPort() == dbItemInventoryInstance.getPort()) {
                 try {
@@ -75,7 +75,6 @@ public class JobSchedulerCleanupInventoryImpl extends JOCResourceImpl implements
                     throw new SessionNotExistException(e1);
                 }
             }
-            storeAuditLogEntry(jobschedulerAudit);
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

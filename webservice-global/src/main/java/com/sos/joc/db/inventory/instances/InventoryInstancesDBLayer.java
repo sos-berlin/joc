@@ -3,10 +3,14 @@ package com.sos.joc.db.inventory.instances;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.StatelessSession;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
+import com.sos.jitl.inventory.db.InventoryCleanup;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -146,6 +150,26 @@ public class InventoryInstancesDBLayer extends DBLayer {
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public void cleanUp(DBItemInventoryInstance schedulerInstanceFromDb) throws DBInvalidDataException {
+        StatelessSession session = null;
+        Transaction tr = null;
+        try {
+            session = (StatelessSession) getSession().getCurrentSession();
+            tr = session.beginTransaction();
+            new InventoryCleanup().cleanup(getSession(), schedulerInstanceFromDb);
+            tr.commit();
+        } catch (SOSHibernateException ex) {
+            try {
+                if (tr != null) {
+                    tr.rollback();
+                }
+            } catch (Exception e) {
+                //
+            }
             throw new DBInvalidDataException(ex);
         }
     }
