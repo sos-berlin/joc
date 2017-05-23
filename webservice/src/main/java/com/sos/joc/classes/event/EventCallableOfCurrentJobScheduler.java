@@ -22,6 +22,7 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
+import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.JobSchedulerObjectType;
@@ -403,6 +404,12 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             } else {
                 throw e;
             }
+        } catch (JobSchedulerConnectionResetException e) {
+            EventSnapshot eventSnapshot = new EventSnapshot();
+            eventSnapshot.setEventType("SchedulerStateChanged");
+            eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+            eventSnapshot.setPath(command.getSchemeAndAuthority());
+            eventSnapshots.put(eventSnapshot);
         }
         return eventSnapshots;
     }
