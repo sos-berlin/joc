@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
+import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
@@ -47,11 +48,13 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                     }
                 }
             }
-            JOCPreferences jocPreferences = new JOCPreferences(jobschedulerUser.getSosShiroCurrentUser().getUsername());
+            SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
+            JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
             String selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first);
             if (!jobSchedulerIds.contains(selectedInstance)) {
                 selectedInstance = first;
                 jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first);
+                shiroUser.setSelectedInstance(selectedInstance);
             }
 
             JobSchedulerIds entity = new JobSchedulerIds();
