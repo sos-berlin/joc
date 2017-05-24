@@ -1,7 +1,6 @@
 package com.sos.joc.classes;
 
 import java.io.StringReader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -9,7 +8,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.http.HttpEntity;
 import org.slf4j.Logger;

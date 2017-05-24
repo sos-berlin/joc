@@ -103,7 +103,7 @@ public class ConfigurationStatus {
      */
     public static ConfigurationState getConfigurationStatus(JsonArray obstacles) {
         try {
-            Optional<JsonValue> fileBasedObstacleItem = obstacles.stream().filter(p -> "fileBasedObstacles".equals(((JsonObject) p).getString("TYPE"))).findFirst();
+            Optional<JsonValue> fileBasedObstacleItem = obstacles.stream().filter(p -> "fileBasedObstacles".equalsIgnoreCase(((JsonObject) p).getString("TYPE"))).findFirst();
             if (!fileBasedObstacleItem.isPresent()) {
                 return null;
             }
