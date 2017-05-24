@@ -113,7 +113,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 JobSchedulerEvent jsEvent = initEvent(jsObject, defaultEventId);
                 eventList.put(jsObject.getJobschedulerId(), jsEvent);
                 DBItemInventoryInstance instance = getJobSchedulerInstance(jsObject, instanceLayer, accessToken);
-                JOCJsonCommand command = initJocJsonCommand(jsObject, instance);
+                JOCJsonCommand command = initJocJsonCommand(jsEvent, instance);
                 jocJsonCommands.add(command);
 
                 if (isCurrentJobScheduler) {
@@ -124,7 +124,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                     if (instance.getSupervisorId() > 0) {
                         DBItemInventoryInstance supervisor = instanceLayer.getInventoryInstanceByKey(instance.getSupervisorId());
                         JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, supervisor.getId(), defaultEventId);
-                        JOCJsonCommand commandOfMember = initJocJsonCommand(jsObject, supervisor, "SchedulerEvent");
+                        JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, supervisor, "SchedulerEvent");
                         jocJsonCommandsOfClusterMember.add(commandOfMember);
                         tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
                                 supervisor.getId()));
@@ -135,7 +135,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                             continue;
                         }
                         JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, jobSchedulerMember.getId(), defaultEventId);
-                        JOCJsonCommand commandOfMember = initJocJsonCommand(jsObject, jobSchedulerMember, "SchedulerEvent");
+                        JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, jobSchedulerMember, "SchedulerEvent");
                         jocJsonCommandsOfClusterMember.add(commandOfMember);
                         tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
                                 jobSchedulerMember.getId()));
@@ -253,18 +253,18 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
         return initEvent(jsObject, null, null, defaultEventId);
     }
 
-    private JOCJsonCommand initJocJsonCommand(JobSchedulerObjects jsObject, DBItemInventoryInstance instance) {
-        return initJocJsonCommand(jsObject, instance, null);
+    private JOCJsonCommand initJocJsonCommand(JobSchedulerEvent jsEvent, DBItemInventoryInstance instance) {
+        return initJocJsonCommand(jsEvent, instance, null);
     }
 
-    private JOCJsonCommand initJocJsonCommand(JobSchedulerObjects jsObject, DBItemInventoryInstance instance, String event) {
+    private JOCJsonCommand initJocJsonCommand(JobSchedulerEvent jsEvent, DBItemInventoryInstance instance, String event) {
         JOCJsonCommand command = new JOCJsonCommand();
         command.setUriBuilderForEvents(instance.getUrl());
         command.setBasicAuthorization(instance.getAuth());
         command.setSocketTimeout((EVENT_TIMEOUT + 5) * 1000);
         command.createHttpClient();
         command.setAutoCloseHttpClient(false);
-        command.addEventQuery(jsObject.getEventId(), EVENT_TIMEOUT, event);
+        command.addEventQuery(jsEvent.getEventId(), EVENT_TIMEOUT, event);
         return command;
     }
 
