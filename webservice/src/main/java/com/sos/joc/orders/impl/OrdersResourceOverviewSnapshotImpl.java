@@ -7,6 +7,8 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.Orders;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.order.OrdersSnapshot;
@@ -20,6 +22,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 	@Override
 	public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter)
 			throws Exception {
+        String folders="";
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken,
 					jobChainsFilter.getJobschedulerId(),
@@ -31,6 +34,7 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
 				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
 					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+					folders = folders + folder.getFolder() + ",";
 					com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
 					f.setFolder(folder.getFolder());
 					f.setRecursive(folder.isRecursive());
@@ -41,7 +45,13 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 			OrdersSnapshot entity = Orders.getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
 
 			return JOCDefaultResponse.responseStatus200(entity);
-		} catch (JocException e) {
+			
+        } catch (JobSchedulerObjectNotExistException e) {
+            JocError err = getJocError();
+            err.setMessage(String.format("%s: Please check your folder permissions (%s)",err.getMessage() ,folders));
+            e.addErrorMetaInfo(err);
+            return JOCDefaultResponse.responseStatusJSError(e,err);
+        } catch (JocException e) {
 			e.addErrorMetaInfo(getJocError());
 			return JOCDefaultResponse.responseStatusJSError(e);
 		} catch (Exception e) {

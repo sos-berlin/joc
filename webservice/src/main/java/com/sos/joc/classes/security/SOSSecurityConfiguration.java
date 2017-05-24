@@ -83,9 +83,9 @@ public class SOSSecurityConfiguration {
     }
 
     private Section getSection(String section) {
-        Section s = ini.getSection(SECTION_ROLES);
+        Section s = ini.getSection(section);
         if (s == null) {
-            s = ini.addSection(SECTION_ROLES);
+            s = ini.addSection(section);
         }
         return s;
     }
