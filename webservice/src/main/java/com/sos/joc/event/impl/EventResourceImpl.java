@@ -179,6 +179,10 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));
 
+        }catch (org.apache.shiro.session.UnknownSessionException e){
+            entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
+            entity.setDeliveryDate(Date.from(Instant.now()));
+
         } catch (ForcedClosingHttpClientException e) {
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));

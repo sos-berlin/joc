@@ -79,14 +79,13 @@ public class SOSSecurityConfiguration {
     private void clearSection(String section) {
         if (writeIni.get(section) != null) {
             writeIni.get(section).clear();
+        }else{
+            writeIni.add(section);
         }
     }
 
     private Section getSection(String section) {
-        Section s = ini.getSection(section);
-        if (s == null) {
-            s = ini.addSection(section);
-        }
+        Section s = ini.addSection(section);
         return s;
     }
 
