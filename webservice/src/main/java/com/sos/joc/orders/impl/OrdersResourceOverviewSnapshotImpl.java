@@ -47,9 +47,9 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 			return JOCDefaultResponse.responseStatus200(entity);
 			
         } catch (JobSchedulerObjectNotExistException e) {
-            JocError err = getJocError();
-            err.setMessage(String.format("%s: Please check your folder permissions (%s)",err.getMessage() ,folders));
-            e.addErrorMetaInfo(err);
+            JocError err = new JocError();
+            err.setMessage(String.format("%s: Please check your folders in the Account Management (%s)",e.getMessage() ,folders));
+            e.setError(err);
             return JOCDefaultResponse.responseStatusJSError(e,err);
         } catch (JocException e) {
 			e.addErrorMetaInfo(getJocError());

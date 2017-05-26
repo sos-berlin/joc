@@ -38,10 +38,10 @@ public class SOSSecurityConfigurationUserEntry {
 
     public String getIniWriteString() {
         String s = securityConfigurationUser.getPassword() + ",";
-        for (int i=0;i<securityConfigurationUser.getRoles().size();i++){
+        for (int i = 0; i < securityConfigurationUser.getRoles().size(); i++) {
             s = s + securityConfigurationUser.getRoles().get(i) + ",";
         }
-        s = s.substring(0,s.length());
-       return s;
+        s = s.substring(0, s.length() - 1);
+        return s;
     }
 }
