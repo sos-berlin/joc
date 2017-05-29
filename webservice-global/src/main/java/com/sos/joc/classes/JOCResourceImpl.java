@@ -89,18 +89,14 @@ public class JOCResourceImpl {
         Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp / 1000);
         return Date.from(fromEpochMilli);
     }
-    
+      
     public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws Exception {
-        return init(request, body, accessToken, schedulerId, permission, false);
-    }
-    
-    public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws Exception {
         this.accessToken = accessToken;
         if (jobschedulerUser == null) {
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
         initLogging(request, body);
-        return init(schedulerId, permission, withJobSchedulerDBCheck);
+        return init(schedulerId, permission);
     }
     
     public JOCDefaultResponse init(String request, String accessToken) throws Exception {
@@ -253,7 +249,7 @@ public class JOCResourceImpl {
         jocError.addMetaInfoOnTop("\nREQUEST: " + request, "PARAMS: " + getJsonString(body), "USER: " + user);
     }
 
-    private JOCDefaultResponse init(String schedulerId, boolean permission, boolean withJobSchedulerDBCheck) throws JocException {
+    private JOCDefaultResponse init(String schedulerId, boolean permission) throws JocException {
         JOCDefaultResponse jocDefaultResponse = init401And440();
 
         if (!permission) {

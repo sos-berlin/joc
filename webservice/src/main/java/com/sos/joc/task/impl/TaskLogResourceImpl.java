@@ -25,7 +25,7 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken, taskFilter.getJobschedulerId(), 
-                    getPermissonsJocCockpit(accessToken).getJob().getView().isTaskLog(), true);
+                    getPermissonsJocCockpit(accessToken).getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

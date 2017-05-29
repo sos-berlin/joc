@@ -33,7 +33,7 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
             }
 
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken, jobschedulerId, getPermissonsJocCockpit(
-                    accessToken).getOrder().getView().isOrderLog(), true);
+                    accessToken).getOrder().getView().isOrderLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
