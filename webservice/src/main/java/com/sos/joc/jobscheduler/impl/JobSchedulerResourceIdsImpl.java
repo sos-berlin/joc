@@ -35,31 +35,42 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
+            SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
+            JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
+
+            String idFromPreferences = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE,"");
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
             Set<String> jobSchedulerIds = new HashSet<String>();
-            String first = "";
+            DBItemInventoryInstance first = null;
+            DBItemInventoryInstance selected = null;
             if (listOfInstance != null) {
                 for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
                     jobSchedulerIds.add(inventoryInstance.getSchedulerId());
-                    if ("".equals(first)) {
-                        first = inventoryInstance.getSchedulerId();
+                    if (first == null) {
+                        first = inventoryInstance; 
+                    }
+                    if (idFromPreferences.equals(inventoryInstance.getSchedulerId())){
+                        selected = inventoryInstance;
                     }
                 }
             }
-            SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
-            JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
-            String selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first);
-            if (!jobSchedulerIds.contains(selectedInstance)) {
-                selectedInstance = first;
-                jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first);
-                shiroUser.setSelectedInstance(selectedInstance);
+            String selectedInstanceSchedulerId = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
+
+            if (!jobSchedulerIds.contains(selectedInstanceSchedulerId)) {
+                selectedInstanceSchedulerId = first.getSchedulerId();
+                jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
+                shiroUser.setSelectedInstance(first);
+            }else{
+                shiroUser.setSelectedInstance(selected);
             }
 
             JobSchedulerIds entity = new JobSchedulerIds();
             entity.getJobschedulerIds().addAll(jobSchedulerIds);
-            entity.setSelected(selectedInstance);
+            entity.setSelected(selectedInstanceSchedulerId);
             entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);

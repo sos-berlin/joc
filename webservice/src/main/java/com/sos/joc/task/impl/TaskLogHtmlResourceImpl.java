@@ -28,7 +28,7 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
                 accessToken = queryAccessToken;
             }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken)
-                    .getJob().getView().isTaskLog(), true);
+                    .getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

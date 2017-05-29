@@ -19,7 +19,7 @@ import com.sos.joc.classes.WebserviceConstants;
 public class SOSShiroCurrentUser {
 
     private static final Logger LOGGER = Logger.getLogger(SOSShiroCurrentUser.class);
-  
+
     public SOSShiroFolderPermissions getSosShiroFolderPermissions() {
         return sosShiroFolderPermissions;
     }
@@ -29,7 +29,7 @@ public class SOSShiroCurrentUser {
     private String password;
     private String accessToken;
     private String authorization;
-    private String selectedInstance;
+    private DBItemInventoryInstance selectedInstance;
 
     private SOSPermissionJocCockpit sosPermissionJocCockpit;
     private SOSPermissionCommands sosPermissionCommands;
@@ -53,6 +53,14 @@ public class SOSShiroCurrentUser {
     }
 
     public SOSPermissionJocCockpit getSosPermissionJocCockpit() {
+        if (selectedInstance != null) {
+            sosPermissionJocCockpit.setJobschedulerId(selectedInstance.getSchedulerId());
+            if (selectedInstance.getPrecedence() == null) {
+                sosPermissionJocCockpit.setPrecedence(-1);
+            } else {
+                sosPermissionJocCockpit.setPrecedence(selectedInstance.getPrecedence());
+            }
+        }
         return sosPermissionJocCockpit;
     }
 
@@ -106,16 +114,23 @@ public class SOSShiroCurrentUser {
     }
 
     private boolean getPermissionFromMaster(String permission) {
+        String master;
         if (selectedInstance == null) {
             JOCPreferences jocPreferences = new JOCPreferences(username);
-            selectedInstance = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
+            master = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
+        } else {
+            master = selectedInstance.getSchedulerId();
         }
-        String permissionMaster = selectedInstance + ":" + permission;
+        String permissionMaster = master + ":" + permission;
         return getPermissionFromSubject(permission, permissionMaster);
     }
 
-    public void setSelectedInstance(String selectedInstance) {
+    public void setSelectedInstance(DBItemInventoryInstance selectedInstance) {
         this.selectedInstance = selectedInstance;
+    }
+
+    public DBItemInventoryInstance getSelectedInstance() {
+        return this.selectedInstance;
     }
 
     public boolean isPermitted(String permission) {
@@ -192,6 +207,5 @@ public class SOSShiroCurrentUser {
     public void setAuthorization(String authorization) {
         this.authorization = authorization;
     }
-    
 
 }

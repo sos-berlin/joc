@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.05.18 um 10:46:58 AM CEST 
+// Generiert: 2017.05.29 um 02:53:08 PM CEST 
 //
 
 
@@ -629,6 +629,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="isAuthenticated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="user" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="accessToken" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="jobschedulerId" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="precedence" type="{http://www.w3.org/2001/XMLSchema}int" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -702,6 +704,10 @@ public class SOSPermissionJocCockpit {
     protected String user;
     @XmlAttribute(name = "accessToken")
     protected String accessToken;
+    @XmlAttribute(name = "jobschedulerId")
+    protected String jobschedulerId;
+    @XmlAttribute(name = "precedence")
+    protected Integer precedence;
 
     /**
      * Ruft den Wert der jobschedulerMaster-Eigenschaft ab.
@@ -1205,6 +1211,54 @@ public class SOSPermissionJocCockpit {
      */
     public void setAccessToken(String value) {
         this.accessToken = value;
+    }
+
+    /**
+     * Ruft den Wert der jobschedulerId-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getJobschedulerId() {
+        return jobschedulerId;
+    }
+
+    /**
+     * Legt den Wert der jobschedulerId-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setJobschedulerId(String value) {
+        this.jobschedulerId = value;
+    }
+
+    /**
+     * Ruft den Wert der precedence-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *     
+     */
+    public Integer getPrecedence() {
+        return precedence;
+    }
+
+    /**
+     * Legt den Wert der precedence-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *     
+     */
+    public void setPrecedence(Integer value) {
+        this.precedence = value;
     }
 
 

@@ -2,6 +2,8 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
+import org.apache.shiro.session.InvalidSessionException;
+
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.joc.Globals;
@@ -10,6 +12,7 @@ import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSwitch;
 import com.sos.joc.model.common.JobSchedulerId;
 
@@ -31,9 +34,16 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
             JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
             String selectedInstance = jobSchedulerId.getJobschedulerId();
             jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, selectedInstance);
-            shiroUser.setSelectedInstance(selectedInstance);
+            shiroUser.setSelectedInstance(dbItemInventoryInstance);
 
             SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
+            
+            try {
+                shiroUser.removeSchedulerInstanceDBItem(dbItemInventoryInstance.getSchedulerId());
+            } catch (InvalidSessionException e1) {
+                throw new SessionNotExistException(e1);
+            }
+
             jocDefaultResponse = sosServicePermissionShiro.getJocCockpitPermissions(accessToken, shiroUser.getUsername(), shiroUser.getPassword());
 
             try {
