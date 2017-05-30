@@ -254,7 +254,7 @@ public class Globals {
     }
 
     private static void setJobSchedulerSocketTimeout() {
-        int defaultSeconds = 2;
+        int defaultSeconds = 5;
         if (sosShiroProperties != null) {
             int seconds = sosShiroProperties.getProperty("jobscheduler_socket_timeout", defaultSeconds);
             httpSocketTimeout = seconds * 1000;
