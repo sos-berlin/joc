@@ -10,7 +10,8 @@ public class SOSShiroFolderPermissions {
 
 	private Map<String, ArrayList<FilterFolder>> listOfFoldersForInstance;
 	private String schedulerId;
-
+    private boolean force=false;
+    
 	public SOSShiroFolderPermissions() {
 		super();
 		listOfFoldersForInstance = new HashMap<String, ArrayList<FilterFolder>>();
@@ -53,6 +54,10 @@ public class SOSShiroFolderPermissions {
 	}
 
 	public boolean isPermittedForFolder(String folder) {
+	    if (this.force){
+	        return true;
+	    }
+	    
 		ArrayList<FilterFolder> listOfFolders = getListOfFolders(schedulerId);
 
 		if (listOfFolders == null || listOfFolders.size() == 0) {
@@ -101,5 +106,10 @@ public class SOSShiroFolderPermissions {
 	public void setSchedulerId(String schedulerId) {
 		this.schedulerId = schedulerId;
 	}
+	
+    public void setForce(boolean force) {
+        this.force = force;
+    }
+
 
 }

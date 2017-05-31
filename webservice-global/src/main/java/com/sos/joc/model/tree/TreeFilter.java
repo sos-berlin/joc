@@ -26,6 +26,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "jobschedulerId",
     "types",
     "compact",
+    "force",
     "regex",
     "folders"
 })
@@ -54,6 +55,14 @@ public class TreeFilter {
      */
     @JsonProperty("compact")
     private Boolean compact = false;
+    /**
+     * force full tree
+     * <p>
+     * controls whether the folder permissions are use. If true the full tree will be returned
+     * 
+     */
+    @JsonProperty("force")
+    private Boolean force = false;
     /**
      * filter with regex
      * <p>
@@ -148,6 +157,32 @@ public class TreeFilter {
     }
 
     /**
+     * force full tree
+     * <p>
+     * controls whether the folder permissions are use. If true the full tree will be returned
+     * 
+     * @return
+     *     The force
+     */
+    @JsonProperty("force")
+    public Boolean getForce() {
+        return force;
+    }
+
+    /**
+     * force full tree
+     * <p>
+     * controls whether the folder permissions are use. If true the full tree will be returned
+     * 
+     * @param force
+     *     The force
+     */
+    @JsonProperty("force")
+    public void setForce(Boolean force) {
+        this.force = force;
+    }
+
+    /**
      * filter with regex
      * <p>
      * regular expression to filter JobScheduler objects by matching the path
@@ -206,7 +241,7 @@ public class TreeFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(types).append(compact).append(regex).append(folders).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(types).append(compact).append(force).append(regex).append(folders).toHashCode();
     }
 
     @Override
@@ -218,7 +253,7 @@ public class TreeFilter {
             return false;
         }
         TreeFilter rhs = ((TreeFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(types, rhs.types).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(types, rhs.types).append(compact, rhs.compact).append(force, rhs.force).append(regex, rhs.regex).append(folders, rhs.folders).isEquals();
     }
 
 }
