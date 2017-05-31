@@ -1,17 +1,13 @@
 package com.sos.auth.rest;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.shiro.config.Ini;
-import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.subject.Subject;
 
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
-import com.sos.auth.rest.permission.model.SOSPermissionRoles;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.WebserviceConstants;
