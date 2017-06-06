@@ -4,7 +4,7 @@ import com.sos.joc.model.security.SecurityConfigurationPermission;
 
 public class SOSSecurityPermissionItem {
 
-    private boolean excluded;
+    private Boolean excluded;
     private String permission;
     private String normalizedPermission;
     private String master;
@@ -40,7 +40,10 @@ public class SOSSecurityPermissionItem {
         return master;
     }
 
-    public boolean isExcluded() {
+    public Boolean isExcluded() {
+        if(excluded == null) {
+            excluded = Boolean.FALSE;
+        }
         return excluded;
     }
 
