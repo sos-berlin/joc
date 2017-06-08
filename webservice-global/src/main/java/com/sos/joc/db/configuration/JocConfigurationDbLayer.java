@@ -8,9 +8,6 @@ import org.hibernate.query.Query;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
-import com.sos.hibernate.exceptions.SOSHibernateQueryException;
-import com.sos.hibernate.exceptions.SOSHibernateQueryNonUniqueResultException;
-import com.sos.hibernate.exceptions.SOSHibernateSessionException;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
 import com.sos.jitl.joc.db.JocConfigurationDbItem;
 
