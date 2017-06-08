@@ -26,7 +26,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         resetFilter();
     }
 
-    public JocConfigurationDbItem getJocConfigurationDbItem(final Long id) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
+    public JocConfigurationDbItem getJocConfigurationDbItem(final Long id) throws SOSHibernateException {
         return (JocConfigurationDbItem) (sosHibernateSession.get(JocConfigurationDbItem.class, id));
     }
 
@@ -124,8 +124,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         }
     }
 
-    public List<JocConfigurationDbItem> getJocConfigurationList(final int limit) throws SOSHibernateInvalidSessionException,
-            SOSHibernateQueryException {
+    public List<JocConfigurationDbItem> getJocConfigurationList(final int limit) throws SOSHibernateException {
 
         String sql = "from " + JOC_CONFIGURATION_DB_ITEM + " " + getWhere() + filter.getOrderCriteria() + filter.getSortMode();
         Query<JocConfigurationDbItem> query = sosHibernateSession.createQuery(sql);
@@ -137,7 +136,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
 
     }
 
-    public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateInvalidSessionException, SOSHibernateQueryNonUniqueResultException,SOSHibernateQueryException {
+    public JocConfigurationDbItem getJocConfiguration(Long id) throws SOSHibernateException {
         StringBuilder sql = new StringBuilder();
         sql.append("from ").append(JOC_CONFIGURATION_DB_ITEM).append(" where id = :id");
         Query<JocConfigurationDbItem> query = sosHibernateSession.createQuery(sql.toString());
@@ -145,7 +144,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return sosHibernateSession.getSingleResult(query);
     }
 
-    public List<JocConfigurationDbItem> getJocConfigurations(final int limit) throws SOSHibernateInvalidSessionException, SOSHibernateQueryException {
+    public List<JocConfigurationDbItem> getJocConfigurations(final int limit) throws SOSHibernateException {
         StringBuilder sql = new StringBuilder();
         sql.append("from ").append(JOC_CONFIGURATION_DB_ITEM).append(" ").append(getWhere()).append(filter.getOrderCriteria()).append(filter
                 .getSortMode());
@@ -157,8 +156,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return sosHibernateSession.getResultList(query);
     }
 
-    public Long saveOrUpdateConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws SOSHibernateInvalidSessionException,
-            SOSHibernateSessionException {
+    public Long saveOrUpdateConfiguration(JocConfigurationDbItem jocConfigurationDbItem) throws SOSHibernateException {
         jocConfigurationDbItem.setModified(new Date());
         if (jocConfigurationDbItem.getId() == null) {
             sosHibernateSession.save(jocConfigurationDbItem);
@@ -168,7 +166,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return jocConfigurationDbItem.getId();
     }
 
-    public int deleteConfiguration() throws SOSHibernateInvalidSessionException, SOSHibernateSessionException, SOSHibernateQueryException {
+    public int deleteConfiguration() throws SOSHibernateInvalidSessionException, SOSHibernateException {
         List<JocConfigurationDbItem> l = getJocConfigurationList(1);
         int size = (l != null) ? l.size() : 0;
         if (size > 0) {
@@ -177,7 +175,7 @@ public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
         return size;
     }
 
-    public void deleteConfiguration(JocConfigurationDbItem dbItem) throws SOSHibernateInvalidSessionException, SOSHibernateSessionException {
+    public void deleteConfiguration(JocConfigurationDbItem dbItem) throws SOSHibernateException {
         sosHibernateSession.delete(dbItem);
     }
 
