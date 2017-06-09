@@ -172,15 +172,15 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" and ijcn.nodeType = 5");
             sql.append(" and ijcn.instanceId = :instanceId");
             sql.append(" and ijc.name = :jobChain");
-            Query<Integer> query = getSession().createQuery(sql.toString());
+            Query<Long> query = getSession().createQuery(sql.toString());
             query.setParameter("nodeName", node);
             query.setParameter("jobChain", jobChain);
             query.setParameter("instanceId", instanceId);
-            Integer result = getSession().getSingleResult(query);
+            Long result = getSession().getSingleResult(query);
             if (result == null) {
                 return false;
             }
-            return result > 0;
+            return result > 0L;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -198,15 +198,15 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append(" and ijcn.errorState = :nodeName");
             sql.append(" and ijcn.instanceId = :instanceId");
             sql.append(" and ijc.name = :jobChain");
-            Query<Integer> query = getSession().createQuery(sql.toString());
+            Query<Long> query = getSession().createQuery(sql.toString());
             query.setParameter("nodeName", node);
             query.setParameter("jobChain", jobChain);
             query.setParameter("instanceId", instanceId);
-            Integer result = getSession().getSingleResult(query);
+            Long result = getSession().getSingleResult(query);
             if (result == null) {
                 return false;
             }
-            return result > 0;
+            return result > 0L;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
