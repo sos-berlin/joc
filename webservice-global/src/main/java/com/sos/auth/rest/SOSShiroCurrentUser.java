@@ -1,5 +1,7 @@
 package com.sos.auth.rest;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,8 +106,46 @@ public class SOSShiroCurrentUser {
         }
     }
 
+    private String getPermissionSubString(int pos, String permission) {
+        String p = permission.replace(':', '/');
+        Path path = Paths.get(p, "");
+        for (int i = 0; i < pos; i++) {
+            p = path.getParent().toString();
+            path = Paths.get(p, "");
+        }
+        p = p.replace('/', ':');
+        return p;
+    }
+
+    private boolean getExcluded(String permission, String permissionMaster) {
+        String[] permissionToken = permission.split(":");
+        boolean excluded = false;
+        for (int i = 0; i < permissionToken.length; i++) {
+            String s = getPermissionSubString(i, permission);
+            if (currentSubject != null) {
+                excluded = excluded || currentSubject.isPermitted("-" + s);
+            }
+        }
+
+        if (!excluded) {
+            permissionToken = permissionMaster.split(":");
+            for (int i = 1; i < permissionToken.length; i++) {
+                String s = getPermissionSubString(i - 1, permissionMaster);
+                if (currentSubject != null) {
+                    excluded = excluded || currentSubject.isPermitted("-" + s);
+                }
+            }
+        }
+        return excluded;
+    }
+
+    public boolean testGetExcluded(String permission, String permissionMaster) {
+        return getExcluded(permission, permissionMaster);
+    }
+
     private boolean getPermissionFromSubject(String permission, String permissionMaster) {
         boolean excluded = currentSubject.isPermitted("-" + permission) || currentSubject.isPermitted("-" + permissionMaster);
+        excluded = getExcluded(permission, permissionMaster);
         return (currentSubject.isPermitted(permission) || currentSubject.isPermitted(permissionMaster)) && !excluded;
     }
 
