@@ -110,8 +110,10 @@ public class SOSShiroCurrentUser {
         String p = permission.replace(':', '/');
         Path path = Paths.get(p, "");
         for (int i = 0; i < pos; i++) {
-            p = path.getParent().toString();
-            path = Paths.get(p, "");
+            if (path.getParent() != null) {
+                p = path.getParent().toString();
+                path = Paths.get(p, "");
+            }
         }
         p = p.replace('/', ':');
         return p;
@@ -120,7 +122,7 @@ public class SOSShiroCurrentUser {
     private boolean getExcluded(String permission, String permissionMaster) {
         String[] permissionToken = permission.split(":");
         boolean excluded = false;
-        for (int i = 0; i < permissionToken.length; i++) {
+        for (int i = 0; i < permissionToken.length-1; i++) {
             String s = getPermissionSubString(i, permission);
             if (currentSubject != null) {
                 excluded = excluded || currentSubject.isPermitted("-" + s);
@@ -129,8 +131,8 @@ public class SOSShiroCurrentUser {
 
         if (!excluded) {
             permissionToken = permissionMaster.split(":");
-            for (int i = 1; i < permissionToken.length; i++) {
-                String s = getPermissionSubString(i - 1, permissionMaster);
+            for (int i = 0; i < permissionToken.length-1; i++) {
+                String s = getPermissionSubString(i, permissionMaster);
                 if (currentSubject != null) {
                     excluded = excluded || currentSubject.isPermitted("-" + s);
                 }
