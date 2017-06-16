@@ -216,13 +216,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             case "reset_run_time":
                 try {
                     DBItemInventoryOrder dbItem = getDBItem(jobChainPath, order.getOrderId());
-                    if (dbItem == null) {
-                        throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", jobChainPath, order.getOrderId()));
+                    Boolean runTimeIsTemporary = Boolean.FALSE;
+                    if (dbItem != null && dbItem.getRunTimeIsTemporary() != null) {
+                        runTimeIsTemporary = dbItem.getRunTimeIsTemporary();
                     }
-                    if (dbItem.getRunTimeIsTemporary() == null) {
-                        dbItem.setRunTimeIsTemporary(false); 
-                    }
-                    if (dbItem.getRunTimeIsTemporary()) {
+                    if (runTimeIsTemporary) {
+                        dbItem.setRunTimeIsTemporary(true);
                         String runTimeCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, order.getOrderId(), "source");
                         String runTime = RunTime.getRuntimeXmlString(jobChainPath, jocXmlCommand, runTimeCommand, "//source/order/run_time", getAccessToken());
                         xml.add(XMLBuilder.parse(runTime));
