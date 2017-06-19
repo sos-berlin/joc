@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.sos.joc.model.common.ConfigurationState;
+import com.sos.joc.model.common.Err;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrdersSummary;
@@ -42,6 +43,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "taskQueue",
     "params",
     "configurationStatus",
+    "error",
     "ordersSummary",
     "nextStartTime",
     "delayUntil",
@@ -145,6 +147,14 @@ public class JobV {
      */
     @JsonProperty("configurationStatus")
     private ConfigurationState configurationStatus;
+    /**
+     * error
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("error")
+    private Err error;
     /**
      * job chain order summary
      * <p>
@@ -555,6 +565,32 @@ public class JobV {
     }
 
     /**
+     * error
+     * <p>
+     * 
+     * 
+     * @return
+     *     The error
+     */
+    @JsonProperty("error")
+    public Err getError() {
+        return error;
+    }
+
+    /**
+     * error
+     * <p>
+     * 
+     * 
+     * @param error
+     *     The error
+     */
+    @JsonProperty("error")
+    public void setError(Err error) {
+        this.error = error;
+    }
+
+    /**
      * job chain order summary
      * <p>
      * only relevant for order jobs and is empty if job's order queue is empty
@@ -659,7 +695,7 @@ public class JobV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(orderQueue).append(allTasks).append(allSteps).append(state).append(stateText).append(locks).append(temporary).append(numOfRunningTasks).append(runningTasks).append(numOfQueuedTasks).append(taskQueue).append(params).append(configurationStatus).append(ordersSummary).append(nextStartTime).append(delayUntil).append(runTimeIsTemporary).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(orderQueue).append(allTasks).append(allSteps).append(state).append(stateText).append(locks).append(temporary).append(numOfRunningTasks).append(runningTasks).append(numOfQueuedTasks).append(taskQueue).append(params).append(configurationStatus).append(error).append(ordersSummary).append(nextStartTime).append(delayUntil).append(runTimeIsTemporary).toHashCode();
     }
 
     @Override
@@ -671,7 +707,7 @@ public class JobV {
             return false;
         }
         JobV rhs = ((JobV) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(orderQueue, rhs.orderQueue).append(allTasks, rhs.allTasks).append(allSteps, rhs.allSteps).append(state, rhs.state).append(stateText, rhs.stateText).append(locks, rhs.locks).append(temporary, rhs.temporary).append(numOfRunningTasks, rhs.numOfRunningTasks).append(runningTasks, rhs.runningTasks).append(numOfQueuedTasks, rhs.numOfQueuedTasks).append(taskQueue, rhs.taskQueue).append(params, rhs.params).append(configurationStatus, rhs.configurationStatus).append(ordersSummary, rhs.ordersSummary).append(nextStartTime, rhs.nextStartTime).append(delayUntil, rhs.delayUntil).append(runTimeIsTemporary, rhs.runTimeIsTemporary).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(orderQueue, rhs.orderQueue).append(allTasks, rhs.allTasks).append(allSteps, rhs.allSteps).append(state, rhs.state).append(stateText, rhs.stateText).append(locks, rhs.locks).append(temporary, rhs.temporary).append(numOfRunningTasks, rhs.numOfRunningTasks).append(runningTasks, rhs.runningTasks).append(numOfQueuedTasks, rhs.numOfQueuedTasks).append(taskQueue, rhs.taskQueue).append(params, rhs.params).append(configurationStatus, rhs.configurationStatus).append(error, rhs.error).append(ordersSummary, rhs.ordersSummary).append(nextStartTime, rhs.nextStartTime).append(delayUntil, rhs.delayUntil).append(runTimeIsTemporary, rhs.runTimeIsTemporary).isEquals();
     }
 
 }

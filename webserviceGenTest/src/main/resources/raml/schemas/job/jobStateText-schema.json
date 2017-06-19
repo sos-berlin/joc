@@ -17,6 +17,8 @@
     "NOT_IN_PERIOD",
     "STOPPING",
     "STOPPED",
-    "DISABLED"
+    "DISABLED",
+    "ERROR",
+    "UNKNOWN"
   ]
 }

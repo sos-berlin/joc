@@ -15,6 +15,7 @@ import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.classes.parameters.Parameters;
+import com.sos.joc.model.common.Err;
 import com.sos.joc.model.job.JobState;
 import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobV;
@@ -78,6 +79,7 @@ public class JobVolatile extends JobV {
                 try {
                     getState().set_text(JobStateText.fromValue(job.getAttribute(WebserviceConstants.STATE).toUpperCase()));
                 } catch (Exception e) {
+                    getState().set_text(JobStateText.fromValue("UNKNOWN"));
                 }
                 if (jocXmlCommand.getBoolValue(job.getAttribute(WebserviceConstants.WAITING_FOR_AGENT), false)) {
                     getState().set_text(JobStateText.WAITING_FOR_AGENT);
@@ -163,6 +165,7 @@ public class JobVolatile extends JobV {
         setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));
         setNextStartTime(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, WebserviceConstants.NEXT_START_TIME, null)));
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(job));
+        setErr((Element) jocXmlCommand.getSosxml().selectSingleNode(job, "ERROR"));
         setSummary();
         if (isOrderJob() && withOrderQueue) {
             JOCJsonCommand jocJsonCommand = new JOCJsonCommand(jocXmlCommand.getJOCResourceImpl());
@@ -174,6 +177,15 @@ public class JobVolatile extends JobV {
         }
     }
     
+    private void setErr(Element errorElem) {
+        if (errorElem != null) {
+            Err err = new Err();
+            err.setCode(errorElem.getAttribute("code"));
+            err.setMessage(errorElem.getAttribute("text"));
+            setError(err);
+        }
+    }
+
     private String getAttributeValue(String attributeName, String default_) {
         String val = job.getAttribute(attributeName);
         if (val == null || val.isEmpty()) {
@@ -210,6 +222,7 @@ public class JobVolatile extends JobV {
         case WAITING_FOR_AGENT:
         case STOPPING:
         case STOPPED:
+        case ERROR:
             state.setSeverity(2);
             break;
         case INITIALIZED:
@@ -221,6 +234,7 @@ public class JobVolatile extends JobV {
             state.setSeverity(3);
             break;
         case DISABLED:
+        case UNKNOWN:
             state.setSeverity(4);
             break;
         }
