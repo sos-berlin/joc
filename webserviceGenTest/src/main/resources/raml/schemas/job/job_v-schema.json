@@ -102,6 +102,10 @@
     "configurationStatus": {
       "$ref": "../common/configurationStatus-schema.json"
     },
+    "error": {
+      "description": "if state=error",
+      "$ref": "../common/error-schema.json"
+    },
     "ordersSummary": {
       "$ref": "../order/ordersSummary-schema.json"
     },

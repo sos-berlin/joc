@@ -1,7 +1,6 @@
 package com.sos.joc.classes.jobs;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.sos.hibernate.classes.SOSHibernateSession;

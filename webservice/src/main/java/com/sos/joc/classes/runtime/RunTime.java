@@ -33,16 +33,21 @@ public class RunTime {
         NodeList runtimeNodes = jocXmlCommand.getSosxml().selectNodeList(xPath);
         com.sos.joc.model.common.RunTime runTime = new com.sos.joc.model.common.RunTime();
         runTime.setRunTimeIsTemporary(runTimeIsTemporary);
+        runTime.setSurveyDate(jocXmlCommand.getSurveyDate());
         Path parent = Paths.get(path).getParent();
-        for (int i=0; i < runtimeNodes.getLength(); i++) {
-            Node runtimeNode = runtimeNodes.item(i);
-            if ("source".equals(runtimeNode.getParentNode().getParentNode().getNodeName())) {
-                if (runTimeIsTemporary) {
-                    runTime.setPermanentRunTime(getRuntimeXmlString(parent, runtimeNode));
+        if (runtimeNodes != null && runtimeNodes.getLength() > 0) {  //adhoc and file orders
+            for (int i=0; i < runtimeNodes.getLength(); i++) {
+                Node runtimeNode = runtimeNodes.item(i);
+                if ("source".equals(runtimeNode.getParentNode().getParentNode().getNodeName())) {
+                    if (runTimeIsTemporary) {
+                        runTime.setPermanentRunTime(getRuntimeXmlString(parent, runtimeNode));
+                    }
+                } else {
+                    runTime.setRunTime(getRuntimeXmlString(parent, runtimeNode));
                 }
-            } else {
-                runTime.setRunTime(getRuntimeXmlString(parent, runtimeNode));
-            }
+            } 
+        } else {
+            runTime.setRunTime(getRuntimeXmlString(parent, null)); 
         }
         runTimeAnswer.setRunTime(runTime);
         runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));

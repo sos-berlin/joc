@@ -22,7 +22,9 @@ public enum JobStateText {
     NOT_IN_PERIOD("NOT_IN_PERIOD"),
     STOPPING("STOPPING"),
     STOPPED("STOPPED"),
-    DISABLED("DISABLED");
+    DISABLED("DISABLED"),
+    ERROR("ERROR"),
+    UNKNOWN("UNKNOWN");
     private final String value;
     private final static Map<String, JobStateText> CONSTANTS = new HashMap<String, JobStateText>();
 

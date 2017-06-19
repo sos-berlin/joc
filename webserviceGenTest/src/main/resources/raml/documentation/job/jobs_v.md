@@ -13,6 +13,7 @@ It depends on the parameter ``compact``.<br/>
 * The compact view have further optional fields
     * locks
     * configurationStatus
+    * error
 * The detailed view has the following required fields in addition to the compact view
     * allTasks
     * allSteps

@@ -15,7 +15,6 @@ import javax.ws.rs.Path;
 
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.StoppedSessionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

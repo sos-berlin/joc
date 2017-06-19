@@ -14,7 +14,6 @@ import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
-import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;

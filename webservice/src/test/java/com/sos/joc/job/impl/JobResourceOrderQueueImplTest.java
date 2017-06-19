@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.job.JobFilter;
 
 public class JobResourceOrderQueueImplTest {

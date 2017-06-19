@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class JobState {
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
+     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/error, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled/unknown
      * (Required)
      * 
      */
@@ -42,7 +42,7 @@ public class JobState {
     private JobStateText _text;
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
+     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/error, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled/unknown
      * (Required)
      * 
      * @return
@@ -54,7 +54,7 @@ public class JobState {
     }
 
     /**
-     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled
+     *  0=running; 1=pending; 2=not_initialized/waiting_for_agent/stopping/stopped/error, 3=initialized/loaded/waiting_for_process/waiting_for_lock/waiting_for_task/not_in_period, 4=disabled/unknown
      * (Required)
      * 
      * @param severity
