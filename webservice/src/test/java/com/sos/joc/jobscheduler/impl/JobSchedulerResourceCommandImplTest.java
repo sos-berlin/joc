@@ -1,15 +1,13 @@
 package com.sos.joc.jobscheduler.impl;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
 import com.sos.auth.rest.SOSServicePermissionShiro;
-import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.commands.JobChainNodeAction;
 import com.sos.joc.model.commands.JobChainNodeModify;
 import com.sos.joc.model.commands.JobschedulerCommands;
-import com.sos.joc.model.commands.ShowJobs;
 import com.sos.joc.model.commands.ShowState;
 
 public class JobSchedulerResourceCommandImplTest {
@@ -28,11 +26,8 @@ public class JobSchedulerResourceCommandImplTest {
         JobChainNodeModify jobChainNodeModify = new JobChainNodeModify();
         jobChainNodeModify.setAction(JobChainNodeAction.STOP);
         jobChainNodeModify.setJobChain("/job_chain1");
-         jobChainNodeModify.setState("test");
-         
-         ShowJobs showJobs = new ShowJobs();
-          
-         jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().add(command);
+        jobChainNodeModify.setState("test");
+        jobschedulerCommand.getAddOrderOrCheckFoldersOrKillTask().add(command);
         JobSchedulerResourceCommandImpl orderConfigurationImpl = new JobSchedulerResourceCommandImpl();
         JOCDefaultResponse response = orderConfigurationImpl.postJobschedulerCommands(sosShiroCurrentUserAnswer.getAccessToken(), jobschedulerCommand);
         System.out.println(response.getEntity().toString());

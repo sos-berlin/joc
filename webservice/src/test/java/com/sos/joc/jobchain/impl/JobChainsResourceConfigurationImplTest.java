@@ -1,12 +1,12 @@
 package com.sos.joc.jobchain.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
 import com.sos.auth.rest.SOSServicePermissionShiro;
 import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.jobchain.impl.JobChainResourceConfigurationImpl;
 import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.jobChain.JobChainConfigurationFilter;
 

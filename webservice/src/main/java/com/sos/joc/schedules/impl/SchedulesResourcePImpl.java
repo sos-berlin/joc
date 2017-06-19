@@ -17,7 +17,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
-import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.schedule.ScheduleP;
