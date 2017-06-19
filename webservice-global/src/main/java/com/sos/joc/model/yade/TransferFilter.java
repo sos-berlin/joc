@@ -21,23 +21,26 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "fileIds",
     "transferIds",
-    "interventionTransferIds",
     "compact",
     "regex",
+    "profiles",
+    "mandator",
     "states",
+    "operations",
+    "dateFrom",
+    "dateTo",
+    "timeZone",
+    "limit",
+    "hasIntervention",
+    "isIntervention",
     "sources",
     "targets"
 })
 public class TransferFilter {
 
-    @JsonProperty("fileIds")
-    private List<Integer> fileIds = new ArrayList<Integer>();
     @JsonProperty("transferIds")
     private List<Integer> transferIds = new ArrayList<Integer>();
-    @JsonProperty("interventionTransferIds")
-    private List<Integer> interventionTransferIds = new ArrayList<Integer>();
     /**
      * compact parameter
      * <p>
@@ -54,32 +57,38 @@ public class TransferFilter {
      */
     @JsonProperty("regex")
     private String regex;
+    @JsonProperty("profiles")
+    private List<Object> profiles = new ArrayList<Object>();
+    @JsonProperty("mandator")
+    private String mandator;
     @JsonProperty("states")
-    private List<FileTransferStateText> states = new ArrayList<FileTransferStateText>();
+    private List<TransferStateText> states = new ArrayList<TransferStateText>();
+    @JsonProperty("operations")
+    private List<Operation> operations = new ArrayList<Operation>();
+    @JsonProperty("dateFrom")
+    private String dateFrom;
+    @JsonProperty("dateTo")
+    private String dateTo;
+    /**
+     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+     * 
+     */
+    @JsonProperty("timeZone")
+    private String timeZone;
+    /**
+     * only for db history urls to restrict the number of responsed records; -1=unlimited
+     * 
+     */
+    @JsonProperty("limit")
+    private Integer limit = 10000;
+    @JsonProperty("hasIntervention")
+    private Boolean hasIntervention;
+    @JsonProperty("isIntervention")
+    private Boolean isIntervention;
     @JsonProperty("sources")
-    private List<Source> sources = new ArrayList<Source>();
+    private List<Source_> sources = new ArrayList<Source_>();
     @JsonProperty("targets")
-    private List<Target> targets = new ArrayList<Target>();
-
-    /**
-     * 
-     * @return
-     *     The fileIds
-     */
-    @JsonProperty("fileIds")
-    public List<Integer> getFileIds() {
-        return fileIds;
-    }
-
-    /**
-     * 
-     * @param fileIds
-     *     The fileIds
-     */
-    @JsonProperty("fileIds")
-    public void setFileIds(List<Integer> fileIds) {
-        this.fileIds = fileIds;
-    }
+    private List<Target_> targets = new ArrayList<Target_>();
 
     /**
      * 
@@ -99,26 +108,6 @@ public class TransferFilter {
     @JsonProperty("transferIds")
     public void setTransferIds(List<Integer> transferIds) {
         this.transferIds = transferIds;
-    }
-
-    /**
-     * 
-     * @return
-     *     The interventionTransferIds
-     */
-    @JsonProperty("interventionTransferIds")
-    public List<Integer> getInterventionTransferIds() {
-        return interventionTransferIds;
-    }
-
-    /**
-     * 
-     * @param interventionTransferIds
-     *     The interventionTransferIds
-     */
-    @JsonProperty("interventionTransferIds")
-    public void setInterventionTransferIds(List<Integer> interventionTransferIds) {
-        this.interventionTransferIds = interventionTransferIds;
     }
 
     /**
@@ -176,10 +165,50 @@ public class TransferFilter {
     /**
      * 
      * @return
+     *     The profiles
+     */
+    @JsonProperty("profiles")
+    public List<Object> getProfiles() {
+        return profiles;
+    }
+
+    /**
+     * 
+     * @param profiles
+     *     The profiles
+     */
+    @JsonProperty("profiles")
+    public void setProfiles(List<Object> profiles) {
+        this.profiles = profiles;
+    }
+
+    /**
+     * 
+     * @return
+     *     The mandator
+     */
+    @JsonProperty("mandator")
+    public String getMandator() {
+        return mandator;
+    }
+
+    /**
+     * 
+     * @param mandator
+     *     The mandator
+     */
+    @JsonProperty("mandator")
+    public void setMandator(String mandator) {
+        this.mandator = mandator;
+    }
+
+    /**
+     * 
+     * @return
      *     The states
      */
     @JsonProperty("states")
-    public List<FileTransferStateText> getStates() {
+    public List<TransferStateText> getStates() {
         return states;
     }
 
@@ -189,8 +218,152 @@ public class TransferFilter {
      *     The states
      */
     @JsonProperty("states")
-    public void setStates(List<FileTransferStateText> states) {
+    public void setStates(List<TransferStateText> states) {
         this.states = states;
+    }
+
+    /**
+     * 
+     * @return
+     *     The operations
+     */
+    @JsonProperty("operations")
+    public List<Operation> getOperations() {
+        return operations;
+    }
+
+    /**
+     * 
+     * @param operations
+     *     The operations
+     */
+    @JsonProperty("operations")
+    public void setOperations(List<Operation> operations) {
+        this.operations = operations;
+    }
+
+    /**
+     * 
+     * @return
+     *     The dateFrom
+     */
+    @JsonProperty("dateFrom")
+    public String getDateFrom() {
+        return dateFrom;
+    }
+
+    /**
+     * 
+     * @param dateFrom
+     *     The dateFrom
+     */
+    @JsonProperty("dateFrom")
+    public void setDateFrom(String dateFrom) {
+        this.dateFrom = dateFrom;
+    }
+
+    /**
+     * 
+     * @return
+     *     The dateTo
+     */
+    @JsonProperty("dateTo")
+    public String getDateTo() {
+        return dateTo;
+    }
+
+    /**
+     * 
+     * @param dateTo
+     *     The dateTo
+     */
+    @JsonProperty("dateTo")
+    public void setDateTo(String dateTo) {
+        this.dateTo = dateTo;
+    }
+
+    /**
+     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+     * 
+     * @return
+     *     The timeZone
+     */
+    @JsonProperty("timeZone")
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    /**
+     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+     * 
+     * @param timeZone
+     *     The timeZone
+     */
+    @JsonProperty("timeZone")
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    /**
+     * only for db history urls to restrict the number of responsed records; -1=unlimited
+     * 
+     * @return
+     *     The limit
+     */
+    @JsonProperty("limit")
+    public Integer getLimit() {
+        return limit;
+    }
+
+    /**
+     * only for db history urls to restrict the number of responsed records; -1=unlimited
+     * 
+     * @param limit
+     *     The limit
+     */
+    @JsonProperty("limit")
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+    /**
+     * 
+     * @return
+     *     The hasIntervention
+     */
+    @JsonProperty("hasIntervention")
+    public Boolean getHasIntervention() {
+        return hasIntervention;
+    }
+
+    /**
+     * 
+     * @param hasIntervention
+     *     The hasIntervention
+     */
+    @JsonProperty("hasIntervention")
+    public void setHasIntervention(Boolean hasIntervention) {
+        this.hasIntervention = hasIntervention;
+    }
+
+    /**
+     * 
+     * @return
+     *     The isIntervention
+     */
+    @JsonProperty("isIntervention")
+    public Boolean getIsIntervention() {
+        return isIntervention;
+    }
+
+    /**
+     * 
+     * @param isIntervention
+     *     The isIntervention
+     */
+    @JsonProperty("isIntervention")
+    public void setIsIntervention(Boolean isIntervention) {
+        this.isIntervention = isIntervention;
     }
 
     /**
@@ -199,7 +372,7 @@ public class TransferFilter {
      *     The sources
      */
     @JsonProperty("sources")
-    public List<Source> getSources() {
+    public List<Source_> getSources() {
         return sources;
     }
 
@@ -209,7 +382,7 @@ public class TransferFilter {
      *     The sources
      */
     @JsonProperty("sources")
-    public void setSources(List<Source> sources) {
+    public void setSources(List<Source_> sources) {
         this.sources = sources;
     }
 
@@ -219,7 +392,7 @@ public class TransferFilter {
      *     The targets
      */
     @JsonProperty("targets")
-    public List<Target> getTargets() {
+    public List<Target_> getTargets() {
         return targets;
     }
 
@@ -229,7 +402,7 @@ public class TransferFilter {
      *     The targets
      */
     @JsonProperty("targets")
-    public void setTargets(List<Target> targets) {
+    public void setTargets(List<Target_> targets) {
         this.targets = targets;
     }
 
@@ -240,7 +413,7 @@ public class TransferFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(fileIds).append(transferIds).append(interventionTransferIds).append(compact).append(regex).append(states).append(sources).append(targets).toHashCode();
+        return new HashCodeBuilder().append(transferIds).append(compact).append(regex).append(profiles).append(mandator).append(states).append(operations).append(dateFrom).append(dateTo).append(timeZone).append(limit).append(hasIntervention).append(isIntervention).append(sources).append(targets).toHashCode();
     }
 
     @Override
@@ -252,7 +425,7 @@ public class TransferFilter {
             return false;
         }
         TransferFilter rhs = ((TransferFilter) other);
-        return new EqualsBuilder().append(fileIds, rhs.fileIds).append(transferIds, rhs.transferIds).append(interventionTransferIds, rhs.interventionTransferIds).append(compact, rhs.compact).append(regex, rhs.regex).append(states, rhs.states).append(sources, rhs.sources).append(targets, rhs.targets).isEquals();
+        return new EqualsBuilder().append(transferIds, rhs.transferIds).append(compact, rhs.compact).append(regex, rhs.regex).append(profiles, rhs.profiles).append(mandator, rhs.mandator).append(states, rhs.states).append(operations, rhs.operations).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(limit, rhs.limit).append(hasIntervention, rhs.hasIntervention).append(isIntervention, rhs.isIntervention).append(sources, rhs.sources).append(targets, rhs.targets).isEquals();
     }
 
 }
