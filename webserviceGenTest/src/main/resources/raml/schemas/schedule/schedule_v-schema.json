@@ -23,9 +23,6 @@
     "state": {
       "$ref": "scheduleState-schema.json"
     },
-    "substitutedBy": {
-      "$ref": "../common/path-schema.json"
-    },
     "configurationStatus": {
       "$ref": "../common/configurationStatus-schema.json"
     }

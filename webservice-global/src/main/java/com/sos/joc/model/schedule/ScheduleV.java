@@ -25,7 +25,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "path",
     "name",
     "state",
-    "substitutedBy",
     "configurationStatus"
 })
 public class ScheduleV {
@@ -64,14 +63,6 @@ public class ScheduleV {
      */
     @JsonProperty("state")
     private ScheduleState state;
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * 
-     */
-    @JsonProperty("substitutedBy")
-    private String substitutedBy;
     /**
      * configuration status
      * <p>
@@ -190,32 +181,6 @@ public class ScheduleV {
     }
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * 
-     * @return
-     *     The substitutedBy
-     */
-    @JsonProperty("substitutedBy")
-    public String getSubstitutedBy() {
-        return substitutedBy;
-    }
-
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * 
-     * @param substitutedBy
-     *     The substitutedBy
-     */
-    @JsonProperty("substitutedBy")
-    public void setSubstitutedBy(String substitutedBy) {
-        this.substitutedBy = substitutedBy;
-    }
-
-    /**
      * configuration status
      * <p>
      * 
@@ -248,7 +213,7 @@ public class ScheduleV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(state).append(substitutedBy).append(configurationStatus).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(state).append(configurationStatus).toHashCode();
     }
 
     @Override
@@ -260,7 +225,7 @@ public class ScheduleV {
             return false;
         }
         ScheduleV rhs = ((ScheduleV) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(state, rhs.state).append(substitutedBy, rhs.substitutedBy).append(configurationStatus, rhs.configurationStatus).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(state, rhs.state).append(configurationStatus, rhs.configurationStatus).isEquals();
     }
 
 }

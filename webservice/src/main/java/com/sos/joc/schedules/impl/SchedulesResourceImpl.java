@@ -13,11 +13,14 @@ import javax.ws.rs.Path;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.schedule.ScheduleVolatile;
+import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -34,6 +37,8 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
 
     @Override
     public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
+        SOSHibernateSession connection = null;
+        
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, schedulesFilter, accessToken, schedulesFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getSchedule().getView().isStatus());
@@ -54,10 +59,18 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
                 checkRequiredParameter("schedules.schedule", schedule.getSchedule());
                 setOfSchedules.add(normalizePath(schedule.getSchedule()));
             }
+            
+            InventorySchedulesDBLayer dbLayer = null;
+            try {
+                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                Globals.beginTransaction(connection);
+                dbLayer = new InventorySchedulesDBLayer(connection);
+            } catch (Exception e) {
+            }
 
             for (int i = 0; i < schedules.getLength(); i++) {
                 Element scheduleElement = (Element) schedules.item(i);
-                ScheduleVolatile scheduleV = new ScheduleVolatile(surveyDate, scheduleElement);
+                ScheduleVolatile scheduleV = new ScheduleVolatile(surveyDate, scheduleElement, dbLayer, dbItemInventoryInstance);
 
                 if (!setOfSchedules.isEmpty() && !setOfSchedules.contains(scheduleV.getPath())) {
                     continue;
@@ -84,6 +97,8 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
     }
 

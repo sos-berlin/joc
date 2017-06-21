@@ -27,6 +27,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "name",
     "title",
     "substitute",
+    "substitutedBy",
     "usedByOrders",
     "usedByJobs",
     "configurationDate"
@@ -62,6 +63,8 @@ public class ScheduleP {
     private String title;
     @JsonProperty("substitute")
     private Substitute substitute;
+    @JsonProperty("substitutedBy")
+    private List<String> substitutedBy = new ArrayList<String>();
     /**
      * 
      * (Required)
@@ -207,6 +210,26 @@ public class ScheduleP {
 
     /**
      * 
+     * @return
+     *     The substitutedBy
+     */
+    @JsonProperty("substitutedBy")
+    public List<String> getSubstitutedBy() {
+        return substitutedBy;
+    }
+
+    /**
+     * 
+     * @param substitutedBy
+     *     The substitutedBy
+     */
+    @JsonProperty("substitutedBy")
+    public void setSubstitutedBy(List<String> substitutedBy) {
+        this.substitutedBy = substitutedBy;
+    }
+
+    /**
+     * 
      * (Required)
      * 
      * @return
@@ -286,7 +309,7 @@ public class ScheduleP {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(title).append(substitute).append(usedByOrders).append(usedByJobs).append(configurationDate).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(path).append(name).append(title).append(substitute).append(substitutedBy).append(usedByOrders).append(usedByJobs).append(configurationDate).toHashCode();
     }
 
     @Override
@@ -298,7 +321,7 @@ public class ScheduleP {
             return false;
         }
         ScheduleP rhs = ((ScheduleP) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(title, rhs.title).append(substitute, rhs.substitute).append(usedByOrders, rhs.usedByOrders).append(usedByJobs, rhs.usedByJobs).append(configurationDate, rhs.configurationDate).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(name, rhs.name).append(title, rhs.title).append(substitute, rhs.substitute).append(substitutedBy, rhs.substitutedBy).append(usedByOrders, rhs.usedByOrders).append(usedByJobs, rhs.usedByJobs).append(configurationDate, rhs.configurationDate).isEquals();
     }
 
 }

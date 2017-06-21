@@ -11,7 +11,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum ScheduleStateText {
 
     ACTIVE("ACTIVE"),
-    INACTIVE("INACTIVE");
+    INACTIVE("INACTIVE"),
+    UNKNOWN("UNKNOWN");
     private final String value;
     private final static Map<String, ScheduleStateText> CONSTANTS = new HashMap<String, ScheduleStateText>();
 

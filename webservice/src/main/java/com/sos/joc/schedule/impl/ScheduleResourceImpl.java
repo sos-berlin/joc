@@ -7,10 +7,15 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemInventorySchedule;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.schedule.ScheduleVolatile;
+import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ScheduleFilter;
@@ -24,6 +29,8 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
 
     @Override
     public JOCDefaultResponse postSchedule(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
+        SOSHibernateSession connection = null;
+        
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleFilter, accessToken, scheduleFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getSchedule().getView().isStatus());
@@ -45,9 +52,16 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             if (scheduleElement == null) {
                 throw new JobSchedulerBadRequestException(String.format("Schedule '%1$s' doesn't exit.", schedulePath));
             }
+            InventorySchedulesDBLayer dbLayer = null;
+            try {
+                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                Globals.beginTransaction(connection);
+                dbLayer = new InventorySchedulesDBLayer(connection);
+            } catch (Exception e) {
+            }
 
             ScheduleV200 entity = new ScheduleV200();
-            entity.setSchedule(new ScheduleVolatile(jocXmlCommand.getSurveyDate(), scheduleElement));
+            entity.setSchedule(new ScheduleVolatile(jocXmlCommand.getSurveyDate(), scheduleElement, dbLayer, dbItemInventoryInstance));
             entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -56,6 +70,8 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
     }
 }

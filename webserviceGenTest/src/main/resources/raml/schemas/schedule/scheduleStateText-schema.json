@@ -6,6 +6,7 @@
   "type": "string",
   "enum": [
     "ACTIVE",
-    "INACTIVE"
+    "INACTIVE",
+    "UNKNOWN"
   ]
 }

@@ -232,25 +232,7 @@ traits:
         schema200: !include schemas/jobscheduler/agentClusters-schema.json
         example: !include examples/jobscheduler/filteredByAgentCluster-example.json
         example200: !include examples/jobscheduler/agentClusters_v-example.json
-#    /p:
-#      type:
-#        postJSON:
-#          description: Collection of JobScheduler Agent Clusters with general permanent information
-#          description1: !include documentation/common/compact.md
-#          description2: !include documentation/jobscheduler/agentClustersParam.md
-#          description3: !include documentation/jobscheduler/state.md
-#          description4: !include documentation/jobscheduler/regex.md
-#          description5: " "
-#          description6: " "
-#          description7: " "
-#          description8: " "
-#          description9: " "
-#          description10: " "
-#          description200: !include documentation/jobscheduler/agentCluster_p.md
-#          schema: !include schemas/jobscheduler/agentClusterFilter-schema.json
-#          schema200: !include schemas/jobscheduler/agentClusters-schema.json
-#          example: !include examples/jobscheduler/filteredByAgentCluster-example.json
-#          example200: !include examples/jobscheduler/agentClusters_p-example.json
+
   /cluster:
     type:
       postOnlyId:
@@ -711,25 +693,6 @@ traits:
         schema200: !include schemas/job/jobs_p-schema.json
         example: TODO
         example200: !include examples/job/jobs_p-example.json
-#  /tree:
-#    type:
-#      postJSON:
-#        description: This is not a real API Url. Only for mock data. Please use ./tree later with "types":["JOB"]
-#        description1: " "
-#        description2: " "
-#        description3: " "
-#        description4: " "
-#        description5: " "
-#        description6: " "
-#        description7: " "
-#        description8: " "
-#        description9: " "
-#        description10: " "
-#        description200: " "
-#        schema: !include schemas/tree/treeFilter-schema.json
-#        schema200: !include schemas/tree/treeView-schema.json
-#        example: !include examples/tree/filteredtree-example.json
-#        example200: !include examples/tree/tree_jobs-example.json
   /start:
     type:
       startJob:
@@ -1300,13 +1263,7 @@ traits:
         schema200: !include schemas/schedule/schedules_p-schema.json
         example: !include examples/schedule/filteredSchedules-example.json
         example200: !include examples/schedule/schedules_p-example.json
-  #/tree:
-#    type:
-#      postOnlyId:
-#        description: This is not a real API Url. Only for mock data. Please use ./tree later with "types":["SCHEDULE"]
-#        description200: " "
-#        example200: TODO
-#        schema200: !include schemas/tree/treeView-schema.json
+
 
 /schedule:
   type:

@@ -6,5 +6,6 @@
     * usedByJobs
 * Optional fields are
     * title
-    * substitute (this field and substitutedBy from the volatile part are exclusive)
+    * substitute (this field and substitutedBy are exclusive)
+    * substitutedBy
     * configurationDate
