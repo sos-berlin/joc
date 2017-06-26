@@ -38,6 +38,13 @@
         }
       }
     },
+    "substitutedBy": {
+      "type" : "array",
+      "items" : {
+        "type": "string",
+        "$ref": "../common/path-schema.json"
+      }
+    },
     "usedByOrders": {
       "type": "array",
       "items": {

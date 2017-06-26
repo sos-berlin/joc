@@ -252,7 +252,7 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             if (eventType.startsWith("File")) {
                 continue;
             }
-            if (eventType.startsWith("Custom")) {
+            if ("VariablesCustomEvent".equalsIgnoreCase(eventType)) {
                 continue;
             }
             if (eventType.startsWith("Task")) {

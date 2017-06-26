@@ -122,11 +122,19 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                             .getJobschedulerId());
                     if (instance.getSupervisorId() > 0) {
                         DBItemInventoryInstance supervisor = instanceLayer.getInventoryInstanceByKey(instance.getSupervisorId());
-                        JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, supervisor.getId(), defaultEventId);
-                        JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, supervisor, "SchedulerEvent");
-                        jocJsonCommandsOfClusterMember.add(commandOfMember);
-                        tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
-                                supervisor.getId()));
+                        if (supervisor != null) {
+                            JobSchedulerEvent jsEventOfMember = initEvent(jsObject, session, supervisor.getId(), defaultEventId);
+                            JOCJsonCommand commandOfMember = initJocJsonCommand(jsEventOfMember, supervisor, "SchedulerEvent");
+                            jocJsonCommandsOfClusterMember.add(commandOfMember);
+                            tasksOfClusterMember.add(new EventCallableJobSchedulerStateChanged(commandOfMember, jsEventOfMember, accessToken, session,
+                                    supervisor.getId()));
+                        } else {
+                            Boolean supervisorWarningIsLogged = (Boolean) session.getAttribute("supervisorWarningIsLogged");
+                            if (supervisorWarningIsLogged == null) {
+                                LOGGER.warn(String.format("Supervisor with ID %d expected but not found in INVENTORY_INSTANCES",instance.getSupervisorId()));
+                                session.setAttribute("supervisorWarningIsLogged", true);
+                            }
+                        }
                     }
 
                     for (DBItemInventoryInstance jobSchedulerMember : jobSchedulerMembers) {

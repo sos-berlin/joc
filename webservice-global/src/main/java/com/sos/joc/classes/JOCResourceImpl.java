@@ -90,7 +90,7 @@ public class JOCResourceImpl {
         return Date.from(fromEpochMilli);
     }
       
-    public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws Exception {
+    public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws JocException {
         this.accessToken = accessToken;
         if (jobschedulerUser == null) {
             jobschedulerUser = new JobSchedulerUser(accessToken);
