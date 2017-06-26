@@ -310,10 +310,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     
     private void updateRunTimeIsTemporary(String jobChainPath, String orderId, boolean value) throws JocException {
         DBItemInventoryOrder dbItem = getDBItem(jobChainPath, orderId);
-        if (dbItem == null) {
-            throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", jobChainPath, orderId));
+        if (dbItem != null) {
+            updateRunTimeIsTemporary(dbItem, value);
         }
-        updateRunTimeIsTemporary(dbItem, value);
     }
     
     private void updateRunTimeIsTemporary(DBItemInventoryOrder dbItem, boolean value) throws JocException {
