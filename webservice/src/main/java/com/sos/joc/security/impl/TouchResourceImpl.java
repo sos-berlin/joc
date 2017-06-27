@@ -4,6 +4,7 @@ import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.security.resource.ITouchResource;
 
@@ -21,10 +22,12 @@ public class TouchResourceImpl extends JOCResourceImpl implements ITouchResource
             }
             try {
                 if (!jobschedulerUser.resetTimeOut()) {
-                    return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
+                    return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
                 }
             } catch (org.apache.shiro.session.InvalidSessionException e) {
-                return JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, e.getMessage()));
+                JocError err = getJocError();
+                err.setMessage(e.getMessage());
+                return JOCDefaultResponse.responseStatus440(JOCDefaultResponse.getError401Schema(jobschedulerUser, err));
             }
             return JOCDefaultResponse.responseStatusJSOk(null);
         } catch (JocException e) {
