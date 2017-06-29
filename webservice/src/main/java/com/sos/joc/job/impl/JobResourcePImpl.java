@@ -38,8 +38,12 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             checkRequiredParameter("job", jobFilter.getJob());
             Long instanceId = dbItemInventoryInstance.getId();
-            DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(normalizePath(jobFilter.getJob()), instanceId);
-            if (inventoryJob == null) {
+            String jobPath = normalizePath(jobFilter.getJob());
+            DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(jobPath, instanceId);
+            if ("/scheduler_file_order_sink".equals(jobPath)) {
+                inventoryJob = new DBItemInventoryJob();
+                inventoryJob.setName("/scheduler_file_order_sink");
+            } else if (inventoryJob == null) {
                 throw new DBMissingDataException("no entry found in DB for job: " + jobFilter.getJob());
             }
             JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId);

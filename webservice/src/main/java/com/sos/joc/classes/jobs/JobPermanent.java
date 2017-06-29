@@ -1,7 +1,9 @@
 package com.sos.joc.classes.jobs;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
@@ -36,6 +38,9 @@ public class JobPermanent {
     }
 
     public static List<LockUseP> getLocks(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer, Long instanceId) throws Exception {
+        if ("/scheduler_file_order_sink".equals(job.getName())) {
+            return null;
+        }
         List<DBItemInventoryLock> locksFromDb = dbLayer.getLocksIfExists(job.getId(), instanceId);
         List<LockUseP> locks = new ArrayList<LockUseP>();
         if (locksFromDb != null) {
@@ -51,25 +56,38 @@ public class JobPermanent {
     }
 
     public static List<DBItemInventoryJobChain> getJobChains(DBItemInventoryJob job, InventoryJobsDBLayer dbLayer, Long instanceId) throws Exception {
+        if ("/scheduler_file_order_sink".equals(job.getName())) {
+            return dbLayer.getJobChainsWithFileSink(instanceId);
+        }
         return dbLayer.getJobChainsByJobId(job.getId(), instanceId);
     }
 
     public static JobP getJob(DBItemInventoryJob inventoryJob, InventoryJobsDBLayer dbLayer, Boolean compact, Long instanceId) throws Exception {
         JobP job = new JobP();
-        job.setHasDescription(inventoryJob.getHasDescription());
-        job.setIsOrderJob(inventoryJob.getIsOrderJob());
-        job.setMaxTasks(inventoryJob.getMaxTasks());
-        job.setName(inventoryJob.getBaseName());
-        job.setPath(inventoryJob.getName());
-        job.setSurveyDate(inventoryJob.getModified());
-        job.setTitle(inventoryJob.getTitle());
-        job.setUsedInJobChains(inventoryJob.getUsedInJobChains());
-        Integer estimatedDuration = JobPermanent.getEstimatedDurationInSeconds(inventoryJob);
-        if (estimatedDuration != null) {
-            job.setEstimatedDuration(estimatedDuration);
-        } else {
+        if ("/scheduler_file_order_sink".equals(inventoryJob.getName())) {
+            job.setHasDescription(false);
+            job.setIsOrderJob(true);
+            job.setMaxTasks(1);
+            job.setName("scheduler_file_order_sink");
+            job.setPath(inventoryJob.getName());
             job.setEstimatedDuration(0);
+        } else {
+            job.setHasDescription(inventoryJob.getHasDescription());
+            job.setIsOrderJob(inventoryJob.getIsOrderJob());
+            job.setMaxTasks(inventoryJob.getMaxTasks());
+            job.setName(inventoryJob.getBaseName());
+            job.setPath(inventoryJob.getName());
+            job.setSurveyDate(inventoryJob.getModified());
+            job.setTitle(inventoryJob.getTitle());
+            job.setUsedInJobChains(inventoryJob.getUsedInJobChains());
+            Integer estimatedDuration = JobPermanent.getEstimatedDurationInSeconds(inventoryJob);
+            if (estimatedDuration != null) {
+                job.setEstimatedDuration(estimatedDuration);
+            } else {
+                job.setEstimatedDuration(0);
+            }
         }
+        
         if (compact == null || !compact) {
             if (inventoryJob.getProcessClassName() != null && !inventoryJob.getProcessClassName().isEmpty() && !inventoryJob.getProcessClassName().equalsIgnoreCase(
                     DBLayer.DEFAULT_NAME)) {
@@ -78,24 +96,28 @@ public class JobPermanent {
                 job.setProcessClass(inventoryJob.getProcessClass());
             }
             List<LockUseP> locks = JobPermanent.getLocks(inventoryJob, dbLayer, instanceId);
-            if (locks != null && !locks.isEmpty()) {
+            //if (locks != null && !locks.isEmpty()) {
                 job.setLocks(locks);
-            }
-            if (inventoryJob.getIsOrderJob()) {
+            //}
+            if (job.getIsOrderJob()) {
                 List<DBItemInventoryJobChain> jobChainsFromDb = JobPermanent.getJobChains(inventoryJob, dbLayer, instanceId);
                 if (jobChainsFromDb != null && !jobChainsFromDb.isEmpty()) {
-                    ArrayList<String> jobChains = new ArrayList<String>();
+                    Set<String> jobChains = new HashSet<String>();
                     for (DBItemInventoryJobChain chain : jobChainsFromDb) {
                         jobChains.add(chain.getName());
                     }
-                    job.setJobChains(jobChains);
+                    job.setJobChains(new ArrayList<String>(jobChains));
                 } else {
                     job.setJobChains(null);
                 }
             } else {
                 job.setJobChains(null);
             }
-            job.setConfigurationDate(dbLayer.getJobConfigurationDate(inventoryJob.getId()));
+            if ("/scheduler_file_order_sink".equals(job.getName())) {
+                job.setConfigurationDate(null);
+            } else {
+                job.setConfigurationDate(dbLayer.getJobConfigurationDate(inventoryJob.getId()));
+            }
         } else {
             job.setLocks(null);
             job.setJobChains(null);

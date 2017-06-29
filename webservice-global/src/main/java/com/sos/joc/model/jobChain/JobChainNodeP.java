@@ -26,7 +26,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "jobChain",
     "level",
     "onError",
-    "delay"
+    "delay",
+    "remove",
+    "move"
 })
 public class JobChainNodeP {
 
@@ -67,6 +69,18 @@ public class JobChainNodeP {
      */
     @JsonProperty("delay")
     private Integer delay;
+    /**
+     * for file order sink
+     * 
+     */
+    @JsonProperty("remove")
+    private Boolean remove;
+    /**
+     * for file order sink, a directory path is expected
+     * 
+     */
+    @JsonProperty("move")
+    private String move;
 
     /**
      * 
@@ -240,6 +254,50 @@ public class JobChainNodeP {
         this.delay = delay;
     }
 
+    /**
+     * for file order sink
+     * 
+     * @return
+     *     The remove
+     */
+    @JsonProperty("remove")
+    public Boolean getRemove() {
+        return remove;
+    }
+
+    /**
+     * for file order sink
+     * 
+     * @param remove
+     *     The remove
+     */
+    @JsonProperty("remove")
+    public void setRemove(Boolean remove) {
+        this.remove = remove;
+    }
+
+    /**
+     * for file order sink, a directory path is expected
+     * 
+     * @return
+     *     The move
+     */
+    @JsonProperty("move")
+    public String getMove() {
+        return move;
+    }
+
+    /**
+     * for file order sink, a directory path is expected
+     * 
+     * @param move
+     *     The move
+     */
+    @JsonProperty("move")
+    public void setMove(String move) {
+        this.move = move;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -247,7 +305,7 @@ public class JobChainNodeP {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(nextNode).append(errorNode).append(job).append(jobChain).append(level).append(onError).append(delay).toHashCode();
+        return new HashCodeBuilder().append(name).append(nextNode).append(errorNode).append(job).append(jobChain).append(level).append(onError).append(delay).append(remove).append(move).toHashCode();
     }
 
     @Override
@@ -259,7 +317,7 @@ public class JobChainNodeP {
             return false;
         }
         JobChainNodeP rhs = ((JobChainNodeP) other);
-        return new EqualsBuilder().append(name, rhs.name).append(nextNode, rhs.nextNode).append(errorNode, rhs.errorNode).append(job, rhs.job).append(jobChain, rhs.jobChain).append(level, rhs.level).append(onError, rhs.onError).append(delay, rhs.delay).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(nextNode, rhs.nextNode).append(errorNode, rhs.errorNode).append(job, rhs.job).append(jobChain, rhs.jobChain).append(level, rhs.level).append(onError, rhs.onError).append(delay, rhs.delay).append(remove, rhs.remove).append(move, rhs.move).isEquals();
     }
 
 }

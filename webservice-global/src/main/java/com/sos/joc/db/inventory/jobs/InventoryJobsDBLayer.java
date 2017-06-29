@@ -111,7 +111,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryLock> result = getSession().getResultList(query);
-            if (result != null) {
+            if (result != null && !result.isEmpty()) {
                 return result;
             }
             return null;
@@ -135,10 +135,33 @@ public class InventoryJobsDBLayer extends DBLayer {
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
             List<DBItemInventoryJobChain> result = getSession().getResultList(query);
-            if (result != null) {
+            if (result != null && !result.isEmpty()) {
                 return result;
             }
-            return null;
+            return result;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<DBItemInventoryJobChain> getJobChainsWithFileSink(Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select ijc from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
+            sql.append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn ");
+            sql.append("where ijc.id = ijcn.jobChainId ");
+            sql.append("and ijcn.nodeType = 4 ");
+            sql.append("and ijc.instanceId = :instanceId");
+            Query<DBItemInventoryJobChain> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<DBItemInventoryJobChain> result = getSession().getResultList(query);
+            if (result != null && !result.isEmpty()) {
+                return result;
+            }
+            return result;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

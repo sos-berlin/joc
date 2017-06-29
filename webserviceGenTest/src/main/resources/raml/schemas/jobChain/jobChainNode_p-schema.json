@@ -70,6 +70,14 @@
     },
     "delay": {
       "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "remove": {
+      "description": "for file order sink",
+      "type": "boolean"
+    },
+    "move": {
+      "description": "for file order sink, a directory path is expected",
+      "type": "string"
     }
   }
 }

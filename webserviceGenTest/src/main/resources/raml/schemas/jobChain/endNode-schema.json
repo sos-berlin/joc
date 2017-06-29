@@ -1,24 +1,15 @@
 {
-  "title": "job chain end node without a job or a file sink",
+  "title": "job chain end node",
   "id": "schemas/jobchain/endNode",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.jobChain.EndNode",
   "type": "object",
-  "description": "job chain end node of a file sink with 'remove' or 'move' which are exclusivly",
   "required": [
     "name"
   ],
   "properties": {
     "name": {
       "type": "string"
-    },
-    "remove": {
-      "type": "boolean"
-    },
-    "move": {
-      "description": "a directory path is expected",
-      "type": "string",
-      "minLength": 1
     }
   }
 }

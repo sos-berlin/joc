@@ -105,15 +105,31 @@ public class JobChainPermanent {
                         break;
                     case 4:
                         // FileOrderSink -> EndNode
-                        EndNode fileOrderSink = new EndNode();
+                        numOfNodes += 1;
+                        JobChainNodeP fileOrderSink = new JobChainNodeP();
+                        JobChainNodeJobP fileOrderSinkJob = new JobChainNodeJobP();
+                        fileOrderSinkJob.setPath("/scheduler_file_order_sink");
+                        fileOrderSink.setJob(fileOrderSinkJob);
+                        fileOrderSink.setJobChain(null);
                         fileOrderSink.setName(node.getState());
+                        fileOrderSink.setLevel(0);
+                        fileOrderSink.setNextNode("fileOrderSinkEnd");
+                        fileOrderSink.setErrorNode("fileOrderSinkEnd");
+                        fileOrderSink.setOnError(null);
                         if (node.getFileSinkOp() == 1) {
                             fileOrderSink.setMove(node.getMovePath());
                             fileOrderSink.setRemove(false);
                         } else if (node.getFileSinkOp() == 2) {
                             fileOrderSink.setRemove(true);
                         }
-                        jobChainEndNodes.add(fileOrderSink);
+                        jobChainNodes.add(fileOrderSink);
+                        
+                        EndNode fileOrderSinkEndNode = new EndNode();
+                        fileOrderSinkEndNode.setName("fileOrderSinkEnd");
+                        if (!jobChainEndNodes.contains(fileOrderSinkEndNode)) {
+                            jobChainEndNodes.add(fileOrderSinkEndNode);
+                        }
+                        
                         break;
                     case 5:
                         // EndNode -> EndNode
