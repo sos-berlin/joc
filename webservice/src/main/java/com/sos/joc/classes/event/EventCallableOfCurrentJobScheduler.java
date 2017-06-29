@@ -139,7 +139,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 eventSnapshot.setEventType("JobStateChanged");
                 JsonObject eventKeyO = event.getJsonObject("key");
                 String jobPath = eventKeyO.getString("jobPath", null);
-                if (jobPath == null || "/scheduler_file_order_sink".equals(jobPath)) {
+                if (jobPath == null) { // || "/scheduler_file_order_sink".equals(jobPath)) {
                     continue;
                 }
                 eventSnapshot.setPath(jobPath);
