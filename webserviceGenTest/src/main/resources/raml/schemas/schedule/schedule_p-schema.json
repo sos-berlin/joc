@@ -25,24 +25,12 @@
       "type": "string"
     },
     "substitute": {
-      "type": "object",
-      "properties": {
-        "path": {
-          "$ref": "../common/path-schema.json"
-        },
-        "validFrom": {
-          "$ref": "../common/timestamp-schema.json"
-        },
-        "validTo": {
-          "$ref": "../common/timestamp-schema.json"
-        }
-      }
+      "$ref": "substitute-schema.json"
     },
     "substitutedBy": {
       "type" : "array",
       "items" : {
-        "type": "string",
-        "$ref": "../common/path-schema.json"
+        "$ref": "substitute-schema.json"
       }
     },
     "usedByOrders": {

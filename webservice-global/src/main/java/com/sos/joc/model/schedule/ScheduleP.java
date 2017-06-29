@@ -61,10 +61,16 @@ public class ScheduleP {
     private String name;
     @JsonProperty("title")
     private String title;
+    /**
+     * substitute
+     * <p>
+     * 
+     * 
+     */
     @JsonProperty("substitute")
     private Substitute substitute;
     @JsonProperty("substitutedBy")
-    private List<String> substitutedBy = new ArrayList<String>();
+    private List<Substitute> substitutedBy = new ArrayList<Substitute>();
     /**
      * 
      * (Required)
@@ -189,6 +195,9 @@ public class ScheduleP {
     }
 
     /**
+     * substitute
+     * <p>
+     * 
      * 
      * @return
      *     The substitute
@@ -199,6 +208,9 @@ public class ScheduleP {
     }
 
     /**
+     * substitute
+     * <p>
+     * 
      * 
      * @param substitute
      *     The substitute
@@ -214,7 +226,7 @@ public class ScheduleP {
      *     The substitutedBy
      */
     @JsonProperty("substitutedBy")
-    public List<String> getSubstitutedBy() {
+    public List<Substitute> getSubstitutedBy() {
         return substitutedBy;
     }
 
@@ -224,7 +236,7 @@ public class ScheduleP {
      *     The substitutedBy
      */
     @JsonProperty("substitutedBy")
-    public void setSubstitutedBy(List<String> substitutedBy) {
+    public void setSubstitutedBy(List<Substitute> substitutedBy) {
         this.substitutedBy = substitutedBy;
     }
 

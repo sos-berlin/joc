@@ -1,0 +1,24 @@
+{
+  "title": "substitute",
+  "id": "schemas/schedule/substitute",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.schedule.Substitute",
+  "type": "object",
+  "required": [
+    "path",
+    "validFrom",
+    "validTo"
+  ],
+  "properties": {
+    "path": {
+      "$ref": "../common/path-schema.json"
+    },
+    "validFrom": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "validTo": {
+      "$ref": "../common/timestamp-schema.json"
+    }
+  }
+}
+      

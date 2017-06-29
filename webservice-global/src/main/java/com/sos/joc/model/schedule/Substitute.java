@@ -12,7 +12,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * this field and substitutedBy from the volatile part are exclusive
+ * substitute
+ * <p>
+ * 
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -28,6 +30,7 @@ public class Substitute {
      * path
      * <p>
      * absolute path based on live folder of a JobScheduler object.
+     * (Required)
      * 
      */
     @JsonProperty("path")
@@ -36,6 +39,7 @@ public class Substitute {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * (Required)
      * 
      */
     @JsonProperty("validFrom")
@@ -44,6 +48,7 @@ public class Substitute {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * (Required)
      * 
      */
     @JsonProperty("validTo")
@@ -53,6 +58,7 @@ public class Substitute {
      * path
      * <p>
      * absolute path based on live folder of a JobScheduler object.
+     * (Required)
      * 
      * @return
      *     The path
@@ -66,6 +72,7 @@ public class Substitute {
      * path
      * <p>
      * absolute path based on live folder of a JobScheduler object.
+     * (Required)
      * 
      * @param path
      *     The path
@@ -79,6 +86,7 @@ public class Substitute {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * (Required)
      * 
      * @return
      *     The validFrom
@@ -92,6 +100,7 @@ public class Substitute {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * (Required)
      * 
      * @param validFrom
      *     The validFrom
@@ -105,6 +114,7 @@ public class Substitute {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * (Required)
      * 
      * @return
      *     The validTo
@@ -118,6 +128,7 @@ public class Substitute {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * (Required)
      * 
      * @param validTo
      *     The validTo
