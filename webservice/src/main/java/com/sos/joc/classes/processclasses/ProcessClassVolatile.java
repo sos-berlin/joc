@@ -28,6 +28,10 @@ public class ProcessClassVolatile extends ProcessClassV {
     }
     
     public void setFields() throws JobSchedulerInvalidResponseDataException {
+        setFields(true);
+    }
+    
+    public void setFields(boolean withProcesses) throws JobSchedulerInvalidResponseDataException {
         setPath();
         setName(getPath().replaceFirst(".*/([^/]+)$", "$1"));
         JsonArray obstacles = overview.getJsonArray("obstacles");
@@ -36,16 +40,20 @@ public class ProcessClassVolatile extends ProcessClassV {
             List<Process> listOfProcesses = new ArrayList<Process>();
             JsonArray processes = processClass.getJsonArray("processes");
             setNumOfProcesses(processes.size());
-            for (JsonObject processesItem : processes.getValuesAs(JsonObject.class)) {
-                Process process = new Process();
-                process.setAgent(processesItem.getString("agent", null));
-                process.setJob(processesItem.getString("jobPath", null));
-                process.setPid(processesItem.getInt("pid", 0));
-                process.setRunningSince(JobSchedulerDate.getDateFromISO8601String(processesItem.getString("startedAt", null)));
-                process.setTaskId(processesItem.getString("taskId", null));
-                listOfProcesses.add(process);
+            if (withProcesses) {
+                for (JsonObject processesItem : processes.getValuesAs(JsonObject.class)) {
+                    Process process = new Process();
+                    process.setAgent(processesItem.getString("agent", null));
+                    process.setJob(processesItem.getString("jobPath", null));
+                    process.setPid(processesItem.getInt("pid", 0));
+                    process.setRunningSince(JobSchedulerDate.getDateFromISO8601String(processesItem.getString("startedAt", null)));
+                    process.setTaskId(processesItem.getString("taskId", null));
+                    listOfProcesses.add(process);
+                }
+                setProcesses(listOfProcesses); 
+            } else {
+                setProcesses(null);
             }
-            setProcesses(listOfProcesses);
         } else {
             setNumOfProcesses(0);
         }

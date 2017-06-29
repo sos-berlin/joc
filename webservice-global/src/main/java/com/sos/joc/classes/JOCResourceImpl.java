@@ -230,7 +230,8 @@ public class JOCResourceImpl {
     }
     
     public JOCDefaultResponse accessDeniedResponse() {
-        return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, "Access denied"));
+        jocError.setMessage("Access denied");
+        return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, jocError));
     }
 
     private void initLogging(String request, Object body) {
@@ -269,7 +270,7 @@ public class JOCResourceImpl {
 
     private JOCDefaultResponse init401And440() {
         if (!jobschedulerUser.isAuthenticated()) {
-            return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser, ""));
+            return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
         }
         return null;
     }

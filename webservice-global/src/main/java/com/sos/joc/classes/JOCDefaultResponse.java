@@ -269,6 +269,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
 
     public static JOCDefaultResponse responseStatus401(SOSShiroCurrentUserAnswer entity) {
         Response.ResponseBuilder responseBuilder = Response.status(401).header("Content-Type", MediaType.APPLICATION_JSON).cacheControl(setNoCaching());
+        LOGGER.error(entity.getMessage());
         responseBuilder.entity(entity);
         return new JOCDefaultResponse(responseBuilder.build());
     }
@@ -308,17 +309,27 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     public static JOCDefaultResponse responseHTMLStatus440(SOSShiroCurrentUserAnswer entity) {
         return responseStatus440(entity, MediaType.TEXT_HTML + "; charset=UTF-8");
     }
+    
+    public static SOSShiroCurrentUserAnswer getError401Schema(JobSchedulerUser sosJobschedulerUser) {
+        return getError401Schema(sosJobschedulerUser, null);
+    }
 
-    public static SOSShiroCurrentUserAnswer getError401Schema(JobSchedulerUser sosJobschedulerUser,String message) {
+    public static SOSShiroCurrentUserAnswer getError401Schema(JobSchedulerUser sosJobschedulerUser, JocError err) {
         SOSShiroCurrentUserAnswer entity = new SOSShiroCurrentUserAnswer();
         SOSShiroCurrentUser sosShiroCurrentUser=null;
+        String message = "Authentication failure";
+        if (err != null && err.getMessage() != null) {
+            if (err.getMessage() != null) {
+                message = err.getMessage(); 
+            }
+            if (!"".equals(err.printMetaInfo())) {
+                LOGGER.info(err.printMetaInfo());
+            }
+        }
         try {
             sosShiroCurrentUser = sosJobschedulerUser.getSosShiroCurrentUser();
         } catch (SessionNotExistException e) {
-            if ("".equals(message)) {
-                message = "Authentication failure:";
-            }
-            message += e.getMessage();
+            message += ": "+e.getMessage();
         }
         if (sosShiroCurrentUser != null) {
             entity.setAccessToken(sosShiroCurrentUser.getAccessToken());
@@ -330,10 +341,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         entity.setHasRole(false);
         entity.setIsPermitted(false);
         entity.setIsAuthenticated(sosJobschedulerUser.isAuthenticated());
-        if ("".equals(message)){
-            message = "Authentication failure";
-        }
-        LOGGER.error(message);
+        //LOGGER.error(message);
         entity.setMessage(message);
         return entity;
     }

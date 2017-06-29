@@ -19,9 +19,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "name",
-    "remove",
-    "move"
+    "name"
 })
 public class EndNode {
 
@@ -32,14 +30,6 @@ public class EndNode {
      */
     @JsonProperty("name")
     private String name;
-    @JsonProperty("remove")
-    private Boolean remove;
-    /**
-     * a directory path is expected
-     * 
-     */
-    @JsonProperty("move")
-    private String move;
 
     /**
      * 
@@ -65,48 +55,6 @@ public class EndNode {
         this.name = name;
     }
 
-    /**
-     * 
-     * @return
-     *     The remove
-     */
-    @JsonProperty("remove")
-    public Boolean getRemove() {
-        return remove;
-    }
-
-    /**
-     * 
-     * @param remove
-     *     The remove
-     */
-    @JsonProperty("remove")
-    public void setRemove(Boolean remove) {
-        this.remove = remove;
-    }
-
-    /**
-     * a directory path is expected
-     * 
-     * @return
-     *     The move
-     */
-    @JsonProperty("move")
-    public String getMove() {
-        return move;
-    }
-
-    /**
-     * a directory path is expected
-     * 
-     * @param move
-     *     The move
-     */
-    @JsonProperty("move")
-    public void setMove(String move) {
-        this.move = move;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -114,7 +62,7 @@ public class EndNode {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(remove).append(move).toHashCode();
+        return new HashCodeBuilder().append(name).toHashCode();
     }
 
     @Override
@@ -126,7 +74,7 @@ public class EndNode {
             return false;
         }
         EndNode rhs = ((EndNode) other);
-        return new EqualsBuilder().append(name, rhs.name).append(remove, rhs.remove).append(move, rhs.move).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).isEquals();
     }
 
 }
