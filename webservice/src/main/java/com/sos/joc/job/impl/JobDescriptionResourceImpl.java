@@ -48,7 +48,7 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
             jocJsonCommand.setUriBuilderForJobs();
             jocJsonCommand.addJobDescriptionQuery();
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            builder.add("path", normalizePath(jobFilter.getJob()));
+            builder.add("path", jobFilter.getJob());
             JsonObject json = jocJsonCommand.getJsonObjectFromPostWithRetry(builder.build().toString(), accessToken);
             String description = json.getString("description", "").trim();
             if (description.isEmpty()) {

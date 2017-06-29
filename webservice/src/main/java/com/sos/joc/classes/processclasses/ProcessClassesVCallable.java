@@ -24,23 +24,26 @@ public class ProcessClassesVCallable implements Callable<List<ProcessClassV>> {
     private final String processClass;
     private final String regex;
     private final Boolean isAgentCluster;
+    private final Boolean withProcesses;
     private final Folder folder;
     private final JOCJsonCommand jocJsonCommand;
     private final String accessToken;
 
-    public ProcessClassesVCallable(String processClass, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public ProcessClassesVCallable(String processClass, JOCJsonCommand jocJsonCommand, String accessToken, boolean withProcesses) {
         this.processClass = processClass;
         this.regex = null;
         this.isAgentCluster = null;
+        this.withProcesses = withProcesses;
         this.folder = null;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
     }
 
-    public ProcessClassesVCallable(Folder folder, String regex, Boolean isAgentCluster, JOCJsonCommand jocJsonCommand, String accessToken) {
+    public ProcessClassesVCallable(Folder folder, String regex, Boolean isAgentCluster, JOCJsonCommand jocJsonCommand, String accessToken, boolean withProcesses) {
         this.processClass = null;
         this.regex = regex;
         this.isAgentCluster = isAgentCluster;
+        this.withProcesses = withProcesses;
         this.folder = folder;
         this.jocJsonCommand = jocJsonCommand;
         this.accessToken = accessToken;
@@ -84,13 +87,13 @@ public class ProcessClassesVCallable implements Callable<List<ProcessClassV>> {
                 if (!FilterAfterResponse.matchRegex(regex, processClass.getPath())) {
                     continue;
                 }
-                processClass.setFields();
+                processClass.setFields(withProcesses);
                 processClass.setSurveyDate(surveyDate);
                 mapProcessClasses.put(processClass.getPath(), processClass);
             }
         } else {
             ProcessClassVolatile processClass = new ProcessClassVolatile(json);
-            processClass.setFields();
+            processClass.setFields(withProcesses);
             mapProcessClasses.put(processClass.getPath(), processClass);
         }
         return new ArrayList<ProcessClassV>(mapProcessClasses.values());

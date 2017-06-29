@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
+import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -33,11 +34,14 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     @Override
     public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken, processClassFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getProcessClass().getView().isStatus());
+            SOSPermissionJocCockpit perms = getPermissonsJocCockpit(accessToken);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken, processClassFilter.getJobschedulerId(), perms
+                    .getProcessClass().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+
+            boolean jobViewStatusEnabled = perms.getJob().getView().isStatus();
 
             JOCJsonCommand command = new JOCJsonCommand(this);
             command.setUriBuilderForProcessClasses();
@@ -53,21 +57,21 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             if (processClasses != null && !processClasses.isEmpty()) {
                 for (ProcessClassPath processClass : processClasses) {
                     checkRequiredParameter("processClass", processClass.getProcessClass());
-                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken));
+                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
                 }
                 entity.setProcessClasses(listProcessClasses);
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
                     tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(),
-                            new JOCJsonCommand(command), accessToken));
+                            new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
                 }
             } else {
                 Folder rootFolder = new Folder();
                 rootFolder.setFolder("/");
                 rootFolder.setRecursive(true);
                 ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder, processClassFilter.getRegex(), processClassFilter
-                        .getIsAgentCluster(), command, accessToken);
+                        .getIsAgentCluster(), command, accessToken, jobViewStatusEnabled);
                 entity.setProcessClasses(callable.getProcessClasses());
             }
             if (tasks.size() > 0) {
