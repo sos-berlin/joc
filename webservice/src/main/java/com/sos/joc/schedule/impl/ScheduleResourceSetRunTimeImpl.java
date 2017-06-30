@@ -56,10 +56,6 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
             
-            DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
-            dailyPlanCalender2DBFilter.setForSchedule(schedule);
-            updateDailyPlan(dailyPlanCalender2DBFilter);
-
             storeAuditLogEntry(scheduleAudit);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
