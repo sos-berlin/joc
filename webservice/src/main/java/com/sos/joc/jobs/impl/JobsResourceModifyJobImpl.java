@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
+import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -42,7 +43,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private static final String UNSTOP = "unstop";
     private static String API_CALL = "./jobs/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
-    private SOSHibernateSession connection = null;
+    private SOSHibernateSession session = null;
     private InventoryJobsDBLayer dbLayer = null;
 
     @Override
@@ -69,10 +70,13 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
+
+
     @Override
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().getChange().isRunTime(), modifyJobs);
+            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob()
+                    .getChange().isRunTime(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -80,7 +84,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-    
+
     @Override
     public JOCDefaultResponse postJobsResetRunTime(String accessToken, ModifyJobs modifyJobs) {
         try {
@@ -120,7 +124,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     @Override
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(accessToken).getJob().getExecute().isContinueAllTasks(), modifyJobs);
+            return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(accessToken).getJob().getExecute().isContinueAllTasks(),
+                    modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -151,6 +156,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     xml.add(XMLBuilder.parse(modifyJob.getRunTime()));
                     jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                     updateRunTimeIsTemporary(jobPath, true);
+
+                    DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+                    dailyPlanCalender2DBFilter.setForJob(jobPath);
+                    updateDailyPlan(dailyPlanCalender2DBFilter);            
+
                     storeAuditLogEntry(jobAudit);
                 } catch (JocException e) {
                     throw e;
@@ -165,17 +175,23 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                         throw new DBMissingDataException(String.format("no entry found in DB: %1$s", jobPath));
                     }
                     if (dbItem.getRunTimeIsTemporary() == null) {
-                        dbItem.setRunTimeIsTemporary(false); 
+                        dbItem.setRunTimeIsTemporary(false);
                     }
                     if (dbItem.getRunTimeIsTemporary()) {
                         String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "source", 0, 0);
-                        String runTime = RunTime.getRuntimeXmlString(jobPath, jocXmlCommand, runTimeCommand, "//source/job/run_time", getAccessToken());
+                        String runTime = RunTime.getRuntimeXmlString(jobPath, jocXmlCommand, runTimeCommand, "//source/job/run_time",
+                                getAccessToken());
                         xml.add(XMLBuilder.parse(runTime));
                         jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                         updateRunTimeIsTemporary(dbItem, false);
+
+                        DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+                        dailyPlanCalender2DBFilter.setForJob(jobPath);
+                        updateDailyPlan(dailyPlanCalender2DBFilter);            
+                        
                         storeAuditLogEntry(jobAudit);
                     } else {
-                        //nothing to do
+                        // nothing to do
                     }
                 } catch (JocException e) {
                     throw e;
@@ -212,23 +228,23 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         for (ModifyJob job : modifyJobs.getJobs()) {
             surveyDate = executeModifyJobCommand(job, modifyJobs, command);
         }
-        Globals.disconnect(connection);
+        Globals.disconnect(session);
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);
         }
         return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
-    
+
     private DBItemInventoryJob getDBItem(String jobPath) throws JocException {
-        if (connection == null) {
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+        if (session == null) {
+            session = Globals.createSosHibernateStatelessConnection(API_CALL);
         }
         if (dbLayer == null) {
-            dbLayer = new InventoryJobsDBLayer(connection);
+            dbLayer = new InventoryJobsDBLayer(session);
         }
         return dbLayer.getInventoryJobByName(jobPath, dbItemInventoryInstance.getId());
     }
-    
+
     private void updateRunTimeIsTemporary(String jobPath, boolean value) throws JocException {
         DBItemInventoryJob dbItem = getDBItem(jobPath);
         if (dbItem == null) {
@@ -236,11 +252,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
         updateRunTimeIsTemporary(dbItem, value);
     }
-    
+
     private void updateRunTimeIsTemporary(DBItemInventoryJob dbItem, boolean value) throws JocException {
         dbItem.setRunTimeIsTemporary(value);
         try {
-            connection.update(dbItem);
+            session.update(dbItem);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

@@ -4,15 +4,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.hibernate.StatelessSession;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.dailyplan.db.Calendar2DB;
+import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
+import com.sos.jitl.dailyplan.job.CreateDailyPlanOptions;
+import com.sos.jitl.inventory.db.InventoryCleanup;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;
@@ -40,21 +49,21 @@ public class JOCResourceImpl {
 
     private JocError jocError = new JocError();
 
-    protected void initGetPermissions(String accessToken)  {
+    protected void initGetPermissions(String accessToken) {
         if (jobschedulerUser == null) {
             this.accessToken = accessToken;
             jobschedulerUser = new JobSchedulerUser(accessToken);
         }
-       
+
         updateUserInMetaInfo();
     }
 
-    protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws SessionNotExistException  {
+    protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws SessionNotExistException {
         initGetPermissions(accessToken);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
     }
 
-    protected SOSPermissionCommands getPermissonsCommands(String accessToken) throws SessionNotExistException   {
+    protected SOSPermissionCommands getPermissonsCommands(String accessToken) throws SessionNotExistException {
         initGetPermissions(accessToken);
         return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands();
     }
@@ -89,7 +98,7 @@ public class JOCResourceImpl {
         Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp / 1000);
         return Date.from(fromEpochMilli);
     }
-      
+
     public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws JocException {
         this.accessToken = accessToken;
         if (jobschedulerUser == null) {
@@ -98,7 +107,7 @@ public class JOCResourceImpl {
         initLogging(request, body);
         return init(schedulerId, permission);
     }
-    
+
     public JOCDefaultResponse init(String request, String accessToken) throws Exception {
         this.accessToken = accessToken;
         if (jobschedulerUser == null) {
@@ -134,7 +143,7 @@ public class JOCResourceImpl {
         }
         return true;
     }
-    
+
     public boolean checkRequiredComment(String comment) throws JocMissingCommentException {
         if (Globals.auditLogCommentsAreRequired) {
             if (comment == null || comment.isEmpty()) {
@@ -228,7 +237,7 @@ public class JOCResourceImpl {
         }
         return null;
     }
-    
+
     public JOCDefaultResponse accessDeniedResponse() {
         jocError.setMessage("Access denied");
         return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, jocError));
@@ -283,7 +292,7 @@ public class JOCResourceImpl {
                 if (metaInfo.size() > 2) {
                     metaInfo.remove(2);
                     metaInfo.add(2, userMetaInfo);
-                } 
+                }
             }
         } catch (Exception e) {
         }
@@ -293,16 +302,16 @@ public class JOCResourceImpl {
             DBMissingDataException, DBInvalidDataException {
         if (host != null && !host.isEmpty() && port != null && port > 0) {
 
-            SOSHibernateSession connection = null;
+            SOSHibernateSession session = null;
 
             try {
                 try {
-                    connection = Globals.createSosHibernateStatelessConnection("getJobSchedulerInstanceByHostPort");
+                    session = Globals.createSosHibernateStatelessConnection("getJobSchedulerInstanceByHostPort");
                 } catch (Exception e) {
                     throw new DBConnectionRefusedException(e);
                 }
 
-                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
                 dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(host, port, schedulerId);
 
                 if (dbItemInventoryInstance == null) {
@@ -313,9 +322,55 @@ public class JOCResourceImpl {
             } catch (Exception e) {
                 throw e;
             } finally {
-                Globals.disconnect(connection);
+                Globals.disconnect(session);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void updateDailyPlan(DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter) throws Exception {
+        @SuppressWarnings("rawtypes")
+        HashMap createDaysScheduleOptionsMap = new HashMap();
+
+        String[] commandUrl = dbItemInventoryInstance.getCommandUrl().split(":");
+        String host = "localhost";
+        String port = "4444";
+        if (commandUrl.length > 1) {
+            host = commandUrl[0];
+            port = commandUrl[1];
+        }
+
+        createDaysScheduleOptionsMap.put("scheduler_port", port);
+        createDaysScheduleOptionsMap.put("schedulerHostName", host);
+        createDaysScheduleOptionsMap.put("dayOffset", 365);
+        CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
+        createDailyPlanOptions.setAllOptions(createDaysScheduleOptionsMap);
+
+        Transaction tr = null;
+        try {
+            SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("dailyplan");
+
+            StatelessSession session = null;
+
+            session = (StatelessSession) sosHibernateSession.getCurrentSession();
+
+            tr = session.beginTransaction();
+            Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession);
+            calendar2Db.setOptions(createDailyPlanOptions);
+            calendar2Db.addDailyplan2DBFilter(dailyPlanCalender2DBFilter);
+            calendar2Db.setSpooler(null);
+            calendar2Db.processDailyplan2DBFilter();
+            tr.commit();
+        } catch (SOSHibernateException ex) {
+            try {
+                if (tr != null) {
+                    tr.rollback();
+                }
+            } catch (Exception e) {
+            }
+            throw new DBInvalidDataException(ex);
+        }
+
     }
 
 }

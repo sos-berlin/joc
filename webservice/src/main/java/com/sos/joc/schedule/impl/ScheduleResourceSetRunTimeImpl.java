@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -54,6 +55,11 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
+            
+            DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+            dailyPlanCalender2DBFilter.setForSchedule(schedule);
+            updateDailyPlan(dailyPlanCalender2DBFilter);
+
             storeAuditLogEntry(scheduleAudit);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
