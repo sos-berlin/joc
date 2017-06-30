@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.hibernate.StatelessSession;
@@ -331,6 +332,7 @@ public class JOCResourceImpl {
     protected void updateDailyPlan(DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter) throws Exception {
         @SuppressWarnings("rawtypes")
         HashMap createDaysScheduleOptionsMap = new HashMap();
+        TimeZone.setDefault(TimeZone.getDefault());
 
         String[] commandUrl = dbItemInventoryInstance.getCommandUrl().split(":");
         String host = "localhost";
@@ -369,6 +371,8 @@ public class JOCResourceImpl {
             } catch (Exception e) {
             }
             throw new DBInvalidDataException(ex);
+        }finally{
+            TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         }
 
     }
