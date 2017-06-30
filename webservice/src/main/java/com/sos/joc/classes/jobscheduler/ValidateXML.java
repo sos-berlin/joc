@@ -9,6 +9,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 
 public class ValidateXML {
@@ -27,12 +28,13 @@ public class ValidateXML {
         return true;
     }
     
-    public static boolean validateAgainstJobSchedulerSchema(String xml, String expectedRootElement) throws JobSchedulerBadRequestException{
-        
-        String rootElement = xml.trim().replaceFirst(".*</?([^>/\\s]+)[^>]*>$", "$1");
+    public static boolean validateAgainstJobSchedulerSchema(String xml, String expectedRootElement) throws JobSchedulerBadRequestException {
+
+        String rootElement = XMLBuilder.getRootElementName(xml);
         if (!expectedRootElement.equals(rootElement)) {
-            throw new JobSchedulerBadRequestException("Expected root element is '"+ expectedRootElement +"' instead of " + rootElement);
+            throw new JobSchedulerBadRequestException("Expected root element is '" + expectedRootElement + "' instead of " + rootElement);
         }
+
         return validateAgainstJobSchedulerSchema(xml);
     }
     
