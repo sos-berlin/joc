@@ -36,7 +36,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
     @Override
     public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter) {
 
-        SOSHibernateSession connection = null;
+        SOSHibernateSession session = null;
 
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
@@ -44,15 +44,15 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            connection.beginTransaction();
+            session = Globals.createSosHibernateStatelessConnection(API_CALL);
+            session.beginTransaction();
             Boolean compact = jobsFilter.getCompact();
             regex = jobsFilter.getRegex();
             folders = jobsFilter.getFolders();
             jobs = jobsFilter.getJobs();
             isOrderJob = jobsFilter.getIsOrderJob();
             List<JobP> listJobs = new ArrayList<JobP>();
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
+            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(session);
             Long instanceId = dbItemInventoryInstance.getId();
             List<DBItemInventoryJob> listOfJobs = processFilters(dbLayer);
             for (DBItemInventoryJob inventoryJob : listOfJobs) {
@@ -71,7 +71,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.disconnect(connection);
+            Globals.disconnect(session);
         }
     }
 

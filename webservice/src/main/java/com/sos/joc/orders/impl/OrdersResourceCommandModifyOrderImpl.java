@@ -11,6 +11,7 @@ import org.dom4j.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
+import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -207,6 +208,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 try {
                     ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
                     xml.add(XMLBuilder.parse(order.getRunTime()));
+                    
+                    DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+                    dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
+                    dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
+                    updateDailyPlan(dailyPlanCalender2DBFilter);            
+
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
@@ -227,6 +234,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         xml.add(XMLBuilder.parse(runTime));
                         jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                         updateRunTimeIsTemporary(dbItem, false);
+                        
+                        DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+                        dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
+                        dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
+                        updateDailyPlan(dailyPlanCalender2DBFilter);
+                                               
                         storeAuditLogEntry(orderAudit);
                     } else {
                         //nothing to do
