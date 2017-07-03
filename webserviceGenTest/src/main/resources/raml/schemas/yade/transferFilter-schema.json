@@ -64,23 +64,13 @@
     "sources": {
       "type": "array",
       "items": {
-        "type":"object",
-        "properties": {
-          "host": {
-            "type":"string"
-          }
-        }
+        "$ref": "protocolFragment-schema.json"
       }
     },
     "targets": {
       "type": "array",
       "items": {
-        "type":"object",
-        "properties": {
-          "host": {
-            "type":"string"
-          }
-        }
+        "$ref": "protocolFragment-schema.json"
       }
     }
   }

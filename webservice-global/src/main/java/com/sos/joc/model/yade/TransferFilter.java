@@ -86,9 +86,9 @@ public class TransferFilter {
     @JsonProperty("isIntervention")
     private Boolean isIntervention;
     @JsonProperty("sources")
-    private List<Source_> sources = new ArrayList<Source_>();
+    private List<ProtocolFragment> sources = new ArrayList<ProtocolFragment>();
     @JsonProperty("targets")
-    private List<Target_> targets = new ArrayList<Target_>();
+    private List<ProtocolFragment> targets = new ArrayList<ProtocolFragment>();
 
     /**
      * 
@@ -372,7 +372,7 @@ public class TransferFilter {
      *     The sources
      */
     @JsonProperty("sources")
-    public List<Source_> getSources() {
+    public List<ProtocolFragment> getSources() {
         return sources;
     }
 
@@ -382,7 +382,7 @@ public class TransferFilter {
      *     The sources
      */
     @JsonProperty("sources")
-    public void setSources(List<Source_> sources) {
+    public void setSources(List<ProtocolFragment> sources) {
         this.sources = sources;
     }
 
@@ -392,7 +392,7 @@ public class TransferFilter {
      *     The targets
      */
     @JsonProperty("targets")
-    public List<Target_> getTargets() {
+    public List<ProtocolFragment> getTargets() {
         return targets;
     }
 
@@ -402,7 +402,7 @@ public class TransferFilter {
      *     The targets
      */
     @JsonProperty("targets")
-    public void setTargets(List<Target_> targets) {
+    public void setTargets(List<ProtocolFragment> targets) {
         this.targets = targets;
     }
 

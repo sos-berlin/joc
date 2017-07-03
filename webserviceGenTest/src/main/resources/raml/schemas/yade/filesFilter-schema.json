@@ -38,23 +38,13 @@
     "sources": {
       "type": "array",
       "items": {
-        "type":"object",
-        "properties": {
-          "path": {
-            "type":"string"
-          }
-        }
+        "type": "string"
       }
     },
     "targets": {
       "type": "array",
       "items": {
-        "type":"object",
-        "properties": {
-          "path": {
-            "type":"string"
-          }
-        }
+        "type": "string"
       }
     }
   }

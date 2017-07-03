@@ -57,9 +57,9 @@ public class FilesFilter {
     @JsonProperty("states")
     private List<FileTransferStateText> states = new ArrayList<FileTransferStateText>();
     @JsonProperty("sources")
-    private List<Source> sources = new ArrayList<Source>();
+    private List<String> sources = new ArrayList<String>();
     @JsonProperty("targets")
-    private List<Target> targets = new ArrayList<Target>();
+    private List<String> targets = new ArrayList<String>();
 
     /**
      * 
@@ -199,7 +199,7 @@ public class FilesFilter {
      *     The sources
      */
     @JsonProperty("sources")
-    public List<Source> getSources() {
+    public List<String> getSources() {
         return sources;
     }
 
@@ -209,7 +209,7 @@ public class FilesFilter {
      *     The sources
      */
     @JsonProperty("sources")
-    public void setSources(List<Source> sources) {
+    public void setSources(List<String> sources) {
         this.sources = sources;
     }
 
@@ -219,7 +219,7 @@ public class FilesFilter {
      *     The targets
      */
     @JsonProperty("targets")
-    public List<Target> getTargets() {
+    public List<String> getTargets() {
         return targets;
     }
 
@@ -229,7 +229,7 @@ public class FilesFilter {
      *     The targets
      */
     @JsonProperty("targets")
-    public void setTargets(List<Target> targets) {
+    public void setTargets(List<String> targets) {
         this.targets = targets;
     }
 
