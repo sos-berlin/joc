@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.json.Json;
 
@@ -45,6 +46,7 @@ public class Globals {
     public static boolean withHostnameVerification = false;
     public static boolean auditLogCommentsAreRequired = false;
     public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
+    public static TimeZone defaultTimeZone;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocException {
         if (sosHibernateFactory == null) {
@@ -123,7 +125,7 @@ public class Globals {
         }
         return DEFAULT_SHIRO_INI_FILENAME;
     }
-    
+
     public static void setProperties() throws JocException {
         readVersion();
         setJobSchedulerConnectionTimeout();
@@ -172,7 +174,7 @@ public class Globals {
                     for (JOCJsonCommand command : (List<JOCJsonCommand>) session.getAttribute(sessionKey)) {
                         command.forcedClosingHttpClient();
                     }
-                    //session.removeAttribute(sessionKey);
+                    // session.removeAttribute(sessionKey);
                 } catch (Exception e) {
                 }
             }
@@ -221,7 +223,7 @@ public class Globals {
         }
         return confFile;
     }
-    
+
     private static void readVersion() {
         InputStream stream = null;
         String versionFile = "/version.json";
@@ -236,7 +238,7 @@ public class Globals {
             LOGGER.warn(String.format("Error while reading %1$s from classpath: ", versionFile), e);
         } finally {
             try {
-                if(stream != null) {
+                if (stream != null) {
                     stream.close();
                 }
             } catch (Exception e) {
@@ -306,5 +308,12 @@ public class Globals {
         if (sosHibernateSession != null) {
             sosHibernateSession.close();
         }
+    }
+
+    public static String normalizePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
     }
 }

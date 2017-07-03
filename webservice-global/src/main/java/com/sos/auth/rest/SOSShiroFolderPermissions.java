@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sos.jitl.reporting.db.filter.FilterFolder;
+import com.sos.joc.Globals;
 
 public class SOSShiroFolderPermissions {
 
@@ -57,7 +58,8 @@ public class SOSShiroFolderPermissions {
 	    if (this.force){
 	        return true;
 	    }
-	    
+       folder = Globals.normalizePath(folder);
+
 		ArrayList<FilterFolder> listOfFolders = getListOfFolders(schedulerId);
 
 		if (listOfFolders == null || listOfFolders.size() == 0) {

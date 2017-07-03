@@ -119,10 +119,7 @@ public class JOCResourceImpl {
     }
 
     public String normalizePath(String path) {
-        if (path == null) {
-            return null;
-        }
-        return ("/" + path.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
+        return Globals.normalizePath(path);
     }
 
     public String normalizeFolder(String path) {
@@ -332,7 +329,7 @@ public class JOCResourceImpl {
     protected void updateDailyPlan(DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter) throws Exception {
         @SuppressWarnings("rawtypes")
         HashMap createDaysScheduleOptionsMap = new HashMap();
-        TimeZone.setDefault(TimeZone.getDefault());
+        TimeZone.setDefault(Globals.defaultTimeZone);
 
         String[] commandUrl = dbItemInventoryInstance.getCommandUrl().split(":");
         String host = "localhost";
