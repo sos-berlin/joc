@@ -46,7 +46,6 @@ public class Globals {
     public static boolean withHostnameVerification = false;
     public static boolean auditLogCommentsAreRequired = false;
     public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
-    public static TimeZone defaultTimeZone;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocException {
         if (sosHibernateFactory == null) {
