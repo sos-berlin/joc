@@ -79,7 +79,7 @@ public class SOSSecurityConfiguration {
     private void clearSection(String section) {
         if (writeIni.get(section) != null) {
             writeIni.get(section).clear();
-        }else{
+        } else {
             writeIni.add(section);
         }
     }
@@ -136,10 +136,41 @@ public class SOSSecurityConfiguration {
         }
     }
 
+    private boolean hasRole(SecurityConfigurationMaster securityConfigurationMaster, String role) {
+        for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
+            if (role.equals(securityConfigurationRole.getRole())) {
+                return true;
+            }
+
+        }
+        return false;
+    }
+
+    private void addRole(SecurityConfigurationMaster securityConfigurationMaster, String role) {
+        SecurityConfigurationRole securityConfigurationRole = new SecurityConfigurationRole();
+        securityConfigurationRole.setRole(role);
+        securityConfigurationMaster.getRoles().add(securityConfigurationRole);
+    }
+
+    private void addEmptyRoles() {
+        SecurityConfigurationMaster getDefaultMaster = listOfMasters.getDefaultMaster(securityConfiguration);
+
+        for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
+            for (String role : securityConfigurationUser.getRoles()) {
+                if (!hasRole(getDefaultMaster, role)) {
+                    addRole(getDefaultMaster, role);
+                }
+            }
+        }
+
+    }
+
     public SecurityConfiguration readConfiguration() {
         addUsers();
         addRoles();
         addFolders();
+
+        addEmptyRoles();
 
         listOfMasters.createConfigurations(securityConfiguration);
         return this.securityConfiguration;
