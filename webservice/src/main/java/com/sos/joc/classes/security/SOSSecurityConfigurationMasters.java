@@ -14,6 +14,7 @@ import com.sos.joc.model.security.SecurityConfigurationRole;
 public class SOSSecurityConfigurationMasters {
 
     private Map<String, SecurityConfigurationMaster> listOfMasters;
+
     private static SOSSecurityConfigurationMasters instance;
 
     protected SOSSecurityConfigurationMasters() {
@@ -100,5 +101,9 @@ public class SOSSecurityConfigurationMasters {
         securityConfigurationMaster.getRoles().add(securityConfigurationRole);
 
         return listOfFolders;
+    }
+
+    public Map<String, SecurityConfigurationMaster> getListOfMasters() {
+        return listOfMasters;
     }
 }
