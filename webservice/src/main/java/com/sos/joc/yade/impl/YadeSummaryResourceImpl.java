@@ -28,8 +28,10 @@ public class YadeSummaryResourceImpl extends JOCResourceImpl implements IYadeSum
         try {
             // TODO new Permissions for YADE
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
-            // TODO new init method for Yade without JobSchedulerId and new permissions
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, null, true);
+            // JobSchedulerId has to be "" to prevent exception to be thrown
+            // TODO: instead of setting parameter permission to true as below 
+            // the check for permissions has to be added when the permissions are ready
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, "", true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -46,7 +48,6 @@ public class YadeSummaryResourceImpl extends JOCResourceImpl implements IYadeSum
             if (dateTo != null && !dateTo.isEmpty()) {
                 to = JobSchedulerDate.getDateTo(dateTo, timeZone);
             }
-            
             DBLayerYade dbLayer = new DBLayerYade(connection);
             Integer successful = dbLayer.getSuccessfulTransferredFilesCount(from, to);
             Integer failed = dbLayer.getFailedTransferredFilesCount(from, to);
