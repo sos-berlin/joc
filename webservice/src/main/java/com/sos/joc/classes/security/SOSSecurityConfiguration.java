@@ -136,14 +136,17 @@ public class SOSSecurityConfiguration {
         }
     }
 
-    private boolean hasRole(SecurityConfigurationMaster securityConfigurationMaster, String role) {
-        for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
-            if (role.equals(securityConfigurationRole.getRole())) {
-                return true;
-            }
+    private boolean roleIsEmpty(String role) {
+        for (Map.Entry<String, SecurityConfigurationMaster> entry : listOfMasters.getListOfMasters().entrySet()) {
+            SecurityConfigurationMaster securityConfigurationMaster = listOfMasters.getListOfMasters().get(entry.getKey());
 
+            for (SecurityConfigurationRole securityConfigurationRole : securityConfigurationMaster.getRoles()) {
+                if (role.equals(securityConfigurationRole.getRole())) {
+                    return false;
+                }
+            }
         }
-        return false;
+        return true;
     }
 
     private void addRole(SecurityConfigurationMaster securityConfigurationMaster, String role) {
@@ -153,12 +156,12 @@ public class SOSSecurityConfiguration {
     }
 
     private void addEmptyRoles() {
-        SecurityConfigurationMaster getDefaultMaster = listOfMasters.getDefaultMaster(securityConfiguration);
 
         for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
             for (String role : securityConfigurationUser.getRoles()) {
-                if (!hasRole(getDefaultMaster, role)) {
-                    addRole(getDefaultMaster, role);
+                if (roleIsEmpty(role)) {
+                    SecurityConfigurationMaster defaultMaster = listOfMasters.getDefaultMaster(securityConfiguration);
+                    addRole(defaultMaster, role);
                 }
             }
         }
