@@ -333,25 +333,23 @@ public class JOCResourceImpl {
         CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
         createDailyPlanOptions.setAllOptions(createDaysScheduleOptionsMap);
 
-        Transaction tr = null;
+        SOSHibernateSession sosHibernateSession = null;
         try {
-            SOSHibernateSession sosHibernateSession = Globals.createSosHibernateStatelessConnection("dailyplan");
+            sosHibernateSession = Globals.createSosHibernateStatelessConnection("dailyplan");
+            sosHibernateSession.setAutoCommit(false);
 
-            StatelessSession session = null;
-
-            session = (StatelessSession) sosHibernateSession.getCurrentSession();
-
-            tr = session.beginTransaction();
+            sosHibernateSession.beginTransaction();
             Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession);
             calendar2Db.setOptions(createDailyPlanOptions);
             calendar2Db.addDailyplan2DBFilter(dailyPlanCalender2DBFilter);
             calendar2Db.setSpooler(null);
             calendar2Db.processDailyplan2DBFilter();
-            tr.commit();
+            sosHibernateSession.commit();
+            
         } catch (SOSHibernateException ex) {
             try {
-                if (tr != null) {
-                    tr.rollback();
+                if (sosHibernateSession != null) {
+                    sosHibernateSession.rollback();
                 }
             } catch (Exception e) {
             }
