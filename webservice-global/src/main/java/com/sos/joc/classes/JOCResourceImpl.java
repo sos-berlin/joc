@@ -330,17 +330,9 @@ public class JOCResourceImpl {
         @SuppressWarnings("rawtypes")
         HashMap createDaysScheduleOptionsMap = new HashMap();
 
-        String[] commandUrl = dbItemInventoryInstance.getCommandUrl().split(":");
-        String host = "localhost";
-        String port = "4444";
-        if (commandUrl.length > 1) {
-            host = commandUrl[0];
-            port = commandUrl[1];
-        }
+        String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
 
-        createDaysScheduleOptionsMap.put("scheduler_port", port);
-        createDaysScheduleOptionsMap.put("schedulerHostName", host);
-        createDaysScheduleOptionsMap.put("dayOffset", 365);
+        createDaysScheduleOptionsMap.put("command_url", commandUrl);
         CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
         createDailyPlanOptions.setAllOptions(createDaysScheduleOptionsMap);
 
