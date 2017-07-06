@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.hibernate.StatelessSession;
@@ -16,13 +15,11 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
-import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.dailyplan.db.Calendar2DB;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.jitl.dailyplan.job.CreateDailyPlanOptions;
-import com.sos.jitl.inventory.db.InventoryCleanup;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.Globals;

@@ -27,6 +27,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCDefaultResponse.class);
     private static final String TIMEOUT = "X-JOC-Timeout";
     private static final String ACCESS_TOKEN = "access_token";
+    private static final String X_ACCESS_TOKEN = "X-Access-Token";
     private static final String ERROR_HTML = "<!DOCTYPE html>%n"
             + "<html>%n"
             + "<head>%n"
@@ -86,6 +87,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", MediaType.APPLICATION_JSON).cacheControl(setNoCaching());
         responseBuilder.entity(entity);
         responseBuilder.header(ACCESS_TOKEN, accessToken);
+        responseBuilder.header(X_ACCESS_TOKEN, accessToken);
         responseBuilder.header(TIMEOUT, timeout);
         return new JOCDefaultResponse(responseBuilder.build());
     }
