@@ -108,7 +108,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(), modifyOrders);
+            return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(),
+                    modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -116,11 +117,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
-    
+
     @Override
     public JOCDefaultResponse postOrdersResetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "reset_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(), modifyOrders);
+            return postOrdersCommand(accessToken, "reset_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(),
+                    modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -132,7 +134,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     @Override
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isRemoveSetback(), modifyOrders);
+            return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isRemoveSetback(),
+                    modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -149,13 +152,13 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             }
             ModifyOrderAudit orderAudit = new ModifyOrderAudit(order, modifyOrders);
             logAuditMessage(orderAudit);
-            
+
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
             if ("set_run_time".equals(command)) {
-                checkRequiredParameter("runTime", order.getRunTime()); 
+                checkRequiredParameter("runTime", order.getRunTime());
             }
-            
+
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             XMLBuilder xml = new XMLBuilder("modify_order");
             String jobChainPath = normalizePath(order.getJobChain());
@@ -208,11 +211,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 try {
                     ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
                     xml.add(XMLBuilder.parse(order.getRunTime()));
-                    
-                    DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
-                    dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
-                    dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
-                    updateDailyPlan(dailyPlanCalender2DBFilter);            
 
                 } catch (JocException e) {
                     throw e;
@@ -230,19 +228,20 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     if (runTimeIsTemporary) {
                         dbItem.setRunTimeIsTemporary(true);
                         String runTimeCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, order.getOrderId(), "source");
-                        String runTime = RunTime.getRuntimeXmlString(jobChainPath, jocXmlCommand, runTimeCommand, "//source/order/run_time", getAccessToken());
+                        String runTime = RunTime.getRuntimeXmlString(jobChainPath, jocXmlCommand, runTimeCommand, "//source/order/run_time",
+                                getAccessToken());
                         xml.add(XMLBuilder.parse(runTime));
                         jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                         updateRunTimeIsTemporary(dbItem, false);
-                        
+
                         DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                         dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
                         dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
                         updateDailyPlan(dailyPlanCalender2DBFilter);
-                                               
+
                         storeAuditLogEntry(orderAudit);
                     } else {
-                        //nothing to do
+                        // nothing to do
                     }
                 } catch (JocException e) {
                     throw e;
@@ -251,15 +250,21 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 }
                 break;
             }
-            
+
             if (!"reset_run_time".equals(command)) {
                 jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                 if ("set_run_time".equals(command)) {
                     updateRunTimeIsTemporary(jobChainPath, order.getOrderId(), true);
+
+                    DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+                    dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
+                    dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
+                    updateDailyPlan(dailyPlanCalender2DBFilter);            
+
                 }
                 storeAuditLogEntry(orderAudit);
             }
-            
+
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), order));
@@ -297,7 +302,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
         return paramsElem;
     }
-    
+
     private DBItemInventoryOrder getDBItem(String jobChainPath, String orderId) throws JocException {
         if (connection == null) {
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -307,7 +312,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
         return dbOrderLayer.getInventoryOrderByOrderId(jobChainPath, orderId, dbItemInventoryInstance.getId());
     }
-    
+
     private boolean isEndNode(String jobChainPath, String orderState) throws JocException {
         if (connection == null) {
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -320,14 +325,14 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
         return false;
     }
-    
+
     private void updateRunTimeIsTemporary(String jobChainPath, String orderId, boolean value) throws JocException {
         DBItemInventoryOrder dbItem = getDBItem(jobChainPath, orderId);
         if (dbItem != null) {
             updateRunTimeIsTemporary(dbItem, value);
         }
     }
-    
+
     private void updateRunTimeIsTemporary(DBItemInventoryOrder dbItem, boolean value) throws JocException {
         dbItem.setRunTimeIsTemporary(value);
         try {
