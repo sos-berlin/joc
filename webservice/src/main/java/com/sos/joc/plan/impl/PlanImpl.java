@@ -161,7 +161,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                     add = regExMatcher.find();
                 }
-                p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
 
                 if (dailyPlanDBItem.getDbItemReportTask() != null) {
                     p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
@@ -187,8 +187,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                             .getDailyPlanDbItem().getOrderId());
                     add = regExMatcher.find();
                 }
-                p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChain());
-                p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
+                p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
+                p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
 
                 if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() == null) {
                     result.add(p);
@@ -207,7 +207,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 	regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                     add = regExMatcher.find();
                 }
-                p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
 
                 if (dailyPlanDBItem.getDbItemReportTask() != null) {
                     p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
@@ -235,8 +235,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                             .getDailyPlanDbItem().getOrderId());
                     add = regExMatcher.find();
                 }
-                p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChain());
-                p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
+                p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
+                p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
 
                 if (dailyPlanDBItem.getDbItemReportTrigger() != null) {
                     p.setEndTime(dailyPlanDBItem.getDbItemReportTrigger().getEndTime());
