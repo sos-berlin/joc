@@ -7,6 +7,7 @@ import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.common.Folder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -28,6 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "dateFrom",
     "dateTo",
     "timeZone",
+    "folders",
     "job",
     "jobChain",
     "orderId"
@@ -63,6 +65,14 @@ public class PlanFilter {
      */
     @JsonProperty("timeZone")
     private String timeZone;
+    /**
+     * folders
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("folders")
+    private List<Folder> folders = new ArrayList<Folder>();
     /**
      * path
      * <p>
@@ -235,6 +245,32 @@ public class PlanFilter {
     }
 
     /**
+     * folders
+     * <p>
+     * 
+     * 
+     * @return
+     *     The folders
+     */
+    @JsonProperty("folders")
+    public List<Folder> getFolders() {
+        return folders;
+    }
+
+    /**
+     * folders
+     * <p>
+     * 
+     * 
+     * @param folders
+     *     The folders
+     */
+    @JsonProperty("folders")
+    public void setFolders(List<Folder> folders) {
+        this.folders = folders;
+    }
+
+    /**
      * path
      * <p>
      * absolute path based on live folder of a JobScheduler object.
@@ -313,7 +349,7 @@ public class PlanFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(regex).append(states).append(late).append(dateFrom).append(dateTo).append(timeZone).append(job).append(jobChain).append(orderId).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(regex).append(states).append(late).append(dateFrom).append(dateTo).append(timeZone).append(folders).append(job).append(jobChain).append(orderId).toHashCode();
     }
 
     @Override
@@ -325,7 +361,7 @@ public class PlanFilter {
             return false;
         }
         PlanFilter rhs = ((PlanFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(regex, rhs.regex).append(states, rhs.states).append(late, rhs.late).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(regex, rhs.regex).append(states, rhs.states).append(late, rhs.late).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).append(folders, rhs.folders).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).isEquals();
     }
 
 }
