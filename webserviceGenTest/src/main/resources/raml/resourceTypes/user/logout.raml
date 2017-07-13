@@ -2,8 +2,14 @@ post:
   description: |
     <h2>Logout</h2>
   headers:
-    access_token:
+    X-Access-Token:
       description: Request requires authentication!
+      type: string
+      required: true
+      example: 550e8400-e29b-11d4-a716-446655440000
+    access_token:
+      description: |
+        Request requires authentication! <span style="color:red">This header is deprecated. Please use X-Access-Token</span>
       type: string
       required: true
       example: 550e8400-e29b-11d4-a716-446655440000
