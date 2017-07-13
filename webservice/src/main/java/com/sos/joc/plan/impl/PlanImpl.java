@@ -104,8 +104,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
         try {
             LOGGER.debug("Reading the daily plan");
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getDailyPlan()
-                    .getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getDailyPlan().getView().isStatus());
 
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -130,19 +130,25 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
             for (PlanStateText state : planFilter.getStates()) {
                 dailyPlanDBLayer.getFilter().addState(state.name());
             }
-            
-			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-					dailyPlanDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),folder.isRecursive());
-				}
-			}
 
-            Matcher regExMatcher=null;
+            if (planFilter.getFolders().size() > 0) {
+                for (com.sos.joc.model.common.Folder folder : planFilter.getFolders()) {
+                    dailyPlanDBLayer.getFilter().addFolderPath(folder.getFolder(), folder.getRecursive());
+                }
+            }
+
+            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+                    dailyPlanDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.isRecursive());
+                }
+            }
+
+            Matcher regExMatcher = null;
             if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
                 regExMatcher = Pattern.compile(planFilter.getRegex()).matcher("");
             }
-            
+
             List<DailyPlanWithReportTriggerDBItem> listOfWaitingDailyPlanOrderDBItems = dailyPlanDBLayer.getWaitingDailyPlanOrderList(0);
             List<DailyPlanWithReportExecutionDBItem> listOfWaitingDailyPlanStandaloneDBItems = dailyPlanDBLayer.getWaitingDailyPlanStandaloneList(0);
             List<DailyPlanWithReportTriggerDBItem> listOfDailyPlanOrderDBItems = dailyPlanDBLayer.getDailyPlanListOrder(0);
@@ -168,8 +174,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
                     p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
                 }
-                
-                
+
                 if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() == null) {
                     result.add(p);
                 }
@@ -183,8 +188,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setStartMode(dailyPlanDBItem.getStartMode());
 
                 if (regExMatcher != null) {
-                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
-                            .getDailyPlanDbItem().getOrderId());
+                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
                     add = regExMatcher.find();
                 }
                 p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
@@ -204,7 +208,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 Err err = new Err();
 
                 if (regExMatcher != null) {
-                	regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
+                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
                     add = regExMatcher.find();
                 }
                 p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
@@ -218,7 +222,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     err.setMessage(dailyPlanDBItem.getDbItemReportTask().getErrorText());
                     p.setError(err);
                 }
-            if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() != null) {
+                if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() != null) {
                     result.add(p);
                 }
             }
@@ -231,8 +235,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 p.setStartMode(dailyPlanDBItem.getStartMode());
 
                 if (regExMatcher != null) {
-                	regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem
-                            .getDailyPlanDbItem().getOrderId());
+                    regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + "," + dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
                     add = regExMatcher.find();
                 }
                 p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
@@ -246,7 +249,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getName());
                 }
 
-                 if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() != null) {
+                if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() != null) {
                     result.add(p);
                 }
             }
