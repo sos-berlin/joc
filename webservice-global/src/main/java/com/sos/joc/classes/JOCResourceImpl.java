@@ -338,13 +338,11 @@ public class JOCResourceImpl {
             sosHibernateSession = Globals.createSosHibernateStatelessConnection("dailyplan");
             sosHibernateSession.setAutoCommit(false);
 
-            sosHibernateSession.beginTransaction();
             Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession);
             calendar2Db.setOptions(createDailyPlanOptions);
             calendar2Db.addDailyplan2DBFilter(dailyPlanCalender2DBFilter);
             calendar2Db.setSpooler(null);
             calendar2Db.processDailyplan2DBFilter();
-            sosHibernateSession.commit();
             
         } catch (SOSHibernateException ex) {
             try {
