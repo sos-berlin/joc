@@ -13,10 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.dailyplan.db.Calendar2DB;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanWithReportTriggerDBItem;
+import com.sos.jitl.dailyplan.job.CreateDailyPlanOptions;
 import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -98,10 +100,14 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
     }
 
+    private Date getMaxPlannedStart(DailyPlanDBLayer dailyPlanDBLayer, String schedulerId) {
+        Date maxPlannedTime = dailyPlanDBLayer.getMaxPlannedStart(schedulerId);
+        return maxPlannedTime;
+    }
+
     @Override
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
         SOSHibernateSession sosHibernateSession = null;
-
         try {
             LOGGER.debug("Reading the daily plan");
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, planFilter, accessToken, planFilter.getJobschedulerId(), getPermissonsJocCockpit(
@@ -115,15 +121,21 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             Globals.beginTransaction(sosHibernateSession);
 
+            Date maxDate = getMaxPlannedStart(dailyPlanDBLayer, planFilter.getJobschedulerId());
+            Date fromDate = null;
+            Date toDate = null;
+
             dailyPlanDBLayer.getFilter().setSchedulerId(planFilter.getJobschedulerId());
             dailyPlanDBLayer.getFilter().setJob(planFilter.getJob());
             dailyPlanDBLayer.getFilter().setJobChain(planFilter.getJobChain());
             dailyPlanDBLayer.getFilter().setOrderId(planFilter.getOrderId());
             if (planFilter.getDateFrom() != null) {
-                dailyPlanDBLayer.getFilter().setPlannedStartFrom(JobSchedulerDate.getDateFrom(planFilter.getDateFrom(), planFilter.getTimeZone()));
+                fromDate = JobSchedulerDate.getDateFrom(planFilter.getDateFrom(), planFilter.getTimeZone());
+                dailyPlanDBLayer.getFilter().setPlannedStartFrom(fromDate);
             }
             if (planFilter.getDateTo() != null) {
-                dailyPlanDBLayer.getFilter().setPlannedStartTo(JobSchedulerDate.getDateTo(planFilter.getDateTo(), planFilter.getTimeZone()));
+                toDate = JobSchedulerDate.getDateTo(planFilter.getDateTo(), planFilter.getTimeZone());
+                dailyPlanDBLayer.getFilter().setPlannedStartTo(toDate);
             }
             dailyPlanDBLayer.getFilter().setLate(planFilter.getLate());
 
@@ -232,6 +244,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 boolean add = true;
 
                 PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
+
                 p.setStartMode(dailyPlanDBItem.getStartMode());
 
                 if (regExMatcher != null) {
@@ -253,6 +266,61 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     result.add(p);
                 }
             }
+
+            if (fromDate != null && toDate != null && (planFilter.getLate() == null || !planFilter.getLate()) && (planFilter.getStates() == null || planFilter.getStates().size() == 0 || planFilter.getStates().get(0)
+                    .name() == "PLANNED")) {
+
+                CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
+                createDailyPlanOptions.dayOffset.value(0);
+                String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
+                createDailyPlanOptions.commandUrl.setValue(commandUrl);
+                Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession);
+                calendar2Db.setOptions(createDailyPlanOptions);
+
+                if (maxDate.before(toDate)) {
+                    Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.DAY_OF_MONTH);
+                    if (f.before(fromDate)){
+                        f = fromDate;
+                    }
+                    List<DailyPlanDBItem> listOfCalenderItems = calendar2Db.getStartTimesFromScheduler(f, toDate);
+
+                    for (DailyPlanDBItem dailyPlanDBItem : listOfCalenderItems) {
+                        DailyPlanWithReportTriggerDBItem dailyPlanWithReportTriggerDBItem = new DailyPlanWithReportTriggerDBItem(dailyPlanDBItem,
+                                null);
+
+                        boolean add = true;
+
+                        PlanItem p = createPlanItem(dailyPlanDBItem);
+
+                        p.setStartMode(dailyPlanWithReportTriggerDBItem.getStartMode());
+
+                        if (regExMatcher != null) {
+                            regExMatcher.reset(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
+                            add = regExMatcher.find();
+                        }
+                        p.setJobChain(dailyPlanDBItem.getJobChainOrNull());
+                        p.setOrderId(dailyPlanDBItem.getOrderIdOrNull());
+                        p.setJob(dailyPlanDBItem.getJobOrNull());
+                        
+                        String path;
+                        if (dailyPlanDBItem.getJob() != null){
+                            path = dailyPlanDBItem.getJob();
+                        }else{
+                            path = dailyPlanDBItem.getJobChain();
+                        }
+                        
+                        add = add && (planFilter.getJob() == null || planFilter.getJob().equals(dailyPlanDBItem.getJob()));
+                        add = add && (planFilter.getJobChain() == null || planFilter.getJobChain().equals(dailyPlanDBItem.getJobChain()));
+                        add = add && (planFilter.getOrderId() == null || planFilter.getOrderId().equals(dailyPlanDBItem.getOrderId()));
+                        add = add && (dailyPlanDBLayer.getFilter().containsFolder(path)); 
+
+                        if (add) {
+                            result.add(p);
+                        }
+                    }
+                }
+            }
+
             entity.setPlanItems(result);
             entity.setDeliveryDate(Date.from(Instant.now()));
 
