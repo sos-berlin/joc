@@ -12,6 +12,7 @@
     "TERMINATING",
     "WAITING_FOR_DATABASE",
     "DEAD",
-    "UNREACHABLE"
+    "UNREACHABLE",
+    "UNKNOWN_AGENT"
   ]
 }

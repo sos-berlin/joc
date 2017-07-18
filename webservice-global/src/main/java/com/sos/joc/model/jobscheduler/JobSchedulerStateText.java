@@ -17,7 +17,8 @@ public enum JobSchedulerStateText {
     TERMINATING("TERMINATING"),
     WAITING_FOR_DATABASE("WAITING_FOR_DATABASE"),
     DEAD("DEAD"),
-    UNREACHABLE("UNREACHABLE");
+    UNREACHABLE("UNREACHABLE"),
+    UNKNOWN_AGENT("UNKNOWN_AGENT");
     private final String value;
     private final static Map<String, JobSchedulerStateText> CONSTANTS = new HashMap<String, JobSchedulerStateText>();
 

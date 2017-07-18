@@ -9,6 +9,7 @@ import javax.json.JsonObject;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.UnknownJobSchedulerAgentException;
 import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
@@ -77,9 +78,9 @@ public class AgentVCallable implements Callable<AgentOfCluster> {
 //        } catch (JobSchedulerBadRequestException e) {
 //            state.set_text(JobSchedulerStateText.UNREACHABLE);
 //            state.setSeverity(2);
-//        } catch (UnknownJobSchedulerAgentException e) {
-//            e.setErrorMessage(agentUrl);
-//            throw e;
+        } catch (UnknownJobSchedulerAgentException e) {
+            state.set_text(JobSchedulerStateText.UNKNOWN_AGENT);
+            state.setSeverity(2);
         } catch (JocException e) {
             state.set_text(JobSchedulerStateText.UNREACHABLE);
             state.setSeverity(2);
