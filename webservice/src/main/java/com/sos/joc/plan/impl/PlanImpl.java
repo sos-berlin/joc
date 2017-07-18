@@ -267,57 +267,59 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 }
             }
 
-            if (fromDate != null && toDate != null && (planFilter.getLate() == null || !planFilter.getLate()) && (planFilter.getStates() == null || planFilter.getStates().size() == 0 || planFilter.getStates().get(0)
-                    .name() == "PLANNED")) {
+            if (fromDate != null && toDate != null && (planFilter.getLate() == null || !planFilter.getLate()) && (planFilter.getStates() == null
+                    || planFilter.getStates().size() == 0 || planFilter.getStates().get(0).name() == "PLANNED")) {
+                try {
+                    CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
+                    createDailyPlanOptions.dayOffset.value(0);
+                    String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
+                    createDailyPlanOptions.commandUrl.setValue(commandUrl);
+                    Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession);
+                    calendar2Db.setOptions(createDailyPlanOptions);
 
-                CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
-                createDailyPlanOptions.dayOffset.value(0);
-                String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
-                createDailyPlanOptions.commandUrl.setValue(commandUrl);
-                Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession);
-                calendar2Db.setOptions(createDailyPlanOptions);
+                    if (maxDate.before(toDate)) {
+                        Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.DAY_OF_MONTH);
+                        if (f.before(fromDate)) {
+                            f = fromDate;
+                        }
+                        List<DailyPlanDBItem> listOfCalenderItems = calendar2Db.getStartTimesFromScheduler(f, toDate);
 
-                if (maxDate.before(toDate)) {
-                    Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.DAY_OF_MONTH);
-                    if (f.before(fromDate)){
-                        f = fromDate;
+                        for (DailyPlanDBItem dailyPlanDBItem : listOfCalenderItems) {
+                            DailyPlanWithReportTriggerDBItem dailyPlanWithReportTriggerDBItem = new DailyPlanWithReportTriggerDBItem(dailyPlanDBItem,
+                                    null);
+
+                            boolean add = true;
+
+                            PlanItem p = createPlanItem(dailyPlanDBItem);
+
+                            p.setStartMode(dailyPlanWithReportTriggerDBItem.getStartMode());
+
+                            if (regExMatcher != null) {
+                                regExMatcher.reset(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
+                                add = regExMatcher.find();
+                            }
+                            p.setJobChain(dailyPlanDBItem.getJobChainOrNull());
+                            p.setOrderId(dailyPlanDBItem.getOrderIdOrNull());
+                            p.setJob(dailyPlanDBItem.getJobOrNull());
+
+                            String path;
+                            if (dailyPlanDBItem.getJob() != null) {
+                                path = dailyPlanDBItem.getJob();
+                            } else {
+                                path = dailyPlanDBItem.getJobChain();
+                            }
+
+                            add = add && (planFilter.getJob() == null || planFilter.getJob().equals(dailyPlanDBItem.getJob()));
+                            add = add && (planFilter.getJobChain() == null || planFilter.getJobChain().equals(dailyPlanDBItem.getJobChain()));
+                            add = add && (planFilter.getOrderId() == null || planFilter.getOrderId().equals(dailyPlanDBItem.getOrderId()));
+                            add = add && (dailyPlanDBLayer.getFilter().containsFolder(path));
+
+                            if (add) {
+                                result.add(p);
+                            }
+                        }
                     }
-                    List<DailyPlanDBItem> listOfCalenderItems = calendar2Db.getStartTimesFromScheduler(f, toDate);
-
-                    for (DailyPlanDBItem dailyPlanDBItem : listOfCalenderItems) {
-                        DailyPlanWithReportTriggerDBItem dailyPlanWithReportTriggerDBItem = new DailyPlanWithReportTriggerDBItem(dailyPlanDBItem,
-                                null);
-
-                        boolean add = true;
-
-                        PlanItem p = createPlanItem(dailyPlanDBItem);
-
-                        p.setStartMode(dailyPlanWithReportTriggerDBItem.getStartMode());
-
-                        if (regExMatcher != null) {
-                            regExMatcher.reset(dailyPlanDBItem.getJobChain() + "," + dailyPlanDBItem.getOrderId());
-                            add = regExMatcher.find();
-                        }
-                        p.setJobChain(dailyPlanDBItem.getJobChainOrNull());
-                        p.setOrderId(dailyPlanDBItem.getOrderIdOrNull());
-                        p.setJob(dailyPlanDBItem.getJobOrNull());
-                        
-                        String path;
-                        if (dailyPlanDBItem.getJob() != null){
-                            path = dailyPlanDBItem.getJob();
-                        }else{
-                            path = dailyPlanDBItem.getJobChain();
-                        }
-                        
-                        add = add && (planFilter.getJob() == null || planFilter.getJob().equals(dailyPlanDBItem.getJob()));
-                        add = add && (planFilter.getJobChain() == null || planFilter.getJobChain().equals(dailyPlanDBItem.getJobChain()));
-                        add = add && (planFilter.getOrderId() == null || planFilter.getOrderId().equals(dailyPlanDBItem.getOrderId()));
-                        add = add && (dailyPlanDBLayer.getFilter().containsFolder(path)); 
-
-                        if (add) {
-                            result.add(p);
-                        }
-                    }
+                } catch (Exception e) {
                 }
             }
 
