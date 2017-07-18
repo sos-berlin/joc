@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.hibernate.StatelessSession;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +26,12 @@ import com.sos.joc.classes.audit.JocAuditLog;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingCommentException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
+import com.sos.joc.exceptions.UnknownJobSchedulerMasterException;
 import com.sos.joc.model.audit.AuditParams;
 
 public class JOCResourceImpl {
@@ -68,6 +66,13 @@ public class JOCResourceImpl {
 
     public String getAccessToken() {
         return accessToken;
+    }
+    
+    public String getAccessToken(String xAccessToken, String oldAccessToken) {
+        if(xAccessToken != null && !xAccessToken.isEmpty()) {
+            return xAccessToken;
+        }
+        return oldAccessToken;
     }
 
     public JobSchedulerUser getJobschedulerUser() {
@@ -294,7 +299,7 @@ public class JOCResourceImpl {
     }
 
     public void getJobSchedulerInstanceByHostPort(String host, Integer port, String schedulerId) throws DBConnectionRefusedException,
-            DBMissingDataException, DBInvalidDataException {
+            DBInvalidDataException, UnknownJobSchedulerMasterException {
         if (host != null && !host.isEmpty() && port != null && port > 0) {
 
             SOSHibernateSession session = null;
@@ -310,22 +315,18 @@ public class JOCResourceImpl {
                 dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(host, port, schedulerId);
 
                 if (dbItemInventoryInstance == null) {
-                    String errMessage = String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
+                    String errMessage = String.format("JobScheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
                             schedulerId, host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
-                    throw new DBInvalidDataException(errMessage);
+                    throw new UnknownJobSchedulerMasterException(errMessage);
                 }
-            } catch (Exception e) {
-                throw e;
             } finally {
                 Globals.disconnect(session);
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected void updateDailyPlan(DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter) throws Exception {
-        @SuppressWarnings("rawtypes")
-        HashMap createDaysScheduleOptionsMap = new HashMap();
+        HashMap<String,String> createDaysScheduleOptionsMap = new HashMap<String,String>();
 
         String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
 

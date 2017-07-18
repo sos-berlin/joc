@@ -22,7 +22,7 @@ public class JobSchedulerResourceImplTest {
         HostPortParameter jobSchedulerFilterSchema = new HostPortParameter();
         jobSchedulerFilterSchema.setJobschedulerId("scheduler_current");
         JobSchedulerResourceImpl jobschedulerResourceImpl = new JobSchedulerResourceImpl();
-        JOCDefaultResponse jobschedulerResponse = jobschedulerResourceImpl.postJobscheduler(sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerFilterSchema);
+        JOCDefaultResponse jobschedulerResponse = jobschedulerResourceImpl.postJobscheduler(sosShiroCurrentUserAnswer.getAccessToken(), sosShiroCurrentUserAnswer.getAccessToken(), jobSchedulerFilterSchema);
         JobSchedulerV200 jobscheduler200VSchema = (JobSchedulerV200) jobschedulerResponse.getEntity();
         assertEquals("postjobschedulerTest", 4000, jobscheduler200VSchema.getJobscheduler().getPort().intValue());
      }

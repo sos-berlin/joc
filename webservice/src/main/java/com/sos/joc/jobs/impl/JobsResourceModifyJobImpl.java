@@ -165,7 +165,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new JobSchedulerInvalidResponseDataException(modifyJob.getRunTime());
+                    throw new JobSchedulerInvalidResponseDataException(e);
                 }
                 break;
             case RESET_RUN_TIME:
@@ -196,7 +196,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new JobSchedulerInvalidResponseDataException(modifyJob.getRunTime());
+                    throw new JobSchedulerInvalidResponseDataException(e);
                 }
                 break;
             default:

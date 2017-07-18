@@ -23,6 +23,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
+    "created",
     "planItems"
 })
 public class Plan {
@@ -36,6 +37,8 @@ public class Plan {
      */
     @JsonProperty("deliveryDate")
     private Date deliveryDate;
+    @JsonProperty("created")
+    private PlanCreated created;
     /**
      * 
      * (Required)
@@ -74,6 +77,26 @@ public class Plan {
 
     /**
      * 
+     * @return
+     *     The created
+     */
+    @JsonProperty("created")
+    public PlanCreated getCreated() {
+        return created;
+    }
+
+    /**
+     * 
+     * @param created
+     *     The created
+     */
+    @JsonProperty("created")
+    public void setCreated(PlanCreated created) {
+        this.created = created;
+    }
+
+    /**
+     * 
      * (Required)
      * 
      * @return
@@ -103,7 +126,7 @@ public class Plan {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(planItems).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(created).append(planItems).toHashCode();
     }
 
     @Override
@@ -115,7 +138,7 @@ public class Plan {
             return false;
         }
         Plan rhs = ((Plan) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(planItems, rhs.planItems).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(created, rhs.created).append(planItems, rhs.planItems).isEquals();
     }
 
 }

@@ -17,6 +17,8 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
+import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.UnknownJobSchedulerMasterException;
 
 /** @author Uwe Risse */
 public class InventoryInstancesDBLayer extends DBLayer {
@@ -49,7 +51,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
     }
 
     public DBItemInventoryInstance getInventoryInstanceByHostPort(String host, Integer port, String schedulerId)
-            throws DBMissingDataException, DBInvalidDataException, DBConnectionRefusedException {
+            throws DBInvalidDataException, DBConnectionRefusedException, UnknownJobSchedulerMasterException {
         try {
             String sql = String.format("from %s where hostname = :hostname and port = :port", DBITEM_INVENTORY_INSTANCES);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
@@ -68,13 +70,11 @@ public class InventoryInstancesDBLayer extends DBLayer {
                 }
             } else {
                 String errMessage =
-                        String.format("jobscheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
+                        String.format("JobScheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
                                 schedulerId, host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
-                throw new DBMissingDataException(errMessage);
+                throw new UnknownJobSchedulerMasterException(errMessage);
             }
-        } catch (DBMissingDataException e){
-            throw e;
-        } catch (DBInvalidDataException e){
+        } catch (JocException e){
             throw e;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
