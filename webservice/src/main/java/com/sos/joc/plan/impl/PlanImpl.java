@@ -28,6 +28,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.plan.Period;
 import com.sos.joc.model.plan.Plan;
+import com.sos.joc.model.plan.PlanCreated;
 import com.sos.joc.model.plan.PlanFilter;
 import com.sos.joc.model.plan.PlanItem;
 import com.sos.joc.model.plan.PlanState;
@@ -269,12 +270,13 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
             if (fromDate != null && toDate != null && (planFilter.getLate() == null || !planFilter.getLate()) && (planFilter.getStates() == null
                     || planFilter.getStates().size() == 0 || planFilter.getStates().get(0).name() == "PLANNED")) {
+                Calendar2DB calendar2Db = null;
                 try {
                     CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
                     createDailyPlanOptions.dayOffset.value(0);
                     String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
                     createDailyPlanOptions.commandUrl.setValue(commandUrl);
-                    Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession);
+                    calendar2Db = new Calendar2DB(sosHibernateSession);
                     calendar2Db.setOptions(createDailyPlanOptions);
 
                     if (maxDate.before(toDate)) {
@@ -320,6 +322,12 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         }
                     }
                 } catch (Exception e) {
+                    if (calendar2Db != null) {
+                        PlanCreated planCreated = new PlanCreated();
+                        planCreated.setDays(calendar2Db.getDayOffset());
+                        planCreated.setUntil(calendar2Db.getMaxPlannedTime());
+                        entity.setCreated(planCreated);
+                    }
                 }
             }
 
