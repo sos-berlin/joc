@@ -280,7 +280,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     calendar2Db.setOptions(createDailyPlanOptions);
 
                     if (maxDate.before(toDate)) {
-                        Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.DAY_OF_MONTH);
+                        Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.SECOND);
                         if (f.before(fromDate)) {
                             f = fromDate;
                         }
