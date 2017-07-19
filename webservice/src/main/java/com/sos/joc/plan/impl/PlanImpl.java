@@ -2,6 +2,7 @@ package com.sos.joc.plan.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -279,7 +280,14 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     calendar2Db = new Calendar2DB(sosHibernateSession);
                     calendar2Db.setOptions(createDailyPlanOptions);
 
-                    if (maxDate.before(toDate)) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(maxDate);
+                    int maxDay = cal.get(Calendar.DAY_OF_MONTH);                    
+                    cal.setTime(toDate);
+                    int toDay = cal.get(Calendar.DAY_OF_MONTH);                    
+                    
+                    
+                    if (maxDay < toDay) {
                         Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.SECOND);
                         if (f.before(fromDate)) {
                             f = fromDate;
