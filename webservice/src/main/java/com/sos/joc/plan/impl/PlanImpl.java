@@ -10,10 +10,13 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.jitl.dailyplan.db.Calendar2DB;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
@@ -280,10 +283,19 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     calendar2Db = new Calendar2DB(sosHibernateSession);
                     calendar2Db.setOptions(createDailyPlanOptions);
 
+                    String fromTimeZoneString = "UTC";
+                    String toTimeZoneString = DateTimeZone.getDefault().getID();
+
+                    DateTimeZone fromZone = DateTimeZone.forID(fromTimeZoneString);
+
+                    Date dateMaxDate = UtcTimeHelper.convertTimeZonesToDate(fromTimeZoneString, toTimeZoneString, new DateTime(maxDate).withZone(fromZone));
+                    Date dateTo = UtcTimeHelper.convertTimeZonesToDate(fromTimeZoneString, toTimeZoneString, new DateTime(toDate).withZone(fromZone));
+
+                    
                     Calendar cal = Calendar.getInstance();
-                    cal.setTime(maxDate);
+                    cal.setTime(dateMaxDate);
                     int maxDay = cal.get(Calendar.DAY_OF_MONTH);                    
-                    cal.setTime(toDate);
+                    cal.setTime(dateTo);
                     int toDay = cal.get(Calendar.DAY_OF_MONTH);                    
                     
                     
