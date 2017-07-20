@@ -283,23 +283,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     calendar2Db = new Calendar2DB(sosHibernateSession);
                     calendar2Db.setOptions(createDailyPlanOptions);
 
-                    String fromTimeZoneString = "UTC";
-                    String toTimeZoneString = DateTimeZone.getDefault().getID();
-
-                    DateTimeZone fromZone = DateTimeZone.forID(fromTimeZoneString);
-
-                    Date dateMaxDate = UtcTimeHelper.convertTimeZonesToDate(fromTimeZoneString, toTimeZoneString, new DateTime(maxDate).withZone(fromZone));
-                    Date dateTo = UtcTimeHelper.convertTimeZonesToDate(fromTimeZoneString, toTimeZoneString, new DateTime(toDate).withZone(fromZone));
-
-                    
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(dateMaxDate);
-                    int maxDay = cal.get(Calendar.DAY_OF_MONTH);                    
-                    cal.setTime(dateTo);
-                    int toDay = cal.get(Calendar.DAY_OF_MONTH);                    
-                    
-                    
-                    if (maxDay < toDay) {
+                    if (maxDate.before(toDate)) {
                         Date f = calendar2Db.addCalendar(maxDate, 1, java.util.Calendar.SECOND);
                         if (f.before(fromDate)) {
                             f = fromDate;
