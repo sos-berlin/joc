@@ -9,11 +9,11 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.configurations.resource.IJocConfigurationsResource;
-import com.sos.joc.db.configuration.JocConfigurationDbItem;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.configuration.Configuration;

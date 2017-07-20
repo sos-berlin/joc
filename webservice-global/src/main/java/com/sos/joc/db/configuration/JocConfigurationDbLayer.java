@@ -9,6 +9,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.hibernate.layer.SOSHibernateDBLayer;
+import com.sos.jitl.joc.db.JocConfigurationDbItem;
 
 /** @author Uwe Risse */
 public class JocConfigurationDbLayer extends SOSHibernateDBLayer {
