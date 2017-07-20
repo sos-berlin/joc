@@ -6,11 +6,11 @@ import java.util.Date;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.configuration.resource.IJocConfigurationResource;
+import com.sos.joc.db.configuration.JocConfigurationDbItem;
 import com.sos.joc.db.configuration.JocConfigurationDbLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;

@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.joc.db.JocConfigurationDbItem;
 import com.sos.jitl.reporting.db.DBLayer;
 
 public class TestJocConfigurationDbLayer {
