@@ -62,7 +62,8 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
 
             JobSchedulerCommandAudit jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
             logAuditMessage(jobschedulerAudit);
-            String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            //String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            String answer = jocXmlCommand.executePost(xml, getAccessToken());
             storeAuditLogEntry(jobschedulerAudit);
 
             return JOCDefaultResponse.responseStatus200(answer, "application/xml");
