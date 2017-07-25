@@ -329,7 +329,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     if (calendar2Db != null) {
                         PlanCreated planCreated = new PlanCreated();
                         planCreated.setDays(calendar2Db.getDayOffset());
-                        planCreated.setUntil(calendar2Db.getMaxPlannedTime());
+                        planCreated.setUntil(calendar2Db.getMaxPlannedTime(planFilter.getJobschedulerId()));
                         entity.setCreated(planCreated);
                     }
                 }
