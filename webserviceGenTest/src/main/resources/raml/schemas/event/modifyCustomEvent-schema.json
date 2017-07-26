@@ -1,0 +1,46 @@
+{
+  "title": "modify custom event",
+  "id": "schemas/event/modifyCustomEvent",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.ModifyEvent",
+  "type": "object",
+  "properties": {
+    "eventjobChain": {
+      "$ref": "../common/path-schema.json",
+      "default":"/sos/events/scheduler_event_service"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "eventClass": {
+      "type": "string"
+    },
+    "eventId": {
+      "type": "string"
+    },
+    "exitCode": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "expires": {
+      "type": "string"
+    },
+    "expirationPeriod": {
+      "type": "string"
+    },
+    "expirationCycle": {
+      "type": "string"
+    },
+    "params": {
+      "$ref": "../common/nameValuePairs-schema.json"
+    }
+  }
+}

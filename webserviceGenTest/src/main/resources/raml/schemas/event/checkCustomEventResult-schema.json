@@ -1,0 +1,19 @@
+{
+  "title": "events",
+  "id": "schemas/event/events",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.CheckResult",
+  "type": "object",
+  "required": [
+    "count",
+    "deliveryDate"
+  ],
+  "properties": {
+    "count": {
+      "$ref": "../common/nonNegativeInteger-schema.json"
+    },
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    }
+  }
+}

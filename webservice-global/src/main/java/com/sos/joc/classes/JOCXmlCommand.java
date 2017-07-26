@@ -153,11 +153,11 @@ public class JOCXmlCommand extends SOSXmlCommand {
             Element errorElem = (Element) getSosxml().selectSingleNode(xPath);
             if (errorElem != null) {
                 JocError err = new JocError(errorElem.getAttribute("code"), errorElem.getAttribute("text"));
-                if (xmlCommand != null) {
-                    err.appendMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand); 
-                }
                 JobSchedulerBadRequestException badRequestException = new JobSchedulerBadRequestException(err);
                 badRequestException.setSurveyDate(getSurveyDate());
+                if (xmlCommand != null) {
+                    badRequestException.addErrorMetaInfo("JS-URL: " + getUrl(), "JS-REQUEST: " + xmlCommand); 
+                }
                 throw badRequestException;
             }
         } catch (JobSchedulerBadRequestException e) {
