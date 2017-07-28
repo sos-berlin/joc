@@ -16,8 +16,13 @@ import com.sos.joc.model.job.JobConfigurationFilter;
 public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJobResourceConfiguration {
 
     private static final String API_CALL = "./job/configuration";
-
+    
     @Override
+    public JOCDefaultResponse postJobConfiguration(String xAccessToken, String accessToken, JobConfigurationFilter jobBody)
+            throws Exception {
+        return postJobConfiguration(getAccessToken(xAccessToken, accessToken), jobBody);
+    }
+
     public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilter jobBody) throws Exception {
 
         try {

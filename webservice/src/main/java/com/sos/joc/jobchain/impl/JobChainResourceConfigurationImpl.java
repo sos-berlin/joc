@@ -18,6 +18,11 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
     private static final String API_CALL = "./job_chain/configuration";
 
     @Override
+    public JOCDefaultResponse postJobChainConfiguration(String xAccessToken, String accessToken, JobChainConfigurationFilter jobChainBody)
+            throws Exception {
+        return postJobChainConfiguration(getAccessToken(xAccessToken, accessToken), jobChainBody);
+    }
+
     public JOCDefaultResponse postJobChainConfiguration(String accessToken, JobChainConfigurationFilter jobChainBody) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainBody, accessToken, jobChainBody.getJobschedulerId(),

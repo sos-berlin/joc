@@ -24,6 +24,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceHistory;
 import com.sos.joc.model.common.HistoryState;
 import com.sos.joc.model.common.HistoryStateText;
+import com.sos.joc.model.jobChain.JobChainConfigurationFilter;
 import com.sos.joc.model.jobChain.JobChainHistoryFilter;
 import com.sos.joc.model.order.OrderHistory;
 import com.sos.joc.model.order.OrderHistoryItem;
@@ -100,6 +101,11 @@ public class JobChainResourceHistoryImpl extends JOCResourceImpl implements IJob
     }
 
     @Override
+    public JOCDefaultResponse postJobChainHistory(String xAccessToken, String accessToken, JobChainHistoryFilter jobChainHistoryFilter)
+            throws Exception {
+        return postJobChainHistory(getAccessToken(xAccessToken, accessToken), jobChainHistoryFilter);
+    }
+
     public JOCDefaultResponse postJobChainHistory(String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception {
 
         SOSHibernateSession connection = null;

@@ -28,6 +28,17 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
+    public JOCDefaultResponse postJobChainsStop(String xAccessToken, String accessToken, ModifyJobChains modifyJobChains)
+            throws Exception {
+        return postJobChainsStop(getAccessToken(xAccessToken, accessToken), modifyJobChains);
+    }
+
+    @Override
+    public JOCDefaultResponse postJobChainsUnStop(String xAccessToken, String accessToken, ModifyJobChains modifyJobChains)
+            throws Exception {
+        return postJobChainsUnStop(getAccessToken(xAccessToken, accessToken), modifyJobChains);
+    }
+
     public JOCDefaultResponse postJobChainsStop(String accessToken, ModifyJobChains modifyJobChains) {
         try {
             return postJobChainsCommand(STOP, accessToken, getPermissonsJocCockpit(accessToken).getJobChain().getExecute().isStop(), modifyJobChains);
@@ -39,7 +50,6 @@ public class JobChainsResourceModifyJobChainsImpl extends JOCResourceImpl implem
         }
     }
 
-    @Override
     public JOCDefaultResponse postJobChainsUnStop(String accessToken, ModifyJobChains modifyJobChains) {
         try {
             return postJobChainsCommand(UNSTOP, accessToken, getPermissonsJocCockpit(accessToken).getJobChain().getExecute().isUnstop(), modifyJobChains);

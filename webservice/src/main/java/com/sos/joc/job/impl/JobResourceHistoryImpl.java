@@ -27,6 +27,11 @@ public class JobResourceHistoryImpl extends JOCResourceImpl implements IJobResou
     private static final String API_CALL = "./job/configuration";
 
     @Override
+    public JOCDefaultResponse postJobHistory(String xAccessToken, String accessToken, TaskHistoryFilter taskHistoryFilter)
+            throws Exception {
+        return postJobHistory(getAccessToken(xAccessToken, accessToken), taskHistoryFilter);
+    }
+
     public JOCDefaultResponse postJobHistory(String accessToken, TaskHistoryFilter taskHistoryFilter) throws Exception {
 
         try {

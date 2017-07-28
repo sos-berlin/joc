@@ -16,6 +16,6 @@ public interface IJobResourceHistory {
     @Path("history")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobHistory(            
-            @HeaderParam("access_token") String accessToken, TaskHistoryFilter taskHistoryFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, TaskHistoryFilter taskHistoryFilter) throws Exception;
 }
 

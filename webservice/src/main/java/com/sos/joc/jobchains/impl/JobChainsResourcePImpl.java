@@ -35,6 +35,11 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
     private List<JobChainP> allNestedJobChains = new ArrayList<JobChainP>();
 
     @Override
+    public JOCDefaultResponse postJobChainsP(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter)
+            throws Exception {
+        return postJobChainsP(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
+    }
+
     public JOCDefaultResponse postJobChainsP(String accessToken, JobChainsFilter jobChainsFilter) {
 
         SOSHibernateSession connection = null;

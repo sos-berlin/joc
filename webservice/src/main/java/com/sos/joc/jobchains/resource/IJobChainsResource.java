@@ -13,6 +13,7 @@ public interface IJobChainsResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobChains(@HeaderParam("access_token") String accessToken, JobChainsFilter jobChainsFilter) throws Exception;
+    public JOCDefaultResponse postJobChains(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            JobChainsFilter jobChainsFilter) throws Exception;
 
 }

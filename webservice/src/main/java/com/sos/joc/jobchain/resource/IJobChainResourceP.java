@@ -9,13 +9,12 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.jobChain.JobChainFilter;
- 
+
 public interface IJobChainResourceP {
 
     @POST
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobChainP(            
-            @HeaderParam("access_token") String accessToken, JobChainFilter jobChainFilter) throws Exception;
+    public JOCDefaultResponse postJobChainP(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            JobChainFilter jobChainFilter) throws Exception;
 }
-

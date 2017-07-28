@@ -31,7 +31,6 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
 
     private static final String API_CALL = "./audit_log";
 
-    @Override
     public JOCDefaultResponse postAuditLog(String accessToken, AuditLogFilter auditLogFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
@@ -129,6 +128,11 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             audits.add(auditLogItem);
         }
         return audits;
+    }
+
+    @Override
+    public JOCDefaultResponse postAuditLog(String xAccessToken, String accessToken, AuditLogFilter auditLogFilter) throws Exception {
+        return postAuditLog(getAccessToken(xAccessToken, accessToken), auditLogFilter);
     }
 
 }

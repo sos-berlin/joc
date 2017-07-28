@@ -24,6 +24,11 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
     private static final String API_CALL = "./job_chains";
 
     @Override
+    public JOCDefaultResponse postJobChains(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter)
+            throws Exception {
+        return postJobChains(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
+    }
+
     public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {

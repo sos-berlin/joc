@@ -23,6 +23,12 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
     private static final String XSL_FILE = "scheduler_job_documentation_v1.1.xsl";
 
     @Override
+    public JOCDefaultResponse getJobDescription(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String job)
+            throws Exception {
+        // TODO Auto-generated method stub
+        return getJobDescription(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, job);
+    }
+    
     public JOCDefaultResponse getJobDescription(String accessToken, String queryAccessToken, String jobschedulerId, String job) throws Exception {
         JobFilter jobFilter = new JobFilter();
 

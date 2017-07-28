@@ -22,6 +22,11 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
     private static final String API_CALL = "./job/run_time";
 
     @Override
+    public JOCDefaultResponse postJobRunTime(String xAccessToken, String accessToken, JobFilter jobFilter)
+            throws Exception {
+        return postJobRunTime(getAccessToken(xAccessToken, accessToken), jobFilter);
+    }
+
     public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {

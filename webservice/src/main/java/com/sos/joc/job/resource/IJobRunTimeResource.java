@@ -15,6 +15,6 @@ public interface IJobRunTimeResource {
     @POST
     @Path("run_time")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobRunTime(@HeaderParam("access_token") String accessToken, JobFilter jobFilterSchema) throws Exception;
+    public JOCDefaultResponse postJobRunTime(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, JobFilter jobFilterSchema) throws Exception;
 
 }

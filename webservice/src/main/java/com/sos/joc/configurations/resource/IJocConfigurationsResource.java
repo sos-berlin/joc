@@ -13,6 +13,6 @@ public interface IJocConfigurationsResource{
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postConfigurations(@HeaderParam("access_token") String accessToken, ConfigurationsFilter configurationsFilter) throws Exception;
+    public JOCDefaultResponse postConfigurations(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, ConfigurationsFilter configurationsFilter) throws Exception;
  
 }

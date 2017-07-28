@@ -23,6 +23,11 @@ public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobRe
     private static final String API_CALL = "./job/order_queue";
 
     @Override
+    public JOCDefaultResponse postJobOrderQueue(String xAccessToken, String accessToken, JobFilter jobFilter)
+            throws Exception {
+        return postJobOrderQueue(getAccessToken(xAccessToken, accessToken), jobFilter);
+    }
+
     public JOCDefaultResponse postJobOrderQueue(String accessToken, JobFilter jobFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
