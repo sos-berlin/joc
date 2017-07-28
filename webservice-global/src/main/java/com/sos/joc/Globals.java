@@ -45,6 +45,7 @@ public class Globals {
     public static boolean withHostnameVerification = false;
     public static boolean auditLogCommentsAreRequired = false;
     public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
+    public static JocCockpitProperties jocConfigurationProperties;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocException {
         if (sosHibernateFactory == null) {
@@ -131,6 +132,7 @@ public class Globals {
         setHostnameVerification();
         setForceCommentsForAuditLog();
         setTrustStore();
+        setConfigurationProperties();
     }
 
     public static void beginTransaction(SOSHibernateSession connection) {
@@ -272,19 +274,34 @@ public class Globals {
 
     private static void setTrustStore() throws JocException {
         if (sosShiroProperties != null) {
-            JocError error = new JocError();
-            error.setCode("JOC-311");
             String truststore = sosShiroProperties.getProperty("truststore_path", "");
             if (truststore != null && !truststore.trim().isEmpty()) {
                 Path p = sosShiroProperties.resolvePath(truststore.trim());
                 if (p != null) {
                     if (!Files.exists(p)) {
-                        error.setMessage(String.format("truststore path (%1$s) is set but file (%2$s) not found.", truststore, p.toString()));
-                        // throw new JocException(error);
-                        LOGGER.error(error.getMessage());
+                        LOGGER.error(String.format("truststore path (%1$s) is set but file (%2$s) not found.", truststore, p.toString()));
                     } else {
                         truststore = p.toString();
                         System.setProperty("javax.net.ssl.trustStore", truststore);
+                    }
+                }
+            }
+        }
+    }
+    
+    private static void setConfigurationProperties() throws JocException {
+        if (sosShiroProperties != null) {
+            String confFile = sosShiroProperties.getProperty("configuration_file", "");
+            if (confFile != null && !confFile.trim().isEmpty()) {
+                String defaultConfFile = "joc.configuration.properties";
+                Path p = sosShiroProperties.resolvePath(confFile.trim());
+                if (p != null) {
+                    if (!Files.exists(p)) {
+                        if (!confFile.equals(defaultConfFile)) {
+                            LOGGER.error(String.format("configuration file (%1$s) is set but file (%2$s) not found.", confFile, p.toString()));
+                        }
+                    } else {
+                        jocConfigurationProperties = new JocCockpitProperties(p);
                     }
                 }
             }

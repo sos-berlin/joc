@@ -1,5 +1,6 @@
 package com.sos.joc.classes;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -12,12 +13,15 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+
 import sos.scheduler.misc.ParameterSubstitutor;
 
 public class JocCockpitProperties {
     private static final Logger LOGGER = LoggerFactory.getLogger(JocCockpitProperties.class);
     private Properties properties = new Properties();
     private String propertiesFile = "/joc/joc.properties";
+    private Path propertiesPath;
     private ParameterSubstitutor parameterSubstitutor = new ParameterSubstitutor();
 
     public JocCockpitProperties() {
@@ -28,6 +32,12 @@ public class JocCockpitProperties {
     public JocCockpitProperties(String propertiesFile) {
         this.propertiesFile = propertiesFile;
         readProperties();
+        setLog4JConfiguration();
+    }
+    
+    public JocCockpitProperties(Path propertiesPath) {
+        this.propertiesPath = propertiesPath;
+        readPropertiesFromPath();
         setLog4JConfiguration();
     }
 
@@ -68,6 +78,33 @@ public class JocCockpitProperties {
         } else {
             return s;
         }
+    }
+    
+    public DBItemInventoryInstance setUrlMapping(DBItemInventoryInstance instance) {
+        return setUrlMapping(instance, false);
+    }
+    
+    public DBItemInventoryInstance setUrlMapping(DBItemInventoryInstance instance, boolean verbose) {
+        if (instance != null) {
+            String urlMappingKey = String.format("jobscheduler_url_%s_%d", instance.getHostname().toLowerCase(), instance.getPort());
+            String urlFromConfFile = getProperty(urlMappingKey);
+            if (urlFromConfFile != null && !urlFromConfFile.isEmpty()) {
+                if (verbose && !urlFromConfFile.equals(instance.getUrl())) {
+                    LOGGER.info(String.format("JobScheduler url mapped %s -> %s", instance.getUrl(), urlFromConfFile));
+                }
+                if (instance.originalUrl() == null) {
+                    instance.setOriginalUrl(instance.getUrl());
+                }
+                instance.setUrl(urlFromConfFile);
+            } else if (instance.originalUrl() != null) {
+                if (verbose) {
+                    LOGGER.info(String.format("JobScheduler url remapped %s -> %s", instance.getUrl(), instance.originalUrl())); 
+                }
+                instance.setUrl(instance.originalUrl());
+                instance.setOriginalUrl(null);
+            }
+        }
+        return instance;
     }
 
     public int getProperty(String property, int defaultValue) {
@@ -110,29 +147,6 @@ public class JocCockpitProperties {
         return null;
     }
     
-//    public void setAuditLogFile() {
-//        String propKeyAuditLog = "audit_log_file";
-//        System.setProperty(propKeyAuditLog, getProperty(propKeyAuditLog, System.getProperty("java.io.tmpdir")+"/JOCAuditLog.log"));
-//    }
-//    
-//    public void setLogLevel() {
-//        String propKeyLogLevel = "log_level";
-//        String logLevel = getProperty(propKeyLogLevel, null);
-//        if (logLevel != null) {
-//            try {
-//                switch (logLevel.toLowerCase()) {
-//                case "error" : org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.ERROR); break;
-//                case "info"  : org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.INFO); break;
-//                case "warn"  : org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.WARN); break;
-//                case "debug" : org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG); break;
-//                case "trace" : org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.TRACE); break;
-//                }
-//             } catch(Exception e) {
-//                 LOGGER.warn("",e);
-//             }
-//        }
-//    }
-
     private void setLog4JConfiguration() {
         String propKeyLog4J = "log4j.configuration"; 
         //String sysLog4JProp = System.getProperty(propKeyLog4J);
@@ -199,6 +213,36 @@ public class JocCockpitProperties {
             }
         } catch (Exception e) {
             LOGGER.error(String.format("Error while reading %1$s:", propertiesFile), e);
+        } finally {
+            try {
+                if(stream != null) {
+                    stream.close();
+                }
+            } catch (Exception e) {
+            }
+            try {
+                if(streamReader != null) {
+                    streamReader.close();
+                }
+            } catch (Exception e) {
+            }
+        }
+    }
+    
+    private void readPropertiesFromPath() {
+        InputStream stream = null;
+        InputStreamReader streamReader = null;
+        try {
+            if (propertiesPath != null) {
+                stream = new FileInputStream(propertiesPath.toFile());
+                if (stream != null) {
+                    streamReader = new InputStreamReader(stream, "UTF-8");
+                    properties.load(streamReader);
+                    substituteProperties();
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(String.format("Error while reading %1$s:", propertiesPath.toString()), e);
         } finally {
             try {
                 if(stream != null) {

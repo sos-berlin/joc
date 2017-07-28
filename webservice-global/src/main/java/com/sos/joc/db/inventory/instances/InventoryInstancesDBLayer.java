@@ -13,6 +13,7 @@ import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.inventory.db.InventoryCleanup;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -26,8 +27,13 @@ public class InventoryInstancesDBLayer extends DBLayer {
     public InventoryInstancesDBLayer(SOSHibernateSession conn) {
         super(conn);
     }
-
+    
     public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken) throws DBInvalidDataException,
+    DBMissingDataException, DBConnectionRefusedException {
+        return getInventoryInstanceBySchedulerId(schedulerId, accessToken, false);
+    }
+
+    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken, boolean verbose) throws DBInvalidDataException,
             DBMissingDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
@@ -35,7 +41,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             query.setParameter("schedulerId", schedulerId);
             List<DBItemInventoryInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
-                return getRunningJobSchedulerClusterMember(result, accessToken);
+                return setMappedUrl(getRunningJobSchedulerClusterMember(result, accessToken), verbose);
             } else {
                 String errMessage = String.format("jobschedulerId %1$s not found in table %2$s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES);
                 throw new DBMissingDataException(errMessage);
@@ -61,7 +67,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
 
             List<DBItemInventoryInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
-                return result.get(0);
+                return setMappedUrl(result.get(0));
             } else {
                 String errMessage = String.format("JobScheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s", schedulerId,
                         host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
@@ -119,7 +125,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             String sql = String.format("from %s where id = :id", DBITEM_INVENTORY_INSTANCES);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql);
             query.setParameter("id", id);
-            return getSession().getSingleResult(query);
+            return setMappedUrl(getSession().getSingleResult(query));
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -208,6 +214,17 @@ public class InventoryInstancesDBLayer extends DBLayer {
             break;
         }
         return schedulerInstancesDBList.get(0);
+    }
+    
+    private DBItemInventoryInstance setMappedUrl(DBItemInventoryInstance instance) {
+        return setMappedUrl(instance, false);
+    }
+    
+    private DBItemInventoryInstance setMappedUrl(DBItemInventoryInstance instance, boolean verbose) {
+        if (Globals.jocConfigurationProperties != null) {
+            return Globals.jocConfigurationProperties.setUrlMapping(instance, verbose);
+        }
+        return instance;
     }
 
 }

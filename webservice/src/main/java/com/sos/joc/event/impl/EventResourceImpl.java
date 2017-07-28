@@ -55,7 +55,12 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
     private String urlOfCurrentJs = null;
     public static final Integer EVENT_TIMEOUT = 90;
 
+
     @Override
+    public JOCDefaultResponse postEvent(String xAccessToken, String accessToken, RegisterEvent eventBody) throws Exception {
+        return postEvent(getAccessToken(xAccessToken, accessToken), eventBody);
+    }
+
     public JOCDefaultResponse postEvent(String accessToken, RegisterEvent eventBody) {
 
         JobSchedulerEvents entity = new JobSchedulerEvents();
@@ -287,10 +292,17 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 
     private DBItemInventoryInstance getJobSchedulerInstance(JobSchedulerObjects jsObject, InventoryInstancesDBLayer instanceLayer, String accessToken)
             throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
-        DBItemInventoryInstance instance = Globals.urlFromJobSchedulerId.get(jsObject.getJobschedulerId());
+        DBItemInventoryInstance instance = setMappedUrl(Globals.urlFromJobSchedulerId.get(jsObject.getJobschedulerId()));
         if (instance == null) {
-            instance = instanceLayer.getInventoryInstanceBySchedulerId(jsObject.getJobschedulerId(), accessToken);
+            instance = instanceLayer.getInventoryInstanceBySchedulerId(jsObject.getJobschedulerId(), accessToken, true);
             Globals.urlFromJobSchedulerId.put(jsObject.getJobschedulerId(), instance);
+        }
+        return instance;
+    }
+    
+    private DBItemInventoryInstance setMappedUrl(DBItemInventoryInstance instance) {
+        if (Globals.jocConfigurationProperties != null) {
+            return Globals.jocConfigurationProperties.setUrlMapping(instance, true);
         }
         return instance;
     }
