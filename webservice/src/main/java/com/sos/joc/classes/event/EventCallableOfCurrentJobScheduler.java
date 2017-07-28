@@ -113,6 +113,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
         }
         return events;
     }
+    
+//    private Events createEventsOfJobsAndOrdersWhichUseSchedule(String schedule) {
+//        //
+//        return null;
+//    }
 
     @Override
     protected List<EventSnapshot> getEventSnapshots(String eventId) throws JocException {
@@ -184,6 +189,9 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             removedObjects.add(eventSnapshot.getPath() + "." + eventSnapshot.getObjectType().name());
                             break;
                         }
+//                        if (JobSchedulerObjectType.SCHEDULE == eventSnapshot.getObjectType()) {
+//                            //JOC-242
+//                        }
                         
                     } else if (variables.containsKey(CustomEventType.DailyPlanChanged.name())) {
                         eventSnapshot.setEventType(CustomEventType.DailyPlanChanged.name());

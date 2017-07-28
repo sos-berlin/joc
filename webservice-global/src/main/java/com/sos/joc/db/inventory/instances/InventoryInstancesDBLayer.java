@@ -27,8 +27,8 @@ public class InventoryInstancesDBLayer extends DBLayer {
         super(conn);
     }
 
-    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken)
-            throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
+    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken) throws DBInvalidDataException,
+            DBMissingDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
@@ -37,8 +37,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             if (result != null && !result.isEmpty()) {
                 return getRunningJobSchedulerClusterMember(result, accessToken);
             } else {
-                String errMessage = String.format("jobschedulerId %1$s not found in table %2$s", schedulerId,
-                        DBLayer.TABLE_INVENTORY_INSTANCES);
+                String errMessage = String.format("jobschedulerId %1$s not found in table %2$s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES);
                 throw new DBMissingDataException(errMessage);
             }
         } catch (DBMissingDataException ex) {
@@ -50,31 +49,25 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
     }
 
-    public DBItemInventoryInstance getInventoryInstanceByHostPort(String host, Integer port, String schedulerId)
-            throws DBInvalidDataException, DBConnectionRefusedException, UnknownJobSchedulerMasterException {
+    public DBItemInventoryInstance getInventoryInstanceByHostPort(String host, Integer port, String schedulerId) throws DBInvalidDataException,
+            DBConnectionRefusedException, UnknownJobSchedulerMasterException {
         try {
-            String sql = String.format("from %s where hostname = :hostname and port = :port", DBITEM_INVENTORY_INSTANCES);
+            String sql = String.format("from %s where schedulerId = :schedulerId and hostname = :hostname and port = :port",
+                    DBITEM_INVENTORY_INSTANCES);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("hostname", host);
             query.setParameter("port", port);
+            query.setParameter("schedulerId", schedulerId);
 
             List<DBItemInventoryInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
-                DBItemInventoryInstance dbItemInventoryInstance = result.get(0);
-                if (!dbItemInventoryInstance.getSchedulerId().equals(schedulerId)) {
-                    String errMessage = String.format("jobschedulerId %s not assigned for %s:%s in table %s", schedulerId, host,
-                            port, DBLayer.TABLE_INVENTORY_INSTANCES);
-                    throw new DBInvalidDataException(errMessage);
-                } else {
-                    return result.get(0);
-                }
+                return result.get(0);
             } else {
-                String errMessage =
-                        String.format("JobScheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
-                                schedulerId, host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
+                String errMessage = String.format("JobScheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s", schedulerId,
+                        host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
                 throw new UnknownJobSchedulerMasterException(errMessage);
             }
-        } catch (JocException e){
+        } catch (JocException e) {
             throw e;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -83,8 +76,8 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId)
-            throws DBInvalidDataException, DBConnectionRefusedException   {
+    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws DBInvalidDataException,
+            DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
@@ -133,7 +126,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
     public long getInventoryMods() throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("select modified from %s", DBITEM_INVENTORY_INSTANCES);
@@ -142,7 +135,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             if (result != null && !result.isEmpty()) {
                 long mods = 0L;
                 for (Date mod : result) {
-                    mods += mod.getTime()/1000;
+                    mods += mod.getTime() / 1000;
                 }
                 return mods;
             }
@@ -153,7 +146,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
     public void cleanUp(DBItemInventoryInstance schedulerInstanceFromDb) throws DBInvalidDataException {
         StatelessSession session = null;
         Transaction tr = null;
@@ -174,8 +167,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
     }
 
-    private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList,
-            String accessToken) {
+    private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList, String accessToken) {
         switch (schedulerInstancesDBList.get(0).getClusterType()) {
         case "passive":
             DBItemInventoryInstance schedulerInstancesDBItemOfWaitingScheduler = null;
@@ -196,9 +188,9 @@ public class InventoryInstancesDBLayer extends DBLayer {
                     // unreachable
                 }
             }
-//            if (schedulerInstancesDBItemOfWaitingScheduler != null) {
-//                return schedulerInstancesDBItemOfWaitingScheduler;
-//            }
+            // if (schedulerInstancesDBItemOfWaitingScheduler != null) {
+            // return schedulerInstancesDBItemOfWaitingScheduler;
+            // }
             break;
         case "active":
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {

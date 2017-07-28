@@ -69,6 +69,10 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return responseStatus200(entity, MediaType.TEXT_HTML + "; charset=UTF-8");
     }
     
+    public static JOCDefaultResponse responsePlainStatus200(Object entity) {
+        return responseStatus200(entity, MediaType.TEXT_PLAIN + "; charset=UTF-8");
+    }
+    
     public static JOCDefaultResponse responseTxtDownloadStatus200(Object entity, String filename) {
         Response.ResponseBuilder responseBuilder = Response.status(200).header("Content-Type", MediaType.TEXT_PLAIN + "; charset=UTF-8").header(
                 "Content-Disposition", "attachment; filename=" + filename).cacheControl(setNoCaching());
@@ -222,6 +226,12 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
     public static JOCDefaultResponse responseHTMLStatus420(String entity) {
         entity = String.format(ERROR_HTML, "JOC-420", StringEscapeUtils.escapeHtml4(entity));
         Response.ResponseBuilder responseBuilder = Response.status(420).header("Content-Type", MediaType.TEXT_HTML + "; charset=UTF-8").cacheControl(setNoCaching());
+        responseBuilder.entity(entity);
+        return new JOCDefaultResponse(responseBuilder.build());
+    }
+    
+    public static JOCDefaultResponse responsePlainStatus420(String entity) {
+        Response.ResponseBuilder responseBuilder = Response.status(420).header("Content-Type", MediaType.TEXT_PLAIN + "; charset=UTF-8").cacheControl(setNoCaching());
         responseBuilder.entity(entity);
         return new JOCDefaultResponse(responseBuilder.build());
     }
