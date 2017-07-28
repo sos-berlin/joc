@@ -21,6 +21,10 @@ public class OrderRunTimeResourceImpl extends JOCResourceImpl implements IOrderR
     private static final String API_CALL = "./order/run_time";
 
     @Override
+    public JOCDefaultResponse postOrderRunTime(String xAccessToken, String accessToken, OrderFilter orderFilter) throws Exception {
+        return postOrderRunTime(getAccessToken(xAccessToken, accessToken), orderFilter);
+    }
+
     public JOCDefaultResponse postOrderRunTime(String accessToken, OrderFilter orderFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {

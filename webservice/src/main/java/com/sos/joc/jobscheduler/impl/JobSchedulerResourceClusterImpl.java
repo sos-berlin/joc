@@ -24,6 +24,10 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
     private static final String API_CALL = "./jobscheduler/cluster";
 
     @Override
+    public JOCDefaultResponse postJobschedulerCluster(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerFilter) {
+        return postJobschedulerCluster(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
+    }
+
     public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilter) {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),

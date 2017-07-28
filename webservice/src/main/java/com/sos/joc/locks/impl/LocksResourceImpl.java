@@ -33,6 +33,10 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
     private JOCXmlCommand jocXmlCommand;
 
     @Override
+    public JOCDefaultResponse postLocks(String xAccessToken, String accessToken, LocksFilter locksFilter) throws Exception {
+        return postLocks(getAccessToken(xAccessToken, accessToken), locksFilter);
+    }
+
     public JOCDefaultResponse postLocks(String accessToken, LocksFilter locksFilter) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, locksFilter, accessToken, locksFilter.getJobschedulerId(), getPermissonsJocCockpit(

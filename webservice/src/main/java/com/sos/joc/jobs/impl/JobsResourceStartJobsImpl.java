@@ -29,6 +29,10 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
+    public JOCDefaultResponse postJobsStart(String xAccessToken, String accessToken, StartJobs startJobs) throws Exception {
+        return postJobsStart(getAccessToken(xAccessToken, accessToken), startJobs);
+    }
+
     public JOCDefaultResponse postJobsStart(String accessToken, StartJobs startJobs) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, startJobs, accessToken, startJobs.getJobschedulerId(), getPermissonsJocCockpit(

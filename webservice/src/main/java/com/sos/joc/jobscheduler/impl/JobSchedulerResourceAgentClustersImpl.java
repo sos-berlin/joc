@@ -51,6 +51,11 @@ public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl imple
     private static final String API_CALL = "./jobscheduler/agent_clusters";
 
     @Override
+    public JOCDefaultResponse postJobschedulerAgentClusters(String xAccessToken, String accessToken,
+            AgentClusterFilter jobSchedulerAgentClustersBody) {
+        return postJobschedulerAgentClusters(getAccessToken(xAccessToken, accessToken), jobSchedulerAgentClustersBody);
+    }
+
     public JOCDefaultResponse postJobschedulerAgentClusters(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
 
         SOSHibernateSession connection = null;

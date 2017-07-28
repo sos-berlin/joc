@@ -16,7 +16,7 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerTerminate(
-            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
 
     
     @POST
@@ -24,7 +24,7 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerRestartTerminate(
-            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
 
     
     
@@ -33,5 +33,5 @@ public interface IJobSchedulerResourceModifyJobSchedulerCluster {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerTerminateFailSafe(
-            @HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, TimeoutParameter timeoutParameter) throws Exception;
 }

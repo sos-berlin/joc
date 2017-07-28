@@ -19,5 +19,5 @@ public interface IJobSchedulerResourceAgentClusters {
     @Consumes(MediaType.APPLICATION_JSON )
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobschedulerAgentClusters(
-            @HeaderParam("access_token") String accessToken, AgentClusterFilter agentClusterFilterSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, AgentClusterFilter agentClusterFilterSchema) throws Exception;
 }

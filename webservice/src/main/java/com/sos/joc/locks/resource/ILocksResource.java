@@ -15,7 +15,7 @@ public interface ILocksResource {
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postLocks(            
-            @HeaderParam("access_token") String accessToken, LocksFilter locksFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, LocksFilter locksFilter) throws Exception;
 
 
  

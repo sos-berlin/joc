@@ -26,6 +26,10 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
+    public JOCDefaultResponse postOrdersDelete(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersDelete(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersDelete(String accessToken, ModifyOrders modifyOrders) {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),

@@ -15,7 +15,7 @@ public interface ITaskLogHtmlResource {
     @GET
     @Path("log/html")
     @Produces({ MediaType.TEXT_HTML})
-    public JOCDefaultResponse getTaskLogHtml(@HeaderParam("access_token") String accessToken, @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId")  String jobschedulerId,
+    public JOCDefaultResponse getTaskLogHtml(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId")  String jobschedulerId,
             @QueryParam("taskId") String taskId) throws Exception;
 
 }

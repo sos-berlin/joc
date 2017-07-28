@@ -15,5 +15,5 @@ public interface IOrderPResource {
     @POST
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrderP(@HeaderParam("access_token") String accessToken, OrderFilter orderFilter) throws Exception;
+    public JOCDefaultResponse postOrderP(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, OrderFilter orderFilter) throws Exception;
 }

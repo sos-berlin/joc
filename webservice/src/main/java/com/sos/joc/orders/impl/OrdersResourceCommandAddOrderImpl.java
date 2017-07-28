@@ -31,6 +31,10 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
+    public JOCDefaultResponse postOrdersAdd(String xAccessToken, String accessToken, ModifyOrders modifyOrders) throws Exception {
+        return postOrdersAdd(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersAdd(String accessToken, ModifyOrders modifyOrders) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyOrders, accessToken, modifyOrders.getJobschedulerId(),
@@ -114,7 +118,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             if (order.getOrderId() == null || order.getOrderId().isEmpty()) {
                 String orderId = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ok/order/@id");
                 if (orderId != null && !orderId.isEmpty()) {
-                    orderAudit.setOrderId(orderId); 
+                    orderAudit.setOrderId(orderId);
                 }
             }
             storeAuditLogEntry(orderAudit);

@@ -2,7 +2,6 @@ package com.sos.joc.plan.impl;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -10,13 +9,10 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.Path;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.jitl.dailyplan.db.Calendar2DB;
 import com.sos.jitl.dailyplan.db.DailyPlanDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
@@ -109,8 +105,12 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
         Date maxPlannedTime = dailyPlanDBLayer.getMaxPlannedStart(schedulerId);
         return maxPlannedTime;
     }
-
+    
     @Override
+    public JOCDefaultResponse postPlan(String xAccessToken, String accessToken, PlanFilter planFilter) throws Exception {
+       return postPlan(getAccessToken(xAccessToken, accessToken), planFilter);       
+    }
+    
     public JOCDefaultResponse postPlan(String accessToken, PlanFilter planFilter) throws Exception {
         SOSHibernateSession sosHibernateSession = null;
         try {

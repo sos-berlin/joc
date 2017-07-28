@@ -19,6 +19,10 @@ public class JobSchedulerResourcePImpl extends JOCResourceImpl implements IJobSc
     private static final String API_CALL = "./jobscheduler/p";
 
     @Override
+    public JOCDefaultResponse postJobschedulerP(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
+        return postJobschedulerP(getAccessToken(xAccessToken, accessToken), jobSchedulerId);
+    }
+
     public JOCDefaultResponse postJobschedulerP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken, jobSchedulerId.getJobschedulerId(),

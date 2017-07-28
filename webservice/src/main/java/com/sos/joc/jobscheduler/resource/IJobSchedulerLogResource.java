@@ -18,13 +18,13 @@ public interface IJobSchedulerLogResource {
     @GET
     @Path("log")
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
-    public JOCDefaultResponse getMainLog(@HeaderParam("access_token") String accessToken, @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
+    public JOCDefaultResponse getMainLog(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
             @QueryParam("host") String host, @QueryParam("port") Integer port) throws Exception;
 
     @POST
     @Path("log")
     @Consumes("application/json")
     @Produces({ MediaType.APPLICATION_OCTET_STREAM })
-    public JOCDefaultResponse getMainLog(@HeaderParam("access_token") String accessToken, HostPortTimeOutParameter hostPortParamSchema) throws Exception;
+    public JOCDefaultResponse getMainLog(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, HostPortTimeOutParameter hostPortParamSchema) throws Exception;
 
 }

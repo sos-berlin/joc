@@ -15,6 +15,6 @@ public interface IScheduleResourceP {
     @POST
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postScheduleP(@HeaderParam("access_token") String accessToken, ScheduleFilter scheduleFilterSchema) throws Exception;
+    public JOCDefaultResponse postScheduleP(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ScheduleFilter scheduleFilterSchema) throws Exception;
 
 }

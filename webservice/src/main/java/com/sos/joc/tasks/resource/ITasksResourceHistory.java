@@ -16,6 +16,6 @@ public interface ITasksResourceHistory {
     @Path("history")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTasksHistory(@HeaderParam("access_token") String accessToken, JobsFilter jobsFilter) throws Exception;
+    public JOCDefaultResponse postTasksHistory(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, JobsFilter jobsFilter) throws Exception;
 
 }

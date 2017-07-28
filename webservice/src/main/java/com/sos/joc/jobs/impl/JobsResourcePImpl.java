@@ -34,6 +34,10 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
     private Boolean isOrderJob;
 
     @Override
+    public JOCDefaultResponse postJobsP(String xAccessToken, String accessToken, JobsFilter jobsFilter) {
+        return postJobsP(getAccessToken(xAccessToken, accessToken), jobsFilter);
+    }
+
     public JOCDefaultResponse postJobsP(String accessToken, JobsFilter jobsFilter) {
 
         SOSHibernateSession session = null;

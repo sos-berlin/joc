@@ -17,6 +17,6 @@ public interface IJobsResourceP {
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobsP(            
-            @HeaderParam("access_token") String accessToken, JobsFilter jobsFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, JobsFilter jobsFilter) throws Exception;
 }
 

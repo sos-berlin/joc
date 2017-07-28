@@ -19,6 +19,10 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl imp
     private static final String API_CALL = "./jobscheduler/cluster/members/p";
 
     @Override
+    public JOCDefaultResponse postJobschedulerClusterMembers(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerFilter) {
+        return postJobschedulerClusterMembers(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
+    }
+
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),

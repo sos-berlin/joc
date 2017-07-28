@@ -24,6 +24,10 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
     private static final String API_CALL = "./jobs";
 
     @Override
+    public JOCDefaultResponse postJobs(String xAccessToken, String accessToken, JobsFilter jobsFilter) throws Exception {
+        return postJobs(getAccessToken(xAccessToken, accessToken), jobsFilter);
+    }
+
     public JOCDefaultResponse postJobs(String accessToken, JobsFilter jobsFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
@@ -32,7 +36,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());

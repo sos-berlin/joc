@@ -34,6 +34,10 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
     private static final String AGENTS_API_LIST_PATH = "/jobscheduler/master/api/agent/";
 
     @Override
+    public JOCDefaultResponse postJobschedulerAgents(String xAccessToken, String accessToken, AgentFilter agentFilter) {
+        return postJobschedulerAgents(getAccessToken(xAccessToken, accessToken), agentFilter);
+    }
+
     public JOCDefaultResponse postJobschedulerAgents(String accessToken, AgentFilter agentFilter) {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, agentFilter, accessToken, agentFilter.getJobschedulerId(), getPermissonsJocCockpit(

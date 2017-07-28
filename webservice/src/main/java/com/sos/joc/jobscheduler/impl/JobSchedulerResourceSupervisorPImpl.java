@@ -26,6 +26,10 @@ public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl impleme
     private static final String API_CALL = "./jobscheduler/supervisor/p";
 
     @Override
+    public JOCDefaultResponse postJobschedulerSupervisorP(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
+        return postJobschedulerSupervisorP(getAccessToken(xAccessToken, accessToken), jobSchedulerId);
+    }
+
     public JOCDefaultResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
         SOSHibernateSession connection = null;
 

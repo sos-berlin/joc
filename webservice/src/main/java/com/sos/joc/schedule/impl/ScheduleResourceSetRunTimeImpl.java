@@ -28,6 +28,10 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
     private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger(WebserviceConstants.AUDIT_LOGGER);
 
     @Override
+    public JOCDefaultResponse postScheduleSetRuntime(String xAccessToken, String accessToken, ModifyRunTime modifyRuntime) throws Exception {
+        return postScheduleSetRuntime(getAccessToken(xAccessToken, accessToken), modifyRuntime);
+    }
+
     public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRunTime modifyRuntime) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken, modifyRuntime.getJobschedulerId(),
@@ -55,7 +59,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
-            
+
             storeAuditLogEntry(scheduleAudit);
 
             return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));

@@ -31,6 +31,10 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
     private List<LockPath> locks;
 
     @Override
+    public JOCDefaultResponse postLocksP(String xAccessToken, String accessToken, LocksFilter locksFilter) throws Exception {
+        return postLocksP(getAccessToken(xAccessToken, accessToken), locksFilter);
+    }
+
     public JOCDefaultResponse postLocksP(String accessToken, LocksFilter locksFilter) throws Exception {
         SOSHibernateSession connection = null;
 

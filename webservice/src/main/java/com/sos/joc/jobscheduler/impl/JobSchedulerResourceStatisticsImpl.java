@@ -14,6 +14,11 @@ public class JobSchedulerResourceStatisticsImpl extends JOCResourceImpl implemen
     private static final String API_CALL = "./jobscheduler/statistics";
 
     @Override
+    public JOCDefaultResponse postJobschedulerStatistics(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerFilter)
+            throws Exception {
+        return postJobschedulerStatistics(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
+    }
+
     public JOCDefaultResponse postJobschedulerStatistics(String accessToken, JobSchedulerId jobSchedulerFilter) throws Exception {
 
         try {

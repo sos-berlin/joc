@@ -16,5 +16,5 @@ public interface IOrdersResourceP {
     @Path("p")
     @Produces({ "application/json" })
     public JOCDefaultResponse postOrdersP(            
-            @HeaderParam("access_token") String accessToken, OrdersFilter ordersFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, OrdersFilter ordersFilter) throws Exception;
 }

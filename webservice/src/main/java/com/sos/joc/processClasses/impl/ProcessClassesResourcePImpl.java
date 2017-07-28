@@ -30,6 +30,10 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
     private static final String API_CALL = "./process_classes/p";
 
     @Override
+    public JOCDefaultResponse postProcessClassesP(String xAccessToken, String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+        return postProcessClassesP(getAccessToken(xAccessToken, accessToken), processClassFilter);
+    }
+
     public JOCDefaultResponse postProcessClassesP(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
         SOSHibernateSession connection = null;
 

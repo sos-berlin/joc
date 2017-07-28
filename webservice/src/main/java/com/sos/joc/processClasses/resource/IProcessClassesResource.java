@@ -15,5 +15,5 @@ public interface IProcessClassesResource {
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postProcessClasses(            
-            @HeaderParam("access_token") String accessToken, ProcessClassesFilter processClassFilterSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, ProcessClassesFilter processClassFilterSchema) throws Exception;
 }

@@ -33,6 +33,10 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     private Boolean compact = null;
 
     @Override
+    public JOCDefaultResponse postOrdersP(String xAccessToken, String accessToken, OrdersFilter ordersFilter) throws Exception {
+        return postOrdersP(getAccessToken(xAccessToken, accessToken), ordersFilter);
+    }
+
     public JOCDefaultResponse postOrdersP(String accessToken, OrdersFilter ordersFilter) throws Exception {
         SOSHibernateSession connection = null;
 

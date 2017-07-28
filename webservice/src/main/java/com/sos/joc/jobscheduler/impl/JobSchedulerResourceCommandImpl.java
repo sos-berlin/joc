@@ -22,6 +22,11 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
     private static final String API_CALL_COMMAND = "./jobscheduler/commands";
 
     @Override
+    public JOCDefaultResponse postJobschedulerCommands(String xAccessToken, String accessToken, JobschedulerCommands jobSchedulerCommands)
+            throws Exception {
+        return postJobschedulerCommands(getAccessToken(xAccessToken, accessToken), jobSchedulerCommands);
+    }
+
     public JOCDefaultResponse postJobschedulerCommands(String accessToken, JobschedulerCommands jobSchedulerCommands) throws Exception {
 
         try {
@@ -47,7 +52,7 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
 
                 xml = xml + jobSchedulerCommandFactory.getXml(jobschedulerCommand);
-                if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(accessToken),sosShiroFolderPermissions)) {
+                if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(accessToken), sosShiroFolderPermissions)) {
                     if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
                         return accessDeniedResponse();
                     } else {
@@ -56,13 +61,13 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                 }
 
             }
-            if (!xml.startsWith("<params.get") && ! xml.contains("param.get")){
-                 xml = "<commands>" + xml + "</commands>";
+            if (!xml.startsWith("<params.get") && !xml.contains("param.get")) {
+                xml = "<commands>" + xml + "</commands>";
             }
 
             JobSchedulerCommandAudit jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
             logAuditMessage(jobschedulerAudit);
-            //String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
+            // String answer = jocXmlCommand.executePostWithThrowBadRequest(xml, getAccessToken());
             String answer = jocXmlCommand.executePost(xml, getAccessToken());
             storeAuditLogEntry(jobschedulerAudit);
 

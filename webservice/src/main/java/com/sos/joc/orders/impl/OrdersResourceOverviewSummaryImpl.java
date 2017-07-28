@@ -23,6 +23,10 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
     private static final String API_CALL = "./orders/overview/summary";
 
     @Override
+    public JOCDefaultResponse postOrdersOverviewSummary(String xAccessToken, String accessToken, OrdersFilter ordersFilter) throws Exception {
+        return postOrdersOverviewSummary(getAccessToken(xAccessToken, accessToken), ordersFilter);
+    }
+
     public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
         SOSHibernateSession connection = null;
 
@@ -42,7 +46,8 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
             reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
 
             if (ordersFilter.getDateFrom() != null) {
-                reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter.getTimeZone()));
+                reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter
+                        .getTimeZone()));
             }
             if (ordersFilter.getDateTo() != null) {
                 reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
@@ -53,14 +58,13 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
                     reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
                 }
             }
-            
-    		if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-					reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),folder.isRecursive());
-				}
-			}
-            
+
+            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+                    reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.isRecursive());
+                }
+            }
 
             OrdersOverView entity = new OrdersOverView();
             entity.setDeliveryDate(new Date());

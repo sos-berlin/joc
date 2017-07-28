@@ -15,6 +15,6 @@ public interface IScheduleResourceSetRunTime {
     @POST
     @Path("set_run_time")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postScheduleSetRuntime(@HeaderParam("access_token") String accessToken, ModifyRunTime modifyRuntimeSchema) throws Exception;
+    public JOCDefaultResponse postScheduleSetRuntime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyRunTime modifyRuntimeSchema) throws Exception;
 
 }

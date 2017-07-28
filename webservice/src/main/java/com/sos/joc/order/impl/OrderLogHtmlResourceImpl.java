@@ -16,6 +16,11 @@ public class OrderLogHtmlResourceImpl extends JOCResourceImpl implements IOrderL
     private static final String API_CALL = "./order/log/html";
 
     @Override
+    public JOCDefaultResponse getOrderLogHtml(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String orderId,
+            String jobChain, String historyId) throws Exception {
+        return getOrderLogHtml(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, orderId, jobChain, historyId);
+    }
+
     public JOCDefaultResponse getOrderLogHtml(String accessToken, String queryAccessToken, String jobschedulerId, String orderId, String jobChain,
             String historyId) throws Exception {
         OrderHistoryFilter orderHistoryFilter = new OrderHistoryFilter();

@@ -33,6 +33,10 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
+    public JOCDefaultResponse postTasksTerminate(String xAccessToken, String accessToken, ModifyTasks modifyTasks) {
+        return postTasksTerminate(getAccessToken(xAccessToken, accessToken), modifyTasks);
+    }
+
     public JOCDefaultResponse postTasksTerminate(String accessToken, ModifyTasks modifyTasks) {
         try {
             return postTasksCommand(accessToken, TERMINATE, getPermissonsJocCockpit(accessToken).getJob().getExecute().isTerminate(), modifyTasks);
@@ -45,9 +49,14 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     }
 
     @Override
+    public JOCDefaultResponse postTasksTerminateWithin(String xAccessToken, String accessToken, ModifyTasks modifyTasks) {
+        return postTasksTerminateWithin(getAccessToken(xAccessToken, accessToken), modifyTasks);
+    }
+
     public JOCDefaultResponse postTasksTerminateWithin(String accessToken, ModifyTasks modifyTasks) {
         try {
-            return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissonsJocCockpit(accessToken).getJob().getExecute().isTerminate(), modifyTasks);
+            return postTasksCommand(accessToken, TERMINATE_WITHIN, getPermissonsJocCockpit(accessToken).getJob().getExecute().isTerminate(),
+                    modifyTasks);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -57,6 +66,10 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     }
 
     @Override
+    public JOCDefaultResponse postTasksKill(String xAccessToken, String accessToken, ModifyTasks modifyTasks) {
+        return postTasksKill(getAccessToken(xAccessToken, accessToken), modifyTasks);
+    }
+
     public JOCDefaultResponse postTasksKill(String accessToken, ModifyTasks modifyTasks) {
         try {
             return postTasksCommand(accessToken, KILL, getPermissonsJocCockpit(accessToken).getJob().getExecute().isKill(), modifyTasks);
@@ -69,6 +82,10 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
     }
 
     @Override
+    public JOCDefaultResponse postTasksEnd(String xAccessToken, String accessToken, ModifyTasks modifyTasks) {
+        return postTasksEnd(getAccessToken(xAccessToken, accessToken), modifyTasks);
+    }
+
     public JOCDefaultResponse postTasksEnd(String accessToken, ModifyTasks modifyTasks) {
         try {
             return postTasksCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().getExecute().isKill(), modifyTasks);
@@ -130,10 +147,10 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
 
     private Date executeKillCommand(TasksFilter job, TaskId taskId, String command, ModifyTasks modifyTasks) {
         try {
-            
+
             ModifyTaskAudit taskAudit = new ModifyTaskAudit(job, taskId, modifyTasks);
             logAuditMessage(taskAudit);
-            
+
             checkRequiredParameter("job", job.getJob());
             checkRequiredParameter("taskId", taskId.getTaskId());
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
@@ -158,7 +175,7 @@ public class TasksResourceKillImpl extends JOCResourceImpl implements ITasksReso
             }
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
             storeAuditLogEntry(taskAudit);
-            
+
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), job, taskId));

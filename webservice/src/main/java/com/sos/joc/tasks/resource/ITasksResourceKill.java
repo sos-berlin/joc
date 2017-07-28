@@ -16,24 +16,24 @@ public interface ITasksResourceKill {
     @Path("terminate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTasksTerminate(@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
+    public JOCDefaultResponse postTasksTerminate(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
 
     @POST
     @Path("terminate_within")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTasksTerminateWithin(@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
+    public JOCDefaultResponse postTasksTerminateWithin(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
 
     @POST
     @Path("kill")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTasksKill(@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
+    public JOCDefaultResponse postTasksKill(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
 
     @POST
     @Path("end")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTasksEnd(@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
+    public JOCDefaultResponse postTasksEnd(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyTasks modifyTasksSchema) throws Exception;
 
 }

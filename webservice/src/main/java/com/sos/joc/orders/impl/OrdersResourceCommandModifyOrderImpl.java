@@ -46,6 +46,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private InventoryJobChainsDBLayer dbJobChainLayer = null;
 
     @Override
+    public JOCDefaultResponse postOrdersStart(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersStart(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersStart(String accessToken, ModifyOrders modifyOrders) {
         try {
             return postOrdersCommand(accessToken, "start", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isStart(), modifyOrders);
@@ -58,6 +62,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
+    public JOCDefaultResponse postOrdersSuspend(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersSuspend(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersSuspend(String accessToken, ModifyOrders modifyOrders) {
         try {
             return postOrdersCommand(accessToken, "suspend", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isSuspend(), modifyOrders);
@@ -70,6 +78,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
+    public JOCDefaultResponse postOrdersResume(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersResume(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrders modifyOrders) {
         try {
             return postOrdersCommand(accessToken, "resume", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isResume(), modifyOrders);
@@ -82,6 +94,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
+    public JOCDefaultResponse postOrdersReset(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersReset(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersReset(String accessToken, ModifyOrders modifyOrders) {
         try {
             return postOrdersCommand(accessToken, "reset", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isReset(), modifyOrders);
@@ -94,6 +110,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
+    public JOCDefaultResponse postOrdersSetState(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersSetState(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersSetState(String accessToken, ModifyOrders modifyOrders) {
         try {
             return postOrdersCommand(accessToken, "set_state", getPermissonsJocCockpit(accessToken).getOrder().getChange().isState(), modifyOrders);
@@ -106,6 +126,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
+    public JOCDefaultResponse postOrdersSetRunTime(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersSetRunTime(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
             return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(),
@@ -119,6 +143,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
+    public JOCDefaultResponse postOrdersResetRunTime(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersResetRunTime(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersResetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
             return postOrdersCommand(accessToken, "reset_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(),
@@ -132,6 +160,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
 
     @Override
+    public JOCDefaultResponse postOrdersRemoveSetBack(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
+        return postOrdersRemoveSetBack(getAccessToken(xAccessToken, accessToken), modifyOrders);
+    }
+
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
         try {
             return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isRemoveSetback(),
@@ -259,7 +291,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                     dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
                     dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
-                    updateDailyPlan(dailyPlanCalender2DBFilter);            
+                    updateDailyPlan(dailyPlanCalender2DBFilter);
 
                 }
                 storeAuditLogEntry(orderAudit);

@@ -17,5 +17,5 @@ public interface IOrdersResourceOverviewSummary {
     @Path("overview/summary")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postOrdersOverviewSummary(            
-            @HeaderParam("access_token") String accessToken, OrdersFilter ordersFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, OrdersFilter ordersFilter) throws Exception;
 }

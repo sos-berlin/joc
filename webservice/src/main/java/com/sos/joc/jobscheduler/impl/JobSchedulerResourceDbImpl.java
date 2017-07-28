@@ -20,6 +20,10 @@ public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobS
     private static final String API_CALL = "./jobscheduler/db";
 
     @Override
+    public JOCDefaultResponse postJobschedulerDb(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerFilter) {
+        return postJobschedulerDb(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
+    }
+
     public JOCDefaultResponse postJobschedulerDb(String accessToken, JobSchedulerId jobSchedulerFilter) {
 
         try {

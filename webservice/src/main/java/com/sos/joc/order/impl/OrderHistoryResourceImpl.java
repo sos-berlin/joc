@@ -26,6 +26,10 @@ public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderH
     private static final String API_CALL = "./order/history";
 
     @Override
+    public JOCDefaultResponse postOrderHistory(String xAccessToken, String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
+        return postOrderHistory(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
+    }
+
     public JOCDefaultResponse postOrderHistory(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
 
         SOSHibernateSession connection = null;

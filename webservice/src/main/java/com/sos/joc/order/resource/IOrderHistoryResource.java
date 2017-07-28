@@ -15,7 +15,7 @@ public interface IOrderHistoryResource {
     @POST
     @Path("history")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrderHistory(@HeaderParam("access_token") String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception;
+    public JOCDefaultResponse postOrderHistory(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception;
 }
 
  

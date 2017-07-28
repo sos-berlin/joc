@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.processclasses.ProcessClassesVCallable;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.plan.PlanFilter;
 import com.sos.joc.model.processClass.ProcessClassPath;
 import com.sos.joc.model.processClass.ProcessClassV;
 import com.sos.joc.model.processClass.ProcessClassesFilter;
@@ -32,6 +33,10 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
     private static final String API_CALL = "./process_classes";
 
     @Override
+    public JOCDefaultResponse postProcessClasses(String xAccessToken, String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+        return postProcessClasses(getAccessToken(xAccessToken, accessToken), processClassFilter);
+    }
+
     public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
         try {
             SOSPermissionJocCockpit perms = getPermissonsJocCockpit(accessToken);
@@ -57,7 +62,8 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             if (processClasses != null && !processClasses.isEmpty()) {
                 for (ProcessClassPath processClass : processClasses) {
                     checkRequiredParameter("processClass", processClass.getProcessClass());
-                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
+                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken,
+                            jobViewStatusEnabled));
                 }
                 entity.setProcessClasses(listProcessClasses);
             } else if (folders != null && !folders.isEmpty()) {

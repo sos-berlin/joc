@@ -47,6 +47,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private InventoryJobsDBLayer dbLayer = null;
 
     @Override
+    public JOCDefaultResponse postJobsStop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+        return postJobsStop(getAccessToken(xAccessToken, accessToken), modifyJobs);
+    }
+
     public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
         try {
             return postJobsCommand(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJob().getExecute().isStop(), modifyJobs);
@@ -59,6 +63,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
+    public JOCDefaultResponse postJobsUnstop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+        return postJobsUnstop(getAccessToken(xAccessToken, accessToken), modifyJobs);
+    }
+
     public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
         try {
             return postJobsCommand(accessToken, UNSTOP, getPermissonsJocCockpit(accessToken).getJob().getExecute().isUnstop(), modifyJobs);
@@ -70,13 +78,14 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-
-
     @Override
+    public JOCDefaultResponse postJobsSetRunTime(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+        return postJobsSetRunTime(getAccessToken(xAccessToken, accessToken), modifyJobs);
+    }
+
     public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
         try {
-            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob()
-                    .getChange().isRunTime(), modifyJobs);
+            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().getChange().isRunTime(), modifyJobs);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -86,6 +95,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
+    public JOCDefaultResponse postJobsResetRunTime(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+        return postJobsResetRunTime(getAccessToken(xAccessToken, accessToken), modifyJobs);
+    }
+
+
     public JOCDefaultResponse postJobsResetRunTime(String accessToken, ModifyJobs modifyJobs) {
         try {
             return postJobsCommand(accessToken, RESET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().getChange().isRunTime(), modifyJobs);
@@ -98,6 +112,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
+    public JOCDefaultResponse postJobsEndAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+        return postJobsEndAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
+    }
+
+
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
             return postJobsCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().getExecute().isEndAllTasks(), modifyJobs);
@@ -110,6 +129,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
+    public JOCDefaultResponse postJobsSuspendAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+        return postJobsSuspendAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
+    }
+
+
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
             return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(accessToken).getJob().getExecute().isSuspendAllTasks(), modifyJobs);
@@ -122,6 +146,11 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     }
 
     @Override
+    public JOCDefaultResponse postJobsContinueAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+        return postJobsContinueAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
+    }
+
+
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
             return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(accessToken).getJob().getExecute().isContinueAllTasks(),
@@ -159,7 +188,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
                     DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                     dailyPlanCalender2DBFilter.setForJob(jobPath);
-                    updateDailyPlan(dailyPlanCalender2DBFilter);            
+                    updateDailyPlan(dailyPlanCalender2DBFilter);
 
                     storeAuditLogEntry(jobAudit);
                 } catch (JocException e) {
@@ -187,8 +216,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
 
                         DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                         dailyPlanCalender2DBFilter.setForJob(jobPath);
-                        updateDailyPlan(dailyPlanCalender2DBFilter);            
-                        
+                        updateDailyPlan(dailyPlanCalender2DBFilter);
+
                         storeAuditLogEntry(jobAudit);
                     } else {
                         // nothing to do
