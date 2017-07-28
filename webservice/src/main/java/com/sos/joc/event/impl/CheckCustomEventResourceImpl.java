@@ -16,15 +16,14 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
-import com.sos.joc.event.resource.ICheckCustomResource;
-import com.sos.joc.exceptions.JocException;
+import com.sos.joc.event.resource.ICheckCustomEventResource;
 import com.sos.joc.model.event.custom.CheckEvent;
 import com.sos.joc.model.event.custom.CheckResult;
 
 import sos.xml.SOSXMLXPath;
 
 @Path("events")
-public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICheckCustomResource {
+public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICheckCustomEventResource {
 
     private static final String API_CALL = "./events/custom/check";
     private String xPath = "";
@@ -92,12 +91,10 @@ public class CheckCustomEventResourceImpl extends JOCResourceImpl implements ICh
                 }
             }
             
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
+            return JOCDefaultResponse.responsePlainStatus200(entity.getCount());
         } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+            String errorOutput = e.getClass().getSimpleName() + ": " +((e.getCause() != null) ? e.getCause().getMessage() : e.getMessage());
+            return JOCDefaultResponse.responsePlainStatus420(errorOutput);
         } finally {
             Globals.disconnect(connection);
         }

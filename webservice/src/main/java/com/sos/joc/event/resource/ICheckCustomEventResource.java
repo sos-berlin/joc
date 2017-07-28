@@ -12,12 +12,12 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.event.custom.CheckEvent;
 
  
-public interface ICheckCustomResource {
+public interface ICheckCustomEventResource {
 
     @POST
     @Path("custom/check")
-    @Consumes(MediaType.APPLICATION_JSON )
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse checkEvent(            
             @HeaderParam("X-Access-Token") String accessToken, CheckEvent checkEvent) throws Exception;
 }

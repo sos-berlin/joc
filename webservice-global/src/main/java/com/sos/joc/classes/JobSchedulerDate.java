@@ -1,5 +1,7 @@
 package com.sos.joc.classes;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -18,6 +20,13 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 
 public class JobSchedulerDate {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerDate.class);
+    
+    public static String getNowInISO() {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+        df.setTimeZone(tz);
+        return df.format(new Date());
+    }
 
     
     public static Date getDateFromISO8601String(String dateString) {
