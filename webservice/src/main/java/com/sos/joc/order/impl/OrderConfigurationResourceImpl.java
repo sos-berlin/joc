@@ -18,6 +18,10 @@ public class OrderConfigurationResourceImpl extends JOCResourceImpl implements I
     private static final String API_CALL = "./order/configuration";
 
     @Override
+    public JOCDefaultResponse postOrderConfiguration(String xAccessToken, String accessToken, OrderConfigurationFilter orderBody) throws Exception {
+        return postOrderConfiguration(getAccessToken(xAccessToken, accessToken), orderBody);
+    }
+
     public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilter orderBody) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderBody, accessToken, orderBody.getJobschedulerId(), getPermissonsJocCockpit(

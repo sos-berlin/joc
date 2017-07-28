@@ -32,6 +32,10 @@ public class JobSchedulerResourceAgentsPImpl extends JOCResourceImpl implements 
     private SOSHibernateSession connection = null;
 
     @Override
+    public JOCDefaultResponse postJobschedulerAgentsP(String xAccessToken, String accessToken, AgentFilter agentFilter) {
+        return postJobschedulerAgentsP(getAccessToken(xAccessToken, accessToken), agentFilter);
+    }
+
     public JOCDefaultResponse postJobschedulerAgentsP(String accessToken, AgentFilter agentFilter) {
 
         try {

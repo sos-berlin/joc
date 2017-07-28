@@ -18,10 +18,13 @@ public class JobSchedulerResourceImpl extends JOCResourceImpl implements IJobSch
     private static final String API_CALL = "./jobscheduler";
 
     @Override
-    public JOCDefaultResponse postJobscheduler(String accessToken, String oldAccessToken, HostPortParameter jobSchedulerBody) {
+    public JOCDefaultResponse postJobscheduler(String xAccessToken, String accessToken, HostPortParameter jobSchedulerBody) {
+        return postJobscheduler(getAccessToken(xAccessToken, accessToken), jobSchedulerBody);
+    }
 
+        
+    public JOCDefaultResponse postJobscheduler(String accessToken, HostPortParameter jobSchedulerBody) {    
         try {
-            accessToken = getAccessToken(accessToken, oldAccessToken);
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerBody, accessToken, jobSchedulerBody.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
             if (jocDefaultResponse != null) {

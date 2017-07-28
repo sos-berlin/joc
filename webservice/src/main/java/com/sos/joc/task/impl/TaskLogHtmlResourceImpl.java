@@ -16,6 +16,11 @@ public class TaskLogHtmlResourceImpl extends JOCResourceImpl implements ITaskLog
     private static final String API_CALL = "./task/log/html";
 
     @Override
+    public JOCDefaultResponse getTaskLogHtml(String xAccessToken, String accessToken, String queryAccessToken, String jobschedulerId, String taskId)
+            throws Exception {
+        return getTaskLogHtml(getAccessToken(xAccessToken, accessToken), queryAccessToken, jobschedulerId, taskId);
+    }
+
     public JOCDefaultResponse getTaskLogHtml(String accessToken, String queryAccessToken, String jobschedulerId, String taskId) throws Exception {
         TaskFilter taskFilter = new TaskFilter();
 

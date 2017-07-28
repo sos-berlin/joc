@@ -17,6 +17,6 @@ public interface IJobSchedulerResourceClusterMembersP {
     @Path("cluster/members/p")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobschedulerClusterMembers(@HeaderParam("access_token") String accessToken,
+    public JOCDefaultResponse postJobschedulerClusterMembers(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken,
             JobSchedulerId jobSchedulerFilterSchema) throws Exception;
 }

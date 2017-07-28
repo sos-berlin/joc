@@ -25,6 +25,11 @@ public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
     private static final String API_CALL = "./job/p";
 
     @Override
+    public JOCDefaultResponse postJobP(String xAccessToken, String accessToken, JobFilter jobFilter)
+            throws Exception {
+        return postJobP(getAccessToken(xAccessToken, accessToken), jobFilter);
+    }
+
     public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) {
 
         SOSHibernateSession connection = null;

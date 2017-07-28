@@ -39,11 +39,15 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
     private static final String API_CALL = "./orders";
 
     @Override
+    public JOCDefaultResponse postOrders(String xAccessToken, String accessToken, OrdersFilter ordersBody) throws Exception {
+        return postOrders(getAccessToken(xAccessToken, accessToken), ordersBody);
+    }
+
     public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken, ordersBody.getJobschedulerId(), 
-                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken, ordersBody.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -57,22 +61,21 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             List<OrderPath> orders = ordersBody.getOrders();
             List<Folder> folders = ordersBody.getFolders();
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
-            
-    		if (ordersBody.getFolders().size() == 0 && jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-					com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
-					f.setFolder(folder.getFolder());
-					f.setRecursive(folder.isRecursive());
-					folders.add(f);
-				}
-			}
-            
-            
+
+            if (ordersBody.getFolders().size() == 0 && jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+                    com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
+                    f.setFolder(folder.getFolder());
+                    f.setRecursive(folder.isRecursive());
+                    folders.add(f);
+                }
+            }
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
             List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId());
-            
+
             Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
             if (orders != null && !orders.isEmpty()) {
                 InventoryJobChainsDBLayer dbJCLayer = new InventoryJobChainsDBLayer(connection);
@@ -94,7 +97,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
                     } else {
                         opj = new OrdersPerJobChain();
                         opj.setJobChain(order.getJobChain());
-                        opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain())); 
+                        opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
                         opj.addOrder(order.getOrderId());
                     }
                     ordersLists.put(order.getJobChain(), opj);

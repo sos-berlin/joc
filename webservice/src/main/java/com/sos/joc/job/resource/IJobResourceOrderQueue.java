@@ -16,6 +16,6 @@ public interface IJobResourceOrderQueue {
     @Path("order_queue")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobOrderQueue(            
-            @HeaderParam("access_token") String accessToken, JobFilter jobFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, JobFilter jobFilter) throws Exception;
 }
 

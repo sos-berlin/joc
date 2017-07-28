@@ -13,6 +13,6 @@ public interface ITreeResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTree(@HeaderParam("access_token") String accessToken, TreeFilter treeBody) throws Exception;
+    public JOCDefaultResponse postTree(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, TreeFilter treeBody) throws Exception;
 
 }

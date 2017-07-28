@@ -32,6 +32,11 @@ public class OrdersResourceOverviewSnapshotImplEvent extends JOCResourceImpl imp
     private String eventIdStr = null;
 
     @Override
+    public JOCDefaultResponse postOrdersOverviewSnapshotEvent(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter)
+            throws Exception {
+        return postOrdersOverviewSnapshotEvent(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
+    }
+
     public JOCDefaultResponse postOrdersOverviewSnapshotEvent(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),

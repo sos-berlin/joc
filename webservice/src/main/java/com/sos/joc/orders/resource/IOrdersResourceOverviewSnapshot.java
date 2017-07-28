@@ -17,5 +17,5 @@ public interface IOrdersResourceOverviewSnapshot {
     @Path("overview/snapshot")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postOrdersOverviewSnapshot(            
-            @HeaderParam("access_token") String accessToken, JobChainsFilter filterSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, JobChainsFilter filterSchema) throws Exception;
 }

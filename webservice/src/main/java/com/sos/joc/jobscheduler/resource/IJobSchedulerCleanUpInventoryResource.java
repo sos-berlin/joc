@@ -16,6 +16,6 @@ public interface IJobSchedulerCleanUpInventoryResource {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerCleanupInventory(
-            @HeaderParam("access_token") String accessToken, HostPortParameter hostPortParameter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, HostPortParameter hostPortParameter) throws Exception;
 
 }

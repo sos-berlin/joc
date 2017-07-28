@@ -14,6 +14,10 @@ public class TouchResourceImpl extends JOCResourceImpl implements ITouchResource
     private static final String API_CALL = "./touch";
 
     @Override
+    public JOCDefaultResponse postTouch(String xAccessToken, String accessToken) throws Exception {
+        return postTouch(getAccessToken(xAccessToken, accessToken));
+    }
+
     public JOCDefaultResponse postTouch(String accessToken) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, accessToken);

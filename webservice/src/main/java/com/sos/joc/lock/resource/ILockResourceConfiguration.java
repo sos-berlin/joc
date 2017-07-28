@@ -16,7 +16,7 @@ public interface ILockResourceConfiguration {
     @Path("configuration")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postLockConfiguration(            
-            @HeaderParam("access_token") String accessToken, LockConfigurationFilter lockConfigurationFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, LockConfigurationFilter lockConfigurationFilter) throws Exception;
 
    
  

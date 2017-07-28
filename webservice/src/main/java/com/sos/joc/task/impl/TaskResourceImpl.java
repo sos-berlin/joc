@@ -35,6 +35,10 @@ public class TaskResourceImpl extends JOCResourceImpl implements ITaskResource {
     private static final String API_CALL = "./task";
 
     @Override
+    public JOCDefaultResponse postTask(String xAccessToken, String accessToken, TaskFilter taskFilter) throws Exception {
+        return postTask(getAccessToken(xAccessToken, accessToken), taskFilter);
+    }
+
     public JOCDefaultResponse postTask(String accessToken, TaskFilter taskFilter) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken, taskFilter.getJobschedulerId(), getPermissonsJocCockpit(

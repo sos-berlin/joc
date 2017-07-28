@@ -21,6 +21,10 @@ public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogRe
     private static final String API_CALL = "./order/log";
 
     @Override
+    public JOCDefaultResponse postOrderLog(String xAccessToken, String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
+        return postOrderLog(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
+    }
+
     public JOCDefaultResponse postOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
 
         try {

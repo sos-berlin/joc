@@ -8,14 +8,12 @@ import javax.ws.rs.Path;
 import org.w3c.dom.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.schedule.ScheduleVolatile;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
-import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ScheduleFilter;
@@ -28,9 +26,14 @@ public class ScheduleResourceImpl extends JOCResourceImpl implements IScheduleRe
     private static final String API_CALL = "./schedule";
 
     @Override
+    public JOCDefaultResponse postSchedule(String xAccessToken, String accessToken, ScheduleFilter scheduleFilter) throws Exception {
+        return postSchedule(getAccessToken(xAccessToken, accessToken), scheduleFilter);
+    }
+
     public JOCDefaultResponse postSchedule(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
+
         SOSHibernateSession connection = null;
-        
+
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, scheduleFilter, accessToken, scheduleFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getSchedule().getView().isStatus());

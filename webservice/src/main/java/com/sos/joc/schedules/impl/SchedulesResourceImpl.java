@@ -36,6 +36,10 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
     private static final String API_CALL = "./schedules";
 
     @Override
+    public JOCDefaultResponse postSchedules(String xAccessToken, String accessToken, SchedulesFilter schedulesFilter) throws Exception {
+        return postSchedules(getAccessToken(xAccessToken, accessToken),  schedulesFilter);
+    }
+
     public JOCDefaultResponse postSchedules(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
         SOSHibernateSession connection = null;
         

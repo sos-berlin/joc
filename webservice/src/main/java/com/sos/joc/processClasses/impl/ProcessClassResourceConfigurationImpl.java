@@ -18,6 +18,11 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
     private static final String API_CALL = "./process_class/configuration";
 
     @Override
+    public JOCDefaultResponse postProcessClassConfiguration(String xAccessToken, String accessToken,
+            ProcessClassConfigurationFilter processClassConfigurationFilter) throws Exception {
+        return postProcessClassConfiguration(getAccessToken(xAccessToken, accessToken), processClassConfigurationFilter);
+    }
+
     public JOCDefaultResponse postProcessClassConfiguration(String accessToken, ProcessClassConfigurationFilter processClassConfigurationFilter)
             throws Exception {
 

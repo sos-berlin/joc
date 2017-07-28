@@ -18,6 +18,10 @@ public class LockResourceConfigurationImpl extends JOCResourceImpl implements IL
     private static final String API_CALL = "./lock/configuration";
 
     @Override
+    public JOCDefaultResponse postLockConfiguration(String xAccessToken, String accessToken, LockConfigurationFilter lockBody) throws Exception {
+        return postLockConfiguration(getAccessToken(xAccessToken, accessToken), lockBody);
+    }
+
     public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilter lockBody) throws Exception {
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, lockBody, accessToken, lockBody.getJobschedulerId(), getPermissonsJocCockpit(

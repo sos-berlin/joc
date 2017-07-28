@@ -34,6 +34,10 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
     private List<SchedulePath> schedules;
 
     @Override
+    public JOCDefaultResponse postSchedulesP(String xAccessToken, String accessToken, SchedulesFilter schedulesFilter) throws Exception {
+        return postSchedulesP(getAccessToken(xAccessToken, accessToken), schedulesFilter);
+    }
+
     public JOCDefaultResponse postSchedulesP(String accessToken, SchedulesFilter schedulesFilter) throws Exception {
         SOSHibernateSession connection = null;
 

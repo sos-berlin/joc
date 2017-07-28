@@ -25,6 +25,10 @@ public class ScheduleResourcePImpl extends JOCResourceImpl implements IScheduleR
     private static final String API_CALL = "./schedule/p";
 
     @Override
+    public JOCDefaultResponse postScheduleP(String xAccessToken, String accessToken, ScheduleFilter scheduleFilter) throws Exception {
+        return postScheduleP(getAccessToken(xAccessToken, accessToken), scheduleFilter);
+    }
+
     public JOCDefaultResponse postScheduleP(String accessToken, ScheduleFilter scheduleFilter) throws Exception {
         SOSHibernateSession connection = null;
 

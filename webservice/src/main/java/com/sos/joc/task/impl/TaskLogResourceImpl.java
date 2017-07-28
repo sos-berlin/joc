@@ -21,11 +21,15 @@ public class TaskLogResourceImpl extends JOCResourceImpl implements ITaskLogReso
     private static final String API_CALL = "./task/log";
 
     @Override
+    public JOCDefaultResponse postTaskLog(String xAccessToken, String accessToken, TaskFilter taskFilter) throws Exception {
+        return postTaskLog(getAccessToken(xAccessToken, accessToken), taskFilter);
+    }
+
     public JOCDefaultResponse postTaskLog(String accessToken, TaskFilter taskFilter) throws Exception {
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken, taskFilter.getJobschedulerId(), 
-                    getPermissonsJocCockpit(accessToken).getJob().getView().isTaskLog());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, taskFilter, accessToken, taskFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getJob().getView().isTaskLog());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

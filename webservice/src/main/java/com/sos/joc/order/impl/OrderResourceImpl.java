@@ -24,6 +24,10 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
     private static final String API_CALL = "./order";
 
     @Override
+    public JOCDefaultResponse postOrder(String xAccessToken, String accessToken, OrderFilter orderBody) throws Exception {
+        return postOrder(getAccessToken(xAccessToken, accessToken), orderBody);
+    }
+
     public JOCDefaultResponse postOrder(String accessToken, OrderFilter orderBody) throws Exception {
         SOSHibernateSession connection = null;
         try {
@@ -42,7 +46,8 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
                 connection = Globals.createSosHibernateStatelessConnection(API_CALL);
                 InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
                 String jobChainPath = normalizePath(orderBody.getJobChain());
-                List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId(), jobChainPath, orderBody.getOrderId());
+                List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId(), jobChainPath, orderBody
+                        .getOrderId());
                 orderBody.setJobChain(jobChainPath);
                 OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken, ordersWithTempRunTime);
                 entity.setOrder(o.getOrder());

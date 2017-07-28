@@ -15,6 +15,6 @@ public interface IOrderRunTimeResource {
     @POST
     @Path("run_time")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrderRunTime(@HeaderParam("access_token") String accessToken, OrderFilter orderFilter) throws Exception;
+    public JOCDefaultResponse postOrderRunTime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, OrderFilter orderFilter) throws Exception;
 
 }

@@ -18,8 +18,12 @@ import com.sos.joc.model.audit.Comments;
 public class CommentsResourceImpl extends JOCResourceImpl implements ICommentsResource {
 
     private static final String API_CALL = "./audit_log/comments";
-
+    
     @Override
+    public JOCDefaultResponse postComments(String xAccessToken, String accessToken) throws Exception {
+        return postComments(getAccessToken(xAccessToken, accessToken));
+    }
+
     public JOCDefaultResponse postComments(String accessToken) throws Exception {
         
         try {

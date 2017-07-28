@@ -9,13 +9,12 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.jobChain.JobChainHistoryFilter;
-  
+
 public interface IJobChainResourceHistory {
 
     @POST
     @Path("history")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobChainHistory(            
-            @HeaderParam("access_token") String accessToken, JobChainHistoryFilter jobChainHistoryFilter) throws Exception;
+    public JOCDefaultResponse postJobChainHistory(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            JobChainHistoryFilter jobChainHistoryFilter) throws Exception;
 }
-

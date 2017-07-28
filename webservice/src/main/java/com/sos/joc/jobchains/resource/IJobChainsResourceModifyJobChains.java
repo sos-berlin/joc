@@ -15,11 +15,13 @@ public interface IJobChainsResourceModifyJobChains {
     @POST
     @Path("stop")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobChainsStop(@HeaderParam("access_token") String accessToken, ModifyJobChains modifyJobChains) throws Exception;
+    public JOCDefaultResponse postJobChainsStop(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            ModifyJobChains modifyJobChains) throws Exception;
 
     @POST
     @Path("unstop")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobChainsUnStop(@HeaderParam("access_token") String accessToken, ModifyJobChains modifyJobChains) throws Exception;
+    public JOCDefaultResponse postJobChainsUnStop(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            ModifyJobChains modifyJobChains) throws Exception;
 
 }

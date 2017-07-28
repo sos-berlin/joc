@@ -16,12 +16,12 @@ public interface ISecurityConfigurationResourceRead
     @POST
     @Path("read")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postSecurityConfigurationRead(@HeaderParam("access_token") String accessToken) throws Exception;
+    public JOCDefaultResponse postSecurityConfigurationRead(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken) throws Exception;
     
     @POST
     @Path("write")
   
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postSecurityConfigurationWrite(@HeaderParam("access_token") String accessToken, SecurityConfiguration securityConfiguration) throws Exception;
+    public JOCDefaultResponse postSecurityConfigurationWrite(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, SecurityConfiguration securityConfiguration) throws Exception;
 
 }

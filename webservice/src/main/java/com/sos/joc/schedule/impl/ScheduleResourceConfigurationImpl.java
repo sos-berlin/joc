@@ -18,6 +18,10 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
     private static final String API_CALL = "./schedule/configuration";
 
     @Override
+    public JOCDefaultResponse postScheduleConfiguration(String xAccessToken, String accessToken, ScheduleConfigurationFilter scheduleBody) throws Exception {
+        return postScheduleConfiguration(getAccessToken(xAccessToken, accessToken), scheduleBody);
+    }
+        
     public JOCDefaultResponse postScheduleConfiguration(String accessToken, ScheduleConfigurationFilter scheduleBody) throws Exception {
 
         try {

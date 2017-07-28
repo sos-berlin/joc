@@ -16,48 +16,48 @@ public interface IOrdersResourceCommandModifyOrder {
     @Path("start")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersStart(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersStart(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
 
     @POST
     @Path("suspend")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersSuspend(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersSuspend(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
 
     @POST
     @Path("resume")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersResume(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersResume(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
 
     @POST
     @Path("reset")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersReset(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersReset(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
 
     @POST
     @Path("set_state")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersSetState(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersSetState(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
 
     @POST
     @Path("set_run_time")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersSetRunTime(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersSetRunTime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
     
     @POST
     @Path("reset_run_time")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersResetRunTime(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersResetRunTime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
     
     @POST
     @Path("remove_setback")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersRemoveSetBack(@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
+    public JOCDefaultResponse postOrdersRemoveSetBack(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
     
 }

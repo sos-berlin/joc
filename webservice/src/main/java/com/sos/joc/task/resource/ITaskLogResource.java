@@ -15,7 +15,7 @@ public interface ITaskLogResource {
     @POST
     @Path("log")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTaskLog(@HeaderParam("access_token") String accessToken, TaskFilter taskFilter) throws Exception;
+    public JOCDefaultResponse postTaskLog(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, TaskFilter taskFilter) throws Exception;
 
 }
 

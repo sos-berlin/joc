@@ -12,5 +12,5 @@ public interface ITouchResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postTouch(@HeaderParam("access_token") String accessToken) throws Exception;
+    public JOCDefaultResponse postTouch(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken) throws Exception;
 }

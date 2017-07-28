@@ -29,6 +29,23 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
     private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
+    public JOCDefaultResponse postJobChainNodesStop(String xAccessToken, String accessToken, ModifyJobChainNodes modifyNodes)
+            throws Exception {
+        return postJobChainNodesStop(getAccessToken(xAccessToken, accessToken), modifyNodes);
+    }
+
+    @Override
+    public JOCDefaultResponse postJobChainNodesSkip(String xAccessToken, String accessToken, ModifyJobChainNodes modifyNodes)
+            throws Exception {
+        return postJobChainNodesSkip(getAccessToken(xAccessToken, accessToken), modifyNodes);
+    }
+
+    @Override
+    public JOCDefaultResponse postJobChainNodesActivate(String xAccessToken, String accessToken, ModifyJobChainNodes modifyNodes)
+            throws Exception {
+        return postJobChainNodesActivate(getAccessToken(xAccessToken, accessToken), modifyNodes);
+    }
+
     public JOCDefaultResponse postJobChainNodesStop(String accessToken, ModifyJobChainNodes modifyNodes) {
         try {
             return postJobChainNodesCommands(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJobChain().getExecute().isStopJobChainNode(),
@@ -41,7 +58,6 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
         }
     }
 
-    @Override
     public JOCDefaultResponse postJobChainNodesSkip(String accessToken, ModifyJobChainNodes modifyNodes) {
         try {
             return postJobChainNodesCommands(accessToken, SKIP, getPermissonsJocCockpit(accessToken).getJobChain().getExecute().isSkipJobChainNode(),
@@ -54,7 +70,6 @@ public class JobChainsResourceModifyJobChainNodesImpl extends JOCResourceImpl im
         }
     }
 
-    @Override
     public JOCDefaultResponse postJobChainNodesActivate(String accessToken, ModifyJobChainNodes modifyNodes) {
         try {
             return postJobChainNodesCommands(accessToken, ACTIVATE, getPermissonsJocCockpit(accessToken).getJobChain().getExecute().isProcessJobChainNode(), modifyNodes);

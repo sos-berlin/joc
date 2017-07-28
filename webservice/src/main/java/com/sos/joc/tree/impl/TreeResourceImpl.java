@@ -25,6 +25,10 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
     private static final String API_CALL = "./tree";
 
     @Override
+    public JOCDefaultResponse postTree(String xAccessToken, String accessToken, TreeFilter treeBody) throws Exception {
+        return postTree(getAccessToken(xAccessToken, accessToken), treeBody);
+    }
+
     public JOCDefaultResponse postTree(String accessToken, TreeFilter treeBody) throws Exception {
         try {
             List<JobSchedulerObjectType> types = null;
@@ -47,7 +51,7 @@ public class TreeResourceImpl extends JOCResourceImpl implements ITreeResource {
             }
             SortedSet<String> folders = TreePermanent.initFoldersByFoldersFromBody(treeBody, dbItemInventoryInstance.getId());
             this.getJobschedulerUser().getSosShiroCurrentUser().getSosShiroFolderPermissions().setForce(treeBody.getForce());
-            Tree root = TreePermanent.getTree(folders,this.getJobschedulerUser().getSosShiroCurrentUser().getSosShiroFolderPermissions());
+            Tree root = TreePermanent.getTree(folders, this.getJobschedulerUser().getSosShiroCurrentUser().getSosShiroFolderPermissions());
 
             TreeView entity = new TreeView();
             if (root != null) {

@@ -16,7 +16,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerTerminate(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
 
     
     @POST
@@ -24,7 +24,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerRestartTerminate(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
 
     
     
@@ -33,14 +33,14 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerAbort(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
 
     @POST
     @Path("abort_and_restart")
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerRestartAbort(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
 
            
     @POST
@@ -48,7 +48,7 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerPause(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
 
            
     @POST
@@ -56,5 +56,5 @@ public interface IJobSchedulerResourceModifyJobScheduler {
     @Consumes("application/json")
     @Produces({ "application/json" })
     public JOCDefaultResponse postJobschedulerContinue(
-            @HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception;
 }

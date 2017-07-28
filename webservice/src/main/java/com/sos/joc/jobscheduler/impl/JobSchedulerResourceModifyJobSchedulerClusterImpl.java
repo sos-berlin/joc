@@ -20,6 +20,10 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     private static String API_CALL = "./jobscheduler/cluster/";
 
     @Override
+    public JOCDefaultResponse postJobschedulerTerminate(String xAccessToken, String accessToken, TimeoutParameter timeoutParameter) throws Exception {
+        return postJobschedulerTerminate(getAccessToken(xAccessToken, accessToken), timeoutParameter);
+    }
+
     public JOCDefaultResponse postJobschedulerTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getExecute().isTerminate();
@@ -33,6 +37,10 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
+    public JOCDefaultResponse postJobschedulerRestartTerminate(String xAccessToken, String accessToken, TimeoutParameter timeoutParameter) throws Exception {
+        return postJobschedulerRestartTerminate(getAccessToken(xAccessToken, accessToken), timeoutParameter);
+    }
+
     public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getExecute().isRestart();
@@ -46,6 +54,11 @@ public class JobSchedulerResourceModifyJobSchedulerClusterImpl extends JOCResour
     }
 
     @Override
+    public JOCDefaultResponse postJobschedulerTerminateFailSafe(String xAccessToken, String accessToken, TimeoutParameter timeoutParameter) throws Exception {
+        return postJobschedulerTerminateFailSafe(getAccessToken(xAccessToken, accessToken), timeoutParameter);
+    }
+
+
     public JOCDefaultResponse postJobschedulerTerminateFailSafe(String accessToken, TimeoutParameter timeoutParameter) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getExecute().isTerminateFailSafe();

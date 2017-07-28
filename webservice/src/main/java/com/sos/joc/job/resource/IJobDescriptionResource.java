@@ -15,7 +15,8 @@ public interface IJobDescriptionResource {
     @GET
     @Path("description")
     @Produces({ MediaType.TEXT_HTML })
-    public JOCDefaultResponse getJobDescription(@HeaderParam("access_token") String accessToken, @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId,
-            @QueryParam("job") String job) throws Exception;
+    public JOCDefaultResponse getJobDescription(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,
+            @QueryParam("accessToken") String queryAccessToken, @QueryParam("jobschedulerId") String jobschedulerId, @QueryParam("job") String job)
+            throws Exception;
 
 }

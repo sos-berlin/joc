@@ -15,6 +15,6 @@ public interface IAuditLogResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postAuditLog(@HeaderParam("access_token") String accessToken, AuditLogFilter auditLogFilter) throws Exception;
+    public JOCDefaultResponse postAuditLog(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, AuditLogFilter auditLogFilter) throws Exception;
 
 }

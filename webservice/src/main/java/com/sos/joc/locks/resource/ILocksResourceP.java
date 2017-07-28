@@ -17,7 +17,7 @@ public interface ILocksResourceP {
     @Path("p")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postLocksP(            
-            @HeaderParam("access_token") String accessToken, LocksFilter locksFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, LocksFilter locksFilter) throws Exception;
 
 
  

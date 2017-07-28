@@ -22,6 +22,10 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
     private static final String API_CALL = "./jobscheduler/switch";
 
     @Override
+    public JOCDefaultResponse postJobschedulerSwitch(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
+        return postJobschedulerSwitch(getAccessToken(xAccessToken, accessToken), jobSchedulerId);
+    }
+
     public JOCDefaultResponse postJobschedulerSwitch(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
 
         try {
@@ -37,7 +41,7 @@ public class JobSchedulerResourceSwitchImpl extends JOCResourceImpl implements I
             shiroUser.setSelectedInstance(dbItemInventoryInstance);
 
             SOSServicePermissionShiro sosServicePermissionShiro = new SOSServicePermissionShiro();
-            
+
             try {
                 shiroUser.removeSchedulerInstanceDBItem(dbItemInventoryInstance.getSchedulerId());
             } catch (InvalidSessionException e1) {

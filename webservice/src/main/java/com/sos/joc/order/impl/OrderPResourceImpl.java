@@ -28,11 +28,15 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
     private SOSHibernateSession connection = null;
 
     @Override
+    public JOCDefaultResponse postOrderP(String xAccessToken, String accessToken, OrderFilter orderFilter) throws Exception {
+        return postOrderP(getAccessToken(xAccessToken, accessToken), orderFilter);
+    }
+
     public JOCDefaultResponse postOrderP(String accessToken, OrderFilter orderFilter) throws Exception {
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken, orderFilter.getJobschedulerId(), 
-                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderFilter, accessToken, orderFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getOrder().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -44,7 +48,8 @@ public class OrderPResourceImpl extends JOCResourceImpl implements IOrderPResour
             DBItemInventoryOrder dbItemInventoryOrder = dbLayer.getInventoryOrderByOrderId(normalizePath(orderFilter.getJobChain()), orderFilter
                     .getOrderId(), instanceId);
             if (dbItemInventoryOrder == null) {
-               throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", orderFilter.getJobChain(), orderFilter.getOrderId()));
+                throw new DBMissingDataException(String.format("no entry found in DB: %1$s,%2$s", orderFilter.getJobChain(), orderFilter
+                        .getOrderId()));
             }
             OrderP order = new OrderP();
             order.setSurveyDate(dbItemInventoryOrder.getModified());

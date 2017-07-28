@@ -30,13 +30,17 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
     private static final String API_CALL = "./jobscheduler/cluster/members";
 
     @Override
+    public JOCDefaultResponse postJobschedulerClusterMembers(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerFilter) {
+        return postJobschedulerClusterMembers(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
+    }
+
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
         String jobSchedulerId = jobSchedulerFilter.getJobschedulerId();
         SOSHibernateSession connection = null;
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerId, 
-                    getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerId, getPermissonsJocCockpit(
+                    accessToken).getJobschedulerMasterCluster().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

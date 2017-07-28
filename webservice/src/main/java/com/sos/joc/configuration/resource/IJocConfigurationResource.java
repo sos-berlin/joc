@@ -15,25 +15,25 @@ public interface IJocConfigurationResource{
     @POST
     @Path("save")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postSaveConfiguration(@HeaderParam("access_token") String accessToken, Configuration configuration) throws Exception;
+    public JOCDefaultResponse postSaveConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, Configuration configuration) throws Exception;
 
     @POST
     @Path("delete")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postDeleteConfiguration(@HeaderParam("access_token") String accessToken, Configuration configuration) throws Exception;
+    public JOCDefaultResponse postDeleteConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, Configuration configuration) throws Exception;
 
     @POST
     @Path("share")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postShareConfiguration(@HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
+    public JOCDefaultResponse postShareConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
     
     @POST
     @Path("make_private")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postMakePrivate(@HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
+    public JOCDefaultResponse postMakePrivate(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postReadConfiguration(@HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
+    public JOCDefaultResponse postReadConfiguration(@HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken,  Configuration configuration) throws Exception;
 
 }

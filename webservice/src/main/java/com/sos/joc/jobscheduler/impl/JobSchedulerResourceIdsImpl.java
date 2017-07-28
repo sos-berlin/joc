@@ -27,20 +27,25 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
     private static final String API_CALL = "./jobscheduler/ids";
 
     @Override
+    public JOCDefaultResponse postJobschedulerIds(String xAccessToken, String accessToken) {
+        return postJobschedulerIds(getAccessToken(xAccessToken, accessToken));
+    }
+
     public JOCDefaultResponse postJobschedulerIds(String accessToken) {
         SOSHibernateSession connection = null;
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster()
+                    .getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
             JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
 
-            String idFromPreferences = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE,"");
-            
+            String idFromPreferences = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
             List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
@@ -51,9 +56,9 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                 for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
                     jobSchedulerIds.add(inventoryInstance.getSchedulerId());
                     if (first == null) {
-                        first = inventoryInstance; 
+                        first = inventoryInstance;
                     }
-                    if (idFromPreferences.equals(inventoryInstance.getSchedulerId())){
+                    if (idFromPreferences.equals(inventoryInstance.getSchedulerId())) {
                         selected = inventoryInstance;
                     }
                 }
@@ -64,7 +69,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                 selectedInstanceSchedulerId = first.getSchedulerId();
                 jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
                 shiroUser.setSelectedInstance(first);
-            }else{
+            } else {
                 shiroUser.setSelectedInstance(selected);
             }
 

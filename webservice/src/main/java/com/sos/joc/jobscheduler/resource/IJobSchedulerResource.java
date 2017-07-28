@@ -17,5 +17,5 @@ public interface IJobSchedulerResource {
     @Consumes(MediaType.APPLICATION_JSON )
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobscheduler(            
-            @HeaderParam("X-Access-Token") String accessToken, @HeaderParam("access_token") String oldAccessToken, HostPortParameter jobSchedulerFilter) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, HostPortParameter jobSchedulerFilter) throws Exception;
 }

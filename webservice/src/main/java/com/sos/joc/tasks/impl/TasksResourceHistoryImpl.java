@@ -34,12 +34,16 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
     private static final String API_CALL = "./tasks/history";
 
     @Override
+    public JOCDefaultResponse postTasksHistory(String xAccessToken, String accessToken, JobsFilter jobsFilter) throws Exception {
+        return postTasksHistory(getAccessToken(xAccessToken, accessToken), jobsFilter);
+    }
+
     public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
         SOSHibernateSession connection = null;
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), 
-                    getPermissonsJocCockpit(accessToken).getHistory().isView());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getHistory().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -52,7 +56,8 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(connection);
             reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
             if (jobsFilter.getDateFrom() != null) {
-                reportTaskExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
+                reportTaskExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter
+                        .getTimeZone()));
             }
             if (jobsFilter.getDateTo() != null) {
                 reportTaskExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
@@ -85,15 +90,15 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             if (jobsFilter.getLimit() == null) {
                 jobsFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
             }
-            
+
             reportTaskExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
-            
-			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-					reportTaskExecutionsDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),folder.isRecursive());
-				}
-			}
+
+            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+                    reportTaskExecutionsDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.isRecursive());
+                }
+            }
 
             List<DBItemReportTask> listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
 

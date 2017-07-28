@@ -25,6 +25,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     private static String API_CALL = "./jobscheduler/";
 
     @Override
+    public JOCDefaultResponse postJobschedulerTerminate(String xAccessToken, String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema)
+            throws Exception {
+        return postJobschedulerTerminate(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
+    }
+
     public JOCDefaultResponse postJobschedulerTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().isTerminate();
@@ -38,6 +43,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
+    public JOCDefaultResponse postJobschedulerRestartTerminate(String xAccessToken, String accessToken,
+            HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
+        return postJobschedulerRestartTerminate(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
+    }
+
     public JOCDefaultResponse postJobschedulerRestartTerminate(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().getRestart().isTerminate();
@@ -51,6 +61,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
+    public JOCDefaultResponse postJobschedulerAbort(String xAccessToken, String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema)
+            throws Exception {
+        return postJobschedulerAbort(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
+    }
+
     public JOCDefaultResponse postJobschedulerAbort(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().isAbort();
@@ -64,6 +79,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
+    public JOCDefaultResponse postJobschedulerRestartAbort(String xAccessToken, String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema)
+            throws Exception {
+        return postJobschedulerRestartAbort(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
+    }
+
     public JOCDefaultResponse postJobschedulerRestartAbort(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().getRestart().isAbort();
@@ -77,6 +97,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
+    public JOCDefaultResponse postJobschedulerPause(String xAccessToken, String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema)
+            throws Exception {
+        return postJobschedulerPause(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
+    }
+
     public JOCDefaultResponse postJobschedulerPause(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().isPause();
@@ -90,6 +115,11 @@ public class JobSchedulerResourceModifyJobSchedulerImpl extends JOCResourceImpl 
     }
 
     @Override
+    public JOCDefaultResponse postJobschedulerContinue(String xAccessToken, String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema)
+            throws Exception {
+        return postJobschedulerContinue(getAccessToken(xAccessToken, accessToken), urlTimeoutParamSchema);
+    }
+
     public JOCDefaultResponse postJobschedulerContinue(String accessToken, HostPortTimeOutParameter urlTimeoutParamSchema) throws Exception {
         try {
             boolean permission = getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getExecute().isContinue();

@@ -29,6 +29,11 @@ public class JobSchedulerCleanupInventoryImpl extends JOCResourceImpl implements
     private static String API_CALL = "./jobscheduler/cleanup";
 
     @Override
+    public JOCDefaultResponse postJobschedulerCleanupInventory(String xAccessToken, String accessToken, HostPortParameter hostPortParameter)
+            throws Exception {
+        return postJobschedulerCleanupInventory(getAccessToken(xAccessToken, accessToken), hostPortParameter);
+    }
+
     public JOCDefaultResponse postJobschedulerCleanupInventory(String accessToken, HostPortParameter hostPortParameter) throws Exception {
         SOSHibernateSession connection = null;
         try {
@@ -38,34 +43,33 @@ public class JobSchedulerCleanupInventoryImpl extends JOCResourceImpl implements
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            
+
             checkRequiredParameter("host", hostPortParameter.getHost());
             checkRequiredParameter("port", hostPortParameter.getPort());
             checkRequiredComment(hostPortParameter.getAuditLog());
             ModifyJobSchedulerAudit jobschedulerAudit = new ModifyJobSchedulerAudit(hostPortParameter);
             logAuditMessage(jobschedulerAudit);
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            
+
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
-            DBItemInventoryInstance schedulerInstanceFromDb = instanceLayer.getInventoryInstanceByHostPort(hostPortParameter.getHost(), hostPortParameter.getPort(), hostPortParameter.getJobschedulerId());
+            DBItemInventoryInstance schedulerInstanceFromDb = instanceLayer.getInventoryInstanceByHostPort(hostPortParameter.getHost(),
+                    hostPortParameter.getPort(), hostPortParameter.getJobschedulerId());
             boolean jobSchedulerIsRunning = true;
             try {
                 JOCXmlCommand jocCommand = new JOCXmlCommand(schedulerInstanceFromDb);
                 jocCommand.executePost("<param.get name=\"\" />", accessToken);
-            }
-            catch (JobSchedulerConnectionRefusedException e) {
+            } catch (JobSchedulerConnectionRefusedException e) {
                 jobSchedulerIsRunning = false;
-            }
-            catch (JocException e) {
+            } catch (JocException e) {
                 //
             }
             if (jobSchedulerIsRunning) {
                 throw new JobSchedulerBadRequestException("Cleanup function is not available when JobScheduler is still running.");
             }
-            
+
             instanceLayer.cleanUp(schedulerInstanceFromDb);
             storeAuditLogEntry(jobschedulerAudit);
-            
+
             if (hostPortParameter.getJobschedulerId().equals(dbItemInventoryInstance.getSchedulerId()) && hostPortParameter.getHost().equals(
                     dbItemInventoryInstance.getHostname()) && hostPortParameter.getPort() == dbItemInventoryInstance.getPort()) {
                 try {
