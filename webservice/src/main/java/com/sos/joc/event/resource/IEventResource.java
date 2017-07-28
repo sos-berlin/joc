@@ -17,5 +17,5 @@ public interface IEventResource {
     @Consumes(MediaType.APPLICATION_JSON )
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postEvent(            
-            @HeaderParam("access_token") String accessToken, RegisterEvent eventBody) throws Exception;
+            @HeaderParam("X-Access-Token") String xAccessToken, @HeaderParam("access_token") String accessToken, RegisterEvent eventBody) throws Exception;
 }
