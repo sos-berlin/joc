@@ -64,14 +64,24 @@ post:
         }
   responses:
     200:
-      description: It returns an _ok_. This reply code comes only for bulk operations if all commands were successful.
+      description: It returns an _ok_ and a collection of tasks with the new taskId. . This reply code comes only for bulk operations if all commands were successful.
       body:
         application/json:
-          schema: ok
+          schema: startedTasks
           example: |
             {
               "deliveryDate":"2016-05-05T21:13:35Z",
-              "surveyDate":"2016-05-05T21:13:34Z",
-              "ok":true
+              "ok":true,
+              "tasks": [
+                {
+                  "surveyDate":"2016-05-05T21:13:34Z",
+                  "job": "/path/to/job",
+                  "taskId": "4711"
+                }
+              ]
             }
     419:
+      description: It returns an array of _error_ items for each failed command and the new taskId in an tasks collection for each successful command at bulk operations.
+      body:
+        application/json:
+          schema: startedTasks

@@ -1,0 +1,31 @@
+{
+  "title": "add order response",
+  "id": "schemas/order/addOrders",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.AddedOrders",
+  "type": "object",
+  "description": "if ok=true then orders collection is required",
+  "required": [
+    "deliveryDate"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "orders": {
+      "type": "array",
+      "items": {
+        "$ref": "orderPath200-schema.json"
+      }
+    },
+    "ok": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/error419-schema.json"
+      }
+    }
+  }
+}

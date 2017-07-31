@@ -1,0 +1,23 @@
+{
+  "title": "taskPath200",
+  "id": "schemas/job/taskPath200",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.job.TaskPath200",
+  "type": "object",
+  "required": [
+    "job",
+    "taskId",
+    "surveyDate"
+  ],
+  "properties": {
+    "job": {
+      "$ref": "../common/path-schema.json"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    }
+  }
+}

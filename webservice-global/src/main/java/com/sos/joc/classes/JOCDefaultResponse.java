@@ -272,6 +272,13 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
         return new JOCDefaultResponse(responseBuilder.build());
     }
     
+    public static JOCDefaultResponse responseStatus419(Object entity) {
+        Response.ResponseBuilder responseBuilder = Response.status(419).header("Content-Type", MediaType.APPLICATION_JSON).cacheControl(setNoCaching());
+        responseBuilder.entity(entity);
+        Globals.forceRollback(null);
+        return new JOCDefaultResponse(responseBuilder.build());
+    }
+    
     public static JOCDefaultResponse responseStatus419(List<Err419> listOfErrors, JocError err) {
         if (!"".equals(err.printMetaInfo())) {
             LOGGER.info(err.printMetaInfo());

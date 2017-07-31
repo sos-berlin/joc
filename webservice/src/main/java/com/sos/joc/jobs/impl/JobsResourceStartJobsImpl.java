@@ -1,5 +1,6 @@
 package com.sos.joc.jobs.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,12 +22,15 @@ import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
 import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
+import com.sos.joc.model.job.StartedTasks;
+import com.sos.joc.model.job.TaskPath200;
 
 @Path("jobs")
 public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsResourceStartJob {
 
     private static final String API_CALL = "./jobs/start";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
+    private List<TaskPath200> taskPaths = new ArrayList<TaskPath200>();
 
     @Override
     public JOCDefaultResponse postJobsStart(String xAccessToken, String accessToken, StartJobs startJobs) throws Exception {
@@ -44,14 +48,24 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             if (startJobs.getJobs().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'jobs'");
             }
-            Date surveyDate = new Date();
+            StartedTasks entity = new StartedTasks();
             for (StartJob job : startJobs.getJobs()) {
-                surveyDate = executeStartJobCommand(job, startJobs);
+                executeStartJobCommand(job, startJobs);
             }
+            entity.setTasks(taskPaths);
+            if (taskPaths.isEmpty()) {
+                entity.setTasks(null);
+            }
+            entity.setDeliveryDate(Date.from(Instant.now()));
             if (listOfErrors.size() > 0) {
-                return JOCDefaultResponse.responseStatus419(listOfErrors);
+                entity.setErrors(listOfErrors);
+                entity.setOk(null);
+                return JOCDefaultResponse.responseStatus419(entity);
+            } else {
+                entity.setErrors(null);
+                entity.setOk(true);
             }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+            return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -60,7 +74,7 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-    private Date executeStartJobCommand(StartJob startJob, StartJobs startJobs) {
+    private void executeStartJobCommand(StartJob startJob, StartJobs startJobs) {
 
         try {
             if (startJob.getParams() != null && startJob.getParams().isEmpty()) {
@@ -98,13 +112,20 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
             }
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
             storeAuditLogEntry(jobAudit);
-
-            return jocXmlCommand.getSurveyDate();
+            
+            TaskPath200 task = new TaskPath200();
+            task.setSurveyDate(jocXmlCommand.getSurveyDate());
+            task.setJob(startJob.getJob());
+            try {
+                task.setTaskId(jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ok/task/@id"));
+            } catch (Exception e) {
+                task.setTaskId(null);
+            }
+            taskPaths.add(task);
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), startJob));
         } catch (Exception e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), startJob));
         }
-        return null;
     }
 }
