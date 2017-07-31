@@ -1,0 +1,23 @@
+{
+  "title": "orderPath200",
+  "id": "schemas/order/orderPath200",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.order.OrderPath200",
+  "type": "object",
+  "required": [
+    "jobChain",
+    "orderId",
+    "surveyDate"
+  ],
+  "properties": {
+    "jobChain": {
+      "$ref": "../common/path-schema.json"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "surveyDate": {
+      "$ref": "../common/surveyDate_v-schema.json"
+    }
+  }
+}

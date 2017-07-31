@@ -1,5 +1,6 @@
 package com.sos.joc.orders.impl;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,8 +21,10 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.order.AddedOrders;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
+import com.sos.joc.model.order.OrderPath200;
 import com.sos.joc.orders.resource.IOrdersResourceCommandAddOrder;
 
 @Path("orders")
@@ -29,6 +32,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
 
     private static final String API_CALL = "./orders/add";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
+    private List<OrderPath200> orderPaths = new ArrayList<OrderPath200>();
 
     @Override
     public JOCDefaultResponse postOrdersAdd(String xAccessToken, String accessToken, ModifyOrders modifyOrders) throws Exception {
@@ -46,14 +50,24 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             if (modifyOrders.getOrders().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'orders'");
             }
-            Date surveyDate = new Date();
+            AddedOrders entity = new AddedOrders();
             for (ModifyOrder order : modifyOrders.getOrders()) {
-                surveyDate = executeAddOrderCommand(order, modifyOrders);
+                executeAddOrderCommand(order, modifyOrders);
             }
+            entity.setOrders(orderPaths);
+            if (orderPaths.isEmpty()) {
+                entity.setOrders(null);
+            }
+            entity.setDeliveryDate(Date.from(Instant.now()));
             if (listOfErrors.size() > 0) {
-                return JOCDefaultResponse.responseStatus419(listOfErrors);
+                entity.setErrors(listOfErrors);
+                entity.setOk(null);
+                return JOCDefaultResponse.responseStatus419(entity);
+            } else {
+                entity.setErrors(null);
+                entity.setOk(true);
             }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+            return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -62,7 +76,7 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
         }
     }
 
-    private Date executeAddOrderCommand(ModifyOrder order, ModifyOrders modifyOrders) {
+    private void executeAddOrderCommand(ModifyOrder order, ModifyOrders modifyOrders) {
 
         try {
             if (order.getParams() != null && order.getParams().isEmpty()) {
@@ -115,20 +129,28 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            
+            OrderPath200 orderPath = new OrderPath200();
+            orderPath.setSurveyDate(jocXmlCommand.getSurveyDate());
+            orderPath.setJobChain(order.getJobChain());
+            
             if (order.getOrderId() == null || order.getOrderId().isEmpty()) {
-                String orderId = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ok/order/@id");
-                if (orderId != null && !orderId.isEmpty()) {
-                    orderAudit.setOrderId(orderId);
+                try {
+                    String orderId = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ok/order/@id");
+                    if (orderId != null && !orderId.isEmpty()) {
+                        orderAudit.setOrderId(orderId);
+                    }
+                    orderPath.setOrderId(orderId);
+                } catch (Exception e) {
+                    orderPath.setOrderId(null);
                 }
             }
             storeAuditLogEntry(orderAudit);
-
-            return jocXmlCommand.getSurveyDate();
+            orderPaths.add(orderPath);
         } catch (JocException e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), order));
         } catch (Exception e) {
             listOfErrors.add(new BulkError().get(e, getJocError(), order));
         }
-        return null;
     }
 }
