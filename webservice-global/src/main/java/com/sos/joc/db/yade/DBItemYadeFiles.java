@@ -31,7 +31,7 @@ public class DBItemYadeFiles extends DbItem implements Serializable {
     private String targetPath;
     private Long size;
     private Date modificationDate;
-    private Long state;
+    private Integer state;
     private String errorMessage;
     private String integrityHash;
     
@@ -115,12 +115,12 @@ public class DBItemYadeFiles extends DbItem implements Serializable {
     }
     
     @Column(name = "`STATE`", nullable = false)
-    public Long getState() {
+    public Integer getState() {
         return state;
     }
     
     @Column(name = "`STATE`", nullable = false)
-    public void setState(Long state) {
+    public void setState(Integer state) {
         this.state = state;
     }
     
