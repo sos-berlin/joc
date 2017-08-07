@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.05.29 um 02:53:08 PM CEST 
+// Generiert: 2017.08.07 um 12:45:48 PM CEST 
 //
 
 
@@ -625,6 +625,42 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;/complexType>
  *         &lt;/element>
  *         &lt;element ref="{}SOSPermissionRoles"/>
+ *         &lt;element name="YADE">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="view">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *                   &lt;element name="execute">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="transferStore" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="transferStart" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="isAuthenticated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="user" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -657,7 +693,8 @@ import javax.xml.bind.annotation.XmlType;
     "maintenanceWindow",
     "auditLog",
     "jocConfigurations",
-    "sosPermissionRoles"
+    "sosPermissionRoles",
+    "yade"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpit")
 public class SOSPermissionJocCockpit {
@@ -698,6 +735,8 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionJocCockpit.JOCConfigurations jocConfigurations;
     @XmlElement(name = "SOSPermissionRoles", required = true)
     protected SOSPermissionRoles sosPermissionRoles;
+    @XmlElement(name = "YADE", required = true)
+    protected SOSPermissionJocCockpit.YADE yade;
     @XmlAttribute(name = "isAuthenticated")
     protected Boolean isAuthenticated;
     @XmlAttribute(name = "user")
@@ -1139,6 +1178,30 @@ public class SOSPermissionJocCockpit {
      */
     public void setSOSPermissionRoles(SOSPermissionRoles value) {
         this.sosPermissionRoles = value;
+    }
+
+    /**
+     * Ruft den Wert der yade-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SOSPermissionJocCockpit.YADE }
+     *     
+     */
+    public SOSPermissionJocCockpit.YADE getYADE() {
+        return yade;
+    }
+
+    /**
+     * Legt den Wert der yade-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SOSPermissionJocCockpit.YADE }
+     *     
+     */
+    public void setYADE(SOSPermissionJocCockpit.YADE value) {
+        this.yade = value;
     }
 
     /**
@@ -5707,6 +5770,281 @@ public class SOSPermissionJocCockpit {
              */
             public void setConfiguration(boolean value) {
                 this.configuration = value;
+            }
+
+        }
+
+    }
+
+
+    /**
+     * <p>Java-Klasse für anonymous complex type.
+     * 
+     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="view">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *         &lt;element name="execute">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="transferStore" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="transferStart" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "view",
+        "execute"
+    })
+    public static class YADE {
+
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.YADE.View view;
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.YADE.Execute execute;
+
+        /**
+         * Ruft den Wert der view-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.YADE.View }
+         *     
+         */
+        public SOSPermissionJocCockpit.YADE.View getView() {
+            return view;
+        }
+
+        /**
+         * Legt den Wert der view-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.YADE.View }
+         *     
+         */
+        public void setView(SOSPermissionJocCockpit.YADE.View value) {
+            this.view = value;
+        }
+
+        /**
+         * Ruft den Wert der execute-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.YADE.Execute }
+         *     
+         */
+        public SOSPermissionJocCockpit.YADE.Execute getExecute() {
+            return execute;
+        }
+
+        /**
+         * Legt den Wert der execute-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.YADE.Execute }
+         *     
+         */
+        public void setExecute(SOSPermissionJocCockpit.YADE.Execute value) {
+            this.execute = value;
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="transferStore" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="transferStart" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "transferStore",
+            "transferStart"
+        })
+        public static class Execute {
+
+            protected boolean transferStore;
+            protected boolean transferStart;
+
+            /**
+             * Ruft den Wert der transferStore-Eigenschaft ab.
+             * 
+             */
+            public boolean isTransferStore() {
+                return transferStore;
+            }
+
+            /**
+             * Legt den Wert der transferStore-Eigenschaft fest.
+             * 
+             */
+            public void setTransferStore(boolean value) {
+                this.transferStore = value;
+            }
+
+            /**
+             * Ruft den Wert der transferStart-Eigenschaft ab.
+             * 
+             */
+            public boolean isTransferStart() {
+                return transferStart;
+            }
+
+            /**
+             * Legt den Wert der transferStart-Eigenschaft fest.
+             * 
+             */
+            public void setTransferStart(boolean value) {
+                this.transferStart = value;
+            }
+
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "status",
+            "log",
+            "transfers",
+            "files"
+        })
+        public static class View {
+
+            protected boolean status;
+            protected boolean log;
+            protected boolean transfers;
+            protected boolean files;
+
+            /**
+             * Ruft den Wert der status-Eigenschaft ab.
+             * 
+             */
+            public boolean isStatus() {
+                return status;
+            }
+
+            /**
+             * Legt den Wert der status-Eigenschaft fest.
+             * 
+             */
+            public void setStatus(boolean value) {
+                this.status = value;
+            }
+
+            /**
+             * Ruft den Wert der log-Eigenschaft ab.
+             * 
+             */
+            public boolean isLog() {
+                return log;
+            }
+
+            /**
+             * Legt den Wert der log-Eigenschaft fest.
+             * 
+             */
+            public void setLog(boolean value) {
+                this.log = value;
+            }
+
+            /**
+             * Ruft den Wert der transfers-Eigenschaft ab.
+             * 
+             */
+            public boolean isTransfers() {
+                return transfers;
+            }
+
+            /**
+             * Legt den Wert der transfers-Eigenschaft fest.
+             * 
+             */
+            public void setTransfers(boolean value) {
+                this.transfers = value;
+            }
+
+            /**
+             * Ruft den Wert der files-Eigenschaft ab.
+             * 
+             */
+            public boolean isFiles() {
+                return files;
+            }
+
+            /**
+             * Legt den Wert der files-Eigenschaft fest.
+             * 
+             */
+            public void setFiles(boolean value) {
+                this.files = value;
             }
 
         }
