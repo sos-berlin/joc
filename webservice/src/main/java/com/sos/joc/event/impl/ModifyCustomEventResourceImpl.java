@@ -39,7 +39,6 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
         return executeModifyEvent("remove", modifyEvent, accessToken);
     }
     
-    
     private JOCDefaultResponse executeModifyEvent(String request, ModifyOrders modifyEvent, String accessToken) {
         
         SOSHibernateSession connection = null;
@@ -67,24 +66,32 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             
             Map<String,Boolean> requiredParams = new HashMap<String,Boolean>();
             requiredParams.put("event_class", Boolean.FALSE);
-            requiredParams.put("event_id", Boolean.FALSE);
-            requiredParams.put("exit_code", Boolean.FALSE);
+            if ("add".equals(request)) {
+                requiredParams.put("event_id", Boolean.FALSE);
+                requiredParams.put("exit_code", Boolean.FALSE);
+            }
             
             ModifyOrder order = modifyEvent.getOrders().get(0);
             checkRequiredParameter("jobChain", order.getJobChain());
             
             XMLBuilder xml = new XMLBuilder("add_order");
             xml.addAttribute("job_chain", normalizePath(order.getJobChain()));
+            boolean createdFound = false;
             if (order.getParams() != null && !order.getParams().isEmpty()) {
                 Element params = XMLBuilder.create("params");
                 for (NameValuePair param : order.getParams()) {
                     if (requiredParams.containsKey(param.getName()) && !param.getValue().isEmpty()) {
                         requiredParams.put(param.getName(), Boolean.TRUE);
                     }
+                    if ("created".equals(param.getName()) && !param.getValue().isEmpty()) {
+                        createdFound = true;
+                    }
                     params.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
                 }
                 params.addElement("param").addAttribute("name", "action").addAttribute("value", request);
-                params.addElement("param").addAttribute("name", "created").addAttribute("value", JobSchedulerDate.getNowInISO());
+                if (!createdFound) {
+                    params.addElement("param").addAttribute("name", "created").addAttribute("value", JobSchedulerDate.getNowInISO()); 
+                }
                 xml.add(params);
             }
             

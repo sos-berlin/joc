@@ -27,4 +27,5 @@ public interface IModifyCustomEventResource {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse removeEvent(            
             @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyEvent) throws Exception;
+    
 }

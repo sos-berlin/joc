@@ -52,7 +52,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             if (schedulersFromDb != null && !schedulersFromDb.isEmpty()) {
                 List<JobSchedulerVCallable> tasks = new ArrayList<JobSchedulerVCallable>();
                 for (DBItemInventoryInstance instance : schedulersFromDb) {
-                    tasks.add(new JobSchedulerVCallable(instance, accessToken));
+                    tasks.add(new JobSchedulerVCallable(setMappedUrl(instance), accessToken));
                 }
                 if (!tasks.isEmpty()) {
                     ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -83,5 +83,12 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         } finally {
             Globals.rollback(connection);
         }
+    }
+    
+    private DBItemInventoryInstance setMappedUrl(DBItemInventoryInstance instance) {
+        if (Globals.jocConfigurationProperties != null) {
+            return Globals.jocConfigurationProperties.setUrlMapping(instance);
+        }
+        return instance;
     }
 }
