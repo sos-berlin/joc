@@ -65,8 +65,8 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             }
             
             Map<String,Boolean> requiredParams = new HashMap<String,Boolean>();
-            requiredParams.put("event_class", Boolean.FALSE);
             if ("add".equals(request)) {
+                requiredParams.put("event_class", Boolean.FALSE);
                 requiredParams.put("event_id", Boolean.FALSE);
                 requiredParams.put("exit_code", Boolean.FALSE);
             }
@@ -80,7 +80,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             if (order.getParams() != null && !order.getParams().isEmpty()) {
                 Element params = XMLBuilder.create("params");
                 for (NameValuePair param : order.getParams()) {
-                    if (requiredParams.containsKey(param.getName()) && !param.getValue().isEmpty()) {
+                    if ("add".equals(request) && requiredParams.containsKey(param.getName()) && !param.getValue().isEmpty()) {
                         requiredParams.put(param.getName(), Boolean.TRUE);
                     }
                     if ("created".equals(param.getName()) && !param.getValue().isEmpty()) {
