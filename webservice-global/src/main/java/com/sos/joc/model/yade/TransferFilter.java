@@ -58,7 +58,7 @@ public class TransferFilter {
     @JsonProperty("regex")
     private String regex;
     @JsonProperty("profiles")
-    private List<Object> profiles = new ArrayList<Object>();
+    private List<String> profiles = new ArrayList<String>();
     @JsonProperty("mandator")
     private String mandator;
     @JsonProperty("states")
@@ -168,7 +168,7 @@ public class TransferFilter {
      *     The profiles
      */
     @JsonProperty("profiles")
-    public List<Object> getProfiles() {
+    public List<String> getProfiles() {
         return profiles;
     }
 
@@ -178,7 +178,7 @@ public class TransferFilter {
      *     The profiles
      */
     @JsonProperty("profiles")
-    public void setProfiles(List<Object> profiles) {
+    public void setProfiles(List<String> profiles) {
         this.profiles = profiles;
     }
 

@@ -10,7 +10,7 @@
   ],
   "properties": {
     "severity": {
-      "description": "0=transferred,compressed,remaned,success 1=skipped,ignored_due_to_zerobyte_contraint,not_overwritten, 3=undefined, 2=failed,aborted,deleted, 5=waiting,transferring,in_progress,setback,polling",
+      "description": "0=SUCCESSFUL, 1=INCOMPLETE, 2=FAILED",
       "type": "integer"
     },
     "_text": {

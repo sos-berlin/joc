@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class TransferState {
 
     /**
-     *  0=transferred,compressed,remaned,success 1=skipped,ignored_due_to_zerobyte_contraint,not_overwritten, 3=undefined, 2=failed,aborted,deleted, 5=waiting,transferring,in_progress,setback,polling
+     *  0=SUCCESSFUL, 1=INCOMPLETE, 2=FAILED
      * (Required)
      * 
      */
@@ -42,7 +42,7 @@ public class TransferState {
     private TransferStateText _text;
 
     /**
-     *  0=transferred,compressed,remaned,success 1=skipped,ignored_due_to_zerobyte_contraint,not_overwritten, 3=undefined, 2=failed,aborted,deleted, 5=waiting,transferring,in_progress,setback,polling
+     *  0=SUCCESSFUL, 1=INCOMPLETE, 2=FAILED
      * (Required)
      * 
      * @return
@@ -54,7 +54,7 @@ public class TransferState {
     }
 
     /**
-     *  0=transferred,compressed,remaned,success 1=skipped,ignored_due_to_zerobyte_contraint,not_overwritten, 3=undefined, 2=failed,aborted,deleted, 5=waiting,transferring,in_progress,setback,polling
+     *  0=SUCCESSFUL, 1=INCOMPLETE, 2=FAILED
      * (Required)
      * 
      * @param severity

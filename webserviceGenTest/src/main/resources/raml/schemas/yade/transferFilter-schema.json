@@ -19,8 +19,8 @@
     },
     "profiles": {
       "type": "array",
-      "item": {
-        "type":"string"
+      "items": {
+        "type": "string"
       }
     },
     "mandator": {
