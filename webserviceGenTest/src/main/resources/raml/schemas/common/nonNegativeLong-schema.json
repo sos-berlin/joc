@@ -1,0 +1,7 @@
+{
+  "title": "non negative long",
+  "id": "schemas/common/nonNegativeLong",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "string",
+  "format":"utc-millisec"
+}

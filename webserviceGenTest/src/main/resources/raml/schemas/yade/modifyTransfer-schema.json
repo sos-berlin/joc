@@ -9,12 +9,12 @@
   ],
   "properties": {
     "transferId": {
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "fileIds": {
       "type": "array",
       "items": {
-        "$ref": "../common/nonNegativeInteger-schema.json"
+        "$ref": "../common/nonNegativeLong-schema.json"
       }
     }
   }

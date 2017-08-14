@@ -53,23 +53,23 @@ public class Transfer {
     @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("parent_id")
-    private Integer parent_id;
+    private Long parent_id;
     @JsonProperty("profile")
     private String profile;
     @JsonProperty("mandator")
@@ -209,7 +209,7 @@ public class Transfer {
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -218,12 +218,12 @@ public class Transfer {
      *     The id
      */
     @JsonProperty("id")
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -232,12 +232,12 @@ public class Transfer {
      *     The id
      */
     @JsonProperty("id")
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -246,12 +246,12 @@ public class Transfer {
      *     The parent_id
      */
     @JsonProperty("parent_id")
-    public Integer getParent_id() {
+    public Long getParent_id() {
         return parent_id;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -260,7 +260,7 @@ public class Transfer {
      *     The parent_id
      */
     @JsonProperty("parent_id")
-    public void setParent_id(Integer parent_id) {
+    public void setParent_id(Long parent_id) {
         this.parent_id = parent_id;
     }
 

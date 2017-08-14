@@ -27,18 +27,18 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class ModifyTransfer {
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * 
      */
     @JsonProperty("transferId")
-    private Integer transferId;
+    private Long transferId;
     @JsonProperty("fileIds")
-    private List<Integer> fileIds = new ArrayList<Integer>();
+    private List<Long> fileIds = new ArrayList<Long>();
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * 
@@ -46,12 +46,12 @@ public class ModifyTransfer {
      *     The transferId
      */
     @JsonProperty("transferId")
-    public Integer getTransferId() {
+    public Long getTransferId() {
         return transferId;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * 
@@ -59,7 +59,7 @@ public class ModifyTransfer {
      *     The transferId
      */
     @JsonProperty("transferId")
-    public void setTransferId(Integer transferId) {
+    public void setTransferId(Long transferId) {
         this.transferId = transferId;
     }
 
@@ -69,7 +69,7 @@ public class ModifyTransfer {
      *     The fileIds
      */
     @JsonProperty("fileIds")
-    public List<Integer> getFileIds() {
+    public List<Long> getFileIds() {
         return fileIds;
     }
 
@@ -79,7 +79,7 @@ public class ModifyTransfer {
      *     The fileIds
      */
     @JsonProperty("fileIds")
-    public void setFileIds(List<Integer> fileIds) {
+    public void setFileIds(List<Long> fileIds) {
         this.fileIds = fileIds;
     }
 

@@ -8,7 +8,7 @@
     "transferIds": {
       "type": "array",
       "items": {
-        "$ref": "../common/nonNegativeInteger-schema.json"
+        "$ref": "../common/nonNegativeLong-schema.json"
       }
     },
     "compact": {

@@ -19,13 +19,13 @@
       "$ref": "../common/surveyDate_p-schema.json"
     },
     "id": {
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "transferId": {
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "interventionTransferId": {
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "state": {
       "$ref": "fileTransferState-schema.json"
@@ -38,7 +38,7 @@
       "format": "date-time"
     },
     "size": {
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "error": {
       "$ref": "../common/error-schema.json"

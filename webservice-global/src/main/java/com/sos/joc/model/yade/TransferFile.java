@@ -45,32 +45,32 @@ public class TransferFile {
     @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("transferId")
-    private Integer transferId;
+    private Long transferId;
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("interventionTransferId")
-    private Integer interventionTransferId;
+    private Long interventionTransferId;
     /**
      * state for each transferred file
      * <p>
@@ -85,14 +85,14 @@ public class TransferFile {
     @JsonProperty("modificationDate")
     private Date modificationDate;
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("size")
-    private Integer size;
+    private Long size;
     /**
      * error
      * <p>
@@ -140,7 +140,7 @@ public class TransferFile {
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -149,12 +149,12 @@ public class TransferFile {
      *     The id
      */
     @JsonProperty("id")
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -163,12 +163,12 @@ public class TransferFile {
      *     The id
      */
     @JsonProperty("id")
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -177,12 +177,12 @@ public class TransferFile {
      *     The transferId
      */
     @JsonProperty("transferId")
-    public Integer getTransferId() {
+    public Long getTransferId() {
         return transferId;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -191,12 +191,12 @@ public class TransferFile {
      *     The transferId
      */
     @JsonProperty("transferId")
-    public void setTransferId(Integer transferId) {
+    public void setTransferId(Long transferId) {
         this.transferId = transferId;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -205,12 +205,12 @@ public class TransferFile {
      *     The interventionTransferId
      */
     @JsonProperty("interventionTransferId")
-    public Integer getInterventionTransferId() {
+    public Long getInterventionTransferId() {
         return interventionTransferId;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -219,7 +219,7 @@ public class TransferFile {
      *     The interventionTransferId
      */
     @JsonProperty("interventionTransferId")
-    public void setInterventionTransferId(Integer interventionTransferId) {
+    public void setInterventionTransferId(Long interventionTransferId) {
         this.interventionTransferId = interventionTransferId;
     }
 
@@ -292,7 +292,7 @@ public class TransferFile {
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -301,12 +301,12 @@ public class TransferFile {
      *     The size
      */
     @JsonProperty("size")
-    public Integer getSize() {
+    public Long getSize() {
         return size;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -315,7 +315,7 @@ public class TransferFile {
      *     The size
      */
     @JsonProperty("size")
-    public void setSize(Integer size) {
+    public void setSize(Long size) {
         this.size = size;
     }
 

@@ -40,7 +40,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class TransferFilter {
 
     @JsonProperty("transferIds")
-    private List<Integer> transferIds = new ArrayList<Integer>();
+    private List<Long> transferIds = new ArrayList<Long>();
     /**
      * compact parameter
      * <p>
@@ -96,7 +96,7 @@ public class TransferFilter {
      *     The transferIds
      */
     @JsonProperty("transferIds")
-    public List<Integer> getTransferIds() {
+    public List<Long> getTransferIds() {
         return transferIds;
     }
 
@@ -106,7 +106,7 @@ public class TransferFilter {
      *     The transferIds
      */
     @JsonProperty("transferIds")
-    public void setTransferIds(List<Integer> transferIds) {
+    public void setTransferIds(List<Long> transferIds) {
         this.transferIds = transferIds;
     }
 

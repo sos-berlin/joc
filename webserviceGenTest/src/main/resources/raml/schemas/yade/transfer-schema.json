@@ -22,10 +22,10 @@
       "$ref": "../common/surveyDate_p-schema.json"
     },
     "id": {
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "parent_id": {
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "profile": {
       "type": "string"

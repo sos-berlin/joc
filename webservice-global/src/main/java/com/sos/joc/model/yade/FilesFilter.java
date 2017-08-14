@@ -33,11 +33,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class FilesFilter {
 
     @JsonProperty("fileIds")
-    private List<Integer> fileIds = new ArrayList<Integer>();
+    private List<Long> fileIds = new ArrayList<Long>();
     @JsonProperty("transferIds")
-    private List<Integer> transferIds = new ArrayList<Integer>();
+    private List<Long> transferIds = new ArrayList<Long>();
     @JsonProperty("interventionTransferIds")
-    private List<Integer> interventionTransferIds = new ArrayList<Integer>();
+    private List<Long> interventionTransferIds = new ArrayList<Long>();
     /**
      * compact parameter
      * <p>
@@ -67,7 +67,7 @@ public class FilesFilter {
      *     The fileIds
      */
     @JsonProperty("fileIds")
-    public List<Integer> getFileIds() {
+    public List<Long> getFileIds() {
         return fileIds;
     }
 
@@ -77,7 +77,7 @@ public class FilesFilter {
      *     The fileIds
      */
     @JsonProperty("fileIds")
-    public void setFileIds(List<Integer> fileIds) {
+    public void setFileIds(List<Long> fileIds) {
         this.fileIds = fileIds;
     }
 
@@ -87,7 +87,7 @@ public class FilesFilter {
      *     The transferIds
      */
     @JsonProperty("transferIds")
-    public List<Integer> getTransferIds() {
+    public List<Long> getTransferIds() {
         return transferIds;
     }
 
@@ -97,7 +97,7 @@ public class FilesFilter {
      *     The transferIds
      */
     @JsonProperty("transferIds")
-    public void setTransferIds(List<Integer> transferIds) {
+    public void setTransferIds(List<Long> transferIds) {
         this.transferIds = transferIds;
     }
 
@@ -107,7 +107,7 @@ public class FilesFilter {
      *     The interventionTransferIds
      */
     @JsonProperty("interventionTransferIds")
-    public List<Integer> getInterventionTransferIds() {
+    public List<Long> getInterventionTransferIds() {
         return interventionTransferIds;
     }
 
@@ -117,7 +117,7 @@ public class FilesFilter {
      *     The interventionTransferIds
      */
     @JsonProperty("interventionTransferIds")
-    public void setInterventionTransferIds(List<Integer> interventionTransferIds) {
+    public void setInterventionTransferIds(List<Long> interventionTransferIds) {
         this.interventionTransferIds = interventionTransferIds;
     }
 
