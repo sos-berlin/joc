@@ -33,14 +33,14 @@ public class Configuration {
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
     @JsonProperty("account")
     private String account;
     /**
@@ -95,7 +95,7 @@ public class Configuration {
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -104,12 +104,12 @@ public class Configuration {
      *     The id
      */
     @JsonProperty("id")
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -118,7 +118,7 @@ public class Configuration {
      *     The id
      */
     @JsonProperty("id")
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

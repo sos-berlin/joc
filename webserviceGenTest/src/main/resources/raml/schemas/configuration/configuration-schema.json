@@ -13,7 +13,7 @@
     },
     "id": {
       "description": "=0, if customization is new",
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeLong-schema.json"
     },
     "account": {
       "type": "string"

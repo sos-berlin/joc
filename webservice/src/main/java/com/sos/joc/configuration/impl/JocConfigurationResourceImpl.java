@@ -129,7 +129,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
                 dbItem.setId(id);
             }
             ConfigurationOk ok = new ConfigurationOk();
-            ok.setId(dbItem.getId().intValue());
+            ok.setId(dbItem.getId());
             ok.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(ok);
         } catch (JocException e) {
@@ -209,7 +209,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
             /** delete item */
             ConfigurationOk ok = new ConfigurationOk();
-            ok.setId(dbItem.getId().intValue());
+            ok.setId(dbItem.getId());
             ok.setDeliveryDate(Date.from(Instant.now()));
             jocConfigurationDBLayer.deleteConfiguration(dbItem);
             return JOCDefaultResponse.responseStatus200(ok);
@@ -243,7 +243,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             /** save item to DB */
             jocConfigurationDBLayer.saveOrUpdateConfiguration(dbItem);
             ConfigurationOk ok = new ConfigurationOk();
-            ok.setId(dbItem.getId().intValue());
+            ok.setId(dbItem.getId());
             ok.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(ok);
         } catch (JocException e) {
@@ -280,7 +280,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             jocConfigurationDBLayer.saveOrUpdateConfiguration(dbItem);
 
             ConfigurationOk ok = new ConfigurationOk();
-            ok.setId(dbItem.getId().intValue());
+            ok.setId(dbItem.getId());
             ok.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(ok);
         } catch (JocException e) {
@@ -295,7 +295,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
     private Configuration setConfigurationValues(JocConfigurationDbItem dbItem) {
         Configuration config = new Configuration();
-        config.setId(dbItem.getId().intValue());
+        config.setId(dbItem.getId());
         config.setAccount(dbItem.getAccount());
         if (dbItem.getConfigurationType() != null) {
             config.setConfigurationType(ConfigurationType.fromValue(dbItem.getConfigurationType()));

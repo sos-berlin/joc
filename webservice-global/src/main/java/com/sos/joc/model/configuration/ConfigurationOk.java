@@ -42,14 +42,14 @@ public class ConfigurationOk {
     @JsonProperty("surveyDate")
     private Date surveyDate;
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
      * 
      */
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
 
     /**
      * delivery date
@@ -102,7 +102,7 @@ public class ConfigurationOk {
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -111,12 +111,12 @@ public class ConfigurationOk {
      *     The id
      */
     @JsonProperty("id")
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * (Required)
@@ -125,7 +125,7 @@ public class ConfigurationOk {
      *     The id
      */
     @JsonProperty("id")
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
