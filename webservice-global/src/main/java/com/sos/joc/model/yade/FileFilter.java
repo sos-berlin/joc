@@ -27,13 +27,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class FileFilter {
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * 
      */
     @JsonProperty("fileId")
-    private Integer fileId;
+    private Long fileId;
     /**
      * compact parameter
      * <p>
@@ -52,7 +52,7 @@ public class FileFilter {
     private LogMime mime = LogMime.fromValue("PLAIN");
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * 
@@ -60,12 +60,12 @@ public class FileFilter {
      *     The fileId
      */
     @JsonProperty("fileId")
-    public Integer getFileId() {
+    public Long getFileId() {
         return fileId;
     }
 
     /**
-     * non negative integer
+     * non negative long
      * <p>
      * 
      * 
@@ -73,7 +73,7 @@ public class FileFilter {
      *     The fileId
      */
     @JsonProperty("fileId")
-    public void setFileId(Integer fileId) {
+    public void setFileId(Long fileId) {
         this.fileId = fileId;
     }
 
