@@ -64,6 +64,12 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
             }
 
+            if (ordersFilter.getHistoryStates().size() > 0) {
+                for (HistoryStateText historyStateText : ordersFilter.getHistoryStates()) {
+                    reportTriggerDBLayer.getFilter().addState(historyStateText.toString());
+                }
+            }
+
             if (ordersFilter.getOrders().size() > 0) {
                 InventoryJobChainsDBLayer jobChainDbLayer = new InventoryJobChainsDBLayer(connection);
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
@@ -86,11 +92,6 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                     }
                 }
 
-                if (ordersFilter.getHistoryStates().size() > 0) {
-                    for (HistoryStateText historyStateText : ordersFilter.getHistoryStates()) {
-                        reportTriggerDBLayer.getFilter().addState(historyStateText.toString());
-                    }
-                }
                 if (ordersFilter.getFolders().size() > 0) {
                     for (Folder folder : ordersFilter.getFolders()) {
                         reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
