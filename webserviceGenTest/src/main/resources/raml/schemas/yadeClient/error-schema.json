@@ -1,0 +1,19 @@
+{
+  "title": "error",
+  "id": "schemas/yadeClient/error",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.DataExchange.model.Err",
+  "type": "object",
+  "required": [
+    "code",
+    "message"
+  ],
+  "properties": {
+    "code": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    }
+  }
+}

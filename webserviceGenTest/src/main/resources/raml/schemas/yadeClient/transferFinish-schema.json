@@ -1,0 +1,26 @@
+{
+  "title": "transfer finish",
+  "id": "schemas/yadeClient/transferFinish",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.DataExchange.model.TransferFinish",
+  "type": "object",
+  "required": [
+    "id"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format":"utc-millisec"
+    },
+    "end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "log": {
+      "type": "string"
+    },
+    "error": {
+      "$ref": "error-schema.json"
+    }
+  }
+}

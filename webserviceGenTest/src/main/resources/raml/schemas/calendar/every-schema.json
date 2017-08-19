@@ -1,0 +1,24 @@
+{
+  "title": "every",
+  "id": "schemas/calendar/every",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Every",
+  "type": "object",
+  "required": [
+    "dateEntity"
+  ],
+  "properties": {
+    "dateEntity": {
+      "javaType": "com.sos.joc.model.calendar.DateEntity",
+      "type": "string",
+      "enum": [
+        "DAY",
+        "WEEK",
+        "MONTH"
+      ]
+    },
+    "interval": {
+      "type": "../common/nonNegativeInteger-schema.json"
+    }
+  }
+}

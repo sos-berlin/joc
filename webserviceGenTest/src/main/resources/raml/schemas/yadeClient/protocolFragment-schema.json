@@ -1,0 +1,38 @@
+{
+  "title": "protocol, host, port, account",
+  "id": "schemas/yadeClient/protocolFragment",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.DataExchange.model.ProtocolFragment",
+  "type": "object",
+  "required": [
+    "protocol",
+    "host"
+  ],
+  "properties": {
+    "host": {
+      "type": "string"
+    },
+    "protocol": {
+      "javaType": "com.sos.DataExchange.model.Protocol",
+      "type": "string",
+      "enum": [
+        "LOCAL",
+        "FTP",
+        "FTPS",
+        "SFTP",
+        "HTTP",
+        "HTTPS",
+        "WEBDAV",
+        "WEBDAVS",
+        "SMB"
+      ]
+    },
+    "port": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "account": {
+      "type": "string"
+    }
+  }
+}

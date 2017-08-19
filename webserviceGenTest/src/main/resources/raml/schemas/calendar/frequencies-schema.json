@@ -1,0 +1,50 @@
+{
+  "title": "frequencies",
+  "id": "schemas/calendar/frequencies",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Frequencies",
+  "type": "object",
+  "required": [
+  ],
+  "properties": {
+    "dates": {
+      "type": "array",
+      "items": {
+        "$ref": "day-schema.json"
+      }
+    },
+    "weekdays": {
+      "type": "array",
+      "items": {
+        "$ref": "day-schema.json"
+      }
+    },
+    "ultimos": {
+      "type": "array",
+      "items": {
+        "$ref": "ultimo-schema.json"
+      }
+    },
+    "monthdays": {
+      "type": "array",
+      "items": {
+        "$ref": "monthday-schema.json"
+      }
+    },
+    "months": {
+      "type": "array",
+      "items": {
+        "$ref": "month-schema.json"
+      }
+    },
+    "holidays": {
+      "type": "array",
+      "items": {
+        "$ref": "holiday-schema.json"
+      }
+    },
+    "every": {
+      "$ref": "every-schema.json"
+    }
+  }
+}

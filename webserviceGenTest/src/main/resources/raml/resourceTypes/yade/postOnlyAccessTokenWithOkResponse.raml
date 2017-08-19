@@ -1,0 +1,24 @@
+type: error
+post:
+  description: |
+    <h2><<description>></h2>
+    ___
+    
+  body:
+    application/json:
+      schema: <<schema>>
+  responses:
+    200:
+      description: |
+        **Confirm <span style="text-transform: capitalize;"><<resourcePathName>></span> successfully**
+      body:
+        application/json:
+          example: |
+            {
+              "deliveryDate":"2016-05-05T21:13:35Z",
+              "ok":true
+            }
+          schema: ok
+    420:
+      body:
+        application/json:

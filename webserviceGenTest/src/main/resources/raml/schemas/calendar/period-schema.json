@@ -1,0 +1,19 @@
+{
+  "title": "period",
+  "id": "schemas/calendar/period",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Period",
+  "type": "object",
+  "required": [
+    "from",
+    "to"
+  ],
+  "properties": {
+    "form": {
+      "$ref": "../common/timestamp-schema.json"
+    },
+    "to": {
+      "$ref": "../common/timestamp-schema.json"
+    }
+  }
+}

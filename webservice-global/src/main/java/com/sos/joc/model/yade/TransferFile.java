@@ -39,7 +39,6 @@ public class TransferFile {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      */
     @JsonProperty("surveyDate")
@@ -48,7 +47,6 @@ public class TransferFile {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("id")
@@ -66,7 +64,6 @@ public class TransferFile {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("interventionTransferId")
@@ -75,20 +72,24 @@ public class TransferFile {
      * state for each transferred file
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("state")
     private FileTransferState state;
     @JsonProperty("integrityHash")
     private String integrityHash;
+    /**
+     * timestamp
+     * <p>
+     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
+     * 
+     */
     @JsonProperty("modificationDate")
     private Date modificationDate;
     /**
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("size")
@@ -115,7 +116,6 @@ public class TransferFile {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      * @return
      *     The surveyDate
@@ -129,7 +129,6 @@ public class TransferFile {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      * @param surveyDate
      *     The surveyDate
@@ -143,7 +142,6 @@ public class TransferFile {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The id
@@ -157,7 +155,6 @@ public class TransferFile {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @param id
      *     The id
@@ -199,7 +196,6 @@ public class TransferFile {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The interventionTransferId
@@ -213,7 +209,6 @@ public class TransferFile {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @param interventionTransferId
      *     The interventionTransferId
@@ -227,7 +222,6 @@ public class TransferFile {
      * state for each transferred file
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The state
@@ -241,7 +235,6 @@ public class TransferFile {
      * state for each transferred file
      * <p>
      * 
-     * (Required)
      * 
      * @param state
      *     The state
@@ -272,6 +265,9 @@ public class TransferFile {
     }
 
     /**
+     * timestamp
+     * <p>
+     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      * @return
      *     The modificationDate
@@ -282,6 +278,9 @@ public class TransferFile {
     }
 
     /**
+     * timestamp
+     * <p>
+     * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
      * 
      * @param modificationDate
      *     The modificationDate
@@ -295,7 +294,6 @@ public class TransferFile {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The size
@@ -309,7 +307,6 @@ public class TransferFile {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @param size
      *     The size

@@ -1,0 +1,18 @@
+{
+  "title": "yade files",
+  "id": "schemas/yadeCLient/files",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.DataExchange.model.TransferFiles",
+  "type": "object",
+  "required": [
+    "files"
+  ],
+  "properties": {
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "file-schema.json"
+      }
+    }
+  }
+}

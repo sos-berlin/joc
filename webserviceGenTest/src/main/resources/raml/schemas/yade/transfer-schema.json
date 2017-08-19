@@ -6,16 +6,9 @@
   "type": "object",
   "description": "compact=true -> required fields + possibly profile, mandator, target",
   "required": [
-    "surveyDate",
-    "id",
-    "parent_id",
-    "state",
     "_operation",
     "start",
-    "end",
-    "source",
-    "numOfFiles",
-    "hasIntervention"
+    "source"
   ],
   "properties": {
     "surveyDate": {

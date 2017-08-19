@@ -147,22 +147,43 @@
 						<groupId>org.jsonschema2pojo</groupId>
 						<artifactId>jsonschema2pojo-maven-plugin</artifactId>
 						<version>0.4.23</version>
-						<configuration>
-							<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
-							<targetPackage>com.sos.joc.model</targetPackage>
-							<removeOldOutput>true</removeOldOutput>
-							<annotationStyle>jackson2</annotationStyle>
-							<propertyWordDelimiters>- </propertyWordDelimiters>
-							<includeAdditionalProperties>false</includeAdditionalProperties>
-							<includes>
-								<include>**/*.json</include>
-							</includes>
-                            <excludes>
-								<exclude>user/*.json</exclude>
-							</excludes>
-						</configuration>
+						
 						<executions>
 							<execution>
+								<id>generate-joc-model</id>
+								<configuration>
+									<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+									<targetPackage>com.sos.joc.model</targetPackage>
+									<removeOldOutput>true</removeOldOutput>
+									<annotationStyle>jackson2</annotationStyle>
+									<propertyWordDelimiters>- </propertyWordDelimiters>
+									<includeAdditionalProperties>false</includeAdditionalProperties>
+									<includes>
+										<include>**/*.json</include>
+									</includes>
+                            		<excludes>
+										<exclude>user/*.json</exclude>
+										<exclude>yadeClient/*.json</exclude>
+										<exclude>calendar/*.json</exclude>
+									</excludes>
+								</configuration>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>generate-yade-client-model</id>
+								<configuration>
+									<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+									<targetPackage>com.sos.DataExchange.model</targetPackage>
+									<removeOldOutput>false</removeOldOutput>
+									<annotationStyle>jackson2</annotationStyle>
+									<propertyWordDelimiters>- </propertyWordDelimiters>
+									<includeAdditionalProperties>false</includeAdditionalProperties>
+									<includes>
+										<include>yadeClient/*.json</include>
+									</includes>
+								</configuration>
 								<goals>
 									<goal>generate</goal>
 								</goals>

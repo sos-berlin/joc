@@ -47,7 +47,6 @@ public class Transfer {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      */
     @JsonProperty("surveyDate")
@@ -56,7 +55,6 @@ public class Transfer {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("id")
@@ -65,7 +63,6 @@ public class Transfer {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("parent_id")
@@ -78,7 +75,6 @@ public class Transfer {
      * transfer state
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("state")
@@ -105,7 +101,6 @@ public class Transfer {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
-     * (Required)
      * 
      */
     @JsonProperty("end")
@@ -147,16 +142,10 @@ public class Transfer {
      * non negative integer
      * <p>
      * 
-     * (Required)
      * 
      */
     @JsonProperty("numOfFiles")
     private Integer numOfFiles;
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("hasIntervention")
     private Boolean hasIntervention = false;
     @JsonProperty("jobschedulerId")
@@ -184,7 +173,6 @@ public class Transfer {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      * @return
      *     The surveyDate
@@ -198,7 +186,6 @@ public class Transfer {
      * survey date of the inventory data; last time the inventory job has checked the live folder
      * <p>
      * Date of the inventory data. Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ
-     * (Required)
      * 
      * @param surveyDate
      *     The surveyDate
@@ -212,7 +199,6 @@ public class Transfer {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The id
@@ -226,7 +212,6 @@ public class Transfer {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @param id
      *     The id
@@ -240,7 +225,6 @@ public class Transfer {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The parent_id
@@ -254,7 +238,6 @@ public class Transfer {
      * non negative long
      * <p>
      * 
-     * (Required)
      * 
      * @param parent_id
      *     The parent_id
@@ -308,7 +291,6 @@ public class Transfer {
      * transfer state
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The state
@@ -322,7 +304,6 @@ public class Transfer {
      * transfer state
      * <p>
      * 
-     * (Required)
      * 
      * @param state
      *     The state
@@ -392,7 +373,6 @@ public class Transfer {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
-     * (Required)
      * 
      * @return
      *     The end
@@ -406,7 +386,6 @@ public class Transfer {
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
-     * (Required)
      * 
      * @param end
      *     The end
@@ -526,7 +505,6 @@ public class Transfer {
      * non negative integer
      * <p>
      * 
-     * (Required)
      * 
      * @return
      *     The numOfFiles
@@ -540,7 +518,6 @@ public class Transfer {
      * non negative integer
      * <p>
      * 
-     * (Required)
      * 
      * @param numOfFiles
      *     The numOfFiles
@@ -552,8 +529,6 @@ public class Transfer {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
      *     The hasIntervention
      */
@@ -563,8 +538,6 @@ public class Transfer {
     }
 
     /**
-     * 
-     * (Required)
      * 
      * @param hasIntervention
      *     The hasIntervention
