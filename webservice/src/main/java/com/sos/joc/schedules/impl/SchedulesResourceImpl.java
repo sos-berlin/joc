@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -71,6 +72,8 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
                 dbLayer = new InventorySchedulesDBLayer(connection);
             } catch (Exception e) {
             }
+            
+            List<Folder> folders = addPermittedFolder(schedulesFilter.getFolders());
 
             for (int i = 0; i < schedules.getLength(); i++) {
                 Element scheduleElement = (Element) schedules.item(i);
@@ -85,7 +88,7 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
                 if (!FilterAfterResponse.filterStateHasState(schedulesFilter.getStates(), scheduleV.getState().get_text())) {
                     continue;
                 }
-                if (!isInFolderList(schedulesFilter.getFolders(), scheduleV.getPath())) {
+                if (!isInFolderList(folders, scheduleV.getPath())) {
                     continue;
                 }
                 listOfSchedules.add(scheduleV);

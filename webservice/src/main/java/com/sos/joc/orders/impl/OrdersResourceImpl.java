@@ -59,7 +59,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
             List<OrderPath> orders = ordersBody.getOrders();
-            List<Folder> folders = ordersBody.getFolders();
+            List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
+            
             List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
             if (ordersBody.getFolders().size() == 0 && jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {

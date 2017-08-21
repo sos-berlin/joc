@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -47,7 +48,8 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             // FILTER
             locks = locksFilter.getLocks();
-            folders = locksFilter.getFolders();
+            folders = addPermittedFolder(locksFilter.getFolders());
+            
             regex = locksFilter.getRegex();
             InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(connection);
             LocksP entity = new LocksP();
