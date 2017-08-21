@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -52,7 +53,8 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             session.beginTransaction();
             Boolean compact = jobsFilter.getCompact();
             regex = jobsFilter.getRegex();
-            folders = jobsFilter.getFolders();
+            folders = addPermittedFolder(jobsFilter.getFolders());
+            
             jobs = jobsFilter.getJobs();
             isOrderJob = jobsFilter.getIsOrderJob();
             List<JobP> listJobs = new ArrayList<JobP>();

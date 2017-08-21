@@ -6,6 +6,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -43,7 +44,8 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             JobsV entity = new JobsV();
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
-            List<Folder> folders = jobsFilter.getFolders();
+            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+
             if (jobs != null && !jobs.isEmpty()) {
                 entity.setJobs(jocXmlCommand.getJobsFromShowJob(jobs, jobsFilter));
             } else if (folders != null && !folders.isEmpty()) {

@@ -20,6 +20,7 @@ import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.jitl.dailyplan.job.CreateDailyPlanOptions;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.audit.IAuditLog;
 import com.sos.joc.classes.audit.JocAuditLog;
@@ -33,6 +34,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.exceptions.UnknownJobSchedulerMasterException;
 import com.sos.joc.model.audit.AuditParams;
+import com.sos.joc.model.common.Folder;
 
 public class JOCResourceImpl {
 
@@ -342,7 +344,6 @@ public class JOCResourceImpl {
             Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession);
             calendar2Db.setOptions(createDailyPlanOptions);
             calendar2Db.addDailyplan2DBFilter(dailyPlanCalender2DBFilter);
-            calendar2Db.setSpooler(null);
             calendar2Db.processDailyplan2DBFilter();
             
         } catch (SOSHibernateException ex) {
@@ -354,5 +355,18 @@ public class JOCResourceImpl {
             }
             throw new DBInvalidDataException(ex);
         }
+    }
+    
+    protected List<Folder>  addPermittedFolder(List<Folder> folders) throws SessionNotExistException {
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+                FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+                Folder f = new Folder();
+                f.setFolder(folder.getFolder());
+                f.setRecursive(folder.isRecursive());
+                folders.add(f);
+            }
+        }
+        return folders;
     }
 }

@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -56,7 +57,8 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 
             List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
             Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(processClassFilter.getProcessClasses());
-            List<Folder> folders = processClassFilter.getFolders();
+            List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
+            
             List<ProcessClassV> listProcessClasses = new ArrayList<ProcessClassV>();
             ProcessClassesV entity = new ProcessClassesV();
             if (processClasses != null && !processClasses.isEmpty()) {

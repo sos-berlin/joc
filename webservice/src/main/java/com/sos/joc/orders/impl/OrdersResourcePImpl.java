@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -29,7 +30,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
     private static final String API_CALL = "./orders/p";
     private String regex = null;
     private List<OrderPath> orderPaths = null;
-    private List<Folder> foldersFilter = null;
+    private List<Folder> folders = null;
     private Boolean compact = null;
 
     @Override
@@ -52,7 +53,8 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
             regex = ordersFilter.getRegex();
             orderPaths = ordersFilter.getOrders();
-            foldersFilter = ordersFilter.getFolders();
+            folders = addPermittedFolder(ordersFilter.getFolders());
+            
             compact = ordersFilter.getCompact();
             List<DBItemInventoryOrder> ordersFromDB = new ArrayList<DBItemInventoryOrder>();
             if (orderPaths != null && !orderPaths.isEmpty()) {
@@ -63,8 +65,8 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                         ordersFromDB.addAll(filteredOrders);
                     }
                 }
-            } else if (foldersFilter != null && !foldersFilter.isEmpty()) {
-                for (Folder folder : foldersFilter) {
+            } else if (folders != null && !folders.isEmpty()) {
+                for (Folder folder : folders) {
                     List<DBItemInventoryOrder> filteredOrders = null;
                     filteredOrders = dbLayer.getInventoryOrdersFilteredByFolders(normalizeFolder(folder.getFolder()), folder.getRecursive(),
                             instanceId);
