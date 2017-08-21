@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.08.07 um 12:45:48 PM CEST 
+// Generiert: 2017.08.18 um 02:47:40 PM CEST 
 //
 
 
@@ -661,6 +661,43 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
+ *         &lt;element name="Calendar">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                   &lt;element name="edit">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="create" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="assign">
+ *                               &lt;complexType>
+ *                                 &lt;complexContent>
+ *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                     &lt;sequence>
+ *                                       &lt;element name="runtime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                       &lt;element name="nonworking" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                       &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                                     &lt;/sequence>
+ *                                   &lt;/restriction>
+ *                                 &lt;/complexContent>
+ *                               &lt;/complexType>
+ *                             &lt;/element>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="isAuthenticated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="user" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -694,7 +731,8 @@ import javax.xml.bind.annotation.XmlType;
     "auditLog",
     "jocConfigurations",
     "sosPermissionRoles",
-    "yade"
+    "yade",
+    "calendar"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpit")
 public class SOSPermissionJocCockpit {
@@ -737,6 +775,8 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionRoles sosPermissionRoles;
     @XmlElement(name = "YADE", required = true)
     protected SOSPermissionJocCockpit.YADE yade;
+    @XmlElement(name = "Calendar", required = true)
+    protected SOSPermissionJocCockpit.Calendar calendar;
     @XmlAttribute(name = "isAuthenticated")
     protected Boolean isAuthenticated;
     @XmlAttribute(name = "user")
@@ -1205,6 +1245,30 @@ public class SOSPermissionJocCockpit {
     }
 
     /**
+     * Ruft den Wert der calendar-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SOSPermissionJocCockpit.Calendar }
+     *     
+     */
+    public SOSPermissionJocCockpit.Calendar getCalendar() {
+        return calendar;
+    }
+
+    /**
+     * Legt den Wert der calendar-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SOSPermissionJocCockpit.Calendar }
+     *     
+     */
+    public void setCalendar(SOSPermissionJocCockpit.Calendar value) {
+        this.calendar = value;
+    }
+
+    /**
      * Ruft den Wert der isAuthenticated-Eigenschaft ab.
      * 
      * @return
@@ -1429,6 +1493,322 @@ public class SOSPermissionJocCockpit {
              */
             public void setStatus(boolean value) {
                 this.status = value;
+            }
+
+        }
+
+    }
+
+
+    /**
+     * <p>Java-Klasse für anonymous complex type.
+     * 
+     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *         &lt;element name="edit">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="create" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="assign">
+     *                     &lt;complexType>
+     *                       &lt;complexContent>
+     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                           &lt;sequence>
+     *                             &lt;element name="runtime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                             &lt;element name="nonworking" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                             &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                           &lt;/sequence>
+     *                         &lt;/restriction>
+     *                       &lt;/complexContent>
+     *                     &lt;/complexType>
+     *                   &lt;/element>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "view",
+        "edit"
+    })
+    public static class Calendar {
+
+        @XmlElement(required = true)
+        protected Object view;
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.Calendar.Edit edit;
+
+        /**
+         * Ruft den Wert der view-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link Object }
+         *     
+         */
+        public Object getView() {
+            return view;
+        }
+
+        /**
+         * Legt den Wert der view-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link Object }
+         *     
+         */
+        public void setView(Object value) {
+            this.view = value;
+        }
+
+        /**
+         * Ruft den Wert der edit-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.Calendar.Edit }
+         *     
+         */
+        public SOSPermissionJocCockpit.Calendar.Edit getEdit() {
+            return edit;
+        }
+
+        /**
+         * Legt den Wert der edit-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.Calendar.Edit }
+         *     
+         */
+        public void setEdit(SOSPermissionJocCockpit.Calendar.Edit value) {
+            this.edit = value;
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="create" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="assign">
+         *           &lt;complexType>
+         *             &lt;complexContent>
+         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                 &lt;sequence>
+         *                   &lt;element name="runtime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                   &lt;element name="nonworking" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                   &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *                 &lt;/sequence>
+         *               &lt;/restriction>
+         *             &lt;/complexContent>
+         *           &lt;/complexType>
+         *         &lt;/element>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "create",
+            "change",
+            "delete",
+            "assign"
+        })
+        public static class Edit {
+
+            protected boolean create;
+            protected boolean change;
+            protected boolean delete;
+            @XmlElement(required = true)
+            protected SOSPermissionJocCockpit.Calendar.Edit.Assign assign;
+
+            /**
+             * Ruft den Wert der create-Eigenschaft ab.
+             * 
+             */
+            public boolean isCreate() {
+                return create;
+            }
+
+            /**
+             * Legt den Wert der create-Eigenschaft fest.
+             * 
+             */
+            public void setCreate(boolean value) {
+                this.create = value;
+            }
+
+            /**
+             * Ruft den Wert der change-Eigenschaft ab.
+             * 
+             */
+            public boolean isChange() {
+                return change;
+            }
+
+            /**
+             * Legt den Wert der change-Eigenschaft fest.
+             * 
+             */
+            public void setChange(boolean value) {
+                this.change = value;
+            }
+
+            /**
+             * Ruft den Wert der delete-Eigenschaft ab.
+             * 
+             */
+            public boolean isDelete() {
+                return delete;
+            }
+
+            /**
+             * Legt den Wert der delete-Eigenschaft fest.
+             * 
+             */
+            public void setDelete(boolean value) {
+                this.delete = value;
+            }
+
+            /**
+             * Ruft den Wert der assign-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link SOSPermissionJocCockpit.Calendar.Edit.Assign }
+             *     
+             */
+            public SOSPermissionJocCockpit.Calendar.Edit.Assign getAssign() {
+                return assign;
+            }
+
+            /**
+             * Legt den Wert der assign-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link SOSPermissionJocCockpit.Calendar.Edit.Assign }
+             *     
+             */
+            public void setAssign(SOSPermissionJocCockpit.Calendar.Edit.Assign value) {
+                this.assign = value;
+            }
+
+
+            /**
+             * <p>Java-Klasse für anonymous complex type.
+             * 
+             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * 
+             * <pre>
+             * &lt;complexType>
+             *   &lt;complexContent>
+             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *       &lt;sequence>
+             *         &lt;element name="runtime" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *         &lt;element name="nonworking" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *         &lt;element name="change" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+             *       &lt;/sequence>
+             *     &lt;/restriction>
+             *   &lt;/complexContent>
+             * &lt;/complexType>
+             * </pre>
+             * 
+             * 
+             */
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "", propOrder = {
+                "runtime",
+                "nonworking",
+                "change"
+            })
+            public static class Assign {
+
+                protected boolean runtime;
+                protected boolean nonworking;
+                protected boolean change;
+
+                /**
+                 * Ruft den Wert der runtime-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isRuntime() {
+                    return runtime;
+                }
+
+                /**
+                 * Legt den Wert der runtime-Eigenschaft fest.
+                 * 
+                 */
+                public void setRuntime(boolean value) {
+                    this.runtime = value;
+                }
+
+                /**
+                 * Ruft den Wert der nonworking-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isNonworking() {
+                    return nonworking;
+                }
+
+                /**
+                 * Legt den Wert der nonworking-Eigenschaft fest.
+                 * 
+                 */
+                public void setNonworking(boolean value) {
+                    this.nonworking = value;
+                }
+
+                /**
+                 * Ruft den Wert der change-Eigenschaft ab.
+                 * 
+                 */
+                public boolean isChange() {
+                    return change;
+                }
+
+                /**
+                 * Legt den Wert der change-Eigenschaft fest.
+                 * 
+                 */
+                public void setChange(boolean value) {
+                    this.change = value;
+                }
+
             }
 
         }
