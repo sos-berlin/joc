@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
+import org.ini4j.Profile;
 import org.ini4j.Wini;
 
 import com.sos.joc.Globals;
@@ -19,27 +20,33 @@ import com.sos.joc.model.security.SecurityConfigurationUser;
 
 public class SOSSecurityConfiguration {
 
+    private static final String HASHING_ALGORITHM = "hashingAlgorithm";
+    private static final String INI_REALM_CREDENTIALS_MATCHER = "iniRealm.credentialsMatcher";
+    private static final String PASSWORD_MATCHER = "passwordMatcher";
     private static final String SECTION_USERS = "users";
     private static final String SECTION_ROLES = "roles";
     private static final String SECTION_FOLDERS = "folders";
+    private static final String SECTION_MAIN = "main";
     private Ini ini;
     private Wini writeIni;
     private SecurityConfiguration securityConfiguration = new SecurityConfiguration();
     private SOSSecurityConfigurationMasters listOfMasters;
-
+    
     public SOSSecurityConfiguration() {
         super();
         securityConfiguration = new SecurityConfiguration();
         ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
         listOfMasters = SOSSecurityConfigurationMasters.getInstance();
     }
+    
 
     private void addUsers() {
 
         Section s = getSection(SECTION_USERS);
+
         for (String user : s.keySet()) {
             SecurityConfigurationUser securityConfigurationUser = new SecurityConfigurationUser();
-            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(s.get(user));
+            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(s.get(user),null,true,"");
             securityConfigurationUser.setUser(user);
             securityConfigurationUser.setPassword(sosSecurityConfigurationUserEntry.getPassword());
             securityConfigurationUser.setRoles(sosSecurityConfigurationUserEntry.getRoles());
@@ -70,9 +77,16 @@ public class SOSSecurityConfiguration {
 
     private void writeUsers() {
         clearSection(SECTION_USERS);
+        Section main = getSection(SECTION_MAIN);
+        String passwordMatcher = main.get(PASSWORD_MATCHER);
+        String credentialsMatcher  = main.get(INI_REALM_CREDENTIALS_MATCHER);
+        String hashingAlgorithm  = main.get(HASHING_ALGORITHM);
+        boolean crypt = (passwordMatcher != null && credentialsMatcher != null && credentialsMatcher.equals("$" + PASSWORD_MATCHER));
+        
+        Profile.Section s = writeIni.get(SECTION_USERS);
         for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
-            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser);
-            writeIni.get(SECTION_USERS).put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
+            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser,s,crypt,hashingAlgorithm);
+            s.put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
         }
     }
 

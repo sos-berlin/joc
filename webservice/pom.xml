@@ -200,7 +200,10 @@
 			<artifactId>postgresql</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.shiro.tools</groupId>
+			<artifactId>shiro-tools-hasher</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
