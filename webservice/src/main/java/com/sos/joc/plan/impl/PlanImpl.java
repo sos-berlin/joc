@@ -280,7 +280,10 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     createDailyPlanOptions.dayOffset.value(0);
                     String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
                     createDailyPlanOptions.commandUrl.setValue(commandUrl);
-                    calendar2Db = new Calendar2DB(sosHibernateSession);
+                    calendar2Db = new Calendar2DB(sosHibernateSession, dbItemInventoryInstance.getSchedulerId());
+                    if (dbItemInventoryInstance.getAuth() != null &&!dbItemInventoryInstance.getAuth().isEmpty()) {
+                        createDailyPlanOptions.basicAuthorization.setValue(dbItemInventoryInstance.getAuth());
+                    }
                     calendar2Db.setOptions(createDailyPlanOptions);
 
                     if (maxDate.before(toDate)) {
