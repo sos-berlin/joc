@@ -35,13 +35,23 @@ public class InventoryInstancesDBLayer extends DBLayer {
 
     public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken, boolean verbose) throws DBInvalidDataException,
             DBMissingDataException, DBConnectionRefusedException {
+        return getInventoryInstanceBySchedulerId(schedulerId, accessToken, verbose, null);
+    }
+    
+    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken, DBItemInventoryInstance curInstance)
+            throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
+        return getInventoryInstanceBySchedulerId(schedulerId, accessToken, false, curInstance);
+    }
+
+    public DBItemInventoryInstance getInventoryInstanceBySchedulerId(String schedulerId, String accessToken, boolean verbose, DBItemInventoryInstance curInstance)
+            throws DBInvalidDataException, DBMissingDataException, DBConnectionRefusedException {
         try {
             String sql = String.format("from %s where schedulerId = :schedulerId order by precedence", DBITEM_INVENTORY_INSTANCES);
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             List<DBItemInventoryInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
-                return setMappedUrl(getRunningJobSchedulerClusterMember(result, accessToken), verbose);
+                return setMappedUrl(getRunningJobSchedulerClusterMember(result, accessToken, curInstance), verbose);
             } else {
                 String errMessage = String.format("jobschedulerId %1$s not found in table %2$s", schedulerId, DBLayer.TABLE_INVENTORY_INSTANCES);
                 throw new DBMissingDataException(errMessage);
@@ -173,7 +183,7 @@ public class InventoryInstancesDBLayer extends DBLayer {
         }
     }
 
-    private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList, String accessToken) {
+    private DBItemInventoryInstance getRunningJobSchedulerClusterMember(List<DBItemInventoryInstance> schedulerInstancesDBList, String accessToken, DBItemInventoryInstance curInstance) {
         switch (schedulerInstancesDBList.get(0).getClusterType()) {
         case "passive":
             DBItemInventoryInstance schedulerInstancesDBItemOfWaitingScheduler = null;
@@ -194,20 +204,34 @@ public class InventoryInstancesDBLayer extends DBLayer {
                     // unreachable
                 }
             }
-            // if (schedulerInstancesDBItemOfWaitingScheduler != null) {
-            // return schedulerInstancesDBItemOfWaitingScheduler;
-            // }
+//            if (schedulerInstancesDBItemOfWaitingScheduler != null) {
+//                return schedulerInstancesDBItemOfWaitingScheduler;
+//            }
             break;
         case "active":
+            if (curInstance != null) {
+                schedulerInstancesDBList.add(0, curInstance);
+            }
+            DBItemInventoryInstance schedulerInstancesDBItemOfPausedScheduler = null;
             for (DBItemInventoryInstance schedulerInstancesDBItem : schedulerInstancesDBList) {
                 try {
-                    String xml = "<param.get name=\"\" />";
+                    String xml = "<show_state subsystems=\"folder\" what=\"folders no_subfolders\" path=\"/does/not/exist\" />";
                     JOCXmlCommand resourceImpl = new JOCXmlCommand(schedulerInstancesDBItem);
                     resourceImpl.executePost(xml, accessToken);
-                    return schedulerInstancesDBItem;
+                    String state = resourceImpl.getSosxml().selectSingleNodeValue("/spooler/answer/state/@state");
+                    if ("running".equals(state)) {
+                        schedulerInstancesDBItemOfPausedScheduler = null;
+                        return schedulerInstancesDBItem;
+                    } 
+                    if (schedulerInstancesDBItemOfPausedScheduler == null && "paused".equals(state)) {
+                        schedulerInstancesDBItemOfPausedScheduler = schedulerInstancesDBItem;
+                    }
                 } catch (Exception e) {
                     // unreachable
                 }
+            }
+            if (schedulerInstancesDBItemOfPausedScheduler != null) {
+                return schedulerInstancesDBItemOfPausedScheduler;
             }
             break;
         default:

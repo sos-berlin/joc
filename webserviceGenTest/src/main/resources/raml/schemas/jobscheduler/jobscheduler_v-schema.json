@@ -41,6 +41,12 @@
     "state": {
       "$ref": "state-schema.json"
     },
+    "url": {
+      "type": "string"
+    },
+    "clusterType": {
+      "$ref": "clusterMemberType-schema.json"
+    },
     "startedAt": {
       "$ref": "../common/timestamp-schema.json"
     },

@@ -19,6 +19,7 @@ import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventType;
 import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventTypeValue;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
@@ -33,7 +34,7 @@ import com.sos.joc.model.event.NodeTransitionType;
 public class EventCallableOfCurrentJobScheduler extends EventCallable implements Callable<JobSchedulerEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventCallableOfCurrentJobScheduler.class);
-//    private final String accessToken;
+    private final String accessToken;
     private final JobSchedulerEvent jobSchedulerEvent;
     private final JOCJsonCommand command;
     private final SOSShiroCurrentUser shiroUser;
@@ -47,6 +48,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             Long instanceId, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
         super(command, jobSchedulerEvent, accessToken, session, instanceId);
 //        this.accessToken = accessToken;
+        this.accessToken = accessToken;
         this.command = command;
         this.jobSchedulerEvent = jobSchedulerEvent;
         this.shiroUser = shiroUser;
@@ -60,19 +62,39 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
         return super.call();
     }
 
-    private void removeSavedInventoryInstance() {
+    private Events updateSavedInventoryInstance() {
+        Events events = new Events();
         if (Globals.urlFromJobSchedulerId.containsKey(jobSchedulerEvent.getJobschedulerId())) {
             DBItemInventoryInstance instance = Globals.urlFromJobSchedulerId.get(jobSchedulerEvent.getJobschedulerId());
             if (instance != null && !"standalone".equals(instance.getClusterType())) {
-                Globals.urlFromJobSchedulerId.remove(jobSchedulerEvent.getJobschedulerId());
+
                 try {
-                    shiroUser.removeSchedulerInstanceDBItem(jobSchedulerEvent.getJobschedulerId());
+                    if (connection == null) {
+                        connection = Globals.createSosHibernateStatelessConnection("eventCallable-" + jobSchedulerEvent.getJobschedulerId());
+                    }
+                    InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+                    Globals.beginTransaction(connection);
+                    DBItemInventoryInstance inst = dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerEvent.getJobschedulerId(), accessToken);
+                    shiroUser.addSchedulerInstanceDBItem(jobSchedulerEvent.getJobschedulerId(), inst);
+                    Globals.rollback(connection);
+                    Globals.urlFromJobSchedulerId.put(jobSchedulerEvent.getJobschedulerId(), inst);
+                    if (!instance.equals(inst)) {
+                        EventSnapshot masterChangedEventSnapshot = new EventSnapshot();
+                        masterChangedEventSnapshot.setEventType("CurrentJobSchedulerChanged");
+                        masterChangedEventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+                        masterChangedEventSnapshot.setPath(inst.getUrl());
+                        events.put(masterChangedEventSnapshot);
+                    }
                 } catch (Exception e) {
+                } finally {
+                    Globals.disconnect(connection);
+                    connection = null;
                 }
             }
         }
+        return events;
     }
-    
+
     private EventSnapshot createJobChainEventOfOrder(EventSnapshot orderEventSnapshot) {
         String[] pathParts = orderEventSnapshot.getPath().split(",", 2);
         String jobChain = pathParts[0];
@@ -153,11 +175,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 eventNotification = null;
                 eventSnapshot.setEventType("SchedulerStateChanged");
                 eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
-                String state = event.getString("state", null);
+                //String state = event.getString("state", null);
                 eventSnapshot.setPath(command.getSchemeAndAuthority());
-                if (state!= null && (state.contains("stop") || state.contains("waiting"))) {
-                    removeSavedInventoryInstance();
-                }
+                //if (state!= null && (state.contains("stop") || state.contains("waiting"))) {
+                    eventSnapshots.putAll(updateSavedInventoryInstance());
+                //}
             }  else {
                 String eventKey = event.getString("key", null);
                 if (eventKey == null) {
@@ -374,7 +396,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             }
         } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException e) {
             // if current Jobscheduler down then retry after 15sec
-            removeSavedInventoryInstance();
+            eventSnapshots.putAll(updateSavedInventoryInstance());
             try {
                 int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
                 LOGGER.debug(command.getSchemeAndAuthority() + ": connection refused; retry after " + delay + "ms");
@@ -415,6 +437,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
             eventSnapshot.setPath(command.getSchemeAndAuthority());
             eventSnapshots.put(eventSnapshot);
+            eventSnapshots.putAll(updateSavedInventoryInstance());
         }
         return eventSnapshots;
     }

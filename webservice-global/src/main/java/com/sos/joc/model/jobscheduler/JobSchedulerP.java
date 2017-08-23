@@ -27,6 +27,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "port",
     "os",
     "timeZone",
+    "url",
     "clusterType",
     "startedAt",
     "supervisor"
@@ -88,6 +89,8 @@ public class JobSchedulerP {
      */
     @JsonProperty("timeZone")
     private String timeZone;
+    @JsonProperty("url")
+    private String url;
     /**
      * jobscheduler cluster member type
      * <p>
@@ -107,7 +110,7 @@ public class JobSchedulerP {
     @JsonProperty("startedAt")
     private Date startedAt;
     /**
-     * clusterMember
+     * hostPortParam
      * <p>
      * 
      * 
@@ -296,6 +299,26 @@ public class JobSchedulerP {
     }
 
     /**
+     * 
+     * @return
+     *     The url
+     */
+    @JsonProperty("url")
+    public String getUrl() {
+        return url;
+    }
+
+    /**
+     * 
+     * @param url
+     *     The url
+     */
+    @JsonProperty("url")
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    /**
      * jobscheduler cluster member type
      * <p>
      * 
@@ -352,7 +375,7 @@ public class JobSchedulerP {
     }
 
     /**
-     * clusterMember
+     * hostPortParam
      * <p>
      * 
      * 
@@ -365,7 +388,7 @@ public class JobSchedulerP {
     }
 
     /**
-     * clusterMember
+     * hostPortParam
      * <p>
      * 
      * 
@@ -384,7 +407,7 @@ public class JobSchedulerP {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(version).append(host).append(port).append(os).append(timeZone).append(clusterType).append(startedAt).append(supervisor).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(version).append(host).append(port).append(os).append(timeZone).append(url).append(clusterType).append(startedAt).append(supervisor).toHashCode();
     }
 
     @Override
@@ -396,7 +419,7 @@ public class JobSchedulerP {
             return false;
         }
         JobSchedulerP rhs = ((JobSchedulerP) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(version, rhs.version).append(host, rhs.host).append(port, rhs.port).append(os, rhs.os).append(timeZone, rhs.timeZone).append(clusterType, rhs.clusterType).append(startedAt, rhs.startedAt).append(supervisor, rhs.supervisor).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(version, rhs.version).append(host, rhs.host).append(port, rhs.port).append(os, rhs.os).append(timeZone, rhs.timeZone).append(url, rhs.url).append(clusterType, rhs.clusterType).append(startedAt, rhs.startedAt).append(supervisor, rhs.supervisor).isEquals();
     }
 
 }

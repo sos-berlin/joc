@@ -9,6 +9,8 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
+import com.sos.joc.model.jobscheduler.ClusterMemberType;
+import com.sos.joc.model.jobscheduler.ClusterType;
 import com.sos.joc.model.jobscheduler.JobSchedulerState;
 import com.sos.joc.model.jobscheduler.JobSchedulerStateText;
 import com.sos.joc.model.jobscheduler.JobSchedulerV;
@@ -40,6 +42,11 @@ public class JobSchedulerVCallable implements Callable<JobSchedulerV> {
         js.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
         js.setHost(dbItemInventoryInstance.getHostname());
         js.setPort(dbItemInventoryInstance.getPort());
+        ClusterMemberType clusterMemberTypeSchema = new ClusterMemberType();
+        clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getPrecedence());
+        clusterMemberTypeSchema.set_type(ClusterType.fromValue(dbItemInventoryInstance.getClusterType()));
+        js.setClusterType(clusterMemberTypeSchema);
+        js.setUrl(dbItemInventoryInstance.getUrl());
         JobSchedulerState jobSchedulerState = new JobSchedulerState();
         jobSchedulerState.set_text(JobSchedulerStateText.UNREACHABLE);
         jobSchedulerState.setSeverity(2);
@@ -54,6 +61,11 @@ public class JobSchedulerVCallable implements Callable<JobSchedulerV> {
         js.setHost(dbItemInventoryInstance.getHostname());
         js.setJobschedulerId(dbItemInventoryInstance.getSchedulerId());
         js.setPort(dbItemInventoryInstance.getPort());
+        ClusterMemberType clusterMemberTypeSchema = new ClusterMemberType();
+        clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getPrecedence());
+        clusterMemberTypeSchema.set_type(ClusterType.fromValue(dbItemInventoryInstance.getClusterType()));
+        js.setClusterType(clusterMemberTypeSchema);
+        js.setUrl(dbItemInventoryInstance.getUrl());
         js.setStartedAt(JobSchedulerDate.getDateFromISO8601String(stateElem.getAttribute("spooler_running_since")));
         js.setState(getJobSchedulerState(stateElem));
         if (stateElem.hasAttribute("waiting_errno_text")) {

@@ -37,6 +37,7 @@ public class JobSchedulerPermanent {
             jobscheduler.setTimeZone(dbItemInventoryInstance.getTimeZone());
             jobscheduler.setVersion(dbItemInventoryInstance.getVersion());
             jobscheduler.setSurveyDate(dbItemInventoryInstance.getModified());
+            jobscheduler.setUrl(dbItemInventoryInstance.getUrl());
 
             ClusterMemberType clusterMemberTypeSchema = new ClusterMemberType();
             clusterMemberTypeSchema.setPrecedence(dbItemInventoryInstance.getPrecedence());
