@@ -64,18 +64,23 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                 }
             }
             String selectedInstanceSchedulerId = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
-
+            
             if (!jobSchedulerIds.contains(selectedInstanceSchedulerId)) {
-                selectedInstanceSchedulerId = first.getSchedulerId();
-                jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
+                if (first != null) {
+                    selectedInstanceSchedulerId = first.getSchedulerId();
+                    jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
+                }
                 shiroUser.setSelectedInstance(first);
             } else {
                 shiroUser.setSelectedInstance(selected);
             }
+            
+            DBItemInventoryInstance inst = jobschedulerUser.getSchedulerInstance(selectedInstanceSchedulerId);
 
             JobSchedulerIds entity = new JobSchedulerIds();
             entity.getJobschedulerIds().addAll(jobSchedulerIds);
             entity.setSelected(selectedInstanceSchedulerId);
+            entity.setPrecedence(inst.getPrecedence());
             entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);

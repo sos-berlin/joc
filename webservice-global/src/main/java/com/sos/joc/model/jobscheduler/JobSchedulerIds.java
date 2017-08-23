@@ -24,7 +24,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "deliveryDate",
     "jobschedulerIds",
-    "selected"
+    "selected",
+    "precedence"
 })
 public class JobSchedulerIds {
 
@@ -51,6 +52,14 @@ public class JobSchedulerIds {
      */
     @JsonProperty("selected")
     private String selected;
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("precedence")
+    private Integer precedence;
 
     /**
      * delivery date
@@ -128,6 +137,32 @@ public class JobSchedulerIds {
         this.selected = selected;
     }
 
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @return
+     *     The precedence
+     */
+    @JsonProperty("precedence")
+    public Integer getPrecedence() {
+        return precedence;
+    }
+
+    /**
+     * non negative integer
+     * <p>
+     * 
+     * 
+     * @param precedence
+     *     The precedence
+     */
+    @JsonProperty("precedence")
+    public void setPrecedence(Integer precedence) {
+        this.precedence = precedence;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -135,7 +170,7 @@ public class JobSchedulerIds {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(jobschedulerIds).append(selected).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(jobschedulerIds).append(selected).append(precedence).toHashCode();
     }
 
     @Override
@@ -147,7 +182,7 @@ public class JobSchedulerIds {
             return false;
         }
         JobSchedulerIds rhs = ((JobSchedulerIds) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(jobschedulerIds, rhs.jobschedulerIds).append(selected, rhs.selected).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(jobschedulerIds, rhs.jobschedulerIds).append(selected, rhs.selected).append(precedence, rhs.precedence).isEquals();
     }
 
 }
