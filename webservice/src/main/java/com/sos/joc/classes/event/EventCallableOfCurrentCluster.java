@@ -1,5 +1,6 @@
 package com.sos.joc.classes.event;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,26 +14,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
+import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.common.JobSchedulerObjectType;
+import com.sos.joc.model.event.EventSnapshot;
 import com.sos.joc.model.event.JobSchedulerEvent;
 
 public class EventCallableOfCurrentCluster extends EventCallable implements Callable<JobSchedulerEvent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventCallableOfCurrentCluster.class);
+    private final String accessToken;
     private List<EventCallable> tasksOfClustermember = null;
     private List<JOCJsonCommand> jocJsonCommands = null;
     private String jobSchedulerId = null;
     private String eventId = null;
     private Session session = null;
+    private SOSHibernateSession connection = null;
+    private final SOSShiroCurrentUser shiroUser;
     
     public EventCallableOfCurrentCluster(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
             Long instanceId, SOSShiroCurrentUser shiroUser, List<EventCallable> tasksOfClustermember, List<JOCJsonCommand> jocJsonCommands, Map<String, Set<String>> nestedJobChains) {
         super();
         tasksOfClustermember.add(0, new EventCallableOfCurrentJobScheduler(command, jobSchedulerEvent, accessToken, session, instanceId, shiroUser, nestedJobChains));
+        this.accessToken = accessToken;
         this.tasksOfClustermember = tasksOfClustermember;
         this.jocJsonCommands = jocJsonCommands;
         this.jobSchedulerId = jobSchedulerEvent.getJobschedulerId();
+        this.shiroUser = shiroUser;
         this.eventId = jobSchedulerEvent.getEventId();
         this.session = session;
     }
@@ -47,6 +59,7 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
                 session.setAttribute("eventIdOfClusterMembers", evt.getEventId());
                 evt.setJobschedulerId(jobSchedulerId);
                 evt.setEventId(eventId);
+                evt.getEventSnapshots().addAll(updateSavedInventoryInstance());
             } else {
                 session.setAttribute("eventIdOfClusterMembers", eventId);
             }
@@ -64,6 +77,37 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             }
             executorService.shutdown();
         }
+    }
+    
+    private List<EventSnapshot> updateSavedInventoryInstance() {
+        List<EventSnapshot> events = new ArrayList<EventSnapshot>();
+        DBItemInventoryInstance curInstance = null;
+        if (Globals.urlFromJobSchedulerId.containsKey(jobSchedulerId)) {
+            curInstance = Globals.urlFromJobSchedulerId.get(jobSchedulerId);
+        }
+        try {
+            if (connection == null) {
+                connection = Globals.createSosHibernateStatelessConnection("eventClusterCallable-" + jobSchedulerId);
+            }
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+            Globals.beginTransaction(connection);
+            DBItemInventoryInstance inst = dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerId, accessToken, curInstance);
+            shiroUser.addSchedulerInstanceDBItem(jobSchedulerId, inst);
+            Globals.rollback(connection);
+            Globals.urlFromJobSchedulerId.put(jobSchedulerId, inst);
+            if (inst != null && !inst.equals(curInstance)) {
+                EventSnapshot masterChangedEventSnapshot = new EventSnapshot();
+                masterChangedEventSnapshot.setEventType("CurrentJobSchedulerChanged");
+                masterChangedEventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+                masterChangedEventSnapshot.setPath(inst.getUrl());
+                events.add(masterChangedEventSnapshot);
+            }
+        } catch (Exception e) {
+        } finally {
+            Globals.disconnect(connection);
+            connection = null;
+        }
+        return events;
     }
 
 }
