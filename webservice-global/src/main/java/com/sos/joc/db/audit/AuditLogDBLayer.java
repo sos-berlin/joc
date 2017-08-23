@@ -126,6 +126,7 @@ public class AuditLogDBLayer extends DBLayer {
                     }
                 }
             }
+            sql.append(" order by created desc");
             Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
@@ -175,6 +176,7 @@ public class AuditLogDBLayer extends DBLayer {
             if (account != null && !account.isEmpty()) {
                 sql.append(" and account = :account");
             }
+            sql.append(" order by created desc");
             Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
@@ -225,6 +227,7 @@ public class AuditLogDBLayer extends DBLayer {
                     sql.append(" and folder in (:folder)");
                 }
             }
+            sql.append(" order by created desc");
             Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
             query.setParameter("schedulerId", schedulerId);
             if (from != null) {
