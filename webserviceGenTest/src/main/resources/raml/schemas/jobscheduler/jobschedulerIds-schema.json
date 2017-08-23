@@ -22,6 +22,10 @@
     "selected": {
       "description": "The Id from the 'jobschedulerIds' collection which is specified in the selected field will be used for all further calls",
       "type": "string"
+    },
+    "precedence": {
+      "description": "primary (0), secondary (1), ...only relevant for passive cluster",
+      "$ref": "../common/nonNegativeInteger-schema.json"
     }
   }
 }
