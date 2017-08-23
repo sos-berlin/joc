@@ -26,6 +26,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "host",
     "port",
     "state",
+    "url",
+    "clusterType",
     "startedAt",
     "error"
 })
@@ -59,6 +61,16 @@ public class JobSchedulerV {
      */
     @JsonProperty("state")
     private JobSchedulerState state;
+    @JsonProperty("url")
+    private String url;
+    /**
+     * jobscheduler cluster member type
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("clusterType")
+    private ClusterMemberType clusterType;
     /**
      * timestamp
      * <p>
@@ -195,6 +207,52 @@ public class JobSchedulerV {
     }
 
     /**
+     * 
+     * @return
+     *     The url
+     */
+    @JsonProperty("url")
+    public String getUrl() {
+        return url;
+    }
+
+    /**
+     * 
+     * @param url
+     *     The url
+     */
+    @JsonProperty("url")
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    /**
+     * jobscheduler cluster member type
+     * <p>
+     * 
+     * 
+     * @return
+     *     The clusterType
+     */
+    @JsonProperty("clusterType")
+    public ClusterMemberType getClusterType() {
+        return clusterType;
+    }
+
+    /**
+     * jobscheduler cluster member type
+     * <p>
+     * 
+     * 
+     * @param clusterType
+     *     The clusterType
+     */
+    @JsonProperty("clusterType")
+    public void setClusterType(ClusterMemberType clusterType) {
+        this.clusterType = clusterType;
+    }
+
+    /**
      * timestamp
      * <p>
      * Value is UTC timestamp in ISO 8601 YYYY-MM-DDThh:mm:ss.sZ or empty
@@ -253,7 +311,7 @@ public class JobSchedulerV {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(host).append(port).append(state).append(startedAt).append(error).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(host).append(port).append(state).append(url).append(clusterType).append(startedAt).append(error).toHashCode();
     }
 
     @Override
@@ -265,7 +323,7 @@ public class JobSchedulerV {
             return false;
         }
         JobSchedulerV rhs = ((JobSchedulerV) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(state, rhs.state).append(startedAt, rhs.startedAt).append(error, rhs.error).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(host, rhs.host).append(port, rhs.port).append(state, rhs.state).append(url, rhs.url).append(clusterType, rhs.clusterType).append(startedAt, rhs.startedAt).append(error, rhs.error).isEquals();
     }
 
 }

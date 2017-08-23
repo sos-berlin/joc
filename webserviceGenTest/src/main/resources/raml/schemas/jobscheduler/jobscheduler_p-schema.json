@@ -37,6 +37,9 @@
     "timeZone": {
       "type": "string"
     },
+    "url": {
+      "type": "string"
+    },
     "clusterType": {
       "$ref": "clusterMemberType-schema.json"
     },
