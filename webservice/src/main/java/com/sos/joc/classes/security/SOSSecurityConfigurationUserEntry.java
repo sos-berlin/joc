@@ -3,15 +3,12 @@ package com.sos.joc.classes.security;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.shiro.authc.credential.DefaultPasswordService;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Hash;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.crypto.hash.format.DefaultHashFormatFactory;
 import org.apache.shiro.crypto.hash.format.HashFormat;
 import org.apache.shiro.crypto.hash.format.HashFormatFactory;
-import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
-import org.apache.shiro.util.ByteSource;
+import org.apache.shiro.util.StringUtils;
 import org.ini4j.Profile;
 
 import com.sos.joc.model.security.SecurityConfigurationUser;
@@ -19,46 +16,40 @@ import com.sos.joc.model.security.SecurityConfigurationUser;
 public class SOSSecurityConfigurationUserEntry {
 
     private static final String DEFAULT_PASSWORD_512_ALGORITHM_NAME = "SHA-512";
-    private static final int DEFAULT_GENERATED_SALT_SIZE = 16;
-    private static final int DEFAULT_PASSWORD_NUM_ITERATIONS = DefaultPasswordService.DEFAULT_HASH_ITERATIONS;
     private static final HashFormatFactory HASH_FORMAT_FACTORY = new DefaultHashFormatFactory();
     private Profile.Section oldSection;
-    private String hashingAlgorithm="";
-    private boolean crypt=true;
+    private SOSSecurityHashSettings sosSecurityHashSettings;
 
     private String[] listOfRolesAndPassword;
     SecurityConfigurationUser securityConfigurationUser;
 
-    public SOSSecurityConfigurationUserEntry(String entry, Profile.Section oldSection, boolean crypt, String hashingAlgorithm) {
+    public SOSSecurityConfigurationUserEntry(String entry, Profile.Section oldSection, SOSSecurityHashSettings sosSecurityHashSettings) {
         super();
         this.oldSection = oldSection;
-        this.crypt = crypt;
-        this.hashingAlgorithm = hashingAlgorithm;
+        this.sosSecurityHashSettings = sosSecurityHashSettings;
         listOfRolesAndPassword = entry.split(",");
     }
 
-    public SOSSecurityConfigurationUserEntry(SecurityConfigurationUser securityConfigurationUser, Profile.Section oldSection, boolean crypt,
-            String hashingAlgorithm) {
+    public SOSSecurityConfigurationUserEntry(SecurityConfigurationUser securityConfigurationUser, Profile.Section oldSection,
+            SOSSecurityHashSettings sosSecurityHashSettings) {
         super();
         this.oldSection = oldSection;
-        this.crypt = crypt;
-        this.hashingAlgorithm = hashingAlgorithm;
+        this.sosSecurityHashSettings = sosSecurityHashSettings;
         this.securityConfigurationUser = securityConfigurationUser;
     }
 
-    private static ByteSource getSalt() {
-        int byteSize = DEFAULT_GENERATED_SALT_SIZE;
-        return new SecureRandomNumberGenerator().nextBytes(byteSize);
-    }
+   
 
     public String crypt(String s) {
-        if (this.crypt) {
+        if (sosSecurityHashSettings.isCrypt()) {
             String alg = DEFAULT_PASSWORD_512_ALGORITHM_NAME;
-            if (this.hashingAlgorithm != null && !this.hashingAlgorithm.isEmpty()) {
-                alg = this.hashingAlgorithm;
+            if (StringUtils.hasText(this.sosSecurityHashSettings.getHashingAlgorithm())) {
+                alg = this.sosSecurityHashSettings.getHashingAlgorithm();
             }
-            Hash hash = new SimpleHash(alg, s, getSalt(), DEFAULT_PASSWORD_NUM_ITERATIONS);
-            HashFormat format = HASH_FORMAT_FACTORY.getInstance(Shiro1CryptFormat.class.getName());
+
+            Hash hash = new SimpleHash(alg, s, sosSecurityHashSettings.getSalt(), this.sosSecurityHashSettings.getHashIterations());
+            HashFormat format;
+            format = HASH_FORMAT_FACTORY.getInstance(sosSecurityHashSettings.getFormat());
             return format.format(hash);
         } else {
             return s;

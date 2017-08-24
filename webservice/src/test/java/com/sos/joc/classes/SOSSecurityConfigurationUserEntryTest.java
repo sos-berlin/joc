@@ -16,7 +16,7 @@ public class SOSSecurityConfigurationUserEntryTest {
         if (Globals.sosShiroProperties == null) {
             Globals.sosShiroProperties = new JocCockpitProperties();
         }
-        SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry("",null,true,"");
+        SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry("",null,null);
         String s = sosSecurityConfigurationUserEntry.crypt("root");
         Assert.assertEquals("Crypt","", s);
 
