@@ -79,6 +79,11 @@ public class SOSSecurityHashSettings {
                 }
                 if (formatKey != null) {
                     this.format = main.get(formatKey);
+                    if (isDefaultFormat()) {
+                        this.hashIterations = DefaultPasswordService.DEFAULT_HASH_ITERATIONS;
+                    } else {
+                        this.hashIterations = 1;
+                    }
                 } else {
                     this.format = DEFAULT_HASH_FORMAT;
                 }
