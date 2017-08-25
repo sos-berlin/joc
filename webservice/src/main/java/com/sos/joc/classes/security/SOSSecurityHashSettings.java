@@ -7,12 +7,15 @@ import java.io.UnsupportedEncodingException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.shiro.config.Ini.Section;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.format.HashFormat;
 import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SOSSecurityHashSettings {
 
+    private static final String HASH_FORMAT_BASE64_FORMAT = "org.apache.shiro.crypto.hash.format.Base64Format";
+    private static final String HASH_FORMAT_HEX_FORMAT = "org.apache.shiro.crypto.hash.format.HexFormat";
     private static final String DEFAULT_PASSWORD_MATCHER = "org.apache.shiro.authc.credential.PasswordMatcher";
     private static final int DEFAULT_GENERATED_SALT_SIZE = 16;
     private static final String DEFAULT_ALGORITHM = "SHA-512";
@@ -26,10 +29,12 @@ public class SOSSecurityHashSettings {
     private String format;
     private String passwordService;
     private String hashService;
-    private String salt;
+    private String privateSalt;
+    private Boolean generatePublicSalt;
 
     public boolean isCrypt() {
-        return (passwordMatcher != null && credentialsMatcher != null && hashingAlgorithm != null && DEFAULT_PASSWORD_MATCHER.equals(passwordMatcher));
+        return (passwordMatcher != null && credentialsMatcher != null && hashingAlgorithm != null && DEFAULT_PASSWORD_MATCHER.equals(
+                passwordMatcher));
     }
 
     public String getHashingAlgorithm() {
@@ -98,9 +103,13 @@ public class SOSSecurityHashSettings {
                     if (s != null) {
                         byte[] decoded = Base64.decodeBase64(s);
                         s = new String(decoded, "UTF-8");
-                        this.salt = s;
+                        this.privateSalt = s;
                     }
 
+                    s = main.get(hashServiceKey + ".generatePublicSalt");
+                    if (s != null) {
+                        this.generatePublicSalt = s.equals("true");
+                    }
 
                     try {
                         String iter = main.get(hashServiceKey + ".hashIterations");
@@ -121,13 +130,9 @@ public class SOSSecurityHashSettings {
         LOGGER.debug("Using hash algorithm: " + hashingAlgorithm);
     }
 
-    public ByteSource getSalt() {
-        if (salt == null) {
-            int byteSize = DEFAULT_GENERATED_SALT_SIZE;
-            return new SecureRandomNumberGenerator().nextBytes(byteSize);
-        } else {
-            return ByteSource.Util.bytes(salt);
-        }
+    public ByteSource getRandomSalt() {
+        int byteSize = DEFAULT_GENERATED_SALT_SIZE;
+        return new SecureRandomNumberGenerator().nextBytes(byteSize);
     }
 
     public String getCredentialsMatcher() {
@@ -144,6 +149,40 @@ public class SOSSecurityHashSettings {
 
     public String getHashService() {
         return hashService;
+    }
+
+    public boolean isDefaultFormat() {
+        return DEFAULT_HASH_FORMAT.equals(format);
+    }
+
+    public HashFormat getFormatObject() {
+        if (isDefaultFormat()) {
+            return new org.apache.shiro.crypto.hash.format.Shiro1CryptFormat();
+        }
+        if (HASH_FORMAT_HEX_FORMAT.equals(format)) {
+            return new org.apache.shiro.crypto.hash.format.HexFormat();
+        }
+        if (HASH_FORMAT_BASE64_FORMAT.equals(format)) {
+            return new org.apache.shiro.crypto.hash.format.Base64Format();
+        }
+
+        return null;
+    }
+
+    public ByteSource getPrivateSalt() {
+        if (privateSalt != null) {
+            return ByteSource.Util.bytes(privateSalt);
+        } else {
+            return null;
+        }
+    }
+
+    public Boolean isGeneratePublicSalt() {
+        if (generatePublicSalt == null) {
+            return isDefaultFormat();
+        } else {
+            return generatePublicSalt;
+        }
     }
 
 }
