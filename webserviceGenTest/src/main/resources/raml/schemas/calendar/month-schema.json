@@ -1,0 +1,41 @@
+{
+  "title": "month",
+  "id": "schemas/calendar/month",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Month",
+  "type": "object",
+  "required": [
+    "month"
+  ],
+  "properties": {
+    "month": {
+      "description": "1-12 repeatable",
+      "type": "string",
+      "pattern": "[1-9 ]|10|11|12"
+    },
+    "from": {
+      "$ref": "../common/date-schema.json"
+    },
+    "to": {
+      "$ref": "../common/date-schema.json"
+    },
+    "weekdays": {
+      "type": "array",
+      "items": {
+        "$ref": "dayNumber-schema.json"
+      }
+    },
+    "monthdays": {
+      "type": "array",
+      "items": {
+        "$ref": "monthday-schema.json"
+      }
+    },
+    "ultimos": {
+      "type": "array",
+      "items": {
+        "$ref": "ultimo-schema.json"
+      }
+    }
+  }
+}

@@ -8,6 +8,12 @@
     "dateEntity"
   ],
   "properties": {
+    "from": {
+      "$ref": "../common/date-schema.json"
+    },
+    "to": {
+      "$ref": "../common/date-schema.json"
+    },
     "dateEntity": {
       "javaType": "com.sos.joc.model.calendar.DateEntity",
       "type": "string",
@@ -18,7 +24,7 @@
       ]
     },
     "interval": {
-      "type": "../common/nonNegativeInteger-schema.json"
+      "$ref": "../common/nonNegativeInteger-schema.json"
     }
   }
 }

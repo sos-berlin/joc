@@ -1,0 +1,12 @@
+{
+  "title": "day",
+  "id": "schemas/calendar/day",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Day",
+  "type": "object",
+  "properties": {
+    "day": {
+      "$ref": "dayNumber-schema.json"
+    }
+  }
+}

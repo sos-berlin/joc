@@ -1,0 +1,21 @@
+{
+  "title": "monthday",
+  "id": "schemas/calendar/monthday",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Monthday",
+  "type": "object",
+  "properties": {
+    "days": {
+      "type": "array",
+      "items": {
+        "$ref": "dayNumber-schema.json"
+      }
+    },
+    "weekdays": {
+      "type": "array",
+      "items": {
+        "$ref": "whichday-schema.json"
+      }
+    }
+  }
+}

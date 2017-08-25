@@ -1,0 +1,24 @@
+{
+  "title": "holiday",
+  "id": "schemas/calendar/holiday",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Holiday",
+  "type": "object",
+  "properties": {
+    "calendarName": {
+      "type": "string"
+    },
+    "dates": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/date-schema.json"
+      }
+    },
+    "weekdays": {
+      "type": "array",
+      "items": {
+        "$ref": "dayNumber-schema.json"
+      }
+    }
+  }
+}

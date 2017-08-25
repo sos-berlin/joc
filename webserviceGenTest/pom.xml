@@ -164,7 +164,7 @@
                             		<excludes>
 										<exclude>user/*.json</exclude>
 										<exclude>yadeClient/*.json</exclude>
-										<exclude>calendar/*.json</exclude>
+										<!-- exclude>calendar/*.json</exclude-->
 									</excludes>
 								</configuration>
 								<goals>

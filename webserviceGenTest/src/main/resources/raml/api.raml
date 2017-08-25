@@ -39,6 +39,7 @@ schemas:
 
 resourceTypes:
   - error: !include resourceTypes/common/error.raml
+  - postCalendarWithOkResponse: !include resourceTypes/calendar/postJSONWithOkResponse.raml
   - postTaskWithOkResponse: !include resourceTypes/job/postWithOkResponse.raml
   - postTaskAndTimeoutWithOkResponse: !include resourceTypes/job/postTimeoutWithOkResponse.raml
   - postTimeoutWithOkResponse: !include resourceTypes/common/postTimeoutWithOkResponse.raml
@@ -1706,7 +1707,7 @@ traits:
         description15: " "
         description200: " "
         schema200: !include schemas/yade/summary-schema.json
-        schema: !include schemas/yade/transfers-schema.json
+        schema: !include schemas/yade/transferFilter-schema.json
         example: |
             {
               "dateFrom": "1d"
@@ -1859,4 +1860,50 @@ traits:
           200:
             body:
               text/html:
-  
+ 
+/calendars:
+  type:
+    postJSON:
+      description: Sends collection of calendar items
+      description1: !include documentation/common/compact.md
+      description2: " "
+      description3: " "
+      description4: " "
+      description5: !include documentation/common/regex.md
+      description6: !include documentation/common/folders.md
+      description7: !include documentation/calendar/filteredByCalendars.md
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: " "
+      schema: !include schemas/calendar/calendarsFilter-schema.json
+      schema200: !include schemas/calendar/calendars-schema.json
+      example: " "
+      example200: " "
+
+/calendar:
+  type:
+    postJSON:
+      description: Sends calendar
+      description1: !include documentation/common/compact.md
+      description2: " "
+      description3: !include documentation/calendar/calendarRequired.md
+      description4: " "
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: " "
+      schema: !include schemas/calendar/calendarFilter-schema.json
+      schema200: !include schemas/calendar/calendar200-schema.json
+      example: " "
+      example200: " "
+      
+  /store:
+    type:
+      postCalendarWithOkResponse:
+        description: Stores calendar
+        schema: !include schemas/calendar/calendarStoreFilter-schema.json
+        example: " "     

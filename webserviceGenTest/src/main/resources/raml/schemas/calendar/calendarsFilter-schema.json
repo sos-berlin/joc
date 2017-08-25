@@ -1,0 +1,30 @@
+{
+  "title": "calendars filter",
+  "id": "schemas/calendar/calendarsFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.CalendarsFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "calendars": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/path-schema.json"
+      }
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    },
+    "regex": {
+      "$ref": "../common/regexFilter-schema.json"
+    },
+    "folders": {
+      "$ref": "../common/folders-schema.json"
+    }
+  }
+}

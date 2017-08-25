@@ -1,0 +1,22 @@
+{
+  "title": "calendarFilter",
+  "id": "schemas/calendar/calendarFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.CalendarFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "calendar"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "calendar": {
+      "$ref": "../common/path-schema.json"
+    },
+    "compact": {
+      "$ref": "../common/compactParam-schema.json"
+    }
+  }
+}

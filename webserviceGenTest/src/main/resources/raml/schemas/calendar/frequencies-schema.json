@@ -5,19 +5,25 @@
   "javaType": "com.sos.joc.model.calendar.Frequencies",
   "type": "object",
   "required": [
+    "mode"
   ],
   "properties": {
+    "mode": {
+      "type": "string",
+      "javaType": "com.sos.joc.model.calendar.FrequencyMode",
+      "enum": [
+        "INCLUDE",
+        "EXCLUDE"
+      ]
+    },
     "dates": {
       "type": "array",
       "items": {
-        "$ref": "day-schema.json"
+        "$ref": "../common/date-schema.json"
       }
     },
     "weekdays": {
-      "type": "array",
-      "items": {
-        "$ref": "day-schema.json"
-      }
+      "$ref": "weekdays-schema.json"
     },
     "ultimos": {
       "type": "array",
@@ -26,10 +32,7 @@
       }
     },
     "monthdays": {
-      "type": "array",
-      "items": {
-        "$ref": "monthday-schema.json"
-      }
+      "$ref": "monthdays-schema.json"
     },
     "months": {
       "type": "array",
@@ -43,8 +46,11 @@
         "$ref": "holiday-schema.json"
       }
     },
-    "every": {
-      "$ref": "every-schema.json"
+    "intervals": {
+      "type": "array",
+      "items": {
+        "$ref": "every-schema.json"
+      }
     }
   }
 }

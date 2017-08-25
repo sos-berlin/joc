@@ -1,0 +1,33 @@
+{
+  "title": "ultimo",
+  "id": "schemas/calendar/ultimo",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Ultimo",
+  "type": "object",
+  "properties": {
+    "from": {
+      "$ref": "../common/date-schema.json"
+    },
+    "to": {
+      "$ref": "../common/date-schema.json"
+    },
+    "days": {
+      "type": "array",
+      "items": {
+        "$ref": "dayNumber-schema.json"
+      }
+    },
+    "lastWorkingDays": {
+      "type": "array",
+      "items": {
+        "$ref": "dayNumber-schema.json"
+      }
+    },
+    "firstWorkingDays": {
+      "type": "array",
+      "items": {
+        "$ref": "dayNumber-schema.json"
+      }
+    }
+  }
+}
