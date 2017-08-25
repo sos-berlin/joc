@@ -3,11 +3,15 @@ package com.sos.joc.classes.security;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.Hash;
+import org.apache.shiro.crypto.hash.HashRequest;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.crypto.hash.format.DefaultHashFormatFactory;
 import org.apache.shiro.crypto.hash.format.HashFormat;
 import org.apache.shiro.crypto.hash.format.HashFormatFactory;
+import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
+import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.StringUtils;
 import org.ini4j.Profile;
 
@@ -16,7 +20,6 @@ import com.sos.joc.model.security.SecurityConfigurationUser;
 public class SOSSecurityConfigurationUserEntry {
 
     private static final String DEFAULT_PASSWORD_512_ALGORITHM_NAME = "SHA-512";
-    private static final HashFormatFactory HASH_FORMAT_FACTORY = new DefaultHashFormatFactory();
     private Profile.Section oldSection;
     private SOSSecurityHashSettings sosSecurityHashSettings;
 
@@ -38,19 +41,40 @@ public class SOSSecurityConfigurationUserEntry {
         this.securityConfigurationUser = securityConfigurationUser;
     }
 
-   
+    protected ByteSource createByteSource(Object o) {
+        return ByteSource.Util.bytes(o);
+    }
+
+    protected HashRequest createHashRequest(ByteSource plaintext) {
+        return new HashRequest.Builder().setSource(plaintext).setIterations(sosSecurityHashSettings.getHashIterations()).setAlgorithmName(
+                sosSecurityHashSettings.getHashingAlgorithm()).build();
+    }
 
     public String crypt(String s) {
+        DefaultHashService hashService = new DefaultHashService();
+
         if (sosSecurityHashSettings.isCrypt()) {
             String alg = DEFAULT_PASSWORD_512_ALGORITHM_NAME;
             if (StringUtils.hasText(this.sosSecurityHashSettings.getHashingAlgorithm())) {
                 alg = this.sosSecurityHashSettings.getHashingAlgorithm();
             }
 
-            Hash hash = new SimpleHash(alg, s, sosSecurityHashSettings.getSalt(), this.sosSecurityHashSettings.getHashIterations());
-            HashFormat format;
-            format = HASH_FORMAT_FACTORY.getInstance(sosSecurityHashSettings.getFormat());
-            return format.format(hash);
+            ByteSource plaintextBytes = createByteSource(s);
+
+            hashService.setHashAlgorithmName(alg);
+            hashService.setHashIterations(this.sosSecurityHashSettings.getHashIterations());
+            if (sosSecurityHashSettings.getPrivateSalt() != null) {
+                hashService.setPrivateSalt(sosSecurityHashSettings.getPrivateSalt());
+            }
+
+            hashService.setGeneratePublicSalt(sosSecurityHashSettings.isGeneratePublicSalt());
+
+            HashFormat hashFormat = sosSecurityHashSettings.getFormatObject();
+
+            HashRequest request = createHashRequest(plaintextBytes);
+            Hash computed = hashService.computeHash(request);
+            return hashFormat.format(computed);
+
         } else {
             return s;
         }
