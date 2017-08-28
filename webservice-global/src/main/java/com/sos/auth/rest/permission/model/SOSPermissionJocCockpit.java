@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.08.18 um 02:47:40 PM CEST 
+// Generiert: 2017.08.28 um 03:50:15 PM CEST 
 //
 
 
@@ -666,7 +666,7 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                   &lt;element name="edit">
  *                     &lt;complexType>
  *                       &lt;complexContent>
@@ -1510,7 +1510,7 @@ public class SOSPermissionJocCockpit {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *         &lt;element name="edit">
      *           &lt;complexType>
      *             &lt;complexContent>
@@ -1552,32 +1552,23 @@ public class SOSPermissionJocCockpit {
     })
     public static class Calendar {
 
-        @XmlElement(required = true)
-        protected Object view;
+        protected boolean view;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Calendar.Edit edit;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
          * 
-         * @return
-         *     possible object is
-         *     {@link Object }
-         *     
          */
-        public Object getView() {
+        public boolean isView() {
             return view;
         }
 
         /**
          * Legt den Wert der view-Eigenschaft fest.
          * 
-         * @param value
-         *     allowed object is
-         *     {@link Object }
-         *     
          */
-        public void setView(Object value) {
+        public void setView(boolean value) {
             this.view = value;
         }
 
