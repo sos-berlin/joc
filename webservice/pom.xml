@@ -205,7 +205,7 @@
 			<artifactId>shiro-tools-hasher</artifactId>
 			<exclusions>
                 <exclusion>
-					<groupId>org.sl4j</groupId>
+					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-simple</artifactId>
                 </exclusion>
 			</exclusions>
