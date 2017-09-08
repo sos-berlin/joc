@@ -1,6 +1,5 @@
 package com.sos.joc.classes.security;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -34,7 +33,7 @@ public class SOSSecurityConfiguration {
     public SOSSecurityConfiguration() {
         super();
         securityConfiguration = new SecurityConfiguration();
-        ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
+        ini = Globals.getIniFromSecurityManagerFactory();
         listOfMasters = SOSSecurityConfigurationMasters.getInstance();
     }
 
@@ -191,7 +190,7 @@ public class SOSSecurityConfiguration {
     }
 
     public SecurityConfiguration writeConfiguration(SecurityConfiguration securityConfiguration) throws IOException {
-        writeIni = new Wini(new File(Globals.getShiroIniFileName()));
+        writeIni = new Wini(Globals.getShiroIniFile().toFile());
 
         this.securityConfiguration = securityConfiguration;
         writeUsers();

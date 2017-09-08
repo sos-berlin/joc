@@ -182,34 +182,11 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
         }
         
         ExecutorService executorService = Executors.newFixedThreadPool(10);
-        for (Future<Map<String, JobChainVolatile>> result : executorService.invokeAll(summaryTasks)) {
-            try {
-                jobChainMap.putAll(result.get());
-            } catch (ExecutionException e) {
-                executorService.shutdown();
-                if (e.getCause() instanceof JocException) {
-                    throw (JocException) e.getCause();
-                } else {
-                    throw (Exception) e.getCause();
-                }
-            }
-        }
-        if (!orderTasks.isEmpty()) {
-            for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(orderTasks)) {
+        try {
+            for (Future<Map<String, JobChainVolatile>> result : executorService.invokeAll(summaryTasks)) {
                 try {
-                    Map<String, OrderVolatile> orders = result.get();
-                    if (orders.size() > 0) {
-                        JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
-                        if (j != null) {
-                            if (j.hasJobChainNodes()) {
-                                j.setOuterOrdersAndSummary(orders, jobChainsFilter.getMaxOrders(), jobChainsFilter.getCompact());
-                            } else {
-                                j.setOrders(orders, jobChainsFilter.getMaxOrders());
-                            }
-                        }
-                    }
+                    jobChainMap.putAll(result.get());
                 } catch (ExecutionException e) {
-                    executorService.shutdown();
                     if (e.getCause() instanceof JocException) {
                         throw (JocException) e.getCause();
                     } else {
@@ -217,8 +194,32 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
                     }
                 }
             }
+            if (!orderTasks.isEmpty()) {
+                for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(orderTasks)) {
+                    try {
+                        Map<String, OrderVolatile> orders = result.get();
+                        if (orders.size() > 0) {
+                            JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
+                            if (j != null) {
+                                if (j.hasJobChainNodes()) {
+                                    j.setOuterOrdersAndSummary(orders, jobChainsFilter.getMaxOrders(), jobChainsFilter.getCompact());
+                                } else {
+                                    j.setOrders(orders, jobChainsFilter.getMaxOrders());
+                                }
+                            }
+                        }
+                    } catch (ExecutionException e) {
+                        if (e.getCause() instanceof JocException) {
+                            throw (JocException) e.getCause();
+                        } else {
+                            throw (Exception) e.getCause();
+                        }
+                    }
+                }
+            }
+        } finally {
+            executorService.shutdown();
         }
-        executorService.shutdown();
         //LOGGER.debug("..." + jobChainMap.size() + " jobChains processed");
         return new ArrayList<JobChainV>(jobChainMap.values());
     }

@@ -95,20 +95,22 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         }
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();
-        for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-            try {
-                AgentOfCluster a = result.get();
-                mapOfAgents.put(a.getUrl(), a);
-            } catch (ExecutionException e) {
-                executorService.shutdown();
-                if (e.getCause() instanceof JocException) {
-                    throw (JocException) e.getCause();
-                } else {
-                    throw (Exception) e.getCause();
+        try {
+            for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+                try {
+                    AgentOfCluster a = result.get();
+                    mapOfAgents.put(a.getUrl(), a);
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
                 }
             }
+        } finally {
+            executorService.shutdown();
         }
-        executorService.shutdown();
         List<AgentCluster> listAgentClusterV = new ArrayList<AgentCluster>();
         for (AgentClusterVolatile agentClusterV : listAgentCluster) {
             agentClusterV.setAgentsListAndState(mapOfAgents, agentClusterBody.getCompact());
@@ -136,20 +138,22 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         }
         ExecutorService executorService = Executors.newFixedThreadPool(5);
         Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();
-        for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-            try {
-                AgentOfCluster a = result.get();
-                mapOfAgents.put(a.getUrl(), a);
-            } catch (ExecutionException e) {
-                executorService.shutdown();
-                if (e.getCause() instanceof JocException) {
-                    throw (JocException) e.getCause();
-                } else {
-                    throw (Exception) e.getCause();
+        try {
+            for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+                try {
+                    AgentOfCluster a = result.get();
+                    mapOfAgents.put(a.getUrl(), a);
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
                 }
             }
+        } finally {
+            executorService.shutdown();
         }
-        executorService.shutdown();
         agentClusterV.setFields(mapOfAgents, agentClusterBody.getCompact());
         return agentClusterV;
     }

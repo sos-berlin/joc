@@ -14,7 +14,6 @@ import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -22,7 +21,6 @@ import com.sos.joc.classes.processclasses.ProcessClassesVCallable;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.plan.PlanFilter;
 import com.sos.joc.model.processClass.ProcessClassPath;
 import com.sos.joc.model.processClass.ProcessClassV;
 import com.sos.joc.model.processClass.ProcessClassesFilter;
@@ -85,19 +83,21 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             }
             if (tasks.size() > 0) {
                 ExecutorService executorService = Executors.newFixedThreadPool(10);
-                for (Future<List<ProcessClassV>> result : executorService.invokeAll(tasks)) {
-                    try {
-                        listProcessClasses.addAll(result.get());
-                    } catch (ExecutionException e) {
-                        executorService.shutdown();
-                        if (e.getCause() instanceof JocException) {
-                            throw (JocException) e.getCause();
-                        } else {
-                            throw (Exception) e.getCause();
+                try {
+                    for (Future<List<ProcessClassV>> result : executorService.invokeAll(tasks)) {
+                        try {
+                            listProcessClasses.addAll(result.get());
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
                         }
                     }
+                } finally {
+                    executorService.shutdown();
                 }
-                executorService.shutdown();
                 entity.setProcessClasses(listProcessClasses);
             }
 

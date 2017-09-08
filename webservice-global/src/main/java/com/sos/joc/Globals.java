@@ -3,12 +3,15 @@ package com.sos.joc;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.json.Json;
 
+import org.apache.shiro.config.Ini;
+import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
@@ -46,6 +49,7 @@ public class Globals {
     public static boolean auditLogCommentsAreRequired = false;
     public static JocWebserviceDataContainer jocWebserviceDataContainer = JocWebserviceDataContainer.getInstance();
     public static JocCockpitProperties jocConfigurationProperties;
+    public static IniSecurityManagerFactory factory = null;
 
     public static SOSHibernateFactory getHibernateFactory() throws JocException {
         if (sosHibernateFactory == null) {
@@ -102,27 +106,37 @@ public class Globals {
             throw new DBConnectionRefusedException(e);
         }
     }
+    
+    public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
+        if (factory == null) {
+            factory = new IniSecurityManagerFactory(); 
+        }
+        String iniFile = getShiroIniInClassPath();
+        factory.setIni(Ini.fromResourcePath(iniFile));
+        return factory;
+    }
+    
+    public static Ini getIniFromSecurityManagerFactory() {
+        if (factory == null) {
+            String iniFile = getShiroIniInClassPath();
+            factory = new IniSecurityManagerFactory(iniFile);
+        }
+        return factory.getIni();
+    }
 
-    public static String getShiroIniInClassPath() {
+    private static String getShiroIniInClassPath() {
         if (sosShiroProperties != null) {
             Path p = sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
-            String s;
-            s = "file:" + p;
-            s = s.replace("\\", "/");
-            return s;
+            return "file:" + p.toString().replace('\\', '/');
         }
         return DEFAULT_SHIRO_INI_PATH;
     }
 
-    public static String getShiroIniFileName() {
+    public static Path getShiroIniFile() {
         if (sosShiroProperties != null) {
-            Path p = sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
-            String s;
-            s = "" + p;
-            s = s.replace("\\", "/");
-            return s;
+            return sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
         }
-        return DEFAULT_SHIRO_INI_FILENAME;
+        return Paths.get(DEFAULT_SHIRO_INI_FILENAME);
     }
 
     public static void setProperties() throws JocException {
