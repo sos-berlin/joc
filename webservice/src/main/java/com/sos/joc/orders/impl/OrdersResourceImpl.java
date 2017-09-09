@@ -124,19 +124,21 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
 
             if (tasks != null && !tasks.isEmpty()) {
                 ExecutorService executorService = Executors.newFixedThreadPool(10);
-                for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
-                    try {
-                        listOrders.putAll(result.get());
-                    } catch (ExecutionException e) {
-                        executorService.shutdown();
-                        if (e.getCause() instanceof JocException) {
-                            throw (JocException) e.getCause();
-                        } else {
-                            throw (Exception) e.getCause();
+                try {
+                    for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
+                        try {
+                            listOrders.putAll(result.get());
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
                         }
                     }
+                } finally {
+                    executorService.shutdown();
                 }
-                executorService.shutdown();
             }
 
             OrdersV entity = new OrdersV();

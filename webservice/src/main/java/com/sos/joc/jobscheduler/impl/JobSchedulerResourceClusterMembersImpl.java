@@ -56,17 +56,20 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                 }
                 if (!tasks.isEmpty()) {
                     ExecutorService executorService = Executors.newFixedThreadPool(10);
-                    for (Future<JobSchedulerV> result : executorService.invokeAll(tasks)) {
-                        try {
-                            masters.add(result.get());
-                        } catch (ExecutionException e) {
-                            executorService.shutdown();
-                            if (e.getCause() instanceof JocException) {
-                                throw (JocException) e.getCause();
-                            } else {
-                                throw (Exception) e.getCause();
+                    try {
+                        for (Future<JobSchedulerV> result : executorService.invokeAll(tasks)) {
+                            try {
+                                masters.add(result.get());
+                            } catch (ExecutionException e) {
+                                if (e.getCause() instanceof JocException) {
+                                    throw (JocException) e.getCause();
+                                } else {
+                                    throw (Exception) e.getCause();
+                                }
                             }
                         }
+                    } finally {
+                        executorService.shutdown();
                     }
                 }
             }

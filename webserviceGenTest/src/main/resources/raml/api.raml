@@ -902,19 +902,19 @@ traits:
   /terminate_within:
     type:
       modifyTasks:
-        description: Terminate task with timeout (sends first SIGTERM and later SIGKILL) - Only for Unix
+        description: Terminate tasks with timeout (sends first SIGTERM and later SIGKILL) - Only for Unix
         description1: !include documentation/common/timeout.md
         audit: !include documentation/audit/auditLog.md
   /kill:
     type:
       modifyTasks:
-        description: Kill task (sends SIGKILL)
+        description: Kill tasks (sends SIGKILL)
         description1: " "
         audit: !include documentation/audit/auditLog.md
   /end:
     type:
       modifyTasks:
-        description: End task - Only for API Jobs
+        description: End tasks - Only for API Jobs
         description1: " "
         audit: !include documentation/audit/auditLog.md
 

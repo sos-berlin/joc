@@ -64,29 +64,31 @@ public class Orders {
         summary.setWaitingForResource(0);
         
         ExecutorService executorService = Executors.newFixedThreadPool(10);
-        for (Future<OrdersSnapshotEvent> result : executorService.invokeAll(tasks)) {
-            try {
-                OrdersSnapshotEvent o = result.get();
-                summary.setBlacklist(summary.getBlacklist() + o.getBlacklist());
-                summary.setPending(summary.getPending() + o.getPending());
-                summary.setRunning(summary.getRunning() + o.getRunning());
-                summary.setSetback(summary.getSetback() + o.getSetback());
-                summary.setSuspended(summary.getSuspended() + o.getSuspended());
-                summary.setWaitingForResource(summary.getWaitingForResource() + o.getWaitingForResource());
-                long event = o.getEventId();
-                if (event > eventId) {
-                    eventId = event; 
-                }
-            } catch (ExecutionException e) {
-                executorService.shutdown();
-                if (e.getCause() instanceof JocException) {
-                    throw (JocException) e.getCause();
-                } else {
-                    throw (Exception) e.getCause();
+        try {
+            for (Future<OrdersSnapshotEvent> result : executorService.invokeAll(tasks)) {
+                try {
+                    OrdersSnapshotEvent o = result.get();
+                    summary.setBlacklist(summary.getBlacklist() + o.getBlacklist());
+                    summary.setPending(summary.getPending() + o.getPending());
+                    summary.setRunning(summary.getRunning() + o.getRunning());
+                    summary.setSetback(summary.getSetback() + o.getSetback());
+                    summary.setSuspended(summary.getSuspended() + o.getSuspended());
+                    summary.setWaitingForResource(summary.getWaitingForResource() + o.getWaitingForResource());
+                    long event = o.getEventId();
+                    if (event > eventId) {
+                        eventId = event; 
+                    }
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
                 }
             }
+        } finally {
+            executorService.shutdown();
         }
-        executorService.shutdown();
         
         //System.setProperty(eventIdPropKey, eventId.toString());
         if (session != null && eventIdPropKey != null) {
