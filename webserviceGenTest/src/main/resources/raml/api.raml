@@ -1,6 +1,6 @@
 #%RAML 0.8
 title: JOC API
-version: 1.11.4-SNAPSHOT
+version: 1.11.5-SNAPSHOT
 protocols: [ HTTP, HTTPS ]
 baseUri: http://test.sos-berlin.com:3001/joc/api
 #mediaType: application/json
@@ -896,19 +896,19 @@ traits:
   /terminate_within:
     type:
       modifyTasks:
-        description: Terminate task with timeout (sends first SIGTERM and later SIGKILL) - Only for Unix
+        description: Terminate tasks with timeout (sends first SIGTERM and later SIGKILL) - Only for Unix
         description1: !include documentation/common/timeout.md
         audit: !include documentation/audit/auditLog.md
   /kill:
     type:
       modifyTasks:
-        description: Kill task (sends SIGKILL)
+        description: Kill tasks (sends SIGKILL)
         description1: " "
         audit: !include documentation/audit/auditLog.md
   /end:
     type:
       modifyTasks:
-        description: End task - Only for API Jobs
+        description: End tasks - Only for API Jobs
         description1: " "
         audit: !include documentation/audit/auditLog.md
 

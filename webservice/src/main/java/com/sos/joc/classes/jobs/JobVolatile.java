@@ -249,6 +249,7 @@ public class JobVolatile extends JobV {
                 Element taskQueueElement = (Element) queuedTasksList.item(queuedTasksCount);
                 taskQueue.setTaskId(taskQueueElement.getAttribute(WebserviceConstants.ID));
                 taskQueue.setEnqueued(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(taskQueueElement, WebserviceConstants.ENQUEUED, null)));
+                taskQueue.setPlannedStart(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(taskQueueElement, WebserviceConstants.START_AT, null)));
                 queuedTasks.add(taskQueue);
             }
             setTaskQueue(queuedTasks);
