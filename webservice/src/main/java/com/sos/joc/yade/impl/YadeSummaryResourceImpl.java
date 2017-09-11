@@ -10,12 +10,11 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
-import com.sos.joc.db.yade.DBLayerYade;
+import com.sos.joc.db.yade.JocDBLayerYade;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.yade.TransferFilesSummary;
 import com.sos.joc.model.yade.TransferFilter;
 import com.sos.joc.yade.resource.IYadeSummaryResource;
-
 
 @Path("/yade/summary")
 public class YadeSummaryResourceImpl extends JOCResourceImpl implements IYadeSummaryResource {
@@ -26,12 +25,10 @@ public class YadeSummaryResourceImpl extends JOCResourceImpl implements IYadeSum
     public JOCDefaultResponse postYadeSummary(String accessToken, TransferFilter filterBody) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            // TODO new Permissions for YADE
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
             // JobSchedulerId has to be "" to prevent exception to be thrown
-            // TODO: instead of setting parameter permission to true as below 
-            // the check for permissions has to be added when the permissions are ready
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, "", true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, "", 
+                    sosPermission.getYADE().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -48,7 +45,7 @@ public class YadeSummaryResourceImpl extends JOCResourceImpl implements IYadeSum
             if (dateTo != null && !dateTo.isEmpty()) {
                 to = JobSchedulerDate.getDateTo(dateTo, timeZone);
             }
-            DBLayerYade dbLayer = new DBLayerYade(connection);
+            JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
             Integer successful = dbLayer.getSuccessfulTransferredFilesCount(from, to);
             Integer failed = dbLayer.getFailedTransferredFilesCount(from, to);
 
