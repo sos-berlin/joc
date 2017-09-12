@@ -15,8 +15,8 @@
     "calendar": {
       "$ref": "../common/path-schema.json"
     },
-    "compact": {
-      "$ref": "../common/compactParam-schema.json"
+    "category": {
+      "type": "string"
     }
   }
 }

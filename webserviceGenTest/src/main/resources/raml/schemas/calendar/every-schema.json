@@ -18,9 +18,9 @@
       "javaType": "com.sos.joc.model.calendar.DateEntity",
       "type": "string",
       "enum": [
-        "DAY",
-        "WEEK",
-        "MONTH"
+        "DAILY",
+        "WEEKLY",
+        "MONTHLY"
       ]
     },
     "interval": {

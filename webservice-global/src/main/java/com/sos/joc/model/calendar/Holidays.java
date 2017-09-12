@@ -13,7 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * holiday
+ * holidays
  * <p>
  * 
  * 
@@ -25,14 +25,14 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "dates",
     "weekdays"
 })
-public class Holiday {
+public class Holidays {
 
     @JsonProperty("calendarName")
     private String calendarName;
     @JsonProperty("dates")
     private List<String> dates = new ArrayList<String>();
     @JsonProperty("weekdays")
-    private List<String> weekdays = new ArrayList<String>();
+    private List<WeekDays> weekdays = new ArrayList<WeekDays>();
 
     /**
      * 
@@ -80,7 +80,7 @@ public class Holiday {
      *     The weekdays
      */
     @JsonProperty("weekdays")
-    public List<String> getWeekdays() {
+    public List<WeekDays> getWeekdays() {
         return weekdays;
     }
 
@@ -90,7 +90,7 @@ public class Holiday {
      *     The weekdays
      */
     @JsonProperty("weekdays")
-    public void setWeekdays(List<String> weekdays) {
+    public void setWeekdays(List<WeekDays> weekdays) {
         this.weekdays = weekdays;
     }
 
@@ -109,10 +109,10 @@ public class Holiday {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Holiday) == false) {
+        if ((other instanceof Holidays) == false) {
             return false;
         }
-        Holiday rhs = ((Holiday) other);
+        Holidays rhs = ((Holidays) other);
         return new EqualsBuilder().append(calendarName, rhs.calendarName).append(dates, rhs.dates).append(weekdays, rhs.weekdays).isEquals();
     }
 

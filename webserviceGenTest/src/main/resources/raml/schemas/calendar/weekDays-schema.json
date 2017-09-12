@@ -1,8 +1,8 @@
 {
   "title": "weekdays",
-  "id": "schemas/calendar/weekdays",
+  "id": "schemas/calendar/weekDays",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.calendar.Weekdays",
+  "javaType": "com.sos.joc.model.calendar.WeekDays",
   "type": "object",
   "properties": {
     "from": {
@@ -14,7 +14,7 @@
     "days": {
       "type": "array",
       "items": {
-        "$ref": "dayNumber-schema.json"
+        "$ref": "dayOfWeek-schema.json"
       }
     }
   }

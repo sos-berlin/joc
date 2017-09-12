@@ -1,8 +1,0 @@
-{
-  "title": "day number",
-  "id": "schemas/calendar/dayNumber",
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "description": "0-7 repeatable",
-  "type": "string",
-  "pattern": "[0-7 ]"
-}

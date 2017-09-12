@@ -21,22 +21,22 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "month",
+    "months",
     "from",
     "to",
     "weekdays",
     "monthdays",
     "ultimos"
 })
-public class Month {
+public class Months {
 
     /**
-     *  1-12 repeatable
+     * 
      * (Required)
      * 
      */
-    @JsonProperty("month")
-    private String month;
+    @JsonProperty("months")
+    private List<Integer> months = new ArrayList<Integer>();
     /**
      * date
      * <p>
@@ -54,34 +54,34 @@ public class Month {
     @JsonProperty("to")
     private String to;
     @JsonProperty("weekdays")
-    private List<String> weekdays = new ArrayList<String>();
+    private List<WeekDays> weekdays = new ArrayList<WeekDays>();
     @JsonProperty("monthdays")
-    private List<Monthday> monthdays = new ArrayList<Monthday>();
+    private List<MonthDays> monthdays = new ArrayList<MonthDays>();
     @JsonProperty("ultimos")
-    private List<Ultimo> ultimos = new ArrayList<Ultimo>();
+    private List<MonthDays> ultimos = new ArrayList<MonthDays>();
 
     /**
-     *  1-12 repeatable
+     * 
      * (Required)
      * 
      * @return
-     *     The month
+     *     The months
      */
-    @JsonProperty("month")
-    public String getMonth() {
-        return month;
+    @JsonProperty("months")
+    public List<Integer> getMonths() {
+        return months;
     }
 
     /**
-     *  1-12 repeatable
+     * 
      * (Required)
      * 
-     * @param month
-     *     The month
+     * @param months
+     *     The months
      */
-    @JsonProperty("month")
-    public void setMonth(String month) {
-        this.month = month;
+    @JsonProperty("months")
+    public void setMonths(List<Integer> months) {
+        this.months = months;
     }
 
     /**
@@ -142,7 +142,7 @@ public class Month {
      *     The weekdays
      */
     @JsonProperty("weekdays")
-    public List<String> getWeekdays() {
+    public List<WeekDays> getWeekdays() {
         return weekdays;
     }
 
@@ -152,7 +152,7 @@ public class Month {
      *     The weekdays
      */
     @JsonProperty("weekdays")
-    public void setWeekdays(List<String> weekdays) {
+    public void setWeekdays(List<WeekDays> weekdays) {
         this.weekdays = weekdays;
     }
 
@@ -162,7 +162,7 @@ public class Month {
      *     The monthdays
      */
     @JsonProperty("monthdays")
-    public List<Monthday> getMonthdays() {
+    public List<MonthDays> getMonthdays() {
         return monthdays;
     }
 
@@ -172,7 +172,7 @@ public class Month {
      *     The monthdays
      */
     @JsonProperty("monthdays")
-    public void setMonthdays(List<Monthday> monthdays) {
+    public void setMonthdays(List<MonthDays> monthdays) {
         this.monthdays = monthdays;
     }
 
@@ -182,7 +182,7 @@ public class Month {
      *     The ultimos
      */
     @JsonProperty("ultimos")
-    public List<Ultimo> getUltimos() {
+    public List<MonthDays> getUltimos() {
         return ultimos;
     }
 
@@ -192,7 +192,7 @@ public class Month {
      *     The ultimos
      */
     @JsonProperty("ultimos")
-    public void setUltimos(List<Ultimo> ultimos) {
+    public void setUltimos(List<MonthDays> ultimos) {
         this.ultimos = ultimos;
     }
 
@@ -203,7 +203,7 @@ public class Month {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(month).append(from).append(to).append(weekdays).append(monthdays).append(ultimos).toHashCode();
+        return new HashCodeBuilder().append(months).append(from).append(to).append(weekdays).append(monthdays).append(ultimos).toHashCode();
     }
 
     @Override
@@ -211,11 +211,11 @@ public class Month {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Month) == false) {
+        if ((other instanceof Months) == false) {
             return false;
         }
-        Month rhs = ((Month) other);
-        return new EqualsBuilder().append(month, rhs.month).append(from, rhs.from).append(to, rhs.to).append(weekdays, rhs.weekdays).append(monthdays, rhs.monthdays).append(ultimos, rhs.ultimos).isEquals();
+        Months rhs = ((Months) other);
+        return new EqualsBuilder().append(months, rhs.months).append(from, rhs.from).append(to, rhs.to).append(weekdays, rhs.weekdays).append(monthdays, rhs.monthdays).append(ultimos, rhs.ultimos).isEquals();
     }
 
 }

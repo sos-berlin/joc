@@ -38,7 +38,7 @@ public class CalendarsFilter {
     @JsonProperty("jobschedulerId")
     private String jobschedulerId;
     @JsonProperty("calendars")
-    private List<String> calendars = new ArrayList<String>();
+    private List<CalendarPath> calendars = new ArrayList<CalendarPath>();
     /**
      * compact parameter
      * <p>
@@ -94,7 +94,7 @@ public class CalendarsFilter {
      *     The calendars
      */
     @JsonProperty("calendars")
-    public List<String> getCalendars() {
+    public List<CalendarPath> getCalendars() {
         return calendars;
     }
 
@@ -104,7 +104,7 @@ public class CalendarsFilter {
      *     The calendars
      */
     @JsonProperty("calendars")
-    public void setCalendars(List<String> calendars) {
+    public void setCalendars(List<CalendarPath> calendars) {
         this.calendars = calendars;
     }
 

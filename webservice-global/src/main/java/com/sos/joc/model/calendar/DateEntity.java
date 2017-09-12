@@ -10,9 +10,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Generated("org.jsonschema2pojo")
 public enum DateEntity {
 
-    DAY("DAY"),
-    WEEK("WEEK"),
-    MONTH("MONTH");
+    DAILY("DAILY"),
+    WEEKLY("WEEKLY"),
+    MONTHLY("MONTHLY");
     private final String value;
     private final static Map<String, DateEntity> CONSTANTS = new HashMap<String, DateEntity>();
 

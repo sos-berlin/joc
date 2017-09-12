@@ -1,0 +1,9 @@
+{
+  "title": "dayOfWeek number",
+  "id": "schemas/calendar/dayOfWeek",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "digit from 0-7, 0=Sunday, 1=Monday, ..., 6=Saturday, 7=Sunday",
+  "type": "integer",
+  "minimum": 0,
+  "maximum": 7
+}

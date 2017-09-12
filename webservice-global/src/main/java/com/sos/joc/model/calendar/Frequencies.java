@@ -24,8 +24,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "mode",
     "dates",
     "weekdays",
-    "ultimos",
     "monthdays",
+    "ultimos",
     "months",
     "holidays",
     "intervals"
@@ -41,28 +41,16 @@ public class Frequencies {
     private FrequencyMode mode;
     @JsonProperty("dates")
     private List<String> dates = new ArrayList<String>();
-    /**
-     * weekdays
-     * <p>
-     * 
-     * 
-     */
     @JsonProperty("weekdays")
-    private Weekdays weekdays;
-    @JsonProperty("ultimos")
-    private List<Ultimo> ultimos = new ArrayList<Ultimo>();
-    /**
-     * monthdays
-     * <p>
-     * 
-     * 
-     */
+    private List<WeekDays> weekdays = new ArrayList<WeekDays>();
     @JsonProperty("monthdays")
-    private Monthdays monthdays;
+    private List<MonthDays> monthdays = new ArrayList<MonthDays>();
+    @JsonProperty("ultimos")
+    private List<MonthDays> ultimos = new ArrayList<MonthDays>();
     @JsonProperty("months")
-    private List<Month> months = new ArrayList<Month>();
+    private List<Months> months = new ArrayList<Months>();
     @JsonProperty("holidays")
-    private List<Holiday> holidays = new ArrayList<Holiday>();
+    private List<Holidays> holidays = new ArrayList<Holidays>();
     @JsonProperty("intervals")
     private List<Every> intervals = new ArrayList<Every>();
 
@@ -111,29 +99,43 @@ public class Frequencies {
     }
 
     /**
-     * weekdays
-     * <p>
-     * 
      * 
      * @return
      *     The weekdays
      */
     @JsonProperty("weekdays")
-    public Weekdays getWeekdays() {
+    public List<WeekDays> getWeekdays() {
         return weekdays;
     }
 
     /**
-     * weekdays
-     * <p>
-     * 
      * 
      * @param weekdays
      *     The weekdays
      */
     @JsonProperty("weekdays")
-    public void setWeekdays(Weekdays weekdays) {
+    public void setWeekdays(List<WeekDays> weekdays) {
         this.weekdays = weekdays;
+    }
+
+    /**
+     * 
+     * @return
+     *     The monthdays
+     */
+    @JsonProperty("monthdays")
+    public List<MonthDays> getMonthdays() {
+        return monthdays;
+    }
+
+    /**
+     * 
+     * @param monthdays
+     *     The monthdays
+     */
+    @JsonProperty("monthdays")
+    public void setMonthdays(List<MonthDays> monthdays) {
+        this.monthdays = monthdays;
     }
 
     /**
@@ -142,7 +144,7 @@ public class Frequencies {
      *     The ultimos
      */
     @JsonProperty("ultimos")
-    public List<Ultimo> getUltimos() {
+    public List<MonthDays> getUltimos() {
         return ultimos;
     }
 
@@ -152,34 +154,8 @@ public class Frequencies {
      *     The ultimos
      */
     @JsonProperty("ultimos")
-    public void setUltimos(List<Ultimo> ultimos) {
+    public void setUltimos(List<MonthDays> ultimos) {
         this.ultimos = ultimos;
-    }
-
-    /**
-     * monthdays
-     * <p>
-     * 
-     * 
-     * @return
-     *     The monthdays
-     */
-    @JsonProperty("monthdays")
-    public Monthdays getMonthdays() {
-        return monthdays;
-    }
-
-    /**
-     * monthdays
-     * <p>
-     * 
-     * 
-     * @param monthdays
-     *     The monthdays
-     */
-    @JsonProperty("monthdays")
-    public void setMonthdays(Monthdays monthdays) {
-        this.monthdays = monthdays;
     }
 
     /**
@@ -188,7 +164,7 @@ public class Frequencies {
      *     The months
      */
     @JsonProperty("months")
-    public List<Month> getMonths() {
+    public List<Months> getMonths() {
         return months;
     }
 
@@ -198,7 +174,7 @@ public class Frequencies {
      *     The months
      */
     @JsonProperty("months")
-    public void setMonths(List<Month> months) {
+    public void setMonths(List<Months> months) {
         this.months = months;
     }
 
@@ -208,7 +184,7 @@ public class Frequencies {
      *     The holidays
      */
     @JsonProperty("holidays")
-    public List<Holiday> getHolidays() {
+    public List<Holidays> getHolidays() {
         return holidays;
     }
 
@@ -218,7 +194,7 @@ public class Frequencies {
      *     The holidays
      */
     @JsonProperty("holidays")
-    public void setHolidays(List<Holiday> holidays) {
+    public void setHolidays(List<Holidays> holidays) {
         this.holidays = holidays;
     }
 
@@ -249,7 +225,7 @@ public class Frequencies {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(mode).append(dates).append(weekdays).append(ultimos).append(monthdays).append(months).append(holidays).append(intervals).toHashCode();
+        return new HashCodeBuilder().append(mode).append(dates).append(weekdays).append(monthdays).append(ultimos).append(months).append(holidays).append(intervals).toHashCode();
     }
 
     @Override
@@ -261,7 +237,7 @@ public class Frequencies {
             return false;
         }
         Frequencies rhs = ((Frequencies) other);
-        return new EqualsBuilder().append(mode, rhs.mode).append(dates, rhs.dates).append(weekdays, rhs.weekdays).append(ultimos, rhs.ultimos).append(monthdays, rhs.monthdays).append(months, rhs.months).append(holidays, rhs.holidays).append(intervals, rhs.intervals).isEquals();
+        return new EqualsBuilder().append(mode, rhs.mode).append(dates, rhs.dates).append(weekdays, rhs.weekdays).append(monthdays, rhs.monthdays).append(ultimos, rhs.ultimos).append(months, rhs.months).append(holidays, rhs.holidays).append(intervals, rhs.intervals).isEquals();
     }
 
 }

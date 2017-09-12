@@ -9,29 +9,14 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/**
- * calendarFilter
- * <p>
- * 
- * 
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "jobschedulerId",
     "calendar",
     "category"
 })
-public class CalendarFilter {
+public class CalendarPath {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("jobschedulerId")
-    private String jobschedulerId;
     /**
      * path
      * <p>
@@ -43,30 +28,6 @@ public class CalendarFilter {
     private String calendar;
     @JsonProperty("category")
     private String category;
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The jobschedulerId
-     */
-    @JsonProperty("jobschedulerId")
-    public String getJobschedulerId() {
-        return jobschedulerId;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param jobschedulerId
-     *     The jobschedulerId
-     */
-    @JsonProperty("jobschedulerId")
-    public void setJobschedulerId(String jobschedulerId) {
-        this.jobschedulerId = jobschedulerId;
-    }
 
     /**
      * path
@@ -123,7 +84,7 @@ public class CalendarFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(calendar).append(category).toHashCode();
+        return new HashCodeBuilder().append(calendar).append(category).toHashCode();
     }
 
     @Override
@@ -131,11 +92,11 @@ public class CalendarFilter {
         if (other == this) {
             return true;
         }
-        if ((other instanceof CalendarFilter) == false) {
+        if ((other instanceof CalendarPath) == false) {
             return false;
         }
-        CalendarFilter rhs = ((CalendarFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(calendar, rhs.calendar).append(category, rhs.category).isEquals();
+        CalendarPath rhs = ((CalendarPath) other);
+        return new EqualsBuilder().append(calendar, rhs.calendar).append(category, rhs.category).isEquals();
     }
 
 }

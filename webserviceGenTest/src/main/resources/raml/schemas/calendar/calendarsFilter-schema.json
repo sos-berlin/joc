@@ -14,7 +14,19 @@
     "calendars": {
       "type": "array",
       "items": {
-        "$ref": "../common/path-schema.json"
+        "type": "object",
+        "javaType": "com.sos.joc.model.calendar.CalendarPath",
+        "required": [
+          "calendar"
+        ],
+        "properties": {
+          "calendar": {
+            "$ref": "../common/path-schema.json"
+          },
+          "category": {
+            "type": "string"
+          }
+        }
       }
     },
     "compact": {

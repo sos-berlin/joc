@@ -13,7 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * monthdays
+ * DaysOfMonth for MonthDays or Ultimos
  * <p>
  * 
  * 
@@ -24,9 +24,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "from",
     "to",
     "days",
-    "weekdays"
+    "workingDays",
+    "weeklyDays"
 })
-public class Monthdays {
+public class MonthDays {
 
     /**
      * date
@@ -45,9 +46,11 @@ public class Monthdays {
     @JsonProperty("to")
     private String to;
     @JsonProperty("days")
-    private List<String> days = new ArrayList<String>();
-    @JsonProperty("weekdays")
-    private List<WhichDay> weekdays = new ArrayList<WhichDay>();
+    private List<Integer> days = new ArrayList<Integer>();
+    @JsonProperty("workingDays")
+    private List<Integer> workingDays = new ArrayList<Integer>();
+    @JsonProperty("weeklyDays")
+    private List<WeeklyDay> weeklyDays = new ArrayList<WeeklyDay>();
 
     /**
      * date
@@ -107,7 +110,7 @@ public class Monthdays {
      *     The days
      */
     @JsonProperty("days")
-    public List<String> getDays() {
+    public List<Integer> getDays() {
         return days;
     }
 
@@ -117,28 +120,48 @@ public class Monthdays {
      *     The days
      */
     @JsonProperty("days")
-    public void setDays(List<String> days) {
+    public void setDays(List<Integer> days) {
         this.days = days;
     }
 
     /**
      * 
      * @return
-     *     The weekdays
+     *     The workingDays
      */
-    @JsonProperty("weekdays")
-    public List<WhichDay> getWeekdays() {
-        return weekdays;
+    @JsonProperty("workingDays")
+    public List<Integer> getWorkingDays() {
+        return workingDays;
     }
 
     /**
      * 
-     * @param weekdays
-     *     The weekdays
+     * @param workingDays
+     *     The workingDays
      */
-    @JsonProperty("weekdays")
-    public void setWeekdays(List<WhichDay> weekdays) {
-        this.weekdays = weekdays;
+    @JsonProperty("workingDays")
+    public void setWorkingDays(List<Integer> workingDays) {
+        this.workingDays = workingDays;
+    }
+
+    /**
+     * 
+     * @return
+     *     The weeklyDays
+     */
+    @JsonProperty("weeklyDays")
+    public List<WeeklyDay> getWeeklyDays() {
+        return weeklyDays;
+    }
+
+    /**
+     * 
+     * @param weeklyDays
+     *     The weeklyDays
+     */
+    @JsonProperty("weeklyDays")
+    public void setWeeklyDays(List<WeeklyDay> weeklyDays) {
+        this.weeklyDays = weeklyDays;
     }
 
     @Override
@@ -148,7 +171,7 @@ public class Monthdays {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(from).append(to).append(days).append(weekdays).toHashCode();
+        return new HashCodeBuilder().append(from).append(to).append(days).append(workingDays).append(weeklyDays).toHashCode();
     }
 
     @Override
@@ -156,11 +179,11 @@ public class Monthdays {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Monthdays) == false) {
+        if ((other instanceof MonthDays) == false) {
             return false;
         }
-        Monthdays rhs = ((Monthdays) other);
-        return new EqualsBuilder().append(from, rhs.from).append(to, rhs.to).append(days, rhs.days).append(weekdays, rhs.weekdays).isEquals();
+        MonthDays rhs = ((MonthDays) other);
+        return new EqualsBuilder().append(from, rhs.from).append(to, rhs.to).append(days, rhs.days).append(workingDays, rhs.workingDays).append(weeklyDays, rhs.weeklyDays).isEquals();
     }
 
 }

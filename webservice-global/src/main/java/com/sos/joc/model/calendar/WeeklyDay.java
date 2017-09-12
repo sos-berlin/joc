@@ -9,76 +9,69 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/**
- * whichday
- * <p>
- * 
- * 
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "day",
-    "which"
+    "weekOfMonth"
 })
-public class WhichDay {
+public class WeeklyDay {
 
     /**
-     * day number
+     * dayOfWeek number
      * <p>
-     *  0-7 repeatable
+     * digit from 0-7, 0=Sunday, 1=Monday, ..., 6=Saturday, 7=Sunday
      * 
      */
     @JsonProperty("day")
-    private String day;
-    @JsonProperty("which")
-    private Integer which;
+    private Integer day;
+    @JsonProperty("weekOfMonth")
+    private Integer weekOfMonth;
 
     /**
-     * day number
+     * dayOfWeek number
      * <p>
-     *  0-7 repeatable
+     * digit from 0-7, 0=Sunday, 1=Monday, ..., 6=Saturday, 7=Sunday
      * 
      * @return
      *     The day
      */
     @JsonProperty("day")
-    public String getDay() {
+    public Integer getDay() {
         return day;
     }
 
     /**
-     * day number
+     * dayOfWeek number
      * <p>
-     *  0-7 repeatable
+     * digit from 0-7, 0=Sunday, 1=Monday, ..., 6=Saturday, 7=Sunday
      * 
      * @param day
      *     The day
      */
     @JsonProperty("day")
-    public void setDay(String day) {
+    public void setDay(Integer day) {
         this.day = day;
     }
 
     /**
      * 
      * @return
-     *     The which
+     *     The weekOfMonth
      */
-    @JsonProperty("which")
-    public Integer getWhich() {
-        return which;
+    @JsonProperty("weekOfMonth")
+    public Integer getWeekOfMonth() {
+        return weekOfMonth;
     }
 
     /**
      * 
-     * @param which
-     *     The which
+     * @param weekOfMonth
+     *     The weekOfMonth
      */
-    @JsonProperty("which")
-    public void setWhich(Integer which) {
-        this.which = which;
+    @JsonProperty("weekOfMonth")
+    public void setWeekOfMonth(Integer weekOfMonth) {
+        this.weekOfMonth = weekOfMonth;
     }
 
     @Override
@@ -88,7 +81,7 @@ public class WhichDay {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(day).append(which).toHashCode();
+        return new HashCodeBuilder().append(day).append(weekOfMonth).toHashCode();
     }
 
     @Override
@@ -96,11 +89,11 @@ public class WhichDay {
         if (other == this) {
             return true;
         }
-        if ((other instanceof WhichDay) == false) {
+        if ((other instanceof WeeklyDay) == false) {
             return false;
         }
-        WhichDay rhs = ((WhichDay) other);
-        return new EqualsBuilder().append(day, rhs.day).append(which, rhs.which).isEquals();
+        WeeklyDay rhs = ((WeeklyDay) other);
+        return new EqualsBuilder().append(day, rhs.day).append(weekOfMonth, rhs.weekOfMonth).isEquals();
     }
 
 }

@@ -1875,7 +1875,7 @@ traits:
       description8: " "
       description9: " "
       description10: " "
-      description200: " "
+      description200: !include documentation/calendar/calendar.md
       schema: !include schemas/calendar/calendarsFilter-schema.json
       schema200: !include schemas/calendar/calendars-schema.json
       example: " "
@@ -1885,21 +1885,61 @@ traits:
   type:
     postJSON:
       description: Sends calendar
-      description1: !include documentation/common/compact.md
+      description1: " "
       description2: " "
       description3: !include documentation/calendar/calendarRequired.md
-      description4: " "
+      description4: !include documentation/calendar/category.md
       description5: " "
       description6: " "
       description7: " "
       description8: " "
       description9: " "
       description10: " "
-      description200: " "
+      description200: !include documentation/calendar/calendar.md
       schema: !include schemas/calendar/calendarFilter-schema.json
       schema200: !include schemas/calendar/calendar200-schema.json
       example: " "
       example200: " "
+      
+  /categories:
+    type:
+      postJSON:
+        description: Sends categories
+        description1: " "
+        description2: " "
+        description3: !include documentation/calendar/calendarRequired.md
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/calendar/calendarFilter-schema.json
+        schema200: !include schemas/calendar/categories-schema.json
+        example: " "
+        example200: " "
+        
+  /dates:
+    type:
+      postJSON:
+        description: Sends dates of a calendar
+        description1: " "
+        description2: " "
+        description3: !include documentation/calendar/calendarRequired.md
+        description4: !include documentation/calendar/category.md
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/calendar/calendarFilter-schema.json
+        schema200: !include schemas/calendar/dates-schema.json
+        example: " "
+        example200: " "
       
   /store:
     type:

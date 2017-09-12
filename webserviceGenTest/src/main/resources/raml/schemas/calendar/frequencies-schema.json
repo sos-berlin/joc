@@ -23,27 +23,33 @@
       }
     },
     "weekdays": {
-      "$ref": "weekdays-schema.json"
+      "type": "array",
+      "items": {
+        "$ref": "weekDays-schema.json"
+      }
+    },
+    "monthdays": {
+      "type": "array",
+      "items": {
+        "$ref": "monthDays-schema.json"
+      }
     },
     "ultimos": {
       "type": "array",
       "items": {
-        "$ref": "ultimo-schema.json"
+        "$ref": "monthDays-schema.json"
       }
-    },
-    "monthdays": {
-      "$ref": "monthdays-schema.json"
     },
     "months": {
       "type": "array",
       "items": {
-        "$ref": "month-schema.json"
+        "$ref": "months-schema.json"
       }
     },
     "holidays": {
       "type": "array",
       "items": {
-        "$ref": "holiday-schema.json"
+        "$ref": "holidays-schema.json"
       }
     },
     "intervals": {

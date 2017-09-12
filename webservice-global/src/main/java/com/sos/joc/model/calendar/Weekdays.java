@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "to",
     "days"
 })
-public class Weekdays {
+public class WeekDays {
 
     /**
      * date
@@ -44,7 +44,7 @@ public class Weekdays {
     @JsonProperty("to")
     private String to;
     @JsonProperty("days")
-    private List<String> days = new ArrayList<String>();
+    private List<Integer> days = new ArrayList<Integer>();
 
     /**
      * date
@@ -104,7 +104,7 @@ public class Weekdays {
      *     The days
      */
     @JsonProperty("days")
-    public List<String> getDays() {
+    public List<Integer> getDays() {
         return days;
     }
 
@@ -114,7 +114,7 @@ public class Weekdays {
      *     The days
      */
     @JsonProperty("days")
-    public void setDays(List<String> days) {
+    public void setDays(List<Integer> days) {
         this.days = days;
     }
 
@@ -133,10 +133,10 @@ public class Weekdays {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Weekdays) == false) {
+        if ((other instanceof WeekDays) == false) {
             return false;
         }
-        Weekdays rhs = ((Weekdays) other);
+        WeekDays rhs = ((WeekDays) other);
         return new EqualsBuilder().append(from, rhs.from).append(to, rhs.to).append(days, rhs.days).isEquals();
     }
 
