@@ -8,21 +8,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @Generated("org.jsonschema2pojo")
-public enum DateEntity {
+public enum RepetitionText {
 
     DAILY("DAILY"),
     WEEKLY("WEEKLY"),
     MONTHLY("MONTHLY");
     private final String value;
-    private final static Map<String, DateEntity> CONSTANTS = new HashMap<String, DateEntity>();
+    private final static Map<String, RepetitionText> CONSTANTS = new HashMap<String, RepetitionText>();
 
     static {
-        for (DateEntity c: values()) {
+        for (RepetitionText c: values()) {
             CONSTANTS.put(c.value, c);
         }
     }
 
-    private DateEntity(String value) {
+    private RepetitionText(String value) {
         this.value = value;
     }
 
@@ -33,8 +33,8 @@ public enum DateEntity {
     }
 
     @JsonCreator
-    public static DateEntity fromValue(String value) {
-        DateEntity constant = CONSTANTS.get(value);
+    public static RepetitionText fromValue(String value) {
+        RepetitionText constant = CONSTANTS.get(value);
         if (constant == null) {
             throw new IllegalArgumentException(value);
         } else {

@@ -28,7 +28,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "ultimos",
     "months",
     "holidays",
-    "intervals"
+    "repetitions"
 })
 public class Frequencies {
 
@@ -51,8 +51,8 @@ public class Frequencies {
     private List<Months> months = new ArrayList<Months>();
     @JsonProperty("holidays")
     private List<Holidays> holidays = new ArrayList<Holidays>();
-    @JsonProperty("intervals")
-    private List<Every> intervals = new ArrayList<Every>();
+    @JsonProperty("repetitions")
+    private List<Repetition> repetitions = new ArrayList<Repetition>();
 
     /**
      * 
@@ -201,21 +201,21 @@ public class Frequencies {
     /**
      * 
      * @return
-     *     The intervals
+     *     The repetitions
      */
-    @JsonProperty("intervals")
-    public List<Every> getIntervals() {
-        return intervals;
+    @JsonProperty("repetitions")
+    public List<Repetition> getRepetitions() {
+        return repetitions;
     }
 
     /**
      * 
-     * @param intervals
-     *     The intervals
+     * @param repetitions
+     *     The repetitions
      */
-    @JsonProperty("intervals")
-    public void setIntervals(List<Every> intervals) {
-        this.intervals = intervals;
+    @JsonProperty("repetitions")
+    public void setRepetitions(List<Repetition> repetitions) {
+        this.repetitions = repetitions;
     }
 
     @Override
@@ -225,7 +225,7 @@ public class Frequencies {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(mode).append(dates).append(weekdays).append(monthdays).append(ultimos).append(months).append(holidays).append(intervals).toHashCode();
+        return new HashCodeBuilder().append(mode).append(dates).append(weekdays).append(monthdays).append(ultimos).append(months).append(holidays).append(repetitions).toHashCode();
     }
 
     @Override
@@ -237,7 +237,7 @@ public class Frequencies {
             return false;
         }
         Frequencies rhs = ((Frequencies) other);
-        return new EqualsBuilder().append(mode, rhs.mode).append(dates, rhs.dates).append(weekdays, rhs.weekdays).append(monthdays, rhs.monthdays).append(ultimos, rhs.ultimos).append(months, rhs.months).append(holidays, rhs.holidays).append(intervals, rhs.intervals).isEquals();
+        return new EqualsBuilder().append(mode, rhs.mode).append(dates, rhs.dates).append(weekdays, rhs.weekdays).append(monthdays, rhs.monthdays).append(ultimos, rhs.ultimos).append(months, rhs.months).append(holidays, rhs.holidays).append(repetitions, rhs.repetitions).isEquals();
     }
 
 }

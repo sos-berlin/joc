@@ -21,10 +21,10 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "from",
     "to",
-    "dateEntity",
-    "interval"
+    "repetition",
+    "step"
 })
-public class Every {
+public class Repetition {
 
     /**
      * date
@@ -42,21 +42,16 @@ public class Every {
      */
     @JsonProperty("to")
     private String to;
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("dateEntity")
-    private DateEntity dateEntity;
+    @JsonProperty("repetition")
+    private RepetitionText repetition;
     /**
      * non negative integer
      * <p>
      * 
      * 
      */
-    @JsonProperty("interval")
-    private Integer interval;
+    @JsonProperty("step")
+    private Integer step;
 
     /**
      * date
@@ -112,26 +107,22 @@ public class Every {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
-     *     The dateEntity
+     *     The repetition
      */
-    @JsonProperty("dateEntity")
-    public DateEntity getDateEntity() {
-        return dateEntity;
+    @JsonProperty("repetition")
+    public RepetitionText getRepetition() {
+        return repetition;
     }
 
     /**
      * 
-     * (Required)
-     * 
-     * @param dateEntity
-     *     The dateEntity
+     * @param repetition
+     *     The repetition
      */
-    @JsonProperty("dateEntity")
-    public void setDateEntity(DateEntity dateEntity) {
-        this.dateEntity = dateEntity;
+    @JsonProperty("repetition")
+    public void setRepetition(RepetitionText repetition) {
+        this.repetition = repetition;
     }
 
     /**
@@ -140,11 +131,11 @@ public class Every {
      * 
      * 
      * @return
-     *     The interval
+     *     The step
      */
-    @JsonProperty("interval")
-    public Integer getInterval() {
-        return interval;
+    @JsonProperty("step")
+    public Integer getStep() {
+        return step;
     }
 
     /**
@@ -152,12 +143,12 @@ public class Every {
      * <p>
      * 
      * 
-     * @param interval
-     *     The interval
+     * @param step
+     *     The step
      */
-    @JsonProperty("interval")
-    public void setInterval(Integer interval) {
-        this.interval = interval;
+    @JsonProperty("step")
+    public void setStep(Integer step) {
+        this.step = step;
     }
 
     @Override
@@ -167,7 +158,7 @@ public class Every {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(from).append(to).append(dateEntity).append(interval).toHashCode();
+        return new HashCodeBuilder().append(from).append(to).append(repetition).append(step).toHashCode();
     }
 
     @Override
@@ -175,11 +166,11 @@ public class Every {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Every) == false) {
+        if ((other instanceof Repetition) == false) {
             return false;
         }
-        Every rhs = ((Every) other);
-        return new EqualsBuilder().append(from, rhs.from).append(to, rhs.to).append(dateEntity, rhs.dateEntity).append(interval, rhs.interval).isEquals();
+        Repetition rhs = ((Repetition) other);
+        return new EqualsBuilder().append(from, rhs.from).append(to, rhs.to).append(repetition, rhs.repetition).append(step, rhs.step).isEquals();
     }
 
 }

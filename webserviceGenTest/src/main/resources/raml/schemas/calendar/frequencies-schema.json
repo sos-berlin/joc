@@ -52,7 +52,7 @@
         "$ref": "holidays-schema.json"
       }
     },
-    "intervals": {
+    "repetitions": {
       "type": "array",
       "items": {
         "$ref": "every-schema.json"

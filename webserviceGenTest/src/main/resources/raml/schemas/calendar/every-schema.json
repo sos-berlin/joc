@@ -2,7 +2,7 @@
   "title": "every",
   "id": "schemas/calendar/every",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.calendar.Every",
+  "javaType": "com.sos.joc.model.calendar.Repetition",
   "type": "object",
   "required": [
     "dateEntity"
@@ -14,8 +14,8 @@
     "to": {
       "$ref": "../common/date-schema.json"
     },
-    "dateEntity": {
-      "javaType": "com.sos.joc.model.calendar.DateEntity",
+    "repetition": {
+      "javaType": "com.sos.joc.model.calendar.RepetitionText",
       "type": "string",
       "enum": [
         "DAILY",
@@ -23,7 +23,7 @@
         "MONTHLY"
       ]
     },
-    "interval": {
+    "step": {
       "$ref": "../common/nonNegativeInteger-schema.json"
     }
   }
