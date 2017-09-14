@@ -1,0 +1,2 @@
+<tr><td>``newCalendar``</td><td>required, string</td><td>New path of the calendar</td><td></td><td></td></tr>
+<tr><td>``newCategory``</td><td>required, string</td><td>New category of the calendar.</td><td></td><td></td></tr>

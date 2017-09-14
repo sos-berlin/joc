@@ -1,0 +1,12 @@
+{
+	"path": "path/to/myCalendar",
+	"category": "",
+	"title": "every Monday and Tuesday",
+	"includes": {
+		"weekdays": [{
+			"from": "",
+			"to": "",
+			"days": [1,2]
+		}]
+	}
+}

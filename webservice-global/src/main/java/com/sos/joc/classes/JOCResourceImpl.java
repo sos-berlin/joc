@@ -161,6 +161,13 @@ public class JOCResourceImpl {
         }
         return true;
     }
+    
+    public boolean checkLazyRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
+        if (paramVal == null) {
+            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+        }
+        return true;
+    }
 
     public boolean checkRequiredParameter(String paramKey, Long paramVal) throws JocMissingRequiredParameterException {
         if (paramVal == null) {

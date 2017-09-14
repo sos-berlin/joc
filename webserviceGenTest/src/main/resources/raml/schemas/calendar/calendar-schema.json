@@ -6,7 +6,6 @@
   "type": "object",
   "required": [
     "path",
-    "name",
     "category"
   ],
   "properties": {
@@ -17,6 +16,9 @@
       "type": "string"
     },
     "category": {
+      "type": "string"
+    },
+    "title": {
       "type": "string"
     },
     "includes": {

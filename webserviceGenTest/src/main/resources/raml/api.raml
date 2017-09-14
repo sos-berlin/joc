@@ -1896,7 +1896,7 @@ traits:
       description200: !include documentation/calendar/calendar.md
       schema: !include schemas/calendar/calendarFilter-schema.json
       schema200: !include schemas/calendar/calendar200-schema.json
-      example: " "
+      example: !include examples/calendar/calendar-example.json
       example200: " "
       
   /categories:
@@ -1910,7 +1910,7 @@ traits:
         description200: " "
         schema: !include schemas/calendar/calendarFilter-schema.json
         schema200: !include schemas/calendar/categories-schema.json
-        example: " "
+        example: !include examples/calendar/calendar-example.json
         example200: " "
         
   /dates:
@@ -1924,14 +1924,30 @@ traits:
         description200: " "
         schema: !include schemas/calendar/calendarFilter-schema.json
         schema200: !include schemas/calendar/dates-schema.json
-        example: " "
+        example: !include examples/calendar/calendar-example.json
         example200: " "
       
   /store:
     type:
       postCalendarWithOkResponse:
         description: Stores calendar
+        description1: !include documentation/calendar/calendarObj.md
+        description2: " "
+        description3: " "
+        description4: " "
         schema: !include schemas/calendar/calendarStoreFilter-schema.json
         audit: !include documentation/audit/auditLog.md
-        example: " "
+        example: !include examples/calendar/calendarObj-example.json
+  
+  /move:
+    type:
+      postCalendarWithOkResponse:
+        description: Moves calendar
+        description1: !include documentation/calendar/calendarRequired.md
+        description2: !include documentation/calendar/category.md
+        description3: !include documentation/calendar/calendarNewRequired.md
+        description4: " "
+        schema: !include schemas/calendar/calendarMoveFilter-schema.json
+        audit: !include documentation/audit/auditLog.md
+        example: !include examples/calendar/calendarMove-example.json
      

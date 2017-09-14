@@ -22,6 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "path",
     "name",
     "category",
+    "title",
     "includes",
     "excludes"
 })
@@ -36,11 +37,6 @@ public class Calendar {
      */
     @JsonProperty("path")
     private String path;
-    /**
-     * 
-     * (Required)
-     * 
-     */
     @JsonProperty("name")
     private String name;
     /**
@@ -50,6 +46,8 @@ public class Calendar {
      */
     @JsonProperty("category")
     private String category;
+    @JsonProperty("title")
+    private String title;
     /**
      * frequencies
      * <p>
@@ -97,8 +95,6 @@ public class Calendar {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
      *     The name
      */
@@ -108,8 +104,6 @@ public class Calendar {
     }
 
     /**
-     * 
-     * (Required)
      * 
      * @param name
      *     The name
@@ -141,6 +135,26 @@ public class Calendar {
     @JsonProperty("category")
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    /**
+     * 
+     * @return
+     *     The title
+     */
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * 
+     * @param title
+     *     The title
+     */
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     /**
@@ -202,7 +216,7 @@ public class Calendar {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(name).append(category).append(includes).append(excludes).toHashCode();
+        return new HashCodeBuilder().append(path).append(name).append(category).append(title).append(includes).append(excludes).toHashCode();
     }
 
     @Override
@@ -214,7 +228,7 @@ public class Calendar {
             return false;
         }
         Calendar rhs = ((Calendar) other);
-        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(category, rhs.category).append(includes, rhs.includes).append(excludes, rhs.excludes).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(category, rhs.category).append(title, rhs.title).append(includes, rhs.includes).append(excludes, rhs.excludes).isEquals();
     }
 
 }
