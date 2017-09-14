@@ -5,15 +5,14 @@
   "javaType": "com.sos.joc.model.calendar.CalendarStoreFilter",
   "type": "object",
   "required": [
-    "jobschedulerId",
     "calendar"
   ],
   "properties": {
-    "jobschedulerId": {
-      "type": "string"
-    },
     "calendar": {
       "$ref": "calendar-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
     }
   }
 }

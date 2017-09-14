@@ -5,4 +5,5 @@ It depends on the parameter ``compact``.
     * name
     * category
 * The detailed view has the following field in addition to the compact view
-    * frequencies
+    * includes
+    * excludes

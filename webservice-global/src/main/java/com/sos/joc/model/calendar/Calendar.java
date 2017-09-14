@@ -22,7 +22,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "path",
     "name",
     "category",
-    "frequencies"
+    "includes",
+    "excludes"
 })
 public class Calendar {
 
@@ -55,8 +56,16 @@ public class Calendar {
      * 
      * 
      */
-    @JsonProperty("frequencies")
-    private Frequencies frequencies;
+    @JsonProperty("includes")
+    private Frequencies includes;
+    /**
+     * frequencies
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("excludes")
+    private Frequencies excludes;
 
     /**
      * path
@@ -140,11 +149,11 @@ public class Calendar {
      * 
      * 
      * @return
-     *     The frequencies
+     *     The includes
      */
-    @JsonProperty("frequencies")
-    public Frequencies getFrequencies() {
-        return frequencies;
+    @JsonProperty("includes")
+    public Frequencies getIncludes() {
+        return includes;
     }
 
     /**
@@ -152,12 +161,38 @@ public class Calendar {
      * <p>
      * 
      * 
-     * @param frequencies
-     *     The frequencies
+     * @param includes
+     *     The includes
      */
-    @JsonProperty("frequencies")
-    public void setFrequencies(Frequencies frequencies) {
-        this.frequencies = frequencies;
+    @JsonProperty("includes")
+    public void setIncludes(Frequencies includes) {
+        this.includes = includes;
+    }
+
+    /**
+     * frequencies
+     * <p>
+     * 
+     * 
+     * @return
+     *     The excludes
+     */
+    @JsonProperty("excludes")
+    public Frequencies getExcludes() {
+        return excludes;
+    }
+
+    /**
+     * frequencies
+     * <p>
+     * 
+     * 
+     * @param excludes
+     *     The excludes
+     */
+    @JsonProperty("excludes")
+    public void setExcludes(Frequencies excludes) {
+        this.excludes = excludes;
     }
 
     @Override
@@ -167,7 +202,7 @@ public class Calendar {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(name).append(category).append(frequencies).toHashCode();
+        return new HashCodeBuilder().append(path).append(name).append(category).append(includes).append(excludes).toHashCode();
     }
 
     @Override
@@ -179,7 +214,7 @@ public class Calendar {
             return false;
         }
         Calendar rhs = ((Calendar) other);
-        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(category, rhs.category).append(frequencies, rhs.frequencies).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(category, rhs.category).append(includes, rhs.includes).append(excludes, rhs.excludes).isEquals();
     }
 
 }

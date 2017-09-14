@@ -19,7 +19,10 @@
     "category": {
       "type": "string"
     },
-    "frequencies": {
+    "includes": {
+      "$ref": "frequencies-schema.json"
+    },
+    "excludes": {
       "$ref": "frequencies-schema.json"
     }
   }

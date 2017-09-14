@@ -1,7 +1,6 @@
 
 package com.sos.joc.model.calendar;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Generated;
@@ -63,7 +62,7 @@ public class Dates {
      * 
      */
     @JsonProperty("dates")
-    private List<String> dates = new ArrayList<String>();
+    private List<String> dates = null;
 
     /**
      * delivery date

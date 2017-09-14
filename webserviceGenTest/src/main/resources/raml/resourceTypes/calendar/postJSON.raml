@@ -15,25 +15,26 @@ post:
     <thead>
     <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
     </thead><tbody>
-    <tr><td>``calendar``</td><td>required, object</td><td>Calendar object</td><td>scheduler</td><td></td></tr>
-    <<audit>>
+    <<description1>>
+    <<description2>>
+    <<description3>>
+    <<description4>>
     </tbody></table>
+
   body:
     application/json:
       schema: <<schema>>
       example: <<example>>
   responses:
     200:
-      description: |
-        **Confirm <span style="text-transform: capitalize;"><<resourcePathName>></span> successfully**
+      description: <<description200>>
       body:
         application/json:
-          example: |
-            {
-              "deliveryDate":"2016-05-05T21:13:35Z",
-              "ok":true
-            }
-          schema: ok
-#    419:
-#      body:
-#        application/json:
+          schema: <<schema200>>
+          example: <<example200>>
+    420:
+      body:
+        application/json:
+    440:
+      body:
+        application/json:

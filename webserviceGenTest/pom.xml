@@ -163,9 +163,27 @@
 									</includes>
                             		<excludes>
 										<exclude>user/*.json</exclude>
+										<exclude>calendar/*.json</exclude>
 										<exclude>yadeClient/*.json</exclude>
-										<!-- exclude>calendar/*.json</exclude-->
 									</excludes>
+								</configuration>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>generate-calendar-model</id>
+								<configuration>
+									<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
+									<targetPackage>com.sos.joc.model</targetPackage>
+									<removeOldOutput>false</removeOldOutput>
+									<annotationStyle>jackson2</annotationStyle>
+									<propertyWordDelimiters>- </propertyWordDelimiters>
+									<includeAdditionalProperties>false</includeAdditionalProperties>
+									<initializeCollections>false</initializeCollections>
+									<includes>
+										<include>calendar/*.json</include>
+									</includes>
 								</configuration>
 								<goals>
 									<goal>generate</goal>

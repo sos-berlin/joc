@@ -1,7 +1,6 @@
 
 package com.sos.joc.model.calendar;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -46,11 +45,11 @@ public class MonthDays {
     @JsonProperty("to")
     private String to;
     @JsonProperty("days")
-    private List<Integer> days = new ArrayList<Integer>();
+    private List<Integer> days = null;
     @JsonProperty("workingDays")
-    private List<Integer> workingDays = new ArrayList<Integer>();
+    private List<Integer> workingDays = null;
     @JsonProperty("weeklyDays")
-    private List<WeeklyDay> weeklyDays = new ArrayList<WeeklyDay>();
+    private List<WeeklyDay> weeklyDays = null;
 
     /**
      * date

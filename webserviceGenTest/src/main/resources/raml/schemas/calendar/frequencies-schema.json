@@ -4,18 +4,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.Frequencies",
   "type": "object",
-  "required": [
-    "mode"
-  ],
   "properties": {
-    "mode": {
-      "type": "string",
-      "javaType": "com.sos.joc.model.calendar.FrequencyMode",
-      "enum": [
-        "INCLUDE",
-        "EXCLUDE"
-      ]
-    },
     "dates": {
       "type": "array",
       "items": {

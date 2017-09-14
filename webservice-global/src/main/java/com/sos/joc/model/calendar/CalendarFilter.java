@@ -19,19 +19,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "jobschedulerId",
     "calendar",
     "category"
 })
 public class CalendarFilter {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("jobschedulerId")
-    private String jobschedulerId;
     /**
      * path
      * <p>
@@ -43,30 +35,6 @@ public class CalendarFilter {
     private String calendar;
     @JsonProperty("category")
     private String category;
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The jobschedulerId
-     */
-    @JsonProperty("jobschedulerId")
-    public String getJobschedulerId() {
-        return jobschedulerId;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param jobschedulerId
-     *     The jobschedulerId
-     */
-    @JsonProperty("jobschedulerId")
-    public void setJobschedulerId(String jobschedulerId) {
-        this.jobschedulerId = jobschedulerId;
-    }
 
     /**
      * path
@@ -123,7 +91,7 @@ public class CalendarFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(calendar).append(category).toHashCode();
+        return new HashCodeBuilder().append(calendar).append(category).toHashCode();
     }
 
     @Override
@@ -135,7 +103,7 @@ public class CalendarFilter {
             return false;
         }
         CalendarFilter rhs = ((CalendarFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(calendar, rhs.calendar).append(category, rhs.category).isEquals();
+        return new EqualsBuilder().append(calendar, rhs.calendar).append(category, rhs.category).isEquals();
     }
 
 }

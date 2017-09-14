@@ -1,7 +1,6 @@
 
 package com.sos.joc.model.calendar;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,7 +20,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "mode",
     "dates",
     "weekdays",
     "monthdays",
@@ -32,51 +30,20 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class Frequencies {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("mode")
-    private FrequencyMode mode;
     @JsonProperty("dates")
-    private List<String> dates = new ArrayList<String>();
+    private List<String> dates = null;
     @JsonProperty("weekdays")
-    private List<WeekDays> weekdays = new ArrayList<WeekDays>();
+    private List<WeekDays> weekdays = null;
     @JsonProperty("monthdays")
-    private List<MonthDays> monthdays = new ArrayList<MonthDays>();
+    private List<MonthDays> monthdays = null;
     @JsonProperty("ultimos")
-    private List<MonthDays> ultimos = new ArrayList<MonthDays>();
+    private List<MonthDays> ultimos = null;
     @JsonProperty("months")
-    private List<Months> months = new ArrayList<Months>();
+    private List<Months> months = null;
     @JsonProperty("holidays")
-    private List<Holidays> holidays = new ArrayList<Holidays>();
+    private List<Holidays> holidays = null;
     @JsonProperty("repetitions")
-    private List<Repetition> repetitions = new ArrayList<Repetition>();
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The mode
-     */
-    @JsonProperty("mode")
-    public FrequencyMode getMode() {
-        return mode;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param mode
-     *     The mode
-     */
-    @JsonProperty("mode")
-    public void setMode(FrequencyMode mode) {
-        this.mode = mode;
-    }
+    private List<Repetition> repetitions = null;
 
     /**
      * 
@@ -225,7 +192,7 @@ public class Frequencies {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(mode).append(dates).append(weekdays).append(monthdays).append(ultimos).append(months).append(holidays).append(repetitions).toHashCode();
+        return new HashCodeBuilder().append(dates).append(weekdays).append(monthdays).append(ultimos).append(months).append(holidays).append(repetitions).toHashCode();
     }
 
     @Override
@@ -237,7 +204,7 @@ public class Frequencies {
             return false;
         }
         Frequencies rhs = ((Frequencies) other);
-        return new EqualsBuilder().append(mode, rhs.mode).append(dates, rhs.dates).append(weekdays, rhs.weekdays).append(monthdays, rhs.monthdays).append(ultimos, rhs.ultimos).append(months, rhs.months).append(holidays, rhs.holidays).append(repetitions, rhs.repetitions).isEquals();
+        return new EqualsBuilder().append(dates, rhs.dates).append(weekdays, rhs.weekdays).append(monthdays, rhs.monthdays).append(ultimos, rhs.ultimos).append(months, rhs.months).append(holidays, rhs.holidays).append(repetitions, rhs.repetitions).isEquals();
     }
 
 }

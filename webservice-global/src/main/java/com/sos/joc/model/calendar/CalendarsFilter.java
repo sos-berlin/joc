@@ -1,12 +1,12 @@
 
 package com.sos.joc.model.calendar;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.common.Folder;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -22,23 +22,16 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "jobschedulerId",
     "calendars",
     "compact",
     "regex",
-    "folders"
+    "folders",
+    "auditLog"
 })
 public class CalendarsFilter {
 
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("jobschedulerId")
-    private String jobschedulerId;
     @JsonProperty("calendars")
-    private List<CalendarPath> calendars = new ArrayList<CalendarPath>();
+    private List<CalendarPath> calendars = null;
     /**
      * compact parameter
      * <p>
@@ -62,31 +55,15 @@ public class CalendarsFilter {
      * 
      */
     @JsonProperty("folders")
-    private List<Folder> folders = new ArrayList<Folder>();
-
+    private List<Folder> folders = null;
     /**
+     * auditParams
+     * <p>
      * 
-     * (Required)
      * 
-     * @return
-     *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerId")
-    public String getJobschedulerId() {
-        return jobschedulerId;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param jobschedulerId
-     *     The jobschedulerId
-     */
-    @JsonProperty("jobschedulerId")
-    public void setJobschedulerId(String jobschedulerId) {
-        this.jobschedulerId = jobschedulerId;
-    }
+    @JsonProperty("auditLog")
+    private AuditParams auditLog;
 
     /**
      * 
@@ -186,6 +163,32 @@ public class CalendarsFilter {
         this.folders = folders;
     }
 
+    /**
+     * auditParams
+     * <p>
+     * 
+     * 
+     * @return
+     *     The auditLog
+     */
+    @JsonProperty("auditLog")
+    public AuditParams getAuditLog() {
+        return auditLog;
+    }
+
+    /**
+     * auditParams
+     * <p>
+     * 
+     * 
+     * @param auditLog
+     *     The auditLog
+     */
+    @JsonProperty("auditLog")
+    public void setAuditLog(AuditParams auditLog) {
+        this.auditLog = auditLog;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -193,7 +196,7 @@ public class CalendarsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerId).append(calendars).append(compact).append(regex).append(folders).toHashCode();
+        return new HashCodeBuilder().append(calendars).append(compact).append(regex).append(folders).append(auditLog).toHashCode();
     }
 
     @Override
@@ -205,7 +208,7 @@ public class CalendarsFilter {
             return false;
         }
         CalendarsFilter rhs = ((CalendarsFilter) other);
-        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(calendars, rhs.calendars).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).isEquals();
+        return new EqualsBuilder().append(calendars, rhs.calendars).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

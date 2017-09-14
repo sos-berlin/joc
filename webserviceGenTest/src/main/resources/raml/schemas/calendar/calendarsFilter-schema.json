@@ -4,13 +4,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.CalendarsFilter",
   "type": "object",
-  "required": [
-    "jobschedulerId"
-  ],
   "properties": {
-    "jobschedulerId": {
-      "type": "string"
-    },
     "calendars": {
       "type": "array",
       "items": {
@@ -37,6 +31,9 @@
     },
     "folders": {
       "$ref": "../common/folders-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
     }
   }
 }
