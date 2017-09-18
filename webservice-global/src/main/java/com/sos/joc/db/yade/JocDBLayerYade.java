@@ -51,14 +51,15 @@ public class JocDBLayerYade extends DBLayer {
                 sql.append(" end < :to");
             }
             sql.append(")");
-            Query<Integer> query = getSession().createQuery(sql.toString());
+            // select count(*) returns Object of type Long, therefore Query has to have type Long also
+            Query<Long> query = getSession().createQuery(sql.toString());
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
             }
             if (to != null) {
                 query.setParameter("to", to, TemporalType.TIMESTAMP);
             }
-            return getSession().getSingleResult(query);
+            return getSession().getSingleResult(query).intValue();
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -89,14 +90,59 @@ public class JocDBLayerYade extends DBLayer {
                 sql.append(" end < :to");
             }
             sql.append(")");
-            Query<Integer> query = getSession().createQuery(sql.toString());
+            // select count(*) returns Object of type Long, therefore Query hasto have type Long also
+            Query<Long> query = getSession().createQuery(sql.toString());
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
             }
             if (to != null) {
                 query.setParameter("to", to, TemporalType.TIMESTAMP);
             }
-            return getSession().getSingleResult(query);
+            return getSession().getSingleResult(query).intValue();
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    // TODO: at the moment only state = 7 (TRANSFER_HAS_ERRORS) is checked
+    public List<DBItemYadeFiles> getFailedTransferredFiles (Long transferId)
+        throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ");
+            sql.append(DBItemYadeFiles.class.getSimpleName());
+            sql.append(" where state = 7");
+            sql.append(" and transferId = :transferId ");
+            Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
+            query.setParameter("transferId", transferId);
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<DBItemYadeFiles> getFilesById (List<Long> fileIds) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ");
+            sql.append(DBItemYadeFiles.class.getSimpleName());
+            sql.append(" where id in (");
+            boolean first = true;
+            for (Long id : fileIds) {
+              if (first) {
+                sql.append(id);
+                first = false;
+              } else {
+                sql.append(", ").append(id);
+              }
+            }
+            sql.append(")");
+            Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
+            return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -140,135 +186,148 @@ public class JocDBLayerYade extends DBLayer {
                     throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             boolean anotherValueAlreadySet = false;
+            boolean hasFilter = (
+                    (operations != null && !operations.isEmpty()) || 
+                    (states != null && !states.isEmpty()) || 
+                    mandator != null || 
+                    (sources != null && !sources.isEmpty()) || 
+                    (targets != null && !targets.isEmpty()) ||
+                    isIntervention != null || 
+                    hasInterventions != null || 
+                    (profiles != null && !profiles.isEmpty()) || 
+                    dateFrom != null || 
+                    dateTo != null);
             StringBuilder sql = new StringBuilder();
             sql.append("select yt from ");
             sql.append(DBItemYadeTransfers.class.getSimpleName()).append(" yt,");
             sql.append(DBItemYadeProtocols.class.getSimpleName()).append(" yp");
-            sql.append(" where");
-            if (operations != null && !operations.isEmpty()) {
-                sql.append(" yt.operation in (");
-                boolean first = true;
-                for (Operation operation : operations) {
-                    if(first) {
-                        sql.append(operation.toString());
-                        first = false;
-                    } else {
-                        sql.append(",").append(operation.toString());
+            if (hasFilter) {
+                sql.append(" where");
+                if (operations != null && !operations.isEmpty()) {
+                    sql.append(" yt.operation in (");
+                    boolean first = true;
+                    for (Operation operation : operations) {
+                        if (first) {
+                            sql.append(operation.toString());
+                            first = false;
+                        } else {
+                            sql.append(",").append(operation.toString());
+                        }
                     }
+                    sql.append(")");
+                    anotherValueAlreadySet = true;
                 }
-                sql.append(")");
-                anotherValueAlreadySet = true;
-            }
-            if(states != null && !states.isEmpty()) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
-                }
-                sql.append(" yt.state in (");
-                boolean first = true;
-                for (TransferStateText state : states) {
-                    if(first) {
-                        sql.append(state.toString());
-                        first = false;
-                    } else {
-                        sql.append(",").append(state.toString());
+                if (states != null && !states.isEmpty()) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
                     }
-                }
-                sql.append(")");
-                anotherValueAlreadySet = true;
-            }
-            if(mandator != null && !mandator.isEmpty()) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
-                }
-                sql.append(" yt.mandator = :mandator");
-                anotherValueAlreadySet = true;
-            }
-            if(sources != null && !sources.isEmpty()) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
-                }
-                boolean first = true;
-                sql.append(" yt.sourceProtocolId in (");
-                sql.append("select yp.id from yp");
-                sql.append(" where yp.hostname in (");
-                for (ProtocolFragment source : sources) {
-                    if (first) {
-                        sql.append(source.getHost());
-                        first = false;
-                    } else {
-                        sql.append(",").append(source.getHost());
+                    sql.append(" yt.state in (");
+                    boolean first = true;
+                    for (TransferStateText state : states) {
+                        if (first) {
+                            sql.append(state.toString());
+                            first = false;
+                        } else {
+                            sql.append(",").append(state.toString());
+                        }
                     }
+                    sql.append(")");
+                    anotherValueAlreadySet = true;
                 }
-                sql.append("))");
-                anotherValueAlreadySet = true;
-            }
-            if(targets != null && !targets.isEmpty()) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
-                }
-                boolean first = true;
-                sql.append(" yt.targetProtocolId in (");
-                sql.append("select yp.id from yp");
-                sql.append(" where yp.hostname in (");
-                for (ProtocolFragment source : sources) {
-                    if (first) {
-                        sql.append(source.getHost());
-                        first = false;
-                    } else {
-                        sql.append(",").append(source.getHost());
+                if (mandator != null && !mandator.isEmpty()) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
                     }
+                    sql.append(" yt.mandator = :mandator");
+                    anotherValueAlreadySet = true;
                 }
-                sql.append("))");
-                anotherValueAlreadySet = true;
-            }
-            if(isIntervention != null) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
-                }
-                if(isIntervention) {
-                    sql.append(" yt.parentTransferId != null");
-                } else {
-                    sql.append(" yt.parentTransferId == null");
-                }
-                anotherValueAlreadySet = true;
-            }
-            if(hasInterventions != null) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
-                }
-                sql.append(" yt.hasIntervention = :hasInterventions");
-                anotherValueAlreadySet = true;
-            }
-            if(profiles != null && !profiles.isEmpty()) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
-                }
-                sql.append(" yt.profileName in (");
-                boolean first = true;
-                for (String profile : profiles) {
-                    if(first) {
-                        sql.append(profile);
-                        first = false;
-                    } else {
-                        sql.append(",").append(profile);
+                if (sources != null && !sources.isEmpty()) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
                     }
+                    boolean first = true;
+                    sql.append(" yt.sourceProtocolId in (");
+                    sql.append("select yp.id from yp");
+                    sql.append(" where yp.hostname in (");
+                    for (ProtocolFragment source : sources) {
+                        if (first) {
+                            sql.append(source.getHost());
+                            first = false;
+                        } else {
+                            sql.append(",").append(source.getHost());
+                        }
+                    }
+                    sql.append("))");
+                    anotherValueAlreadySet = true;
                 }
-                sql.append(")");
-                anotherValueAlreadySet = true;
-            }
-            if(dateFrom != null) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
+                if (targets != null && !targets.isEmpty()) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
+                    }
+                    boolean first = true;
+                    sql.append(" yt.targetProtocolId in (");
+                    sql.append("select yp.id from yp");
+                    sql.append(" where yp.hostname in (");
+                    for (ProtocolFragment source : sources) {
+                        if (first) {
+                            sql.append(source.getHost());
+                            first = false;
+                        } else {
+                            sql.append(",").append(source.getHost());
+                        }
+                    }
+                    sql.append("))");
+                    anotherValueAlreadySet = true;
                 }
-                sql.append(" yt.start >= :dateFrom");
-                anotherValueAlreadySet = true;
-            }
-            if(dateTo != null) {
-                if(anotherValueAlreadySet) {
-                    sql.append(" and");
+                if (isIntervention != null) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
+                    }
+                    if (isIntervention) {
+                        sql.append(" yt.parentTransferId != null");
+                    } else {
+                        sql.append(" yt.parentTransferId == null");
+                    }
+                    anotherValueAlreadySet = true;
                 }
-                sql.append(" yt.end <= :dateTo");
-                anotherValueAlreadySet = true;
+                if (hasInterventions != null) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
+                    }
+                    sql.append(" yt.hasIntervention = :hasInterventions");
+                    anotherValueAlreadySet = true;
+                }
+                if (profiles != null && !profiles.isEmpty()) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
+                    }
+                    sql.append(" yt.profileName in (");
+                    boolean first = true;
+                    for (String profile : profiles) {
+                        if (first) {
+                            sql.append(profile);
+                            first = false;
+                        } else {
+                            sql.append(",").append(profile);
+                        }
+                    }
+                    sql.append(")");
+                    anotherValueAlreadySet = true;
+                }
+                if (dateFrom != null) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
+                    }
+                    sql.append(" yt.start >= :dateFrom");
+                    anotherValueAlreadySet = true;
+                }
+                if (dateTo != null) {
+                    if (anotherValueAlreadySet) {
+                        sql.append(" and");
+                    }
+                    sql.append(" yt.end <= :dateTo");
+                    anotherValueAlreadySet = true;
+                }
             }
             Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
             if(mandator != null && !mandator.isEmpty()) {
@@ -415,4 +474,21 @@ public class JocDBLayerYade extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+
+    public DBItemYadeTransfers getTransfer(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ");
+            sql.append(DBItemYadeTransfers.class.getSimpleName());
+            sql.append(" where id = :id");
+            Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
+            query.setParameter("id", id);
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
 }

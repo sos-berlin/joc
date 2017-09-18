@@ -38,7 +38,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
         SOSHibernateSession connection = null;
         try {
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, null, 
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, "", 
                     sosPermission.getYADE().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
