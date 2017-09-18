@@ -1,5 +1,5 @@
 
-package com.sos.joc.calendar.resource;
+package com.sos.joc.calendars.resource;
 
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;

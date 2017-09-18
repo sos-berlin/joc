@@ -15,7 +15,7 @@
       "$ref": "../common/compactParam-schema.json"
     },
     "type": {
-      "$ref": "calendarType-schema.json"
+      "type": "string"
     },
     "categories": {
       "type": "array",

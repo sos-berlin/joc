@@ -42,14 +42,8 @@ public class CalendarsFilter {
      */
     @JsonProperty("compact")
     private Boolean compact = false;
-    /**
-     * calendar type
-     * <p>
-     * 
-     * 
-     */
     @JsonProperty("type")
-    private CalendarType type;
+    private String type;
     @JsonProperty("categories")
     private List<String> categories = null;
     /**
@@ -124,28 +118,22 @@ public class CalendarsFilter {
     }
 
     /**
-     * calendar type
-     * <p>
-     * 
      * 
      * @return
      *     The type
      */
     @JsonProperty("type")
-    public CalendarType getType() {
+    public String getType() {
         return type;
     }
 
     /**
-     * calendar type
-     * <p>
-     * 
      * 
      * @param type
      *     The type
      */
     @JsonProperty("type")
-    public void setType(CalendarType type) {
+    public void setType(String type) {
         this.type = type;
     }
 

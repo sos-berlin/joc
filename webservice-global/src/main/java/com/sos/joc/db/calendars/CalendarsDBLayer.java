@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.query.Query;
 
@@ -109,6 +110,69 @@ public class CalendarsDBLayer extends DBLayer {
                 getSession().update(calendarDbItem);
             }
             return now;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<DBItemCalendar> getCalendars(Set<String> paths) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_CALENDARS);
+            if (paths != null && !paths.isEmpty()) {
+                if (paths.size() == 1) {
+                    sql.append(" where name = :name");
+                } else {
+                    sql.append(" where name in (:name)");
+                }
+            }
+            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
+            if (paths != null && !paths.isEmpty()) {
+                if (paths.size() == 1) {
+                    query.setParameter("name", paths.iterator().next());
+                } else {
+                    query.setParameterList("name", paths);
+                }
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<DBItemCalendar> getCalendars(String type, Set<String> categories, Set<String> folders) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_CALENDARS);
+            if (type != null) {
+                sql.append(" where type = :type"); 
+            } else {
+                sql.append(" where 1=1"); 
+            }
+            if (categories != null && !categories.isEmpty()) {
+                if (categories.size() == 1) {
+                    sql.append(" and category = :category");
+                } else {
+                    sql.append(" and category in (:category)");
+                }
+            }
+            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
+            if (type != null) {
+                query.setParameter("type", type); 
+            }
+            if (categories != null && !categories.isEmpty()) {
+                if (categories.size() == 1) {
+                    query.setParameter("category", categories.iterator().next());
+                } else {
+                    query.setParameterList("category", categories);
+                }
+            }
+            //TODO folders
+            return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
