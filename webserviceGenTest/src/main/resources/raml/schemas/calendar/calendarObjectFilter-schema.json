@@ -1,15 +1,15 @@
 {
-  "title": "calendarFilter",
-  "id": "schemas/calendar/calendarFilter",
+  "title": "calendarObjectFilter",
+  "id": "schemas/calendar/calendarObjectFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.calendar.CalendarStoreFilter",
+  "javaType": "com.sos.joc.model.calendar.CalendarObjectFilter",
   "type": "object",
-  "required": [
-    "calendar"
-  ],
   "properties": {
     "calendar": {
       "$ref": "calendar-schema.json"
+    },
+    "path": {
+      "type": "string"
     },
     "auditLog": {
       "$ref": "../audit/auditParams-schema.json"

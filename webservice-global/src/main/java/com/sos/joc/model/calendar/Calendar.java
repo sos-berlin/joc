@@ -21,6 +21,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "path",
     "name",
+    "type",
     "category",
     "title",
     "includes",
@@ -28,22 +29,18 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class Calendar {
 
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     */
     @JsonProperty("path")
     private String path;
     @JsonProperty("name")
     private String name;
     /**
+     * calendar type
+     * <p>
      * 
-     * (Required)
      * 
      */
+    @JsonProperty("type")
+    private CalendarType type;
     @JsonProperty("category")
     private String category;
     @JsonProperty("title")
@@ -66,10 +63,6 @@ public class Calendar {
     private Frequencies excludes;
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
      * 
      * @return
      *     The path
@@ -80,10 +73,6 @@ public class Calendar {
     }
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
      * 
      * @param path
      *     The path
@@ -114,8 +103,32 @@ public class Calendar {
     }
 
     /**
+     * calendar type
+     * <p>
      * 
-     * (Required)
+     * 
+     * @return
+     *     The type
+     */
+    @JsonProperty("type")
+    public CalendarType getType() {
+        return type;
+    }
+
+    /**
+     * calendar type
+     * <p>
+     * 
+     * 
+     * @param type
+     *     The type
+     */
+    @JsonProperty("type")
+    public void setType(CalendarType type) {
+        this.type = type;
+    }
+
+    /**
      * 
      * @return
      *     The category
@@ -126,8 +139,6 @@ public class Calendar {
     }
 
     /**
-     * 
-     * (Required)
      * 
      * @param category
      *     The category
@@ -216,7 +227,7 @@ public class Calendar {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(name).append(category).append(title).append(includes).append(excludes).toHashCode();
+        return new HashCodeBuilder().append(path).append(name).append(type).append(category).append(title).append(includes).append(excludes).toHashCode();
     }
 
     @Override
@@ -228,7 +239,7 @@ public class Calendar {
             return false;
         }
         Calendar rhs = ((Calendar) other);
-        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(category, rhs.category).append(title, rhs.title).append(includes, rhs.includes).append(excludes, rhs.excludes).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(type, rhs.type).append(category, rhs.category).append(title, rhs.title).append(includes, rhs.includes).append(excludes, rhs.excludes).isEquals();
     }
 
 }

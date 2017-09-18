@@ -8,23 +8,20 @@
     "calendars": {
       "type": "array",
       "items": {
-        "type": "object",
-        "javaType": "com.sos.joc.model.calendar.CalendarPath",
-        "required": [
-          "calendar"
-        ],
-        "properties": {
-          "calendar": {
-            "$ref": "../common/path-schema.json"
-          },
-          "category": {
-            "type": "string"
-          }
-        }
+        "type": "string"
       }
     },
     "compact": {
       "$ref": "../common/compactParam-schema.json"
+    },
+    "type": {
+      "$ref": "calendarType-schema.json"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "regex": {
       "$ref": "../common/regexFilter-schema.json"

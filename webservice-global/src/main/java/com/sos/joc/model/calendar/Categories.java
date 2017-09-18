@@ -22,8 +22,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "path",
-    "name",
     "categories"
 })
 public class Categories {
@@ -37,22 +35,6 @@ public class Categories {
      */
     @JsonProperty("deliveryDate")
     private Date deliveryDate;
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     */
-    @JsonProperty("path")
-    private String path;
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("name")
-    private String name;
     /**
      * 
      * (Required)
@@ -90,58 +72,6 @@ public class Categories {
     }
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     * @return
-     *     The path
-     */
-    @JsonProperty("path")
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     * @param path
-     *     The path
-     */
-    @JsonProperty("path")
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @return
-     *     The name
-     */
-    @JsonProperty("name")
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param name
-     *     The name
-     */
-    @JsonProperty("name")
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
      * 
      * (Required)
      * 
@@ -172,7 +102,7 @@ public class Categories {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(path).append(name).append(categories).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(categories).toHashCode();
     }
 
     @Override
@@ -184,7 +114,7 @@ public class Categories {
             return false;
         }
         Categories rhs = ((Categories) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(path, rhs.path).append(name, rhs.name).append(categories, rhs.categories).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(categories, rhs.categories).isEquals();
     }
 
 }

@@ -22,12 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "path",
-    "name",
-    "category",
-    "title",
-    "days",
-    "holidays"
+    "dates"
 })
 public class Dates {
 
@@ -41,29 +36,12 @@ public class Dates {
     @JsonProperty("deliveryDate")
     private Date deliveryDate;
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     */
-    @JsonProperty("path")
-    private String path;
-    /**
      * 
      * (Required)
      * 
      */
-    @JsonProperty("name")
-    private String name;
-    @JsonProperty("category")
-    private String category;
-    @JsonProperty("title")
-    private String title;
-    @JsonProperty("days")
-    private List<String> days = null;
-    @JsonProperty("holidays")
-    private List<String> holidays = null;
+    @JsonProperty("dates")
+    private List<String> dates = null;
 
     /**
      * delivery date
@@ -94,135 +72,27 @@ public class Dates {
     }
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
+     * 
      * (Required)
      * 
      * @return
-     *     The path
+     *     The dates
      */
-    @JsonProperty("path")
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
-     * 
-     * @param path
-     *     The path
-     */
-    @JsonProperty("path")
-    public void setPath(String path) {
-        this.path = path;
+    @JsonProperty("dates")
+    public List<String> getDates() {
+        return dates;
     }
 
     /**
      * 
      * (Required)
      * 
-     * @return
-     *     The name
+     * @param dates
+     *     The dates
      */
-    @JsonProperty("name")
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * 
-     * (Required)
-     * 
-     * @param name
-     *     The name
-     */
-    @JsonProperty("name")
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * 
-     * @return
-     *     The category
-     */
-    @JsonProperty("category")
-    public String getCategory() {
-        return category;
-    }
-
-    /**
-     * 
-     * @param category
-     *     The category
-     */
-    @JsonProperty("category")
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    /**
-     * 
-     * @return
-     *     The title
-     */
-    @JsonProperty("title")
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * 
-     * @param title
-     *     The title
-     */
-    @JsonProperty("title")
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    /**
-     * 
-     * @return
-     *     The days
-     */
-    @JsonProperty("days")
-    public List<String> getDays() {
-        return days;
-    }
-
-    /**
-     * 
-     * @param days
-     *     The days
-     */
-    @JsonProperty("days")
-    public void setDays(List<String> days) {
-        this.days = days;
-    }
-
-    /**
-     * 
-     * @return
-     *     The holidays
-     */
-    @JsonProperty("holidays")
-    public List<String> getHolidays() {
-        return holidays;
-    }
-
-    /**
-     * 
-     * @param holidays
-     *     The holidays
-     */
-    @JsonProperty("holidays")
-    public void setHolidays(List<String> holidays) {
-        this.holidays = holidays;
+    @JsonProperty("dates")
+    public void setDates(List<String> dates) {
+        this.dates = dates;
     }
 
     @Override
@@ -232,7 +102,7 @@ public class Dates {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(path).append(name).append(category).append(title).append(days).append(holidays).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(dates).toHashCode();
     }
 
     @Override
@@ -244,7 +114,7 @@ public class Dates {
             return false;
         }
         Dates rhs = ((Dates) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(path, rhs.path).append(name, rhs.name).append(category, rhs.category).append(title, rhs.title).append(days, rhs.days).append(holidays, rhs.holidays).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(dates, rhs.dates).isEquals();
     }
 
 }

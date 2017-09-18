@@ -9,7 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.calendar.Calendar;
-import com.sos.joc.model.calendar.CalendarMoveFilter;
+import com.sos.joc.model.calendar.CalendarRenameFilter;
 
  
 public interface ICalendarEditResource {
@@ -20,7 +20,7 @@ public interface ICalendarEditResource {
     public JOCDefaultResponse postStoreCalendar(@HeaderParam("X-Access-Token") String xAccessToken, Calendar calendar) throws Exception;
     
     @POST
-    @Path("move")
+    @Path("rename")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postMoveCalendar(@HeaderParam("X-Access-Token") String xAccessToken, CalendarMoveFilter calendarFilter) throws Exception;
+    public JOCDefaultResponse postRenameCalendar(@HeaderParam("X-Access-Token") String xAccessToken, CalendarRenameFilter calendarFilter) throws Exception;
 }

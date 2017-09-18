@@ -1,4 +1,3 @@
 {
-    "calendar":  "/path/to/myCalendar",
-    "category":  ""
+    "path":  "/path/to/myCalendar"
 }

@@ -24,6 +24,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "calendars",
     "compact",
+    "type",
+    "categories",
     "regex",
     "folders",
     "auditLog"
@@ -31,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 public class CalendarsFilter {
 
     @JsonProperty("calendars")
-    private List<CalendarPath> calendars = null;
+    private List<String> calendars = null;
     /**
      * compact parameter
      * <p>
@@ -40,6 +42,16 @@ public class CalendarsFilter {
      */
     @JsonProperty("compact")
     private Boolean compact = false;
+    /**
+     * calendar type
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("type")
+    private CalendarType type;
+    @JsonProperty("categories")
+    private List<String> categories = null;
     /**
      * filter with regex
      * <p>
@@ -71,7 +83,7 @@ public class CalendarsFilter {
      *     The calendars
      */
     @JsonProperty("calendars")
-    public List<CalendarPath> getCalendars() {
+    public List<String> getCalendars() {
         return calendars;
     }
 
@@ -81,7 +93,7 @@ public class CalendarsFilter {
      *     The calendars
      */
     @JsonProperty("calendars")
-    public void setCalendars(List<CalendarPath> calendars) {
+    public void setCalendars(List<String> calendars) {
         this.calendars = calendars;
     }
 
@@ -109,6 +121,52 @@ public class CalendarsFilter {
     @JsonProperty("compact")
     public void setCompact(Boolean compact) {
         this.compact = compact;
+    }
+
+    /**
+     * calendar type
+     * <p>
+     * 
+     * 
+     * @return
+     *     The type
+     */
+    @JsonProperty("type")
+    public CalendarType getType() {
+        return type;
+    }
+
+    /**
+     * calendar type
+     * <p>
+     * 
+     * 
+     * @param type
+     *     The type
+     */
+    @JsonProperty("type")
+    public void setType(CalendarType type) {
+        this.type = type;
+    }
+
+    /**
+     * 
+     * @return
+     *     The categories
+     */
+    @JsonProperty("categories")
+    public List<String> getCategories() {
+        return categories;
+    }
+
+    /**
+     * 
+     * @param categories
+     *     The categories
+     */
+    @JsonProperty("categories")
+    public void setCategories(List<String> categories) {
+        this.categories = categories;
     }
 
     /**
@@ -196,7 +254,7 @@ public class CalendarsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendars).append(compact).append(regex).append(folders).append(auditLog).toHashCode();
+        return new HashCodeBuilder().append(calendars).append(compact).append(type).append(categories).append(regex).append(folders).append(auditLog).toHashCode();
     }
 
     @Override
@@ -208,7 +266,7 @@ public class CalendarsFilter {
             return false;
         }
         CalendarsFilter rhs = ((CalendarsFilter) other);
-        return new EqualsBuilder().append(calendars, rhs.calendars).append(compact, rhs.compact).append(regex, rhs.regex).append(folders, rhs.folders).append(auditLog, rhs.auditLog).isEquals();
+        return new EqualsBuilder().append(calendars, rhs.calendars).append(compact, rhs.compact).append(type, rhs.type).append(categories, rhs.categories).append(regex, rhs.regex).append(folders, rhs.folders).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

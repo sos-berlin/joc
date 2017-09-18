@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.hibernate.query.Query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemCalendar;
@@ -15,6 +16,7 @@ import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.calendar.Calendar;
 
 public class CalendarsDBLayer extends DBLayer {
 
@@ -22,14 +24,13 @@ public class CalendarsDBLayer extends DBLayer {
         super(connection);
     }
 
-    public DBItemCalendar getCalendar(String path, String category) throws DBConnectionRefusedException, DBInvalidDataException {
+    public DBItemCalendar getCalendar(String path) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_CALENDARS);
-            sql.append(" where name = :name").append(" and category = :category");
+            sql.append(" where name = :name");
             Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
             query.setParameter("name", path);
-            query.setParameter("category", category);
             return getSession().getSingleResult(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -38,19 +39,18 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
     
-    public Date moveCalendar(String path, String category, String newPath, String newCategory) throws JocException {
+    public Date renameCalendar(String path, String newPath) throws JocException {
         try {
-            DBItemCalendar calendarDbItem = getCalendar(path, category);
+            DBItemCalendar calendarDbItem = getCalendar(path);
             if (calendarDbItem == null) {
-                throw new DBMissingDataException(String.format("calendar '%1$s'.'%2$s' not found", path, category));
+                throw new DBMissingDataException(String.format("calendar '%1$s' not found", path));
             }
-            DBItemCalendar calendarNewDbItem = getCalendar(newPath, newCategory);
+            DBItemCalendar calendarNewDbItem = getCalendar(newPath);
             if (calendarNewDbItem != null) {
-                throw new DBInvalidDataException(String.format("calendar '%1$s'.'%2$s' already exists", newPath, newCategory));
+                throw new DBInvalidDataException(String.format("calendar '%1$s' already exists", newPath));
             }
             Date now = Date.from(Instant.now());
             calendarDbItem.setName(newPath);
-            calendarDbItem.setCategory(newCategory);
             calendarDbItem.setBaseName(Paths.get(newPath).getFileName().toString());
             calendarDbItem.setModified(now);
             getSession().update(calendarDbItem);
@@ -64,13 +64,11 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
     
-    public List<String> getCategories(String path) throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<String> getCategories() throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select category from ").append(DBITEM_CALENDARS);
-            sql.append(" where name = :name").append(" and category = :category");
+            sql.append("select category from ").append(DBITEM_CALENDARS).append(" group by category order by category");
             Query<String> query = getSession().createQuery(sql.toString());
-            query.setParameter("name", path);
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
@@ -79,21 +77,34 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
     
-    public Date saveOrUpdateCalendar(String path, String category, String configuration) throws DBConnectionRefusedException, DBInvalidDataException {
+    public Date saveOrUpdateCalendar(Calendar calendar) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            DBItemCalendar calendarDbItem = getCalendar(path, category);
+            DBItemCalendar calendarDbItem = getCalendar(calendar.getPath());
             Date now = Date.from(Instant.now());
             if (calendarDbItem == null) {
                 calendarDbItem = new DBItemCalendar();
-                calendarDbItem.setBaseName(Paths.get(path).getFileName().toString());
-                calendarDbItem.setName(path);
-                calendarDbItem.setCategory(category);
+                calendarDbItem.setBaseName(Paths.get(calendar.getPath()).getFileName().toString());
+                calendarDbItem.setName(calendar.getPath());
+                if (calendar.getCategory() != null) {
+                    calendarDbItem.setCategory(calendar.getCategory()); 
+                } else {
+                    calendarDbItem.setCategory(""); 
+                }
+                calendarDbItem.setTitle(calendar.getTitle());
+                calendarDbItem.setType(calendar.getType().name());
                 calendarDbItem.setCreated(now);
-                calendarDbItem.setConfiguration(configuration);
+                calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
                 calendarDbItem.setModified(now);
                 getSession().save(calendarDbItem);
             } else {
-                calendarDbItem.setConfiguration(configuration);
+                if (calendar.getCategory() != null) {
+                    calendarDbItem.setCategory(calendar.getCategory()); 
+                } else {
+                    calendarDbItem.setCategory(""); 
+                }
+                calendarDbItem.setTitle(calendar.getTitle());
+                calendarDbItem.setType(calendar.getType().name());
+                calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
                 calendarDbItem.setModified(now);
                 getSession().update(calendarDbItem);
             }

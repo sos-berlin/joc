@@ -3,7 +3,9 @@ It depends on the parameter ``compact``.
 * Fix required fields are
     * path
     * name
+    * type
     * category
+    * title
 * The detailed view has the following field in addition to the compact view
     * includes
     * excludes

@@ -42,6 +42,7 @@ resourceTypes:
   - error: !include resourceTypes/common/error.raml
   - postCalendarWithOkResponse: !include resourceTypes/calendar/postJSONWithOkResponse.raml
   - postCalendar: !include resourceTypes/calendar/postJSON.raml
+  - postCategories: !include resourceTypes/calendar/postCategories.raml
   - postTaskWithOkResponse: !include resourceTypes/job/postWithOkResponse.raml
   - postTaskAndTimeoutWithOkResponse: !include resourceTypes/job/postTimeoutWithOkResponse.raml
   - postTimeoutWithOkResponse: !include resourceTypes/common/postTimeoutWithOkResponse.raml
@@ -1872,13 +1873,27 @@ traits:
       description1: !include documentation/common/compact.md
       description2: !include documentation/common/regex.md
       description3: !include documentation/common/folders.md
-      description4: !include documentation/calendar/filteredByCalendars.md
+      description4: !include documentation/calendar/calendarType.md
+      description5: !include documentation/calendar/categories.md
+      description6: !include documentation/calendar/filteredByCalendars.md
       description200: !include documentation/calendar/calendar.md
       schema: !include schemas/calendar/calendarsFilter-schema.json
       schema200: !include schemas/calendar/calendars-schema.json
       example: " "
       example200: " "
       
+  /categories:
+    type:
+      postCategories:
+        description: Sends categories
+        description1: " "
+        description2: " "
+        description3: " "
+        description4: " "
+        description200: " "
+        schema200: !include schemas/calendar/categories-schema.json
+        example200: " "
+        
   /delete:
     type:
       modifyCalendar:
@@ -1892,26 +1907,14 @@ traits:
       description1: " "
       description2: " "
       description3: !include documentation/calendar/calendarRequired.md
-      description4: !include documentation/calendar/category.md
+      description4: " "
+      description5: " "
+      description6: " "
       description200: !include documentation/calendar/calendar.md
       schema: !include schemas/calendar/calendarFilter-schema.json
       schema200: !include schemas/calendar/calendar200-schema.json
       example: !include examples/calendar/calendar-example.json
       example200: " "
-      
-  /categories:
-    type:
-      postCalendar:
-        description: Sends categories
-        description1: " "
-        description2: " "
-        description3: !include documentation/calendar/calendarRequired.md
-        description4: " "
-        description200: " "
-        schema: !include schemas/calendar/calendarFilter-schema.json
-        schema200: !include schemas/calendar/categories-schema.json
-        example: !include examples/calendar/calendar-example.json
-        example200: " "
         
   /dates:
     type:
@@ -1920,9 +1923,11 @@ traits:
         description1: " "
         description2: " "
         description3: !include documentation/calendar/calendarRequired.md
-        description4: !include documentation/calendar/category.md
+        description4: !include documentation/calendar/calendarObj.md
+        description5: " "
+        description6: " "
         description200: " "
-        schema: !include schemas/calendar/calendarFilter-schema.json
+        schema: !include schemas/calendar/calendarDatesFilter-schema.json
         schema200: !include schemas/calendar/dates-schema.json
         example: !include examples/calendar/calendar-example.json
         example200: " "
@@ -1935,19 +1940,19 @@ traits:
         description2: " "
         description3: " "
         description4: " "
-        schema: !include schemas/calendar/calendarStoreFilter-schema.json
+        schema: !include schemas/calendar/calendarObjectFilter-schema.json
         audit: !include documentation/audit/auditLog.md
         example: !include examples/calendar/calendarObj-example.json
   
-  /move:
+  /rename:
     type:
       postCalendarWithOkResponse:
         description: Moves calendar
         description1: !include documentation/calendar/calendarRequired.md
-        description2: !include documentation/calendar/category.md
+        description2: " "
         description3: !include documentation/calendar/calendarNewRequired.md
         description4: " "
-        schema: !include schemas/calendar/calendarMoveFilter-schema.json
+        schema: !include schemas/calendar/calendarRenameFilter-schema.json
         audit: !include documentation/audit/auditLog.md
-        example: !include examples/calendar/calendarMove-example.json
+        example: !include examples/calendar/calendarRename-example.json
      

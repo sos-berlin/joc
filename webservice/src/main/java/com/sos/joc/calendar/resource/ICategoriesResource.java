@@ -8,7 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.calendar.CalendarFilter;
 
  
 public interface ICategoriesResource {
@@ -16,5 +15,5 @@ public interface ICategoriesResource {
     @POST
     @Path("categories")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postCategories(@HeaderParam("X-Access-Token") String xAccessToken, CalendarFilter calendarFilter) throws Exception;
+    public JOCDefaultResponse postCategories(@HeaderParam("X-Access-Token") String xAccessToken) throws Exception;
 }

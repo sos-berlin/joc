@@ -18,6 +18,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendar200;
 import com.sos.joc.model.calendar.CalendarFilter;
+import com.sos.joc.model.calendar.CalendarType;
 
 @Path("calendar")
 public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarResource {
@@ -33,18 +34,18 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("calendar path", calendarFilter.getCalendar());
-            checkLazyRequiredParameter("calendar category", calendarFilter.getCategory());
+            checkRequiredParameter("calendar path", calendarFilter.getPath());
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            String calendarPath = normalizePath(calendarFilter.getCalendar());
+            String calendarPath = normalizePath(calendarFilter.getPath());
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
-            DBItemCalendar calendarItem = dbLayer.getCalendar(calendarPath, calendarFilter.getCategory());
+            DBItemCalendar calendarItem = dbLayer.getCalendar(calendarPath);
             if (calendarItem == null) {
-                throw new DBMissingDataException(String.format("calendar '%1$s'.'%2$s' not found", calendarPath, calendarFilter.getCategory()));
+                throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
             }
             Calendar calendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
             calendar.setPath(calendarPath);
             calendar.setName(calendarItem.getName());
+            calendar.setType(CalendarType.fromValue(calendarItem.getType()));
             calendar.setTitle(calendarItem.getTitle());
             calendar.setCategory(calendarItem.getCategory());
             Calendar200 entity = new Calendar200();

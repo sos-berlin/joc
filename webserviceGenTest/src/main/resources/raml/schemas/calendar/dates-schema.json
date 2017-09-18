@@ -6,33 +6,13 @@
   "type": "object",
   "required": [
     "deliveryDate",
-    "path",
-    "name",
     "dates"
   ],
   "properties": {
     "deliveryDate": {
       "$ref": "../common/deliveryDate-schema.json"
     },
-    "path": {
-      "$ref": "../common/path-schema.json"
-    },
-    "name": {
-      "type": "string"
-    },
-    "category": {
-      "type": "string"
-    },
-    "title": {
-      "type": "string"
-    },
-    "days": {
-      "type": "array",
-      "items": {
-        "$ref": "../common/date-schema.json"
-      }
-    },
-    "holidays": {
+    "dates": {
       "type": "array",
       "items": {
         "$ref": "../common/date-schema.json"

@@ -9,72 +9,76 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+
+/**
+ * calendarDatesFilter
+ * <p>
+ * one of the fields calendar and path is required.
+ * 
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "calendar",
-    "category"
+    "path"
 })
-public class CalendarPath {
+public class CalendarDatesFilter {
 
     /**
-     * path
+     * calendar
      * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
+     * 
      * 
      */
     @JsonProperty("calendar")
-    private String calendar;
-    @JsonProperty("category")
-    private String category;
+    private Calendar calendar;
+    @JsonProperty("path")
+    private String path;
 
     /**
-     * path
+     * calendar
      * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
+     * 
      * 
      * @return
      *     The calendar
      */
     @JsonProperty("calendar")
-    public String getCalendar() {
+    public Calendar getCalendar() {
         return calendar;
     }
 
     /**
-     * path
+     * calendar
      * <p>
-     * absolute path based on live folder of a JobScheduler object.
-     * (Required)
+     * 
      * 
      * @param calendar
      *     The calendar
      */
     @JsonProperty("calendar")
-    public void setCalendar(String calendar) {
+    public void setCalendar(Calendar calendar) {
         this.calendar = calendar;
     }
 
     /**
      * 
      * @return
-     *     The category
+     *     The path
      */
-    @JsonProperty("category")
-    public String getCategory() {
-        return category;
+    @JsonProperty("path")
+    public String getPath() {
+        return path;
     }
 
     /**
      * 
-     * @param category
-     *     The category
+     * @param path
+     *     The path
      */
-    @JsonProperty("category")
-    public void setCategory(String category) {
-        this.category = category;
+    @JsonProperty("path")
+    public void setPath(String path) {
+        this.path = path;
     }
 
     @Override
@@ -84,7 +88,7 @@ public class CalendarPath {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendar).append(category).toHashCode();
+        return new HashCodeBuilder().append(calendar).append(path).toHashCode();
     }
 
     @Override
@@ -92,11 +96,11 @@ public class CalendarPath {
         if (other == this) {
             return true;
         }
-        if ((other instanceof CalendarPath) == false) {
+        if ((other instanceof CalendarDatesFilter) == false) {
             return false;
         }
-        CalendarPath rhs = ((CalendarPath) other);
-        return new EqualsBuilder().append(calendar, rhs.calendar).append(category, rhs.category).isEquals();
+        CalendarDatesFilter rhs = ((CalendarDatesFilter) other);
+        return new EqualsBuilder().append(calendar, rhs.calendar).append(path, rhs.path).isEquals();
     }
 
 }

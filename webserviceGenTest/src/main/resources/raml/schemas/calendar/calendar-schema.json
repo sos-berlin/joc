@@ -4,16 +4,15 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.Calendar",
   "type": "object",
-  "required": [
-    "path",
-    "category"
-  ],
   "properties": {
     "path": {
-      "$ref": "../common/path-schema.json"
+      "type": "string"
     },
     "name": {
       "type": "string"
+    },
+    "type": {
+      "$ref": "calendarType-schema.json"
     },
     "category": {
       "type": "string"

@@ -21,8 +21,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "calendarName",
-    "dates",
-    "weekdays"
+    "dates"
 })
 public class Holidays {
 
@@ -30,8 +29,6 @@ public class Holidays {
     private String calendarName;
     @JsonProperty("dates")
     private List<String> dates = null;
-    @JsonProperty("weekdays")
-    private List<WeekDays> weekdays = null;
 
     /**
      * 
@@ -73,26 +70,6 @@ public class Holidays {
         this.dates = dates;
     }
 
-    /**
-     * 
-     * @return
-     *     The weekdays
-     */
-    @JsonProperty("weekdays")
-    public List<WeekDays> getWeekdays() {
-        return weekdays;
-    }
-
-    /**
-     * 
-     * @param weekdays
-     *     The weekdays
-     */
-    @JsonProperty("weekdays")
-    public void setWeekdays(List<WeekDays> weekdays) {
-        this.weekdays = weekdays;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -100,7 +77,7 @@ public class Holidays {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendarName).append(dates).append(weekdays).toHashCode();
+        return new HashCodeBuilder().append(calendarName).append(dates).toHashCode();
     }
 
     @Override
@@ -112,7 +89,7 @@ public class Holidays {
             return false;
         }
         Holidays rhs = ((Holidays) other);
-        return new EqualsBuilder().append(calendarName, rhs.calendarName).append(dates, rhs.dates).append(weekdays, rhs.weekdays).isEquals();
+        return new EqualsBuilder().append(calendarName, rhs.calendarName).append(dates, rhs.dates).isEquals();
     }
 
 }

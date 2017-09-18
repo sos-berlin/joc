@@ -1,0 +1,16 @@
+{
+  "title": "calendarDatesFilter",
+  "id": "schemas/calendar/calendarDatesFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.CalendarDatesFilter",
+  "type": "object",
+  "description": "one of the fields calendar and path is required.",
+  "properties": {
+    "calendar": {
+      "$ref": "calendar-schema.json"
+    },
+    "path": {
+      "type": "string"
+    }
+  }
+}

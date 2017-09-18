@@ -13,12 +13,6 @@
       "items": {
         "$ref": "../common/date-schema.json"
       }
-    },
-    "weekdays": {
-      "type": "array",
-      "items": {
-        "$ref": "weekDays-schema.json"
-      }
     }
   }
 }

@@ -18,8 +18,9 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
-import com.sos.joc.model.calendar.CalendarFilter;
+import com.sos.joc.model.calendar.CalendarDatesFilter;
 import com.sos.joc.model.calendar.Dates;
 import com.sos.joc.model.calendar.Frequencies;
 
@@ -29,7 +30,7 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
     private static final String API_CALL = "./calendar/dates";
 
     @Override
-    public JOCDefaultResponse postCalendarDates(String accessToken, CalendarFilter calendarFilter) throws Exception {
+    public JOCDefaultResponse postCalendarDates(String accessToken, CalendarDatesFilter calendarFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, "", getPermissonsJocCockpit(
@@ -37,23 +38,29 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("calendar path", calendarFilter.getCalendar());
-            checkLazyRequiredParameter("calendar category", calendarFilter.getCategory());
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            String calendarPath = normalizePath(calendarFilter.getCalendar());
-            CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
-            DBItemCalendar calendarItem = dbLayer.getCalendar(calendarPath, calendarFilter.getCategory());
-            if (calendarItem == null) {
-                throw new DBMissingDataException(String.format("calendar '%1$s'.'%2$s' not found", calendarPath, calendarFilter.getCategory()));
+            boolean calendarPathIsDefined = calendarFilter.getPath() != null && !calendarFilter.getPath().isEmpty();
+            if (!calendarPathIsDefined && calendarFilter.getCalendar() == null) {
+                throw new JocMissingRequiredParameterException("undefined 'calendar path'");
             }
-            Calendar calendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
+            
+            if (calendarPathIsDefined) {
+                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                String calendarPath = normalizePath(calendarFilter.getPath());
+                CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+                DBItemCalendar calendarItem = dbLayer.getCalendar(calendarPath);
+                if (calendarItem == null) {
+                    throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
+                }
+                calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
+            }
+            
             Set<String> dates = null;
-            Frequencies includes = calendar.getIncludes();
+            Frequencies includes = calendarFilter.getCalendar().getIncludes();
             if (includes != null) {
                 dates = new HashSet<String>();
                 dates.addAll(includes.getDates());
                 //TODO ...dates.add()
-                Frequencies excludes = calendar.getExcludes();
+                Frequencies excludes = calendarFilter.getCalendar().getExcludes();
                 if (excludes != null) {
                     dates.removeAll(excludes.getDates());
                     //TODO ...dates.remove()
@@ -61,10 +68,6 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
             }
             
             Dates entity = new Dates();
-            entity.setPath(calendarPath);
-            entity.setName(calendarItem.getName());
-            entity.setTitle(calendarItem.getTitle());
-            entity.setCategory(calendarItem.getCategory());
             if (dates != null) {
                 entity.setDates(new ArrayList<String>(dates)); 
             }

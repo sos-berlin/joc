@@ -12,7 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * calendarFilter
+ * calendar rename filter
  * <p>
  * 
  * 
@@ -20,20 +20,16 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "calendar",
+    "path",
+    "newPath",
     "auditLog"
 })
-public class CalendarStoreFilter {
+public class CalendarRenameFilter {
 
-    /**
-     * calendar
-     * <p>
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("calendar")
-    private Calendar calendar;
+    @JsonProperty("path")
+    private String path;
+    @JsonProperty("newPath")
+    private String newPath;
     /**
      * auditParams
      * <p>
@@ -44,31 +40,43 @@ public class CalendarStoreFilter {
     private AuditParams auditLog;
 
     /**
-     * calendar
-     * <p>
-     * 
-     * (Required)
      * 
      * @return
-     *     The calendar
+     *     The path
      */
-    @JsonProperty("calendar")
-    public Calendar getCalendar() {
-        return calendar;
+    @JsonProperty("path")
+    public String getPath() {
+        return path;
     }
 
     /**
-     * calendar
-     * <p>
      * 
-     * (Required)
-     * 
-     * @param calendar
-     *     The calendar
+     * @param path
+     *     The path
      */
-    @JsonProperty("calendar")
-    public void setCalendar(Calendar calendar) {
-        this.calendar = calendar;
+    @JsonProperty("path")
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    /**
+     * 
+     * @return
+     *     The newPath
+     */
+    @JsonProperty("newPath")
+    public String getNewPath() {
+        return newPath;
+    }
+
+    /**
+     * 
+     * @param newPath
+     *     The newPath
+     */
+    @JsonProperty("newPath")
+    public void setNewPath(String newPath) {
+        this.newPath = newPath;
     }
 
     /**
@@ -104,7 +112,7 @@ public class CalendarStoreFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendar).append(auditLog).toHashCode();
+        return new HashCodeBuilder().append(path).append(newPath).append(auditLog).toHashCode();
     }
 
     @Override
@@ -112,11 +120,11 @@ public class CalendarStoreFilter {
         if (other == this) {
             return true;
         }
-        if ((other instanceof CalendarStoreFilter) == false) {
+        if ((other instanceof CalendarRenameFilter) == false) {
             return false;
         }
-        CalendarStoreFilter rhs = ((CalendarStoreFilter) other);
-        return new EqualsBuilder().append(calendar, rhs.calendar).append(auditLog, rhs.auditLog).isEquals();
+        CalendarRenameFilter rhs = ((CalendarRenameFilter) other);
+        return new EqualsBuilder().append(path, rhs.path).append(newPath, rhs.newPath).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

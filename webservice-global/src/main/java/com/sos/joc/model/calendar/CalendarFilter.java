@@ -19,69 +19,40 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "calendar",
-    "category"
+    "path"
 })
 public class CalendarFilter {
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
+     * 
      * (Required)
      * 
      */
-    @JsonProperty("calendar")
-    private String calendar;
-    @JsonProperty("category")
-    private String category;
+    @JsonProperty("path")
+    private String path;
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
+     * 
      * (Required)
      * 
      * @return
-     *     The calendar
+     *     The path
      */
-    @JsonProperty("calendar")
-    public String getCalendar() {
-        return calendar;
+    @JsonProperty("path")
+    public String getPath() {
+        return path;
     }
 
     /**
-     * path
-     * <p>
-     * absolute path based on live folder of a JobScheduler object.
+     * 
      * (Required)
      * 
-     * @param calendar
-     *     The calendar
+     * @param path
+     *     The path
      */
-    @JsonProperty("calendar")
-    public void setCalendar(String calendar) {
-        this.calendar = calendar;
-    }
-
-    /**
-     * 
-     * @return
-     *     The category
-     */
-    @JsonProperty("category")
-    public String getCategory() {
-        return category;
-    }
-
-    /**
-     * 
-     * @param category
-     *     The category
-     */
-    @JsonProperty("category")
-    public void setCategory(String category) {
-        this.category = category;
+    @JsonProperty("path")
+    public void setPath(String path) {
+        this.path = path;
     }
 
     @Override
@@ -91,7 +62,7 @@ public class CalendarFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendar).append(category).toHashCode();
+        return new HashCodeBuilder().append(path).toHashCode();
     }
 
     @Override
@@ -103,7 +74,7 @@ public class CalendarFilter {
             return false;
         }
         CalendarFilter rhs = ((CalendarFilter) other);
-        return new EqualsBuilder().append(calendar, rhs.calendar).append(category, rhs.category).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).isEquals();
     }
 
 }

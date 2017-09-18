@@ -16,12 +16,11 @@ post:
     <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
     </thead><tbody>
     <tr><td>``calendars``</td><td>required, array</td>
-      <td>Filtered response by a collection of calendars specified by its calendar path and an optional category.
-        If "category" is undefined then all categories of the specified calendar are considered.</td>
-      <td> [{
-        <div style="padding-left:10px;">"path": "/sos/myCalendar",</div>
-        <div style="padding-left:10px;">"category": ""</div>
-      }]</td>
+      <td>Filtered response by a collection of calendars specified by its calendar path.</td>
+      <td> [
+        <div style="padding-left:10px;">"/sos/myCalendar",</div>
+        <div style="padding-left:10px;">"/sos/myCalendar2"</div>
+      ]</td>
       <td></td>
     </tr>
     <<audit>>
@@ -32,16 +31,11 @@ post:
       schema: modifyCalendars
       example: |
         {
-          "calendars": [{
-            "calendar": "/test/testCalendar",
-            "category": "workingDays"
-          }, {
-            "calendar": "/test/testCalendar",
-            "category": "nonWorkingDays"
-          }, {
-            "calendar": "/test/testCalendar2",
-            "category": ""
-          }]
+          "calendars": [
+            "/test/testCalendar",
+            "/test/testCalendar",
+            "/test/testCalendar2"
+          ]
         }
   responses:
     200:

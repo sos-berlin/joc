@@ -5,13 +5,10 @@
   "javaType": "com.sos.joc.model.calendar.CalendarFilter",
   "type": "object",
   "required": [
-    "calendar"
+    "path"
   ],
   "properties": {
-    "calendar": {
-      "$ref": "../common/path-schema.json"
-    },
-    "category": {
+    "path": {
       "type": "string"
     }
   }

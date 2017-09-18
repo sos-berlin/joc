@@ -1,6 +1,5 @@
 package com.sos.joc.calendar.impl;
 
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 
@@ -13,7 +12,6 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.calendar.CalendarFilter;
 import com.sos.joc.model.calendar.Categories;
 
 @Path("calendar")
@@ -22,21 +20,17 @@ public class CategoriesResourceImpl extends JOCResourceImpl implements ICategori
     private static final String API_CALL = "./calendar/categories";
 
     @Override
-    public JOCDefaultResponse postCategories(String accessToken, CalendarFilter calendarFilter) throws Exception {
+    public JOCDefaultResponse postCategories(String accessToken) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, "", getPermissonsJocCockpit(
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "", getPermissonsJocCockpit(
                     accessToken).getCalendar().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("calendar", calendarFilter.getCalendar());
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            String calendarPath = normalizePath(calendarFilter.getCalendar());
             Categories entity = new Categories();
-            entity.setPath(calendarPath);
-            entity.setName(Paths.get(calendarPath).getFileName().toString());
-            entity.setCategories(new CalendarsDBLayer(connection).getCategories(calendarPath));
+            entity.setCategories(new CalendarsDBLayer(connection).getCategories());
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
