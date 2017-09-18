@@ -25,7 +25,9 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "path",
     "name",
     "category",
-    "dates"
+    "title",
+    "days",
+    "holidays"
 })
 public class Dates {
 
@@ -56,13 +58,12 @@ public class Dates {
     private String name;
     @JsonProperty("category")
     private String category;
-    /**
-     * 
-     * (Required)
-     * 
-     */
-    @JsonProperty("dates")
-    private List<String> dates = null;
+    @JsonProperty("title")
+    private String title;
+    @JsonProperty("days")
+    private List<String> days = null;
+    @JsonProperty("holidays")
+    private List<String> holidays = null;
 
     /**
      * delivery date
@@ -166,26 +167,62 @@ public class Dates {
 
     /**
      * 
-     * (Required)
-     * 
      * @return
-     *     The dates
+     *     The title
      */
-    @JsonProperty("dates")
-    public List<String> getDates() {
-        return dates;
+    @JsonProperty("title")
+    public String getTitle() {
+        return title;
     }
 
     /**
      * 
-     * (Required)
-     * 
-     * @param dates
-     *     The dates
+     * @param title
+     *     The title
      */
-    @JsonProperty("dates")
-    public void setDates(List<String> dates) {
-        this.dates = dates;
+    @JsonProperty("title")
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * 
+     * @return
+     *     The days
+     */
+    @JsonProperty("days")
+    public List<String> getDays() {
+        return days;
+    }
+
+    /**
+     * 
+     * @param days
+     *     The days
+     */
+    @JsonProperty("days")
+    public void setDays(List<String> days) {
+        this.days = days;
+    }
+
+    /**
+     * 
+     * @return
+     *     The holidays
+     */
+    @JsonProperty("holidays")
+    public List<String> getHolidays() {
+        return holidays;
+    }
+
+    /**
+     * 
+     * @param holidays
+     *     The holidays
+     */
+    @JsonProperty("holidays")
+    public void setHolidays(List<String> holidays) {
+        this.holidays = holidays;
     }
 
     @Override
@@ -195,7 +232,7 @@ public class Dates {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(path).append(name).append(category).append(dates).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(path).append(name).append(category).append(title).append(days).append(holidays).toHashCode();
     }
 
     @Override
@@ -207,7 +244,7 @@ public class Dates {
             return false;
         }
         Dates rhs = ((Dates) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(path, rhs.path).append(name, rhs.name).append(category, rhs.category).append(dates, rhs.dates).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(path, rhs.path).append(name, rhs.name).append(category, rhs.category).append(title, rhs.title).append(days, rhs.days).append(holidays, rhs.holidays).isEquals();
     }
 
 }
