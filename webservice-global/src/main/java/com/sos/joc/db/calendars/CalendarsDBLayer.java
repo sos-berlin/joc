@@ -40,7 +40,7 @@ public class CalendarsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
     public Date renameCalendar(String path, String newPath) throws JocException {
         try {
             DBItemCalendar calendarDbItem = getCalendar(path);
@@ -67,7 +67,7 @@ public class CalendarsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
     public List<String> getCategories() throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -80,10 +80,9 @@ public class CalendarsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
-    public Date saveOrUpdateCalendar(Calendar calendar) throws DBConnectionRefusedException, DBInvalidDataException {
+
+    public Date saveOrUpdateCalendar(DBItemCalendar calendarDbItem, Calendar calendar) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            DBItemCalendar calendarDbItem = getCalendar(calendar.getPath());
             Date now = Date.from(Instant.now());
             if (calendarDbItem == null) {
                 calendarDbItem = new DBItemCalendar();
@@ -92,9 +91,9 @@ public class CalendarsDBLayer extends DBLayer {
                 calendarDbItem.setDirectory(p.getParent().toString().replace('\\', '/'));
                 calendarDbItem.setName(calendar.getPath());
                 if (calendar.getCategory() != null) {
-                    calendarDbItem.setCategory(calendar.getCategory()); 
+                    calendarDbItem.setCategory(calendar.getCategory());
                 } else {
-                    calendarDbItem.setCategory(""); 
+                    calendarDbItem.setCategory("");
                 }
                 calendarDbItem.setTitle(calendar.getTitle());
                 calendarDbItem.setType(calendar.getType().name());
@@ -106,9 +105,9 @@ public class CalendarsDBLayer extends DBLayer {
                 getSession().save(calendarDbItem);
             } else {
                 if (calendar.getCategory() != null) {
-                    calendarDbItem.setCategory(calendar.getCategory()); 
+                    calendarDbItem.setCategory(calendar.getCategory());
                 } else {
-                    calendarDbItem.setCategory(""); 
+                    calendarDbItem.setCategory("");
                 }
                 calendarDbItem.setTitle(calendar.getTitle());
                 calendarDbItem.setType(calendar.getType().name());
@@ -125,7 +124,32 @@ public class CalendarsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
+    public void deleteCalendars(Set<String> paths) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            for (DBItemCalendar calendarDbItem : getCalendars(paths)) {
+                getSession().delete(calendarDbItem);
+            }
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public void deleteCalendar(String path) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            DBItemCalendar dbCalendar = getCalendar(path);
+            if (dbCalendar != null) {
+                getSession().delete(dbCalendar); 
+            }
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
     public List<DBItemCalendar> getCalendars(Set<String> paths) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -152,16 +176,17 @@ public class CalendarsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
-    public List<DBItemCalendar> getCalendars(String type, Set<String> categories, Set<String> folders, Set<String> recuriveFolders) throws DBConnectionRefusedException, DBInvalidDataException {
-        //all recursiveFolders are included in folders too
+
+    public List<DBItemCalendar> getCalendars(String type, Set<String> categories, Set<String> folders, Set<String> recuriveFolders)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        // all recursiveFolders are included in folders too
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_CALENDARS);
             if (type != null && !type.isEmpty()) {
-                sql.append(" where type = :type"); 
+                sql.append(" where type = :type");
             } else {
-                sql.append(" where 1=1"); 
+                sql.append(" where 1=1");
             }
             if (categories != null && !categories.isEmpty()) {
                 if (categories.size() == 1) {
@@ -180,8 +205,8 @@ public class CalendarsDBLayer extends DBLayer {
                 } else {
                     if (recuriveFolders != null && !recuriveFolders.isEmpty()) {
                         sql.append(" and (directory in (:directory)");
-                        for (int i=0; i < recuriveFolders.size(); i++) {
-                            sql.append(" or directory like :likeDirectory"+i);
+                        for (int i = 0; i < recuriveFolders.size(); i++) {
+                            sql.append(" or directory like :likeDirectory" + i);
                         }
                         sql.append(")");
                     } else {
@@ -191,7 +216,7 @@ public class CalendarsDBLayer extends DBLayer {
             }
             Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
             if (type != null && !type.isEmpty()) {
-                query.setParameter("type", type); 
+                query.setParameter("type", type);
             }
             if (categories != null && !categories.isEmpty()) {
                 if (categories.size() == 1) {
@@ -204,14 +229,14 @@ public class CalendarsDBLayer extends DBLayer {
                 if (folders.size() == 1) {
                     query.setParameter("directory", folders.iterator().next());
                     if (recuriveFolders != null && recuriveFolders.contains(folders.iterator().next())) {
-                        query.setParameter("likeDirectory", recuriveFolders.iterator().next()+"/%");
+                        query.setParameter("likeDirectory", recuriveFolders.iterator().next() + "/%");
                     }
                 } else {
                     query.setParameterList("directory", folders);
                     if (recuriveFolders != null && !recuriveFolders.isEmpty()) {
                         int index = 0;
                         for (String recuriveFolder : recuriveFolders) {
-                            query.setParameter("likeDirectory"+index, recuriveFolder+"/%");
+                            query.setParameter("likeDirectory" + index, recuriveFolder + "/%");
                             index++;
                         }
                     }

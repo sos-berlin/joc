@@ -3,6 +3,7 @@ package com.sos.joc.calendar.impl;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarEditResource;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -12,6 +13,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
+import com.sos.joc.model.calendar.CalendarType;
 
 @Path("calendar")
 public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalendarEditResource {
@@ -23,8 +25,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
     public JOCDefaultResponse postStoreCalendar(String accessToken, Calendar calendar) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_STORE, calendar, accessToken, "", getPermissonsJocCockpit(accessToken).getCalendar()
-                    .getEdit().isChange());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_STORE, calendar, accessToken, "", true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -35,10 +36,16 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             if (calendar.getType() == null || calendar.getType().name().isEmpty()) {
                 throw new JocMissingRequiredParameterException("undefined 'calendar type'");
             }
-            
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_STORE);
             calendar.setPath(normalizePath(calendar.getPath()));
-            return JOCDefaultResponse.responseStatusJSOk(new CalendarsDBLayer(connection).saveOrUpdateCalendar(calendar));
+            CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+            DBItemCalendar calendarDbItem = dbLayer.getCalendar(calendar.getPath());
+            if ((calendarDbItem == null && !getPermissonsJocCockpit(accessToken).getCalendar().getEdit().isCreate()) 
+                    || (calendarDbItem != null && !getPermissonsJocCockpit(accessToken).getCalendar().getEdit().isChange())) {
+                return accessDeniedResponse();
+            }
+            return JOCDefaultResponse.responseStatusJSOk(dbLayer.saveOrUpdateCalendar(calendarDbItem, calendar));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

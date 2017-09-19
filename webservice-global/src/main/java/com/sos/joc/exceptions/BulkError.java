@@ -27,6 +27,18 @@ public class BulkError extends Err419 {
         setSurveyDate(new Date());
     }
     
+    public Err419 get(JocException e, JocError jocError, String path) {
+        setCodeAndMessage(e, jocError);
+        setPath(path);
+        return this;
+    }
+    
+    public Err419 get(Throwable e, JocError jocError, String path) {
+        setCodeAndMessage(e, jocError);
+        setPath(path);
+        return this;
+    }
+    
     public Err419 get(JocException e, JocError jocError, ModifyOrder order) {
         setCodeAndMessage(e, jocError);
         setPath(order);
