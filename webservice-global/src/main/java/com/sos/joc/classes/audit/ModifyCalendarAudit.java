@@ -4,10 +4,10 @@ import java.nio.file.Paths;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
-import com.sos.joc.model.calendar.CalendarsFilter;
+import com.sos.joc.model.calendar.CalendarFilter;
 
 
-public class ModifyCalendarAudit implements IAuditLog {
+public class ModifyCalendarAudit extends CalendarFilter implements IAuditLog {
     
     @JsonIgnore
     private String folder;
@@ -21,9 +21,10 @@ public class ModifyCalendarAudit implements IAuditLog {
     @JsonIgnore
     private String ticketLink;
     
-    public ModifyCalendarAudit(String calendarPath, CalendarsFilter calendarsFilter) {
-        if (calendarsFilter != null) {
-            setAuditParams(calendarsFilter.getAuditLog());
+    public ModifyCalendarAudit(String calendarPath, AuditParams auditParams) {
+        setPath(calendarPath);
+        setAuditParams(auditParams);
+        if (calendarPath != null) {
             this.folder = Paths.get(calendarPath).getParent().toString().replace('\\', '/');
         }
     }

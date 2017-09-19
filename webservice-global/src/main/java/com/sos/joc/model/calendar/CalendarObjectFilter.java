@@ -21,7 +21,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "calendar",
-    "path",
     "auditLog"
 })
 public class CalendarObjectFilter {
@@ -34,8 +33,6 @@ public class CalendarObjectFilter {
      */
     @JsonProperty("calendar")
     private Calendar calendar;
-    @JsonProperty("path")
-    private String path;
     /**
      * auditParams
      * <p>
@@ -72,26 +69,6 @@ public class CalendarObjectFilter {
     }
 
     /**
-     * 
-     * @return
-     *     The path
-     */
-    @JsonProperty("path")
-    public String getPath() {
-        return path;
-    }
-
-    /**
-     * 
-     * @param path
-     *     The path
-     */
-    @JsonProperty("path")
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    /**
      * auditParams
      * <p>
      * 
@@ -124,7 +101,7 @@ public class CalendarObjectFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendar).append(path).append(auditLog).toHashCode();
+        return new HashCodeBuilder().append(calendar).append(auditLog).toHashCode();
     }
 
     @Override
@@ -136,7 +113,7 @@ public class CalendarObjectFilter {
             return false;
         }
         CalendarObjectFilter rhs = ((CalendarObjectFilter) other);
-        return new EqualsBuilder().append(calendar, rhs.calendar).append(path, rhs.path).append(auditLog, rhs.auditLog).isEquals();
+        return new EqualsBuilder().append(calendar, rhs.calendar).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

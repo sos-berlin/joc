@@ -5,28 +5,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsDeleteResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
-import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.calendar.CalendarsFilter;
 import com.sos.joc.model.common.Err419;
-import com.sos.joc.model.order.ModifyOrder;
-import com.sos.joc.model.order.ModifyOrders;
 
 @Path("calendars")
 public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICalendarsDeleteResource {
@@ -50,9 +44,10 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
             
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+            AuditParams auditParams = calendarsFilter.getAuditLog();
             Date surveyDate = Date.from(Instant.now());
             for (String calendar : new HashSet<String>(calendarsFilter.getCalendars())) {
-                surveyDate = executeDeleteCalendar(calendar, calendarsFilter, dbLayer);
+                surveyDate = executeDeleteCalendar(calendar, auditParams, dbLayer);
             }
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
@@ -68,9 +63,9 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
         }
     }
     
-    private Date executeDeleteCalendar(String calendar, CalendarsFilter calendarsFilter, CalendarsDBLayer dbLayer) {
+    private Date executeDeleteCalendar(String calendar, AuditParams auditParams, CalendarsDBLayer dbLayer) {
         try {
-            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar, calendarsFilter);
+            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar, auditParams);
             logAuditMessage(calendarAudit);
             dbLayer.deleteCalendar(calendar);
             storeAuditLogEntry(calendarAudit);

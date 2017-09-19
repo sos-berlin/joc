@@ -8,9 +8,6 @@
     "calendar": {
       "$ref": "calendar-schema.json"
     },
-    "path": {
-      "type": "string"
-    },
     "auditLog": {
       "$ref": "../audit/auditParams-schema.json"
     }

@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.calendar.Calendar;
+import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
 
  
@@ -17,7 +17,7 @@ public interface ICalendarEditResource {
     @POST
     @Path("store")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postStoreCalendar(@HeaderParam("X-Access-Token") String xAccessToken, Calendar calendar) throws Exception;
+    public JOCDefaultResponse postStoreCalendar(@HeaderParam("X-Access-Token") String xAccessToken, CalendarObjectFilter calendarFilter) throws Exception;
     
     @POST
     @Path("rename")
