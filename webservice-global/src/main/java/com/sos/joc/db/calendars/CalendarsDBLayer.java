@@ -1,5 +1,6 @@
 package com.sos.joc.db.calendars;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
@@ -52,7 +53,9 @@ public class CalendarsDBLayer extends DBLayer {
             }
             Date now = Date.from(Instant.now());
             calendarDbItem.setName(newPath);
-            calendarDbItem.setBaseName(Paths.get(newPath).getFileName().toString());
+            Path p = Paths.get(newPath);
+            calendarDbItem.setBaseName(p.getFileName().toString());
+            calendarDbItem.setDirectory(p.getParent().toString().replace('\\', '/'));
             calendarDbItem.setModified(now);
             getSession().update(calendarDbItem);
             return now;
@@ -84,7 +87,9 @@ public class CalendarsDBLayer extends DBLayer {
             Date now = Date.from(Instant.now());
             if (calendarDbItem == null) {
                 calendarDbItem = new DBItemCalendar();
-                calendarDbItem.setBaseName(Paths.get(calendar.getPath()).getFileName().toString());
+                Path p = Paths.get(calendar.getPath());
+                calendarDbItem.setBaseName(p.getFileName().toString());
+                calendarDbItem.setDirectory(p.getParent().toString().replace('\\', '/'));
                 calendarDbItem.setName(calendar.getPath());
                 if (calendar.getCategory() != null) {
                     calendarDbItem.setCategory(calendar.getCategory()); 
@@ -94,6 +99,8 @@ public class CalendarsDBLayer extends DBLayer {
                 calendarDbItem.setTitle(calendar.getTitle());
                 calendarDbItem.setType(calendar.getType().name());
                 calendarDbItem.setCreated(now);
+                calendar.setPath(null);
+                calendar.setName(null);
                 calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
                 calendarDbItem.setModified(now);
                 getSession().save(calendarDbItem);
@@ -105,6 +112,8 @@ public class CalendarsDBLayer extends DBLayer {
                 }
                 calendarDbItem.setTitle(calendar.getTitle());
                 calendarDbItem.setType(calendar.getType().name());
+                calendar.setPath(null);
+                calendar.setName(null);
                 calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
                 calendarDbItem.setModified(now);
                 getSession().update(calendarDbItem);
@@ -144,11 +153,12 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
     
-    public List<DBItemCalendar> getCalendars(String type, Set<String> categories, Set<String> folders) throws DBConnectionRefusedException, DBInvalidDataException {
+    public List<DBItemCalendar> getCalendars(String type, Set<String> categories, Set<String> folders, Set<String> recuriveFolders) throws DBConnectionRefusedException, DBInvalidDataException {
+        //all recursiveFolders are included in folders too
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_CALENDARS);
-            if (type != null) {
+            if (type != null && !type.isEmpty()) {
                 sql.append(" where type = :type"); 
             } else {
                 sql.append(" where 1=1"); 
@@ -160,8 +170,27 @@ public class CalendarsDBLayer extends DBLayer {
                     sql.append(" and category in (:category)");
                 }
             }
+            if (folders != null && !folders.isEmpty()) {
+                if (folders.size() == 1) {
+                    if (recuriveFolders != null && recuriveFolders.contains(folders.iterator().next())) {
+                        sql.append(" and (directory = :directory or directory like :likeDirectory)");
+                    } else {
+                        sql.append(" and directory = :directory");
+                    }
+                } else {
+                    if (recuriveFolders != null && !recuriveFolders.isEmpty()) {
+                        sql.append(" and (directory in (:directory)");
+                        for (int i=0; i < recuriveFolders.size(); i++) {
+                            sql.append(" or directory like :likeDirectory"+i);
+                        }
+                        sql.append(")");
+                    } else {
+                        sql.append(" and directory in (:directory)");
+                    }
+                }
+            }
             Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
-            if (type != null) {
+            if (type != null && !type.isEmpty()) {
                 query.setParameter("type", type); 
             }
             if (categories != null && !categories.isEmpty()) {
@@ -171,7 +200,23 @@ public class CalendarsDBLayer extends DBLayer {
                     query.setParameterList("category", categories);
                 }
             }
-            //TODO folders
+            if (folders != null && !folders.isEmpty()) {
+                if (folders.size() == 1) {
+                    query.setParameter("directory", folders.iterator().next());
+                    if (recuriveFolders != null && recuriveFolders.contains(folders.iterator().next())) {
+                        query.setParameter("likeDirectory", recuriveFolders.iterator().next()+"/%");
+                    }
+                } else {
+                    query.setParameterList("directory", folders);
+                    if (recuriveFolders != null && !recuriveFolders.isEmpty()) {
+                        int index = 0;
+                        for (String recuriveFolder : recuriveFolders) {
+                            query.setParameter("likeDirectory"+index, recuriveFolder+"/%");
+                            index++;
+                        }
+                    }
+                }
+            }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

@@ -18,7 +18,6 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendar200;
 import com.sos.joc.model.calendar.CalendarFilter;
-import com.sos.joc.model.calendar.CalendarType;
 
 @Path("calendar")
 public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarResource {
@@ -44,10 +43,7 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
             }
             Calendar calendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
             calendar.setPath(calendarPath);
-            calendar.setName(calendarItem.getName());
-            calendar.setType(CalendarType.fromValue(calendarItem.getType()));
-            calendar.setTitle(calendarItem.getTitle());
-            calendar.setCategory(calendarItem.getCategory());
+            calendar.setName(calendarItem.getBaseName());
             Calendar200 entity = new Calendar200();
             entity.setCalendar(calendar);
             entity.setDeliveryDate(Date.from(Instant.now()));
