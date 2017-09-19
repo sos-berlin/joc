@@ -12,6 +12,7 @@
     "AGENTCLUSTER",
     "LOCK",
     "SCHEDULE",
+    "CALENDAR",
     "FOLDER",
     "JOBSCHEDULER",
     "OTHER"

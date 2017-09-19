@@ -76,11 +76,16 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
             List<Calendar> calendarList = new ArrayList<Calendar>();
             if (dbCalendars != null) {
                 ObjectMapper om = new ObjectMapper();
+                boolean compact = calendarsFilter.getCompact() != null && calendarsFilter.getCompact();
                 for (DBItemCalendar dbCalendar : dbCalendars) {
                     if (FilterAfterResponse.matchRegex(calendarsFilter.getRegex(), dbCalendar.getName())) {
                         Calendar calendar = om.readValue(dbCalendar.getConfiguration(), Calendar.class);
                         calendar.setPath(dbCalendar.getName());
                         calendar.setName(dbCalendar.getBaseName());
+                        if (compact) {
+                            calendar.setIncludes(null);
+                            calendar.setExcludes(null);
+                        }
                         calendarList.add(calendar);
                     }
                 }

@@ -16,6 +16,7 @@ import com.sos.auth.rest.SOSShiroFolderPermissions;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
+import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.inventory.files.InventoryFilesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Folder;
@@ -66,6 +67,11 @@ public class TreePermanent {
 					types.add(type);
 				}
 				break;
+			case CALENDAR:
+                if (sosPermission.getCalendar().isView()) {
+                    types.add(type);
+                }
+                break;
 			case FOLDER:
 				break;
 			default:
@@ -85,6 +91,7 @@ public class TreePermanent {
 			}
 		});
 		Set<String> bodyTypes = new HashSet<String>();
+		boolean withCalendar = false;
 		if (treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
 			for (JobSchedulerObjectType type : treeBody.getTypes()) {
 				switch (type) {
@@ -99,11 +106,16 @@ public class TreePermanent {
 					bodyTypes.add("process_class");
 					bodyTypes.add("agent_cluster");
 					break;
+				case CALENDAR:
+				    withCalendar = true;
+				    break;
 				default:
 					bodyTypes.add(type.name().toLowerCase());
 					break;
 				}
 			}
+		} else {
+		    withCalendar = true; 
 		}
 
 		SOSHibernateSession connection = null;
@@ -114,24 +126,44 @@ public class TreePermanent {
 
 			Globals.beginTransaction(connection);
 			InventoryFilesDBLayer dbLayer = new InventoryFilesDBLayer(connection);
+			CalendarsDBLayer dbCalendarLayer = new CalendarsDBLayer(connection);
 			List<String> results = null;
+			List<String> calendarResults = null;
 			if (treeBody.getFolders() != null && !treeBody.getFolders().isEmpty()) {
 				for (Folder folder : treeBody.getFolders()) {
 					String normalizedFolder = ("/" + folder.getFolder()).replaceAll("//+", "/");
 					results = dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes);
+					if (withCalendar) {
+					    calendarResults = dbCalendarLayer.getFoldersByFolder(normalizedFolder);
+					    if (calendarResults != null && !calendarResults.isEmpty()) {
+					        if (results == null) {
+					            results = new ArrayList<String>();
+					        } 
+					        results.addAll(calendarResults);
+					    }
+					}
 					if (results != null && !results.isEmpty()) {
 						if (folder.getRecursive() == null || folder.getRecursive()) {
 							folders.addAll(results);
 						} else {
 							Path parent = Paths.get(normalizedFolder);
 							for (String result : results) {
-								folders.add("/" + Paths.get(result).subpath(0, parent.getNameCount() + 1).toString());
+								folders.add("/" + Paths.get(result).subpath(0, parent.getNameCount() + 1).toString().replace('\\', '/'));
 							}
 						}
 					}
 				}
 			} else {
 				results = dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes);
+				if (withCalendar) {
+                    calendarResults = dbCalendarLayer.getFoldersByFolder("/");
+                    if (calendarResults != null && !calendarResults.isEmpty()) {
+                        if (results == null) {
+                            results = new ArrayList<String>();
+                        } 
+                        results.addAll(calendarResults);
+                    }
+                }
 				if (results != null && !results.isEmpty()) {
 					folders.addAll(results);
 				}

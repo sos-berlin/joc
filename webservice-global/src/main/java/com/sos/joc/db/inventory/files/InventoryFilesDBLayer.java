@@ -83,8 +83,8 @@ public class InventoryFilesDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("select fileDirectory from ").append(DBITEM_INVENTORY_FILES);
             sql.append(" where instanceId = :instanceId");
-            if (folderName != null) {
-                sql.append(" and fileDirectory like :folderName");
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                sql.append(" and (fileDirectory = :folderName or fileDirectory like :likeFolderName)");
             }
             if (types != null && !types.isEmpty()) {
                 if (types.size() == 1) {
@@ -95,8 +95,9 @@ public class InventoryFilesDBLayer extends DBLayer {
             }
             Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
-            if (folderName != null) {
-                query.setParameter("folderName", folderName + "%");
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                query.setParameter("folderName", folderName);
+                query.setParameter("folderName", folderName + "/%");
             }
             if (types != null && !types.isEmpty()) {
                 if (types.size() == 1) {

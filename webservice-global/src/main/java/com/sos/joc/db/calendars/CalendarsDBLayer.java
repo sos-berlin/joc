@@ -250,4 +250,24 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
+    public List<String> getFoldersByFolder(String folderName) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select directory from ").append(DBITEM_CALENDARS);
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                sql.append(" where directory = :folderName or directory like :likeFolderName");
+            }
+            Query<String> query = getSession().createQuery(sql.toString());
+            if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
+                query.setParameter("folderName", folderName);
+                query.setParameter("likeFolderName", folderName + "/%");
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
 }

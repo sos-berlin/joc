@@ -17,6 +17,7 @@ public enum JobSchedulerObjectType {
     AGENTCLUSTER("AGENTCLUSTER"),
     LOCK("LOCK"),
     SCHEDULE("SCHEDULE"),
+    CALENDAR("CALENDAR"),
     FOLDER("FOLDER"),
     JOBSCHEDULER("JOBSCHEDULER"),
     OTHER("OTHER");
