@@ -1,10 +1,7 @@
 package com.sos.joc.calendar.impl;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -15,6 +12,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarDatesResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.calendar.FrequencyResolver;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
@@ -22,7 +20,6 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarDatesFilter;
 import com.sos.joc.model.calendar.Dates;
-import com.sos.joc.model.calendar.Frequencies;
 
 @Path("calendar")
 public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalendarDatesResource {
@@ -33,14 +30,17 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
     public JOCDefaultResponse postCalendarDates(String accessToken, CalendarDatesFilter calendarFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, "", getPermissonsJocCockpit(
-                    accessToken).getCalendar().isView());
+            //TODO permissions for runtime and calendar
+            //getPermissonsJocCockpit(accessToken).getCalendar().isView()
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, "", true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            checkRequiredParameter("calendar dateFrom", calendarFilter.getDateFrom());
+            checkRequiredParameter("calendar dateTo", calendarFilter.getDateTo());
             boolean calendarPathIsDefined = calendarFilter.getPath() != null && !calendarFilter.getPath().isEmpty();
             if (!calendarPathIsDefined && calendarFilter.getCalendar() == null) {
-                throw new JocMissingRequiredParameterException("undefined 'calendar path'");
+                throw new JocMissingRequiredParameterException("'calendar' or 'path' parameter is required");
             }
             
             if (calendarPathIsDefined) {
@@ -54,23 +54,8 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
                 calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
             }
             
-            Set<String> dates = null;
-            Frequencies includes = calendarFilter.getCalendar().getIncludes();
-            if (includes != null) {
-                dates = new HashSet<String>();
-                dates.addAll(includes.getDates());
-                //TODO ...dates.add()
-                Frequencies excludes = calendarFilter.getCalendar().getExcludes();
-                if (excludes != null) {
-                    dates.removeAll(excludes.getDates());
-                    //TODO ...dates.remove()
-                }
-            }
-            
             Dates entity = new Dates();
-            if (dates != null) {
-                entity.setDates(new ArrayList<String>(dates)); 
-            }
+            entity.setDates(new FrequencyResolver().resolve(calendarFilter)); 
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

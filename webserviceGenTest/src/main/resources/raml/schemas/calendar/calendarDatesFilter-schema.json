@@ -14,15 +14,11 @@
     },
     "dateFrom": {
       "type": "string",
-      "pattern": "^(0|([0-9-]+[smhdwMy])+|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(,\\d{1,3})?)(Z|[+-]\\d{2}(:?\\d{2})?)?$"
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
     },
     "dateTo": {
       "type": "string",
-      "pattern": "^(0|([0-9-]+[smhdwMy])+|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(,\\d{1,3})?)(Z|[+-]\\d{2}(:?\\d{2})?)?$"
-    },
-    "timeZone": {
-      "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
-      "type": "string"
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
     }
   }
 }

@@ -40,7 +40,7 @@ public class Calendar {
      * 
      */
     @JsonProperty("type")
-    private CalendarType type;
+    private CalendarType type = CalendarType.fromValue("WORKING_DAYS");
     @JsonProperty("category")
     private String category;
     @JsonProperty("title")

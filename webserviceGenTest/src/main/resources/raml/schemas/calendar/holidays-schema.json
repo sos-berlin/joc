@@ -5,7 +5,7 @@
   "javaType": "com.sos.joc.model.calendar.Holidays",
   "type": "object",
   "properties": {
-    "calendarName": {
+    "nationalCalendar": {
       "type": "string"
     },
     "dates": {

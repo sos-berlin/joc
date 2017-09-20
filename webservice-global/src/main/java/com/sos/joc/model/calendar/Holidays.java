@@ -20,34 +20,34 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "calendarName",
+    "nationalCalendar",
     "dates"
 })
 public class Holidays {
 
-    @JsonProperty("calendarName")
-    private String calendarName;
+    @JsonProperty("nationalCalendar")
+    private String nationalCalendar;
     @JsonProperty("dates")
     private List<String> dates = null;
 
     /**
      * 
      * @return
-     *     The calendarName
+     *     The nationalCalendar
      */
-    @JsonProperty("calendarName")
-    public String getCalendarName() {
-        return calendarName;
+    @JsonProperty("nationalCalendar")
+    public String getNationalCalendar() {
+        return nationalCalendar;
     }
 
     /**
      * 
-     * @param calendarName
-     *     The calendarName
+     * @param nationalCalendar
+     *     The nationalCalendar
      */
-    @JsonProperty("calendarName")
-    public void setCalendarName(String calendarName) {
-        this.calendarName = calendarName;
+    @JsonProperty("nationalCalendar")
+    public void setNationalCalendar(String nationalCalendar) {
+        this.nationalCalendar = nationalCalendar;
     }
 
     /**
@@ -77,7 +77,7 @@ public class Holidays {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendarName).append(dates).toHashCode();
+        return new HashCodeBuilder().append(nationalCalendar).append(dates).toHashCode();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class Holidays {
             return false;
         }
         Holidays rhs = ((Holidays) other);
-        return new EqualsBuilder().append(calendarName, rhs.calendarName).append(dates, rhs.dates).isEquals();
+        return new EqualsBuilder().append(nationalCalendar, rhs.nationalCalendar).append(dates, rhs.dates).isEquals();
     }
 
 }

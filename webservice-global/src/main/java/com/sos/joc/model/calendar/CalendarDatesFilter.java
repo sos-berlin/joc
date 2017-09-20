@@ -22,8 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "calendar",
     "path",
     "dateFrom",
-    "dateTo",
-    "timeZone"
+    "dateTo"
 })
 public class CalendarDatesFilter {
 
@@ -41,12 +40,6 @@ public class CalendarDatesFilter {
     private String dateFrom;
     @JsonProperty("dateTo")
     private String dateTo;
-    /**
-     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-     * 
-     */
-    @JsonProperty("timeZone")
-    private String timeZone;
 
     /**
      * calendar
@@ -134,28 +127,6 @@ public class CalendarDatesFilter {
         this.dateTo = dateTo;
     }
 
-    /**
-     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-     * 
-     * @return
-     *     The timeZone
-     */
-    @JsonProperty("timeZone")
-    public String getTimeZone() {
-        return timeZone;
-    }
-
-    /**
-     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-     * 
-     * @param timeZone
-     *     The timeZone
-     */
-    @JsonProperty("timeZone")
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
-    }
-
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -163,7 +134,7 @@ public class CalendarDatesFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendar).append(path).append(dateFrom).append(dateTo).append(timeZone).toHashCode();
+        return new HashCodeBuilder().append(calendar).append(path).append(dateFrom).append(dateTo).toHashCode();
     }
 
     @Override
@@ -175,7 +146,7 @@ public class CalendarDatesFilter {
             return false;
         }
         CalendarDatesFilter rhs = ((CalendarDatesFilter) other);
-        return new EqualsBuilder().append(calendar, rhs.calendar).append(path, rhs.path).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).isEquals();
+        return new EqualsBuilder().append(calendar, rhs.calendar).append(path, rhs.path).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).isEquals();
     }
 
 }

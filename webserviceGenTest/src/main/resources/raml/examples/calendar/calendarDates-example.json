@@ -1,0 +1,5 @@
+{
+    "path":  "/path/to/myCalendar",
+    "dateFrom": "2017-01-01",
+    "dateTo": "2017-12-31"
+}

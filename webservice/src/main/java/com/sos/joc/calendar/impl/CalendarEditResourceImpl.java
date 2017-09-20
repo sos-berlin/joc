@@ -17,6 +17,7 @@ import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
+import com.sos.joc.model.calendar.CalendarType;
 
 @Path("calendar")
 public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalendarEditResource {
@@ -39,7 +40,8 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             }
             checkRequiredParameter("calendar path", calendar.getPath());
             if (calendar.getType() == null || calendar.getType().name().isEmpty()) {
-                throw new JocMissingRequiredParameterException("undefined 'calendar type'");
+//                throw new JocMissingRequiredParameterException("undefined 'calendar type'");
+                calendar.setType(CalendarType.WORKING_DAYS);
             }
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_STORE);

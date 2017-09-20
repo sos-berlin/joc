@@ -51,7 +51,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
             } else {
                 if (calendarsFilter.getType() != null && !calendarsFilter.getType().isEmpty()) {
                     try {
-                        CalendarType.fromValue(calendarsFilter.getType());
+                        CalendarType.fromValue(calendarsFilter.getType().toUpperCase());
                     } catch (IllegalArgumentException e) {
                         throw new JobSchedulerBadRequestException(String.format("Invalid value '%1$s' in 'type' parameter", calendarsFilter.getType()));
                     }
@@ -70,7 +70,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                         }
                     }
                 }
-                dbCalendars = dbLayer.getCalendars(calendarsFilter.getType(), categories, folders, recursiveFolders);
+                dbCalendars = dbLayer.getCalendars(calendarsFilter.getType().toUpperCase(), categories, folders, recursiveFolders);
             }
             
             List<Calendar> calendarList = new ArrayList<Calendar>();

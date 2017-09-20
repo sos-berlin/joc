@@ -7,5 +7,6 @@
   "enum": [
     "WORKING_DAYS",
     "NON_WORKING_DAYS"
-  ]
+  ],
+  "default": "WORKING_DAYS"
 }
