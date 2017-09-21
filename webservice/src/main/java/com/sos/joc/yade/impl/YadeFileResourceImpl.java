@@ -14,6 +14,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.yade.TransferFileUtils;
 import com.sos.joc.db.yade.JocDBLayerYade;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.yade.FileFilter;
@@ -48,7 +49,11 @@ public class YadeFileResourceImpl extends JOCResourceImpl implements IYadeFileRe
             TransferFile transferFile = null;
             if (fileId != null) {
                 DBItemYadeFiles file = dbLayer.getTransferFile(fileId);
-                transferFile = TransferFileUtils.initTransferFileFromDbItem(file);
+                if (file != null) {
+                    transferFile = TransferFileUtils.initTransferFileFromDbItem(file);
+                } else {
+                    throw new DBMissingDataException(String.format("File with id = %1$s not found in DB!", fileId));
+                }
             }
             TransferFile200 entity = new TransferFile200();
             entity.setFile(transferFile);
