@@ -12,7 +12,8 @@ public enum RepetitionText {
 
     DAILY("DAILY"),
     WEEKLY("WEEKLY"),
-    MONTHLY("MONTHLY");
+    MONTHLY("MONTHLY"),
+    YEARLY("YEARLY");
     private final String value;
     private final static Map<String, RepetitionText> CONSTANTS = new HashMap<String, RepetitionText>();
 

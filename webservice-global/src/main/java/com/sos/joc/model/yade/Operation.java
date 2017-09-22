@@ -13,7 +13,9 @@ public enum Operation {
     COPY("COPY"),
     MOVE("MOVE"),
     GETLIST("GETLIST"),
-    RENAME("RENAME");
+    RENAME("RENAME"),
+    COPYTOINTERNET("COPYTOINTERNET"),
+    COPYFROMINTERNET("COPYFROMINTERNET");
     private final String value;
     private final static Map<String, Operation> CONSTANTS = new HashMap<String, Operation>();
 

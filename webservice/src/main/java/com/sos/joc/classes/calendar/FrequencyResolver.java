@@ -246,8 +246,8 @@ public class FrequencyResolver {
     private void removeMonthDays(List<MonthDays> monthDays, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
         if (monthDays != null) {
             for (MonthDays monthDay : monthDays) {
-                removeAll(resolveMonthDays(monthDay.getDays(), monthDay.getWorkingDays(), monthDay.getWeeklyDays(), getFrom(monthDay.getFrom(),
-                        from), getTo(monthDay.getTo(), to)));
+                removeAll(resolveMonthDays(monthDay.getDays(), monthDay.getWorkingDays(), monthDay.getWeeklyDays(), getFrom(monthDay.getFrom(), from),
+                        getTo(monthDay.getTo(), to)));
             }
         }
     }
@@ -259,8 +259,8 @@ public class FrequencyResolver {
     private void addUltimos(List<MonthDays> ultimos, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
         if (ultimos != null) {
             for (MonthDays ultimo : ultimos) {
-                addAll(resolveUltimos(ultimo.getDays(), ultimo.getWorkingDays(), ultimo.getWeeklyDays(), getFrom(ultimo.getFrom(), from), getTo(
-                        ultimo.getTo(), to)));
+                addAll(resolveUltimos(ultimo.getDays(), ultimo.getWorkingDays(), ultimo.getWeeklyDays(), getFrom(ultimo.getFrom(), from), getTo(ultimo
+                        .getTo(), to)));
             }
         }
     }
@@ -312,7 +312,7 @@ public class FrequencyResolver {
                             addWeekDays(month.getWeekdays(), monthFrom, monthTo);
                             addMonthDays(month.getMonthdays(), monthFrom, monthTo);
                             addUltimos(month.getUltimos(), monthFrom, monthTo);
-                            
+
                         }
                         from.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
                         from.add(Calendar.DATE, 1);
@@ -346,15 +346,16 @@ public class FrequencyResolver {
             }
         }
     }
-    
+
     private Calendar getFromPerMonth(Calendar monthStart, Calendar refFrom) throws JobSchedulerInvalidResponseDataException {
         monthStart.set(Calendar.YEAR, refFrom.get(Calendar.YEAR));
         monthStart.set(Calendar.MONTH, refFrom.get(Calendar.MONTH));
         monthStart.set(Calendar.DAY_OF_MONTH, 1);
         return getFrom(monthStart, refFrom);
     }
-    
-    private Calendar getFromToMonth(Calendar monthEnd, Calendar refFrom, Calendar refTo, int lastDayOfMonth) throws JobSchedulerInvalidResponseDataException {
+
+    private Calendar getFromToMonth(Calendar monthEnd, Calendar refFrom, Calendar refTo, int lastDayOfMonth)
+            throws JobSchedulerInvalidResponseDataException {
         monthEnd.set(Calendar.YEAR, refFrom.get(Calendar.YEAR));
         monthEnd.set(Calendar.MONTH, refFrom.get(Calendar.MONTH));
         monthEnd.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
@@ -432,7 +433,7 @@ public class FrequencyResolver {
         }
         return (Calendar) toRef.clone();
     }
-    
+
     private boolean isBetweenFromTo(String date) throws JobSchedulerInvalidResponseDataException {
         if (date != null && !date.isEmpty()) {
             if (!date.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
@@ -446,13 +447,53 @@ public class FrequencyResolver {
         }
         return false;
     }
+
+    private Calendar getFirstDayOfMonth(Calendar firstDayOfMonth, Calendar refCal) {
+        return getDayOfMonth(firstDayOfMonth, refCal, 1);
+    }
+
+    private Calendar getLastDayOfMonth(Calendar lastDayOfMonth, Calendar refCal) {
+        return getDayOfMonth(lastDayOfMonth, refCal, refCal.getActualMaximum(Calendar.DAY_OF_MONTH));
+    }
+
+    private Calendar getDayOfMonth(Calendar firstDayOfMonth, Calendar refCal, int dayOfMonth) {
+        firstDayOfMonth.set(Calendar.YEAR, refCal.get(Calendar.YEAR));
+        firstDayOfMonth.set(Calendar.MONTH, refCal.get(Calendar.MONTH));
+        firstDayOfMonth.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        return firstDayOfMonth;
+    }
     
+    private int getWorkingDay(Calendar currentDay, Calendar firstDayOfMonth) {
+        // WEEK_OF_MONTH == 0 if first day is SA or SU
+        int countWeekEndDays = (currentDay.get(Calendar.WEEK_OF_MONTH) - firstDayOfMonth.get(Calendar.WEEK_OF_MONTH)) * 2;
+        if (firstDayOfMonth.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+            countWeekEndDays--;
+        }
+        return currentDay.get(Calendar.DAY_OF_MONTH) - countWeekEndDays;
+        // int prevSunday = dayOfMonth - dayOfWeek + 1;
+        // if (prevSunday <= 0) {
+        // return dayOfMonth;
+        // }
+        // int a = (prevSunday / 7);
+        // int b = (prevSunday % 7);
+        // if (b > 1) {
+        // b = 2;
+        // }
+        // return dayOfMonth - (a * 2) - b;
+    }
+    
+    private int getUltimoWorkingDay(Calendar currentDay, Calendar lastDayOfMonth, Calendar firstDayOfMonth) {
+        int maxWorkingDaysInMonth = getWorkingDay(lastDayOfMonth, firstDayOfMonth);
+        int workingDayInMonth = getWorkingDay(currentDay, firstDayOfMonth);
+        return maxWorkingDaysInMonth - workingDayInMonth + 1;
+    }
+
     private List<String> resolveDates(List<String> dates) throws JobSchedulerInvalidResponseDataException {
         List<String> d = new ArrayList<String>();
         if (dates != null && !dates.isEmpty()) {
             for (String date : dates) {
                 if (isBetweenFromTo(date)) {
-                   d.add(date); 
+                    d.add(date);
                 }
             }
         }
@@ -483,6 +524,7 @@ public class FrequencyResolver {
 
         List<String> dates = new ArrayList<String>();
         WeeklyDay weeklyDay = new WeeklyDay();
+        Calendar firstDayOfMonth = Calendar.getInstance();
 
         while (from.compareTo(to) <= 0) {
             if (days != null) {
@@ -491,7 +533,11 @@ public class FrequencyResolver {
                 }
             }
             if (workingDays != null) {
-                // TODO
+                if (from.get(Calendar.DAY_OF_WEEK) != 1 && from.get(Calendar.DAY_OF_WEEK) != 7) {
+                    if (days.contains(getWorkingDay(from, getFirstDayOfMonth(firstDayOfMonth, from)))) {
+                        dates.add(df.format(from.getTime()));
+                    }
+                }
             }
             if (weeklyDays != null) {
                 weeklyDay.setDay(from.get(Calendar.DAY_OF_WEEK) - 1);
@@ -510,6 +556,8 @@ public class FrequencyResolver {
 
         List<String> dates = new ArrayList<String>();
         WeeklyDay weeklyDay = new WeeklyDay();
+        Calendar firstDayOfMonth = Calendar.getInstance();
+        Calendar lastDayOfMonth = Calendar.getInstance();
 
         while (from.compareTo(to) <= 0) {
             if (days != null) {
@@ -519,7 +567,12 @@ public class FrequencyResolver {
                 }
             }
             if (workingDays != null) {
-                // TODO
+                if (from.get(Calendar.DAY_OF_WEEK) != 1 && from.get(Calendar.DAY_OF_WEEK) != 7) {
+                    if (days.contains(getUltimoWorkingDay(from, getLastDayOfMonth(lastDayOfMonth, from), 
+                            getFirstDayOfMonth(firstDayOfMonth, from)))) {
+                        dates.add(df.format(from.getTime()));
+                    }
+                }
             }
             if (weeklyDays != null) {
                 int weeOfUltimo = from.getActualMaximum(Calendar.WEEK_OF_MONTH) + 1 - from.get(Calendar.WEEK_OF_MONTH);
@@ -554,11 +607,18 @@ public class FrequencyResolver {
             case MONTHLY:
                 from.add(Calendar.MONTH, step);
                 if (dayOfMonth > from.get(Calendar.DAY_OF_MONTH) && from.getActualMaximum(Calendar.DAY_OF_MONTH) >= dayOfMonth) {
-                   from.set(Calendar.DAY_OF_MONTH, dayOfMonth); 
+                    from.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 }
                 break;
             case WEEKLY:
                 from.add(Calendar.DATE, (step * 7));
+                break;
+            case YEARLY:
+                from.add(Calendar.YEAR, step);
+                //if original 'from' was 29th of FEB
+                if (dayOfMonth > from.get(Calendar.DAY_OF_MONTH) && from.getActualMaximum(Calendar.DAY_OF_MONTH) >= dayOfMonth) {
+                    from.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                }
                 break;
             }
         }

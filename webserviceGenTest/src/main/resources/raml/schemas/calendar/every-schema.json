@@ -20,7 +20,8 @@
       "enum": [
         "DAILY",
         "WEEKLY",
-        "MONTHLY"
+        "MONTHLY",
+        "YEARLY"
       ]
     },
     "step": {

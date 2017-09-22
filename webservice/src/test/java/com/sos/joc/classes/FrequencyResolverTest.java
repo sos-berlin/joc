@@ -39,13 +39,33 @@ public class FrequencyResolverTest {
         json += "    \"ultimos\":[{\"from\":\"\", \"to\":\"2017-07-01\", \"days\":[8, 11]}]";
         json += "}]";
         json += "}}";
-        LOGGER.info(json);
+        //LOGGER.info(json);
         CalendarDatesFilter calendarFilter = new CalendarDatesFilter();
         calendarFilter.setDateFrom("2017-01-01");
         calendarFilter.setDateTo("2017-12-31");
         calendarFilter.setCalendar(new ObjectMapper().readValue(json, Calendar.class));
         fr.init(calendarFilter);
     }
+    
+//    @Test
+//    public void getWorkingDayOfMonthTest() throws Exception {
+//        java.util.Calendar cal = java.util.Calendar.getInstance();
+//        cal.setTime(Date.from(Instant.parse("2017-06-22T00:00:00Z")));
+//        int workingDay = fr.getWorkingDay(cal, fr.getFirstDayOfMonth(java.util.Calendar.getInstance(), cal));
+//        int expected = 16;
+//        LOGGER.info(workingDay+"");
+//        assertEquals("getWorkingDayOfMonthTest", expected, workingDay);
+//    }
+//    
+//    @Test
+//    public void getUltimoWorkingDayOfMonthTest() throws Exception {
+//        java.util.Calendar cal = java.util.Calendar.getInstance();
+//        cal.setTime(Date.from(Instant.parse("2017-06-22T00:00:00Z")));
+//        int workingDay = fr.getUltimoWorkingDay(cal, fr.getLastDayOfMonth(java.util.Calendar.getInstance(), cal), fr.getFirstDayOfMonth(java.util.Calendar.getInstance(), cal));
+//        int expected = 7;
+//        LOGGER.info(workingDay+"");
+//        assertEquals("getUltimoWorkingDayOfMonthTest", expected, workingDay);
+//    }
 
     @Test
     public void addDatesTest() throws Exception {
