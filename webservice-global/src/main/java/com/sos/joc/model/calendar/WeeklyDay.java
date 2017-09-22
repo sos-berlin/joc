@@ -20,7 +20,7 @@ public class WeeklyDay {
     /**
      * dayOfWeek number
      * <p>
-     * digit from 0-7, 0=Sunday, 1=Monday, ..., 6=Saturday, 7=Sunday
+     * digit from 0-6, 0=Sunday, 1=Monday, ..., 6=Saturday
      * 
      */
     @JsonProperty("day")
@@ -31,7 +31,7 @@ public class WeeklyDay {
     /**
      * dayOfWeek number
      * <p>
-     * digit from 0-7, 0=Sunday, 1=Monday, ..., 6=Saturday, 7=Sunday
+     * digit from 0-6, 0=Sunday, 1=Monday, ..., 6=Saturday
      * 
      * @return
      *     The day
@@ -44,7 +44,7 @@ public class WeeklyDay {
     /**
      * dayOfWeek number
      * <p>
-     * digit from 0-7, 0=Sunday, 1=Monday, ..., 6=Saturday, 7=Sunday
+     * digit from 0-6, 0=Sunday, 1=Monday, ..., 6=Saturday
      * 
      * @param day
      *     The day

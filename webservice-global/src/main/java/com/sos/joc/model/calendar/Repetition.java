@@ -42,16 +42,15 @@ public class Repetition {
      */
     @JsonProperty("to")
     private String to;
-    @JsonProperty("repetition")
-    private RepetitionText repetition;
     /**
-     * non negative integer
-     * <p>
      * 
+     * (Required)
      * 
      */
+    @JsonProperty("repetition")
+    private RepetitionText repetition;
     @JsonProperty("step")
-    private Integer step;
+    private Integer step = 1;
 
     /**
      * date
@@ -107,6 +106,8 @@ public class Repetition {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The repetition
      */
@@ -117,6 +118,8 @@ public class Repetition {
 
     /**
      * 
+     * (Required)
+     * 
      * @param repetition
      *     The repetition
      */
@@ -126,9 +129,6 @@ public class Repetition {
     }
 
     /**
-     * non negative integer
-     * <p>
-     * 
      * 
      * @return
      *     The step
@@ -139,9 +139,6 @@ public class Repetition {
     }
 
     /**
-     * non negative integer
-     * <p>
-     * 
      * 
      * @param step
      *     The step

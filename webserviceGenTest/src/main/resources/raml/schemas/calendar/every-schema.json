@@ -5,7 +5,7 @@
   "javaType": "com.sos.joc.model.calendar.Repetition",
   "type": "object",
   "required": [
-    "dateEntity"
+    "repetition"
   ],
   "properties": {
     "from": {
@@ -24,7 +24,9 @@
       ]
     },
     "step": {
-      "$ref": "../common/nonNegativeInteger-schema.json"
+      "type": "integer",
+	  "minimum": 1,
+	  "default": 1
     }
   }
 }

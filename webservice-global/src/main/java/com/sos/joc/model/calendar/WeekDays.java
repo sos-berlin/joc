@@ -42,6 +42,11 @@ public class WeekDays {
      */
     @JsonProperty("to")
     private String to;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("days")
     private List<Integer> days = null;
 
@@ -99,6 +104,8 @@ public class WeekDays {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
      *     The days
      */
@@ -108,6 +115,8 @@ public class WeekDays {
     }
 
     /**
+     * 
+     * (Required)
      * 
      * @param days
      *     The days

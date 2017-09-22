@@ -1,9 +1,11 @@
 package com.sos.joc.classes.calendar;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -16,23 +18,20 @@ import com.sos.joc.model.calendar.Holidays;
 import com.sos.joc.model.calendar.MonthDays;
 import com.sos.joc.model.calendar.Months;
 import com.sos.joc.model.calendar.Repetition;
+import com.sos.joc.model.calendar.RepetitionText;
 import com.sos.joc.model.calendar.WeekDays;
+import com.sos.joc.model.calendar.WeeklyDay;
 
 public class FrequencyResolver {
 
-    private SortedSet<String> dates = new TreeSet<String>(new Comparator<String>() {
-
-        public int compare(String a, String b) {
-            return b.compareTo(a);
-        }
-    });
-    private Instant dateFrom = null;
-    private Instant dateTo = null;
+    private SortedSet<String> dates = new TreeSet<String>();
+    private Calendar dateFrom = null;
+    private Calendar dateTo = null;
     private Frequencies includes = null;
     private Frequencies excludes = null;
+    private DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
     public FrequencyResolver() {
-        //
     }
 
     public SortedSet<String> getDates() {
@@ -77,43 +76,45 @@ public class FrequencyResolver {
         if (dateFrom == null || dateFrom.isEmpty()) {
             throw new JocMissingRequiredParameterException("'dateFrom' parameter is undefined.");
         }
-        if (!dateFrom.matches("^\\d{4}-\\d{2}-\\d{2}")) {
+        if (!dateFrom.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
             throw new JobSchedulerInvalidResponseDataException("'dateFrom' parameter must have the format YYYY-MM-DD.");
         }
-        this.dateFrom = Instant.parse(dateFrom + "T00:00:00Z");
+        this.dateFrom = Calendar.getInstance();
+        this.dateFrom.setTime(Date.from(Instant.parse(dateFrom + "T00:00:00Z")));
     }
 
     public void setDateTo(String dateTo) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
         if (dateTo == null || dateTo.isEmpty()) {
             throw new JocMissingRequiredParameterException("'dateTo' parameter is undefined.");
         }
-        if (!dateTo.matches("^\\d{4}-\\d{2}-\\d{2}")) {
+        if (!dateTo.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
             throw new JobSchedulerInvalidResponseDataException("'dateTo' parameter must have the format YYYY-MM-DD.");
         }
-        this.dateTo = Instant.parse(dateTo + "T00:00:00Z");
+        this.dateTo = Calendar.getInstance();
+        this.dateTo.setTime(Date.from(Instant.parse(dateTo + "T00:00:00Z")));
     }
 
-    public void addDates() {
+    public void addDates() throws JobSchedulerInvalidResponseDataException {
         if (includes != null) {
             addDates(includes.getDates());
         }
     }
 
-    public void removeDates() {
+    public void removeDates() throws JobSchedulerInvalidResponseDataException {
         if (excludes != null && dates.size() > 0) {
-            addDates(excludes.getDates());
+            removeDates(excludes.getDates());
         }
     }
 
-    public void addHolidays() {
+    public void addHolidays() throws JobSchedulerInvalidResponseDataException {
         if (includes != null) {
             addHolidays(includes.getHolidays());
         }
     }
 
-    public void removeHolidays() {
+    public void removeHolidays() throws JobSchedulerInvalidResponseDataException {
         if (excludes != null && dates.size() > 0) {
-            addHolidays(excludes.getHolidays());
+            removeHolidays(excludes.getHolidays());
         }
     }
 
@@ -161,7 +162,7 @@ public class FrequencyResolver {
 
     public void removeRepetitions() throws JobSchedulerInvalidResponseDataException {
         if (excludes != null && dates.size() > 0) {
-            addRepetitions(excludes.getRepetitions());
+            removeRepetitions(excludes.getRepetitions());
         }
     }
 
@@ -177,15 +178,15 @@ public class FrequencyResolver {
         }
     }
 
-    public void addDates(List<String> list) {
-        addAll(list);
+    private void addDates(List<String> list) throws JobSchedulerInvalidResponseDataException {
+        addAll(resolveDates(list));
     }
 
-    public void removeDates(List<String> list) {
-        removeAll(list);
+    private void removeDates(List<String> list) throws JobSchedulerInvalidResponseDataException {
+        removeAll(resolveDates(list));
     }
 
-    public void addHolidays(List<Holidays> holidays) {
+    private void addHolidays(List<Holidays> holidays) throws JobSchedulerInvalidResponseDataException {
         if (holidays != null) {
             for (Holidays holiday : holidays) {
                 addDates(holiday.getDates());
@@ -193,7 +194,7 @@ public class FrequencyResolver {
         }
     }
 
-    public void removeHolidays(List<Holidays> holidays) {
+    private void removeHolidays(List<Holidays> holidays) throws JobSchedulerInvalidResponseDataException {
         if (holidays != null) {
             for (Holidays holiday : holidays) {
                 removeDates(holiday.getDates());
@@ -201,134 +202,367 @@ public class FrequencyResolver {
         }
     }
 
-    public void addWeekDays(List<WeekDays> weekDays) throws JobSchedulerInvalidResponseDataException {
+    private void addWeekDays(List<WeekDays> weekDays) throws JobSchedulerInvalidResponseDataException {
+        addWeekDays(weekDays, dateFrom, dateTo);
+    }
+
+    private void addWeekDays(List<WeekDays> weekDays, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
         if (weekDays != null) {
             for (WeekDays weekDay : weekDays) {
-                addDates(FrequencyWeekDaysResolver.resolve(weekDay.getDays(), getFrom(weekDay.getFrom()), getTo(weekDay.getTo())));
+                addAll(resolveWeekDays(weekDay.getDays(), getFrom(weekDay.getFrom(), from), getTo(weekDay.getTo(), to)));
             }
         }
     }
 
-    public void removeWeekDays(List<WeekDays> weekDays) throws JobSchedulerInvalidResponseDataException {
+    private void removeWeekDays(List<WeekDays> weekDays) throws JobSchedulerInvalidResponseDataException {
+        removeWeekDays(weekDays, dateFrom, dateTo);
+    }
+
+    private void removeWeekDays(List<WeekDays> weekDays, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
         if (weekDays != null) {
             for (WeekDays weekDay : weekDays) {
-                removeDates(FrequencyWeekDaysResolver.resolve(weekDay.getDays(), getFrom(weekDay.getFrom()), getTo(weekDay.getTo())));
+                removeAll(resolveWeekDays(weekDay.getDays(), getFrom(weekDay.getFrom(), from), getTo(weekDay.getTo(), to)));
             }
         }
     }
 
-    public void addMonthDays(List<MonthDays> monthDays) throws JobSchedulerInvalidResponseDataException {
+    private void addMonthDays(List<MonthDays> monthDays) throws JobSchedulerInvalidResponseDataException {
+        addMonthDays(monthDays, dateFrom, dateTo);
+    }
+
+    private void addMonthDays(List<MonthDays> monthDays, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
         if (monthDays != null) {
             for (MonthDays monthDay : monthDays) {
-                addDates(FrequencyMonthDaysResolver.resolve(monthDay.getDays(), monthDay.getWorkingDays(), monthDay.getWeeklyDays(), getFrom(monthDay
-                        .getFrom()), getTo(monthDay.getTo())));
+                addAll(resolveMonthDays(monthDay.getDays(), monthDay.getWorkingDays(), monthDay.getWeeklyDays(), getFrom(monthDay.getFrom(), from),
+                        getTo(monthDay.getTo(), to)));
             }
         }
     }
 
-    public void removeMonthDays(List<MonthDays> monthDays) throws JobSchedulerInvalidResponseDataException {
+    private void removeMonthDays(List<MonthDays> monthDays) throws JobSchedulerInvalidResponseDataException {
+        removeMonthDays(monthDays, dateFrom, dateTo);
+    }
+
+    private void removeMonthDays(List<MonthDays> monthDays, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
         if (monthDays != null) {
             for (MonthDays monthDay : monthDays) {
-                removeDates(FrequencyMonthDaysResolver.resolve(monthDay.getDays(), monthDay.getWorkingDays(), monthDay.getWeeklyDays(), getFrom(
-                        monthDay.getFrom()), getTo(monthDay.getTo())));
+                removeAll(resolveMonthDays(monthDay.getDays(), monthDay.getWorkingDays(), monthDay.getWeeklyDays(), getFrom(monthDay.getFrom(),
+                        from), getTo(monthDay.getTo(), to)));
             }
         }
     }
 
-    public void addUltimos(List<MonthDays> ultimos) throws JobSchedulerInvalidResponseDataException {
+    private void addUltimos(List<MonthDays> monthDays) throws JobSchedulerInvalidResponseDataException {
+        addUltimos(monthDays, dateFrom, dateTo);
+    }
+
+    private void addUltimos(List<MonthDays> ultimos, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
         if (ultimos != null) {
             for (MonthDays ultimo : ultimos) {
-                addDates(FrequencyUltimosResolver.resolve(ultimo.getDays(), ultimo.getWorkingDays(), ultimo.getWeeklyDays(), getFrom(ultimo
-                        .getFrom()), getTo(ultimo.getTo())));
+                addAll(resolveUltimos(ultimo.getDays(), ultimo.getWorkingDays(), ultimo.getWeeklyDays(), getFrom(ultimo.getFrom(), from), getTo(
+                        ultimo.getTo(), to)));
             }
         }
     }
 
-    public void removeUltimos(List<MonthDays> ultimos) throws JobSchedulerInvalidResponseDataException {
+    private void removeUltimos(List<MonthDays> monthDays) throws JobSchedulerInvalidResponseDataException {
+        removeUltimos(monthDays, dateFrom, dateTo);
+    }
+
+    private void removeUltimos(List<MonthDays> ultimos, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
         if (ultimos != null) {
             for (MonthDays ultimo : ultimos) {
-                removeDates(FrequencyUltimosResolver.resolve(ultimo.getDays(), ultimo.getWorkingDays(), ultimo.getWeeklyDays(), getFrom(ultimo
-                        .getFrom()), getTo(ultimo.getTo())));
+                removeAll(resolveUltimos(ultimo.getDays(), ultimo.getWorkingDays(), ultimo.getWeeklyDays(), getFrom(ultimo.getFrom(), from), getTo(
+                        ultimo.getTo(), to)));
             }
         }
     }
 
-    public void addRepetitions(List<Repetition> repetitions) throws JobSchedulerInvalidResponseDataException {
+    private void addRepetitions(List<Repetition> repetitions) throws JobSchedulerInvalidResponseDataException {
         if (repetitions != null) {
             for (Repetition repetition : repetitions) {
-                addDates(FrequencyRepetitionResolver.resolve(repetition.getRepetition(), repetition.getStep(), getFrom(repetition.getFrom()), getTo(
-                        repetition.getTo())));
+                addAll(resolveRepetitions(repetition.getRepetition(), repetition.getStep(), getFrom(repetition.getFrom()), getTo(repetition
+                        .getTo())));
             }
         }
     }
 
-    public void removeRepetitions(List<Repetition> repetitions) throws JobSchedulerInvalidResponseDataException {
+    private void removeRepetitions(List<Repetition> repetitions) throws JobSchedulerInvalidResponseDataException {
         if (repetitions != null) {
             for (Repetition repetition : repetitions) {
-                removeDates(FrequencyRepetitionResolver.resolve(repetition.getRepetition(), repetition.getStep(), getFrom(repetition.getFrom()),
-                        getTo(repetition.getTo())));
+                removeAll(resolveRepetitions(repetition.getRepetition(), repetition.getStep(), getFrom(repetition.getFrom()), getTo(repetition
+                        .getTo())));
             }
         }
     }
 
-    public void addMonths(List<Months> months) throws JobSchedulerInvalidResponseDataException {
+    private void addMonths(List<Months> months) throws JobSchedulerInvalidResponseDataException {
         if (months != null) {
+            Calendar monthStart = Calendar.getInstance();
+            Calendar monthEnd = Calendar.getInstance();
             for (Months month : months) {
-                addDates(FrequencyMonthsResolver.resolve(month.getMonths(), month.getWeekdays(), month.getMonthdays(), month.getUltimos(), getFrom(
-                        month.getFrom()), getTo(month.getTo())));
+                if (month.getMonths() != null) {
+                    Calendar from = getFrom(month.getFrom());
+                    Calendar to = getTo(month.getTo());
+                    while (from.compareTo(to) <= 0) {
+                        int lastDayOfMonth = from.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        if (month.getMonths().contains(from.get(Calendar.MONTH) + 1)) {
+                            Calendar monthFrom = getFromPerMonth(monthStart, from);
+                            Calendar monthTo = getFromToMonth(monthEnd, from, to, lastDayOfMonth);
+                            addWeekDays(month.getWeekdays(), monthFrom, monthTo);
+                            addMonthDays(month.getMonthdays(), monthFrom, monthTo);
+                            addUltimos(month.getUltimos(), monthFrom, monthTo);
+                            
+                        }
+                        from.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
+                        from.add(Calendar.DATE, 1);
+                    }
+                }
             }
         }
     }
 
-    public void removeMonths(List<Months> months) throws JobSchedulerInvalidResponseDataException {
+    private void removeMonths(List<Months> months) throws JobSchedulerInvalidResponseDataException {
         if (months != null) {
+            Calendar monthStart = Calendar.getInstance();
+            Calendar monthEnd = Calendar.getInstance();
             for (Months month : months) {
-                removeDates(FrequencyMonthsResolver.resolve(month.getMonths(), month.getWeekdays(), month.getMonthdays(), month.getUltimos(), getFrom(
-                        month.getFrom()), getTo(month.getTo())));
+                if (month.getMonths() != null) {
+                    Calendar from = getFrom(month.getFrom());
+                    Calendar to = getTo(month.getTo());
+                    while (from.compareTo(to) <= 0) {
+                        int lastDayOfMonth = from.getActualMaximum(Calendar.DAY_OF_MONTH);
+                        if (month.getMonths().contains(from.get(Calendar.MONTH) + 1)) {
+                            Calendar monthFrom = getFromPerMonth(monthStart, from);
+                            Calendar monthTo = getFromToMonth(monthEnd, from, to, lastDayOfMonth);
+                            removeWeekDays(month.getWeekdays(), monthFrom, monthTo);
+                            removeMonthDays(month.getMonthdays(), monthFrom, monthTo);
+                            removeUltimos(month.getUltimos(), monthFrom, monthTo);
+                        }
+                        from.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
+                        from.add(Calendar.DATE, 1);
+                    }
+                }
             }
         }
     }
+    
+    private Calendar getFromPerMonth(Calendar monthStart, Calendar refFrom) throws JobSchedulerInvalidResponseDataException {
+        monthStart.set(Calendar.YEAR, refFrom.get(Calendar.YEAR));
+        monthStart.set(Calendar.MONTH, refFrom.get(Calendar.MONTH));
+        monthStart.set(Calendar.DAY_OF_MONTH, 1);
+        return getFrom(monthStart, refFrom);
+    }
+    
+    private Calendar getFromToMonth(Calendar monthEnd, Calendar refFrom, Calendar refTo, int lastDayOfMonth) throws JobSchedulerInvalidResponseDataException {
+        monthEnd.set(Calendar.YEAR, refFrom.get(Calendar.YEAR));
+        monthEnd.set(Calendar.MONTH, refFrom.get(Calendar.MONTH));
+        monthEnd.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
+        return getTo(monthEnd, refTo);
+    }
 
-    private boolean addAll(Collection<String> c) {
-        if (c == null) {
+    private boolean addAll(List<String> list) {
+        if (list == null) {
             return false;
         }
-        return dates.addAll(c);
+        return dates.addAll(list);
     }
 
-    private boolean removeAll(Collection<String> c) {
-        if (c == null) {
+    private boolean removeAll(List<String> list) {
+        if (list == null) {
             return false;
         }
-        return dates.removeAll(c);
+        return dates.removeAll(list);
     }
 
-    private Instant getFrom(String from) throws JobSchedulerInvalidResponseDataException {
+    private Calendar getFrom(String from) throws JobSchedulerInvalidResponseDataException {
+        return getFrom(from, dateFrom);
+    }
+
+    private Calendar getTo(String to) throws JobSchedulerInvalidResponseDataException {
+        return getTo(to, dateTo);
+    }
+
+    private Calendar getFrom(String from, Calendar fromRef) throws JobSchedulerInvalidResponseDataException {
+        Calendar cal = Calendar.getInstance();
         if (from == null || from.isEmpty()) {
-            return dateFrom;
+            return (Calendar) fromRef.clone();
         }
-        if (!from.matches("^\\d{4}-\\d{2}-\\d{2}")) {
+        if (!from.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
             throw new JobSchedulerInvalidResponseDataException("json field 'from' must have the format YYYY-MM-DD.");
         }
-        Instant instant = Instant.parse(from + "T00:00:00Z");
-        if (instant.compareTo(dateFrom) > 0) {
-            return instant;
+        cal.setTime(Date.from(Instant.parse(from + "T00:00:00Z")));
+        if (cal.after(fromRef)) {
+            return cal;
         }
-        return dateFrom;
+        return (Calendar) fromRef.clone();
     }
 
-    private Instant getTo(String to) throws JobSchedulerInvalidResponseDataException {
-        if (to == null || to.isEmpty()) {
-            return dateTo;
+    private Calendar getFrom(Calendar from, Calendar fromRef) throws JobSchedulerInvalidResponseDataException {
+        if (from == null) {
+            return (Calendar) fromRef.clone();
         }
-        if (!to.matches("^\\d{4}-\\d{2}-\\d{2}")) {
+        if (from.after(fromRef)) {
+            return from;
+        }
+        return (Calendar) fromRef.clone();
+    }
+
+    private Calendar getTo(String to, Calendar toRef) throws JobSchedulerInvalidResponseDataException {
+        if (to == null || to.isEmpty()) {
+            return (Calendar) toRef.clone();
+        }
+        if (!to.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
             throw new JobSchedulerInvalidResponseDataException("json field 'to' must have the format YYYY-MM-DD.");
         }
-        Instant instant = Instant.parse(to + "T00:00:00Z");
-        if (instant.compareTo(dateTo) < 0) {
-            return instant;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(Date.from(Instant.parse(to + "T00:00:00Z")));
+        if (cal.before(toRef)) {
+            return cal;
         }
-        return dateFrom;
+        return (Calendar) toRef.clone();
+    }
+
+    private Calendar getTo(Calendar to, Calendar toRef) throws JobSchedulerInvalidResponseDataException {
+        if (to == null) {
+            return (Calendar) toRef.clone();
+        }
+        if (to.before(toRef)) {
+            return to;
+        }
+        return (Calendar) toRef.clone();
+    }
+    
+    private boolean isBetweenFromTo(String date) throws JobSchedulerInvalidResponseDataException {
+        if (date != null && !date.isEmpty()) {
+            if (!date.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+                throw new JobSchedulerInvalidResponseDataException("dates must have the format YYYY-MM-DD.");
+            }
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(Date.from(Instant.parse(date + "T00:00:00Z")));
+            if (cal.compareTo(dateTo) <= 0 && cal.compareTo(dateFrom) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private List<String> resolveDates(List<String> dates) throws JobSchedulerInvalidResponseDataException {
+        List<String> d = new ArrayList<String>();
+        if (dates != null && !dates.isEmpty()) {
+            for (String date : dates) {
+                if (isBetweenFromTo(date)) {
+                   d.add(date); 
+                }
+            }
+        }
+        return d;
+    }
+
+    private List<String> resolveWeekDays(List<Integer> days, Calendar from, Calendar to) throws JobSchedulerInvalidResponseDataException {
+        if (days == null || days.isEmpty()) {
+            throw new JobSchedulerInvalidResponseDataException("json field 'days' in 'weekdays' is undefined.");
+        }
+        if (days.contains(7) && !days.contains(0)) {
+            days.add(0);
+        }
+        List<String> dates = new ArrayList<String>();
+
+        while (from.compareTo(to) <= 0) {
+            // Calendar.DAY_OF_WEEK: 1=Sunday, 2=Monday, ... -> -1
+            if (days.contains(from.get(Calendar.DAY_OF_WEEK) - 1)) {
+                dates.add(df.format(from.getTime()));
+            }
+            from.add(Calendar.DATE, 1);
+        }
+        return dates;
+    }
+
+    private List<String> resolveMonthDays(List<Integer> days, List<Integer> workingDays, List<WeeklyDay> weeklyDays, Calendar from, Calendar to)
+            throws JobSchedulerInvalidResponseDataException {
+
+        List<String> dates = new ArrayList<String>();
+        WeeklyDay weeklyDay = new WeeklyDay();
+
+        while (from.compareTo(to) <= 0) {
+            if (days != null) {
+                if (days.contains(from.get(Calendar.DAY_OF_MONTH))) {
+                    dates.add(df.format(from.getTime()));
+                }
+            }
+            if (workingDays != null) {
+                // TODO
+            }
+            if (weeklyDays != null) {
+                weeklyDay.setDay(from.get(Calendar.DAY_OF_WEEK) - 1);
+                weeklyDay.setWeekOfMonth(from.get(Calendar.WEEK_OF_MONTH));
+                if (weeklyDays.contains(weeklyDay)) {
+                    dates.add(df.format(from.getTime()));
+                }
+            }
+            from.add(Calendar.DATE, 1);
+        }
+        return dates;
+    }
+
+    private List<String> resolveUltimos(List<Integer> days, List<Integer> workingDays, List<WeeklyDay> weeklyDays, Calendar from, Calendar to)
+            throws JobSchedulerInvalidResponseDataException {
+
+        List<String> dates = new ArrayList<String>();
+        WeeklyDay weeklyDay = new WeeklyDay();
+
+        while (from.compareTo(to) <= 0) {
+            if (days != null) {
+                int dayOfUltimo = from.getActualMaximum(Calendar.DAY_OF_MONTH) + 1 - from.get(Calendar.DAY_OF_MONTH);
+                if (days.contains(dayOfUltimo)) {
+                    dates.add(df.format(from.getTime()));
+                }
+            }
+            if (workingDays != null) {
+                // TODO
+            }
+            if (weeklyDays != null) {
+                int weeOfUltimo = from.getActualMaximum(Calendar.WEEK_OF_MONTH) + 1 - from.get(Calendar.WEEK_OF_MONTH);
+                weeklyDay.setDay(from.get(Calendar.DAY_OF_WEEK) - 1);
+                weeklyDay.setWeekOfMonth(weeOfUltimo);
+                if (weeklyDays.contains(weeklyDay)) {
+                    dates.add(df.format(from.getTime()));
+                }
+            }
+            from.add(Calendar.DATE, 1);
+        }
+        return dates;
+    }
+
+    private List<String> resolveRepetitions(RepetitionText repetition, Integer step, Calendar from, Calendar to)
+            throws JobSchedulerInvalidResponseDataException {
+        if (repetition == null) {
+            throw new JobSchedulerInvalidResponseDataException("json field 'repetition' in 'repetitions' is undefined.");
+        }
+        if (step == null) {
+            step = 1;
+        }
+        List<String> dates = new ArrayList<String>();
+        int dayOfMonth = from.get(Calendar.DAY_OF_MONTH);
+
+        while (from.compareTo(to) <= 0) {
+            dates.add(df.format(from.getTime()));
+            switch (repetition) {
+            case DAILY:
+                from.add(Calendar.DATE, step);
+                break;
+            case MONTHLY:
+                from.add(Calendar.MONTH, step);
+                if (dayOfMonth > from.get(Calendar.DAY_OF_MONTH) && from.getActualMaximum(Calendar.DAY_OF_MONTH) >= dayOfMonth) {
+                   from.set(Calendar.DAY_OF_MONTH, dayOfMonth); 
+                }
+                break;
+            case WEEKLY:
+                from.add(Calendar.DATE, (step * 7));
+                break;
+            }
+        }
+        return dates;
     }
 
 }
