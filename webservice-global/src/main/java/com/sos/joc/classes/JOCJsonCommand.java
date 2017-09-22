@@ -463,7 +463,7 @@ public class JOCJsonCommand extends JobSchedulerRestApiClient {
                         throw new JobSchedulerObjectNotExistException(response);
                     }
                     // Async call while JobScheduler is terminating 
-                    if (response.trim().startsWith("com.sos.scheduler.engine.common.async.CallQueue$ClosedException")) {
+                    if (response.contains("com.sos.scheduler.engine.common.async.CallQueue$ClosedException")) {
                         throw new JobSchedulerConnectionResetException(response);
                     }
                     throw new JobSchedulerBadRequestException(response);
