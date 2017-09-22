@@ -8,6 +8,8 @@ import org.apache.shiro.ShiroException;
 
 public class SOSShiroCurrentUsersList {
 
+    private static final String VALID = "valid";
+    private static final String NOT_VALID = "not-valid";
     private Map<String, SOSShiroCurrentUser> currentUsers;
 
     public SOSShiroCurrentUsersList() {
@@ -27,9 +29,9 @@ public class SOSShiroCurrentUsersList {
     }
 
     public void removeTimedOutUser(String user) {
-       
+
         ArrayList<String> toBeRemoved = new ArrayList<String>();
-        
+
         for (Map.Entry<String, SOSShiroCurrentUser> entry : currentUsers.entrySet()) {
             boolean found = user.equals(entry.getValue().getUsername());
             if (found) {
@@ -43,7 +45,7 @@ public class SOSShiroCurrentUsersList {
                 }
             }
         }
-        
+
         for (String entry : toBeRemoved) {
             currentUsers.remove(entry);
         }
@@ -52,11 +54,14 @@ public class SOSShiroCurrentUsersList {
 
     public SOSShiroCurrentUserAnswer getUserByName(String user) {
         SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(user);
+        sosShiroCurrentUserAnswer.setUser(user);
+        sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+        sosShiroCurrentUserAnswer.setSessionTimeout(0L);
+        boolean found = false;
         for (Map.Entry<String, SOSShiroCurrentUser> entry : currentUsers.entrySet()) {
-            boolean found = user.equals(entry.getValue().getUsername());
+            found = user.equals(entry.getValue().getUsername());
             if (found) {
-                sosShiroCurrentUserAnswer.setUser(entry.getValue().getUsername());
-                sosShiroCurrentUserAnswer.setAccessToken(entry.getValue().getAccessToken());
+                sosShiroCurrentUserAnswer.setAccessToken(VALID);
 
                 if (entry.getValue().getCurrentSubject() != null) {
                     sosShiroCurrentUserAnswer.setIsAuthenticated(entry.getValue().getCurrentSubject().isAuthenticated());
@@ -64,20 +69,54 @@ public class SOSShiroCurrentUsersList {
                         try {
                             sosShiroCurrentUserAnswer.setSessionTimeout(entry.getValue().getCurrentSubject().getSession().getTimeout());
                         } catch (ShiroException e) {
+                            sosShiroCurrentUserAnswer.setMessage("user not valid");
                             sosShiroCurrentUserAnswer.setSessionTimeout(0l);
                             sosShiroCurrentUserAnswer.setIsAuthenticated(false);
-                            sosShiroCurrentUserAnswer.setAccessToken("");
+                            sosShiroCurrentUserAnswer.setAccessToken(NOT_VALID);
                         }
                     }
                 }
                 return sosShiroCurrentUserAnswer;
             }
         }
-        return null;
+
+        sosShiroCurrentUserAnswer.setAccessToken(NOT_VALID);
+        sosShiroCurrentUserAnswer.setMessage("user " + user + " not found");
+        return sosShiroCurrentUserAnswer;
     }
 
     public int size() {
         return currentUsers.size();
+    }
+
+    public SOSShiroCurrentUserAnswer getUserByToken(String token) {
+        SOSShiroCurrentUser user = getUser(token);
+        SOSShiroCurrentUserAnswer sosShiroCurrentUserAnswer = null;
+        if (user != null) {
+            sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer(user.getUsername());
+            sosShiroCurrentUserAnswer.setAccessToken(VALID);
+            sosShiroCurrentUserAnswer.setIsAuthenticated(user.isAuthenticated());
+            try {
+                if (user.getCurrentSubject() != null && user.getCurrentSubject().getSession() != null) {
+                    sosShiroCurrentUserAnswer.setSessionTimeout(user.getCurrentSubject().getSession().getTimeout());
+                } else {
+                    sosShiroCurrentUserAnswer.setSessionTimeout(0l);
+                }
+            } catch (ShiroException e) {
+                sosShiroCurrentUserAnswer.setMessage("token not valid");
+                sosShiroCurrentUserAnswer.setSessionTimeout(0l);
+                sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+                sosShiroCurrentUserAnswer.setAccessToken(NOT_VALID);
+            }
+        } else {
+            sosShiroCurrentUserAnswer = new SOSShiroCurrentUserAnswer("");
+            sosShiroCurrentUserAnswer.setAccessToken(NOT_VALID);
+            sosShiroCurrentUserAnswer.setMessage("token not valid");
+            sosShiroCurrentUserAnswer.setIsAuthenticated(false);
+            sosShiroCurrentUserAnswer.setSessionTimeout(0L);
+        }
+
+        return sosShiroCurrentUserAnswer;
     }
 
 }
