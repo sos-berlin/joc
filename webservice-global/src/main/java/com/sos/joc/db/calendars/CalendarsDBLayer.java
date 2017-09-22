@@ -216,7 +216,7 @@ public class CalendarsDBLayer extends DBLayer {
             }
             Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
             if (type != null && !type.isEmpty()) {
-                query.setParameter("type", type);
+                query.setParameter("type", type.toUpperCase());
             }
             if (categories != null && !categories.isEmpty()) {
                 if (categories.size() == 1) {
