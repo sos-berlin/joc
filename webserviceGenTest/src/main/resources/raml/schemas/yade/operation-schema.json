@@ -8,6 +8,8 @@
     "COPY",
     "MOVE",
     "GETLIST",
-    "RENAME"
+    "RENAME",
+    "COPYTOINTERNET",
+    "COPYFROMINTERNET"
   ]
 }
