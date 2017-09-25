@@ -66,6 +66,22 @@
 			</exclusions>
 		</dependency>
 
+    <dependency>
+      <groupId>com.sos-berlin.jobscheduler</groupId>
+      <artifactId>sos-security</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.ws.rs</groupId>
+          <artifactId>jsr311-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
 		<!-- 3RD PARTY DEPENDENCIES -->
 
 		<dependency>
