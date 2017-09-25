@@ -15,6 +15,9 @@
     "surveyDate": {
       "$ref": "../common/surveyDate_p-schema.json"
     },
+    "jobschedulerId": {
+      "type": "string"
+    },
     "job": {
       "type": "string"
     },

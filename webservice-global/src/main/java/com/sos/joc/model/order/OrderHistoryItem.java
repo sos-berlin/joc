@@ -22,6 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "surveyDate",
+    "jobschedulerId",
     "path",
     "orderId",
     "jobChain",
@@ -42,6 +43,8 @@ public class OrderHistoryItem {
      */
     @JsonProperty("surveyDate")
     private Date surveyDate;
+    @JsonProperty("jobschedulerId")
+    private String jobschedulerId;
     /**
      * path
      * <p>
@@ -134,6 +137,26 @@ public class OrderHistoryItem {
     @JsonProperty("surveyDate")
     public void setSurveyDate(Date surveyDate) {
         this.surveyDate = surveyDate;
+    }
+
+    /**
+     * 
+     * @return
+     *     The jobschedulerId
+     */
+    @JsonProperty("jobschedulerId")
+    public String getJobschedulerId() {
+        return jobschedulerId;
+    }
+
+    /**
+     * 
+     * @param jobschedulerId
+     *     The jobschedulerId
+     */
+    @JsonProperty("jobschedulerId")
+    public void setJobschedulerId(String jobschedulerId) {
+        this.jobschedulerId = jobschedulerId;
     }
 
     /**
@@ -353,7 +376,7 @@ public class OrderHistoryItem {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(surveyDate).append(path).append(orderId).append(jobChain).append(startTime).append(endTime).append(node).append(state).append(historyId).toHashCode();
+        return new HashCodeBuilder().append(surveyDate).append(jobschedulerId).append(path).append(orderId).append(jobChain).append(startTime).append(endTime).append(node).append(state).append(historyId).toHashCode();
     }
 
     @Override
@@ -365,7 +388,7 @@ public class OrderHistoryItem {
             return false;
         }
         OrderHistoryItem rhs = ((OrderHistoryItem) other);
-        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(node, rhs.node).append(state, rhs.state).append(historyId, rhs.historyId).isEquals();
+        return new EqualsBuilder().append(surveyDate, rhs.surveyDate).append(jobschedulerId, rhs.jobschedulerId).append(path, rhs.path).append(orderId, rhs.orderId).append(jobChain, rhs.jobChain).append(startTime, rhs.startTime).append(endTime, rhs.endTime).append(node, rhs.node).append(state, rhs.state).append(historyId, rhs.historyId).isEquals();
     }
 
 }
