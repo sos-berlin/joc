@@ -122,6 +122,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 boolean add = true;
 
                 OrderHistoryItem history = new OrderHistoryItem();
+                history.setJobschedulerId(dbItemReportTrigger.getSchedulerId());
                 history.setEndTime(dbItemReportTrigger.getEndTime());
                 history.setHistoryId(String.valueOf(dbItemReportTrigger.getHistoryId()));
                 history.setJobChain(dbItemReportTrigger.getParentName());
