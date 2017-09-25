@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.json.Json;
 
@@ -109,11 +110,18 @@ public class Globals {
     }
     
     public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
-        if (factory == null) {
-            factory = new IniSecurityManagerFactory(); 
-        }
         String iniFile = getShiroIniInClassPath();
-        factory.setIni(Ini.fromResourcePath(iniFile));
+        if (factory == null) {
+            factory = new IniSecurityManagerFactory(iniFile);
+        } else {
+            Ini oldShiroIni = factory.getIni();
+            Ini currentShiroIni = Ini.fromResourcePath(iniFile);
+            if (!oldShiroIni.equals(currentShiroIni)) {
+                LOGGER.debug(iniFile + " is changed");
+                factory = new IniSecurityManagerFactory();
+                factory.setIni(currentShiroIni);
+            }
+        }
         return factory;
     }
     
