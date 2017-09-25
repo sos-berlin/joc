@@ -107,6 +107,7 @@ public class TreePermanent {
 					bodyTypes.add("agent_cluster");
 					break;
 				case CALENDAR:
+				    bodyTypes.add("calendar");
 				    withCalendar = true;
 				    break;
 				default:
