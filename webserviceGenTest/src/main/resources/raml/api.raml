@@ -48,6 +48,7 @@ resourceTypes:
   - postURLWithOkResponseAfterModify: !include resourceTypes/jobscheduler/postWithOkResponseAfterModify.raml
   - postXMLWithOkResponse: !include resourceTypes/jobscheduler/postXMLWithOkResponse.raml
   - postJSON: !include resourceTypes/common/postJSON.raml
+  - postJSONWithoutJSId: !include resourceTypes/common/postJSONWithoutJSId.raml
   - postOnlyAccessToken: !include resourceTypes/common/postOnlyAccessToken.raml
   - postOnlyId: !include resourceTypes/common/postOnlyId.raml
   - postJSONWithOkResponse: !include resourceTypes/common/postJSONWithOkResponse.raml
@@ -1670,25 +1671,22 @@ traits:
         schema200: !include schemas/audit/comments-schema.json
         example200: !include examples/audit/comments-example.json
 
-# TODO calendar
-#/calendar:
-#  is: [ jobschedulerObject, limitedByCalendarPeriod ]
-#  type:
-#    getBaseWithoutExample:
-#      description: "A calendar view of history and plan"
-#      description200: " "
-#      schema200: !include schemas/calendar/days-schema.json
-
-# TODO actions
-#/actions:
-#  is: [ jobschedulerObject, limitableByTime ]
-#  type:
-#    getBaseWithoutExample:
-#      description: |
-#        Returns a collection of user actions of a JobScheduler object such as
-#        * modify job chain
-#        * modify job
-#        * suspend order
-#        * ...
-#      description200: " "
-#      schema200: !include schemas/action/actions-schema.json
+/report/agents:
+  type:
+    postJSONWithoutJSId:
+      description: Report of JobScheduler Agent tasks
+      description1: !include documentation/report/agentsParam.md
+      description2: !include documentation/common/dateFrom.md
+      description3: !include documentation/common/dateTo.md
+      description4: !include documentation/common/timeZone.md
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: " "
+      schema: !include schemas/report/agentsFilter-schema.json
+      schema200: !include schemas/report/agents-schema.json
+      example: !include examples/report/agents-example.json
+      example200: " "
