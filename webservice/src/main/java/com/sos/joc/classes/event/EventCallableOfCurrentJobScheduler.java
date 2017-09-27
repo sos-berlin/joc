@@ -44,6 +44,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     private final Map<String, Set<String>> nestedJobChains;
     private final Long instanceId;
     private final Session session;
+    private String eventId = null;
     private SOSHibernateSession connection = null;
     private Set<String> removedObjects = new HashSet<String>();
     
@@ -54,6 +55,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
         this.accessToken = accessToken;
         this.command = command;
         this.jobSchedulerEvent = jobSchedulerEvent;
+        this.eventId = jobSchedulerEvent.getEventId();
         this.shiroUser = shiroUser;
         this.nestedJobChains = nestedJobChains;
         this.instanceId = instanceId;
@@ -434,7 +436,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 connection = Globals.createSosHibernateStatelessConnection("eventCallable-" + jobSchedulerEvent.getJobschedulerId());
             }
             Date from = new Date();
-            from.setTime(Long.parseLong(jobSchedulerEvent.getEventId()) / 1000);
+            from.setTime(Long.parseLong(eventId) / 1000);
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
             Globals.beginTransaction(connection);
             List<DBItemAuditLog> auditLogs = dbLayer.getAllAuditLogs(jobSchedulerEvent.getJobschedulerId(), null, from, null, null, null);
