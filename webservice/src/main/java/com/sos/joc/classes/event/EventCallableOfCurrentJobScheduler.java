@@ -1,5 +1,6 @@
 package com.sos.joc.classes.event;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +15,13 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemAuditLog;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventType;
 import com.sos.jitl.reporting.plugin.FactEventHandler.CustomEventTypeValue;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCJsonCommand;
+import com.sos.joc.db.audit.AuditLogDBLayer;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
@@ -371,23 +374,15 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         }
                     }
                     eventSnapshots.putAll(getEventSnapshotsMapFromNextResponse(newEventId.toString()));
-//                    if (!(Boolean) session.getAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY)) {
-//                        try { //a small delay because events comes earlier then the JobScheduler has update its objects in some requests 
-//                            int delay = Math.min(1000, new Long(getSessionTimeout()).intValue());
-//                            if (delay > 0) {
-//                                Thread.sleep(delay);
-//                            }
-//                        } catch (InterruptedException e1) {
-//                        }
-//                    } else {
-                        try { //a small delay because events comes earlier then the JobScheduler has update its objects in some requests 
-                            int delay = Math.min(500, new Long(getSessionTimeout()).intValue());
-                            if (delay > 0) {
-                                Thread.sleep(delay);
-                            }
-                        } catch (InterruptedException e1) {
+                    // add auditLogEvent
+                    eventSnapshots.putAll(addAuditLogEvent());
+                    try { // a small delay because events comes earlier then the JobScheduler has update its objects in some requests
+                        int delay = Math.min(500, new Long(getSessionTimeout()).intValue());
+                        if (delay > 0) {
+                            Thread.sleep(delay);
                         }
-//                    }
+                    } catch (InterruptedException e1) {
+                    }
                 }
                 break;
             case "Torn":
@@ -403,34 +398,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                 Thread.sleep(delay);
             } catch (InterruptedException e1) {
             }
-//            SOSHibernateSession connection = null;
-//            DBItemInventoryInstance inventoryInstance = null;
-//            InventoryInstancesDBLayer instanceLayer = null;
-//            try {
-//                connection = Globals.createSosHibernateStatelessConnection("eventCallable-"+jobSchedulerEvent.getJobschedulerId());
-//                instanceLayer = new InventoryInstancesDBLayer(connection);
-//                inventoryInstance = instanceLayer.getInventoryInstanceBySchedulerId(jobSchedulerEvent.getJobschedulerId(), accessToken);
-//            } catch (Exception e1) {
-//                throw e1;
-//            } finally {
-//                Globals.disconnect(connection);
-//            }
-//            if (inventoryInstance != null) {
-//                if (instanceId != inventoryInstance.getId()) {
-//                    Globals.urlFromJobSchedulerId.put(jobSchedulerEvent.getJobschedulerId(), inventoryInstance);
-//                    command.setUriBuilderForEvents(inventoryInstance.getUrl());
-//                    command.setBasicAuthorization(inventoryInstance.getAuth());
-//                    command.createHttpClient();
-//                    EventSnapshot eventSnapshot = new EventSnapshot();
-//                    eventSnapshot.setEventType("SchedulerStateChanged");
-//                    eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
-//                    eventSnapshot.setPath(command.getSchemeAndAuthority());
-//                    eventSnapshots.put(eventSnapshot);
-//                }
-                eventSnapshots.putAll(getEventSnapshotsMap(eventId));   
-//            } else {
-//                throw e;
-//            }
+            eventSnapshots.putAll(getEventSnapshotsMap(eventId));
         } catch (JobSchedulerConnectionResetException e) {
             EventSnapshot eventSnapshot = new EventSnapshot();
             eventSnapshot.setEventType("SchedulerStateChanged");
@@ -455,6 +423,49 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             break;
         case "Torn":
             break;
+        }
+        return eventSnapshots;
+    }
+    
+    private Events addAuditLogEvent() {
+        Events eventSnapshots = new Events();
+        try {
+            if (connection == null) {
+                connection = Globals.createSosHibernateStatelessConnection("eventCallable-" + jobSchedulerEvent.getJobschedulerId());
+            }
+            Date from = new Date();
+            from.setTime(Long.parseLong(jobSchedulerEvent.getEventId()) / 1000);
+            AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
+            Globals.beginTransaction(connection);
+            List<DBItemAuditLog> auditLogs = dbLayer.getAllAuditLogs(jobSchedulerEvent.getJobschedulerId(), null, from, null, null, null);
+            Globals.rollback(connection);
+            if (auditLogs != null && !auditLogs.isEmpty()) {
+                for (DBItemAuditLog auditLogItem : auditLogs) {
+                    EventSnapshot auditLogEvent = new EventSnapshot();
+                    auditLogEvent.setEventType("AuditLogChanged");
+                    if (auditLogItem.getJob() != null && !auditLogItem.getJob().isEmpty()) {
+                        auditLogEvent.setObjectType(JobSchedulerObjectType.JOB);
+                        auditLogEvent.setPath(auditLogItem.getJob());
+                    } else if (auditLogItem.getJobChain() != null && !auditLogItem.getJobChain().isEmpty()) {
+                        String path = auditLogItem.getJobChain();
+                        auditLogEvent.setObjectType(JobSchedulerObjectType.JOBCHAIN);
+                        if (auditLogItem.getOrderId() != null && !auditLogItem.getOrderId().isEmpty()) {
+                            path += "," + auditLogItem.getOrderId();
+                            auditLogEvent.setObjectType(JobSchedulerObjectType.ORDER);
+                        }
+                        auditLogEvent.setPath(path);
+                    } else {
+                        auditLogEvent.setObjectType(JobSchedulerObjectType.OTHER);
+                        auditLogEvent.setPath("AuditLogChanged");
+                    }
+                    eventSnapshots.put(auditLogEvent);
+                }
+                
+            }
+        } catch (Exception e) {
+        } finally {
+            Globals.disconnect(connection);
+            connection = null;
         }
         return eventSnapshots;
     }
