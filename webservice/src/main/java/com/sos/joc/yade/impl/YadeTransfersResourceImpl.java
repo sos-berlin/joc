@@ -7,11 +7,10 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import sos.yade.db.DBItemYadeProtocols;
-import sos.yade.db.DBItemYadeTransfers;
-
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jade.db.DBItemYadeProtocols;
+import com.sos.jade.db.DBItemYadeTransfers;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;

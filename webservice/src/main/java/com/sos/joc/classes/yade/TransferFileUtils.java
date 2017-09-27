@@ -1,7 +1,6 @@
 package com.sos.joc.classes.yade;
 
-import sos.yade.db.DBItemYadeFiles;
-
+import com.sos.jade.db.DBItemYadeFiles;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.yade.FileTransferState;
 import com.sos.joc.model.yade.FileTransferStateText;

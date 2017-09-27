@@ -5,10 +5,9 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
-import sos.yade.db.DBItemYadeFiles;
-
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jade.db.DBItemYadeFiles;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
