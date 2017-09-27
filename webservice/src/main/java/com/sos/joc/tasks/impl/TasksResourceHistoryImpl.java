@@ -111,6 +111,9 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
             for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
                 boolean add = true;
                 TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
+                if (jobsFilter.getJobschedulerId().isEmpty()) {
+                    taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+                }
                 taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
                 taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
                 taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());

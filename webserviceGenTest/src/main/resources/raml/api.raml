@@ -52,6 +52,7 @@ resourceTypes:
   - postURLWithOkResponseAfterModify: !include resourceTypes/jobscheduler/postWithOkResponseAfterModify.raml
   - postXMLWithOkResponse: !include resourceTypes/jobscheduler/postXMLWithOkResponse.raml
   - postJSON: !include resourceTypes/common/postJSON.raml
+  - postJSONWithoutJSId: !include resourceTypes/common/postJSONWithoutJSId.raml
   - postYADEJSON15: !include resourceTypes/yade/postJSON15.raml
   - postYADEJSONWithOkResponse: !include resourceTypes/yade/postJSONWithOkResponse.raml
   - postYADEOnlyAccessToken: !include resourceTypes/yade/postOnlyAccessToken.raml
@@ -1680,6 +1681,26 @@ traits:
         description200: " "
         schema200: !include schemas/audit/comments-schema.json
         example200: !include examples/audit/comments-example.json
+
+/report/agents:
+  type:
+    postJSONWithoutJSId:
+      description: Report of JobScheduler Agent tasks
+      description1: !include documentation/report/agentsParam.md
+      description2: !include documentation/common/dateFrom.md
+      description3: !include documentation/common/dateTo.md
+      description4: !include documentation/common/timeZone.md
+      description5: " "
+      description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
+      description200: " "
+      schema: !include schemas/report/agentsFilter-schema.json
+      schema200: !include schemas/report/agents-schema.json
+      example: !include examples/report/agents-example.json
+      example200: " "
 
 /yade:
   description: |

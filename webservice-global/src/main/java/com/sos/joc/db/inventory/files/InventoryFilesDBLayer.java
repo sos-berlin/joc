@@ -97,7 +97,7 @@ public class InventoryFilesDBLayer extends DBLayer {
             query.setParameter("instanceId", instanceId);
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
                 query.setParameter("folderName", folderName);
-                query.setParameter("folderName", folderName + "/%");
+                query.setParameter("likeFolderName", folderName + "/%");
             }
             if (types != null && !types.isEmpty()) {
                 if (types.size() == 1) {

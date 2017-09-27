@@ -1,0 +1,28 @@
+{
+  "title": "agent",
+  "id": "schemas/report/agent",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.report.Agent",
+  "type": "object",
+  "required": [
+    "agent",
+    "cause",
+    "numOfSuccessfulTasks"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "agent": {
+      "description": "Url of an Agent",
+      "type": "string",
+      "pattern": "https?://.+"
+    },
+    "cause": {
+      "$ref": "../job/taskCause-schema.json"
+    },
+    "numOfSuccessfulTasks": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    }
+  }
+}
