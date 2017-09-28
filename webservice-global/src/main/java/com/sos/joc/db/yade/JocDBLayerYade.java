@@ -7,12 +7,11 @@ import javax.persistence.TemporalType;
 
 import org.hibernate.query.Query;
 
-import sos.yade.db.DBItemYadeFiles;
-import sos.yade.db.DBItemYadeProtocols;
-import sos.yade.db.DBItemYadeTransfers;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
+import com.sos.jade.db.DBItemYadeFiles;
+import com.sos.jade.db.DBItemYadeProtocols;
+import com.sos.jade.db.DBItemYadeTransfers;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
