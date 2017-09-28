@@ -487,6 +487,26 @@ public class FrequencyResolver {
         int workingDayInMonth = getWorkingDay(currentDay, firstDayOfMonth);
         return maxWorkingDaysInMonth - workingDayInMonth + 1;
     }
+    
+    private int getWeekOfMonthOfWeeklyDay(Calendar currentDay) {
+        int dayOfMonth = currentDay.get(Calendar.DAY_OF_MONTH);
+        int weekOfMonthOfWeeklyDay = dayOfMonth / 7;
+        if (dayOfMonth % 7 > 0) {
+            weekOfMonthOfWeeklyDay++;
+        }
+        return weekOfMonthOfWeeklyDay;
+    }
+    
+    private int getWeekOfMonthOfUltimoWeeklyDay(Calendar currentDay) {
+        int dayOfMonth = currentDay.get(Calendar.DAY_OF_MONTH);
+        int maxDaysOfMonth = currentDay.getActualMaximum(Calendar.DAY_OF_MONTH);
+        dayOfMonth = maxDaysOfMonth - dayOfMonth + 1;
+        int weekOfMonthOfWeeklyDay = dayOfMonth / 7;
+        if (dayOfMonth % 7 > 0) {
+            weekOfMonthOfWeeklyDay++;
+        }
+        return weekOfMonthOfWeeklyDay;
+    }
 
     private List<String> resolveDates(List<String> dates) throws JobSchedulerInvalidResponseDataException {
         List<String> d = new ArrayList<String>();
@@ -523,8 +543,8 @@ public class FrequencyResolver {
             throws JobSchedulerInvalidResponseDataException {
 
         List<String> dates = new ArrayList<String>();
-        WeeklyDay weeklyDay = new WeeklyDay();
         Calendar firstDayOfMonth = Calendar.getInstance();
+        WeeklyDay weeklyDay = new WeeklyDay();
 
         while (from.compareTo(to) <= 0) {
             if (days != null) {
@@ -541,7 +561,7 @@ public class FrequencyResolver {
             }
             if (weeklyDays != null) {
                 weeklyDay.setDay(from.get(Calendar.DAY_OF_WEEK) - 1);
-                weeklyDay.setWeekOfMonth(from.get(Calendar.WEEK_OF_MONTH));
+                weeklyDay.setWeekOfMonth(getWeekOfMonthOfWeeklyDay(from));
                 if (weeklyDays.contains(weeklyDay)) {
                     dates.add(df.format(from.getTime()));
                 }
@@ -575,9 +595,8 @@ public class FrequencyResolver {
                 }
             }
             if (weeklyDays != null) {
-                int weeOfUltimo = from.getActualMaximum(Calendar.WEEK_OF_MONTH) + 1 - from.get(Calendar.WEEK_OF_MONTH);
                 weeklyDay.setDay(from.get(Calendar.DAY_OF_WEEK) - 1);
-                weeklyDay.setWeekOfMonth(weeOfUltimo);
+                weeklyDay.setWeekOfMonth(getWeekOfMonthOfUltimoWeeklyDay(from));
                 if (weeklyDays.contains(weeklyDay)) {
                     dates.add(df.format(from.getTime()));
                 }
