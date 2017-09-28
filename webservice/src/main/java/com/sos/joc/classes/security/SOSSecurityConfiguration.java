@@ -33,7 +33,7 @@ public class SOSSecurityConfiguration {
     public SOSSecurityConfiguration() {
         super();
         securityConfiguration = new SecurityConfiguration();
-        ini = Globals.getIniFromSecurityManagerFactory();
+        ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
         listOfMasters = SOSSecurityConfigurationMasters.getInstance();
     }
 
