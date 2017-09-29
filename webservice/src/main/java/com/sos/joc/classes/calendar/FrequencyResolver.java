@@ -59,9 +59,11 @@ public class FrequencyResolver {
     }
 
     public void init(CalendarDatesFilter calendarFilter) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
-        if (calendarFilter != null) {
-            setDateFrom(calendarFilter.getDateFrom());
-            setDateTo(calendarFilter.getDateTo());
+        if (calendarFilter != null && calendarFilter.getCalendar() != null) {
+            setDateFrom(calendarFilter.getDateFrom(), calendarFilter.getCalendar().getFrom());
+            setDateTo(calendarFilter.getDateTo(), calendarFilter.getCalendar().getTo());
+            System.out.println(df.format(dateFrom.getTime()));
+            System.out.println(df.format(dateTo.getTime()));
             if (this.dateFrom.compareTo(this.dateTo) == 1) {
                 throw new JobSchedulerInvalidResponseDataException("'dateFrom' must be an older date than 'dateTo'.");
             }
@@ -72,18 +74,55 @@ public class FrequencyResolver {
         }
     }
 
-    public void setDateFrom(String dateFrom) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
-        if (dateFrom == null || dateFrom.isEmpty()) {
-            throw new JocMissingRequiredParameterException("'dateFrom' parameter is undefined.");
+    public void setDateFrom(String dateFrom, String calendarFrom) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
+        
+        if ((dateFrom == null || dateFrom.isEmpty()) && (calendarFrom == null || calendarFrom.isEmpty())) {
+            //use today at 00:00:00.000 as default
+            this.dateFrom = Calendar.getInstance();
+            this.dateFrom.setTime(Date.from(Instant.now()));
+            this.dateFrom.set(Calendar.HOUR_OF_DAY, 0);
+            this.dateFrom.set(Calendar.MINUTE, 0);
+            this.dateFrom.set(Calendar.SECOND, 0);
+            this.dateFrom.set(Calendar.MILLISECOND, 0);
+        } else {
+            
+            Calendar calFrom = getCalendarFromString(calendarFrom, "calendar field 'from' must have the format YYYY-MM-DD.");
+            Calendar dFrom = getCalendarFromString(dateFrom, "'dateFrom' parameter must have the format YYYY-MM-DD.");
+
+            if (calFrom == null) {
+                this.dateFrom = dFrom;
+            } else if (dFrom == null) {
+                this.dateFrom = calFrom;
+            } else if (calFrom.before(dFrom)) {
+                this.dateFrom = dFrom;
+            } else {
+                this.dateFrom = calFrom;
+            }
         }
-        if (!dateFrom.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
-            throw new JobSchedulerInvalidResponseDataException("'dateFrom' parameter must have the format YYYY-MM-DD.");
+    }
+    
+    public void setDateTo(String dateTo, String calendarTo) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
+        
+        if ((dateTo == null || dateTo.isEmpty()) && (calendarTo == null || calendarTo.isEmpty())) {
+            throw new JocMissingRequiredParameterException("'dateTo' parameter and calendar field 'to' are undefined.");
+        } else {
+
+            Calendar calTo = getCalendarFromString(calendarTo, "calendar field 'to' must have the format YYYY-MM-DD.");
+            Calendar dTo = getCalendarFromString(dateTo, "'dateTo' parameter must have the format YYYY-MM-DD.");
+            
+            if (calTo == null) {
+                this.dateTo = dTo;
+            } else if (dTo == null) {
+                this.dateTo = calTo;
+            } else if (calTo.after(dTo)) {
+                this.dateTo = dTo;
+            } else {
+                this.dateTo = calTo;
+            }
         }
-        this.dateFrom = Calendar.getInstance();
-        this.dateFrom.setTime(Date.from(Instant.parse(dateFrom + "T00:00:00Z")));
     }
 
-    public void setDateTo(String dateTo) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
+    public void setDateTo_(String dateTo, String calendarTo) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
         if (dateTo == null || dateTo.isEmpty()) {
             throw new JocMissingRequiredParameterException("'dateTo' parameter is undefined.");
         }
@@ -176,6 +215,18 @@ public class FrequencyResolver {
         if (excludes != null && dates.size() > 0) {
             removeMonths(excludes.getMonths());
         }
+    }
+    
+    private Calendar getCalendarFromString(String cal, String msg) throws JobSchedulerInvalidResponseDataException {
+        Calendar calendar = null;
+        if (cal != null && !cal.isEmpty()) {
+            if (!cal.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+                throw new JobSchedulerInvalidResponseDataException(msg);
+            }
+            calendar = Calendar.getInstance();
+            calendar.setTime(Date.from(Instant.parse(cal + "T00:00:00Z")));
+        } 
+        return calendar;
     }
 
     private void addDates(List<String> list) throws JobSchedulerInvalidResponseDataException {

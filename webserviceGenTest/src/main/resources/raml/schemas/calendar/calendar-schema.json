@@ -20,6 +20,12 @@
     "title": {
       "type": "string"
     },
+    "from": {
+      "$ref": "../common/date-schema.json"
+    },
+    "to": {
+      "$ref": "../common/date-schema.json"
+    },
     "includes": {
       "$ref": "frequencies-schema.json"
     },

@@ -24,6 +24,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "type",
     "category",
     "title",
+    "from",
+    "to",
     "includes",
     "excludes"
 })
@@ -45,6 +47,22 @@ public class Calendar {
     private String category;
     @JsonProperty("title")
     private String title;
+    /**
+     * date
+     * <p>
+     * ISO date YYYY-MM-DD
+     * 
+     */
+    @JsonProperty("from")
+    private String from;
+    /**
+     * date
+     * <p>
+     * ISO date YYYY-MM-DD
+     * 
+     */
+    @JsonProperty("to")
+    private String to;
     /**
      * frequencies
      * <p>
@@ -169,6 +187,58 @@ public class Calendar {
     }
 
     /**
+     * date
+     * <p>
+     * ISO date YYYY-MM-DD
+     * 
+     * @return
+     *     The from
+     */
+    @JsonProperty("from")
+    public String getFrom() {
+        return from;
+    }
+
+    /**
+     * date
+     * <p>
+     * ISO date YYYY-MM-DD
+     * 
+     * @param from
+     *     The from
+     */
+    @JsonProperty("from")
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    /**
+     * date
+     * <p>
+     * ISO date YYYY-MM-DD
+     * 
+     * @return
+     *     The to
+     */
+    @JsonProperty("to")
+    public String getTo() {
+        return to;
+    }
+
+    /**
+     * date
+     * <p>
+     * ISO date YYYY-MM-DD
+     * 
+     * @param to
+     *     The to
+     */
+    @JsonProperty("to")
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    /**
      * frequencies
      * <p>
      * 
@@ -227,7 +297,7 @@ public class Calendar {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).append(name).append(type).append(category).append(title).append(includes).append(excludes).toHashCode();
+        return new HashCodeBuilder().append(path).append(name).append(type).append(category).append(title).append(from).append(to).append(includes).append(excludes).toHashCode();
     }
 
     @Override
@@ -239,7 +309,7 @@ public class Calendar {
             return false;
         }
         Calendar rhs = ((Calendar) other);
-        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(type, rhs.type).append(category, rhs.category).append(title, rhs.title).append(includes, rhs.includes).append(excludes, rhs.excludes).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(name, rhs.name).append(type, rhs.type).append(category, rhs.category).append(title, rhs.title).append(from, rhs.from).append(to, rhs.to).append(includes, rhs.includes).append(excludes, rhs.excludes).isEquals();
     }
 
 }

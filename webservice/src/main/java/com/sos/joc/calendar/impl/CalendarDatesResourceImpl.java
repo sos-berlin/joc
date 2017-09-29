@@ -30,19 +30,17 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
     public JOCDefaultResponse postCalendarDates(String accessToken, CalendarDatesFilter calendarFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            //TODO permissions for runtime and calendar
-            //getPermissonsJocCockpit(accessToken).getCalendar().isView()
+            // TODO permissions for runtime and calendar
+            // getPermissonsJocCockpit(accessToken).getCalendar().isView()
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, "", true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("calendar dateFrom", calendarFilter.getDateFrom());
-            checkRequiredParameter("calendar dateTo", calendarFilter.getDateTo());
             boolean calendarPathIsDefined = calendarFilter.getPath() != null && !calendarFilter.getPath().isEmpty();
             if (!calendarPathIsDefined && calendarFilter.getCalendar() == null) {
                 throw new JocMissingRequiredParameterException("'calendar' or 'path' parameter is required");
             }
-            
+
             if (calendarPathIsDefined) {
                 connection = Globals.createSosHibernateStatelessConnection(API_CALL);
                 String calendarPath = normalizePath(calendarFilter.getPath());
@@ -53,9 +51,9 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
                 }
                 calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
             }
-            
+
             Dates entity = new Dates();
-            entity.setDates(new FrequencyResolver().resolve(calendarFilter)); 
+            entity.setDates(new FrequencyResolver().resolve(calendarFilter));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -67,5 +65,5 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
             Globals.disconnect(connection);
         }
     }
-    
+
 }
