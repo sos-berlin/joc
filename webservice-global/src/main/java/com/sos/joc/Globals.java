@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.json.Json;
 
@@ -132,8 +131,8 @@ public class Globals {
         }
         return factory.getIni();
     }
-
-    private static String getShiroIniInClassPath() {
+    
+    public static String getShiroIniInClassPath() {
         if (sosShiroProperties != null) {
             Path p = sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
             return "file:" + p.toString().replace('\\', '/');
