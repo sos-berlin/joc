@@ -279,9 +279,11 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                     CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
                     createDailyPlanOptions.dayOffset.value(0);
                     String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
+                    LOGGER.debug("commandUrl:" + commandUrl);
                     createDailyPlanOptions.commandUrl.setValue(commandUrl);
                     calendar2Db = new Calendar2DB(sosHibernateSession, dbItemInventoryInstance.getSchedulerId());
                     if (dbItemInventoryInstance.getAuth() != null &&!dbItemInventoryInstance.getAuth().isEmpty()) {
+                        LOGGER.debug("basicAuthorization:" + dbItemInventoryInstance.getAuth());
                         createDailyPlanOptions.basicAuthorization.setValue(dbItemInventoryInstance.getAuth());
                     }
                     calendar2Db.setOptions(createDailyPlanOptions);
@@ -329,6 +331,11 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                         }
                     }
                 } catch (Exception e) {
+                    String cause="";
+                    if (e.getCause() != null) {
+                        cause = e.getCause().toString();
+                    }
+                    LOGGER.warn("->" + e.toString() + ":" + cause);
                     if (calendar2Db != null) {
                         PlanCreated planCreated = new PlanCreated();
                         planCreated.setUntil(calendar2Db.getMaxPlannedTime(planFilter.getJobschedulerId()));
