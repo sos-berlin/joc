@@ -123,6 +123,14 @@ public class Globals {
         return factory;
     }
     
+    public static Ini getIniFromSecurityManagerFactory() {
+        if (factory == null) {
+            String iniFile = getShiroIniInClassPath();
+            factory = new IniSecurityManagerFactory(iniFile);
+        }
+        return factory.getIni();
+    }
+    
     public static String getShiroIniInClassPath() {
         if (sosShiroProperties != null) {
             Path p = sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
