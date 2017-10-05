@@ -24,6 +24,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonPropertyOrder({
     "job",
     "at",
+    "timeZone",
     "params",
     "environment"
 })
@@ -46,6 +47,12 @@ public class StartJob {
      */
     @JsonProperty("at")
     private String at;
+    /**
+     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+     * 
+     */
+    @JsonProperty("timeZone")
+    private String timeZone;
     /**
      * params or environment variables
      * <p>
@@ -118,6 +125,28 @@ public class StartJob {
     }
 
     /**
+     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+     * 
+     * @return
+     *     The timeZone
+     */
+    @JsonProperty("timeZone")
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    /**
+     * see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+     * 
+     * @param timeZone
+     *     The timeZone
+     */
+    @JsonProperty("timeZone")
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    /**
      * params or environment variables
      * <p>
      * 
@@ -176,7 +205,7 @@ public class StartJob {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(job).append(at).append(params).append(environment).toHashCode();
+        return new HashCodeBuilder().append(job).append(at).append(timeZone).append(params).append(environment).toHashCode();
     }
 
     @Override
@@ -188,7 +217,7 @@ public class StartJob {
             return false;
         }
         StartJob rhs = ((StartJob) other);
-        return new EqualsBuilder().append(job, rhs.job).append(at, rhs.at).append(params, rhs.params).append(environment, rhs.environment).isEquals();
+        return new EqualsBuilder().append(job, rhs.job).append(at, rhs.at).append(timeZone, rhs.timeZone).append(params, rhs.params).append(environment, rhs.environment).isEquals();
     }
 
 }
