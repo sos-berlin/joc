@@ -26,6 +26,10 @@
     "at": {
       "$ref": "../common/timestampWithNow-schema.json"
     },
+    "timeZone": {
+      "description": "see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones",
+      "type": "string"
+    },
     "resume": {
       "description": "only useful when changing order state of suspended orders",
       "type": "boolean"

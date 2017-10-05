@@ -47,6 +47,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
     private String eventId = null;
     private SOSHibernateSession connection = null;
     private Set<String> removedObjects = new HashSet<String>();
+    private Set<String> jobChainEventsOfJob = new HashSet<String>();
     
     public EventCallableOfCurrentJobScheduler(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
             Long instanceId, SOSShiroCurrentUser shiroUser, Map<String, Set<String>> nestedJobChains) {
@@ -114,6 +115,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
         InventoryJobChainsDBLayer jobChainsLayer = null;
         List<String> jobChains = null;
         Events events = new Events();
+        if (jobChainEventsOfJob.contains(job)) {
+            return events;
+        }
+        jobChainEventsOfJob.add(job);
         try {
             if (job != null && instanceId != null) {
                 if (connection == null) {
@@ -256,16 +261,20 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
 //                    if (eventSnapshots.getEvents().containsKey(eventKey)) {
 //                        continue;
 //                    }
-                    if (eventType.startsWith("JobState")) {
+                    if (eventType.startsWith("JobState") || eventType.equals("JobUnstopped")) {
                         eventSnapshot.setEventType("JobStateChanged");
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
                         eventSnapshots.putAll(createJobChainEventsOfJob(eventSnapshot.getPath()));
                         eventNotification.setObjectType(JobSchedulerObjectType.JOB);
                         String jobState = event.getString("state", null);
                         eventNotification.setState(jobState);
-                        if ("closed,initialized,loaded".contains(jobState)) {
+                        if (jobState != null && "closed,initialized,loaded".contains(jobState)) {
                             continue; 
                         }
+                    } else if (eventType.equals("JobTaskQueueChanged")) {
+                        eventNotification = null;
+                        eventSnapshot.setEventType("JobStateChanged");
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
                     } else if (eventType.startsWith("JobChainNode")) {
                         eventNotification = null;
                         eventSnapshot.setEventType("JobChainStateChanged");
@@ -297,6 +306,9 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         }
                         eventNotification.setObjectType(JobSchedulerObjectType.ORDER);
                         switch (eventType) {
+                        case "OrderAdded":
+                            eventNotification.setNodeId(event.getString("nodeId", null));
+                            break;
                         case "OrderNodeChanged":
                             eventNotification.setNodeId(event.getString("nodeId", null));
                             eventNotification.setFromNodeId(event.getString("fromNodeId", null));
