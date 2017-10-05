@@ -1,6 +1,6 @@
 {
-  "title": "categories",
-  "id": "schemas/calendar/categories",
+  "title": "dates",
+  "id": "schemas/calendar/dates",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.Dates",
   "type": "object",

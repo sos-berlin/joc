@@ -1,0 +1,13 @@
+{
+    "deliveryDate":  "2017-10-05T11:13:22Z",
+    "jobs": [
+        "/examples/JobA",
+        "/examples/JobB",
+        "/examples/JobC"
+     ],
+     "orders": [
+        "/examples/JobChainA,Order1",
+        "/examples/JobChainA,Order2",
+        "/examples/JobChainB,Order1"
+     ]
+}

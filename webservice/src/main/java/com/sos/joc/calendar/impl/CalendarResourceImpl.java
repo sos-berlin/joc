@@ -42,6 +42,7 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
                 throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
             }
             Calendar calendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
+            calendar.setId(calendarItem.getId());
             calendar.setPath(calendarPath);
             calendar.setName(calendarItem.getBaseName());
             Calendar200 entity = new Calendar200();

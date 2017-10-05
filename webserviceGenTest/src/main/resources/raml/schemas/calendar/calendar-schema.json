@@ -5,6 +5,9 @@
   "javaType": "com.sos.joc.model.calendar.Calendar",
   "type": "object",
   "properties": {
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
     "path": {
       "type": "string"
     },
