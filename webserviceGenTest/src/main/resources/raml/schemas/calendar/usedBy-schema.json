@@ -2,7 +2,7 @@
   "title": "clections of objects which use calendar",
   "id": "schemas/calendar/usedBy",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.calendar.UsedBy",
+  "javaType": "com.sos.joc.model.calendar.UsedBy200",
   "type": "object",
   "required": [
     "deliveryDate"
@@ -11,22 +11,22 @@
     "deliveryDate": {
       "$ref": "../common/deliveryDate-schema.json"
     },
-    "orders": {
+    "usedBy": {
       "type": "array",
       "items": {
-        "type": "string"
-      }
-    },
-    "jobs": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "schedules": {
-      "type": "array",
-      "items": {
-        "type": "string"
+        "type": "object",
+        "javaType": "com.sos.joc.model.calendar.UsedBy",
+        "properties": {
+          "jobschedulerId": {
+            "type": "string"
+          },
+          "objectType": {
+			"$ref": "../common/type-schema.json"
+		  },
+		  "path": {
+		    "$ref": "../common/path-schema.json"
+		  }
+        }
       }
     }
   }

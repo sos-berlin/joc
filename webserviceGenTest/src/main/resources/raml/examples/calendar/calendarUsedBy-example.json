@@ -1,13 +1,36 @@
 {
     "deliveryDate":  "2017-10-05T11:13:22Z",
-    "jobs": [
-        "/examples/JobA",
-        "/examples/JobB",
-        "/examples/JobC"
-     ],
-     "orders": [
-        "/examples/JobChainA,Order1",
-        "/examples/JobChainA,Order2",
-        "/examples/JobChainB,Order1"
-     ]
+    "usedBy": [
+       {
+         "jobschedulerId": "scheduler-test",
+         "objectType": "JOB",
+         "path": "/examples/JobA"
+       },
+       {
+         "jobschedulerId": "scheduler-test",
+         "objectType": "JOB",
+         "path": "/examples/JobB"
+       },
+       {
+         "jobschedulerId": "scheduler-test",
+         "objectType": "JOB",
+         "path": "/examples/JobB"
+       },
+       {
+         "jobschedulerId": "scheduler-test",
+         "objectType": "ORDER",
+         "path": "/examples/JobChainA,Order1"
+       },
+       {
+         "jobschedulerId": "scheduler-test",
+         "objectType": "ORDER",
+         "path": "/examples/JobChainA,Order2"
+       },
+       {
+         "jobschedulerId": "scheduler-test",
+         "objectType": "ORDER",
+         "path": "/examples/JobChainB,Order1"
+       }
+    
+    ]
 }
