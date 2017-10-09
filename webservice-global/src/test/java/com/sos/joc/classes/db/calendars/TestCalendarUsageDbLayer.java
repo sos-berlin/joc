@@ -76,10 +76,19 @@ public class TestCalendarUsageDbLayer {
     }
 
     @Test
-    public void testJocConfigurationDeleteRecord() throws Exception {
+    public void testJocConfigurationDeleteRecordById() throws Exception {
         initConnection();
         sosHibernateSession.beginTransaction();
         calendarUsageDBLayer.deleteCalendarUsage(2L);
+        sosHibernateSession.commit();
+        sosHibernateFactory.close();
+    }
+
+    @Test
+    public void testJocConfigurationDeleteRecordByPath() throws Exception {
+        initConnection();
+        sosHibernateSession.beginTransaction();
+        calendarUsageDBLayer.deleteCalendarUsage("myCalaendarPath");
         sosHibernateSession.commit();
         sosHibernateFactory.close();
     }

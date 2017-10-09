@@ -142,6 +142,10 @@ public class CalendarsDBLayer extends DBLayer {
             DBItemCalendar dbCalendar = getCalendar(path);
             if (dbCalendar != null) {
                 getSession().delete(dbCalendar); 
+                getSession().beginTransaction();
+                CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(getSession());
+                calendarUsageDBLayer.deleteCalendarUsage(dbCalendar.getId());
+                getSession().commit();
             }
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
