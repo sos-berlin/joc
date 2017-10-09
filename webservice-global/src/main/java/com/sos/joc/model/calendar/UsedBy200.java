@@ -22,7 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "usedBy"
+    "jobschedulers"
 })
 public class UsedBy200 {
 
@@ -35,8 +35,8 @@ public class UsedBy200 {
      */
     @JsonProperty("deliveryDate")
     private Date deliveryDate;
-    @JsonProperty("usedBy")
-    private List<UsedBy> usedBy = null;
+    @JsonProperty("jobschedulers")
+    private List<UsedBy> jobschedulers = null;
 
     /**
      * delivery date
@@ -69,21 +69,21 @@ public class UsedBy200 {
     /**
      * 
      * @return
-     *     The usedBy
+     *     The jobschedulers
      */
-    @JsonProperty("usedBy")
-    public List<UsedBy> getUsedBy() {
-        return usedBy;
+    @JsonProperty("jobschedulers")
+    public List<UsedBy> getJobschedulers() {
+        return jobschedulers;
     }
 
     /**
      * 
-     * @param usedBy
-     *     The usedBy
+     * @param jobschedulers
+     *     The jobschedulers
      */
-    @JsonProperty("usedBy")
-    public void setUsedBy(List<UsedBy> usedBy) {
-        this.usedBy = usedBy;
+    @JsonProperty("jobschedulers")
+    public void setJobschedulers(List<UsedBy> jobschedulers) {
+        this.jobschedulers = jobschedulers;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class UsedBy200 {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(usedBy).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(jobschedulers).toHashCode();
     }
 
     @Override
@@ -105,7 +105,7 @@ public class UsedBy200 {
             return false;
         }
         UsedBy200 rhs = ((UsedBy200) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(usedBy, rhs.usedBy).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(jobschedulers, rhs.jobschedulers).isEquals();
     }
 
 }

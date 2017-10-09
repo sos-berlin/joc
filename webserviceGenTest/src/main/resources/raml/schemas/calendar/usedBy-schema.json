@@ -11,20 +11,43 @@
     "deliveryDate": {
       "$ref": "../common/deliveryDate-schema.json"
     },
-    "usedBy": {
+    "jobschedulers": {
       "type": "array",
       "items": {
-        "type": "object",
         "javaType": "com.sos.joc.model.calendar.UsedBy",
+        "type": "object",
+        "required": [
+          "jobschedulerId",
+          "host",
+          "port"
+        ],
         "properties": {
           "jobschedulerId": {
             "type": "string"
           },
-          "objectType": {
-			"$ref": "../common/type-schema.json"
+          "host": {
+			"type": "string"
 		  },
-		  "path": {
-		    "$ref": "../common/path-schema.json"
+          "port": {
+			"$ref": "../common/port-schema.json"
+		  },
+          "jobs": {
+			"type": "array",
+			"items": {
+			  "$ref": "../common/path-schema.json"
+			}
+		  },
+          "orders": {
+			"type": "array",
+			"items": {
+			  "$ref": "../common/path-schema.json"
+			}
+		  },
+          "schedules": {
+			"type": "array",
+			"items": {
+			  "$ref": "../common/path-schema.json"
+			}
 		  }
         }
       }

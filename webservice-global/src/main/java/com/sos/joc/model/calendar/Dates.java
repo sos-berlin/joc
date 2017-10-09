@@ -13,7 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * categories
+ * dates
  * <p>
  * 
  * 
@@ -22,7 +22,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "dates"
+    "dates",
+    "withExcludes"
 })
 public class Dates {
 
@@ -42,6 +43,8 @@ public class Dates {
      */
     @JsonProperty("dates")
     private List<String> dates = null;
+    @JsonProperty("withExcludes")
+    private List<String> withExcludes = null;
 
     /**
      * delivery date
@@ -95,6 +98,26 @@ public class Dates {
         this.dates = dates;
     }
 
+    /**
+     * 
+     * @return
+     *     The withExcludes
+     */
+    @JsonProperty("withExcludes")
+    public List<String> getWithExcludes() {
+        return withExcludes;
+    }
+
+    /**
+     * 
+     * @param withExcludes
+     *     The withExcludes
+     */
+    @JsonProperty("withExcludes")
+    public void setWithExcludes(List<String> withExcludes) {
+        this.withExcludes = withExcludes;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -102,7 +125,7 @@ public class Dates {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(dates).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(dates).append(withExcludes).toHashCode();
     }
 
     @Override
@@ -114,7 +137,7 @@ public class Dates {
             return false;
         }
         Dates rhs = ((Dates) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(dates, rhs.dates).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(dates, rhs.dates).append(withExcludes, rhs.withExcludes).isEquals();
     }
 
 }

@@ -8,7 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.calendar.CalendarFilter;
+import com.sos.joc.model.calendar.CalendarId;
 
  
 public interface ICalendarUsedByResource {
@@ -16,5 +16,5 @@ public interface ICalendarUsedByResource {
     @POST
     @Path("used")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postUsedBy(@HeaderParam("X-Access-Token") String xAccessToken, CalendarFilter calendarFilter) throws Exception;
+    public JOCDefaultResponse postUsedBy(@HeaderParam("X-Access-Token") String xAccessToken, CalendarId calendarFilter) throws Exception;
 }

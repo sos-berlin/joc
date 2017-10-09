@@ -17,6 +17,12 @@
       "items": {
         "$ref": "../common/date-schema.json"
       }
+    },
+    "withExcludes": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/date-schema.json"
+      }
     }
   }
 }

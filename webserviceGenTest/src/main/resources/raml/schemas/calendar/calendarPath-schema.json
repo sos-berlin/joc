@@ -1,8 +1,8 @@
 {
-  "title": "calendarFilter",
-  "id": "schemas/calendar/calendarFilter",
+  "title": "calendarPathFilter",
+  "id": "schemas/calendar/calendarPathFilter",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.calendar.CalendarFilter",
+  "javaType": "com.sos.joc.model.calendar.CalendarPath",
   "type": "object",
   "required": [
     "path"

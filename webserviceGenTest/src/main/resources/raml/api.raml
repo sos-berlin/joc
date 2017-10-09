@@ -1932,7 +1932,7 @@ traits:
       description5: " "
       description6: " "
       description200: !include documentation/calendar/calendar.md
-      schema: !include schemas/calendar/calendarFilter-schema.json
+      schema: !include schemas/calendar/calendarPath-schema.json
       schema200: !include schemas/calendar/calendar200-schema.json
       example: !include examples/calendar/calendar-example.json
       example200: " "
@@ -1960,16 +1960,16 @@ traits:
     type:
       postCalendar:
         description: Sends a list of jobs, orders and schedules which use the calendar
-        description1: !include documentation/calendar/calendarRequired.md
+        description1: !include documentation/calendar/calendarId.md
         description2: " "
         description3: " "
         description4: " "
         description5: " "
         description6: " "
         description200: " "
-        schema: !include schemas/calendar/calendarFilter-schema.json
+        schema: !include schemas/calendar/calendarId-schema.json
         schema200: !include schemas/calendar/usedBy-schema.json
-        example: !include examples/calendar/calendar-example.json
+        example: " "
         example200: !include examples/calendar/calendarUsedBy-example.json
       
   /store:

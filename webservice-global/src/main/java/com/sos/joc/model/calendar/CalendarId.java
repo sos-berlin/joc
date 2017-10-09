@@ -11,7 +11,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 
 /**
- * calendarFilter
+ * calendarId
  * <p>
  * 
  * 
@@ -19,21 +19,58 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
+    "id",
     "path"
 })
-public class CalendarFilter {
+public class CalendarId {
 
     /**
+     * non negative long
+     * <p>
      * 
-     * (Required)
+     * 
+     */
+    @JsonProperty("id")
+    private Long id;
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
      * 
      */
     @JsonProperty("path")
     private String path;
 
     /**
+     * non negative long
+     * <p>
      * 
-     * (Required)
+     * 
+     * @return
+     *     The id
+     */
+    @JsonProperty("id")
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * non negative long
+     * <p>
+     * 
+     * 
+     * @param id
+     *     The id
+     */
+    @JsonProperty("id")
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
      * 
      * @return
      *     The path
@@ -44,8 +81,9 @@ public class CalendarFilter {
     }
 
     /**
-     * 
-     * (Required)
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
      * 
      * @param path
      *     The path
@@ -62,7 +100,7 @@ public class CalendarFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).toHashCode();
+        return new HashCodeBuilder().append(id).append(path).toHashCode();
     }
 
     @Override
@@ -70,11 +108,11 @@ public class CalendarFilter {
         if (other == this) {
             return true;
         }
-        if ((other instanceof CalendarFilter) == false) {
+        if ((other instanceof CalendarId) == false) {
             return false;
         }
-        CalendarFilter rhs = ((CalendarFilter) other);
-        return new EqualsBuilder().append(path, rhs.path).isEquals();
+        CalendarId rhs = ((CalendarId) other);
+        return new EqualsBuilder().append(id, rhs.id).append(path, rhs.path).isEquals();
     }
 
 }

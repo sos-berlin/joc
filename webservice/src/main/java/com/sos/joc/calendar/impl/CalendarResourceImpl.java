@@ -17,7 +17,7 @@ import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendar200;
-import com.sos.joc.model.calendar.CalendarFilter;
+import com.sos.joc.model.calendar.CalendarPath;
 
 @Path("calendar")
 public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarResource {
@@ -25,7 +25,7 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
     private static final String API_CALL = "./calendar";
 
     @Override
-    public JOCDefaultResponse postCalendar(String accessToken, CalendarFilter calendarFilter) throws Exception {
+    public JOCDefaultResponse postCalendar(String accessToken, CalendarPath calendarFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, "", getPermissonsJocCockpit(

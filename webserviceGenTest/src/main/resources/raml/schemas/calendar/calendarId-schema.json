@@ -1,0 +1,27 @@
+{
+  "title": "calendarId",
+  "id": "schemas/calendar/calendarId",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.CalendarId",
+  "type": "object",
+  "oneOf": [
+    {
+      "required": [
+        "id"
+      ]
+    },
+    {
+      "required": [
+        "path"
+      ]
+    }
+  ],
+  "properties": {
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
+    "path": {
+      "$ref": "../common/path-schema.json"
+    }
+  }
+}

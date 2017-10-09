@@ -1,8 +1,5 @@
 package com.sos.joc.calendar.impl;
 
-import java.time.Instant;
-import java.util.Date;
-
 import javax.ws.rs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +16,6 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarDatesFilter;
-import com.sos.joc.model.calendar.Dates;
 
 @Path("calendar")
 public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalendarDatesResource {
@@ -52,10 +48,7 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
                 calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
             }
 
-            Dates entity = new Dates();
-            entity.setDates(new FrequencyResolver().resolve(calendarFilter));
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(entity);
+            return JOCDefaultResponse.responseStatus200(new FrequencyResolver().resolve(calendarFilter));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -7,12 +7,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.calendar.CalendarFilter;
+import com.sos.joc.model.calendar.CalendarPath;
 
  
 public interface ICalendarResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postCalendar(@HeaderParam("X-Access-Token") String xAccessToken, CalendarFilter calendarFilter) throws Exception;
+    public JOCDefaultResponse postCalendar(@HeaderParam("X-Access-Token") String xAccessToken, CalendarPath calendarFilter) throws Exception;
 }
