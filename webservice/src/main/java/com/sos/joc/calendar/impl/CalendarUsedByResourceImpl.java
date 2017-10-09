@@ -36,7 +36,6 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("calendar id", calendarFilter.getId());
             if (calendarFilter.getId() == null && (calendarFilter.getPath() == null || calendarFilter.getPath().isEmpty())) {
                 throw new JocMissingRequiredParameterException("undefined 'calendar id'");
             }
