@@ -8,6 +8,7 @@ import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
+import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -29,6 +30,12 @@ public class CalendarUsedByWriter {
         this.path = path;
         this.command = command;
     }
+    
+    private Long getCalendarId(String calendarPath) throws DBConnectionRefusedException, DBInvalidDataException {
+        CalendarsDBLayer calendarsDBLayer = new CalendarsDBLayer(sosHibernateSession);
+        DBItemCalendar dbItemCalendar = calendarsDBLayer.getCalendar(calendarPath);
+        return dbItemCalendar.getId();
+    }
 
     public void deleteUsedBy() throws DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException {
         CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(this.sosHibernateSession);
@@ -44,10 +51,12 @@ public class CalendarUsedByWriter {
     public void updateUsedBy() throws Exception {
         SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(command));
         HashMap<String, DBItemInventoryCalendarUsage> listOfusedBy = new HashMap<String, DBItemInventoryCalendarUsage>();
-        NodeList calendars = sosxml.selectNodeList("//date/@calendar_id");
+        NodeList calendars = sosxml.selectNodeList("//date/@calendar");
         for (int i = 0; i < calendars.getLength(); i++) {
             DBItemInventoryCalendarUsage calendarUsageDbItem = new DBItemInventoryCalendarUsage();
-            calendarUsageDbItem.setCalendarId(Long.valueOf(calendars.item(i).getNodeValue()));
+            Long calendarId = getCalendarId(calendars.item(i).getNodeValue());
+//            calendarUsageDbItem.setCalendarId(Long.valueOf(calendars.item(i).getNodeValue()));
+            calendarUsageDbItem.setCalendarId(calendarId);
             calendarUsageDbItem.setCreated(new Date());
             calendarUsageDbItem.setInstanceId(instanceId);
             calendarUsageDbItem.setObjectType(objectType);
@@ -56,10 +65,12 @@ public class CalendarUsedByWriter {
             System.out.println(calendars.item(i).getNodeValue());
         }
 
-        calendars = sosxml.selectNodeList("//holiday/@calendar_id");
+        calendars = sosxml.selectNodeList("//holiday/@calendar");
         for (int i = 0; i < calendars.getLength(); i++) {
             DBItemInventoryCalendarUsage calendarUsageDbItem = new DBItemInventoryCalendarUsage();
-            calendarUsageDbItem.setCalendarId(Long.valueOf(calendars.item(i).getNodeValue()));
+            Long calendarId = getCalendarId(calendars.item(i).getNodeValue());
+//          calendarUsageDbItem.setCalendarId(Long.valueOf(calendars.item(i).getNodeValue()));
+          calendarUsageDbItem.setCalendarId(calendarId);
             calendarUsageDbItem.setCreated(new Date());
             calendarUsageDbItem.setInstanceId(instanceId);
             calendarUsageDbItem.setObjectType(objectType);
