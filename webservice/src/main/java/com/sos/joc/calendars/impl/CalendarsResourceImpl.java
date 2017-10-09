@@ -80,6 +80,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                 for (DBItemCalendar dbCalendar : dbCalendars) {
                     if (FilterAfterResponse.matchRegex(calendarsFilter.getRegex(), dbCalendar.getName())) {
                         Calendar calendar = om.readValue(dbCalendar.getConfiguration(), Calendar.class);
+                        calendar.setId(dbCalendar.getId());
                         calendar.setPath(dbCalendar.getName());
                         calendar.setName(dbCalendar.getBaseName());
                         if (compact) {
