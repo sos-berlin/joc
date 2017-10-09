@@ -4,10 +4,10 @@ import java.nio.file.Paths;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
-import com.sos.joc.model.calendar.CalendarFilter;
+import com.sos.joc.model.calendar.CalendarPath;
 
 
-public class ModifyCalendarAudit extends CalendarFilter implements IAuditLog {
+public class ModifyCalendarAudit extends CalendarPath implements IAuditLog {
     
     @JsonIgnore
     private String folder;
