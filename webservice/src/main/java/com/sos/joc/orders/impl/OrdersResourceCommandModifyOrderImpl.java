@@ -27,7 +27,6 @@ import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -288,7 +287,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                 if ("set_run_time".equals(command)) {
                     updateRunTimeIsTemporary(jobChainPath, order.getOrderId(), true);
-                    setCalendarUsedBy(jobChainPath, order.getOrderId(),command);
+                    setCalendarUsedBy(jobChainPath, order.getOrderId(), order.getRunTime());
 
                     DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                     dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
@@ -361,12 +360,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     }
     
     private void setCalendarUsedBy(String jobChainPath, String orderId, String command) throws Exception {
-        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "JOB_CHAIN" ,jobChainPath + "," + orderId, command);
+        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "ORDER" ,jobChainPath + "," + orderId, command);
         calendarUsedByWriter.updateUsedBy();
     }
 
     private void deleteCalendarUsedBy(String jobChainPath,String orderId) throws Exception {
-        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "JOB_CHAIN" ,jobChainPath + "," + orderId,"");
+        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "ORDER" ,jobChainPath + "," + orderId,"");
         calendarUsedByWriter.deleteUsedBy();
     }
 

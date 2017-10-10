@@ -186,7 +186,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     xml.add(XMLBuilder.parse(modifyJob.getRunTime()));
                     jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                     updateRunTimeIsTemporary(jobPath, true);
-                    setCalendarUsedBy(jobPath,command);
+                    setCalendarUsedBy(jobPath,modifyJob.getRunTime());
 
                     DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                     dailyPlanCalender2DBFilter.setForJob(jobPath);

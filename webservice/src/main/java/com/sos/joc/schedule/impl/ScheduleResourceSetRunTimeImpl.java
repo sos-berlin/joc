@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -64,7 +63,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String commandAsXml = command.asXML();
             jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
-            setCalendarUsedBy(schedulePath,commandAsXml);
+            setCalendarUsedBy(schedulePath, modifyRuntime.getRunTime());
 
             storeAuditLogEntry(scheduleAudit);
 
@@ -88,6 +87,8 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             calendarUsedByWriter.updateUsedBy();
         } catch (Exception e) {
             throw new DBConnectionRefusedException(e);
+        } finally {
+            Globals.disconnect(session);
         }
     }
 
