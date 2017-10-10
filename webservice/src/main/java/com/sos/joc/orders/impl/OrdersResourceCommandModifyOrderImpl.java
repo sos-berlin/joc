@@ -10,9 +10,7 @@ import javax.ws.rs.Path;
 import org.dom4j.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
-import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -20,13 +18,9 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
-import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
-import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
-import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -42,7 +36,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private static String API_CALL = "./orders/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private SOSHibernateSession session = null;
-    private InventoryOrdersDBLayer dbOrderLayer = null;
     private InventoryJobChainsDBLayer dbJobChainLayer = null;
 
     @Override
@@ -132,25 +125,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(),
-                    modifyOrders);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
-
-    @Override
-    public JOCDefaultResponse postOrdersResetRunTime(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
-        return postOrdersResetRunTime(getAccessToken(xAccessToken, accessToken), modifyOrders);
-    }
-
-    public JOCDefaultResponse postOrdersResetRunTime(String accessToken, ModifyOrders modifyOrders) {
-        try {
-            return postOrdersCommand(accessToken, "reset_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(),
-                    modifyOrders);
+            return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -166,8 +141,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isRemoveSetback(),
-                    modifyOrders);
+            return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isRemoveSetback(), modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -213,7 +187,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 if (order.getState() != null && !"".equals(order.getState())) {
                     xml.addAttribute("state", order.getState());
                 }
-                if (order.getRemoveSetback() != null && !"".equals(order.getRemoveSetback())) {
+                if (order.getRemoveSetback() != null && !order.getRemoveSetback()) {
                     xml.addAttribute("setback", "no");
                 }
                 if (order.getResume() != null && order.getResume()) {
@@ -250,53 +224,19 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
                 }
                 break;
-            case "reset_run_time":
-                try {
-                    DBItemInventoryOrder dbItem = getDBItem(jobChainPath, order.getOrderId());
-                    Boolean runTimeIsTemporary = Boolean.FALSE;
-                    if (dbItem != null && dbItem.getRunTimeIsTemporary() != null) {
-                        runTimeIsTemporary = dbItem.getRunTimeIsTemporary();
-                    }
-                    if (runTimeIsTemporary) {
-                        dbItem.setRunTimeIsTemporary(true);
-                        String runTimeCommand = jocXmlCommand.getShowOrderCommand(jobChainPath, order.getOrderId(), "source");
-                        String runTime = RunTime.getRuntimeXmlString(jobChainPath, jocXmlCommand, runTimeCommand, "//source/order/run_time",
-                                getAccessToken());
-                        xml.add(XMLBuilder.parse(runTime));
-                        jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-                        updateRunTimeIsTemporary(dbItem, false);
-                        deleteCalendarUsedBy(jobChainPath,order.getOrderId());
-                        DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
-                        dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
-                        dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
-                        updateDailyPlan(dailyPlanCalender2DBFilter);
-
-                        storeAuditLogEntry(orderAudit);
-                    } else {
-                        // nothing to do
-                    }
-                } catch (JocException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new JobSchedulerInvalidResponseDataException(order.getRunTime());
-                }
-                break;
             }
 
-            if (!"reset_run_time".equals(command)) {
-                jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-                if ("set_run_time".equals(command)) {
-                    updateRunTimeIsTemporary(jobChainPath, order.getOrderId(), true);
-                    setCalendarUsedBy(jobChainPath, order.getOrderId(), order.getRunTime());
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            if ("set_run_time".equals(command)) {
+                setCalendarUsedBy(jobChainPath, order.getOrderId(), order.getRunTime());
 
-                    DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
-                    dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
-                    dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
-                    updateDailyPlan(dailyPlanCalender2DBFilter);
+                DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+                dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
+                dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
+                updateDailyPlan(dailyPlanCalender2DBFilter);
 
-                }
-                storeAuditLogEntry(orderAudit);
             }
+            storeAuditLogEntry(orderAudit);
 
             return jocXmlCommand.getSurveyDate();
         } catch (JocException e) {
@@ -336,16 +276,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         return paramsElem;
     }
 
-    private DBItemInventoryOrder getDBItem(String jobChainPath, String orderId) throws JocException {
-        if (session == null) {
-            session = Globals.createSosHibernateStatelessConnection(API_CALL);
-        }
-        if (dbOrderLayer == null) {
-            dbOrderLayer = new InventoryOrdersDBLayer(session);
-        }
-        return dbOrderLayer.getInventoryOrderByOrderId(jobChainPath, orderId, dbItemInventoryInstance.getId());
-    }
-
+     
     private boolean isEndNode(String jobChainPath, String orderState) throws JocException {
         if (session == null) {
             session = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -358,32 +289,13 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         }
         return false;
     }
-    
+
     private void setCalendarUsedBy(String jobChainPath, String orderId, String command) throws Exception {
-        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "ORDER" ,jobChainPath + "," + orderId, command);
+        if (session == null) {
+            session = Globals.createSosHibernateStatelessConnection(API_CALL);
+        }
+        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "ORDER", jobChainPath + "," + orderId, command);
         calendarUsedByWriter.updateUsedBy();
     }
 
-    private void deleteCalendarUsedBy(String jobChainPath,String orderId) throws Exception {
-        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "ORDER" ,jobChainPath + "," + orderId,"");
-        calendarUsedByWriter.deleteUsedBy();
-    }
-
-    private void updateRunTimeIsTemporary(String jobChainPath, String orderId, boolean value) throws JocException {
-        DBItemInventoryOrder dbItem = getDBItem(jobChainPath, orderId);
-        if (dbItem != null) {
-            updateRunTimeIsTemporary(dbItem, value);
-        }
-    }
-
-    private void updateRunTimeIsTemporary(DBItemInventoryOrder dbItem, boolean value) throws JocException {
-        dbItem.setRunTimeIsTemporary(value);
-        try {
-            session.update(dbItem);
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
-    }
 }

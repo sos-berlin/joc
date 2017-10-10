@@ -7,9 +7,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
-import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -17,13 +15,8 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyJobAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
-import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
-import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.BulkError;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
-import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -40,12 +33,9 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     private static final String SUSPEND = "suspend";
     private static final String STOP = "stop";
     private static final String SET_RUN_TIME = "set_run_time";
-    private static final String RESET_RUN_TIME = "reset_run_time";
     private static final String UNSTOP = "unstop";
     private static String API_CALL = "./jobs/";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
-    private SOSHibernateSession session = null;
-    private InventoryJobsDBLayer dbLayer = null;
 
     @Override
     public JOCDefaultResponse postJobsStop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
@@ -95,22 +85,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-    @Override
-    public JOCDefaultResponse postJobsResetRunTime(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsResetRunTime(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
-
-
-    public JOCDefaultResponse postJobsResetRunTime(String accessToken, ModifyJobs modifyJobs) {
-        try {
-            return postJobsCommand(accessToken, RESET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().getChange().isRunTime(), modifyJobs);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
 
     @Override
     public JOCDefaultResponse postJobsEndAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
@@ -185,7 +159,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     ValidateXML.validateRunTimeAgainstJobSchedulerSchema(modifyJob.getRunTime());
                     xml.add(XMLBuilder.parse(modifyJob.getRunTime()));
                     jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-                    updateRunTimeIsTemporary(jobPath, true);
                     setCalendarUsedBy(jobPath,modifyJob.getRunTime());
 
                     DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
@@ -193,38 +166,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     updateDailyPlan(dailyPlanCalender2DBFilter);
 
                     storeAuditLogEntry(jobAudit);
-                } catch (JocException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new JobSchedulerInvalidResponseDataException(e);
-                }
-                break;
-            case RESET_RUN_TIME:
-                try {
-                    DBItemInventoryJob dbItem = getDBItem(jobPath);
-                    if (dbItem == null) {
-                        throw new DBMissingDataException(String.format("no entry found in DB: %1$s", jobPath));
-                    }
-                    if (dbItem.getRunTimeIsTemporary() == null) {
-                        dbItem.setRunTimeIsTemporary(false);
-                    }
-                    if (dbItem.getRunTimeIsTemporary()) {
-                        String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "source", 0, 0);
-                        String runTime = RunTime.getRuntimeXmlString(jobPath, jocXmlCommand, runTimeCommand, "//source/job/run_time",
-                                getAccessToken());
-                        xml.add(XMLBuilder.parse(runTime));
-                        jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-                        updateRunTimeIsTemporary(dbItem, false);
-                        deleteCalendarUsedBy(jobPath);
-                        
-                        DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
-                        dailyPlanCalender2DBFilter.setForJob(jobPath);
-                        updateDailyPlan(dailyPlanCalender2DBFilter);
-
-                        storeAuditLogEntry(jobAudit);
-                    } else {
-                        // nothing to do
-                    }
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
@@ -260,49 +201,18 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         for (ModifyJob job : modifyJobs.getJobs()) {
             surveyDate = executeModifyJobCommand(job, modifyJobs, command);
         }
-        Globals.disconnect(session);
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);
         }
         return JOCDefaultResponse.responseStatusJSOk(surveyDate);
     }
 
-    private DBItemInventoryJob getDBItem(String jobPath) throws JocException {
-        if (session == null) {
-            session = Globals.createSosHibernateStatelessConnection(API_CALL);
-        }
-        if (dbLayer == null) {
-            dbLayer = new InventoryJobsDBLayer(session);
-        }
-        return dbLayer.getInventoryJobByName(jobPath, dbItemInventoryInstance.getId());
-    }
 
     private void setCalendarUsedBy(String jobPath, String command) throws Exception {
-        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "JOB" ,jobPath, command);
+        SOSHibernateSession session = Globals.createSosHibernateStatelessConnection(API_CALL);
+        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, this.dbItemInventoryInstance.getId(), "JOB" ,jobPath, command);
         calendarUsedByWriter.updateUsedBy();
+        Globals.disconnect(session);
     }
 
-    private void deleteCalendarUsedBy(String jobPath) throws Exception {
-        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "JOB" ,jobPath, "");
-        calendarUsedByWriter.deleteUsedBy();
-    }
-
-    private void updateRunTimeIsTemporary(String jobPath, boolean value) throws JocException {
-        DBItemInventoryJob dbItem = getDBItem(jobPath);
-        if (dbItem == null) {
-            throw new DBMissingDataException(String.format("no entry found in DB: %1$s", jobPath));
-        }
-        updateRunTimeIsTemporary(dbItem, value);
-    }
-
-    private void updateRunTimeIsTemporary(DBItemInventoryJob dbItem, boolean value) throws JocException {
-        dbItem.setRunTimeIsTemporary(value);
-        try {
-            session.update(dbItem);
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
-    }
 }

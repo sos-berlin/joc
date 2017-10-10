@@ -49,10 +49,5 @@ public interface IJobsResourceModifyJob {
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postJobsSetRunTime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyJobs modifyJobs) throws Exception;
     
-    @POST
-    @Path("reset_run_time")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postJobsResetRunTime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyJobs modifyJobs) throws Exception;
 
 }

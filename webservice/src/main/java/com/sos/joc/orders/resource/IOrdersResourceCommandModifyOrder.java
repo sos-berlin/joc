@@ -48,12 +48,7 @@ public interface IOrdersResourceCommandModifyOrder {
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postOrdersSetRunTime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
     
-    @POST
-    @Path("reset_run_time")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postOrdersResetRunTime(@HeaderParam("X-Access-Token") String xAccessToken,@HeaderParam("access_token") String accessToken, ModifyOrders modifyOrders) throws Exception;
-    
+   
     @POST
     @Path("remove_setback")
     @Consumes(MediaType.APPLICATION_JSON)
