@@ -9,7 +9,8 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -17,6 +18,8 @@ import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyScheduleAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
+import com.sos.joc.db.calendars.CalendarUsedByWriter;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
@@ -34,8 +37,8 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
     public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRunTime modifyRuntime) throws Exception {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken, modifyRuntime.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getSchedule().getChange().isEditContent());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken, modifyRuntime.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()
+                    .getChange().isEditContent());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -45,7 +48,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             checkRequiredParameter("schedule", modifyRuntime.getSchedule());
             ValidateXML.validateScheduleAgainstJobSchedulerSchema(modifyRuntime.getRunTime());
 
-            String schedule = normalizePath(modifyRuntime.getSchedule());
+            String schedulePath = normalizePath(modifyRuntime.getSchedule());
             XMLBuilder command = new XMLBuilder("modify_hot_folder");
             // the below command results in an ERROR: XMLBuilder.parse creates
             // Element with root "schedule" which will be added to
@@ -54,11 +57,13 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             // getParent(schedule)).addElement("schedule").addAttribute("name",
             // Paths.get(schedule).getFileName()
             // .toString()).add(XMLBuilder.parse(modifyRuntime.getRunTime()));
-            command.addAttribute("folder", getParent(schedule)).add(XMLBuilder.parse(modifyRuntime.getRunTime()).addAttribute("name", Paths.get(
-                    schedule).getFileName().toString()));
+            command.addAttribute("folder", getParent(schedulePath)).add(XMLBuilder.parse(modifyRuntime.getRunTime()).addAttribute("name", Paths.get(schedulePath).getFileName()
+                    .toString()));
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            jocXmlCommand.executePostWithThrowBadRequest(command.asXML(), getAccessToken());
+            String commandAsXml = command.asXML();
+            jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
+            setCalendarUsedBy(schedulePath, modifyRuntime.getRunTime());
 
             storeAuditLogEntry(scheduleAudit);
 
@@ -70,6 +75,20 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
         } catch (Exception e) {
             AUDIT_LOGGER.error(e.getMessage());
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
+
+    private void setCalendarUsedBy(String schedulePath, String command) throws Exception {
+        SOSHibernateSession session = null;
+
+        try {
+            session = Globals.createSosHibernateStatelessConnection("postScheduleSetRuntime");
+            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, this.dbItemInventoryInstance.getId(), "SCHEDULE", schedulePath, command);
+            calendarUsedByWriter.updateUsedBy();
+        } catch (Exception e) {
+            throw new DBConnectionRefusedException(e);
+        } finally {
+            Globals.disconnect(session);
         }
     }
 

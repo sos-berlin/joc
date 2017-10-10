@@ -109,17 +109,75 @@ public class CalendarUsageDBLayer extends DBLayer {
      * DBInvalidDataException(ex); } }
      */
 
-    public int deleteCalendarUsage(Long calendarId) throws DBConnectionRefusedException, DBInvalidDataException {
+    public int deleteCalendarUsage(CalendarUsageFilter calendarUsageFilter) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-
-            CalendarUsageFilter filter = new CalendarUsageFilter();
-            filter.setCalendarId(calendarId);
-            String hql = "delete from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(filter);
+            String hql = "delete from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(calendarUsageFilter);
             int row = 0;
             query = getSession().createQuery(hql);
-            bindParameters(filter);
+            bindParameters(calendarUsageFilter);
             row = getSession().executeUpdate(query);
             return row;
+
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public int deleteCalendarUsage(Long calendarId) throws DBConnectionRefusedException, DBInvalidDataException {
+        CalendarUsageFilter calendarUsageFilter = new CalendarUsageFilter();
+        calendarUsageFilter.setCalendarId(calendarId);
+        int row = deleteCalendarUsage(calendarUsageFilter);
+        return row;
+    }
+
+    public int deleteCalendarUsage(String calendarPath) throws DBConnectionRefusedException, DBInvalidDataException {
+        CalendarUsageFilter calendarUsageFilter = new CalendarUsageFilter();
+        calendarUsageFilter.setPath(calendarPath);
+        int row = deleteCalendarUsage(calendarUsageFilter);
+        return row;
+    }
+    
+    public void deleteCalendarUsage(DBItemInventoryCalendarUsage calendarUsage) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            getSession().delete(calendarUsage);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public DBItemInventoryCalendarUsage getCalendarUsage(Long instanceId, Long calendarId, String objectType, String path) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            CalendarUsageFilter filter = new CalendarUsageFilter();
+            filter.setCalendarId(calendarId);
+            filter.setInstanceId(instanceId);
+            filter.setObjectType(objectType);
+            filter.setPath(path);
+            String sql = "from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(filter);
+            query = getSession().createQuery(sql);
+            bindParameters(filter);
+            return getSession().getSingleResult(query);
+
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<DBItemInventoryCalendarUsage> getCalendarUsagesOfAnObject(Long instanceId, String objectType, String path) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            CalendarUsageFilter filter = new CalendarUsageFilter();
+            filter.setInstanceId(instanceId);
+            filter.setObjectType(objectType);
+            filter.setPath(path);
+            String sql = "from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(filter);
+            query = getSession().createQuery(sql);
+            bindParameters(filter);
+            return getSession().getResultList(query);
 
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

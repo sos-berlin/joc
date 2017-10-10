@@ -84,37 +84,30 @@ public class CalendarsDBLayer extends DBLayer {
     public Date saveOrUpdateCalendar(DBItemCalendar calendarDbItem, Calendar calendar) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             Date now = Date.from(Instant.now());
-            if (calendarDbItem == null) {
+            boolean newCalendar = (calendarDbItem == null);
+            if (newCalendar) {
                 calendarDbItem = new DBItemCalendar();
                 Path p = Paths.get(calendar.getPath());
                 calendarDbItem.setBaseName(p.getFileName().toString());
                 calendarDbItem.setDirectory(p.getParent().toString().replace('\\', '/'));
                 calendarDbItem.setName(calendar.getPath());
-                if (calendar.getCategory() != null) {
-                    calendarDbItem.setCategory(calendar.getCategory());
-                } else {
-                    calendarDbItem.setCategory("");
-                }
-                calendarDbItem.setTitle(calendar.getTitle());
-                calendarDbItem.setType(calendar.getType().name());
                 calendarDbItem.setCreated(now);
-                calendar.setPath(null);
-                calendar.setName(null);
-                calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
-                calendarDbItem.setModified(now);
+            }
+            if (calendar.getCategory() != null) {
+                calendarDbItem.setCategory(calendar.getCategory());
+            } else {
+                calendarDbItem.setCategory("");
+            }
+            calendarDbItem.setTitle(calendar.getTitle());
+            calendarDbItem.setType(calendar.getType().name());
+            calendar.setId(null);
+            calendar.setPath(null);
+            calendar.setName(null);
+            calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
+            calendarDbItem.setModified(now);
+            if (newCalendar) {
                 getSession().save(calendarDbItem);
             } else {
-                if (calendar.getCategory() != null) {
-                    calendarDbItem.setCategory(calendar.getCategory());
-                } else {
-                    calendarDbItem.setCategory("");
-                }
-                calendarDbItem.setTitle(calendar.getTitle());
-                calendarDbItem.setType(calendar.getType().name());
-                calendar.setPath(null);
-                calendar.setName(null);
-                calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
-                calendarDbItem.setModified(now);
                 getSession().update(calendarDbItem);
             }
             return now;
@@ -142,6 +135,10 @@ public class CalendarsDBLayer extends DBLayer {
             DBItemCalendar dbCalendar = getCalendar(path);
             if (dbCalendar != null) {
                 getSession().delete(dbCalendar); 
+                getSession().beginTransaction();
+                CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(getSession());
+                calendarUsageDBLayer.deleteCalendarUsage(dbCalendar.getId());
+                getSession().commit();
             }
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

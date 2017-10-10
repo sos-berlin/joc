@@ -18,6 +18,7 @@ import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyJobAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.classes.runtime.RunTime;
+import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
@@ -185,6 +186,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     xml.add(XMLBuilder.parse(modifyJob.getRunTime()));
                     jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                     updateRunTimeIsTemporary(jobPath, true);
+                    setCalendarUsedBy(jobPath,modifyJob.getRunTime());
 
                     DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                     dailyPlanCalender2DBFilter.setForJob(jobPath);
@@ -213,7 +215,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                         xml.add(XMLBuilder.parse(runTime));
                         jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                         updateRunTimeIsTemporary(dbItem, false);
-
+                        deleteCalendarUsedBy(jobPath);
+                        
                         DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                         dailyPlanCalender2DBFilter.setForJob(jobPath);
                         updateDailyPlan(dailyPlanCalender2DBFilter);
@@ -272,6 +275,16 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             dbLayer = new InventoryJobsDBLayer(session);
         }
         return dbLayer.getInventoryJobByName(jobPath, dbItemInventoryInstance.getId());
+    }
+
+    private void setCalendarUsedBy(String jobPath, String command) throws Exception {
+        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "JOB" ,jobPath, command);
+        calendarUsedByWriter.updateUsedBy();
+    }
+
+    private void deleteCalendarUsedBy(String jobPath) throws Exception {
+        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "JOB" ,jobPath, "");
+        calendarUsedByWriter.deleteUsedBy();
     }
 
     private void updateRunTimeIsTemporary(String jobPath, boolean value) throws JocException {
