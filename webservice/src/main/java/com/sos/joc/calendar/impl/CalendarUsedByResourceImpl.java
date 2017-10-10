@@ -15,7 +15,7 @@ import com.sos.joc.calendar.resource.ICalendarUsedByResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.calendars.CalendarUsage;
-import com.sos.joc.db.calendars.CalendarUsageModelDBLayer;
+import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.CalendarId;
@@ -40,7 +40,7 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
                 throw new JocMissingRequiredParameterException("undefined 'calendar id'");
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            CalendarUsageModelDBLayer dbCalendarLayer = new CalendarUsageModelDBLayer(connection);
+            CalendarUsageDBLayer dbCalendarLayer = new CalendarUsageDBLayer(connection);
             List<CalendarUsage> calendarUsages = null;
             if (calendarFilter.getId() != null) {
                 calendarUsages = dbCalendarLayer.getCalendarUsages(calendarFilter.getId()); 
