@@ -71,7 +71,6 @@ public class CalendarUsedByWriter {
             if (!calendarPaths.contains(calendarPath)) {
                 calendarPaths.add(calendarPath);
                 Long calendarId = getCalendarId(calendarPath);
-                calendarId = i+1L;
                 if (calendarId != null) {
                     calendarUsageDbItem.setCalendarId(calendarId);
                     if (dbCalendars.contains(calendarUsageDbItem)) {
