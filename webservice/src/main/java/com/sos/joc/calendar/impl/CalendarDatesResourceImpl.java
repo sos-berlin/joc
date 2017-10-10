@@ -32,15 +32,24 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            boolean calendarIdIsDefined = calendarFilter.getId() != null;
             boolean calendarPathIsDefined = calendarFilter.getPath() != null && !calendarFilter.getPath().isEmpty();
-            if (!calendarPathIsDefined && calendarFilter.getCalendar() == null) {
-                throw new JocMissingRequiredParameterException("'calendar' or 'path' parameter is required");
+            if (!calendarIdIsDefined && !calendarPathIsDefined && calendarFilter.getCalendar() == null) {
+                throw new JocMissingRequiredParameterException("'calendar' or 'id' parameter is required");
             }
-
-            if (calendarPathIsDefined) {
+            
+            if (calendarIdIsDefined) {
                 connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-                String calendarPath = normalizePath(calendarFilter.getPath());
                 CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+                DBItemCalendar calendarItem = dbLayer.getCalendar(calendarFilter.getId());
+                if (calendarItem == null) {
+                    throw new DBMissingDataException(String.format("calendar with id '%1$d' not found", calendarFilter.getId()));
+                }
+                calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
+            } else if (calendarPathIsDefined) {
+                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+                String calendarPath = normalizePath(calendarFilter.getPath());
                 DBItemCalendar calendarItem = dbLayer.getCalendar(calendarPath);
                 if (calendarItem == null) {
                     throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));

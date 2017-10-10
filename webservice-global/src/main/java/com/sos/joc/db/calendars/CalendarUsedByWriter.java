@@ -9,7 +9,6 @@ import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
-import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -32,59 +31,57 @@ public class CalendarUsedByWriter {
         this.command = command;
     }
     
-    private Long getCalendarId(String calendarPath) throws DBConnectionRefusedException, DBInvalidDataException {
-        CalendarsDBLayer calendarsDBLayer = new CalendarsDBLayer(sosHibernateSession);
-        DBItemCalendar dbItemCalendar = calendarsDBLayer.getCalendar(calendarPath);
-        if (dbItemCalendar == null) {
-            return null;
-        }
-        return dbItemCalendar.getId();
-    }
-
     public void deleteUsedBy() throws DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException {
         CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(this.sosHibernateSession);
         CalendarUsageFilter calendarUsageFilter = new CalendarUsageFilter();
         calendarUsageFilter.setInstanceId(instanceId);
         calendarUsageFilter.setObjectType(objectType);
         calendarUsageFilter.setPath(path);
-        sosHibernateSession.beginTransaction();
-        calendarUsageDBLayer.deleteCalendarUsage(calendarUsageFilter);
-        sosHibernateSession.commit();
+        try {
+            sosHibernateSession.beginTransaction();
+            calendarUsageDBLayer.deleteCalendarUsage(calendarUsageFilter);
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+            throw e;
+        }
     }
 
     public void updateUsedBy() throws Exception {
         SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(command));
-        Set<String> calendarPaths = new HashSet<String>();
+        Set<Long> calendarIds = new HashSet<Long>();
         NodeList calendars = sosxml.selectNodeList("//date/@calendar|//holiday/@calendar");
         
-        sosHibernateSession.beginTransaction();
-        CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(this.sosHibernateSession);
-        List<DBItemInventoryCalendarUsage> dbCalendars = calendarUsageDBLayer.getCalendarUsagesOfAnObject(instanceId, objectType, path);
-        DBItemInventoryCalendarUsage calendarUsageDbItem = new DBItemInventoryCalendarUsage();
-        calendarUsageDbItem.setCreated(new Date());
-        calendarUsageDbItem.setInstanceId(instanceId);
-        calendarUsageDbItem.setObjectType(objectType);
-        calendarUsageDbItem.setPath(path);
-        
-        for (int i = 0; i < calendars.getLength(); i++) {
-            String calendarPath = calendars.item(i).getNodeValue();
-            if (!calendarPaths.contains(calendarPath)) {
-                calendarPaths.add(calendarPath);
-                Long calendarId = getCalendarId(calendarPath);
-                if (calendarId != null) {
-                    calendarUsageDbItem.setCalendarId(calendarId);
-                    if (dbCalendars.contains(calendarUsageDbItem)) {
-                        dbCalendars.remove(calendarUsageDbItem);
-                    } else {
-                        calendarUsageDBLayer.saveCalendarUsage(calendarUsageDbItem);
+        try {
+            sosHibernateSession.beginTransaction();
+            CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(this.sosHibernateSession);
+            CalendarsDBLayer calendarsDBLayer = new CalendarsDBLayer(this.sosHibernateSession);
+            List<DBItemInventoryCalendarUsage> dbCalendars = calendarUsageDBLayer.getCalendarUsagesOfAnObject(instanceId, objectType, path);
+            DBItemInventoryCalendarUsage calendarUsageDbItem = new DBItemInventoryCalendarUsage();
+            calendarUsageDbItem.setInstanceId(instanceId);
+            calendarUsageDbItem.setObjectType(objectType);
+            calendarUsageDbItem.setPath(path);
+            
+            for (int i = 0; i < calendars.getLength(); i++) {
+                Long calendarId = Long.parseLong(calendars.item(i).getNodeValue());
+                if (calendarId != null && !calendarIds.contains(calendarId)) {
+                    calendarIds.add(calendarId);
+                    if (calendarsDBLayer.getCalendar(calendarId) != null) {
+                        calendarUsageDbItem.setCalendarId(calendarId);
+                        if (!dbCalendars.remove(calendarUsageDbItem)) {
+                            calendarUsageDBLayer.saveCalendarUsage(calendarUsageDbItem);
+                        } 
                     }
                 }
             }
+            for (DBItemInventoryCalendarUsage dbItem : dbCalendars) {
+                calendarUsageDBLayer.deleteCalendarUsage(dbItem);
+            }
+            sosHibernateSession.commit();
+        } catch (Exception e) {
+            sosHibernateSession.rollback();
+            throw e;
         }
-        for (DBItemInventoryCalendarUsage dbItem : dbCalendars) {
-            calendarUsageDBLayer.deleteCalendarUsage(dbItem);
-        }
-        sosHibernateSession.commit();
     }
 
 }

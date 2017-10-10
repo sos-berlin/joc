@@ -12,6 +12,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
+import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
@@ -39,11 +40,15 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                 throw new JocMissingRequiredParameterException("undefined 'calendar'");
             }
             checkRequiredParameter("calendar path", calendar.getPath());
+            if (calendar.getTo() == null || calendar.getTo().isEmpty()) {
+                throw new JobSchedulerInvalidResponseDataException("calendar field 'to' is undefined");
+            } else if (!calendar.getTo().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+                throw new JobSchedulerInvalidResponseDataException("calendar field 'to' must have the format YYYY-MM-DD.");
+            }
             if (calendar.getType() == null || calendar.getType().name().isEmpty()) {
-//                throw new JocMissingRequiredParameterException("undefined 'calendar type'");
                 calendar.setType(CalendarType.WORKING_DAYS);
             }
-
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_STORE);
             calendar.setPath(normalizePath(calendar.getPath()));
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
@@ -54,8 +59,13 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                 return accessDeniedResponse();
             }
             
-            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getPath(), calendarFilter.getAuditLog());
+            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog());
             logAuditMessage(calendarAudit);
+            
+//            if (calendarDbItem != null) {
+//                FrequencyResolver fr = new FrequencyResolver(); 
+//            }
+            
             Date surveyDate = dbLayer.saveOrUpdateCalendar(calendarDbItem, calendar);
             storeAuditLogEntry(calendarAudit);
             
@@ -87,7 +97,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             String calendarPath = normalizePath(calendarFilter.getPath());
             String calendarNewPath = normalizePath(calendarFilter.getNewPath());
             
-            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarPath, calendarFilter.getAuditLog());
+            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, calendarPath, calendarFilter.getAuditLog());
             logAuditMessage(calendarAudit);
             Date surveyDate = new CalendarsDBLayer(connection).renameCalendar(calendarPath, calendarNewPath);
             storeAuditLogEntry(calendarAudit);

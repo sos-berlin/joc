@@ -26,6 +26,21 @@ public class CalendarsDBLayer extends DBLayer {
         super(connection);
     }
 
+    public DBItemCalendar getCalendar(Long id) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_CALENDARS);
+            sql.append(" where id = :id");
+            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
+            query.setParameter("id", id);
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
     public DBItemCalendar getCalendar(String path) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -120,7 +135,7 @@ public class CalendarsDBLayer extends DBLayer {
 
     public void deleteCalendars(Set<String> paths) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            for (DBItemCalendar calendarDbItem : getCalendars(paths)) {
+            for (DBItemCalendar calendarDbItem : getCalendarsFromPaths(paths)) {
                 getSession().delete(calendarDbItem);
             }
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -130,6 +145,23 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
+    public void deleteCalendar(Long id) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            DBItemCalendar dbCalendar = getCalendar(id);
+            if (dbCalendar != null) {
+                getSession().delete(dbCalendar); 
+                getSession().beginTransaction();
+                CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(getSession());
+                calendarUsageDBLayer.deleteCalendarUsage(dbCalendar.getId());
+                getSession().commit();
+            }
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
     public void deleteCalendar(String path) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             DBItemCalendar dbCalendar = getCalendar(path);
@@ -146,8 +178,35 @@ public class CalendarsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-
-    public List<DBItemCalendar> getCalendars(Set<String> paths) throws DBConnectionRefusedException, DBInvalidDataException {
+    
+    public List<DBItemCalendar> getCalendarsFromIds(Set<Long> ids) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_CALENDARS);
+            if (ids != null && !ids.isEmpty()) {
+                if (ids.size() == 1) {
+                    sql.append(" where id = :id");
+                } else {
+                    sql.append(" where id in (:id)");
+                }
+            }
+            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
+            if (ids != null && !ids.isEmpty()) {
+                if (ids.size() == 1) {
+                    query.setParameter("id", ids.iterator().next());
+                } else {
+                    query.setParameterList("id", ids);
+                }
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<DBItemCalendar> getCalendarsFromPaths(Set<String> paths) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_CALENDARS);

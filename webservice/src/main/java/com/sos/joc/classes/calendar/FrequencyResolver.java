@@ -47,7 +47,19 @@ public class FrequencyResolver {
     }
 
     public Dates resolve(CalendarDatesFilter calendarFilter) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
-        init(calendarFilter);
+        if (calendarFilter != null) {
+            return resolve(calendarFilter.getCalendar(), calendarFilter.getDateFrom(), calendarFilter.getDateTo());
+        } else {
+            Dates d = new Dates();
+            d.setDates(new ArrayList<String>(dates));
+            d.setWithExcludes(new ArrayList<String>(withExcludes));
+            d.setDeliveryDate(Date.from(Instant.now()));
+            return d;
+        }
+    }
+    
+    public Dates resolve(com.sos.joc.model.calendar.Calendar calendar, String from, String to) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
+        init(calendar, from, to);
         addDates();
         addHolidays();
         addWeekDays();
@@ -70,16 +82,21 @@ public class FrequencyResolver {
     }
 
     public void init(CalendarDatesFilter calendarFilter) throws JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
-        if (calendarFilter != null && calendarFilter.getCalendar() != null) {
-            setDateFrom(calendarFilter.getDateFrom(), calendarFilter.getCalendar().getFrom());
-            setDateTo(calendarFilter.getDateTo(), calendarFilter.getCalendar().getTo());
+        if (calendarFilter != null) {
+            init(calendarFilter.getCalendar(), calendarFilter.getDateFrom(), calendarFilter.getDateTo());
+        }
+    }
+
+    public void init(com.sos.joc.model.calendar.Calendar calendar, String from, String to) throws JocMissingRequiredParameterException,
+            JobSchedulerInvalidResponseDataException {
+        if (calendar != null) {
+            setDateFrom(from, calendar.getFrom());
+            setDateTo(to, calendar.getTo());
             if (this.dateFrom.after(this.dateTo)) {
                 throw new JobSchedulerInvalidResponseDataException("'dateFrom' must be an older date or equals than 'dateTo'.");
             }
-            if (calendarFilter.getCalendar() != null) {
-                this.includes = calendarFilter.getCalendar().getIncludes();
-                this.excludes = calendarFilter.getCalendar().getExcludes();
-            }
+            this.includes = calendar.getIncludes();
+            this.excludes = calendar.getExcludes();
         }
     }
 

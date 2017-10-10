@@ -15,9 +15,10 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Calendar200;
-import com.sos.joc.model.calendar.CalendarPath;
+import com.sos.joc.model.calendar.CalendarId;
 
 @Path("calendar")
 public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarResource {
@@ -25,7 +26,7 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
     private static final String API_CALL = "./calendar";
 
     @Override
-    public JOCDefaultResponse postCalendar(String accessToken, CalendarPath calendarFilter) throws Exception {
+    public JOCDefaultResponse postCalendar(String accessToken, CalendarId calendarFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, "", getPermissonsJocCockpit(
@@ -33,17 +34,28 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredParameter("calendar path", calendarFilter.getPath());
+            if (calendarFilter.getId() == null && (calendarFilter.getPath() == null || calendarFilter.getPath().isEmpty())) {
+                throw new JocMissingRequiredParameterException("undefined 'calendar id'");
+            }
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            String calendarPath = normalizePath(calendarFilter.getPath());
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
-            DBItemCalendar calendarItem = dbLayer.getCalendar(calendarPath);
-            if (calendarItem == null) {
-                throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
+            DBItemCalendar calendarItem = null;
+            if (calendarFilter.getId() != null) {
+                calendarItem = dbLayer.getCalendar(calendarFilter.getId());
+                if (calendarItem == null) {
+                    throw new DBMissingDataException(String.format("calendar with id '%1$d' not found", calendarFilter.getId()));
+                }
+            } else {
+                String calendarPath = normalizePath(calendarFilter.getPath());
+                calendarItem = dbLayer.getCalendar(calendarPath);
+                if (calendarItem == null) {
+                    throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
+                }
             }
             Calendar calendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
             calendar.setId(calendarItem.getId());
-            calendar.setPath(calendarPath);
+            calendar.setPath(calendarItem.getName());
             calendar.setName(calendarItem.getBaseName());
             Calendar200 entity = new Calendar200();
             entity.setCalendar(calendar);

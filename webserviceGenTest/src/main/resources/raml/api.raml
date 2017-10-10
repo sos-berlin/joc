@@ -1927,7 +1927,7 @@ traits:
       description: Sends calendar
       description1: " "
       description2: " "
-      description3: !include documentation/calendar/calendarRequired.md
+      description3: !include documentation/calendar/calendarId.md
       description4: " "
       description5: " "
       description6: " "
@@ -1942,9 +1942,9 @@ traits:
       postCalendar:
         description: |
           Sends dates of a calendar
-          <p style="font-weight: normal; font-size: 50%">One of the parameters ``calendar`` and ``path`` is required. 
-          The ``path`` parameter beats the ``calendar`` parameter</p>
-        description1: !include documentation/calendar/calendarRequired.md
+          <p style="font-weight: normal; font-size: 50%">One of the parameters ``calendar``, ``id`` or ``path`` is required. 
+          The ``id`` and ``path`` parameter beats the ``calendar`` parameter</p>
+        description1: !include documentation/calendar/calendarId.md
         description2: !include documentation/calendar/calendarObj.md
         description3: !include documentation/calendar/dateFrom.md
         description4: !include documentation/calendar/dateTo.md

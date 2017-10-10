@@ -20,6 +20,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "calendar",
+    "id",
     "path",
     "dateFrom",
     "dateTo"
@@ -34,6 +35,14 @@ public class CalendarDatesFilter {
      */
     @JsonProperty("calendar")
     private Calendar calendar;
+    /**
+     * non negative long
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("id")
+    private Long id;
     @JsonProperty("path")
     private String path;
     @JsonProperty("dateFrom")
@@ -65,6 +74,32 @@ public class CalendarDatesFilter {
     @JsonProperty("calendar")
     public void setCalendar(Calendar calendar) {
         this.calendar = calendar;
+    }
+
+    /**
+     * non negative long
+     * <p>
+     * 
+     * 
+     * @return
+     *     The id
+     */
+    @JsonProperty("id")
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * non negative long
+     * <p>
+     * 
+     * 
+     * @param id
+     *     The id
+     */
+    @JsonProperty("id")
+    public void setId(Long id) {
+        this.id = id;
     }
 
     /**
@@ -134,7 +169,7 @@ public class CalendarDatesFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendar).append(path).append(dateFrom).append(dateTo).toHashCode();
+        return new HashCodeBuilder().append(calendar).append(id).append(path).append(dateFrom).append(dateTo).toHashCode();
     }
 
     @Override
@@ -146,7 +181,7 @@ public class CalendarDatesFilter {
             return false;
         }
         CalendarDatesFilter rhs = ((CalendarDatesFilter) other);
-        return new EqualsBuilder().append(calendar, rhs.calendar).append(path, rhs.path).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).isEquals();
+        return new EqualsBuilder().append(calendar, rhs.calendar).append(id, rhs.id).append(path, rhs.path).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).isEquals();
     }
 
 }

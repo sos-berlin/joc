@@ -22,6 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
+    "calendarIds",
     "calendars",
     "compact",
     "type",
@@ -32,6 +33,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class CalendarsFilter {
 
+    @JsonProperty("calendarIds")
+    private List<Long> calendarIds = null;
     @JsonProperty("calendars")
     private List<String> calendars = null;
     /**
@@ -70,6 +73,26 @@ public class CalendarsFilter {
      */
     @JsonProperty("auditLog")
     private AuditParams auditLog;
+
+    /**
+     * 
+     * @return
+     *     The calendarIds
+     */
+    @JsonProperty("calendarIds")
+    public List<Long> getCalendarIds() {
+        return calendarIds;
+    }
+
+    /**
+     * 
+     * @param calendarIds
+     *     The calendarIds
+     */
+    @JsonProperty("calendarIds")
+    public void setCalendarIds(List<Long> calendarIds) {
+        this.calendarIds = calendarIds;
+    }
 
     /**
      * 
@@ -242,7 +265,7 @@ public class CalendarsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(calendars).append(compact).append(type).append(categories).append(regex).append(folders).append(auditLog).toHashCode();
+        return new HashCodeBuilder().append(calendarIds).append(calendars).append(compact).append(type).append(categories).append(regex).append(folders).append(auditLog).toHashCode();
     }
 
     @Override
@@ -254,7 +277,7 @@ public class CalendarsFilter {
             return false;
         }
         CalendarsFilter rhs = ((CalendarsFilter) other);
-        return new EqualsBuilder().append(calendars, rhs.calendars).append(compact, rhs.compact).append(type, rhs.type).append(categories, rhs.categories).append(regex, rhs.regex).append(folders, rhs.folders).append(auditLog, rhs.auditLog).isEquals();
+        return new EqualsBuilder().append(calendarIds, rhs.calendarIds).append(calendars, rhs.calendars).append(compact, rhs.compact).append(type, rhs.type).append(categories, rhs.categories).append(regex, rhs.regex).append(folders, rhs.folders).append(auditLog, rhs.auditLog).isEquals();
     }
 
 }

@@ -45,9 +45,14 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
             List<DBItemCalendar> dbCalendars = null;
             
-            if (calendarsFilter.getCalendars() != null && !calendarsFilter.getCalendars().isEmpty()) {
+            if (calendarsFilter.getCalendarIds() != null && !calendarsFilter.getCalendarIds().isEmpty()) {
                 calendarsFilter.setRegex(null);
-                dbCalendars = dbLayer.getCalendars(new HashSet<String>(calendarsFilter.getCalendars()));
+                dbCalendars = dbLayer.getCalendarsFromIds(new HashSet<Long>(calendarsFilter.getCalendarIds()));
+            
+            } else if (calendarsFilter.getCalendars() != null && !calendarsFilter.getCalendars().isEmpty()) {
+                calendarsFilter.setRegex(null);
+                dbCalendars = dbLayer.getCalendarsFromPaths(new HashSet<String>(calendarsFilter.getCalendars()));
+            
             } else {
                 if (calendarsFilter.getType() != null && !calendarsFilter.getType().isEmpty()) {
                     try {

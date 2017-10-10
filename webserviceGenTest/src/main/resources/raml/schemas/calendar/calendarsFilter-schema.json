@@ -5,6 +5,12 @@
   "javaType": "com.sos.joc.model.calendar.CalendarsFilter",
   "type": "object",
   "properties": {
+    "calendarIds": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeLong-schema.json"
+      }
+    },
     "calendars": {
       "type": "array",
       "items": {

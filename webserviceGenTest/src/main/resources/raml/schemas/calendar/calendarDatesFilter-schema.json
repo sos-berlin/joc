@@ -9,6 +9,9 @@
     "calendar": {
       "$ref": "calendar-schema.json"
     },
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
     "path": {
       "type": "string"
     },
