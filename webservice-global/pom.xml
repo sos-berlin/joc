@@ -67,6 +67,12 @@
 			</exclusions>
 		</dependency>
 
+        <dependency>
+            <groupId>com.sos-berlin.jade</groupId>
+            <artifactId>jade-db-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
 		<!-- 3RD PARTY DEPENDENCIES -->
 		<dependency>
 			<groupId>org.apache.shiro</groupId>
