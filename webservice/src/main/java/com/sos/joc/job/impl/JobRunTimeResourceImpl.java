@@ -2,9 +2,6 @@ package com.sos.joc.job.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemInventoryJob;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -28,7 +25,6 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
     }
 
     public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) throws Exception {
-        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     accessToken).getJob().getView().isStatus());
@@ -37,16 +33,10 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
             }
             checkRequiredParameter("job", jobFilter.getJob());
             RunTime200 runTimeAnswer = new RunTime200();
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             String jobPath = normalizePath(jobFilter.getJob());
-            DBItemInventoryJob dbItem = dbLayer.getInventoryJobByName(jobPath, dbItemInventoryInstance.getId());
-            if (dbItem == null) {
-                throw new DBMissingDataException("no entry found in DB for job: " + jobFilter.getJob());
-            }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "source run_time", 0, 0);
-            runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken, dbItem.getRunTimeIsTemporary());
+            String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
+            runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken);
             return JOCDefaultResponse.responseStatus200(runTimeAnswer);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
@@ -54,7 +44,6 @@ public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTi
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         } finally {
-            Globals.disconnect(connection);
         }
 
     }
