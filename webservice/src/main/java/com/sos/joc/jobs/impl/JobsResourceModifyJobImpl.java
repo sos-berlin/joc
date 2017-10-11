@@ -1,10 +1,13 @@
 package com.sos.joc.jobs.impl;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
+
+import org.dom4j.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
@@ -14,6 +17,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyJobAudit;
+import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.exceptions.BulkError;
@@ -21,6 +25,7 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
+import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
@@ -156,14 +161,29 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             switch (command) {
             case SET_RUN_TIME:
                 try {
-                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(modifyJob.getRunTime());
-                    xml.add(XMLBuilder.parse(modifyJob.getRunTime()));
-                    jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-                    setCalendarUsedBy(jobPath,modifyJob.getRunTime());
+                    
+                    Configuration200 entity = new Configuration200();
+                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(getAccessToken());
+                    entity = jocConfiguration.getJobConfiguration(this, jobPath, false);
 
-                    DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+                    String configuration = entity.getConfiguration().getContent().getXml();
+                    String newRunTime = modifyJob.getRunTime();
+                    configuration = jocConfiguration.changeRuntimeElement(newRunTime);
+
+                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(configuration);
+                    XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+                    Element jobElement = XMLBuilder.parse(configuration);
+                    jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
+                    xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
+                    String commandAsXml = xmlBuilder.asXML();
+                    jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
+                    
+                    
+                    setCalendarUsedBy(jobPath,modifyJob.getRunTime());
+                    /*DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                     dailyPlanCalender2DBFilter.setForJob(jobPath);
                     updateDailyPlan(dailyPlanCalender2DBFilter);
+                    */
 
                     storeAuditLogEntry(jobAudit);
                 } catch (JocException e) {

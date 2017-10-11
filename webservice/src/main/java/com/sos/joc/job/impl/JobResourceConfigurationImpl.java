@@ -6,6 +6,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.configuration.ConfigurationUtils;
+import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobResourceConfiguration;
 import com.sos.joc.model.common.Configuration200;
@@ -16,30 +17,28 @@ import com.sos.joc.model.job.JobConfigurationFilter;
 public class JobResourceConfigurationImpl extends JOCResourceImpl implements IJobResourceConfiguration {
 
     private static final String API_CALL = "./job/configuration";
-    
+
     @Override
-    public JOCDefaultResponse postJobConfiguration(String xAccessToken, String accessToken, JobConfigurationFilter jobBody)
-            throws Exception {
+    public JOCDefaultResponse postJobConfiguration(String xAccessToken, String accessToken, JobConfigurationFilter jobBody) throws Exception {
         return postJobConfiguration(getAccessToken(xAccessToken, accessToken), jobBody);
     }
 
     public JOCDefaultResponse postJobConfiguration(String accessToken, JobConfigurationFilter jobBody) throws Exception {
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobBody, accessToken, jobBody.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getJob().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobBody, accessToken, jobBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJob().getView()
+                    .isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
 
             Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            if (checkRequiredParameter("job", jobBody.getJob())) {
+            if (checkRequiredParameter("orderId", jobBody.getJob())) {
+                JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken);
                 boolean responseInHtml = jobBody.getMime() == ConfigurationMime.HTML;
-                String jobCommand = jocXmlCommand.getShowJobCommand(normalizePath(jobBody.getJob()), "source", 0, 0);
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml,
-                        accessToken);
+                entity = jocConfiguration.getJobConfiguration(this, jobBody.getJob(), responseInHtml);
             }
+
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

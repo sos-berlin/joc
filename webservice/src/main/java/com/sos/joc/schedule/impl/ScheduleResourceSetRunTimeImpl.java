@@ -6,6 +6,7 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,20 +51,15 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             String schedulePath = normalizePath(modifyRuntime.getSchedule());
             XMLBuilder command = new XMLBuilder("modify_hot_folder");
-            // the below command results in an ERROR: XMLBuilder.parse creates
-            // Element with root "schedule" which will be added to
-            // already existing "schedule" Element with name Attribute
-            // command.addAttribute("folder",
-            // getParent(schedule)).addElement("schedule").addAttribute("name",
-            // Paths.get(schedule).getFileName()
-            // .toString()).add(XMLBuilder.parse(modifyRuntime.getRunTime()));
-            command.addAttribute("folder", getParent(schedulePath)).add(XMLBuilder.parse(modifyRuntime.getRunTime()).addAttribute("name", Paths.get(schedulePath).getFileName()
-                    .toString()));
+                 
+            Element scheduleElement = XMLBuilder.parse(modifyRuntime.getRunTime());
+            scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
+            command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String commandAsXml = command.asXML();
             jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
-            setCalendarUsedBy(schedulePath, modifyRuntime.getRunTime());
+            setCalendarUsedBy(schedulePath,commandAsXml);
 
             storeAuditLogEntry(scheduleAudit);
 
@@ -87,8 +83,6 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             calendarUsedByWriter.updateUsedBy();
         } catch (Exception e) {
             throw new DBConnectionRefusedException(e);
-        } finally {
-            Globals.disconnect(session);
         }
     }
 

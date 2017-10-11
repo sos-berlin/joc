@@ -1,5 +1,6 @@
 package com.sos.joc.orders.impl;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import org.dom4j.Element;
+import org.dom4j.Node;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
@@ -17,15 +19,20 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
+import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
+import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.model.common.Configuration200;
+import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
@@ -215,8 +222,25 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 break;
             case "set_run_time":
                 try {
-                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
-                    xml.add(XMLBuilder.parse(order.getRunTime()));
+                    Configuration200 entity = new Configuration200();
+                    if (checkRequiredParameter("orderId", order.getOrderId()) && checkRequiredParameter("jobChain", jobChainPath)) {
+                        JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(getAccessToken());
+                        entity = jocConfiguration.getOrderConfiguration(this, jobChainPath, order.getOrderId(), false);
+
+                        String configuration = entity.getConfiguration().getContent().getXml();
+                        String newRunTime = order.getRunTime();
+                        configuration = jocConfiguration.changeRuntimeElement(newRunTime);
+
+                        ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
+                        XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+                        Element orderElement = XMLBuilder.parse(configuration);
+                        orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
+                        orderElement.addAttribute("id", order.getOrderId());
+
+                        xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                        String commandAsXml = xmlBuilder.asXML();
+                        jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
+                    }
 
                 } catch (JocException e) {
                     throw e;
@@ -230,10 +254,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             if ("set_run_time".equals(command)) {
                 setCalendarUsedBy(jobChainPath, order.getOrderId(), order.getRunTime());
 
-                DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+               /* DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
                 dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
                 dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
                 updateDailyPlan(dailyPlanCalender2DBFilter);
+                */
+                
 
             }
             storeAuditLogEntry(orderAudit);
@@ -276,7 +302,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         return paramsElem;
     }
 
-     
     private boolean isEndNode(String jobChainPath, String orderState) throws JocException {
         if (session == null) {
             session = Globals.createSosHibernateStatelessConnection(API_CALL);
