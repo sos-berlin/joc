@@ -12,6 +12,7 @@ import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBLayer;
+import com.sos.joc.db.calendars.CalendarUsage;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 
 public class TestCalendarUsageDbLayer {
@@ -44,10 +45,10 @@ public class TestCalendarUsageDbLayer {
     public void testCalendarUsageDBLayerGetList() throws Exception {
         initConnection();
 
-        List<DBItemInventoryCalendarUsage> l = calendarUsageDBLayer.getListOfCalendarUsage(2L);
-        DBItemInventoryCalendarUsage calendarUsageDBItem = l.get(0);
+        List<CalendarUsage> l = calendarUsageDBLayer.getCalendarUsages(2L);
+        CalendarUsage calendarUsage = l.get(0);
         sosHibernateFactory.close();
-        assertEquals("testCalendarUsageDBLayerGetList", "/job4", calendarUsageDBItem.getPath());
+        assertEquals("testCalendarUsageDBLayerGetList", "/job4", calendarUsage.getJobs().get(0));
 
     }
 
@@ -84,13 +85,6 @@ public class TestCalendarUsageDbLayer {
         sosHibernateFactory.close();
     }
 
-    @Test
-    public void testJocConfigurationDeleteRecordByPath() throws Exception {
-        initConnection();
-        sosHibernateSession.beginTransaction();
-        calendarUsageDBLayer.deleteCalendarUsage("myCalaendarPath");
-        sosHibernateSession.commit();
-        sosHibernateFactory.close();
-    }
+    
 
 }
