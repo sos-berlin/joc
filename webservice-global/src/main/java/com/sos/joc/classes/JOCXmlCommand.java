@@ -1,11 +1,23 @@
 package com.sos.joc.classes;
 
+import java.io.StringWriter;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -295,5 +307,79 @@ public class JOCXmlCommand extends SOSXmlCommand {
             showOrder.addAttribute("what", what);
         }
         return showOrder.asXML();
+    }
+    
+    public String getModifyHotFolderCommand(String path, Element jobSchedulerObjectElement) throws Exception {
+        Path p = Paths.get(path);
+        XMLBuilder modifyHotFolder = new XMLBuilder("modify_hot_folder");
+        org.dom4j.Element elem = XMLBuilder.parse(getXmlString(jobSchedulerObjectElement));
+        if (jobSchedulerObjectElement.getNodeName().equals("order")) {
+            String[] orderPath = p.getFileName().toString().split(",", 2);
+            jobSchedulerObjectElement.setAttribute("job_chain", orderPath[0]);
+            jobSchedulerObjectElement.setAttribute("id", orderPath[1]);
+        } else {
+            jobSchedulerObjectElement.setAttribute("name", p.getFileName().toString());
+        }
+        modifyHotFolder.addAttribute("folder", p.getParent().toString().replace('\\', '/')).add(elem);
+        return modifyHotFolder.asXML();
+    }
+    
+    public Element updateCalendarInRuntimes(List<String> dates, String objectType, String path, Long calendarId) throws Exception {
+        Node curObject = getSosxml().selectSingleNode(String.format("//%1$s[@path='%2$s']/source", objectType.toLowerCase(), path));
+        NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%2$s']/parent::*", objectType.toLowerCase(), path, calendarId));
+        NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%2$s']/parent::*", objectType.toLowerCase(), path, calendarId));
+        for (int i=0; i < dateParentList.getLength(); i++) {
+            NodeList dateList = getSosxml().selectNodeList(dateParentList.item(i), String.format("date[@calendar='%2$s']", calendarId));
+            updateCalendarInRuntime(dateList, dates); 
+        }
+        for (int i=0; i < holidayParentList.getLength(); i++) {
+            NodeList holidayList = getSosxml().selectNodeList(holidayParentList.item(i), String.format("holiday[@calendar='%2$s']", calendarId));
+            updateCalendarInRuntime(holidayList, dates); 
+        }
+        return (Element) curObject.getFirstChild(); 
+    }
+    
+    private void updateCalendarInRuntime(NodeList nodeList, List<String> dates) {
+        Element firstElem = null;
+        Node parentOfFirstElem = null;
+        if (nodeList.getLength() > 0) {
+            firstElem = (Element) nodeList.item(0);
+            parentOfFirstElem = firstElem.getParentNode();
+        }
+        for (int i=1; i < nodeList.getLength(); i++) {
+            parentOfFirstElem.removeChild(nodeList.item(i));
+        }
+        if (firstElem != null) {
+            if (dates.isEmpty()) {
+                parentOfFirstElem.removeChild(firstElem);
+            } else {
+                firstElem.setAttribute("date", dates.get(0));
+                for (int i=1; i < dates.size(); i++) {
+                    Element newElem = (Element) firstElem.cloneNode(true);
+                    newElem.setAttribute("date", dates.get(i));
+                    parentOfFirstElem.insertBefore(newElem, firstElem);
+                }
+            }
+        }
+    }
+    
+    private String getXmlString(Node node) throws Exception {
+        StringWriter writer = new StringWriter();
+        try {
+            Source source = new DOMSource(node);
+            Result result = new StreamResult(writer);
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(source, result);
+            return writer.toString().trim();
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            try {
+                writer.close();
+            } catch (Exception e) {
+            }
+        }
     }
 }

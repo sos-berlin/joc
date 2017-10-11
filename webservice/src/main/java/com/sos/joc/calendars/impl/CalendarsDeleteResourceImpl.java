@@ -9,11 +9,13 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsDeleteResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
+import com.sos.joc.classes.calendar.CalendarInRuntimes;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
@@ -43,25 +45,24 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
                     throw new JocMissingRequiredParameterException("undefined 'calendarIds' parameter");
                 }
             }
-            
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
             AuditParams auditParams = calendarsFilter.getAuditLog();
-            Date surveyDate = Date.from(Instant.now());
-            
+
             if (calendarsFilter.getCalendarIds() == null || calendarsFilter.getCalendarIds().size() == 0) {
-                for (String calendar : new HashSet<String>(calendarsFilter.getCalendars())) {
-                    surveyDate = executeDeleteCalendar(calendar, auditParams, calendarDbLayer);
+                for (String calendarPath : new HashSet<String>(calendarsFilter.getCalendars())) {
+                    executeDeleteCalendar(calendarDbLayer.getCalendar(calendarPath), auditParams, calendarDbLayer, accessToken);
                 }
             } else {
                 for (Long calendarId : new HashSet<Long>(calendarsFilter.getCalendarIds())) {
-                    surveyDate = executeDeleteCalendar(calendarId, auditParams, calendarDbLayer);
+                    executeDeleteCalendar(calendarDbLayer.getCalendar(calendarId), auditParams, calendarDbLayer, accessToken);
                 }
             }
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+            return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -71,37 +72,23 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
             Globals.disconnect(connection);
         }
     }
-    
-    private Date executeDeleteCalendar(Long calendarId, AuditParams auditParams, CalendarsDBLayer calendarDbLayer) {
-        try {
-            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarId, null, auditParams);
-            logAuditMessage(calendarAudit);
-            //calendarUsageDbLayer.getListOfCalendarUsage(calendarId)
-            calendarDbLayer.deleteCalendar(calendarId);
-            storeAuditLogEntry(calendarAudit);
-            return Date.from(Instant.now());
-        } catch (JocException e) {
-            listOfErrors.add(new BulkError().get(e, getJocError(), calendarId+""));
-        } catch (Exception e) {
-            listOfErrors.add(new BulkError().get(e, getJocError(), calendarId+""));
+
+    private void executeDeleteCalendar(DBItemCalendar calendarDbItem, AuditParams auditParams, CalendarsDBLayer calendarDbLayer, String accessToken) {
+        if (calendarDbItem != null) {
+            String calendarPath = calendarDbItem.getName();
+            Long calendarId = calendarDbItem.getId();
+            try {
+                ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarId, calendarPath, auditParams);
+                logAuditMessage(calendarAudit);
+                calendarDbLayer.deleteCalendar(calendarDbItem);
+                CalendarInRuntimes.delete(calendarId, calendarDbLayer.getSession(), accessToken);
+                storeAuditLogEntry(calendarAudit);
+            } catch (JocException e) {
+                listOfErrors.add(new BulkError().get(e, getJocError(), calendarPath));
+            } catch (Exception e) {
+                listOfErrors.add(new BulkError().get(e, getJocError(), calendarPath));
+            }
         }
-        return null;
-    }
-    
-    private Date executeDeleteCalendar(String calendar, AuditParams auditParams, CalendarsDBLayer calendarDbLayer) {
-        try {
-            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, calendar, auditParams);
-            logAuditMessage(calendarAudit);
-            //calendarUsageDbLayer.getListOfCalendarUsage(calendarId)
-            calendarDbLayer.deleteCalendar(calendar);
-            storeAuditLogEntry(calendarAudit);
-            return Date.from(Instant.now());
-        } catch (JocException e) {
-            listOfErrors.add(new BulkError().get(e, getJocError(), calendar));
-        } catch (Exception e) {
-            listOfErrors.add(new BulkError().get(e, getJocError(), calendar));
-        }
-        return null;
     }
 
 }

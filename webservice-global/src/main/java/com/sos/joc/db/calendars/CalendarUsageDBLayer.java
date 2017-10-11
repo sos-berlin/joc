@@ -15,7 +15,7 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 public class CalendarUsageDBLayer extends DBLayer {
 
     private static final String CALENDAR_USAGE = CalendarUsage.class.getName();
-    private static final String CALENDAR_USAGE_INSTANCES = CalendarUsageAndInstances.class.getName();
+    private static final String CALENDAR_USAGES_INSTANCE = CalendarUsagesAndInstance.class.getName();
     private Query<DBItemInventoryCalendarUsage> query;
 
     public CalendarUsageDBLayer(SOSHibernateSession connection) {
@@ -111,6 +111,25 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
 
+    public void updateEditFlag(List<DBItemInventoryCalendarUsage> calendarUsages, boolean update) throws DBConnectionRefusedException,
+            DBInvalidDataException {
+        try {
+            if (calendarUsages != null) {
+                for (DBItemInventoryCalendarUsage calendarUsage : calendarUsages) {
+                    if (update || calendarUsage.getEdited()) {
+                        getSession().update(calendarUsage);
+                    } else {
+                        getSession().delete(calendarUsage);
+                    }
+                }
+            }
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
     public List<DBItemInventoryCalendarUsage> getCalendarUsagesOfAnInstance(Long instanceId) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
@@ -195,10 +214,10 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
 
-    public List<CalendarUsageAndInstances> getInstancesFormCalendar(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<CalendarUsagesAndInstance> getInstancesFormCalendar(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(CALENDAR_USAGE_INSTANCES).append(" (ii) from ");
+            sql.append("select new ").append(CALENDAR_USAGES_INSTANCE).append(" (ii) from ");
             sql.append(DBITEM_INVENTORY_INSTANCES).append(" ii, ");
             sql.append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu ");
             sql.append("where ii.id = icu.instanceId ");
@@ -206,7 +225,7 @@ public class CalendarUsageDBLayer extends DBLayer {
                 sql.append("and icu.calendarId = :calendarId ");
             }
             sql.append("group by ii.id");
-            Query<CalendarUsageAndInstances> query = getSession().createQuery(sql.toString());
+            Query<CalendarUsagesAndInstance> query = getSession().createQuery(sql.toString());
             if (calendarId != null) {
                 query.setParameter("calendarId", calendarId);
             }

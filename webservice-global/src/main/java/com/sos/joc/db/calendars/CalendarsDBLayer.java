@@ -145,32 +145,10 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public void deleteCalendar(Long id) throws DBConnectionRefusedException, DBInvalidDataException {
+    public void deleteCalendar(DBItemCalendar dbCalendar) throws DBConnectionRefusedException, DBInvalidDataException {
         try {
-            DBItemCalendar dbCalendar = getCalendar(id);
             if (dbCalendar != null) {
                 getSession().delete(dbCalendar); 
-                getSession().beginTransaction();
-                CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(getSession());
-                calendarUsageDBLayer.deleteCalendarUsage(dbCalendar.getId());
-                getSession().commit();
-            }
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
-    }
-    
-    public void deleteCalendar(String path) throws DBConnectionRefusedException, DBInvalidDataException {
-        try {
-            DBItemCalendar dbCalendar = getCalendar(path);
-            if (dbCalendar != null) {
-                getSession().delete(dbCalendar); 
-                getSession().beginTransaction();
-                CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(getSession());
-                calendarUsageDBLayer.deleteCalendarUsage(dbCalendar.getId());
-                getSession().commit();
             }
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
