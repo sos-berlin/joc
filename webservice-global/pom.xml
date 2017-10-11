@@ -27,6 +27,12 @@
 	</dependencyManagement>
 
 	<dependencies>
+	    <dependency>
+			<groupId>com.sos-berlin.commons</groupId>
+			<artifactId>sos-json</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.sos-berlin.commons</groupId>
 			<artifactId>sos-exceptions</artifactId>
