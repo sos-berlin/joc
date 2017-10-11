@@ -3,6 +3,8 @@ package com.sos.joc.calendar.impl;
 import javax.ws.rs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sos.exception.SOSInvalidDataException;
+import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.joc.Globals;
@@ -12,10 +14,12 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.calendar.FrequencyResolver;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
+import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarDatesFilter;
+import com.sos.joc.model.calendar.Dates;
 
 @Path("calendar")
 public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalendarDatesResource {
@@ -56,8 +60,15 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
                 }
                 calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
             }
-
-            return JOCDefaultResponse.responseStatus200(new FrequencyResolver().resolve(calendarFilter));
+            Dates dates = null;
+            try {
+                dates = new FrequencyResolver().resolve(calendarFilter);
+            } catch (SOSInvalidDataException e) {
+                throw new JobSchedulerInvalidResponseDataException(e);
+            } catch (SOSMissingDataException e) {
+                throw new JocMissingRequiredParameterException(e);
+            }
+            return JOCDefaultResponse.responseStatus200(dates);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

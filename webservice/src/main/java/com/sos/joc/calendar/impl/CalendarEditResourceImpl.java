@@ -1,9 +1,11 @@
 package com.sos.joc.calendar.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.ws.rs.Path;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.joc.Globals;
@@ -11,6 +13,9 @@ import com.sos.joc.calendar.resource.ICalendarEditResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
+import com.sos.joc.classes.calendar.FrequencyResolver;
+import com.sos.joc.db.calendars.CalendarUsageAndInstances;
+import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
@@ -19,6 +24,7 @@ import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
 import com.sos.joc.model.calendar.CalendarType;
+import com.sos.joc.model.calendar.Dates;
 
 @Path("calendar")
 public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalendarEditResource {
@@ -51,9 +57,9 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_STORE);
             calendar.setPath(normalizePath(calendar.getPath()));
-            CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+            CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
             
-            DBItemCalendar calendarDbItem = dbLayer.getCalendar(calendar.getPath());
+            DBItemCalendar calendarDbItem = calendarDbLayer.getCalendar(calendar.getPath());
             if ((calendarDbItem == null && !getPermissonsJocCockpit(accessToken).getCalendar().getEdit().isCreate()) 
                     || (calendarDbItem != null && !getPermissonsJocCockpit(accessToken).getCalendar().getEdit().isChange())) {
                 return accessDeniedResponse();
@@ -62,12 +68,26 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog());
             logAuditMessage(calendarAudit);
             
-//            if (calendarDbItem != null) {
-//                FrequencyResolver fr = new FrequencyResolver(); 
-//            }
-            
-            Date surveyDate = dbLayer.saveOrUpdateCalendar(calendarDbItem, calendar);
+            Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(calendarDbItem, calendar);
             storeAuditLogEntry(calendarAudit);
+            
+            if (calendarDbItem != null) {
+                FrequencyResolver fr = new FrequencyResolver();
+                Dates newDates = fr.resolveFromToday(calendar);
+                Dates oldDates = fr.resolveFromToday(new ObjectMapper().readValue(calendarDbItem.getConfiguration(), Calendar.class));
+                if (newDates.getDates().equals(oldDates.getDates())) {
+                    //nothing to do
+                } else {
+                    //CalendarUsage Objekte holen die Calendar verwenden
+                    CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(connection);
+                    List<CalendarUsageAndInstances> calendarUsageInstances = calendarUsageDbLayer.getInstancesFormCalendar(calendarDbItem.getId());
+                    if (calendarUsageInstances != null) {
+                       for (CalendarUsageAndInstances calendarUsageInstance : calendarUsageInstances) {
+                           calendarUsageInstance.setCalendarUsages(calendarUsageDbLayer.getCalendarUsagesOfAnInstance(calendarUsageInstance.getInstance().getId()));
+                       }
+                    }
+                }
+            }
             
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
