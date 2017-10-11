@@ -31,6 +31,7 @@ public class JSObjectConfiguration {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
         String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
         entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml, accessToken);
+        configuration = entity.getConfiguration().getContent().getXml();
         return entity;
     }
 

@@ -16,7 +16,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
- 
+import org.w3c.dom.NodeList;
+
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.model.common.RunTime200;
 
@@ -26,11 +27,19 @@ public class RunTime {
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
         RunTime200 runTimeAnswer = new RunTime200();
 
+        NodeList runtimeNodes = jocXmlCommand.getSosxml().selectNodeList(xPath);
         com.sos.joc.model.common.RunTime runTime = new com.sos.joc.model.common.RunTime();
         runTime.setRunTimeIsTemporary(false);
         runTime.setSurveyDate(jocXmlCommand.getSurveyDate());
         Path parent = Paths.get(path).getParent();
-        runTime.setRunTime(getRuntimeXmlString(parent, null));
+
+        if (runtimeNodes != null && runtimeNodes.getLength() > 0) { // adhoc and file orders
+            Node runtimeNode = runtimeNodes.item(0);
+            runTime.setRunTime(getRuntimeXmlString(parent, runtimeNode));
+        } else {
+            runTime.setRunTime(getRuntimeXmlString(parent, null));
+        }
+
         runTimeAnswer.setRunTime(runTime);
         runTimeAnswer.setDeliveryDate(Date.from(Instant.now()));
         return runTimeAnswer;

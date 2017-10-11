@@ -231,7 +231,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         String newRunTime = order.getRunTime();
                         configuration = jocConfiguration.changeRuntimeElement(newRunTime);
 
-                        ValidateXML.validateRunTimeAgainstJobSchedulerSchema(order.getRunTime());
+                        ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                         XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
                         Element orderElement = XMLBuilder.parse(configuration);
                         orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());

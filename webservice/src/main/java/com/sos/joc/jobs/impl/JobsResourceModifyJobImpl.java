@@ -170,7 +170,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     String newRunTime = modifyJob.getRunTime();
                     configuration = jocConfiguration.changeRuntimeElement(newRunTime);
 
-                    ValidateXML.validateRunTimeAgainstJobSchedulerSchema(configuration);
+                    ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                     XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
                     Element jobElement = XMLBuilder.parse(configuration);
                     jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
