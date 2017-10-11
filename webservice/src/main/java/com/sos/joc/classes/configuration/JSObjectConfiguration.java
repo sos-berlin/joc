@@ -1,5 +1,8 @@
 package com.sos.joc.classes.configuration;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JocException;
@@ -32,20 +35,18 @@ public class JSObjectConfiguration {
     }
 
     public String changeRuntimeElement(String newRunTime) {
-        String newConfiguration = configuration;
-        newConfiguration = configuration.replaceAll("<run_time>.*<\\/run_time>", newRunTime);
+        Matcher m = Pattern.compile("<run_time.*>.*<\\/run_time>",Pattern.DOTALL).matcher("");
+        String newConfiguration = m.reset(configuration).replaceAll(newRunTime);
+         
         if (newConfiguration.equals(configuration)) {
             newConfiguration = newConfiguration.replaceAll("<run_time.*\\/>", newRunTime);
-        }
-        if (newConfiguration.equals(configuration)) {
-            newConfiguration = newConfiguration.replaceAll("<run_time\\/>", newRunTime);
         }
         configuration = newConfiguration;
         return newConfiguration;
     }
 
-    public String getConfiguration() {
-        return configuration;
+    public void setConfiguration(String configuration) {
+        this.configuration = configuration;
     }
 
 }
