@@ -55,10 +55,11 @@ public class CalendarUsedByWriter {
             sosHibernateSession.beginTransaction();
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(this.sosHibernateSession);
             CalendarsDBLayer calendarsDBLayer = new CalendarsDBLayer(this.sosHibernateSession);
-            List<DBItemInventoryCalendarUsage> dbCalendars = calendarUsageDBLayer.getCalendarUsagesOfAnObject(instanceId, objectType, path);
+            List<DBItemInventoryCalendarUsage> dbCalendarUsage = calendarUsageDBLayer.getCalendarUsagesOfAnObject(instanceId, objectType, path);
             DBItemInventoryCalendarUsage calendarUsageDbItem = new DBItemInventoryCalendarUsage();
             calendarUsageDbItem.setInstanceId(instanceId);
             calendarUsageDbItem.setObjectType(objectType);
+            calendarUsageDbItem.setEdited(false);
             calendarUsageDbItem.setPath(path);
             
             for (int i = 0; i < calendars.getLength(); i++) {
@@ -67,13 +68,13 @@ public class CalendarUsedByWriter {
                     calendarIds.add(calendarId);
                     if (calendarsDBLayer.getCalendar(calendarId) != null) {
                         calendarUsageDbItem.setCalendarId(calendarId);
-                        if (!dbCalendars.remove(calendarUsageDbItem)) {
+                        if (!dbCalendarUsage.remove(calendarUsageDbItem)) {
                             calendarUsageDBLayer.saveCalendarUsage(calendarUsageDbItem);
                         } 
                     }
                 }
             }
-            for (DBItemInventoryCalendarUsage dbItem : dbCalendars) {
+            for (DBItemInventoryCalendarUsage dbItem : dbCalendarUsage) {
                 calendarUsageDBLayer.deleteCalendarUsage(dbItem);
             }
             sosHibernateSession.commit();

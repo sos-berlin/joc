@@ -54,6 +54,7 @@ public class CalendarUsageDBLayer extends DBLayer {
         try {
             if (calendarUsageDbItem != null) {
                 calendarUsageDbItem.setCreated(new Date());
+                calendarUsageDbItem.setModified(new Date());
                 getSession().save(calendarUsageDbItem);
             }
         } catch (SOSHibernateInvalidSessionException ex) {
