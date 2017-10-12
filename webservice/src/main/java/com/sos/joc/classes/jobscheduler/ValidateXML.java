@@ -18,10 +18,16 @@ public class ValidateXML {
         
         try {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            InputStream inputStream = ValidateXML.class.getResourceAsStream("/scheduler.xsd");
-            Schema schema = factory.newSchema(new StreamSource(inputStream));
-            Validator validator = schema.newValidator();
-            validator.validate(new StreamSource(new StringReader(xml)));
+            InputStream inputStream = null;
+            try {
+                inputStream = ValidateXML.class.getResourceAsStream("/scheduler.xsd");
+            } catch (Exception e) {
+            }
+            if (inputStream != null) {
+                Schema schema = factory.newSchema(new StreamSource(inputStream));
+                Validator validator = schema.newValidator();
+                validator.validate(new StreamSource(new StringReader(xml)));
+            }
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(e);
         }
