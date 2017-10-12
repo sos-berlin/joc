@@ -328,6 +328,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
         Node curObject = getSosxml().selectSingleNode(String.format("//%1$s[@path='%2$s']/source", objectType.toLowerCase(), path));
         NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%2$s']/parent::*", objectType.toLowerCase(), path, calendarId));
         NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%2$s']/parent::*", objectType.toLowerCase(), path, calendarId));
+        
         for (int i=0; i < dateParentList.getLength(); i++) {
             NodeList dateList = getSosxml().selectNodeList(dateParentList.item(i), String.format("date[@calendar='%2$s']", calendarId));
             updateCalendarInRuntime(dateList, dates); 
@@ -342,9 +343,14 @@ public class JOCXmlCommand extends SOSXmlCommand {
     private void updateCalendarInRuntime(NodeList nodeList, List<String> dates) {
         Element firstElem = null;
         Node parentOfFirstElem = null;
+        Node textNode = null;
+        
         if (nodeList.getLength() > 0) {
             firstElem = (Element) nodeList.item(0);
             parentOfFirstElem = firstElem.getParentNode();
+            if (firstElem.getPreviousSibling().getNodeType() == Node.TEXT_NODE) {
+                textNode = firstElem.getPreviousSibling(); 
+            }
         }
         for (int i=1; i < nodeList.getLength(); i++) {
             parentOfFirstElem.removeChild(nodeList.item(i));
@@ -357,19 +363,28 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 for (int i=1; i < dates.size(); i++) {
                     Element newElem = (Element) firstElem.cloneNode(true);
                     newElem.setAttribute("date", dates.get(i));
-                    parentOfFirstElem.insertBefore(newElem, firstElem);
+                    if (textNode != null) {
+                        parentOfFirstElem.insertBefore(textNode.cloneNode(false), textNode);
+                        parentOfFirstElem.insertBefore(newElem, textNode);
+                    } else {
+                        parentOfFirstElem.insertBefore(newElem, firstElem);
+                    }
                 }
             }
         }
     }
     
-    private String getXmlString(Node node) throws Exception {
+    public String getXmlString(Node node) throws Exception {
+//        String encoding = "UTF-8";
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//        OutputStreamWriter writer = new OutputStreamWriter(bos, encoding);
         StringWriter writer = new StringWriter();
         try {
             Source source = new DOMSource(node);
             Result result = new StreamResult(writer);
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+//            transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(source, result);
             return writer.toString().trim();
@@ -380,6 +395,10 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 writer.close();
             } catch (Exception e) {
             }
+//            try {
+//                bos.close();
+//            } catch (Exception e) {
+//            }
         }
     }
 }

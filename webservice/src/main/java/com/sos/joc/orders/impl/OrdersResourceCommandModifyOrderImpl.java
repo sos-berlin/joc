@@ -9,10 +9,8 @@ import java.util.List;
 import javax.ws.rs.Path;
 
 import org.dom4j.Element;
-import org.dom4j.Node;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -21,18 +19,14 @@ import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
-import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.common.Configuration200;
-import com.sos.joc.model.common.ConfigurationMime;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.common.NameValuePair;
-import com.sos.joc.model.common.RunTime200;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.orders.resource.IOrdersResourceCommandModifyOrder;
@@ -168,12 +162,13 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
             checkRequiredParameter("jobChain", order.getJobChain());
             checkRequiredParameter("orderId", order.getOrderId());
+            XMLBuilder xml = new XMLBuilder("modify_order");
             if ("set_run_time".equals(command)) {
                 checkRequiredParameter("runTime", order.getRunTime());
+                xml = new XMLBuilder("modify_hot_folder");
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            XMLBuilder xml = new XMLBuilder("modify_order");
             String jobChainPath = normalizePath(order.getJobChain());
             xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", jobChainPath);
             switch (command) {
@@ -222,25 +217,28 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 break;
             case "set_run_time":
                 try {
-                    Configuration200 entity = new Configuration200();
-                    if (checkRequiredParameter("orderId", order.getOrderId()) && checkRequiredParameter("jobChain", jobChainPath)) {
-                        JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(getAccessToken());
-                        entity = jocConfiguration.getOrderConfiguration(this, jobChainPath, order.getOrderId(), false);
-
-                        String configuration = entity.getConfiguration().getContent().getXml();
-                        String newRunTime = order.getRunTime();
-                        configuration = jocConfiguration.changeRuntimeElement(newRunTime);
-
+//                    Configuration200 entity = new Configuration200();
+//                    if (checkRequiredParameter("orderId", order.getOrderId()) && checkRequiredParameter("jobChain", jobChainPath)) {
+//                        JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(getAccessToken());
+//                        entity = jocConfiguration.getOrderConfiguration(this, jobChainPath, order.getOrderId(), false);
+//
+//                        String configuration = entity.getConfiguration().getContent().getXml();
+//                        String newRunTime = order.getRunTime();
+//                        configuration = jocConfiguration.changeRuntimeElement(newRunTime);
+                        
+                        JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
+                        String configuration = jocConfiguration.modifyOrderRuntime(order.getRunTime(), this, jobChainPath, order.getOrderId());
+                        
                         ValidateXML.validateAgainstJobSchedulerSchema(configuration);
-                        XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+//                        XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
                         Element orderElement = XMLBuilder.parse(configuration);
                         orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
                         orderElement.addAttribute("id", order.getOrderId());
 
-                        xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
-                        String commandAsXml = xmlBuilder.asXML();
-                        jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
-                    }
+                        xml.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+//                        String commandAsXml = xmlBuilder.asXML();
+//                        jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
+//                    }
 
                 } catch (JocException e) {
                     throw e;

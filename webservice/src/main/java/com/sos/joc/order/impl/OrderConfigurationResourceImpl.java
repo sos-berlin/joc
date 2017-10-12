@@ -4,8 +4,6 @@ import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.classes.configuration.ConfigurationUtils;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Configuration200;

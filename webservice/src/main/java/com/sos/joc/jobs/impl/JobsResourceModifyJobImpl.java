@@ -10,7 +10,6 @@ import javax.ws.rs.Path;
 import org.dom4j.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -25,7 +24,6 @@ import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.jobs.resource.IJobsResourceModifyJob;
-import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.Err419;
 import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
@@ -155,20 +153,21 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             }
 
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            XMLBuilder xml = new XMLBuilder("modify_job");
             String jobPath = normalizePath(modifyJob.getJob());
-            xml.addAttribute("job", jobPath);
             switch (command) {
             case SET_RUN_TIME:
                 try {
                     
-                    Configuration200 entity = new Configuration200();
-                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(getAccessToken());
-                    entity = jocConfiguration.getJobConfiguration(this, jobPath, false);
-
-                    String configuration = entity.getConfiguration().getContent().getXml();
-                    String newRunTime = modifyJob.getRunTime();
-                    configuration = jocConfiguration.changeRuntimeElement(newRunTime);
+//                    Configuration200 entity = new Configuration200();
+//                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(getAccessToken());
+//                    entity = jocConfiguration.getJobConfiguration(this, jobPath, false);
+//
+//                    String configuration = entity.getConfiguration().getContent().getXml();
+//                    String newRunTime = modifyJob.getRunTime();
+//                    configuration = jocConfiguration.changeRuntimeElement(newRunTime);
+                    
+                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
+                    String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTime(), this, jobPath);
 
                     ValidateXML.validateAgainstJobSchedulerSchema(configuration);
                     XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
@@ -193,6 +192,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                 }
                 break;
             default:
+                XMLBuilder xml = new XMLBuilder("modify_job");
+                xml.addAttribute("job", jobPath);
                 xml.addAttribute("cmd", command);
                 jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
                 storeAuditLogEntry(jobAudit);
