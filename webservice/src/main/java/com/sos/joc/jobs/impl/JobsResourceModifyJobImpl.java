@@ -158,13 +158,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             case SET_RUN_TIME:
                 try {
                     
-//                    Configuration200 entity = new Configuration200();
-//                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(getAccessToken());
-//                    entity = jocConfiguration.getJobConfiguration(this, jobPath, false);
-//
-//                    String configuration = entity.getConfiguration().getContent().getXml();
-//                    String newRunTime = modifyJob.getRunTime();
-//                    configuration = jocConfiguration.changeRuntimeElement(newRunTime);
                     
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
                     String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTime(), this, jobPath);
@@ -176,13 +169,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
                     String commandAsXml = xmlBuilder.asXML();
                     jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
-                    
-                    
                     setCalendarUsedBy(jobPath,modifyJob.getRunTime());
-                    /*DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
-                    dailyPlanCalender2DBFilter.setForJob(jobPath);
-                    updateDailyPlan(dailyPlanCalender2DBFilter);
-                    */
 
                     storeAuditLogEntry(jobAudit);
                 } catch (JocException e) {

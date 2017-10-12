@@ -1,11 +1,7 @@
 package com.sos.joc.classes.configuration;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
@@ -17,8 +13,7 @@ import sos.xml.SOSXMLXPath;
 public class JSObjectConfiguration {
 
     private String accessToken;
-    private String configuration;
-    
+
     public JSObjectConfiguration() {
     }
 
@@ -26,14 +21,11 @@ public class JSObjectConfiguration {
         this.accessToken = accessToken;
     }
 
-    public Configuration200 getOrderConfiguration(JOCResourceImpl jocResourceImpl, String jobChain, String orderId, boolean responseInHtml)
-            throws JocException {
+    public Configuration200 getOrderConfiguration(JOCResourceImpl jocResourceImpl, String jobChain, String orderId, boolean responseInHtml) throws JocException {
         Configuration200 entity = new Configuration200();
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
         String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
-        entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order", responseInHtml,
-                accessToken);
-        configuration = entity.getConfiguration().getContent().getXml();
+        entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order", responseInHtml, accessToken);
         return entity;
     }
 
@@ -42,23 +34,7 @@ public class JSObjectConfiguration {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
         String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
         entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml, accessToken);
-        configuration = entity.getConfiguration().getContent().getXml();
         return entity;
-    }
-
-    public String changeRuntimeElement(String newRunTime) {
-        Matcher m = Pattern.compile("<run_time.*>.*<\\/run_time>", Pattern.DOTALL).matcher("");
-        String newConfiguration = m.reset(configuration).replaceAll(newRunTime);
-
-        if (newConfiguration.equals(configuration)) {
-            newConfiguration = newConfiguration.replaceAll("<run_time.*\\/>", newRunTime);
-        }
-        configuration = newConfiguration;
-        return newConfiguration;
-    }
-
-    public void setConfiguration(String configuration) {
-        this.configuration = configuration;
     }
 
     public String modifyOrderRuntime(String newRunTime, JOCResourceImpl jocResourceImpl, String jobChain, String orderId) throws JocException {
@@ -74,7 +50,7 @@ public class JSObjectConfiguration {
             throw new JobSchedulerBadRequestException(e);
         }
     }
-    
+
     public Node modifyOrderRuntimeNode(SOSXMLXPath oldRunTime, SOSXMLXPath newRunTime) throws JocException {
         try {
             Node orderNode = oldRunTime.selectSingleNode("//source/order");
@@ -98,8 +74,8 @@ public class JSObjectConfiguration {
                 case 1:
                     textNode = payloads.item(0).getPreviousSibling();
                     if (textNode != null && textNode.getNodeType() == Node.TEXT_NODE) {
-                        orderNode.insertBefore(textNode.cloneNode(false), textNode); 
-                        orderNode.insertBefore(newRunTimeNode, textNode); 
+                        orderNode.insertBefore(textNode.cloneNode(false), textNode);
+                        orderNode.insertBefore(newRunTimeNode, textNode);
                     } else {
                         orderNode.insertBefore(newRunTimeNode, payloads.item(0));
                     }
@@ -109,8 +85,8 @@ public class JSObjectConfiguration {
                         if (payloads.item(i).getNodeName().equals("payload")) {
                             textNode = payloads.item(i).getPreviousSibling();
                             if (textNode != null && textNode.getNodeType() == Node.TEXT_NODE) {
-                                orderNode.insertBefore(textNode.cloneNode(false), textNode); 
-                                orderNode.insertBefore(newRunTimeNode, textNode); 
+                                orderNode.insertBefore(textNode.cloneNode(false), textNode);
+                                orderNode.insertBefore(newRunTimeNode, textNode);
                             } else {
                                 orderNode.insertBefore(newRunTimeNode, payloads.item(i));
                             }
@@ -127,7 +103,7 @@ public class JSObjectConfiguration {
             throw new JobSchedulerBadRequestException(e);
         }
     }
-    
+
     public String modifyJobRuntime(String newRunTime, JOCResourceImpl jocResourceImpl, String job) throws JocException {
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
         String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
@@ -141,8 +117,8 @@ public class JSObjectConfiguration {
             throw new JobSchedulerBadRequestException(e);
         }
     }
-    
-    public Node modifyJobRuntimeNode(SOSXMLXPath oldRunTime, SOSXMLXPath newRunTime) throws JocException {
+
+    private Node modifyJobRuntimeNode(SOSXMLXPath oldRunTime, SOSXMLXPath newRunTime) throws JocException {
         try {
             Node jobNode = oldRunTime.selectSingleNode("//source/job");
             Node runTime = oldRunTime.selectSingleNode(jobNode, "run_time");
@@ -155,8 +131,8 @@ public class JSObjectConfiguration {
                 if (commands != null) {
                     textNode = commands.getPreviousSibling();
                     if (textNode != null && textNode.getNodeType() == Node.TEXT_NODE) {
-                        jobNode.insertBefore(textNode.cloneNode(false), textNode); 
-                        jobNode.insertBefore(newRunTimeNode, textNode); 
+                        jobNode.insertBefore(textNode.cloneNode(false), textNode);
+                        jobNode.insertBefore(newRunTimeNode, textNode);
                     } else {
                         jobNode.insertBefore(newRunTimeNode, commands);
                     }
