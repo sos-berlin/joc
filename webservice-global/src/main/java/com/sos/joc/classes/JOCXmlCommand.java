@@ -328,19 +328,27 @@ public class JOCXmlCommand extends SOSXmlCommand {
         Node curObject = getSosxml().selectSingleNode(String.format("//%1$s[@path='%2$s']/source", objectType.toLowerCase(), path));
         NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%2$s']/parent::*", objectType.toLowerCase(), path, calendarId));
         NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%2$s']/parent::*", objectType.toLowerCase(), path, calendarId));
+        boolean runTimeIsChanged = false;
         
         for (int i=0; i < dateParentList.getLength(); i++) {
             NodeList dateList = getSosxml().selectNodeList(dateParentList.item(i), String.format("date[@calendar='%2$s']", calendarId));
-            updateCalendarInRuntime(dateList, dates); 
+            if (updateCalendarInRuntime(dateList, dates)) {
+                runTimeIsChanged = true;
+            }
         }
         for (int i=0; i < holidayParentList.getLength(); i++) {
             NodeList holidayList = getSosxml().selectNodeList(holidayParentList.item(i), String.format("holiday[@calendar='%2$s']", calendarId));
-            updateCalendarInRuntime(holidayList, dates); 
+            if (updateCalendarInRuntime(holidayList, dates)) {
+                runTimeIsChanged = true;
+            }
         }
-        return (Element) curObject.getFirstChild(); 
+        if(runTimeIsChanged) {
+            return (Element) curObject.getFirstChild(); 
+        }
+        return null; 
     }
     
-    private void updateCalendarInRuntime(NodeList nodeList, List<String> dates) {
+    private boolean updateCalendarInRuntime(NodeList nodeList, List<String> dates) {
         Element firstElem = null;
         Node parentOfFirstElem = null;
         Node textNode = null;
@@ -352,10 +360,10 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 textNode = firstElem.getPreviousSibling(); 
             }
         }
-        for (int i=1; i < nodeList.getLength(); i++) {
-            parentOfFirstElem.removeChild(nodeList.item(i));
-        }
         if (firstElem != null) {
+            for (int i=1; i < nodeList.getLength(); i++) {
+                parentOfFirstElem.removeChild(nodeList.item(i));
+            }
             if (dates.isEmpty()) {
                 parentOfFirstElem.removeChild(firstElem);
             } else {
@@ -372,6 +380,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 }
             }
         }
+        return firstElem != null;
     }
     
     public String getXmlString(Node node) throws Exception {

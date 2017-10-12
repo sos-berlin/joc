@@ -84,7 +84,9 @@ public class JobSchedulerCalendarCallable implements Callable<List<DBItemInvento
                     List<String> dates = calendarUsageAndInstance.getDates();
                     Element jobSchedulerObjectElement = jocXmlCommand.updateCalendarInRuntimes(dates, item.getObjectType(), item.getPath(), item
                             .getCalendarId());
-                    commandForHotFolder.append(jocXmlCommand.getModifyHotFolderCommand(item.getPath(), jobSchedulerObjectElement));
+                    if (jobSchedulerObjectElement != null) {
+                        commandForHotFolder.append(jocXmlCommand.getModifyHotFolderCommand(item.getPath(), jobSchedulerObjectElement));
+                    }
                 }
                 item.setEdited(false);
             } catch (Exception e) {
