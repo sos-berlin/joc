@@ -311,8 +311,6 @@ public class JOCXmlCommand extends SOSXmlCommand {
     
     public String getModifyHotFolderCommand(String path, Element jobSchedulerObjectElement) throws Exception {
         Path p = Paths.get(path);
-        XMLBuilder modifyHotFolder = new XMLBuilder("modify_hot_folder");
-        org.dom4j.Element elem = XMLBuilder.parse(getXmlString(jobSchedulerObjectElement));
         if (jobSchedulerObjectElement.getNodeName().equals("order")) {
             String[] orderPath = p.getFileName().toString().split(",", 2);
             jobSchedulerObjectElement.setAttribute("job_chain", orderPath[0]);
@@ -320,24 +318,26 @@ public class JOCXmlCommand extends SOSXmlCommand {
         } else {
             jobSchedulerObjectElement.setAttribute("name", p.getFileName().toString());
         }
+        XMLBuilder modifyHotFolder = new XMLBuilder("modify_hot_folder");
+        org.dom4j.Element elem = XMLBuilder.parse(getXmlString(jobSchedulerObjectElement));
         modifyHotFolder.addAttribute("folder", p.getParent().toString().replace('\\', '/')).add(elem);
         return modifyHotFolder.asXML();
     }
     
     public Element updateCalendarInRuntimes(List<String> dates, String objectType, String path, Long calendarId) throws Exception {
         Node curObject = getSosxml().selectSingleNode(String.format("//%1$s[@path='%2$s']/source", objectType.toLowerCase(), path));
-        NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%2$s']/parent::*", objectType.toLowerCase(), path, calendarId));
-        NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%2$s']/parent::*", objectType.toLowerCase(), path, calendarId));
+        NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%1$s']/parent::*", calendarId));
+        NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%1$s']/parent::*", calendarId));
         boolean runTimeIsChanged = false;
         
         for (int i=0; i < dateParentList.getLength(); i++) {
-            NodeList dateList = getSosxml().selectNodeList(dateParentList.item(i), String.format("date[@calendar='%2$s']", calendarId));
+            NodeList dateList = getSosxml().selectNodeList(dateParentList.item(i), String.format("date[@calendar='%1$s']", calendarId));
             if (updateCalendarInRuntime(dateList, dates)) {
                 runTimeIsChanged = true;
             }
         }
         for (int i=0; i < holidayParentList.getLength(); i++) {
-            NodeList holidayList = getSosxml().selectNodeList(holidayParentList.item(i), String.format("holiday[@calendar='%2$s']", calendarId));
+            NodeList holidayList = getSosxml().selectNodeList(holidayParentList.item(i), String.format("holiday[@calendar='%1$s']", calendarId));
             if (updateCalendarInRuntime(holidayList, dates)) {
                 runTimeIsChanged = true;
             }
@@ -362,9 +362,15 @@ public class JOCXmlCommand extends SOSXmlCommand {
         }
         if (firstElem != null) {
             for (int i=1; i < nodeList.getLength(); i++) {
+                if (nodeList.item(i).getPreviousSibling().getNodeType() == Node.TEXT_NODE) {
+                    parentOfFirstElem.removeChild(nodeList.item(i).getPreviousSibling()); 
+                }
                 parentOfFirstElem.removeChild(nodeList.item(i));
             }
             if (dates.isEmpty()) {
+                if (textNode != null) {
+                    parentOfFirstElem.removeChild(textNode); 
+                }
                 parentOfFirstElem.removeChild(firstElem);
             } else {
                 firstElem.setAttribute("date", dates.get(0));

@@ -3,6 +3,8 @@ package com.sos.joc.classes.calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
@@ -12,6 +14,7 @@ import com.sos.joc.exceptions.JocException;
 
 public class JobSchedulerCalendarCallable implements Callable<List<DBItemInventoryCalendarUsage>> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerCalendarCallable.class);
     private final CalendarUsagesAndInstance calendarUsageAndInstance;
     private final String accessToken;
 
@@ -33,6 +36,7 @@ public class JobSchedulerCalendarCallable implements Callable<List<DBItemInvento
                 }
             }
         } catch (JocException e) {
+            LOGGER.warn(e.toString());
             calendarUsageAndInstance.setAllEdited();
         }
         return calendarUsageAndInstance.getCalendarUsages();

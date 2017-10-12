@@ -67,7 +67,7 @@ public class CalendarInRuntimes {
                 }
 
                 if (tasks != null && !tasks.isEmpty()) {
-                    int threadPoolSize = Math.max(10, calendarUsageInstances.size());
+                    int threadPoolSize = Math.min(10, calendarUsageInstances.size());
                     ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
                     try {
                         for (Future<List<DBItemInventoryCalendarUsage>> result : executorService.invokeAll(tasks)) {
