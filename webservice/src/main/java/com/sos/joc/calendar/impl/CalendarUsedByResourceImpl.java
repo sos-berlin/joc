@@ -54,7 +54,7 @@ public class CalendarUsedByResourceImpl extends JOCResourceImpl implements ICale
                     instanceId = calendarUsage.getInstanceId();
                     if (instanceId != null) {
                         if (usedByMap.containsKey(instanceId)) {
-                            UsedBy usedBy = usedByMap.get(calendarUsage);
+                            UsedBy usedBy = usedByMap.get(instanceId);
                             addJobs(calendarUsage, usedBy);
                             addOrders(calendarUsage, usedBy);
                             addSchedules(calendarUsage, usedBy);
