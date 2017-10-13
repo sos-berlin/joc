@@ -118,6 +118,7 @@ public class CalendarUsageDBLayer extends DBLayer {
             if (calendarUsages != null) {
                 for (DBItemInventoryCalendarUsage calendarUsage : calendarUsages) {
                     if (update || calendarUsage.getEdited()) {
+                        calendarUsage.setModified(new Date());
                         getSession().update(calendarUsage);
                     } else {
                         getSession().delete(calendarUsage);
@@ -166,7 +167,7 @@ public class CalendarUsageDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-
+    
     public List<CalendarUsage> getCalendarUsages(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();

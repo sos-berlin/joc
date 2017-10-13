@@ -66,7 +66,7 @@ public class JSObjectConfiguration {
                     if (orderNode.hasChildNodes() && orderNode.getFirstChild().getNodeType() == Node.TEXT_NODE) {
                         textNode = orderNode.getFirstChild().cloneNode(false);
                     } else {
-                        textNode = orderNode.getOwnerDocument().createTextNode("    ");
+                        textNode = orderNode.getOwnerDocument().createTextNode("\n    ");
                     }
                     orderNode.appendChild(textNode);
                     orderNode.appendChild(newRunTimeNode);

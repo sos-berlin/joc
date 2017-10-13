@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.reporting.db.DBItemCalendar;
+import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
@@ -296,6 +297,27 @@ public class CalendarsDBLayer extends DBLayer {
                 query.setParameter("folderName", folderName);
                 query.setParameter("likeFolderName", folderName + "/%");
             }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<DBItemCalendar> getCalendarsOfAnObject(Long instanceId, String objectType, String path) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_CALENDARS).append(" c, ");
+            sql.append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu ");
+            sql.append("where c.id = icu.calendarId ");
+            sql.append("and icu.instanceId = :instanceId");
+            sql.append("and icu.objectType = :objectType");
+            sql.append("and icu.path = :path");
+            Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("objectType", objectType);
+            query.setParameter("path", path);
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

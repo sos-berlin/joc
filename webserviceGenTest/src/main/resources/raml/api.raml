@@ -661,13 +661,30 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: |
-          Returns the run time as XML string in the JSON content field
-          If the run time is temporary changed then the response contains original permament run time too
+        description200: Returns the run time as XML string in the JSON content field
         schema: !include schemas/order/orderFilter-schema.json
         schema200: !include schemas/common/runtime200-schema.json
         example: !include examples/order/filteredOrder-example.json
         example200: !include examples/common/runtime-example.json
+  /calendars:
+    type:
+      postJSON:
+        description: send assigned calendars
+        description1: !include documentation/order/jobChain.md
+        description2: !include documentation/order/orderIdRequired.md
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/order/orderFilter-schema.json
+        schema200: !include schemas/calendar/calendars-schema.json
+        example: !include examples/order/filteredOrder-example.json
+        example200: TODO
 
 /jobs:
   type:
@@ -869,14 +886,30 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: |
-          Returns the run time as XML string in the JSON content field
-          If the run time is temporary changed then the response contains original permament run time too
+        description200: Returns the run time as XML string in the JSON content field
         schema: !include schemas/job/jobFilter-schema.json
         schema200: !include schemas/common/runtime200-schema.json
         example: TODO
         example200: !include examples/common/runtime-example.json
-
+  /calendars:
+    type:
+      postJSON:
+        description: send assigned calendars 
+        description1: !include documentation/job/jobRequired.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/job/jobFilter-schema.json
+        schema200: !include schemas/calendar/calendars-schema.json
+        example: TODO
+        example200: TODO
 /tasks:
   description: |
     This is not an API call. Use its children!!
@@ -1398,6 +1431,25 @@ traits:
               "surveyDate":"2016-05-05T21:13:34Z",
               "ok":true
             }
+  /calendars:
+    type:
+      postJSON:
+        description: send assigned calendars 
+        description1: !include documentation/schedule/scheduleRequired.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/schedule/scheduleFilter-schema.json
+        schema200: !include schemas/calendar/calendars-schema.json
+        example: !include examples/schedule/filteredSchedule-example.json
+        example200: TODO
 
 /process_classes:
   type:
