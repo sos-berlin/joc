@@ -7,18 +7,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sos.exception.SOSInvalidDataException;
-import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
-import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.Dates;
 
 public class CalendarInRuntimes {
@@ -27,24 +21,13 @@ public class CalendarInRuntimes {
         exec(calendarId, connection, accessToken, null, false);
     }
 
-    public static void update(DBItemCalendar calendarDbItem, Calendar calendar, SOSHibernateSession connection, String accessToken) throws Exception {
+    public static void update(DBItemCalendar calendarDbItem, Dates newDates, SOSHibernateSession connection, String accessToken) throws Exception {
         if (calendarDbItem != null) {
-            FrequencyResolver fr = new FrequencyResolver();
-            Dates newDates;
-            Dates oldDates;
-            try {
-                newDates = fr.resolveFromToday(calendar);
-                oldDates = fr.resolveFromToday(new ObjectMapper().readValue(calendarDbItem.getConfiguration(), Calendar.class));
-            } catch (SOSMissingDataException e) {
-                throw new JocMissingRequiredParameterException(e);
-            } catch (SOSInvalidDataException e) {
-                throw new JobSchedulerInvalidResponseDataException(e);
+            List<String> dates = new ArrayList<String>();
+            if (newDates != null) {
+                dates = newDates.getDates(); 
             }
-            if (newDates.getDates().equals(oldDates.getDates())) {
-                // nothing to do
-            } else {
-                exec(calendarDbItem.getId(), connection, accessToken, newDates.getDates(), true);
-            }
+            exec(calendarDbItem.getId(), connection, accessToken, dates, true);
         }
     }
 

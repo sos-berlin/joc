@@ -4,6 +4,9 @@ import java.util.Date;
 
 import javax.ws.rs.Path;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sos.exception.SOSInvalidDataException;
+import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.joc.Globals;
@@ -12,6 +15,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
 import com.sos.joc.classes.calendar.CalendarInRuntimes;
+import com.sos.joc.classes.calendar.FrequencyResolver;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
@@ -20,6 +24,7 @@ import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
 import com.sos.joc.model.calendar.CalendarType;
+import com.sos.joc.model.calendar.Dates;
 
 @Path("calendar")
 public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalendarEditResource {
@@ -59,14 +64,34 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                     && !getPermissonsJocCockpit(accessToken).getCalendar().getEdit().isChange())) {
                 return accessDeniedResponse();
             }
-
+            
             ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog());
             logAuditMessage(calendarAudit);
+            
+            boolean calendarHasChanged = true;
+            //FrequencyResolver fr = new FrequencyResolver();
+            Dates newDates = null;
+            Dates oldDates = null;
+            if (calendarDbItem != null) {
+                try {
+                    newDates = new FrequencyResolver().resolveFromToday(calendar);
+                    oldDates = new FrequencyResolver().resolveFromToday(new ObjectMapper().readValue(calendarDbItem.getConfiguration(), Calendar.class));
+                } catch (SOSMissingDataException e) {
+                    throw new JocMissingRequiredParameterException(e);
+                } catch (SOSInvalidDataException e) {
+                    throw new JobSchedulerInvalidResponseDataException(e);
+                }
+                if (newDates.getDates().equals(oldDates.getDates())) {
+                    calendarHasChanged = false;
+                } 
+            }
 
             Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(calendarDbItem, calendar);
             storeAuditLogEntry(calendarAudit);
-
-            CalendarInRuntimes.update(calendarDbItem, calendar, connection, accessToken);
+            
+            if (calendarHasChanged) {
+                CalendarInRuntimes.update(calendarDbItem, newDates, connection, accessToken);
+            }
 
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
