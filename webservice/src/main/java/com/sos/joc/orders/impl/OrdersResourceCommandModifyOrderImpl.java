@@ -250,21 +250,23 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         return null;
     }
 
-    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyOrders, accessToken, modifyOrders.getJobschedulerId(), permission);
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
+    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) throws JocException {
+        Date surveyDate = Date.from(Instant.now());;
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyOrders, accessToken, modifyOrders.getJobschedulerId(), permission);
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            checkRequiredComment(modifyOrders.getAuditLog());
+            if (modifyOrders.getOrders().size() == 0) {
+                throw new JocMissingRequiredParameterException("undefined 'orders'");
+            }
+            for (ModifyOrder order : modifyOrders.getOrders()) {
+                surveyDate = executeModifyOrderCommand(order, modifyOrders, command);
+            }
+        } finally {
+            Globals.disconnect(session);
         }
-        checkRequiredComment(modifyOrders.getAuditLog());
-        if (modifyOrders.getOrders().size() == 0) {
-            throw new JocMissingRequiredParameterException("undefined 'orders'");
-        }
-        Date surveyDate = Date.from(Instant.now());
-
-        for (ModifyOrder order : modifyOrders.getOrders()) {
-            surveyDate = executeModifyOrderCommand(order, modifyOrders, command);
-        }
-        Globals.disconnect(session);
         if (listOfErrors.size() > 0) {
             return JOCDefaultResponse.responseStatus419(listOfErrors);
         }

@@ -373,6 +373,8 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 }
                 parentOfFirstElem.removeChild(firstElem);
             } else {
+                String lastDateOfdates = dates.remove(dates.size()-1);
+                dates.add(0, lastDateOfdates);
                 firstElem.setAttribute("date", dates.get(0));
                 for (int i=1; i < dates.size(); i++) {
                     Element newElem = (Element) firstElem.cloneNode(true);
