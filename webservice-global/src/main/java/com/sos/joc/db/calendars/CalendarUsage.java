@@ -1,5 +1,6 @@
 package com.sos.joc.db.calendars;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,13 +19,16 @@ public class CalendarUsage extends UsedBy {
         if (objectType != null && path != null) {
             switch (objectType.toUpperCase()) {
             case "JOB":
-                setJobs(Collections.singletonList(path));
+                setJobs(new ArrayList<String>());
+                getJobs().add(path);
                 break;
             case "ORDER":
-                setOrders(Collections.singletonList(path));
+                setOrders(new ArrayList<String>());
+                getOrders().add(path);
                 break;
             case "SCHEDULE":
-                setSchedules(Collections.singletonList(path));
+                setSchedules(new ArrayList<String>());
+                getSchedules().add(path);
                 break;
             default:
                 break;
