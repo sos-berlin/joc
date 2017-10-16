@@ -51,8 +51,10 @@ public class ScheduleResourceCalendarsImpl extends JOCResourceImpl implements IS
                     calendar.setId(dbCalendar.getId());
                     calendar.setPath(dbCalendar.getName());
                     calendar.setName(dbCalendar.getBaseName());
-                    // calendar.setIncludes(null);
-                    // calendar.setExcludes(null);
+                    if (scheduleFilter.getCompact() != null && scheduleFilter.getCompact()) {
+                        calendar.setIncludes(null);
+                        calendar.setExcludes(null);
+                    }
                     calendarList.add(calendar);
                 }
             }

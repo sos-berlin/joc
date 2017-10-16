@@ -51,8 +51,10 @@ public class OrderCalendarsResourceImpl extends JOCResourceImpl implements IOrde
                     calendar.setId(dbCalendar.getId());
                     calendar.setPath(dbCalendar.getName());
                     calendar.setName(dbCalendar.getBaseName());
-                    //calendar.setIncludes(null);
-                    //calendar.setExcludes(null);
+                    if (orderFilter.getCompact() != null && orderFilter.getCompact()) {
+                        calendar.setIncludes(null);
+                        calendar.setExcludes(null);
+                    }
                     calendarList.add(calendar);
                 }
             }

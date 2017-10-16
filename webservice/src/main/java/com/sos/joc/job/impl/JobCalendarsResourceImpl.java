@@ -50,8 +50,10 @@ public class JobCalendarsResourceImpl extends JOCResourceImpl implements IJobCal
                     calendar.setId(dbCalendar.getId());
                     calendar.setPath(dbCalendar.getName());
                     calendar.setName(dbCalendar.getBaseName());
-                    // calendar.setIncludes(null);
-                    // calendar.setExcludes(null);
+                    if (jobFilter.getCompact() != null && jobFilter.getCompact()) {
+                        calendar.setIncludes(null);
+                        calendar.setExcludes(null);
+                    }
                     calendarList.add(calendar);
                 }
             }

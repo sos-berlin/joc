@@ -672,7 +672,7 @@ traits:
         description: send assigned calendars
         description1: !include documentation/order/jobChain.md
         description2: !include documentation/order/orderIdRequired.md
-        description3: " "
+        description3: !include documentation/common/compact.md
         description4: " "
         description5: " "
         description6: " "
@@ -680,7 +680,7 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: " "
+        description200: !include documentation/calendar/calendar.md
         schema: !include schemas/order/orderFilter-schema.json
         schema200: !include schemas/calendar/calendars-schema.json
         example: !include examples/order/filteredOrder-example.json
@@ -896,7 +896,7 @@ traits:
       postJSON:
         description: send assigned calendars 
         description1: !include documentation/job/jobRequired.md
-        description2: " "
+        description2: !include documentation/common/compact.md
         description3: " "
         description4: " "
         description5: " "
@@ -905,7 +905,7 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: " "
+        description200: !include documentation/calendar/calendar.md
         schema: !include schemas/job/jobFilter-schema.json
         schema200: !include schemas/calendar/calendars-schema.json
         example: TODO
@@ -1436,7 +1436,7 @@ traits:
       postJSON:
         description: send assigned calendars 
         description1: !include documentation/schedule/scheduleRequired.md
-        description2: " "
+        description2: !include documentation/common/compact.md
         description3: " "
         description4: " "
         description5: " "
@@ -1445,11 +1445,11 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: " "
+        description200: !include documentation/calendar/calendar.md
         schema: !include schemas/schedule/scheduleFilter-schema.json
         schema200: !include schemas/calendar/calendars-schema.json
         example: !include examples/schedule/filteredSchedule-example.json
-        example200: TODO
+        example200: " "
 
 /process_classes:
   type:

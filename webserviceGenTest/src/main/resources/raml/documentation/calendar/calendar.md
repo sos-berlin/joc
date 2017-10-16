@@ -6,6 +6,9 @@ It depends on the parameter ``compact``.
     * type
     * category
     * title
+    * to
+* Fix optional field is
+    * from
 * The detailed view has the following field in addition to the compact view
     * includes
     * excludes
