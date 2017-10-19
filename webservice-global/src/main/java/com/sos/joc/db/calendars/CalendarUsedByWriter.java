@@ -61,7 +61,6 @@ public class CalendarUsedByWriter {
             calendarUsageDbItem.setObjectType(objectType);
             calendarUsageDbItem.setEdited(false);
             calendarUsageDbItem.setPath(path);
-            calendarUsageDbItem.setObjectId(calendarUsageDBLayer.getObjectIdOfAnCalendarUsageObject(instanceId, objectType, path));
             
             for (int i = 0; i < calendars.getLength(); i++) {
                 Long calendarId = Long.parseLong(calendars.item(i).getNodeValue());
