@@ -346,6 +346,18 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 runTimeIsChanged = true;
             }
         }
+        for (int i=0; i < holidayParentList.getLength(); i++) {
+            NodeList children = holidayParentList.item(i).getChildNodes();
+            if (children.getLength() == 1 && children.item(0).getNodeType() == Node.TEXT_NODE) {
+                holidayParentList.item(i).removeChild(children.item(0));
+            }
+        }
+        for (int i=0; i < dateParentList.getLength(); i++) {
+            NodeList children = dateParentList.item(i).getChildNodes();
+            if (children.getLength() == 1 && children.item(0).getNodeType() == Node.TEXT_NODE) {
+                dateParentList.item(i).removeChild(children.item(0));
+            }
+        }
         if(runTimeIsChanged) {
             return (Element) curObject.getFirstChild(); 
         }
