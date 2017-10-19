@@ -1,6 +1,10 @@
 package com.sos.joc.calendar.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.Path;
 
@@ -9,6 +13,7 @@ import com.sos.exception.SOSInvalidDataException;
 import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
+import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarEditResource;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -16,7 +21,9 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
 import com.sos.joc.classes.calendar.CalendarInRuntimes;
 import com.sos.joc.classes.calendar.FrequencyResolver;
+import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -25,6 +32,7 @@ import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
 import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.Dates;
+import com.sos.joc.model.common.Err419;
 
 @Path("calendar")
 public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalendarEditResource {
@@ -89,10 +97,21 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(calendarDbItem, calendar);
             storeAuditLogEntry(calendarAudit);
             
+            List<Err419> listOfErrors = new ArrayList<Err419>();
             if (calendarHasChanged) {
-                CalendarInRuntimes.update(calendarDbItem, newDates, connection, accessToken);
+                Map<String, Exception> exceptions = CalendarInRuntimes.update(calendarDbItem, newDates, connection, accessToken);
+                for (Entry<String, Exception> exception : exceptions.entrySet()) {
+                    if (exception.getValue() instanceof JocException) {
+                        listOfErrors.add(new BulkError().get((JocException) exception.getValue(), getJocError(), exception.getKey())); 
+                    } else {
+                        listOfErrors.add(new BulkError().get(exception.getValue(), getJocError(), exception.getKey()));
+                    }
+                }
             }
-
+            
+            if (listOfErrors.size() > 0) {
+                return JOCDefaultResponse.responseStatus419(listOfErrors);
+            }
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());

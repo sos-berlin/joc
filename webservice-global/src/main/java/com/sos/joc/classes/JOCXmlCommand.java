@@ -32,6 +32,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
+import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.xml.SOSXmlCommand;
@@ -326,6 +327,9 @@ public class JOCXmlCommand extends SOSXmlCommand {
     
     public Element updateCalendarInRuntimes(List<String> dates, String objectType, String path, Long calendarId) throws Exception {
         Node curObject = getSosxml().selectSingleNode(String.format("//%1$s[@path='%2$s']/source", objectType.toLowerCase(), path));
+        if (curObject == null) {
+            throw new JobSchedulerObjectNotExistException(objectType + ": " + path);
+        }
         NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%1$s']/parent::*", calendarId));
         NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%1$s']/parent::*", calendarId));
         boolean runTimeIsChanged = false;

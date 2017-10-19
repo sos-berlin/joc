@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.Path;
 
@@ -81,7 +83,16 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
                 ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarId, calendarPath, auditParams);
                 logAuditMessage(calendarAudit);
                 calendarDbLayer.deleteCalendar(calendarDbItem);
-                CalendarInRuntimes.delete(calendarId, calendarDbLayer.getSession(), accessToken);
+                Map<String, Exception> exceptions = CalendarInRuntimes.delete(calendarId, calendarDbLayer.getSession(), accessToken);
+                
+                for (Entry<String, Exception> exception : exceptions.entrySet()) {
+                    if (exception.getValue() instanceof JocException) {
+                        listOfErrors.add(new BulkError().get((JocException) exception.getValue(), getJocError(), exception.getKey())); 
+                    } else {
+                        listOfErrors.add(new BulkError().get(exception.getValue(), getJocError(), exception.getKey()));
+                    }
+                }
+                
                 storeAuditLogEntry(calendarAudit);
             } catch (JocException e) {
                 listOfErrors.add(new BulkError().get(e, getJocError(), calendarPath));

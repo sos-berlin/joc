@@ -1,7 +1,6 @@
 package com.sos.joc.db.calendars;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.calendar.UsedBy;

@@ -2,6 +2,7 @@ package com.sos.joc.db.calendars;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.query.Query;
 
@@ -112,16 +113,25 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
 
-    public void updateEditFlag(List<DBItemInventoryCalendarUsage> calendarUsages, boolean update) throws DBConnectionRefusedException,
+    public void updateEditFlag(Set<DBItemInventoryCalendarUsage> calendarUsages, boolean update) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             if (calendarUsages != null) {
                 for (DBItemInventoryCalendarUsage calendarUsage : calendarUsages) {
-                    if (update || calendarUsage.getEdited()) {
-                        calendarUsage.setModified(new Date());
-                        getSession().update(calendarUsage);
+                    if (update) {
+                        if (calendarUsage.getEdited() == null) {
+                            getSession().delete(calendarUsage);
+                        } else {
+                            calendarUsage.setModified(new Date());
+                            getSession().update(calendarUsage);
+                        }
                     } else {
-                        getSession().delete(calendarUsage);
+                        if (calendarUsage.getEdited() != null && calendarUsage.getEdited()) {
+                            calendarUsage.setModified(new Date()); 
+                            getSession().update(calendarUsage);
+                        } else {
+                            getSession().delete(calendarUsage);
+                        }
                     }
                 }
             }
@@ -132,11 +142,12 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemInventoryCalendarUsage> getCalendarUsagesOfAnInstance(Long instanceId) throws DBConnectionRefusedException,
+    public List<DBItemInventoryCalendarUsage> getCalendarUsagesOfAnInstance(Long instanceId, Long calendarId) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             CalendarUsageFilter filter = new CalendarUsageFilter();
             filter.setInstanceId(instanceId);
+            filter.setCalendarId(calendarId);
             String sql = "from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(filter);
             query = getSession().createQuery(sql);
             bindParameters(filter);
@@ -164,6 +175,51 @@ public class CalendarUsageDBLayer extends DBLayer {
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public Long getObjectIdOfAnCalendarUsageObject(Long instanceId, String objectType, String path)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        if (instanceId == null) {
+            throw new DBInvalidDataException("undefined instanceId"); 
+        }
+        if (objectType == null) {
+            throw new DBInvalidDataException("undefined objectType"); 
+        }
+        if (path == null) {
+            throw new DBInvalidDataException("undefined path"); 
+        }
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select id from ");
+            switch (objectType.toUpperCase()) {
+            case "ORDER":
+                sql.append(DBITEM_INVENTORY_ORDERS);
+                break;
+            case "JOB":
+                sql.append(DBITEM_INVENTORY_JOBS);
+                break;
+            case "SCHEDULE":
+                sql.append(DBITEM_INVENTORY_SCHEDULES);
+                break;
+            }
+            sql.append(" where name = :path");
+            sql.append(" and instanceId = :instanceId");
+            Query<Long> query = getSession().createQuery(sql.toString());
+            query.setParameter("path", path);
+            query.setParameter("instanceId", instanceId);
+            Long id = getSession().getSingleResult(query);
+            if (id == null) {
+                throw new DBInvalidDataException(String.format("cannot determine id of %$1: %2$s", objectType, path)); 
+            }
+            return id;
+            
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (DBInvalidDataException ex) {
+            throw ex;
+        }catch (Exception ex) {
             throw new DBInvalidDataException(ex);
         }
     }

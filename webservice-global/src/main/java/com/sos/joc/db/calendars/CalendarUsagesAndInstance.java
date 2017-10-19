@@ -1,7 +1,11 @@
 package com.sos.joc.db.calendars;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -9,20 +13,23 @@ import com.sos.joc.Globals;
 
 public class CalendarUsagesAndInstance {
 
-    private List<DBItemInventoryCalendarUsage> calendarUsages = null;
+    private Set<DBItemInventoryCalendarUsage> calendarUsages = null;
     private DBItemInventoryInstance instance = null;
     private List<String> dates = new ArrayList<String>();
+    private Map<String, Exception> exceptions = new HashMap<String, Exception>();
 
     public CalendarUsagesAndInstance(DBItemInventoryInstance instance) {
         this.instance = setMappedUrl(instance);
     }
 
-    public List<DBItemInventoryCalendarUsage> getCalendarUsages() {
+    public Set<DBItemInventoryCalendarUsage> getCalendarUsages() {
         return calendarUsages;
     }
 
     public void setCalendarUsages(List<DBItemInventoryCalendarUsage> calendarUsages) {
-        this.calendarUsages = calendarUsages;
+        if (calendarUsages != null && !calendarUsages.isEmpty()) {
+            this.calendarUsages = new HashSet<DBItemInventoryCalendarUsage>(calendarUsages);
+        }
     }
 
     public DBItemInventoryInstance getInstance() {
@@ -37,12 +44,14 @@ public class CalendarUsagesAndInstance {
         this.dates = dates;
     }
 
-    public void setAllEdited() {
+    public void setAllEdited(Exception e) {
         if (this.calendarUsages != null) {
             for (DBItemInventoryCalendarUsage item : this.calendarUsages) {
                 if (!item.getEdited()) {
                     item.setEdited(true);
                 }
+                String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getObjectType(), item.getPath(), instance.getHostname(), instance.getPort());
+                exceptions.put(key, e);
             }
         }
     }
@@ -52,6 +61,19 @@ public class CalendarUsagesAndInstance {
             return Globals.jocConfigurationProperties.setUrlMapping(instance, false);
         }
         return instance;
+    }
+
+    public Map<String, Exception> getExceptions() {
+        return exceptions;
+    }
+
+    public void setExceptions(Map<String, Exception> exceptions) {
+        this.exceptions = exceptions;
+    }
+    
+    public void putException(DBItemInventoryCalendarUsage item, Exception exception) {
+        String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getObjectType(), item.getPath(), instance.getHostname(), instance.getPort());
+        this.exceptions.put(key, exception);
     }
 
 }

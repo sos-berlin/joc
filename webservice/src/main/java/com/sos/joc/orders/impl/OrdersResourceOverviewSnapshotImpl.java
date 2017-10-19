@@ -7,6 +7,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.Orders;
+import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
 import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
@@ -48,6 +49,9 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 
             return JOCDefaultResponse.responseStatus200(entity);
 
+        } catch (JobSchedulerConnectionResetException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatus434JSError(e);
         } catch (JobSchedulerObjectNotExistException e) {
             JocError err = new JocError();
             err.setMessage(String.format("%s: Please check your folders in the Account Management (%s)", e.getMessage(), folders));
