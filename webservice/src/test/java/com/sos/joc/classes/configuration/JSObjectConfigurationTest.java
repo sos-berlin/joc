@@ -32,22 +32,22 @@ public class JSObjectConfigurationTest {
         SOSXMLXPath newRuntime = new SOSXMLXPath(new StringBuffer("<run_time>xxx</run_time>"));
         
         String jobSchedulerAnswer = "<order  title=\"test\" job_chain=\"job_chain2\" id=\"2\">\r\n  <params />\r\n  <run_time>\r\n    <weekdays >\r\n      <day  day=\"1 2 3 4 5 6 7\">\r\n        <period  single_start=\"13:00:00\"/>\r\n      </day>\r\n    </weekdays>\r\n  </run_time>\r\n</order>";
-        Node node = jsObjectConfiguration.modifyOrderRuntimeNode(getSosXmlXPath(jobSchedulerAnswer), newRuntime);
+        Node node = jsObjectConfiguration.modifyOrderRuntimeNode(getSosXmlXPath(jobSchedulerAnswer), newRuntime.getRoot());
         String s = jocXmlCommand.getXmlString(node).replaceAll("(\\r\\n|\\n)+", "\n");
         assertEquals("testChangeRuntimeElement", "<order id=\"2\" job_chain=\"job_chain2\" title=\"test\">\n  <params/>\n  <run_time>xxx</run_time>\n</order>", s);
 
         jobSchedulerAnswer = "<order  title=\"test\" job_chain=\"job_chain2\" id=\"2\">\r\n  <params />\r\n  <run_time/>\r\n</order>";
-        node = jsObjectConfiguration.modifyOrderRuntimeNode(getSosXmlXPath(jobSchedulerAnswer), newRuntime);
+        node = jsObjectConfiguration.modifyOrderRuntimeNode(getSosXmlXPath(jobSchedulerAnswer), newRuntime.getRoot());
         s = jocXmlCommand.getXmlString(node).replaceAll("(\\r\\n|\\n)+", "\n");;
         assertEquals("testChangeRuntimeElement", "<order id=\"2\" job_chain=\"job_chain2\" title=\"test\">\n  <params/>\n  <run_time>xxx</run_time>\n</order>", s);
         
         jobSchedulerAnswer = "<order  title=\"test\" job_chain=\"job_chain2\" id=\"2\">\r\n  <params />\r\n  <payload/>\r\n</order>";
-        node = jsObjectConfiguration.modifyOrderRuntimeNode(getSosXmlXPath(jobSchedulerAnswer), newRuntime);
+        node = jsObjectConfiguration.modifyOrderRuntimeNode(getSosXmlXPath(jobSchedulerAnswer), newRuntime.getRoot());
         s = jocXmlCommand.getXmlString(node).replaceAll("(\\r\\n|\\n)+", "\n");;
         assertEquals("testChangeRuntimeElement", "<order id=\"2\" job_chain=\"job_chain2\" title=\"test\">\n  <params/>\n  <run_time>xxx</run_time>\n  <payload/>\n</order>", s);
         
         jobSchedulerAnswer = "<order  title=\"test\" job_chain=\"job_chain2\" id=\"2\">\r\n  <params />\r\n</order>";
-        node = jsObjectConfiguration.modifyOrderRuntimeNode(getSosXmlXPath(jobSchedulerAnswer), newRuntime);
+        node = jsObjectConfiguration.modifyOrderRuntimeNode(getSosXmlXPath(jobSchedulerAnswer), newRuntime.getRoot());
         s = jocXmlCommand.getXmlString(node).replaceAll("(\\r\\n|\\n)+", "\n");;
         assertEquals("testChangeRuntimeElement", "<order id=\"2\" job_chain=\"job_chain2\" title=\"test\">\n  <params/>\n  <run_time>xxx</run_time>\n</order>", s);
 

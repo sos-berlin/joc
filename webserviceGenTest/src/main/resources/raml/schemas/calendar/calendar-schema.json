@@ -9,10 +9,13 @@
       "$ref": "../common/nonNegativeLong-schema.json"
     },
     "path": {
-      "type": "string"
+      "$ref": "../common/path-schema.json"
     },
     "name": {
       "type": "string"
+    },
+    "basedOn": {
+      "$ref": "../common/path-schema.json"
     },
     "type": {
       "$ref": "calendarType-schema.json"

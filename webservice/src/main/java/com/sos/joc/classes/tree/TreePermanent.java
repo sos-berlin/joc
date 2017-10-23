@@ -67,12 +67,17 @@ public class TreePermanent {
 					types.add(type);
 				}
 				break;
-			case CALENDAR:
+			case WORKINGDAYSCALENDAR:
                 if (sosPermission.getCalendar().isView()) {
                     types.add(type);
                 }
                 break;
-			case FOLDER:
+			case NONWORKINGDAYSCALENDAR:
+                if (sosPermission.getCalendar().isView()) {
+                    types.add(type);
+                }
+                break;
+            case FOLDER:
 				break;
 			default:
 				types.add(type);
@@ -91,8 +96,8 @@ public class TreePermanent {
 			}
 		});
 		Set<String> bodyTypes = new HashSet<String>();
-		boolean withCalendar = false;
-		if (treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
+		Set<String> calendarTypes = new HashSet<String>();
+        if (treeBody.getTypes() != null && !treeBody.getTypes().isEmpty()) {
 			for (JobSchedulerObjectType type : treeBody.getTypes()) {
 				switch (type) {
 				case ORDER:
@@ -106,17 +111,22 @@ public class TreePermanent {
 					bodyTypes.add("process_class");
 					bodyTypes.add("agent_cluster");
 					break;
-				case CALENDAR:
-				    bodyTypes.add("calendar");
-				    withCalendar = true;
+				case WORKINGDAYSCALENDAR:
+				    bodyTypes.add("working_days_calendar");
+				    calendarTypes.add("WORKING_DAYS");
 				    break;
+				case NONWORKINGDAYSCALENDAR:
+                    bodyTypes.add("non_working_days_calendar");
+                    calendarTypes.add("NON_WORKING_DAYS");
+                    break;
 				default:
 					bodyTypes.add(type.name().toLowerCase());
 					break;
 				}
 			}
 		} else {
-		    withCalendar = true; 
+		    calendarTypes.add("WORKING_DAYS");
+		    calendarTypes.add("NON_WORKING_DAYS"); 
 		}
 
 		SOSHibernateSession connection = null;
@@ -134,8 +144,8 @@ public class TreePermanent {
 				for (Folder folder : treeBody.getFolders()) {
 					String normalizedFolder = ("/" + folder.getFolder()).replaceAll("//+", "/");
 					results = dbLayer.getFoldersByFolderAndType(instanceId, normalizedFolder, bodyTypes);
-					if (withCalendar) {
-					    calendarResults = dbCalendarLayer.getFoldersByFolder(normalizedFolder);
+					if (!calendarTypes.isEmpty()) {
+					    calendarResults = dbCalendarLayer.getFoldersByFolder(instanceId, normalizedFolder, calendarTypes);
 					    if (calendarResults != null && !calendarResults.isEmpty()) {
 					        if (results == null) {
 					            results = new ArrayList<String>();
@@ -156,8 +166,8 @@ public class TreePermanent {
 				}
 			} else {
 				results = dbLayer.getFoldersByFolderAndType(instanceId, "/", bodyTypes);
-				if (withCalendar) {
-                    calendarResults = dbCalendarLayer.getFoldersByFolder("/");
+				if (!calendarTypes.isEmpty()) {
+                    calendarResults = dbCalendarLayer.getFoldersByFolder(instanceId, "/", calendarTypes);
                     if (calendarResults != null && !calendarResults.isEmpty()) {
                         if (results == null) {
                             results = new ArrayList<String>();

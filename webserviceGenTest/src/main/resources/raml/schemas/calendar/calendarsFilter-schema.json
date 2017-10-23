@@ -4,7 +4,13 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "javaType": "com.sos.joc.model.calendar.CalendarsFilter",
   "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "calendarIds": {
       "type": "array",
       "items": {

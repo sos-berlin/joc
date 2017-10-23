@@ -5,9 +5,13 @@
   "javaType": "com.sos.joc.model.calendar.CalendarPath",
   "type": "object",
   "required": [
+    "jobschedulerId",
     "path"
   ],
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "path": {
       "type": "string"
     }

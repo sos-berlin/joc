@@ -1,8 +1,8 @@
 {
-  "title": "clections of objects which use calendar",
+  "title": "collections of objects which use calendar",
   "id": "schemas/calendar/usedBy",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.calendar.UsedBy200",
+  "javaType": "com.sos.joc.model.calendar.UsedBy",
   "type": "object",
   "required": [
     "deliveryDate"
@@ -11,46 +11,23 @@
     "deliveryDate": {
       "$ref": "../common/deliveryDate-schema.json"
     },
-    "jobschedulers": {
-      "type": "array",
-      "items": {
-        "javaType": "com.sos.joc.model.calendar.UsedBy",
-        "type": "object",
-        "required": [
-          "jobschedulerId",
-          "host",
-          "port"
-        ],
-        "properties": {
-          "jobschedulerId": {
-            "type": "string"
-          },
-          "host": {
-			"type": "string"
-		  },
-          "port": {
-			"$ref": "../common/port-schema.json"
-		  },
-          "jobs": {
-			"type": "array",
-			"items": {
-			  "$ref": "../common/path-schema.json"
-			}
-		  },
-          "orders": {
-			"type": "array",
-			"items": {
-			  "$ref": "../common/path-schema.json"
-			}
-		  },
-          "schedules": {
-			"type": "array",
-			"items": {
-			  "$ref": "../common/path-schema.json"
-			}
-		  }
-        }
-      }
-    }
+    "jobs": {
+	  "type": "array",
+	  "items": {
+		"$ref": "../common/path-schema.json"
+	  }
+	},
+    "orders": {
+	  "type": "array",
+	  "items": {
+	    "$ref": "../common/path-schema.json"
+	  }
+	},
+    "schedules": {
+	  "type": "array",
+	  "items": {
+	    "$ref": "../common/path-schema.json"
+	  }
+	}
   }
 }

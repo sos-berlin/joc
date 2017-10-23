@@ -38,7 +38,7 @@ public class CalendarInRuntimes {
         Map<String, Exception> exceptions = new HashMap<String, Exception>();
         if (calendarId != null) {
             CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(connection);
-            List<CalendarUsagesAndInstance> calendarUsageInstances = calendarUsageDbLayer.getInstancesFormCalendar(calendarId);
+            List<CalendarUsagesAndInstance> calendarUsageInstances = calendarUsageDbLayer.getInstancesFromCalendar(calendarId);
 
             if (calendarUsageInstances != null && !calendarUsageInstances.isEmpty()) {
                 List<JobSchedulerCalendarCallable> tasks = new ArrayList<JobSchedulerCalendarCallable>();

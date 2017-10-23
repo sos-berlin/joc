@@ -1,9 +1,5 @@
 package com.sos.joc.classes.db.calendars;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,7 +8,6 @@ import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.db.calendars.CalendarUsage;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 
 public class TestCalendarUsageDbLayer {
@@ -39,17 +34,6 @@ public class TestCalendarUsageDbLayer {
         sosHibernateFactory.build();
         sosHibernateSession = sosHibernateFactory.openStatelessSession();
         calendarUsageDBLayer = new CalendarUsageDBLayer(sosHibernateSession);
-    }
-
-    @Test
-    public void testCalendarUsageDBLayerGetList() throws Exception {
-        initConnection();
-
-        List<CalendarUsage> l = calendarUsageDBLayer.getCalendarUsages(2L);
-        CalendarUsage calendarUsage = l.get(0);
-        sosHibernateFactory.close();
-        assertEquals("testCalendarUsageDBLayerGetList", "/job4", calendarUsage.getJobs().get(0));
-
     }
 
     @Test

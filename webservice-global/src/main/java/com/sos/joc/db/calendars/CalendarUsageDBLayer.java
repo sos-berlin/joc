@@ -15,7 +15,6 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 
 public class CalendarUsageDBLayer extends DBLayer {
 
-    private static final String CALENDAR_USAGE = CalendarUsage.class.getName();
     private static final String CALENDAR_USAGES_INSTANCE = CalendarUsagesAndInstance.class.getName();
     private Query<DBItemInventoryCalendarUsage> query;
 
@@ -179,22 +178,15 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
     
-    public List<CalendarUsage> getCalendarUsages(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryCalendarUsage> getCalendarUsages(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(CALENDAR_USAGE);
-            sql.append(" (icu.instanceId, icu.path, icu.objectType, ii.schedulerId, ii.hostname, ii.port) from ");
-            sql.append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu, ");
-            sql.append(DBITEM_INVENTORY_INSTANCES).append(" ii ");
-            sql.append("where icu.instanceId = ii.id ");
-            if (calendarId != null) {
-                sql.append(" and icu.calendarId = :calendarId");
-            }
-            Query<CalendarUsage> query = getSession().createQuery(sql.toString());
-            if (calendarId != null) {
-                query.setParameter("calendarId", calendarId);
-            }
+            CalendarUsageFilter filter = new CalendarUsageFilter();
+            filter.setCalendarId(calendarId);
+            String sql = "from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(filter);
+            query = getSession().createQuery(sql);
+            bindParameters(filter);
             return getSession().getResultList(query);
+
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -202,24 +194,16 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
 
-    public List<CalendarUsage> getCalendarUsages(String calendarPath) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryCalendarUsage> getCalendarUsages(Long instanceId, String calendarPath) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(CALENDAR_USAGE);
-            sql.append(" (icu.instanceId, icu.path, icu.objectType, ii.schedulerId, ii.hostname, ii.port) from ");
-            sql.append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu, ");
-            sql.append(DBITEM_CALENDARS).append(" c, ");
-            sql.append(DBITEM_INVENTORY_INSTANCES).append(" ii ");
-            sql.append("where icu.calendarId = c.id ");
-            sql.append("and icu.instanceId = ii.id ");
-            if (calendarPath != null) {
-                sql.append(" and c.name = :calendarPath");
-            }
-            Query<CalendarUsage> query = getSession().createQuery(sql.toString());
-            if (calendarPath != null) {
-                query.setParameter("calendarPath", calendarPath);
-            }
+            CalendarUsageFilter filter = new CalendarUsageFilter();
+            filter.setInstanceId(instanceId);
+            filter.setPath(calendarPath);
+            String sql = "from " + DBITEM_INVENTORY_CALENDAR_USAGE + getWhere(filter);
+            query = getSession().createQuery(sql);
+            bindParameters(filter);
             return getSession().getResultList(query);
+
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -227,7 +211,7 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
 
-    public List<CalendarUsagesAndInstance> getInstancesFormCalendar(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<CalendarUsagesAndInstance> getInstancesFromCalendar(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(CALENDAR_USAGES_INSTANCE).append(" (ii) from ");

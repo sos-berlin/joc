@@ -5,7 +5,13 @@
   "javaType": "com.sos.joc.model.calendar.CalendarDatesFilter",
   "type": "object",
   "description": "one of the fields calendar and path is required.",
+  "required": [
+    "jobschedulerId"
+  ],
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "calendar": {
       "$ref": "calendar-schema.json"
     },

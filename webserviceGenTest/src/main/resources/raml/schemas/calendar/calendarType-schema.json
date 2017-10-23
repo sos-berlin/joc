@@ -6,7 +6,8 @@
   "type": "string",
   "enum": [
     "WORKING_DAYS",
-    "NON_WORKING_DAYS"
+    "NON_WORKING_DAYS",
+    "BASED"
   ],
   "default": "WORKING_DAYS"
 }

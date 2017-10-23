@@ -20,6 +20,11 @@ public interface ICalendarEditResource {
     public JOCDefaultResponse postStoreCalendar(@HeaderParam("X-Access-Token") String xAccessToken, CalendarObjectFilter calendarFilter) throws Exception;
     
     @POST
+    @Path("save_as")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public JOCDefaultResponse postSaveAsCalendar(@HeaderParam("X-Access-Token") String xAccessToken, CalendarObjectFilter calendarFilter) throws Exception;
+    
+    @POST
     @Path("rename")
     @Produces({ MediaType.APPLICATION_JSON })
     public JOCDefaultResponse postRenameCalendar(@HeaderParam("X-Access-Token") String xAccessToken, CalendarRenameFilter calendarFilter) throws Exception;

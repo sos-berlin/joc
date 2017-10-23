@@ -41,8 +41,6 @@ schemas:
 resourceTypes:
   - error: !include resourceTypes/common/error.raml
   - postCalendarWithOkResponse: !include resourceTypes/calendar/postJSONWithOkResponse.raml
-  - postCalendar: !include resourceTypes/calendar/postJSON.raml
-  - postCategories: !include resourceTypes/calendar/postCategories.raml
   - postTaskWithOkResponse: !include resourceTypes/job/postWithOkResponse.raml
   - postTaskAndTimeoutWithOkResponse: !include resourceTypes/job/postTimeoutWithOkResponse.raml
   - postTimeoutWithOkResponse: !include resourceTypes/common/postTimeoutWithOkResponse.raml
@@ -1941,7 +1939,7 @@ traits:
  
 /calendars:
   type:
-    postCalendar:
+    postJSON:
       description: Sends collection of calendar items
       description1: !include documentation/common/compact.md
       description2: !include documentation/common/regex.md
@@ -1949,6 +1947,10 @@ traits:
       description4: !include documentation/calendar/calendarType.md
       description5: !include documentation/calendar/categories.md
       description6: !include documentation/calendar/filteredByCalendars.md
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
       description200: !include documentation/calendar/calendar.md
       schema: !include schemas/calendar/calendarsFilter-schema.json
       schema200: !include schemas/calendar/calendars-schema.json
@@ -1957,7 +1959,7 @@ traits:
       
   /categories:
     type:
-      postCategories:
+      postOnlyId:
         description: Sends categories
         description1: " "
         description2: " "
@@ -1975,7 +1977,7 @@ traits:
 
 /calendar:
   type:
-    postCalendar:
+    postJSON:
       description: Sends calendar
       description1: " "
       description2: " "
@@ -1983,6 +1985,10 @@ traits:
       description4: " "
       description5: " "
       description6: " "
+      description7: " "
+      description8: " "
+      description9: " "
+      description10: " "
       description200: !include documentation/calendar/calendar.md
       schema: !include schemas/calendar/calendarPath-schema.json
       schema200: !include schemas/calendar/calendar200-schema.json
@@ -1991,7 +1997,7 @@ traits:
         
   /dates:
     type:
-      postCalendar:
+      postJSON:
         description: |
           Sends dates of a calendar
           <p style="font-weight: normal; font-size: 50%">One of the parameters ``calendar``, ``id`` or ``path`` is required. 
@@ -2002,6 +2008,11 @@ traits:
         description4: !include documentation/calendar/dateTo.md
         description5: " "
         description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
         description200: " "
         schema: !include schemas/calendar/calendarDatesFilter-schema.json
         schema200: !include schemas/calendar/dates-schema.json
@@ -2010,7 +2021,7 @@ traits:
         
   /used:
     type:
-      postCalendar:
+      postJSON:
         description: Sends a list of jobs, orders and schedules which use the calendar
         description1: !include documentation/calendar/calendarId.md
         description2: " "
@@ -2018,6 +2029,10 @@ traits:
         description4: " "
         description5: " "
         description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
         description200: " "
         schema: !include schemas/calendar/calendarId-schema.json
         schema200: !include schemas/calendar/usedBy-schema.json
@@ -2027,7 +2042,19 @@ traits:
   /store:
     type:
       postCalendarWithOkResponse:
-        description: Stores calendar
+        description: Save or Rename a calendar
+        description1: !include documentation/calendar/calendarStoreObj.md
+        description2: " "
+        description3: " "
+        description4: " "
+        schema: !include schemas/calendar/calendarObjectFilter-schema.json
+        audit: !include documentation/audit/auditLog.md
+        example: !include examples/calendar/calendarObj-example.json
+  
+  /save_as:
+    type:
+      postCalendarWithOkResponse:
+        description: SaveAs a calendar
         description1: !include documentation/calendar/calendarObj.md
         description2: " "
         description3: " "

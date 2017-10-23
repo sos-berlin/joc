@@ -35,8 +35,8 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
     public JOCDefaultResponse postCalendars(String accessToken, CalendarsFilter calendarsFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarsFilter, accessToken, "", getPermissonsJocCockpit(accessToken)
-                    .getCalendar().isView());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarsFilter, accessToken, calendarsFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getCalendar().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -45,20 +45,21 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
             List<DBItemCalendar> dbCalendars = null;
             
-            if (calendarsFilter.getCalendarIds() != null && !calendarsFilter.getCalendarIds().isEmpty()) {
+            if (calendarsFilter.getCalendars() != null && !calendarsFilter.getCalendars().isEmpty()) {
+                calendarsFilter.setRegex(null);
+                dbCalendars = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getId(), new HashSet<String>(calendarsFilter.getCalendars()));
+
+            } else if (calendarsFilter.getCalendarIds() != null && !calendarsFilter.getCalendarIds().isEmpty()) {
                 calendarsFilter.setRegex(null);
                 dbCalendars = dbLayer.getCalendarsFromIds(new HashSet<Long>(calendarsFilter.getCalendarIds()));
-            
-            } else if (calendarsFilter.getCalendars() != null && !calendarsFilter.getCalendars().isEmpty()) {
-                calendarsFilter.setRegex(null);
-                dbCalendars = dbLayer.getCalendarsFromPaths(new HashSet<String>(calendarsFilter.getCalendars()));
-            
+
             } else {
                 if (calendarsFilter.getType() != null && !calendarsFilter.getType().isEmpty()) {
                     try {
                         CalendarType.fromValue(calendarsFilter.getType().toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        throw new JobSchedulerBadRequestException(String.format("Invalid value '%1$s' in 'type' parameter", calendarsFilter.getType()));
+                        throw new JobSchedulerBadRequestException(String.format("Invalid value '%1$s' in 'type' parameter", calendarsFilter
+                                .getType()));
                     }
                 }
                 Set<String> categories = null;
@@ -71,13 +72,13 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                     for (Folder folder : calendarsFilter.getFolders()) {
                         folders.add(folder.getFolder());
                         if (folder.getRecursive()) {
-                            recursiveFolders.add(folder.getFolder()); 
+                            recursiveFolders.add(folder.getFolder());
                         }
                     }
                 }
                 dbCalendars = dbLayer.getCalendars(calendarsFilter.getType(), categories, folders, recursiveFolders);
             }
-            
+
             List<Calendar> calendarList = new ArrayList<Calendar>();
             if (dbCalendars != null) {
                 ObjectMapper om = new ObjectMapper();

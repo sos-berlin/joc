@@ -1,5 +1,8 @@
 package com.sos.joc.calendar.impl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,7 +16,6 @@ import com.sos.exception.SOSInvalidDataException;
 import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
-import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarEditResource;
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -21,12 +23,13 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
 import com.sos.joc.classes.calendar.CalendarInRuntimes;
 import com.sos.joc.classes.calendar.FrequencyResolver;
-import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingCommentException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.JocObjectAlreadyExistException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarObjectFilter;
 import com.sos.joc.model.calendar.CalendarRenameFilter;
@@ -38,36 +41,27 @@ import com.sos.joc.model.common.Err419;
 public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalendarEditResource {
 
     private static final String API_CALL_STORE = "./calendar/store";
+    private static final String API_CALL_SAVE_AS = "./calendar/save_as";
     private static final String API_CALL_MOVE = "./calendar/rename";
 
     @Override
     public JOCDefaultResponse postStoreCalendar(String accessToken, CalendarObjectFilter calendarFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_STORE, calendarFilter, accessToken, "", true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_STORE, calendarFilter, accessToken, calendarFilter.getJobschedulerId(), true);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredComment(calendarFilter.getAuditLog());
-            Calendar calendar = calendarFilter.getCalendar();
-            if (calendar == null) {
-                throw new JocMissingRequiredParameterException("undefined 'calendar'");
-            }
-            checkRequiredParameter("calendar path", calendar.getPath());
-            if (calendar.getTo() == null || calendar.getTo().isEmpty()) {
-                throw new JobSchedulerInvalidResponseDataException("calendar field 'to' is undefined");
-            } else if (!calendar.getTo().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
-                throw new JobSchedulerInvalidResponseDataException("calendar field 'to' must have the format YYYY-MM-DD.");
-            }
-            if (calendar.getType() == null || calendar.getType().name().isEmpty()) {
-                calendar.setType(CalendarType.WORKING_DAYS);
-            }
+            Calendar calendar = checkRequirements(calendarFilter);
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_STORE);
-            calendar.setPath(normalizePath(calendar.getPath()));
             CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
-
-            DBItemCalendar calendarDbItem = calendarDbLayer.getCalendar(calendar.getPath());
+            
+            DBItemCalendar calendarDbItem = null;
+            if (calendar.getId() != null) {
+                calendarDbItem = calendarDbLayer.getCalendar(calendar.getId());
+            } 
+            
             if ((calendarDbItem == null && !getPermissonsJocCockpit(accessToken).getCalendar().getEdit().isCreate()) || (calendarDbItem != null
                     && !getPermissonsJocCockpit(accessToken).getCalendar().getEdit().isChange())) {
                 return accessDeniedResponse();
@@ -77,7 +71,6 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             logAuditMessage(calendarAudit);
             
             boolean calendarHasChanged = true;
-            //FrequencyResolver fr = new FrequencyResolver();
             Dates newDates = null;
             Dates oldDates = null;
             if (calendarDbItem != null) {
@@ -93,8 +86,15 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                     calendarHasChanged = false;
                 } 
             }
+            
+            if (calendarDbItem == null) {
+                DBItemCalendar oldCalendarDbItem = calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath());
+                if (oldCalendarDbItem != null) {
+                    throw new JocObjectAlreadyExistException(calendar.getPath());
+                }
+            }
 
-            Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(calendarDbItem, calendar);
+            Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
             storeAuditLogEntry(calendarAudit);
             
             List<Err419> listOfErrors = new ArrayList<Err419>();
@@ -122,12 +122,48 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             Globals.disconnect(connection);
         }
     }
+    
+    @Override
+    public JOCDefaultResponse postSaveAsCalendar(String accessToken, CalendarObjectFilter calendarFilter) throws Exception {
+        SOSHibernateSession connection = null;
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_SAVE_AS, calendarFilter, accessToken, calendarFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getCalendar().getEdit().isCreate());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
+            Calendar calendar = checkRequirements(calendarFilter);
+
+            connection = Globals.createSosHibernateStatelessConnection(API_CALL_SAVE_AS);
+            CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
+
+            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog());
+            logAuditMessage(calendarAudit);
+
+            DBItemCalendar oldCalendarDbItem = calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath());
+            if (oldCalendarDbItem != null) {
+                throw new JocObjectAlreadyExistException(calendar.getPath());
+            }
+
+            Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), null, calendar);
+            storeAuditLogEntry(calendarAudit);
+
+            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
+        }
+    }
 
     @Override
     public JOCDefaultResponse postRenameCalendar(String accessToken, CalendarRenameFilter calendarFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL_MOVE, calendarFilter, accessToken, "", getPermissonsJocCockpit(accessToken)
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_MOVE, calendarFilter, accessToken, calendarFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
                     .getCalendar().getEdit().isChange());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -142,7 +178,14 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 
             ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, calendarPath, calendarFilter.getAuditLog());
             logAuditMessage(calendarAudit);
-            Date surveyDate = new CalendarsDBLayer(connection).renameCalendar(calendarPath, calendarNewPath);
+            
+            CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+            
+            DBItemCalendar calendarNewDbItem = dbLayer.getCalendar(dbItemInventoryInstance.getId(), calendarNewPath);
+            if (calendarNewDbItem != null) {
+                throw new JocObjectAlreadyExistException(calendarNewPath);
+            }
+            Date surveyDate = new CalendarsDBLayer(connection).renameCalendar(dbItemInventoryInstance.getId(), calendarPath, calendarNewPath);
             storeAuditLogEntry(calendarAudit);
 
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
@@ -154,6 +197,36 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
         } finally {
             Globals.disconnect(connection);
         }
+    }
+    
+    private Calendar checkRequirements(CalendarObjectFilter calendarFilter) throws JocMissingCommentException, JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
+        checkRequiredComment(calendarFilter.getAuditLog());
+        Calendar calendar = calendarFilter.getCalendar();
+        if (calendar == null) {
+            throw new JocMissingRequiredParameterException("undefined 'calendar'");
+        }
+        
+        checkRequiredParameter("calendar path", calendar.getPath());
+        
+        if (calendar.getTo() == null || calendar.getTo().isEmpty()) {
+            throw new JobSchedulerInvalidResponseDataException("calendar field 'to' is undefined");
+        } else if (!calendar.getTo().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+            throw new JobSchedulerInvalidResponseDataException("calendar field 'to' must have the format YYYY-MM-DD.");
+        }
+        
+        if (calendar.getFrom() == null || calendar.getFrom().isEmpty()) {
+            //throw new JobSchedulerInvalidResponseDataException("calendar field 'from' is undefined");
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            calendar.setFrom(df.format(Date.from(Instant.now())));
+        } else if (!calendar.getFrom().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+            throw new JobSchedulerInvalidResponseDataException("calendar field 'from' must have the format YYYY-MM-DD.");
+        }
+        
+        if (calendar.getType() == null || calendar.getType().name().isEmpty()) {
+            calendar.setType(CalendarType.WORKING_DAYS);
+        }
+        calendar.setPath(normalizePath(calendar.getPath()));
+        return calendar;
     }
 
 }

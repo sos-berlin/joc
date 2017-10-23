@@ -1,5 +1,6 @@
 package com.sos.joc.classes.configuration;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -42,7 +43,10 @@ public class JSObjectConfiguration {
         String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(orderCommand, jocResourceImpl.getAccessToken());
         try {
-            Node orderNode = modifyOrderRuntimeNode(jocXmlCommand.getSosxml(), new SOSXMLXPath(new StringBuffer(newRunTime)));
+            Node orderNode = jocXmlCommand.getSosxml().selectSingleNode("//source/order");
+            if (newRunTime != null && !newRunTime.trim().isEmpty()) {
+                orderNode = modifyOrderRuntimeNode(jocXmlCommand.getSosxml(), cleanEmptyCalendarDates(new SOSXMLXPath(new StringBuffer(newRunTime))));
+            }
             return jocXmlCommand.getXmlString(orderNode);
         } catch (JocException e) {
             throw e;
@@ -51,11 +55,11 @@ public class JSObjectConfiguration {
         }
     }
 
-    public Node modifyOrderRuntimeNode(SOSXMLXPath oldRunTime, SOSXMLXPath newRunTime) throws JocException {
+    public Node modifyOrderRuntimeNode(SOSXMLXPath oldRunTime, Element newRunTimeElem) throws JocException {
         try {
             Node orderNode = oldRunTime.selectSingleNode("//source/order");
             Node runTime = oldRunTime.selectSingleNode(orderNode, "run_time");
-            Node newRunTimeNode = orderNode.getOwnerDocument().adoptNode(newRunTime.getRoot());
+            Node newRunTimeNode = orderNode.getOwnerDocument().adoptNode(newRunTimeElem);
             Node textNode = null;
             if (runTime != null) {
                 orderNode.replaceChild(newRunTimeNode, runTime);
@@ -109,7 +113,10 @@ public class JSObjectConfiguration {
         String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(jobCommand, jocResourceImpl.getAccessToken());
         try {
-            Node jobNode = modifyJobRuntimeNode(jocXmlCommand.getSosxml(), new SOSXMLXPath(new StringBuffer(newRunTime)));
+            Node jobNode = jocXmlCommand.getSosxml().selectSingleNode("//source/job");
+            if (newRunTime != null && !newRunTime.trim().isEmpty()) {
+                jobNode = modifyJobRuntimeNode(jocXmlCommand.getSosxml(), cleanEmptyCalendarDates(new SOSXMLXPath(new StringBuffer(newRunTime))));
+            }
             return jocXmlCommand.getXmlString(jobNode);
         } catch (JocException e) {
             throw e;
@@ -118,11 +125,11 @@ public class JSObjectConfiguration {
         }
     }
 
-    private Node modifyJobRuntimeNode(SOSXMLXPath oldRunTime, SOSXMLXPath newRunTime) throws JocException {
+    private Node modifyJobRuntimeNode(SOSXMLXPath oldRunTime, Element newRunTimeElem) throws JocException {
         try {
             Node jobNode = oldRunTime.selectSingleNode("//source/job");
             Node runTime = oldRunTime.selectSingleNode(jobNode, "run_time");
-            Node newRunTimeNode = jobNode.getOwnerDocument().adoptNode(newRunTime.getRoot());
+            Node newRunTimeNode = jobNode.getOwnerDocument().adoptNode(newRunTimeElem);
             Node textNode = null;
             if (runTime != null) {
                 jobNode.replaceChild(newRunTimeNode, runTime);
@@ -140,7 +147,7 @@ public class JSObjectConfiguration {
                     if (jobNode.hasChildNodes() && jobNode.getFirstChild().getNodeType() == Node.TEXT_NODE) {
                         textNode = jobNode.getFirstChild().cloneNode(false);
                     } else {
-                        textNode = jobNode.getOwnerDocument().createTextNode("    ");
+                        textNode = jobNode.getOwnerDocument().createTextNode("\n    ");
                     }
                     jobNode.appendChild(textNode);
                     jobNode.appendChild(newRunTimeNode);
@@ -152,6 +159,19 @@ public class JSObjectConfiguration {
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(e);
         }
+    }
+    
+    private Element cleanEmptyCalendarDates(SOSXMLXPath runTime) throws Exception {
+        Element runTimeElement = runTime.getRoot();
+        NodeList emptyDates = runTime.selectNodeList("date[not(period)]");
+        for (int i=0; i < emptyDates.getLength(); i++) {
+            Node textNode = emptyDates.item(i).getPreviousSibling();
+            if (textNode != null && textNode.getNodeType() == Node.TEXT_NODE) {
+                runTimeElement.removeChild(textNode);
+            }
+            runTimeElement.removeChild(emptyDates.item(i));
+        }
+        return runTimeElement;
     }
 
 }

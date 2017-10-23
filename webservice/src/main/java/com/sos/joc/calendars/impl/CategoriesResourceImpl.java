@@ -13,6 +13,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Categories;
+import com.sos.joc.model.common.JobSchedulerId;
 
 @Path("calendars")
 public class CategoriesResourceImpl extends JOCResourceImpl implements ICategoriesResource {
@@ -20,17 +21,17 @@ public class CategoriesResourceImpl extends JOCResourceImpl implements ICategori
     private static final String API_CALL = "./calendars/categories";
 
     @Override
-    public JOCDefaultResponse postCategories(String accessToken) throws Exception {
+    public JOCDefaultResponse postCategories(String accessToken, JobSchedulerId jobschedulerId) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "", getPermissonsJocCockpit(
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, jobschedulerId.getJobschedulerId(), getPermissonsJocCockpit(
                     accessToken).getCalendar().isView());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Categories entity = new Categories();
-            entity.setCategories(new CalendarsDBLayer(connection).getCategories());
+            entity.setCategories(new CalendarsDBLayer(connection).getCategories(dbItemInventoryInstance.getId()));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
@@ -42,5 +43,5 @@ public class CategoriesResourceImpl extends JOCResourceImpl implements ICategori
             Globals.disconnect(connection);
         }
     }
-    
+
 }

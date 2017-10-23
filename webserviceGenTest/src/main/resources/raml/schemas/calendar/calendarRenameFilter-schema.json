@@ -5,10 +5,14 @@
   "javaType": "com.sos.joc.model.calendar.CalendarRenameFilter",
   "type": "object",
   "required": [
+    "jobschedulerId",
     "calendar",
     "newCalendar"
   ],
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "path": {
       "type": "string"
     },
