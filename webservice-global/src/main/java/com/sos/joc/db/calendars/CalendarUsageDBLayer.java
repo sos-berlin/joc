@@ -191,6 +191,31 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
     
+    public List<String> getWorkingDaysCalendarUsagesOfAnObject(Long instanceId, String objectType, String path)
+            throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select icu.configuration from ").append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu, ");
+            sql.append(DBITEM_CALENDARS).append(" ic ");
+            sql.append(" where ic.id = icu.calendarId");
+            sql.append(" and ic.type = 'WORKING_DAYS'");
+            sql.append(" and icu.instanceId = :instanceId");
+            sql.append(" and icu.objectType = :objectType");
+            sql.append(" and icu.path = :path");
+            sql.append(" and icu.configuration is not null");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("objectType", objectType);
+            query.setParameter("path", path);
+            return getSession().getResultList(query);
+
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
     public List<DBItemInventoryCalendarUsage> getCalendarUsages(Long calendarId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             CalendarUsageFilter filter = new CalendarUsageFilter();
