@@ -24,6 +24,12 @@
     "runTimeIsTemporary": {
       "type": "boolean",
       "default": false
+    },
+    "calendars": {
+      "type": "array",
+      "items": {
+        "$ref": "../calendar/calendar-schema.json"
+      }
     }
   }
 }

@@ -341,8 +341,8 @@ public class CalendarsDBLayer extends DBLayer {
             sql.append("from ").append(DBITEM_CALENDARS).append(" c, ");
             sql.append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu ");
             sql.append("where c.id = icu.calendarId ");
-            sql.append("and c.instanceId = :instanceId");
-            sql.append("and icu.objectType = :objectType");
+            sql.append("and c.instanceId = :instanceId ");
+            sql.append("and icu.objectType = :objectType ");
             sql.append("and icu.path = :path");
             Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
