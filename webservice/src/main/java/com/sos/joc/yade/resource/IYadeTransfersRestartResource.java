@@ -13,6 +13,6 @@ public interface IYadeTransfersRestartResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postYadeTransfersRestart(@HeaderParam("access_token") String accessToken, ModifyTransfers filterBody)
+    public JOCDefaultResponse postYadeTransfersRestart(@HeaderParam("X-Access-Token") String accessToken, ModifyTransfers filterBody)
             throws Exception;
 }
