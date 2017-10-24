@@ -13,7 +13,7 @@ import com.sos.joc.Globals;
 
 public class CalendarUsagesAndInstance {
 
-    private Set<DBItemInventoryCalendarUsage> calendarUsages = null;
+    private Set<CalendarUsagesWithPath> calendarUsages = null;
     private DBItemInventoryInstance instance = null;
     private List<String> dates = new ArrayList<String>();
     private Map<String, Exception> exceptions = new HashMap<String, Exception>();
@@ -22,13 +22,21 @@ public class CalendarUsagesAndInstance {
         this.instance = setMappedUrl(instance);
     }
 
-    public Set<DBItemInventoryCalendarUsage> getCalendarUsages() {
+    public CalendarUsagesAndInstance(DBItemInventoryInstance instance, boolean withUrlMapping) {
+        if (withUrlMapping) {
+            this.instance = setMappedUrl(instance);
+        } else {
+            this.instance = instance;
+        }
+    }
+
+    public Set<CalendarUsagesWithPath> getCalendarUsages() {
         return calendarUsages;
     }
 
-    public void setCalendarUsages(List<DBItemInventoryCalendarUsage> calendarUsages) {
+    public void setCalendarUsages(List<CalendarUsagesWithPath> calendarUsages) {
         if (calendarUsages != null && !calendarUsages.isEmpty()) {
-            this.calendarUsages = new HashSet<DBItemInventoryCalendarUsage>(calendarUsages);
+            this.calendarUsages = new HashSet<CalendarUsagesWithPath>(calendarUsages);
         }
     }
 
@@ -46,11 +54,11 @@ public class CalendarUsagesAndInstance {
 
     public void setAllEdited(Exception e) {
         if (this.calendarUsages != null) {
-            for (DBItemInventoryCalendarUsage item : this.calendarUsages) {
-                if (!item.getEdited()) {
-                    item.setEdited(true);
+            for (CalendarUsagesWithPath item : this.calendarUsages) {
+                if (!item.getdBItemInventoryCalendarUsage().getEdited()) {
+                    item.getdBItemInventoryCalendarUsage().setEdited(true);
                 }
-                String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getObjectType(), item.getPath(), instance.getHostname(), instance.getPort());
+                String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getdBItemInventoryCalendarUsage().getObjectType(), item.getdBItemInventoryCalendarUsage().getPath(), instance.getHostname(), instance.getPort());
                 exceptions.put(key, e);
             }
         }

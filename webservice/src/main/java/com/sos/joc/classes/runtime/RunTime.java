@@ -4,11 +4,7 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -22,13 +18,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemCalendar;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCXmlCommand;
-import com.sos.joc.db.calendars.CalendarUsageDBLayer;
-import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.common.RunTime200;
 
 public class RunTime {

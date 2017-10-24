@@ -83,7 +83,7 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
                 ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarId, calendarPath, auditParams);
                 logAuditMessage(calendarAudit);
                 calendarDbLayer.deleteCalendar(calendarDbItem);
-                Map<String, Exception> exceptions = CalendarInRuntimes.delete(calendarId, calendarDbLayer.getSession(), accessToken);
+                Map<String, Exception> exceptions = CalendarInRuntimes.delete(dbItemInventoryInstance, calendarId, calendarDbLayer.getSession(), accessToken);
 
                 for (Entry<String, Exception> exception : exceptions.entrySet()) {
                     if (exception.getValue() instanceof JocException) {
