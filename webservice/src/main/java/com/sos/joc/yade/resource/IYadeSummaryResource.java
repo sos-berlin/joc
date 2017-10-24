@@ -13,7 +13,7 @@ public interface IYadeSummaryResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postYadeSummary(@HeaderParam("access_token") String accessToken, TransferFilter filterBody)
+    public JOCDefaultResponse postYadeSummary(@HeaderParam("X-Access-Token") String accessToken, TransferFilter filterBody)
             throws Exception;
 
 }

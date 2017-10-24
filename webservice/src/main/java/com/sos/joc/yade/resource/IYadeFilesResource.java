@@ -13,6 +13,6 @@ public interface IYadeFilesResource {
 
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postYadeFiles(@HeaderParam("access_token") String accessToken, FilesFilter filterBody)
+    public JOCDefaultResponse postYadeFiles(@HeaderParam("X-Access-Token") String accessToken, FilesFilter filterBody)
             throws Exception;
 }
