@@ -159,7 +159,9 @@ public class TreePermanent {
 						} else {
 							Path parent = Paths.get(normalizedFolder);
 							for (String result : results) {
-								folders.add("/" + Paths.get(result).subpath(0, parent.getNameCount() + 1).toString().replace('\\', '/'));
+							    Path r = Paths.get(result);
+							    int endIndex = Math.min(r.getNameCount(), parent.getNameCount() + 1);
+								folders.add("/" + r.subpath(0, endIndex).toString().replace('\\', '/'));
 							}
 						}
 					}

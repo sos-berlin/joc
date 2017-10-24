@@ -93,6 +93,7 @@ public class InventoryFilesDBLayer extends DBLayer {
                     sql.append(" and fileType in (:fileType)");
                 }
             }
+            sql.append(" group by fileDirectory");
             Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {

@@ -1,5 +1,8 @@
 package com.sos.joc.jobchain.impl;
 
+import java.time.Instant;
+import java.util.Date;
+
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -36,8 +39,9 @@ public class JobChainResourceConfigurationImpl extends JOCResourceImpl implement
             if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
                 boolean responseInHtml = jobChainBody.getMime() == ConfigurationMime.HTML;
                 String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainBody.getJobChain()), "source", 0, 0);
-                entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobChainCommand, "/spooler/answer/job_chain", "job_chain",
-                        responseInHtml, accessToken);
+                entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobChainCommand, "/spooler/answer/job_chain",
+                        "job_chain", responseInHtml, accessToken));
+                entity.setDeliveryDate(Date.from(Instant.now()));
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {

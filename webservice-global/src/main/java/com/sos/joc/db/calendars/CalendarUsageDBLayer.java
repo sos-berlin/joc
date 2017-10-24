@@ -131,20 +131,20 @@ public class CalendarUsageDBLayer extends DBLayer {
         try {
             if (calendarUsages != null) {
                 for (CalendarUsagesWithPath calendarUsage : calendarUsages) {
+                    DBItemInventoryCalendarUsage item = calendarUsage.getdBItemInventoryCalendarUsage();
                     if (update) {
-                        if (calendarUsage.getdBItemInventoryCalendarUsage().getEdited() == null) {
-                            getSession().delete(calendarUsage);
+                        if (item.getEdited() == null) {
+                            getSession().delete(item);
                         } else {
-                            calendarUsage.getdBItemInventoryCalendarUsage().setModified(new Date());
-                            getSession().update(calendarUsage);
+                            item.setModified(new Date());
+                            getSession().update(item);
                         }
                     } else {
-                        if (calendarUsage.getdBItemInventoryCalendarUsage().getEdited() != null && calendarUsage.getdBItemInventoryCalendarUsage()
-                                .getEdited()) {
-                            calendarUsage.getdBItemInventoryCalendarUsage().setModified(new Date());
-                            getSession().update(calendarUsage);
+                        if (item.getEdited() != null && item.getEdited()) {
+                            item.setModified(new Date());
+                            getSession().update(item);
                         } else {
-                            getSession().delete(calendarUsage);
+                            getSession().delete(item);
                         }
                     }
                 }

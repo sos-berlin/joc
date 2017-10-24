@@ -2,8 +2,6 @@ package com.sos.joc.classes.configuration;
 
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.time.Instant;
-import java.util.Date;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -20,7 +18,6 @@ import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Configuration;
-import com.sos.joc.model.common.Configuration200;
 import com.sos.joc.model.common.ConfigurationContent;
 import com.sos.joc.model.common.JobSchedulerObjectType;
 
@@ -28,7 +25,7 @@ import sos.xml.SOSXMLTransformer;
 
 public class ConfigurationUtils {
 
-    public static Configuration200 getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
+    public static Configuration getConfigurationSchema(JOCXmlCommand jocXmlCommand, String postCommand, String xPathObjElement, String objName,
             boolean responseInHtml, String accessToken) throws JocException {
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
         try {
@@ -44,10 +41,7 @@ public class ConfigurationUtils {
             ConfigurationContent content = getContent(responseInHtml, getSourceXmlString(jocXmlCommand.getSosxml().selectSingleNode(objElem, "source/"
                     + objName)));
             configuration.setContent(content);
-            Configuration200 entity = new Configuration200();
-            entity.setConfiguration(configuration);
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return entity;
+            return configuration;
         } catch (JocException e) {
             throw e;
         } catch (Exception e) {
@@ -55,7 +49,7 @@ public class ConfigurationUtils {
         }
     }
 
-    public static Configuration200 getConfigurationSchemaOfDefaultProcessClass(JOCXmlCommand jocXmlCommand, String postCommand,
+    public static Configuration getConfigurationSchemaOfDefaultProcessClass(JOCXmlCommand jocXmlCommand, String postCommand,
             String xPathObjElement, boolean responseInHtml, String accessToken) throws JocException {
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(postCommand, accessToken);
         try {
@@ -67,10 +61,7 @@ public class ConfigurationUtils {
             configuration.setType(JobSchedulerObjectType.PROCESSCLASS);
             ConfigurationContent content = getContent(responseInHtml, "<process_class max_processes=\"" + objElem.getAttribute("max_processes") + "\"/>");
             configuration.setContent(content);
-            Configuration200 entity = new Configuration200();
-            entity.setConfiguration(configuration);
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return entity;
+            return configuration;
         } catch (Exception e) {
             throw new JobSchedulerBadRequestException(e);
         }

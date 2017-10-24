@@ -313,8 +313,9 @@ public class CalendarsDBLayer extends DBLayer {
                 sql.append(" and type in (:type)");
             }
             if (folderName != null && !folderName.isEmpty() && !folderName.equals("/")) {
-                sql.append(" and directory = :folderName or directory like :likeFolderName");
+                sql.append(" and ( directory = :folderName or directory like :likeFolderName )");
             }
+            sql.append(" group by directory");
             Query<String> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
             if (types.size() == 1) {

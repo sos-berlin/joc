@@ -1,5 +1,8 @@
 package com.sos.joc.classes.configuration;
 
+import java.time.Instant;
+import java.util.Date;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -26,7 +29,8 @@ public class JSObjectConfiguration {
         Configuration200 entity = new Configuration200();
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
         String orderCommand = jocXmlCommand.getShowOrderCommand(jocResourceImpl.normalizePath(jobChain), orderId, "source");
-        entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order", responseInHtml, accessToken);
+        entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, orderCommand, "/spooler/answer/order", "order", responseInHtml, accessToken));
+        entity.setDeliveryDate(Date.from(Instant.now()));
         return entity;
     }
 
@@ -34,7 +38,8 @@ public class JSObjectConfiguration {
         Configuration200 entity = new Configuration200();
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jocResourceImpl);
         String jobCommand = jocXmlCommand.getShowJobCommand(jocResourceImpl.normalizePath(job), "source", 0, 0);
-        entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml, accessToken);
+        entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobCommand, "/spooler/answer/job", "job", responseInHtml, accessToken));
+        entity.setDeliveryDate(Date.from(Instant.now()));
         return entity;
     }
 

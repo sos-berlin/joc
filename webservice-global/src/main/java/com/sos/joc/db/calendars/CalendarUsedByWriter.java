@@ -95,10 +95,14 @@ public class CalendarUsedByWriter {
                         if (calendar != null) {
                             calendarUsageDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendars.get(calendarPath))); 
                         }
-                        if (!dbCalendarUsage.remove(calendarUsageDbItem)) {
-                            calendarUsageDBLayer.saveCalendarUsage(calendarUsageDbItem);
+                        int index = dbCalendarUsage.indexOf(calendarUsageDbItem);
+                        if (index == -1) {
+                            calendarUsageDBLayer.saveCalendarUsage(calendarUsageDbItem); 
                         } else {
-                            calendarUsageDBLayer.updateCalendarUsage(calendarUsageDbItem);
+                            DBItemInventoryCalendarUsage dbItem = dbCalendarUsage.remove(index);
+                            dbItem.setEdited(false);
+                            dbItem.setConfiguration(calendarUsageDbItem.getConfiguration());
+                            calendarUsageDBLayer.updateCalendarUsage(dbItem);
                         }
                     }
                 }

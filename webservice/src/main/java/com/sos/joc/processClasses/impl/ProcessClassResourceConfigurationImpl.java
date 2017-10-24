@@ -1,5 +1,8 @@
 package com.sos.joc.processClasses.impl;
 
+import java.time.Instant;
+import java.util.Date;
+
 import javax.ws.rs.Path;
 
 import com.sos.joc.classes.JOCDefaultResponse;
@@ -42,12 +45,14 @@ public class ProcessClassResourceConfigurationImpl extends JOCResourceImpl imple
                 String command = jocXmlCommand.getShowStateCommand("folder process_class", "folders no_subfolders source", processClassParent);
                 if ("/(default)".equals(processClassPath)) {
                     String xPath = "/spooler/answer//process_classes/process_class[@path='']";
-                    entity = ConfigurationUtils.getConfigurationSchemaOfDefaultProcessClass(jocXmlCommand, command, xPath, responseInHtml,
-                            accessToken);
+                    entity.setConfiguration(ConfigurationUtils.getConfigurationSchemaOfDefaultProcessClass(jocXmlCommand, command, xPath,
+                            responseInHtml, accessToken));
                 } else {
                     String xPath = String.format("/spooler/answer//process_classes/process_class[@path='%s']", processClassPath);
-                    entity = ConfigurationUtils.getConfigurationSchema(jocXmlCommand, command, xPath, "process_class", responseInHtml, accessToken);
+                    entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, command, xPath, "process_class", responseInHtml,
+                            accessToken));
                 }
+                entity.setDeliveryDate(Date.from(Instant.now()));
             }
             return JOCDefaultResponse.responseStatus200(entity);
         } catch (JocException e) {
