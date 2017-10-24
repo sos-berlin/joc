@@ -41,13 +41,13 @@ public class BulkError extends Err419 {
     
     public Err419 get(JocException e, JocError jocError, ModifyOrder order) {
         setCodeAndMessage(e, jocError);
-        setPath(order);
+        setPath(order.getJobChain(), order.getOrderId());
         return this;
     }
     
     public Err419 get(Throwable e, JocError jocError, ModifyOrder order) {
         setCodeAndMessage(e, jocError);
-        setPath(order);
+        setPath(order.getJobChain(), order.getOrderId());
         return this;
     }
     
@@ -138,10 +138,10 @@ public class BulkError extends Err419 {
         AUDIT_LOGGER.error(errorMsg);
     }
     
-    private void setPath(ModifyOrder order) {
-        StringBuilder path = new StringBuilder().append(order.getJobChain());
-        if (order.getOrderId() != null) {
-            path.append(",").append(order.getOrderId());
+    private void setPath(String jobChain, String orderId) {
+        StringBuilder path = new StringBuilder().append(jobChain);
+        if (orderId != null) {
+            path.append(",").append(orderId);
         }
         setPath(path.toString());
     }

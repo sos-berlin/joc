@@ -126,7 +126,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     public JOCDefaultResponse postOrdersSetRunTime(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(), modifyOrders);
+            return postOrdersCommand(accessToken, "set_run_time", getPermissonsJocCockpit(accessToken).getOrder().getChange().isRunTime(),
+                    modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -142,7 +143,8 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     public JOCDefaultResponse postOrdersRemoveSetBack(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isRemoveSetback(), modifyOrders);
+            return postOrdersCommand(accessToken, "remove_setback", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isRemoveSetback(),
+                    modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
@@ -216,18 +218,24 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 break;
             case "set_run_time":
                 try {
-                        JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
-                        String configuration = jocConfiguration.modifyOrderRuntime(order.getRunTime(), this, jobChainPath, order.getOrderId());
-                        
-                        ValidateXML.validateAgainstJobSchedulerSchema(configuration);
-                        XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                        Element orderElement = XMLBuilder.parse(configuration);
-                        orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
-                        orderElement.addAttribute("id", order.getOrderId());
+                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
+                    String configuration = jocConfiguration.modifyOrderRuntime(order.getRunTime(), this, jobChainPath, order.getOrderId());
 
-                        xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
-                        jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
-                        setCalendarUsedBy(jobChainPath, order.getOrderId(), order.getRunTime());
+                    ValidateXML.validateAgainstJobSchedulerSchema(configuration);
+                    XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+                    Element orderElement = XMLBuilder.parse(configuration);
+                    orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
+                    orderElement.addAttribute("id", order.getOrderId());
+
+                    xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                    jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
+
+                    if (session == null) {
+                        session = Globals.createSosHibernateStatelessConnection(API_CALL);
+                    }
+                    CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), "ORDER",
+                            jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
+                    calendarUsedByWriter.updateUsedBy();
 
                 } catch (JocException e) {
                     throw e;
@@ -250,8 +258,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
         return null;
     }
 
-    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders) throws JocException {
-        Date surveyDate = Date.from(Instant.now());;
+    private JOCDefaultResponse postOrdersCommand(String accessToken, String command, boolean permission, ModifyOrders modifyOrders)
+            throws JocException {
+        Date surveyDate = Date.from(Instant.now());
+        ;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyOrders, accessToken, modifyOrders.getJobschedulerId(), permission);
             if (jocDefaultResponse != null) {
@@ -292,14 +302,6 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             return true;
         }
         return false;
-    }
-
-    private void setCalendarUsedBy(String jobChainPath, String orderId, String command) throws Exception {
-        if (session == null) {
-            session = Globals.createSosHibernateStatelessConnection(API_CALL);
-        }
-        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(this.session, this.dbItemInventoryInstance.getId(), "ORDER", jobChainPath + "," + orderId, command);
-        calendarUsedByWriter.updateUsedBy();
     }
 
 }

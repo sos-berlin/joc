@@ -63,6 +63,19 @@ public class CalendarUsageDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public void updateCalendarUsage(DBItemInventoryCalendarUsage calendarUsageDbItem) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            if (calendarUsageDbItem != null) {
+                calendarUsageDbItem.setModified(new Date());
+                getSession().update(calendarUsageDbItem);
+            }
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
 
     private void bindParameters(CalendarUsageFilter filter) {
         if (filter.getCalendarId() != null) {

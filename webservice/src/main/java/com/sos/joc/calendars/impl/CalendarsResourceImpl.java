@@ -44,7 +44,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
             List<DBItemCalendar> dbCalendars = null;
-            
+
             if (calendarsFilter.getCalendars() != null && !calendarsFilter.getCalendars().isEmpty()) {
                 calendarsFilter.setRegex(null);
                 dbCalendars = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getId(), new HashSet<String>(calendarsFilter.getCalendars()));

@@ -88,12 +88,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         }
     }
 
-
     @Override
     public JOCDefaultResponse postJobsEndAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
         return postJobsEndAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
     }
-
 
     public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
@@ -111,7 +109,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
         return postJobsSuspendAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
     }
 
-
     public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
             return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(accessToken).getJob().getExecute().isSuspendAllTasks(), modifyJobs);
@@ -127,7 +124,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
     public JOCDefaultResponse postJobsContinueAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
         return postJobsContinueAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
     }
-
 
     public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
         try {
@@ -157,8 +153,7 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             switch (command) {
             case SET_RUN_TIME:
                 try {
-                    
-                    
+
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
                     String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTime(), this, jobPath);
 
@@ -169,7 +164,15 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
                     String commandAsXml = xmlBuilder.asXML();
                     jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
-                    setCalendarUsedBy(jobPath,modifyJob.getRunTime());
+                    
+                    SOSHibernateSession session = Globals.createSosHibernateStatelessConnection(API_CALL + SET_RUN_TIME);
+                    try {
+                        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), "JOB", jobPath,
+                                modifyJob.getRunTime(), modifyJob.getCalendars());
+                        calendarUsedByWriter.updateUsedBy();
+                    } finally {
+                        Globals.disconnect(session);
+                    }
 
                     storeAuditLogEntry(jobAudit);
                 } catch (JocException e) {
@@ -213,14 +216,6 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
             return JOCDefaultResponse.responseStatus419(listOfErrors);
         }
         return JOCDefaultResponse.responseStatusJSOk(surveyDate);
-    }
-
-
-    private void setCalendarUsedBy(String jobPath, String command) throws Exception {
-        SOSHibernateSession session = Globals.createSosHibernateStatelessConnection(API_CALL);
-        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, this.dbItemInventoryInstance.getId(), "JOB" ,jobPath, command);
-        calendarUsedByWriter.updateUsedBy();
-        Globals.disconnect(session);
     }
 
 }

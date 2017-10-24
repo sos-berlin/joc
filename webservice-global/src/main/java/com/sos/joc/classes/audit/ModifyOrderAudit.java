@@ -43,7 +43,7 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
             setJobschedulerId(modifyOrders.getJobschedulerId());
         }
     }
-
+    
     private void setAuditParams(AuditParams auditParams) {
         if (auditParams != null) {
             this.comment = auditParams.getComment();

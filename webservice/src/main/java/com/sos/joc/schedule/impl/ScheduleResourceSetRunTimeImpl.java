@@ -20,7 +20,6 @@ import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyScheduleAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.schedule.ModifyRunTime;
 import com.sos.joc.schedule.resource.IScheduleResourceSetRunTime;
@@ -37,9 +36,10 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
     }
 
     public JOCDefaultResponse postScheduleSetRuntime(String accessToken, ModifyRunTime modifyRuntime) throws Exception {
+        SOSHibernateSession session = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken, modifyRuntime.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getSchedule()
-                    .getChange().isEditContent());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyRuntime, accessToken, modifyRuntime.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getSchedule().getChange().isEditContent());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -51,7 +51,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
 
             String schedulePath = normalizePath(modifyRuntime.getSchedule());
             XMLBuilder command = new XMLBuilder("modify_hot_folder");
-                 
+
             Element scheduleElement = XMLBuilder.parse(modifyRuntime.getRunTime());
             scheduleElement.addAttribute("name", Paths.get(schedulePath).getFileName().toString());
             command.addAttribute("folder", getParent(schedulePath)).add(scheduleElement);
@@ -59,7 +59,11 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String commandAsXml = command.asXML();
             jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
-            setCalendarUsedBy(schedulePath,commandAsXml);
+            
+            session = Globals.createSosHibernateStatelessConnection(API_CALL);
+            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), "SCHEDULE", schedulePath,
+                    modifyRuntime.getRunTime(), modifyRuntime.getCalendars());
+            calendarUsedByWriter.updateUsedBy();
 
             storeAuditLogEntry(scheduleAudit);
 
@@ -71,18 +75,8 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
         } catch (Exception e) {
             AUDIT_LOGGER.error(e.getMessage());
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
-
-    private void setCalendarUsedBy(String schedulePath, String command) throws Exception {
-        SOSHibernateSession session = null;
-
-        try {
-            session = Globals.createSosHibernateStatelessConnection("postScheduleSetRuntime");
-            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, this.dbItemInventoryInstance.getId(), "SCHEDULE", schedulePath, command);
-            calendarUsedByWriter.updateUsedBy();
-        } catch (Exception e) {
-            throw new DBConnectionRefusedException(e);
+        } finally {
+            Globals.disconnect(session);
         }
     }
 
