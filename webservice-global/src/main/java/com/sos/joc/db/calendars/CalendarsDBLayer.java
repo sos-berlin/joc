@@ -339,10 +339,10 @@ public class CalendarsDBLayer extends DBLayer {
             DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBITEM_CALENDARS).append(" c, ");
+            sql.append("select c from ").append(DBITEM_CALENDARS).append(" c, ");
             sql.append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu ");
             sql.append("where c.id = icu.calendarId ");
-            sql.append("and c.instanceId = :instanceId ");
+            sql.append("and icu.instanceId = :instanceId ");
             sql.append("and icu.objectType = :objectType ");
             sql.append("and icu.path = :path");
             Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
