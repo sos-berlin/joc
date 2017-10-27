@@ -25,6 +25,7 @@
 		<!-- module>joc-vaadin-cockpit</module -->
     	<!--module>webserviceGenTest</module-->
         <!--module>sos-character-encoding-filter</module-->
-  </modules>
+        <module>patch-executor</module>
+	</modules>
 
 </project>

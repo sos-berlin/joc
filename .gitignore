@@ -23,3 +23,5 @@ webserviceGenTest/target/
 
 webservice-global/target/
 webserviceGenTest/bin
+
+patch-executor/target
