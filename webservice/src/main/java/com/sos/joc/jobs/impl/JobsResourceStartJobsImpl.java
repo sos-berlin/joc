@@ -12,6 +12,7 @@ import org.dom4j.Element;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.StartJobAudit;
 import com.sos.joc.exceptions.BulkError;
@@ -91,10 +92,15 @@ public class JobsResourceStartJobsImpl extends JOCResourceImpl implements IJobsR
 
             XMLBuilder xml = new XMLBuilder("start_job");
             xml.addAttribute("job", normalizePath(startJob.getJob())).addAttribute("force", "yes");
-            if (startJob.getAt() == null || "".equals(startJob.getAt())) {
+            if (startJob.getAt() == null || startJob.getAt().isEmpty()) {
                 xml.addAttribute("at", "now");
             } else {
-                xml.addAttribute("at", startJob.getAt());
+                if (startJob.getAt().contains("now")) {
+                    xml.addAttribute("at", startJob.getAt());
+                } else {
+                    xml.addAttribute("at", JobSchedulerDate.getAtInJobSchedulerTimezone(startJob.getAt(), startJob.getTimeZone(),
+                            dbItemInventoryInstance.getTimeZone()));
+                }
             }
             if (startJob.getParams() != null && !startJob.getParams().isEmpty()) {
                 Element params = XMLBuilder.create("params");

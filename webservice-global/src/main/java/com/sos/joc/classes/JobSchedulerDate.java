@@ -3,8 +3,11 @@ package com.sos.joc.classes;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,6 +18,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 
 
@@ -86,6 +90,18 @@ public class JobSchedulerDate {
         } catch (Exception e) {
             throw new JobSchedulerInvalidResponseDataException(e);
         }
+    }
+    
+    public static String getAtInJobSchedulerTimezone(String at, String userTimezone, String jobSchedulerTimezone) throws JobSchedulerBadRequestException {
+        at = at.trim();
+        if (at.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}")) {
+            at += ":00";
+        }
+        if (!at.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) {
+            throw new JobSchedulerBadRequestException(String.format("date format yyyy-MM-dd HH:mm:ss expected for \"Start time\": %1$s", at));
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return formatter.format(ZonedDateTime.of(LocalDateTime.parse(at, formatter), ZoneId.of(userTimezone)).withZoneSameInstant(ZoneId.of(jobSchedulerTimezone)));
     }
    
     private static Instant getInstantFromDateStr(String dateStr, boolean dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {

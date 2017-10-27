@@ -15,6 +15,7 @@ import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.configuration.JSObjectConfiguration;
@@ -174,10 +175,15 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", jobChainPath);
             switch (command) {
             case "start":
-                if (order.getAt() == null || "".equals(order.getAt())) {
+                if (order.getAt() == null || order.getAt().isEmpty()) {
                     xml.addAttribute("at", "now");
                 } else {
-                    xml.addAttribute("at", order.getAt());
+                    if (order.getAt().contains("now")) {
+                        xml.addAttribute("at", order.getAt());
+                    } else {
+                        xml.addAttribute("at", JobSchedulerDate.getAtInJobSchedulerTimezone(order.getAt(), order.getTimeZone(),
+                                dbItemInventoryInstance.getTimeZone()));
+                    }
                 }
                 if (order.getParams() != null && !order.getParams().isEmpty()) {
                     xml.add(getParams(order.getParams()));
