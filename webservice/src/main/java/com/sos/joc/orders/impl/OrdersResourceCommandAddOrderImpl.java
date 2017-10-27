@@ -12,6 +12,7 @@ import org.dom4j.Element;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.XMLBuilder;
 import com.sos.joc.classes.audit.ModifyOrderAudit;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
@@ -96,7 +97,12 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
                 xml.addAttribute("at", "now");
             }
             if (order.getAt() != null && !"".equals(order.getAt())) {
-                xml.addAttribute("at", order.getAt());
+                if (order.getAt().contains("now")) {
+                    xml.addAttribute("at", order.getAt());
+                } else {
+                    xml.addAttribute("at", JobSchedulerDate.getAtInJobSchedulerTimezone(order.getAt(), order.getTimeZone(), dbItemInventoryInstance
+                            .getTimeZone()));
+                }
             }
             if (order.getEndState() != null && !"".equals(order.getEndState())) {
                 xml.addAttribute("end_state", order.getEndState());
@@ -129,11 +135,11 @@ public class OrdersResourceCommandAddOrderImpl extends JOCResourceImpl implement
             }
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-            
+
             OrderPath200 orderPath = new OrderPath200();
             orderPath.setSurveyDate(jocXmlCommand.getSurveyDate());
             orderPath.setJobChain(order.getJobChain());
-            
+
             if (order.getOrderId() == null || order.getOrderId().isEmpty()) {
                 try {
                     String orderId = jocXmlCommand.getSosxml().selectSingleNodeValue("/spooler/answer/ok/order/@id");
