@@ -49,7 +49,7 @@ public class SOSSecurityConfigurationUserEntry {
     public String crypt(String s) {
         DefaultHashService hashService = new DefaultHashService();
 
-        if (sosSecurityHashSettings.isCrypt()) {
+        if (sosSecurityHashSettings.isCrypt() && s != null && !s.isEmpty()) {
             String alg = DEFAULT_PASSWORD_512_ALGORITHM_NAME;
             if (StringUtils.hasText(this.sosSecurityHashSettings.getHashingAlgorithm())) {
                 alg = this.sosSecurityHashSettings.getHashingAlgorithm();
@@ -94,6 +94,9 @@ public class SOSSecurityConfigurationUserEntry {
 
     public String getIniWriteString() {
         String s = securityConfigurationUser.getPassword();
+        if (s == null) {
+            s="";
+        }
         String oldUser = oldSection.get(securityConfigurationUser.getUser());
         String oldPwd = "";
         if (oldUser != null) {
