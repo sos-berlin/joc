@@ -253,7 +253,7 @@ public class Globals {
             if (stream != null) {
                 LOGGER.info("JOC Cockpit version = " + Json.createReader(stream).readObject().getString("version", "unknown"));
             } else {
-                LOGGER.warn(String.format("Cannot found %1$s in classpath", versionFile));
+                LOGGER.warn(String.format("Version file %1$s not found in classpath", versionFile));
             }
         } catch (Exception e) {
             LOGGER.warn(String.format("Error while reading %1$s from classpath: ", versionFile), e);
@@ -289,7 +289,7 @@ public class Globals {
         boolean defaultVerification = false;
         if (sosShiroProperties != null) {
             withHostnameVerification = sosShiroProperties.getProperty("https_with_hostname_verification", defaultVerification);
-            LOGGER.info("HTTPS with hostname verification in certicate = " + withHostnameVerification);
+            LOGGER.info("HTTPS with hostname verification in certificate = " + withHostnameVerification);
         }
     }
 
