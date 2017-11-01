@@ -109,25 +109,18 @@ public class JobSchedulerDate {
         Pattern dateTimePattern = Pattern.compile("(?:(-?\\d+)\\s*([smhdwMy])\\s*)");
         Matcher m = offsetPattern.matcher(dateStr);
         Calendar calendar = null;
-        ZonedDateTime zdt = null;
-        //ZoneId zoneId = null;
         TimeZone timeZ = null;
         boolean dateTimeIsRelative = false;
         try {
             if (timeZone != null && !timeZone.isEmpty()) {
-                //zoneId = ZoneId.of(timeZone);
                 timeZ = TimeZone.getTimeZone(timeZone);
             }
             if (m.find()) {
-//                if (zoneId == null) {
-//                    zoneId = (m.group(2) != null) ? ZoneOffset.of(m.group(2)) : ZoneOffset.UTC;
-//                }
                 if (timeZ == null) {
                     timeZ = (m.group(2) != null) ? TimeZone.getTimeZone("GMT"+m.group(2)) : TimeZone.getTimeZone(ZoneOffset.UTC);
                 }
                 dateStr = m.group(1);
             } else if (timeZ == null) {
-//                zoneId = ZoneOffset.UTC;
                 timeZ = TimeZone.getTimeZone(ZoneOffset.UTC);
             }
             m = dateTimePattern.matcher(dateStr.replaceAll("([smhdwMy])", "$1 "));
@@ -136,44 +129,57 @@ public class JobSchedulerDate {
                 if (calendar == null) {
                     Instant instant = Instant.now();
                     calendar = Calendar.getInstance();
+                    calendar.setTime(Date.from(instant));
+                    calendar.setTimeZone(timeZ);
                     if (Pattern.compile("[dwMy]").matcher(dateStr).find()) {
-                        calendar.setTime(Date.from(instant));
-                        calendar.setTimeZone(timeZ);
                         calendar.set(Calendar.HOUR_OF_DAY, 0);
                         calendar.set(Calendar.MINUTE, 0);
                         calendar.set(Calendar.SECOND, 0);
                         calendar.set(Calendar.MILLISECOND, 0);
-                        if (dateTo) {
-                            calendar.add(Calendar.DATE, 1);
-                        }
-                        zdt = ZonedDateTime.ofInstant(calendar.toInstant(), timeZ.toZoneId());
-                    } else {
-                        zdt = ZonedDateTime.ofInstant(instant, timeZ.toZoneId());
                     }
                 }
-                Long number = Long.valueOf(m.group(1));
+                Integer number = Integer.valueOf(m.group(1));
                 
                 switch (m.group(2)) {
                 case "s":
-                    zdt = zdt.plusSeconds(number);
+                    calendar.add(Calendar.SECOND, number);
                     break;
                 case "m":
-                    zdt = zdt.plusMinutes(number);
+                    calendar.add(Calendar.MINUTE, number);
                     break;
                 case "h":
-                    zdt = zdt.plusHours(number);
+                    calendar.add(Calendar.HOUR_OF_DAY, number);
                     break;
                 case "d":
-                    zdt = zdt.plusDays(number);
+                    if (dateTo) {
+                        calendar.add(Calendar.DATE, 1 + number);
+                    } else {
+                        calendar.add(Calendar.DATE, number);
+                    }
                     break;
                 case "w":
-                    zdt = zdt.plusWeeks(number);
+                    if (dateTo) {
+                        calendar.add(Calendar.WEEK_OF_YEAR, 1 + number);
+                    } else {
+                        calendar.add(Calendar.WEEK_OF_YEAR, number);
+                    }
+                    calendar.add(Calendar.DATE, Calendar.MONDAY - calendar.get(Calendar.DAY_OF_WEEK));
                     break;
                 case "M":
-                    zdt = zdt.plusMonths(number);
+                    if (dateTo) {
+                        calendar.add(Calendar.MONTH, 1 + number);
+                    } else {
+                        calendar.add(Calendar.MONTH, number);
+                    }
+                    calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DATE));
                     break;
                 case "y":
-                    zdt = zdt.plusYears(number);
+                    if (dateTo) {
+                        calendar.add(Calendar.YEAR, 1 + number);
+                    } else {
+                        calendar.add(Calendar.YEAR, number);
+                    }
+                    calendar.add(Calendar.DAY_OF_YEAR, 1 - calendar.get(Calendar.DAY_OF_YEAR));
                     break;
                 }
             }
@@ -181,10 +187,8 @@ public class JobSchedulerDate {
                 Instant instant = Instant.parse(dateStr+"Z");
                 int offset = timeZ.getOffset(instant.toEpochMilli());
                 return instant.plusMillis(-1*offset);
-//                zdt = ZonedDateTime.ofInstant(Instant.parse(dateStr+"Z"), timeZ.toZoneId());
-//                return Instant.ofEpochMilli(DatatypeConverter.parseDateTime(dateStr+zdt.getOffset().toString()).getTimeInMillis());
             } else {
-                return zdt.toInstant();
+                return calendar.toInstant();
             }
         } catch (Exception e) {
             throw new JobSchedulerInvalidResponseDataException(e);
