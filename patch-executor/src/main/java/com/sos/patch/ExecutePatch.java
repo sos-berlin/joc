@@ -14,6 +14,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Stream;
 
 
 public class ExecutePatch {
@@ -37,55 +44,87 @@ public class ExecutePatch {
         Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
         System.out.println("Path of the temp directory = " + tempDir);
         // copy joc.war to tempDir for further working on
-        Path copiedPath = Files.copy(webAppJocWarPath, tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
+        Path copiedPath = null;
         // archive only once if the original file not already exists in archive directory
         if (Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME))) {
+            copiedPath = Files.copy(archivePath.resolve(JOC_WAR_FILE_NAME), tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
             System.out.println("joc.war not archived, because an archive file already exists!");
         } else {
             Path copiedArchivePath = Files.copy(webAppJocWarPath, archivePath.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS); 
+            copiedPath = Files.copy(copiedArchivePath, tempDir.resolve(JOC_WAR_FILE_NAME), COPYOPTIONS);
             System.out.println("working file to update the web app = " + copiedArchivePath);
         }
 
         // Target
         FileSystem targetFileSystem = FileSystems.newFileSystem(copiedPath, null);
+        // sort the patches ascending
+        File patchesDirectory = new File(patchDir.toString());
+        String[] files = patchesDirectory.list();
 
-        // process a new zip-file-system for each zip-file in patches folder
-        Files.walkFileTree(patchDir, new FileVisitor<Path>() {
-
+        Comparator<String> fileNameComparator = new Comparator<String>() {
+            
             @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
             }
+        };
 
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                return FileVisitResult.CONTINUE;
+        Set<String> patchFiles = new TreeSet<String>(fileNameComparator);
+        
+        for(int i = 0; i < files.length; i++) {
+            File file = new File(files[i]);
+            if (!file.isDirectory() && files[i].endsWith(".zip")) {
+                patchFiles.add(files[i]);
             }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (file.getFileName().toString().endsWith(".zip")) {
-                    // Source
-                    FileSystem sourceFileSystem = FileSystems.newFileSystem(file, null);
-                    processPatchZipFile(sourceFileSystem, targetFileSystem);
-                }
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-        });
-        // close target file system after all patches are processed!
-        targetFileSystem.close();
-
-        // After everything from patches folder is processed, copy back from temp directory
-        Path copyBack = Files.copy(copiedPath, webAppJocWarPath, COPYOPTIONS);
-        if (copyBack != null && !copyBack.toString().isEmpty()) {
-            System.out.println(String.format("%1$s was updated successfully!", copyBack.getFileName().toString()));
         }
+        // process a new zip-file-system for each zip-file in patches folder
+        try {
+            for (String patchFile : patchFiles) {
+                System.out.println(patchFile);
+                FileSystem sourceFileSystem = FileSystems.newFileSystem(Paths.get(patchFile), null);
+                processPatchZipFile(sourceFileSystem, targetFileSystem);
+            }
+//            Files.walkFileTree(patchDir, new FileVisitor<Path>() {
+//
+//                @Override
+//                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+//                    return FileVisitResult.CONTINUE;
+//                }
+//
+//                @Override
+//                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+//                    return FileVisitResult.CONTINUE;
+//                }
+//
+//                @Override
+//                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+//                    if (file.getFileName().toString().endsWith(".zip")) {
+//                        // Source
+//                        FileSystem sourceFileSystem = FileSystems.newFileSystem(file, null);
+//                        processPatchZipFile(sourceFileSystem, targetFileSystem);
+//                    }
+//                    return FileVisitResult.CONTINUE;
+//                }
+//
+//                @Override
+//                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+//                    return FileVisitResult.CONTINUE;
+//                }
+//
+//            });
+            // After everything from patches folder is processed, copy back from temp directory
+            Path copyBack = Files.copy(copiedPath, webAppJocWarPath, COPYOPTIONS);
+            if (copyBack != null && !copyBack.toString().isEmpty()) {
+                System.out.println(String.format("%1$s was updated successfully!", copyBack.getFileName().toString()));
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        } finally {
+            // close target file system after all patches are processed!
+            targetFileSystem.close();
+        }
+
     }
     
     private static void processPatchZipFile (FileSystem sourceFileSystem, FileSystem targetFileSystem) throws IOException {
@@ -119,11 +158,16 @@ public class ExecutePatch {
                 if (Files.exists(targetFile)) {
                     alreadyExists = true;
                 }
-                Path p = Files.copy(file, targetFile, COPYOPTIONS);
-                if (alreadyExists) {
-                    System.out.println(String.format("file '%1$s updated in %2$s'", p.toString(), JOC_WAR_FILE_NAME));
-                } else {
-                    System.out.println(String.format("file '%1$s added to %2$s'", p.toString(), JOC_WAR_FILE_NAME));
+                try {
+                    Path p = Files.copy(file, targetFile, COPYOPTIONS);
+                    if (alreadyExists) {
+                        System.out.println(String.format("file '%1$s updated in %2$s'", p.toString(), JOC_WAR_FILE_NAME));
+                    } else {
+                        System.out.println(String.format("file '%1$s added to %2$s'", p.toString(), JOC_WAR_FILE_NAME));
+                    }
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                    return FileVisitResult.TERMINATE;
                 }
                 return FileVisitResult.CONTINUE;
             }
