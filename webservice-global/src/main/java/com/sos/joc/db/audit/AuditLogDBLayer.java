@@ -33,7 +33,7 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and created >= :from");
             }
             if (to != null) {
-                sql.append(" and created <= :to");
+                sql.append(" and created < :to");
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
@@ -104,7 +104,7 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and created >= :from");
             }
             if (to != null) {
-                sql.append(" and created <= :to");
+                sql.append(" and created < :to");
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
@@ -168,7 +168,7 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and created >= :from");
             }
             if (to != null) {
-                sql.append(" and created <= :to");
+                sql.append(" and created < :to");
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
@@ -212,7 +212,7 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and created >= :from");
             }
             if (to != null) {
-                sql.append(" and created <= :to");
+                sql.append(" and created < :to");
             }
             if (ticketLink != null && !ticketLink.isEmpty()) {
                 sql.append(" and ticketLink = :ticketLink");
