@@ -88,5 +88,10 @@ public class ExecutePatch {
         });
         sourceFileSystem.close();
         targetFileSystem.close();
+        // TODO copy back the updated war file
+//        Path copyBack = Files.copy(copiedPath, webAppJocWarPath, COPYOPTIONS);
+//        if (copyBack != null) {
+//            System.out.println(String.format("%1$s was updated successfully!", copyBack));
+//        }
     }
 }
