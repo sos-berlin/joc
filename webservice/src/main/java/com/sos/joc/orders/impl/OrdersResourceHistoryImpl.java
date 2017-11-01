@@ -72,9 +72,13 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 
             if (ordersFilter.getOrders().size() > 0) {
                 InventoryJobChainsDBLayer jobChainDbLayer = new InventoryJobChainsDBLayer(connection);
+                Long instanceId = null;
+                if (!ordersFilter.getJobschedulerId().isEmpty()) {
+                    instanceId = dbItemInventoryInstance.getId();
+                }
                 for (OrderPath orderPath : ordersFilter.getOrders()) {
                     String normalizeJobChain = normalizePath(orderPath.getJobChain());
-                    List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, dbItemInventoryInstance.getId());
+                    List<String> innerChains = jobChainDbLayer.getInnerJobChains(normalizeJobChain, instanceId);
                     if (innerChains == null) {
                         reportTriggerDBLayer.getFilter().addOrderPath(normalizeJobChain, orderPath.getOrderId());
                     } else {

@@ -272,10 +272,14 @@ public class InventoryJobChainsDBLayer extends DBLayer {
             sql.append("select ijcn.nestedJobChainName from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" ijcn, ");
             sql.append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc");
             sql.append(" where ijc.id = ijcn.jobChainId and ijcn.nodeType = 2");
-            sql.append(" and ijc.instanceId = :instanceId");
+            if (instanceId != null) {
+                sql.append(" and ijc.instanceId = :instanceId");
+            } 
             sql.append(" and ijc.name = :jobChain");
             Query<String> query = getSession().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
+            if (instanceId != null) {
+                query.setParameter("instanceId", instanceId);
+            }
             query.setParameter("jobChain", outerJobChain);
             List<String> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
