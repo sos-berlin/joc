@@ -29,7 +29,7 @@ public class AgentsResourceImpl extends JOCResourceImpl implements IAgentsResour
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             return JOCDefaultResponse.responseStatus200(new JobSchedulerReportDBLayer(connection).getExecutedAgentTasks(agentsFilter
-                    .getJobschedulerId(), JobSchedulerDate.getDateFrom(agentsFilter.getDateFrom(), agentsFilter.getTimeZone()), JobSchedulerDate
+                    .getJobschedulerId(), agentsFilter.getAgents(), JobSchedulerDate.getDateFrom(agentsFilter.getDateFrom(), agentsFilter.getTimeZone()), JobSchedulerDate
                             .getDateTo(agentsFilter.getDateTo(), agentsFilter.getTimeZone())));
 
         } catch (JocException e) {

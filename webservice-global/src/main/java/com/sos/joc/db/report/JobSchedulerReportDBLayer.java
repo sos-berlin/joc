@@ -2,6 +2,7 @@ package com.sos.joc.db.report;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.TemporalType;
 
@@ -23,7 +24,7 @@ public class JobSchedulerReportDBLayer extends DBLayer {
         super(conn);
     }
 
-    public Agents getExecutedAgentTasks(String jobschedulerId, Date from, Date to) throws DBConnectionRefusedException, DBInvalidDataException{
+    public Agents getExecutedAgentTasks(String jobschedulerId, List<String> agentList, Date from, Date to) throws DBConnectionRefusedException, DBInvalidDataException{
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(AGENT_TASKS);
@@ -40,6 +41,13 @@ public class JobSchedulerReportDBLayer extends DBLayer {
             if (to != null) {
                 sql.append(" and startTime < :dateTo"); 
             }
+            if (agentList != null && !agentList.isEmpty()) {
+               if (agentList.size() == 1) {
+                   sql.append(" and agentUrl = :agent");  
+               } else {
+                   sql.append(" and agentUrl in (:agents)");
+               }
+            }
             sql.append(" group by schedulerId, agentUrl, cause");
             Query<Agent> query = getSession().createQuery(sql.toString());
             if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
@@ -50,6 +58,13 @@ public class JobSchedulerReportDBLayer extends DBLayer {
             }
             if (to != null) {
                 query.setParameter("dateTo", to, TemporalType.TIMESTAMP);
+            }
+            if (agentList != null && !agentList.isEmpty()) {
+                if (agentList.size() == 1) {
+                    query.setParameter("agent", agentList.get(0));
+                } else {
+                    query.setParameterList("agents", agentList);
+                }
             }
             Agents agents = new Agents();
             agents.setAgents(getSession().getResultList(query));
