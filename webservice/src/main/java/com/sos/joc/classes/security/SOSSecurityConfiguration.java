@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
+import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile;
 import org.ini4j.Wini;
 
@@ -73,14 +74,17 @@ public class SOSSecurityConfiguration {
         }
     }
 
-    private void writeUsers() throws UnsupportedEncodingException {
+    private void writeUsers() throws InvalidFileFormatException, IOException {
+        Wini oldWriteIni;
+        oldWriteIni = new Wini(Globals.getShiroIniFile().toFile());
+        Profile.Section oldSection = oldWriteIni.get(SECTION_USERS);
         clearSection(SECTION_USERS);
+        Profile.Section s = writeIni.get(SECTION_USERS);
         SOSSecurityHashSettings sosSecurityHashSettings = new SOSSecurityHashSettings();
         sosSecurityHashSettings.setMain(getSection(SECTION_MAIN));
         
-        Profile.Section s = writeIni.get(SECTION_USERS);
         for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
-            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser, s,
+            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser, oldSection,
                     sosSecurityHashSettings);
             s.put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
         }

@@ -97,11 +97,11 @@ public class SOSSecurityConfigurationUserEntry {
         if (s == null) {
             s="";
         }
-        String oldUser = oldSection.get(securityConfigurationUser.getUser());
+        String oldUserEntry = oldSection.get(securityConfigurationUser.getUser());
         String oldPwd = "";
-        if (oldUser != null) {
-            oldPwd = oldSection.get(oldUser).split(",")[0];
-            oldPwd = crypt(oldPwd);
+        if (oldUserEntry != null) {
+            oldPwd = oldUserEntry.split(",")[0];
+            //oldPwd = crypt(oldPwd);
             if (oldPwd.equals(s)) {
                 s = oldPwd;
             } else {
