@@ -34,6 +34,9 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
     public JOCDefaultResponse postAuditLog(String accessToken, AuditLogFilter auditLogFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
+            if (auditLogFilter.getJobschedulerId() == null) {
+                auditLogFilter.setJobschedulerId(""); 
+            }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL,auditLogFilter,accessToken, auditLogFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getAuditLog().getView().isStatus());
             if (jocDefaultResponse != null) {
@@ -56,14 +59,8 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             AuditLogDBLayer dbLayer = new AuditLogDBLayer(connection);
-            Date filterFrom = null;
-            Date filterTo = null;
-            if (auditLogFilter.getDateFrom() != null && !auditLogFilter.getDateFrom().isEmpty()) {
-                filterFrom = JobSchedulerDate.getDateFrom(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
-            }
-            if (auditLogFilter.getDateTo() != null && !auditLogFilter.getDateTo().isEmpty()) {
-                filterTo = JobSchedulerDate.getDateTo(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
-            }
+            Date filterFrom = JobSchedulerDate.getDateFrom(auditLogFilter.getDateFrom(), auditLogFilter.getTimeZone());
+            Date filterTo = JobSchedulerDate.getDateTo(auditLogFilter.getDateTo(), auditLogFilter.getTimeZone());
             String filterRegex = auditLogFilter.getRegex();
             // processing
             if (filterOrders != null && !filterOrders.isEmpty()) {
@@ -84,7 +81,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
                 auditLogs = filterComment(auditLogs, filterRegex);
             }
             AuditLog entity = new AuditLog();
-            entity.setAuditLog(fillAuditLogItems(auditLogs));
+            entity.setAuditLog(fillAuditLogItems(auditLogs, auditLogFilter.getJobschedulerId()));
             entity.setDeliveryDate(new Date());
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -111,10 +108,13 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         return filteredAuditLogs;
     }
 
-    private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb) {
+    private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb, String jobschedulerId) {
         List<AuditLogItem> audits = new ArrayList<AuditLogItem>();
         for (DBItemAuditLog auditLogFromDb : auditLogsFromDb) {
             AuditLogItem auditLogItem = new AuditLogItem();
+            if (jobschedulerId.isEmpty()) {
+                auditLogItem.setJobschedulerId(auditLogFromDb.getSchedulerId());
+            }
             auditLogItem.setAccount(auditLogFromDb.getAccount());
             auditLogItem.setRequest(auditLogFromDb.getRequest());
             auditLogItem.setParameters(auditLogFromDb.getParameters());
