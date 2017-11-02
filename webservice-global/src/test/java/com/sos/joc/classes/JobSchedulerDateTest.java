@@ -58,14 +58,14 @@ public class JobSchedulerDateTest {
     
     @Test
     public void testGetInstantFromDateStr() throws Exception {
-        System.out.println(JobSchedulerDate.getDate("-0dZ", false, null));
-        System.out.println(JobSchedulerDate.getDate("-0dZ", true, null));
-        System.out.println(JobSchedulerDate.getDate("-0wZ", false, null));
-        System.out.println(JobSchedulerDate.getDate("-0wZ", true, null));
-        System.out.println(JobSchedulerDate.getDate("-0MZ", false, null));
-        System.out.println(JobSchedulerDate.getDate("-0MZ", true, null));
-        System.out.println(JobSchedulerDate.getDate("-0yZ", false, null));
-        System.out.println(JobSchedulerDate.getDate("-0yZ", true, null));
+        System.out.println(JobSchedulerDate.getDate("-0d", false, null));
+        System.out.println(JobSchedulerDate.getDate("-0d", true, null));
+        System.out.println(JobSchedulerDate.getDate("-0w", false, null));
+        System.out.println(JobSchedulerDate.getDate("-0w", true, null));
+        System.out.println(JobSchedulerDate.getDate("-0M", false, null));
+        System.out.println(JobSchedulerDate.getDate("-0M", true, null));
+        System.out.println(JobSchedulerDate.getDate("-0y", false, null));
+        System.out.println(JobSchedulerDate.getDate("-0y", true, null));
         
     }
 
