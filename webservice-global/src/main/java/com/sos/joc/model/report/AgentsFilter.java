@@ -21,7 +21,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "jobschedulerIds",
+    "jobschedulerId",
     "agents",
     "dateFrom",
     "dateTo",
@@ -29,8 +29,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 })
 public class AgentsFilter {
 
-    @JsonProperty("jobschedulerIds")
-    private List<String> jobschedulerIds = new ArrayList<String>();
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("jobschedulerId")
+    private String jobschedulerId;
     @JsonProperty("agents")
     private List<String> agents = new ArrayList<String>();
     /**
@@ -56,22 +61,26 @@ public class AgentsFilter {
 
     /**
      * 
+     * (Required)
+     * 
      * @return
-     *     The jobschedulerIds
+     *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerIds")
-    public List<String> getJobschedulerIds() {
-        return jobschedulerIds;
+    @JsonProperty("jobschedulerId")
+    public String getJobschedulerId() {
+        return jobschedulerId;
     }
 
     /**
      * 
-     * @param jobschedulerIds
-     *     The jobschedulerIds
+     * (Required)
+     * 
+     * @param jobschedulerId
+     *     The jobschedulerId
      */
-    @JsonProperty("jobschedulerIds")
-    public void setJobschedulerIds(List<String> jobschedulerIds) {
-        this.jobschedulerIds = jobschedulerIds;
+    @JsonProperty("jobschedulerId")
+    public void setJobschedulerId(String jobschedulerId) {
+        this.jobschedulerId = jobschedulerId;
     }
 
     /**
@@ -171,7 +180,7 @@ public class AgentsFilter {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(jobschedulerIds).append(agents).append(dateFrom).append(dateTo).append(timeZone).toHashCode();
+        return new HashCodeBuilder().append(jobschedulerId).append(agents).append(dateFrom).append(dateTo).append(timeZone).toHashCode();
     }
 
     @Override
@@ -183,7 +192,7 @@ public class AgentsFilter {
             return false;
         }
         AgentsFilter rhs = ((AgentsFilter) other);
-        return new EqualsBuilder().append(jobschedulerIds, rhs.jobschedulerIds).append(agents, rhs.agents).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).isEquals();
+        return new EqualsBuilder().append(jobschedulerId, rhs.jobschedulerId).append(agents, rhs.agents).append(dateFrom, rhs.dateFrom).append(dateTo, rhs.dateTo).append(timeZone, rhs.timeZone).isEquals();
     }
 
 }
