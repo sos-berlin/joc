@@ -22,6 +22,9 @@ public class AgentsResourceImpl extends JOCResourceImpl implements IAgentsResour
         SOSHibernateSession connection = null;
 
         try {
+            if (agentsFilter.getJobschedulerId() == null) {
+                agentsFilter.setJobschedulerId(""); 
+            }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, agentsFilter, accessToken, agentsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
