@@ -28,7 +28,11 @@ public class AuditLogDBLayer extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_AUDIT_LOG);
-            sql.append(" where schedulerId = :schedulerId");
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                sql.append(" where schedulerId = :schedulerId");
+            } else {
+                sql.append(" where schedulerId != '-'"); 
+            }
             if (from != null) {
                 sql.append(" and created >= :from");
             }
@@ -61,7 +65,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             sql.append(" order by created desc");
             Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
-            query.setParameter("schedulerId", schedulerId);
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                query.setParameter("schedulerId", schedulerId);
+            }
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
             }
@@ -99,7 +105,11 @@ public class AuditLogDBLayer extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_AUDIT_LOG);
-            sql.append(" where schedulerId = :schedulerId");
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                sql.append(" where schedulerId = :schedulerId");
+            } else {
+                sql.append(" where schedulerId != '-'"); 
+            }
             if (from != null) {
                 sql.append(" and created >= :from");
             }
@@ -128,7 +138,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             sql.append(" order by created desc");
             Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
-            query.setParameter("schedulerId", schedulerId);
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                query.setParameter("schedulerId", schedulerId);
+            }
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
             }
@@ -163,7 +175,11 @@ public class AuditLogDBLayer extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_AUDIT_LOG);
-            sql.append(" where schedulerId = :schedulerId");
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                sql.append(" where schedulerId = :schedulerId");
+            } else {
+                sql.append(" where schedulerId != '-'"); 
+            }
             if (from != null) {
                 sql.append(" and created >= :from");
             }
@@ -178,7 +194,9 @@ public class AuditLogDBLayer extends DBLayer {
             }
             sql.append(" order by created desc");
             Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
-            query.setParameter("schedulerId", schedulerId);
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                query.setParameter("schedulerId", schedulerId);
+            }
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
             }
@@ -207,7 +225,11 @@ public class AuditLogDBLayer extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_AUDIT_LOG);
-            sql.append(" where schedulerId = :schedulerId");
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                sql.append(" where schedulerId = :schedulerId");
+            } else {
+                sql.append(" where schedulerId != '-'"); 
+            }
             if (from != null) {
                 sql.append(" and created >= :from");
             }
@@ -221,15 +243,18 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and account = :account");
             }
             if (folders != null && !folders.isEmpty()) {
+                sql.append(" and");
                 if (folders.size() == 1) {
-                    sql.append(" and folder = :folder");
+                    sql.append(" folder = :folder");
                 } else {
-                    sql.append(" and folder in (:folder)");
+                    sql.append(" folder in (:folder)");
                 }
             }
             sql.append(" order by created desc");
             Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
-            query.setParameter("schedulerId", schedulerId);
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                query.setParameter("schedulerId", schedulerId);
+            }
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
             }
