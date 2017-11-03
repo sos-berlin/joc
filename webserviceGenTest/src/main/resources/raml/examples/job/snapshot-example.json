@@ -1,0 +1,11 @@
+{
+	"deliveryDate": "2017-11-03T11:06:54.144Z",
+	"jobs": {
+		"pending": 23,
+		"running": 1,
+		"stopped": 2,
+		"tasks": 1,
+		"waitingForProcess": 0
+	},
+	"surveyDate": "2017-11-03T11:06:54.095Z"
+}

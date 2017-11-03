@@ -697,6 +697,20 @@ traits:
         schema200: !include schemas/job/jobs_p-schema.json
         example: TODO
         example200: !include examples/job/jobs_p-example.json
+  /overview/snapshot:
+    type:
+      postOnlyId:
+        description: |
+            Summary with number of<h5>
+            * pending jobs
+            * running jobs
+            * stopped jobs
+            * waiting for process jobs
+            * tasks
+            </h5>
+        description200: " "
+        schema200: !include schemas/job/snapshot-schema.json
+        example200: !include examples/job/snapshot-example.json
   /start:
     type:
       startJob:
