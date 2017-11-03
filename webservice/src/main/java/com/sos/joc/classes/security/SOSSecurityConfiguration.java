@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
+import org.hibernate.query.criteria.internal.predicate.IsEmptyPredicate;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile;
 import org.ini4j.Wini;
@@ -38,7 +39,6 @@ public class SOSSecurityConfiguration {
         listOfMasters = SOSSecurityConfigurationMasters.getInstance();
     }
 
-  
     private void addUsers() {
 
         Section s = getSection(SECTION_USERS);
@@ -52,7 +52,7 @@ public class SOSSecurityConfiguration {
             securityConfiguration.getUsers().add(securityConfigurationUser);
         }
     }
-
+    
     private void addRoles() {
 
         Section s = getSection(SECTION_ROLES);
@@ -82,11 +82,13 @@ public class SOSSecurityConfiguration {
         Profile.Section s = writeIni.get(SECTION_USERS);
         SOSSecurityHashSettings sosSecurityHashSettings = new SOSSecurityHashSettings();
         sosSecurityHashSettings.setMain(getSection(SECTION_MAIN));
-        
+
         for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
-            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser, oldSection,
-                    sosSecurityHashSettings);
-            s.put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
+            SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser,
+                    oldSection, sosSecurityHashSettings);
+            if ((securityConfigurationUser.getPassword() != null && !securityConfigurationUser.getPassword().isEmpty()) || securityConfigurationUser.getRoles().size() > 0) {
+                s.put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
+            }
         }
     }
 
