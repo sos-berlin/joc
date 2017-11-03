@@ -38,7 +38,6 @@ public class TestExecutePatch {
     @Test
     public void testPaths(){
         Path warFilePath = Paths.get("C:/sp/joc-1.11.x-SNAPSHOT/base/webapps/joc.war");
-        Path patchFilePath = Paths.get("C:/sp/joc-1.11.x-SNAPSHOT/base/patches/joc-patch.zip");
         Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
         System.out.println("warFilePath = " + warFilePath);
         System.out.println("tempDir = " + tempDir);
