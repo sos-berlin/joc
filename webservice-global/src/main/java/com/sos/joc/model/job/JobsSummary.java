@@ -22,7 +22,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "pending",
     "running",
     "stopped",
-    "waitingForProcess",
+    "waitingForResource",
     "tasks"
 })
 public class JobsSummary {
@@ -57,8 +57,8 @@ public class JobsSummary {
      * 
      * 
      */
-    @JsonProperty("waitingForProcess")
-    private Integer waitingForProcess;
+    @JsonProperty("waitingForResource")
+    private Integer waitingForResource;
     /**
      * non negative integer
      * <p>
@@ -152,11 +152,11 @@ public class JobsSummary {
      * 
      * 
      * @return
-     *     The waitingForProcess
+     *     The waitingForResource
      */
-    @JsonProperty("waitingForProcess")
-    public Integer getWaitingForProcess() {
-        return waitingForProcess;
+    @JsonProperty("waitingForResource")
+    public Integer getWaitingForResource() {
+        return waitingForResource;
     }
 
     /**
@@ -164,12 +164,12 @@ public class JobsSummary {
      * <p>
      * 
      * 
-     * @param waitingForProcess
-     *     The waitingForProcess
+     * @param waitingForResource
+     *     The waitingForResource
      */
-    @JsonProperty("waitingForProcess")
-    public void setWaitingForProcess(Integer waitingForProcess) {
-        this.waitingForProcess = waitingForProcess;
+    @JsonProperty("waitingForResource")
+    public void setWaitingForResource(Integer waitingForResource) {
+        this.waitingForResource = waitingForResource;
     }
 
     /**
@@ -205,7 +205,7 @@ public class JobsSummary {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(pending).append(running).append(stopped).append(waitingForProcess).append(tasks).toHashCode();
+        return new HashCodeBuilder().append(pending).append(running).append(stopped).append(waitingForResource).append(tasks).toHashCode();
     }
 
     @Override
@@ -217,7 +217,7 @@ public class JobsSummary {
             return false;
         }
         JobsSummary rhs = ((JobsSummary) other);
-        return new EqualsBuilder().append(pending, rhs.pending).append(running, rhs.running).append(stopped, rhs.stopped).append(waitingForProcess, rhs.waitingForProcess).append(tasks, rhs.tasks).isEquals();
+        return new EqualsBuilder().append(pending, rhs.pending).append(running, rhs.running).append(stopped, rhs.stopped).append(waitingForResource, rhs.waitingForResource).append(tasks, rhs.tasks).isEquals();
     }
 
 }
