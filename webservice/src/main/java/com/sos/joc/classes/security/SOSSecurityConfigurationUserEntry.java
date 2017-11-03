@@ -101,7 +101,6 @@ public class SOSSecurityConfigurationUserEntry {
         String oldPwd = "";
         if (oldUserEntry != null) {
             oldPwd = oldUserEntry.split(",")[0];
-            //oldPwd = crypt(oldPwd);
             if (oldPwd.equals(s)) {
                 s = oldPwd;
             } else {
@@ -116,6 +115,7 @@ public class SOSSecurityConfigurationUserEntry {
             s = s + securityConfigurationUser.getRoles().get(i) + ",";
         }
         s = s.substring(0, s.length() - 1);
+        
         return s;
     }
 }
