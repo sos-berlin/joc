@@ -28,23 +28,16 @@ public class TestExecutePatch {
 
     private static final String JOC_WAR_FILE_NAME = "joc.war";
     private static final String PATCH_FILE_NAME = "joc-patch.zip";
+    private static final String PATCHES_DIR= "patchesDir";
+    private static final String ARCHIVES_DIR= "archivesDir";
+    private static final String WEBAPP_DIR= "webappDir";
+    private static final String TEMP_DIR= "tempDir";
     private static CopyOption[] COPYOPTIONS = new StandardCopyOption[] { 
         StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING };
 
     @Test
-    public void testMain(){
-        ExecutePatch execute = new ExecutePatch();
-        try {
-            execute.main(new String[]{});
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-    
-    @Test
     public void testPaths(){
         Path warFilePath = Paths.get("C:/sp/joc-1.11.x-SNAPSHOT/base/webapps/joc.war");
-        Path patchFilePath = Paths.get("C:/sp/joc-1.11.x-SNAPSHOT/base/patches/joc-patch.zip");
         Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
         System.out.println("warFilePath = " + warFilePath);
         System.out.println("tempDir = " + tempDir);
@@ -123,22 +116,6 @@ public class TestExecutePatch {
 
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-//                    Path targetDir = targetFileSystem.getPath("/").resolve(dir);
-//                    if (targetDir.endsWith("WEB-INF/lib")) {
-//                        System.out.println(String.format("Copy directory '%s' is skipped", targetDir.toString()));
-//                        System.setProperty("java.class.path", targetDir.toString()+System.getProperty("path.separator")+System.getProperty("java.class.path").toString());
-//                        return FileVisitResult.CONTINUE; 
-//                    }
-//                    System.out.println(String.format("Copy directory '%s' -> '%s'", patchFilePath.toString(), targetDir.toString()));
-//                    try {
-//                        Path p = Files.copy(dir, targetDir.relativize(dir), COPYOPTIONS);
-//                        System.out.println("creating directory tree '" + p.toString() + "'");
-//                    } catch (FileAlreadyExistsException e) {
-//                    } catch (DirectoryNotEmptyException e) {
-//                    } catch (IOException e) {
-//                        System.out.println("error at creating directory tree '" + targetDir + "'" + e.getMessage());
-//                        return FileVisitResult.SKIP_SUBTREE;
-//                    }
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -170,5 +147,34 @@ public class TestExecutePatch {
             e.printStackTrace();
         }
         
+    }
+    
+    @Test
+    public void testWalkFileTreeExceptions() throws IOException {
+        EnumSet<FileVisitOption> options = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+        Files.walkFileTree(Paths.get("C:/Users/Santiago/AppData/Local/Temp"), options, Integer.MAX_VALUE, new FileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                System.out.println(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                System.out.println("Failed to visit file: " + file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 }

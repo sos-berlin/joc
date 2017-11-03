@@ -42,6 +42,9 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
         SOSHibernateSession connection = null;
 
         try {
+            if (jobsFilter.getJobschedulerId() == null) {
+                jobsFilter.setJobschedulerId("");
+            }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
                     accessToken).getHistory().isView());
             if (jocDefaultResponse != null) {

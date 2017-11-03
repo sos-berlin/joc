@@ -1,19 +1,14 @@
 package com.sos.joc.report.impl;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JobSchedulerDate;
+import com.sos.joc.db.report.JobSchedulerReportDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.report.Agent;
-import com.sos.joc.model.report.Agents;
 import com.sos.joc.model.report.AgentsFilter;
 import com.sos.joc.report.resource.IAgentsResource;
 
@@ -27,20 +22,19 @@ public class AgentsResourceImpl extends JOCResourceImpl implements IAgentsResour
         SOSHibernateSession connection = null;
 
         try {
-            //TODO permission
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, agentsFilter, accessToken, "", true);
+            if (agentsFilter.getJobschedulerId() == null) {
+                agentsFilter.setJobschedulerId(""); 
+            }
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, agentsFilter, accessToken, agentsFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            List<Agent> agents = new ArrayList<Agent>();
-            
-            //TODO set agents
-            
-            Agents entity = new Agents();
-            entity.setAgents(agents);
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(entity);
+            return JOCDefaultResponse.responseStatus200(new JobSchedulerReportDBLayer(connection).getExecutedAgentTasks(agentsFilter
+                    .getJobschedulerId(), agentsFilter.getAgents(), JobSchedulerDate.getDateFrom(agentsFilter.getDateFrom(), agentsFilter.getTimeZone()), JobSchedulerDate
+                            .getDateTo(agentsFilter.getDateTo(), agentsFilter.getTimeZone())));
+
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

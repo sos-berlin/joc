@@ -19,6 +19,9 @@
     "created": {
       "$ref": "../common/timestamp-schema.json"
     },
+    "jobschedulerId": {
+      "type": "string"
+    },
     "comment": {
       "type": "string"
     },

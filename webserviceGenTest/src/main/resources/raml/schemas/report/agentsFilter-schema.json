@@ -5,15 +5,13 @@
   "javaType": "com.sos.joc.model.report.AgentsFilter",
   "type": "object",
   "required": [
+    "jobschedulerId",
     "dateFrom",
     "dateTo"
   ],
   "properties": {
-    "jobschedulerIds": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "jobschedulerId": {
+      "type": "string"
     },
     "agents": {
       "type": "array",

@@ -48,6 +48,7 @@ resourceTypes:
   - postURLWithOkResponseAfterModify: !include resourceTypes/jobscheduler/postWithOkResponseAfterModify.raml
   - postXMLWithOkResponse: !include resourceTypes/jobscheduler/postXMLWithOkResponse.raml
   - postJSON: !include resourceTypes/common/postJSON.raml
+  - postJSONWithOptionalJSId: !include resourceTypes/common/postJSONWithOptionalJSId.raml
   - postJSONWithoutJSId: !include resourceTypes/common/postJSONWithoutJSId.raml
   - postOnlyAccessToken: !include resourceTypes/common/postOnlyAccessToken.raml
   - postOnlyId: !include resourceTypes/common/postOnlyId.raml
@@ -425,40 +426,40 @@ traits:
           example: TODO
           schema200: !include schemas/order/snapshot-schema.json
           example200: !include examples/order/snapshot-example.json
-  /overview/snapshot/event:
-      type:
-        postJSON:
-          description: |
-            Summary with number of<h5>
-            * pending orders
-            * running orders
-            * suspended orders
-            * orders with setback
-            * waiting for resource orders
-            * blacklist orders
-            </h5>
-            <h5>NOTE<br/>
-            The response comes not immediatly.<br/>
-            It comes when a value has changed but the latest after one minute.<br/>
-            It uses the envent from the JobScheduler.<br/></h5>
-          description1: " "
-          description2: !include documentation/jobChain/filteredByJobChains.md
-          description3: !include documentation/common/folders.md
-          description4: !include documentation/order/close.md
-          description5: " "
-          description6: " "
-          description7: " "
-          description8: " "
-          description9: " "
-          description10: " "
-          description200: " "
-          schema: !include schemas/jobChain/jobChainsFilter-schema.json
-          example: TODO
-          schema200: !include schemas/order/snapshot-schema.json
-          example200: !include examples/order/snapshot-example.json
+  #/overview/snapshot/event:
+  #    type:
+  #      postJSON:
+  #        description: |
+  #          Summary with number of<h5>
+  #          * pending orders
+  #          * running orders
+  #          * suspended orders
+  #          * orders with setback
+  #          * waiting for resource orders
+  #          * blacklist orders
+  #          </h5>
+  #          <h5>NOTE<br/>
+  #          The response comes not immediatly.<br/>
+  #          It comes when a value has changed but the latest after one minute.<br/>
+  #          It uses the envent from the JobScheduler.<br/></h5>
+  #        description1: " "
+  #        description2: !include documentation/jobChain/filteredByJobChains.md
+  #        description3: !include documentation/common/folders.md
+  #        description4: !include documentation/order/close.md
+  #        description5: " "
+  #        description6: " "
+  #        description7: " "
+  #        description8: " "
+  #        description9: " "
+  #        description10: " "
+  #        description200: " "
+  #        schema: !include schemas/jobChain/jobChainsFilter-schema.json
+  #        example: TODO
+  #        schema200: !include schemas/order/snapshot-schema.json
+  #        example200: !include examples/order/snapshot-example.json
   /history:
     type:
-      postJSON:
+      postJSONWithOptionalJSId:
         description: Order history from _reporting_
         description1: !include documentation/order/filteredByOrders.md
         description2: !include documentation/order/excludeOrders.md
@@ -696,6 +697,20 @@ traits:
         schema200: !include schemas/job/jobs_p-schema.json
         example: TODO
         example200: !include examples/job/jobs_p-example.json
+  /overview/snapshot:
+    type:
+      postOnlyId:
+        description: |
+            Summary with number of<h5>
+            * pending jobs
+            * running jobs
+            * stopped jobs
+            * waiting for process jobs
+            * tasks
+            </h5>
+        description200: " "
+        schema200: !include schemas/job/snapshot-schema.json
+        example200: !include examples/job/snapshot-example.json
   /start:
     type:
       startJob:
@@ -871,7 +886,7 @@ traits:
     This is not an API call. Use its children!!
   /history:
     type:
-      postJSON:
+      postJSONWithOptionalJSId:
         description: Task history from _reporting_ (permanent)
         description1: !include documentation/job/filteredByJobs.md
         description2: !include documentation/job/excludeJobs.md
@@ -1646,7 +1661,7 @@ traits:
 
 /audit_log:
   type:
-    postJSON:
+    postJSONWithOptionalJSId:
       description: Responds the audit log
       description1: !include documentation/common/dateFrom.md
       description2: !include documentation/common/dateTo.md
@@ -1673,7 +1688,7 @@ traits:
 
 /report/agents:
   type:
-    postJSONWithoutJSId:
+    postJSONWithOptionalJSId:
       description: Report of JobScheduler Agent tasks
       description1: !include documentation/report/agentsParam.md
       description2: !include documentation/common/dateFrom.md
@@ -1685,8 +1700,8 @@ traits:
       description8: " "
       description9: " "
       description10: " "
-      description200: " "
+      description200: !include documentation/report/agents.md
       schema: !include schemas/report/agentsFilter-schema.json
       schema200: !include schemas/report/agents-schema.json
-      example: !include examples/report/agents-example.json
-      example200: " "
+      example: !include examples/report/agentsParam-example.json
+      example200: !include examples/report/agents-example.json

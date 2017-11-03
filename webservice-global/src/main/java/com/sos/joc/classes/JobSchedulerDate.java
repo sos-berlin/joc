@@ -11,6 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,9 +110,17 @@ public class JobSchedulerDate {
         Pattern offsetPattern = Pattern.compile("(\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(?:\\.\\d+)?|(?:\\s*-?\\d+\\s*[smhdwMy])+)([+-][0-9:]+|Z)?$");
         Pattern dateTimePattern = Pattern.compile("(?:(-?\\d+)\\s*([smhdwMy])\\s*)");
         Matcher m = offsetPattern.matcher(dateStr);
-        Calendar calendar = null;
         TimeZone timeZ = null;
         boolean dateTimeIsRelative = false;
+        Map<String, Integer> relativeDateTimes = new HashMap<String, Integer>();
+        relativeDateTimes.put("y", null);
+        relativeDateTimes.put("M", null);
+        relativeDateTimes.put("w", null);
+        relativeDateTimes.put("d", null);
+        relativeDateTimes.put("h", null);
+        relativeDateTimes.put("m", null);
+        relativeDateTimes.put("s", null);
+        
         try {
             if (timeZone != null && !timeZone.isEmpty()) {
                 timeZ = TimeZone.getTimeZone(timeZone);
@@ -126,68 +136,64 @@ public class JobSchedulerDate {
             m = dateTimePattern.matcher(dateStr.replaceAll("([smhdwMy])", "$1 "));
             while (m.find()) {
                 dateTimeIsRelative = true;
-                if (calendar == null) {
-                    Instant instant = Instant.now();
-                    calendar = Calendar.getInstance();
-                    calendar.setTime(Date.from(instant));
-                    calendar.setTimeZone(timeZ);
-                    if (Pattern.compile("[dwMy]").matcher(dateStr).find()) {
-                        calendar.set(Calendar.HOUR_OF_DAY, 0);
-                        calendar.set(Calendar.MINUTE, 0);
-                        calendar.set(Calendar.SECOND, 0);
-                        calendar.set(Calendar.MILLISECOND, 0);
-                    }
-                }
                 Integer number = Integer.valueOf(m.group(1));
-                
-                switch (m.group(2)) {
-                case "s":
-                    calendar.add(Calendar.SECOND, number);
-                    break;
-                case "m":
-                    calendar.add(Calendar.MINUTE, number);
-                    break;
-                case "h":
-                    calendar.add(Calendar.HOUR_OF_DAY, number);
-                    break;
-                case "d":
-                    if (dateTo) {
-                        calendar.add(Calendar.DATE, 1 + number);
-                    } else {
-                        calendar.add(Calendar.DATE, number);
-                    }
-                    break;
-                case "w":
-                    if (dateTo) {
-                        calendar.add(Calendar.WEEK_OF_YEAR, 1 + number);
-                    } else {
-                        calendar.add(Calendar.WEEK_OF_YEAR, number);
-                    }
-                    calendar.add(Calendar.DATE, Calendar.MONDAY - calendar.get(Calendar.DAY_OF_WEEK));
-                    break;
-                case "M":
-                    if (dateTo) {
-                        calendar.add(Calendar.MONTH, 1 + number);
-                    } else {
-                        calendar.add(Calendar.MONTH, number);
-                    }
-                    calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DATE));
-                    break;
-                case "y":
-                    if (dateTo) {
-                        calendar.add(Calendar.YEAR, 1 + number);
-                    } else {
-                        calendar.add(Calendar.YEAR, number);
-                    }
-                    calendar.add(Calendar.DAY_OF_YEAR, 1 - calendar.get(Calendar.DAY_OF_YEAR));
-                    break;
-                }
+                relativeDateTimes.put(m.group(2), number);
             }
             if (!dateTimeIsRelative) {
                 Instant instant = Instant.parse(dateStr+"Z");
                 int offset = timeZ.getOffset(instant.toEpochMilli());
                 return instant.plusMillis(-1*offset);
+                
             } else {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(Date.from(Instant.now()));
+                calendar.setTimeZone(timeZ);
+                if (Pattern.compile("[dwMy]").matcher(dateStr).find()) {
+                    calendar.set(Calendar.HOUR_OF_DAY, 0);
+                    calendar.set(Calendar.MINUTE, 0);
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
+                }
+                if (relativeDateTimes.get("y") != null) {
+                    if (dateTo) {
+                        calendar.add(Calendar.YEAR, 1 + relativeDateTimes.get("y"));
+                    } else {
+                        calendar.add(Calendar.YEAR, relativeDateTimes.get("y"));
+                    }
+                    calendar.add(Calendar.DAY_OF_YEAR, 1 - calendar.get(Calendar.DAY_OF_YEAR));
+                }
+                if (relativeDateTimes.get("M") != null) {
+                    if (dateTo) {
+                        calendar.add(Calendar.MONTH, 1 + relativeDateTimes.get("M"));
+                    } else {
+                        calendar.add(Calendar.MONTH, relativeDateTimes.get("M"));
+                    }
+                    calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DATE));
+                }
+                if (relativeDateTimes.get("w") != null) {
+                    if (dateTo) {
+                        calendar.add(Calendar.WEEK_OF_YEAR, 1 + relativeDateTimes.get("w"));
+                    } else {
+                        calendar.add(Calendar.WEEK_OF_YEAR, relativeDateTimes.get("w"));
+                    }
+                    calendar.add(Calendar.DATE, Calendar.MONDAY - calendar.get(Calendar.DAY_OF_WEEK));
+                }
+                if (relativeDateTimes.get("d") != null) {
+                    if (dateTo) {
+                        calendar.add(Calendar.DATE, 1 + relativeDateTimes.get("d"));
+                    } else {
+                        calendar.add(Calendar.DATE, relativeDateTimes.get("d"));
+                    }
+                }
+                if (relativeDateTimes.get("h") != null) {
+                    calendar.add(Calendar.HOUR_OF_DAY, relativeDateTimes.get("h"));
+                }
+                if (relativeDateTimes.get("m") != null) {
+                    calendar.add(Calendar.MINUTE, relativeDateTimes.get("m"));
+                }
+                if (relativeDateTimes.get("s") != null) {
+                    calendar.add(Calendar.SECOND, relativeDateTimes.get("s"));
+                }
                 return calendar.toInstant();
             }
         } catch (Exception e) {

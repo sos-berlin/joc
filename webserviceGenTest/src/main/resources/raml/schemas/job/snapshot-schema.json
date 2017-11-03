@@ -1,8 +1,8 @@
 {
   "title": "orders overview snapshot",
-  "id": "schemas/order/snapshot",
+  "id": "schemas/job/snapshot",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "javaType": "com.sos.joc.model.order.OrdersSnapshot",
+  "javaType": "com.sos.joc.model.job.JobsSnapshot",
   "type": "object",
   "required": [
     "deliveryDate",
@@ -15,8 +15,8 @@
     "surveyDate": {
       "$ref": "../common/surveyDate_v-schema.json"
     },
-    "orders": {
-      "$ref": "../order/ordersSummary-schema.json"
+    "jobs": {
+      "$ref": "../job/jobsSummary-schema.json"
     }
   }
 }

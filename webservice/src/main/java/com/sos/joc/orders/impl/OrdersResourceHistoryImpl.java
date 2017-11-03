@@ -43,6 +43,9 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
         SOSHibernateSession connection = null;
 
         try {
+            if (ordersFilter.getJobschedulerId() == null) {
+                ordersFilter.setJobschedulerId("");
+            }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken, ordersFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getHistory().isView());
             if (jocDefaultResponse != null) {

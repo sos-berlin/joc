@@ -23,6 +23,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
     "account",
     "request",
     "created",
+    "jobschedulerId",
     "comment",
     "parameters",
     "job",
@@ -56,6 +57,8 @@ public class AuditLogItem {
      */
     @JsonProperty("created")
     private Date created;
+    @JsonProperty("jobschedulerId")
+    private String jobschedulerId;
     @JsonProperty("comment")
     private String comment;
     /**
@@ -155,6 +158,26 @@ public class AuditLogItem {
     @JsonProperty("created")
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    /**
+     * 
+     * @return
+     *     The jobschedulerId
+     */
+    @JsonProperty("jobschedulerId")
+    public String getJobschedulerId() {
+        return jobschedulerId;
+    }
+
+    /**
+     * 
+     * @param jobschedulerId
+     *     The jobschedulerId
+     */
+    @JsonProperty("jobschedulerId")
+    public void setJobschedulerId(String jobschedulerId) {
+        this.jobschedulerId = jobschedulerId;
     }
 
     /**
@@ -312,7 +335,7 @@ public class AuditLogItem {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(account).append(request).append(created).append(comment).append(parameters).append(job).append(jobChain).append(orderId).append(timeSpent).append(ticketLink).toHashCode();
+        return new HashCodeBuilder().append(account).append(request).append(created).append(jobschedulerId).append(comment).append(parameters).append(job).append(jobChain).append(orderId).append(timeSpent).append(ticketLink).toHashCode();
     }
 
     @Override
@@ -324,7 +347,7 @@ public class AuditLogItem {
             return false;
         }
         AuditLogItem rhs = ((AuditLogItem) other);
-        return new EqualsBuilder().append(account, rhs.account).append(request, rhs.request).append(created, rhs.created).append(comment, rhs.comment).append(parameters, rhs.parameters).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(timeSpent, rhs.timeSpent).append(ticketLink, rhs.ticketLink).isEquals();
+        return new EqualsBuilder().append(account, rhs.account).append(request, rhs.request).append(created, rhs.created).append(jobschedulerId, rhs.jobschedulerId).append(comment, rhs.comment).append(parameters, rhs.parameters).append(job, rhs.job).append(jobChain, rhs.jobChain).append(orderId, rhs.orderId).append(timeSpent, rhs.timeSpent).append(ticketLink, rhs.ticketLink).isEquals();
     }
 
 }
