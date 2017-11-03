@@ -14,7 +14,7 @@
     "stopped": {
       "$ref": "../common/nonNegativeInteger-schema.json"
     },
-    "waitingForProcess": {
+    "waitingForResource": {
       "$ref": "../common/nonNegativeInteger-schema.json"
     },
     "tasks": {

@@ -723,6 +723,34 @@ traits:
         schema200: !include schemas/job/jobs_p-schema.json
         example: TODO
         example200: !include examples/job/jobs_p-example.json
+  /overview/summary:
+    type:
+      postJSON:
+        description: |
+            Summary with number of<h5>
+            * successful tasks
+            * failed tasks
+
+            filtered by <code>dateFrom</code> parameter until now
+            </h5>
+        description1: !include documentation/common/dateFrom.md
+        description2: !include documentation/common/dateTo.md
+        description3: !include documentation/common/timeZone.md
+        description4: " "
+        description5: !include documentation/job/filteredByJobs.md
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema200: !include schemas/job/summary-schema.json
+        schema: !include schemas/job/jobsFilter-schema.json
+        example: |
+            {
+              "dateFrom": "1d"
+            }
+        example200: !include examples/job/summary-example.json
   /overview/snapshot:
     type:
       postOnlyId:

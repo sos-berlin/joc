@@ -53,7 +53,7 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
             jobs.setPending(0);
             jobs.setRunning(0);
             jobs.setStopped(0);
-            jobs.setWaitingForProcess(0);
+            jobs.setWaitingForResource(0);
             jobs.setTasks(0);
             for (int i = 0; i < jobStatistics.getLength(); i++) {
                 Element jobStatistic = (Element) jobStatistics.item(i);
@@ -74,7 +74,7 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
                         break;
                     }
                 } else if (jobStatistic.hasAttribute("need_process")) {
-                    jobs.setWaitingForProcess(count);
+                    jobs.setWaitingForResource(count);
                 }
             }
             try {
