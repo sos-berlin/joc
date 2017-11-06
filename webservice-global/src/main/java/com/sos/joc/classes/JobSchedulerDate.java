@@ -107,8 +107,8 @@ public class JobSchedulerDate {
     }
    
     private static Instant getInstantFromDateStr(String dateStr, boolean dateTo, String timeZone) throws JobSchedulerInvalidResponseDataException {
-        Pattern offsetPattern = Pattern.compile("(\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(?:\\.\\d+)?|(?:\\s*-?\\d+\\s*[smhdwMy])+)([+-][0-9:]+|Z)?$");
-        Pattern dateTimePattern = Pattern.compile("(?:(-?\\d+)\\s*([smhdwMy])\\s*)");
+        Pattern offsetPattern = Pattern.compile("(\\d{2,4}-\\d{1,2}-\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}(?:\\.\\d+)?|(?:\\s*[+-]?\\d+\\s*[smhdwMy])+)([+-][0-9:]+|Z)?$");
+        Pattern dateTimePattern = Pattern.compile("(?:([+-]?\\d+)\\s*([smhdwMy])\\s*)");
         Matcher m = offsetPattern.matcher(dateStr);
         TimeZone timeZ = null;
         boolean dateTimeIsRelative = false;
@@ -157,33 +157,39 @@ public class JobSchedulerDate {
                 if (relativeDateTimes.get("y") != null) {
                     if (dateTo) {
                         calendar.add(Calendar.YEAR, 1 + relativeDateTimes.get("y"));
+                        calendar.add(Calendar.DAY_OF_YEAR, 1 - calendar.get(Calendar.DAY_OF_YEAR) - 1);
                     } else {
                         calendar.add(Calendar.YEAR, relativeDateTimes.get("y"));
+                        calendar.add(Calendar.DAY_OF_YEAR, 1 - calendar.get(Calendar.DAY_OF_YEAR));
                     }
-                    calendar.add(Calendar.DAY_OF_YEAR, 1 - calendar.get(Calendar.DAY_OF_YEAR));
                 }
                 if (relativeDateTimes.get("M") != null) {
                     if (dateTo) {
                         calendar.add(Calendar.MONTH, 1 + relativeDateTimes.get("M"));
+                        calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DATE) - 1);
                     } else {
                         calendar.add(Calendar.MONTH, relativeDateTimes.get("M"));
+                        calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DATE));
                     }
-                    calendar.add(Calendar.DATE, 1 - calendar.get(Calendar.DATE));
                 }
                 if (relativeDateTimes.get("w") != null) {
                     if (dateTo) {
                         calendar.add(Calendar.WEEK_OF_YEAR, 1 + relativeDateTimes.get("w"));
+                        calendar.add(Calendar.DATE, Calendar.MONDAY - calendar.get(Calendar.DAY_OF_WEEK) - 1);
                     } else {
                         calendar.add(Calendar.WEEK_OF_YEAR, relativeDateTimes.get("w"));
+                        calendar.add(Calendar.DATE, Calendar.MONDAY - calendar.get(Calendar.DAY_OF_WEEK));
                     }
-                    calendar.add(Calendar.DATE, Calendar.MONDAY - calendar.get(Calendar.DAY_OF_WEEK));
                 }
                 if (relativeDateTimes.get("d") != null) {
                     if (dateTo) {
-                        calendar.add(Calendar.DATE, 1 + relativeDateTimes.get("d"));
+                        calendar.add(Calendar.DATE, 1 + relativeDateTimes.get("d") - 1);
                     } else {
                         calendar.add(Calendar.DATE, relativeDateTimes.get("d"));
                     }
+                }
+                if (dateTo) {
+                    calendar.add(Calendar.DATE, 1); 
                 }
                 if (relativeDateTimes.get("h") != null) {
                     calendar.add(Calendar.HOUR_OF_DAY, relativeDateTimes.get("h"));
