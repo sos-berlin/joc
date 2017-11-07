@@ -1,13 +1,11 @@
 package com.sos.joc.classes.security;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.Ini.Section;
-import org.hibernate.query.criteria.internal.predicate.IsEmptyPredicate;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile;
 import org.ini4j.Wini;
@@ -52,7 +50,7 @@ public class SOSSecurityConfiguration {
             securityConfiguration.getUsers().add(securityConfigurationUser);
         }
     }
-    
+
     private void addRoles() {
 
         Section s = getSection(SECTION_ROLES);
@@ -86,7 +84,8 @@ public class SOSSecurityConfiguration {
         for (SecurityConfigurationUser securityConfigurationUser : securityConfiguration.getUsers()) {
             SOSSecurityConfigurationUserEntry sosSecurityConfigurationUserEntry = new SOSSecurityConfigurationUserEntry(securityConfigurationUser,
                     oldSection, sosSecurityHashSettings);
-            if ((securityConfigurationUser.getPassword() != null && !securityConfigurationUser.getPassword().isEmpty()) || securityConfigurationUser.getRoles().size() > 0) {
+            if ((securityConfigurationUser.getPassword() != null && !securityConfigurationUser.getPassword().isEmpty()) || securityConfigurationUser
+                    .getRoles().size() > 0) {
                 s.put(securityConfigurationUser.getUser(), sosSecurityConfigurationUserEntry.getIniWriteString());
             }
         }
@@ -184,6 +183,17 @@ public class SOSSecurityConfiguration {
 
     }
 
+    private void writeMain() {
+        SOSSecurityConfigurationMainEntry sosSecurityConfigurationMainEntry = new SOSSecurityConfigurationMainEntry();
+
+        Section mainSection = ini.getSection(SECTION_MAIN);
+        clearSection(SECTION_MAIN);
+        
+        for (Map.Entry<String, String> entry : mainSection.entrySet()) {
+            writeIni.get(SECTION_MAIN).put(entry.getKey(),sosSecurityConfigurationMainEntry.getIniWriteString(entry));
+        }
+    }
+
     public SecurityConfiguration readConfiguration() {
         addUsers();
         addRoles();
@@ -201,6 +211,7 @@ public class SOSSecurityConfiguration {
         this.securityConfiguration = securityConfiguration;
         writeUsers();
         writeMasters();
+        writeMain();
         writeIni.store();
 
         return this.securityConfiguration;
