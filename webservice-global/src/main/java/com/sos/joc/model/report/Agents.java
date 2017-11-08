@@ -23,7 +23,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
     "deliveryDate",
-    "agents"
+    "agents",
+    "totalNumOfSuccessfulTasks"
 })
 public class Agents {
 
@@ -43,6 +44,14 @@ public class Agents {
      */
     @JsonProperty("agents")
     private List<Agent> agents = new ArrayList<Agent>();
+    /**
+     * non negative long
+     * <p>
+     * 
+     * 
+     */
+    @JsonProperty("totalNumOfSuccessfulTasks")
+    private Long totalNumOfSuccessfulTasks;
 
     /**
      * delivery date
@@ -96,6 +105,32 @@ public class Agents {
         this.agents = agents;
     }
 
+    /**
+     * non negative long
+     * <p>
+     * 
+     * 
+     * @return
+     *     The totalNumOfSuccessfulTasks
+     */
+    @JsonProperty("totalNumOfSuccessfulTasks")
+    public Long getTotalNumOfSuccessfulTasks() {
+        return totalNumOfSuccessfulTasks;
+    }
+
+    /**
+     * non negative long
+     * <p>
+     * 
+     * 
+     * @param totalNumOfSuccessfulTasks
+     *     The totalNumOfSuccessfulTasks
+     */
+    @JsonProperty("totalNumOfSuccessfulTasks")
+    public void setTotalNumOfSuccessfulTasks(Long totalNumOfSuccessfulTasks) {
+        this.totalNumOfSuccessfulTasks = totalNumOfSuccessfulTasks;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -103,7 +138,7 @@ public class Agents {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(deliveryDate).append(agents).toHashCode();
+        return new HashCodeBuilder().append(deliveryDate).append(agents).append(totalNumOfSuccessfulTasks).toHashCode();
     }
 
     @Override
@@ -115,7 +150,7 @@ public class Agents {
             return false;
         }
         Agents rhs = ((Agents) other);
-        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(agents, rhs.agents).isEquals();
+        return new EqualsBuilder().append(deliveryDate, rhs.deliveryDate).append(agents, rhs.agents).append(totalNumOfSuccessfulTasks, rhs.totalNumOfSuccessfulTasks).isEquals();
     }
 
 }
