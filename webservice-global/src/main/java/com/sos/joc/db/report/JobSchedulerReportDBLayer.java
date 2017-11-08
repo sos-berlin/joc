@@ -67,7 +67,15 @@ public class JobSchedulerReportDBLayer extends DBLayer {
                 }
             }
             Agents agents = new Agents();
-            agents.setAgents(getSession().getResultList(query));
+            List<Agent> agentsL = getSession().getResultList(query);
+            Long totalNumOfSuccessfulTasks = 0L;
+            if (agentsL != null && !agentsL.isEmpty()) {
+               for (Agent a : agentsL) {
+                   totalNumOfSuccessfulTasks = totalNumOfSuccessfulTasks + a.getNumOfSuccessfulTasks(); 
+               }
+            }
+            agents.setTotalNumOfSuccessfulTasks(totalNumOfSuccessfulTasks);
+            agents.setAgents(agentsL);
             agents.setDeliveryDate(Date.from(Instant.now()));
             return agents;
         } catch (SOSHibernateInvalidSessionException ex) {
