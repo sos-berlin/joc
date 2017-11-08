@@ -102,8 +102,7 @@ public class ExecutePatch {
         // Target
         FileSystem targetFileSystem = FileSystems.newFileSystem(copiedPath, null);
         // sort the patches ascending
-        File patchesDirectory = new File(patchDir.toString());
-        String[] files = patchesDirectory.list();
+        String[] files = patchDir.toFile().list();
 
         Comparator<String> fileNameComparator = new Comparator<String>() {
             
@@ -123,6 +122,7 @@ public class ExecutePatch {
                 patchFiles.add(files[i]);
             }
         }
+        
         // process a new zip-file-system for each zip-file in patches folder
         try {
             if ((patchFiles.isEmpty() && Files.exists(archivePath.resolve(JOC_WAR_FILE_NAME)))
@@ -130,9 +130,9 @@ public class ExecutePatch {
                 rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
             } else {
                 for (String patchFile : patchFiles) {
-                    System.out.println(patchFile);
+                    System.out.println(patchDir.resolve(patchFile));
                     FileSystem sourceFileSystem = null;
-                    sourceFileSystem = FileSystems.newFileSystem(Paths.get(patchFile), null);
+                    sourceFileSystem = FileSystems.newFileSystem(patchDir.resolve(patchFile), null);
                     processPatchZipFile(sourceFileSystem, targetFileSystem);
                 }
                 // After everything from patches folder is processed, copy back from temp directory
