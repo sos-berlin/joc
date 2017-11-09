@@ -1,6 +1,8 @@
 package com.sos.patch;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
@@ -102,25 +104,28 @@ public class ExecutePatch {
         // Target
         FileSystem targetFileSystem = FileSystems.newFileSystem(copiedPath, null);
         // sort the patches ascending
-        String[] files = patchDir.toFile().list();
-
-        Comparator<String> fileNameComparator = new Comparator<String>() {
+        File[] files = patchDir.toFile().listFiles(new FileFilter() {
             
             @Override
-            public int compare(String o1, String o2) {
-                String timestamp1 = o1.replaceFirst("(\\d{8})", "$1");
-                String timestamp2 = o2.replaceFirst("(\\d{8})", "$1");
+            public boolean accept(File pathname) {
+                return !pathname.isDirectory() && pathname.getAbsolutePath().matches(".*\\d{8}.*\\.zip$");
+            }
+        });
+
+        Comparator<File> fileNameComparator = new Comparator<File>() {
+            
+            @Override
+            public int compare(File o1, File o2) {
+                String timestamp1 = o1.getName().replaceFirst("(\\d{8})", "$1");
+                String timestamp2 = o2.getName().replaceFirst("(\\d{8})", "$1");
                 return timestamp1.compareTo(timestamp2);
             }
         };
 
-        Set<String> patchFiles = new TreeSet<String>(fileNameComparator);
+        Set<File> patchFiles = new TreeSet<File>(fileNameComparator);
         
         for(int i = 0; i < files.length; i++) {
-            File file = new File(files[i]);
-            if (!file.isDirectory() && files[i].endsWith(".zip")) {
-                patchFiles.add(files[i]);
-            }
+            patchFiles.add(files[i]);
         }
         
         // process a new zip-file-system for each zip-file in patches folder
@@ -129,10 +134,10 @@ public class ExecutePatch {
                     || rollback) {
                 rollbackPatch(archivePath.resolve(JOC_WAR_FILE_NAME), webAppJocWarPath);
             } else {
-                for (String patchFile : patchFiles) {
-                    System.out.println(patchDir.resolve(patchFile));
+                for (File patchFile : patchFiles) {
+                    System.out.println(patchFile.getAbsolutePath());
                     FileSystem sourceFileSystem = null;
-                    sourceFileSystem = FileSystems.newFileSystem(patchDir.resolve(patchFile), null);
+                    sourceFileSystem = FileSystems.newFileSystem(patchFile.toPath(), null);
                     processPatchZipFile(sourceFileSystem, targetFileSystem);
                 }
                 // After everything from patches folder is processed, copy back from temp directory
