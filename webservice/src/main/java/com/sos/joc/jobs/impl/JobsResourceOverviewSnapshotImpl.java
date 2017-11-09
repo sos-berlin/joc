@@ -47,40 +47,72 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
 //            }
             
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            jocXmlCommand.executePostWithThrowBadRequestAfterRetry("<subsystem.show what=\"statistics\"/>", accessToken);
-            NodeList jobStatistics = jocXmlCommand.getSosxml().selectNodeList("//job.statistics/job.statistic");
-            JobsSummary jobs = new JobsSummary();
-            jobs.setPending(0);
-            jobs.setRunning(0);
-            jobs.setStopped(0);
-            jobs.setWaitingForResource(0);
-            jobs.setTasks(0);
+            String command = jocXmlCommand.getShowStateCommand("job", "", "", 0, 0);
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
+            Integer countPending = 0;
+            Integer countRunning = 0;
+            Integer countStopped = 0;
+            Integer countWaitingForResource = 0;
+            NodeList jobStatistics = jocXmlCommand.getSosxml().selectNodeList("//job[not(@path='/scheduler_file_order_sink')]/@state");
+            NodeList taskStatistics = jocXmlCommand.getSosxml().selectNodeList("//job[not(@path='/scheduler_file_order_sink')]/tasks/task");
             for (int i = 0; i < jobStatistics.getLength(); i++) {
-                Element jobStatistic = (Element) jobStatistics.item(i);
-                Integer count = 0;
-                try {
-                    count = Integer.valueOf(jobStatistic.getAttribute("count"));
-                } catch (Exception e) {}
-                if (jobStatistic.hasAttribute("job_state")) {
-                    switch (jobStatistic.getAttribute("job_state")) {
-                    case "pending":
-                        jobs.setPending(count);
-                        break;
-                    case "running":
-                        jobs.setRunning(count);
-                        break;
-                    case "stopped":
-                        jobs.setStopped(count);
-                        break;
-                    }
-                } else if (jobStatistic.hasAttribute("need_process")) {
-                    jobs.setWaitingForResource(count);
+                switch (jobStatistics.item(i).getNodeValue()) {
+                case "pending":
+                case "stopping":
+                    countPending++;
+                    break;
+                case "stopped":
+                    countStopped++;
+                    break;
+                case "running":
+                    countRunning++;
+                    break;
+                default:
+                    countWaitingForResource++;
+                    break;
                 }
             }
-            try {
-                jobs.setTasks(Integer.valueOf(jocXmlCommand.getSosxml().selectSingleNode("task.statistic[@task_state='exist']/@count").getNodeValue()));
-            } catch (Exception e) {}
+            JobsSummary jobs = new JobsSummary();
+            jobs.setPending(countPending);
+            jobs.setRunning(countRunning);
+            jobs.setStopped(countStopped);
+            jobs.setWaitingForResource(countWaitingForResource);
+            jobs.setTasks(taskStatistics.getLength());
             
+//            jocXmlCommand.executePostWithThrowBadRequestAfterRetry("<subsystem.show what=\"statistics\"/>", accessToken);
+//            NodeList jobStatistics = jocXmlCommand.getSosxml().selectNodeList("//job.statistics/job.statistic");
+//            JobsSummary jobs = new JobsSummary();
+//            jobs.setPending(0);
+//            jobs.setRunning(0);
+//            jobs.setStopped(0);
+//            jobs.setWaitingForResource(0);
+//            jobs.setTasks(0);
+//            for (int i = 0; i < jobStatistics.getLength(); i++) {
+//                Element jobStatistic = (Element) jobStatistics.item(i);
+//                Integer count = 0;
+//                try {
+//                    count = Integer.valueOf(jobStatistic.getAttribute("count"));
+//                } catch (Exception e) {}
+//                if (jobStatistic.hasAttribute("job_state")) {
+//                    switch (jobStatistic.getAttribute("job_state")) {
+//                    case "pending":
+//                        jobs.setPending(count);
+//                        break;
+//                    case "running":
+//                        jobs.setRunning(count);
+//                        break;
+//                    case "stopped":
+//                        jobs.setStopped(count);
+//                        break;
+//                    }
+//                } else if (jobStatistic.hasAttribute("need_process")) {
+//                    jobs.setWaitingForResource(count);
+//                }
+//            }
+//            try {
+//                jobs.setTasks(Integer.valueOf(jocXmlCommand.getSosxml().selectSingleNode("task.statistic[@task_state='exist']/@count").getNodeValue()));
+//            } catch (Exception e) {}
+//            
             JobsSnapshot entity = new JobsSnapshot();
             entity.setSurveyDate(jocXmlCommand.getSurveyDate());entity.setJobs(jobs);
             entity.setDeliveryDate(Date.from(Instant.now()));
