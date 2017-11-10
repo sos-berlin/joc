@@ -15,6 +15,7 @@ import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.classes.parameters.Parameters;
+import com.sos.joc.model.common.ConfigurationState;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.job.JobState;
 import com.sos.joc.model.job.JobStateText;
@@ -72,27 +73,33 @@ public class JobVolatile extends JobV {
 
     public void setState() throws Exception {
         if (getState() == null) {
+            setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));
+            setNumOfQueuedTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "queued_tasks/@length", "0")));
+            ConfigurationState confState = ConfigurationStatus.getConfigurationStatus(job);
+            setConfigurationStatus(confState);
             setState(new JobState());
             if (!jocXmlCommand.getBoolValue(job.getAttribute("enabled"), true)) {
                 getState().set_text(JobStateText.DISABLED);
+            } else if (confState != null && confState.getSeverity() == 2) {
+                getState().set_text(JobStateText.ERROR);
             } else {
                 try {
                     getState().set_text(JobStateText.fromValue(job.getAttribute(WebserviceConstants.STATE).toUpperCase()));
                 } catch (Exception e) {
                     getState().set_text(JobStateText.fromValue("UNKNOWN"));
                 }
-                if (jocXmlCommand.getBoolValue(job.getAttribute(WebserviceConstants.WAITING_FOR_AGENT), false)) {
+                if (jocXmlCommand.getSosxml().selectNodeList(job, "tasks/task[@waiting_for_remote_scheduler='true']").getLength() > 0) {
                     getState().set_text(JobStateText.WAITING_FOR_AGENT);
                 } else if (jocXmlCommand.getBoolValue(job.getAttribute(WebserviceConstants.WAITING_FOR_PROCESS), false)) {
                     getState().set_text(JobStateText.WAITING_FOR_PROCESS);
                 } else if (jocXmlCommand.getSosxml().selectNodeList(job, "lock.requestor/lock.use[@is_available='no']").getLength() > 0) {
                     getState().set_text(JobStateText.WAITING_FOR_LOCK);
-                } else if (getNumOfRunningTasks() == Integer.valueOf(getAttributeValue("tasks", "1")) && getNumOfQueuedTasks() > 0) {
+                //} else if (getNumOfRunningTasks() == Integer.valueOf(getAttributeValue("tasks", "1")) && getNumOfQueuedTasks() > 0) {
                     // TODO: WaitingForTask has to be improved
                     // Look into queue items where start_time in the past
                     // it could be that a task is queued caused of a delayed
                     // start instead of max tasks is reached
-                    getState().set_text(JobStateText.WAITING_FOR_TASK);
+                //    getState().set_text(JobStateText.WAITING_FOR_TASK);
                 } else if (isOrderJob() && getState().get_text() == JobStateText.PENDING
                         && !jocXmlCommand.getBoolValue(job.getAttribute(WebserviceConstants.IN_PERIOD), true)) {
                     getState().set_text(JobStateText.NOT_IN_PERIOD);
@@ -159,12 +166,12 @@ public class JobVolatile extends JobV {
         setState();
         setSurveyDate(jocXmlCommand.getSurveyDate());
         setName(job.getAttribute(WebserviceConstants.NAME));
-        setNumOfQueuedTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "queued_tasks/@length", "0")));
+        //setNumOfQueuedTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "queued_tasks/@length", "0")));
         setLocks(getLocks(jocXmlCommand.getSosxml().selectNodeList(job, "lock.requestor/lock.use")));
         setStateText(job.getAttribute("state_text"));
-        setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));
+        //setNumOfRunningTasks(Integer.parseInt(jocXmlCommand.getSosxml().selectSingleNodeValue(job, "tasks/@count", "0")));
         setNextStartTime(JobSchedulerDate.getDateFromISO8601String(jocXmlCommand.getAttributeValue(job, WebserviceConstants.NEXT_START_TIME, null)));
-        setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(job));
+        //setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(job));
         setErr((Element) jocXmlCommand.getSosxml().selectSingleNode(job, "ERROR"));
         setSummary();
         if (isOrderJob() && withOrderQueue) {
