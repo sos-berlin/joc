@@ -1,0 +1,33 @@
+{
+  "title": "jobscheduler custom event for calendar and calendar usage",
+  "id": "schemas/jobschedulerEvent/calendarEvent",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.jobscheduler.model.event.CalendarEvent",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string"
+    },
+    "variables": {
+      "javaType": "com.sos.jobscheduler.model.event.CalendarVariables",
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "oldPath": {
+          "type": "string"
+        },
+        "objectType": {
+          "javaType": "com.sos.jobscheduler.model.event.CalendarObjectType",
+          "type": "string",
+          "enum": [
+             "JOB",
+             "ORDER",
+             "SCHEDULE"
+          ]
+        }
+      }
+    }
+  }
+}
