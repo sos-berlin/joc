@@ -17,12 +17,6 @@
         "$ref": "dayOfMonth-schema.json"
       }
     },
-    "workingDays": {
-      "type": "array",
-      "items": {
-        "$ref": "dayOfMonth-schema.json"
-      }
-    },
     "weeklyDays": {
       "type": "array",
       "items": {

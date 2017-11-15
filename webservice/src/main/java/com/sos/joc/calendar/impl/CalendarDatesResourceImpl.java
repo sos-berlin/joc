@@ -41,6 +41,8 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
             if (!calendarIdIsDefined && !calendarPathIsDefined && calendarFilter.getCalendar() == null) {
                 throw new JocMissingRequiredParameterException("'calendar' or 'path' parameter is required");
             }
+            Dates dates = null;
+            FrequencyResolver fr = new FrequencyResolver();
             
             if (calendarPathIsDefined || calendarIdIsDefined) {
                 connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -59,11 +61,26 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
                     }
                 }
                 calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
-            }
-
-            Dates dates = null;
+                
+            } 
+            
             try {
-                dates = new FrequencyResolver().resolve(calendarFilter);
+                if (calendarFilter.getCalendar().getBasedOn() != null && !calendarFilter.getCalendar().getBasedOn().isEmpty()) {
+                    connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+                    CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+                    String calendarPath = normalizePath(calendarFilter.getCalendar().getBasedOn());
+                    DBItemCalendar calendarItem = dbLayer.getCalendar(dbItemInventoryInstance.getId(), calendarPath);
+                    if (calendarItem == null) {
+                        throw new DBMissingDataException(String.format("calendar '%1$s' not found", calendarPath));
+                    }
+                    Calendar basedCalendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
+                    if (calendarFilter.getDateFrom() == null || calendarFilter.getDateFrom().isEmpty()) {
+                        calendarFilter.setDateFrom(fr.getToday()); 
+                    }
+                    dates = fr.resolveRestrictions(basedCalendar, calendarFilter.getCalendar(), calendarFilter.getDateFrom(), calendarFilter.getDateTo());
+                } else {
+                    dates = fr.resolve(calendarFilter);
+                }
             } catch (SOSInvalidDataException e) {
                 throw new JobSchedulerInvalidResponseDataException(e);
             } catch (SOSMissingDataException e) {
