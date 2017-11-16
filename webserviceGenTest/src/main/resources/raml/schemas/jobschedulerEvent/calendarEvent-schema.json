@@ -5,6 +5,10 @@
   "javaType": "com.sos.jobscheduler.model.event.CalendarEvent",
   "type": "object",
   "properties": {
+    "TYPE": {
+      "type": "string",
+      "default": "VariablesCustomEvent"
+    },
     "key": {
       "type": "string"
     },

@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -58,13 +59,15 @@ public class ScheduleResourceConfigurationImpl extends JOCResourceImpl implement
             if (!responseInHtml) {
                 connection = Globals.createSosHibernateStatelessConnection(API_CALL);
                 CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
-                List<String> dbCalendars = calendarUsageDBLayer.getWorkingDaysCalendarUsagesOfAnObject(dbItemInventoryInstance.getId(), "SCHEDULE",
-                        schedulePath);
+                List<DBItemInventoryCalendarUsage> dbCalendars = calendarUsageDBLayer.getCalendarUsagesOfAnObject(dbItemInventoryInstance.getId(),
+                        "SCHEDULE", schedulePath);
                 if (dbCalendars != null && !dbCalendars.isEmpty()) {
                     List<Calendar> calendars = new ArrayList<Calendar>();
                     ObjectMapper objMapper = new ObjectMapper();
-                    for (String dbCalendar : dbCalendars) {
-                        calendars.add(objMapper.readValue(dbCalendar, Calendar.class));
+                    for (DBItemInventoryCalendarUsage dbCalendar : dbCalendars) {
+                        if (dbCalendar.getConfiguration() != null && !dbCalendar.getConfiguration().isEmpty()) {
+                            calendars.add(objMapper.readValue(dbCalendar.getConfiguration(), Calendar.class));
+                        }
                     }
                     entity.setCalendars(calendars);
                 }
