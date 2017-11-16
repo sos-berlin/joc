@@ -99,7 +99,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             
             List<Err419> listOfErrors = new ArrayList<Err419>();
             if (calendarHasChanged) {
-                Map<String, Exception> exceptions = CalendarInRuntimes.update(dbItemInventoryInstance, calendarDbItem, newDates, connection, accessToken);
+                Map<String, Exception> exceptions = CalendarInRuntimes.update(dbItemInventoryInstance, calendarDbItem, calendar, newDates, connection, accessToken);
                 for (Entry<String, Exception> exception : exceptions.entrySet()) {
                     if (exception.getValue() instanceof JocException) {
                         listOfErrors.add(new BulkError().get((JocException) exception.getValue(), getJocError(), exception.getKey())); 

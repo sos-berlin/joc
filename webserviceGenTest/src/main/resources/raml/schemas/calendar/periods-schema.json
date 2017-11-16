@@ -25,7 +25,7 @@
       "absoluteRepeat": {
         "type": "string"
       },
-      "wheHoliday": {
+      "whenHoliday": {
         "type": "string"
       },
       "once": {

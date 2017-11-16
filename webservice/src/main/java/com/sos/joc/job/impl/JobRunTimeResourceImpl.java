@@ -13,8 +13,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.runtime.RunTime;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
-import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
-import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.job.resource.IJobRunTimeResource;
 import com.sos.joc.model.calendar.Calendar;

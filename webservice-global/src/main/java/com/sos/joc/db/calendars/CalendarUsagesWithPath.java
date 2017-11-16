@@ -1,14 +1,17 @@
 package com.sos.joc.db.calendars;
 
+import java.util.List;
+
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 
 public class CalendarUsagesWithPath {
 
     private DBItemInventoryCalendarUsage dBItemInventoryCalendarUsage = null;
     private String calendarPath = null;
+    private List<String> dates = null;
 
     public CalendarUsagesWithPath(DBItemInventoryCalendarUsage dBItemInventoryCalendarUsage, String calendarPath) {
-        this.setdBItemInventoryCalendarUsage(dBItemInventoryCalendarUsage);
+        this.setDBItemInventoryCalendarUsage(dBItemInventoryCalendarUsage);
         this.setCalendarPath(calendarPath);
     }
 
@@ -20,12 +23,20 @@ public class CalendarUsagesWithPath {
         this.calendarPath = calendarPath;
     }
 
-    public DBItemInventoryCalendarUsage getdBItemInventoryCalendarUsage() {
+    public DBItemInventoryCalendarUsage getDBItemInventoryCalendarUsage() {
         return dBItemInventoryCalendarUsage;
     }
 
-    public void setdBItemInventoryCalendarUsage(DBItemInventoryCalendarUsage dBItemInventoryCalendarUsage) {
+    public void setDBItemInventoryCalendarUsage(DBItemInventoryCalendarUsage dBItemInventoryCalendarUsage) {
         this.dBItemInventoryCalendarUsage = dBItemInventoryCalendarUsage;
+    }
+
+    public List<String> getDates() {
+        return dates;
+    }
+
+    public void setDates(List<String> dates) {
+        this.dates = dates;
     }
 
     

@@ -131,7 +131,7 @@ public class CalendarUsageDBLayer extends DBLayer {
         try {
             if (calendarUsages != null) {
                 for (CalendarUsagesWithPath calendarUsage : calendarUsages) {
-                    DBItemInventoryCalendarUsage item = calendarUsage.getdBItemInventoryCalendarUsage();
+                    DBItemInventoryCalendarUsage item = calendarUsage.getDBItemInventoryCalendarUsage();
                     if (update) {
                         if (item.getEdited() == null) {
                             getSession().delete(item);

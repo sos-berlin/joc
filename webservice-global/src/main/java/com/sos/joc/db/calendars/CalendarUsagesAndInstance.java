@@ -10,11 +10,13 @@ import java.util.Set;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
+import com.sos.joc.model.calendar.Calendar;
 
 public class CalendarUsagesAndInstance {
 
     private Set<CalendarUsagesWithPath> calendarUsages = null;
     private DBItemInventoryInstance instance = null;
+    private Calendar baseCalendar = null;
     private List<String> dates = new ArrayList<String>();
     private Map<String, Exception> exceptions = new HashMap<String, Exception>();
 
@@ -44,6 +46,14 @@ public class CalendarUsagesAndInstance {
         return instance;
     }
 
+    public Calendar getBaseCalendar() {
+        return baseCalendar;
+    }
+
+    public void setBaseCalendar(Calendar baseCalendar) {
+        this.baseCalendar = baseCalendar;
+    }
+
     public List<String> getDates() {
         return dates;
     }
@@ -55,10 +65,10 @@ public class CalendarUsagesAndInstance {
     public void setAllEdited(Exception e) {
         if (this.calendarUsages != null) {
             for (CalendarUsagesWithPath item : this.calendarUsages) {
-                if (!item.getdBItemInventoryCalendarUsage().getEdited()) {
-                    item.getdBItemInventoryCalendarUsage().setEdited(true);
+                if (!item.getDBItemInventoryCalendarUsage().getEdited()) {
+                    item.getDBItemInventoryCalendarUsage().setEdited(true);
                 }
-                String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getdBItemInventoryCalendarUsage().getObjectType(), item.getdBItemInventoryCalendarUsage().getPath(), instance.getHostname(), instance.getPort());
+                String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getDBItemInventoryCalendarUsage().getObjectType(), item.getDBItemInventoryCalendarUsage().getPath(), instance.getHostname(), instance.getPort());
                 exceptions.put(key, e);
             }
         }
