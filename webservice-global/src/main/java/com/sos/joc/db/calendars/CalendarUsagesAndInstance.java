@@ -55,6 +55,9 @@ public class CalendarUsagesAndInstance {
     }
 
     public List<String> getDates() {
+        if (dates == null) {
+            dates = new ArrayList<String>();
+        }
         return dates;
     }
 

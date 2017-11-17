@@ -6,25 +6,32 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.ws.rs.Path;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.exception.SOSInvalidDataException;
 import com.sos.exception.SOSMissingDataException;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
+import com.sos.jobscheduler.model.event.CalendarEvent;
+import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarEditResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
-import com.sos.joc.classes.calendar.CalendarInRuntimes;
 import com.sos.joc.classes.calendar.FrequencyResolver;
+import com.sos.joc.classes.calendar.JobSchedulerCalendarCallable;
+import com.sos.joc.db.calendars.CalendarUsageDBLayer;
+import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.BulkError;
+import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
+import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingCommentException;
@@ -70,10 +77,18 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog());
             logAuditMessage(calendarAudit);
             
+            CalendarEvent calEvt = new CalendarEvent();
+            CalendarVariables calEvtVars = new CalendarVariables();
+            calEvtVars.setPath(calendar.getPath());
+            
             boolean calendarHasChanged = true;
             Dates newDates = null;
             Dates oldDates = null;
             if (calendarDbItem != null) {
+                calEvt.setKey("CalendarUpdated");
+                if (!calendar.getPath().equals(calendarDbItem.getName())) {
+                    calEvtVars.setOldPath(calendarDbItem.getName());
+                }
                 try {
                     newDates = new FrequencyResolver().resolveFromToday(calendar);
                     oldDates = new FrequencyResolver().resolveFromToday(new ObjectMapper().readValue(calendarDbItem.getConfiguration(), Calendar.class));
@@ -88,6 +103,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             }
             
             if (calendarDbItem == null) {
+                calEvt.setKey("CalendarCreated");
                 DBItemCalendar oldCalendarDbItem = calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath());
                 if (oldCalendarDbItem != null) {
                     throw new JocObjectAlreadyExistException(calendar.getPath());
@@ -96,19 +112,33 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 
             Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
             storeAuditLogEntry(calendarAudit);
+            calEvt.setVariables(calEvtVars);
             
             List<Err419> listOfErrors = new ArrayList<Err419>();
             if (calendarHasChanged) {
-                Map<String, Exception> exceptions = CalendarInRuntimes.update(dbItemInventoryInstance, calendarDbItem, calendar, newDates, connection, accessToken);
-                for (Entry<String, Exception> exception : exceptions.entrySet()) {
-                    if (exception.getValue() instanceof JocException) {
-                        listOfErrors.add(new BulkError().get((JocException) exception.getValue(), getJocError(), exception.getKey())); 
-                    } else {
-                        listOfErrors.add(new BulkError().get(exception.getValue(), getJocError(), exception.getKey()));
+                sendEvent(calEvt, accessToken);
+                
+                if (calendarDbItem != null) {
+                    //update calendar in jobs, orders and schedules
+                    CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(connection);
+                    CalendarUsagesAndInstance calendarUsageInstance = new CalendarUsagesAndInstance(dbItemInventoryInstance, false);
+                    calendarUsageInstance.setCalendarUsages(calendarUsageDbLayer.getCalendarUsagesOfAnInstance(dbItemInventoryInstance.getId(), calendarDbItem.getId()));
+                    calendarUsageInstance.setBaseCalendar(calendar);
+                    calendarUsageInstance.setDates(newDates.getDates());
+                    JobSchedulerCalendarCallable callable = new JobSchedulerCalendarCallable(calendarUsageInstance, accessToken);
+                    CalendarUsagesAndInstance c = callable.call();
+                    calendarUsageDbLayer.updateEditFlag(c.getCalendarUsages(), true);
+                    
+                    for (Entry<String, Exception> exception : c.getExceptions().entrySet()) {
+                        if (exception.getValue() instanceof JocException) {
+                            listOfErrors.add(new BulkError().get((JocException) exception.getValue(), getJocError(), exception.getKey()));
+                        } else {
+                            listOfErrors.add(new BulkError().get(exception.getValue(), getJocError(), exception.getKey()));
+                        }
                     }
                 }
             }
-            
+                        
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
@@ -147,6 +177,13 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
 
             Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), null, calendar);
             storeAuditLogEntry(calendarAudit);
+            
+            CalendarEvent calEvt = new CalendarEvent();
+            calEvt.setKey("CalendarCreated");
+            CalendarVariables calEvtVars = new CalendarVariables();
+            calEvtVars.setPath(calendar.getPath());
+            calEvt.setVariables(calEvtVars);
+            sendEvent(calEvt, accessToken);
 
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
@@ -187,6 +224,14 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             }
             Date surveyDate = new CalendarsDBLayer(connection).renameCalendar(dbItemInventoryInstance.getId(), calendarPath, calendarNewPath);
             storeAuditLogEntry(calendarAudit);
+            
+            CalendarEvent calEvt = new CalendarEvent();
+            calEvt.setKey("CalendarUpdated");
+            CalendarVariables calEvtVars = new CalendarVariables();
+            calEvtVars.setPath(calendarNewPath);
+            calEvtVars.setOldPath(calendarPath);
+            calEvt.setVariables(calEvtVars);
+            sendEvent(calEvt, accessToken);
 
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
@@ -227,6 +272,17 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
         }
         calendar.setPath(normalizePath(calendar.getPath()));
         return calendar;
+    }
+    
+    private void sendEvent(CalendarEvent calEvt, String accessToken) throws JocException, JsonProcessingException {
+        try {
+            String xmlCommand = new ObjectMapper().writeValueAsString(calEvt);
+            xmlCommand = "<publish_event>" + xmlCommand + "</publish_event>";
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+            jocXmlCommand.executePostWithRetry(xmlCommand, accessToken);
+        } catch (JobSchedulerConnectionRefusedException e) {
+        } catch (JobSchedulerConnectionResetException e) {
+        }
     }
 
 }

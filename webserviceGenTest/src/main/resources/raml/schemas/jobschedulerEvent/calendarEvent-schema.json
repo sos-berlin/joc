@@ -12,6 +12,10 @@
     "key": {
       "type": "string"
     },
+    "eventId": {
+      "type": "string",
+      "format":"utc-millisec"
+    },
     "variables": {
       "javaType": "com.sos.jobscheduler.model.event.CalendarVariables",
       "type": "object",
