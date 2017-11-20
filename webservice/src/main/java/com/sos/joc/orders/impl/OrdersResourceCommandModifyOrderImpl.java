@@ -228,22 +228,30 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
                     String configuration = jocConfiguration.modifyOrderRuntime(order.getRunTime(), this, jobChainPath, order.getOrderId());
 
-                    ValidateXML.validateAgainstJobSchedulerSchema(configuration);
-                    XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                    Element orderElement = XMLBuilder.parse(configuration);
-                    orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
-                    orderElement.addAttribute("id", order.getOrderId());
+                    if (configuration == null) { // adhoc order
+                        ValidateXML.validateAgainstJobSchedulerSchema(order.getRunTime());
+                        XMLBuilder xmlBuilder = new XMLBuilder("modify_order");
+                        Element runTimeElement = XMLBuilder.parse(order.getRunTime());
+                        xmlBuilder.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString()).addAttribute("order", order
+                                .getOrderId()).add(runTimeElement);
+                    } else {
+                        ValidateXML.validateAgainstJobSchedulerSchema(configuration);
+                        XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+                        Element orderElement = XMLBuilder.parse(configuration);
+                        orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
+                        orderElement.addAttribute("id", order.getOrderId());
 
-                    xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
-                    jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
+                        xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                        jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
 
-                    if (session == null) {
-                        session = Globals.createSosHibernateStatelessConnection(API_CALL);
+                        if (session == null) {
+                            session = Globals.createSosHibernateStatelessConnection(API_CALL);
+                        }
+                        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
+                                CalendarObjectType.ORDER, jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
+                        calendarUsedByWriter.updateUsedBy();
+                        jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
                     }
-                    CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
-                            CalendarObjectType.ORDER, jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
-                    calendarUsedByWriter.updateUsedBy();
-                    jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {

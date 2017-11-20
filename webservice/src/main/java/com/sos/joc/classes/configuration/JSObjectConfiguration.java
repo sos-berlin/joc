@@ -49,6 +49,9 @@ public class JSObjectConfiguration {
         jocXmlCommand.executePostWithThrowBadRequestAfterRetry(orderCommand, jocResourceImpl.getAccessToken());
         try {
             Node orderNode = jocXmlCommand.getSosxml().selectSingleNode("//source/order");
+            if (orderNode == null) {
+                return null;
+            }
             if (newRunTime != null && !newRunTime.trim().isEmpty()) {
                 orderNode = modifyOrderRuntimeNode(jocXmlCommand.getSosxml(), cleanEmptyCalendarDates(new SOSXMLXPath(new StringBuffer(newRunTime))));
             }

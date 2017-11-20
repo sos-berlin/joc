@@ -16,7 +16,6 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 public class CalendarUsageDBLayer extends DBLayer {
 
     private static final String CALENDAR_USAGES_INSTANCE = CalendarUsagesAndInstance.class.getName();
-    private static final String CALENDAR_USAGES_WITH_PATH = CalendarUsagesWithPath.class.getName();
     private Query<DBItemInventoryCalendarUsage> query;
 
     public CalendarUsageDBLayer(SOSHibernateSession connection) {
@@ -126,12 +125,11 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
 
-    public void updateEditFlag(Set<CalendarUsagesWithPath> calendarUsages, boolean update) throws DBConnectionRefusedException,
+    public void updateEditFlag(Set<DBItemInventoryCalendarUsage> calendarUsages, boolean update) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             if (calendarUsages != null) {
-                for (CalendarUsagesWithPath calendarUsage : calendarUsages) {
-                    DBItemInventoryCalendarUsage item = calendarUsage.getDBItemInventoryCalendarUsage();
+                for (DBItemInventoryCalendarUsage item : calendarUsages) {
                     if (update) {
                         if (item.getEdited() == null) {
                             getSession().delete(item);
@@ -149,29 +147,6 @@ public class CalendarUsageDBLayer extends DBLayer {
                     }
                 }
             }
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
-    }
-
-    public List<CalendarUsagesWithPath> getCalendarUsagesOfAnInstance(Long instanceId, Long calendarId) throws DBConnectionRefusedException,
-            DBInvalidDataException {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(CALENDAR_USAGES_WITH_PATH).append(" (icu, ic.name) ");
-            sql.append(" from ").append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu, ");
-            sql.append(DBITEM_CALENDARS).append(" ic ");
-            sql.append(" where ic.id = icu.calendarId");
-            sql.append(" and icu.instanceId = :instanceId");
-            sql.append(" and icu.calendarId = :calendarId");
-
-            Query<CalendarUsagesWithPath> query = getSession().createQuery(sql.toString());
-            query.setParameter("instanceId", instanceId);
-            query.setParameter("calendarId", calendarId);
-            return getSession().getResultList(query);
-
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

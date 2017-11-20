@@ -101,8 +101,10 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
                 // delete calendar in jobs, orders and schedules
                 CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(calendarDbLayer.getSession());
                 CalendarUsagesAndInstance calendarUsageInstance = new CalendarUsagesAndInstance(dbItemInventoryInstance, false);
-                calendarUsageInstance.setCalendarUsages(calendarUsageDbLayer.getCalendarUsagesOfAnInstance(dbItemInventoryInstance.getId(),
-                        calendarDbItem.getId()));
+                calendarUsageInstance.setCalendarUsages(calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId()));
+                calendarUsageInstance.setCalendarPath(calendarDbItem.getName());
+                calendarUsageInstance.setOldCalendarPath(calendarDbItem.getName());
+                
                 JobSchedulerCalendarCallable callable = new JobSchedulerCalendarCallable(calendarUsageInstance, accessToken);
                 CalendarUsagesAndInstance c = callable.call();
                 calendarUsageDbLayer.updateEditFlag(c.getCalendarUsages(), false);

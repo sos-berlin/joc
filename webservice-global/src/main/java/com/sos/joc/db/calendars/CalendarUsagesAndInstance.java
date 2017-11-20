@@ -14,11 +14,13 @@ import com.sos.joc.model.calendar.Calendar;
 
 public class CalendarUsagesAndInstance {
 
-    private Set<CalendarUsagesWithPath> calendarUsages = null;
+    private Set<DBItemInventoryCalendarUsage> calendarUsages = null;
     private DBItemInventoryInstance instance = null;
     private Calendar baseCalendar = null;
     private List<String> dates = new ArrayList<String>();
     private Map<String, Exception> exceptions = new HashMap<String, Exception>();
+    private String calendarPath = null;
+    private String oldCalendarPath = null;
 
     public CalendarUsagesAndInstance(DBItemInventoryInstance instance) {
         this.instance = setMappedUrl(instance);
@@ -32,13 +34,13 @@ public class CalendarUsagesAndInstance {
         }
     }
 
-    public Set<CalendarUsagesWithPath> getCalendarUsages() {
+    public Set<DBItemInventoryCalendarUsage> getCalendarUsages() {
         return calendarUsages;
     }
 
-    public void setCalendarUsages(List<CalendarUsagesWithPath> calendarUsages) {
+    public void setCalendarUsages(List<DBItemInventoryCalendarUsage> calendarUsages) {
         if (calendarUsages != null && !calendarUsages.isEmpty()) {
-            this.calendarUsages = new HashSet<CalendarUsagesWithPath>(calendarUsages);
+            this.calendarUsages = new HashSet<DBItemInventoryCalendarUsage>(calendarUsages);
         }
     }
 
@@ -64,14 +66,30 @@ public class CalendarUsagesAndInstance {
     public void setDates(List<String> dates) {
         this.dates = dates;
     }
+    
+    public String getCalendarPath() {
+        return calendarPath;
+    }
+
+    public void setCalendarPath(String calendarPath) {
+        this.calendarPath = calendarPath;
+    }
+    
+    public String getOldCalendarPath() {
+        return oldCalendarPath;
+    }
+
+    public void setOldCalendarPath(String oldCalendarPath) {
+        this.oldCalendarPath = oldCalendarPath;
+    }
 
     public void setAllEdited(Exception e) {
         if (this.calendarUsages != null) {
-            for (CalendarUsagesWithPath item : this.calendarUsages) {
-                if (!item.getDBItemInventoryCalendarUsage().getEdited()) {
-                    item.getDBItemInventoryCalendarUsage().setEdited(true);
+            for (DBItemInventoryCalendarUsage item : this.calendarUsages) {
+                if (!item.getEdited()) {
+                    item.setEdited(true);
                 }
-                String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getDBItemInventoryCalendarUsage().getObjectType(), item.getDBItemInventoryCalendarUsage().getPath(), instance.getHostname(), instance.getPort());
+                String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getObjectType(), getCalendarPath(), instance.getHostname(), instance.getPort());
                 exceptions.put(key, e);
             }
         }

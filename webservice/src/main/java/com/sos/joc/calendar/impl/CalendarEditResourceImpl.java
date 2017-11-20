@@ -86,20 +86,21 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             Dates oldDates = null;
             if (calendarDbItem != null) {
                 calEvt.setKey("CalendarUpdated");
-                if (!calendar.getPath().equals(calendarDbItem.getName())) {
-                    calEvtVars.setOldPath(calendarDbItem.getName());
-                }
                 try {
                     newDates = new FrequencyResolver().resolveFromToday(calendar);
-                    oldDates = new FrequencyResolver().resolveFromToday(new ObjectMapper().readValue(calendarDbItem.getConfiguration(), Calendar.class));
+                    if (!calendar.getPath().equals(calendarDbItem.getName())) {
+                        calEvtVars.setOldPath(calendarDbItem.getName());
+                    } else {
+                        oldDates = new FrequencyResolver().resolveFromToday(new ObjectMapper().readValue(calendarDbItem.getConfiguration(), Calendar.class));
+                        if (newDates.getDates().equals(oldDates.getDates())) {
+                            calendarHasChanged = false;
+                        }
+                    }
                 } catch (SOSMissingDataException e) {
                     throw new JocMissingRequiredParameterException(e);
                 } catch (SOSInvalidDataException e) {
                     throw new JobSchedulerInvalidResponseDataException(e);
                 }
-                if (newDates.getDates().equals(oldDates.getDates())) {
-                    calendarHasChanged = false;
-                } 
             }
             
             if (calendarDbItem == null) {
@@ -122,7 +123,9 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                     //update calendar in jobs, orders and schedules
                     CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(connection);
                     CalendarUsagesAndInstance calendarUsageInstance = new CalendarUsagesAndInstance(dbItemInventoryInstance, false);
-                    calendarUsageInstance.setCalendarUsages(calendarUsageDbLayer.getCalendarUsagesOfAnInstance(dbItemInventoryInstance.getId(), calendarDbItem.getId()));
+                    calendarUsageInstance.setCalendarUsages(calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId()));
+                    calendarUsageInstance.setCalendarPath(calendar.getPath());
+                    calendarUsageInstance.setOldCalendarPath(calendarDbItem.getName());
                     calendarUsageInstance.setBaseCalendar(calendar);
                     calendarUsageInstance.setDates(newDates.getDates());
                     JobSchedulerCalendarCallable callable = new JobSchedulerCalendarCallable(calendarUsageInstance, accessToken);

@@ -123,9 +123,12 @@ public class CalendarsDBLayer extends DBLayer {
             calendar.setName(null);
             calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
             calendarDbItem.setModified(now);
+            calendar.setPath(calendarDbItem.getName());
+            calendar.setName(calendarDbItem.getBaseName());
             if (newCalendar) {
                 getSession().save(calendarDbItem);
             } else {
+                calendar.setId(calendarDbItem.getId());
                 getSession().update(calendarDbItem);
             }
             return now;
