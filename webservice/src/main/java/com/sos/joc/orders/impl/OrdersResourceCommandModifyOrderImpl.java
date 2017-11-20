@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 import org.dom4j.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -239,10 +240,10 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     if (session == null) {
                         session = Globals.createSosHibernateStatelessConnection(API_CALL);
                     }
-                    CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), "ORDER",
-                            jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
+                    CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
+                            CalendarObjectType.ORDER, jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
                     calendarUsedByWriter.updateUsedBy();
-
+                    calendarUsedByWriter.sendEvent();
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {

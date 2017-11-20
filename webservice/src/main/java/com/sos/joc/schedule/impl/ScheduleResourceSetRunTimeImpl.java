@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -59,11 +60,12 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
             String commandAsXml = command.asXML();
             jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
-            
+
             session = Globals.createSosHibernateStatelessConnection(API_CALL);
-            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), "SCHEDULE", schedulePath,
-                    modifyRuntime.getRunTime(), modifyRuntime.getCalendars());
+            CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
+                    CalendarObjectType.SCHEDULE, schedulePath, modifyRuntime.getRunTime(), modifyRuntime.getCalendars());
             calendarUsedByWriter.updateUsedBy();
+            calendarUsedByWriter.sendEvent();
 
             storeAuditLogEntry(scheduleAudit);
 

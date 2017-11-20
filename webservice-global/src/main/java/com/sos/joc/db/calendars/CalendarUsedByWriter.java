@@ -10,24 +10,26 @@ import org.w3c.dom.NodeList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
-import com.sos.joc.exceptions.DBConnectionRefusedException;
-import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.jobscheduler.model.event.CalendarEvent;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
+import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.model.calendar.Calendar;
 
 import sos.xml.SOSXMLXPath;
 
 public class CalendarUsedByWriter {
+
     private Long instanceId;
     private String path;
-    private String objectType;
+    private CalendarObjectType objectType;
     private String command;
     private SOSHibernateSession sosHibernateSession;
     private Map<String, Calendar> calendars = new HashMap<String, Calendar>();
 
-    public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, Long instanceId, String objectType, String path, String command) {
+    public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, Long instanceId, CalendarObjectType objectType, String path,
+            String command) {
         super();
         this.sosHibernateSession = sosHibernateSession;
         this.instanceId = instanceId;
@@ -35,8 +37,9 @@ public class CalendarUsedByWriter {
         this.path = path;
         this.command = command;
     }
-    
-    public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, Long instanceId, String objectType, String path, String command, List<Calendar> calendars) {
+
+    public CalendarUsedByWriter(SOSHibernateSession sosHibernateSession, Long instanceId, CalendarObjectType objectType, String path, 
+            String command, List<Calendar> calendars) {
         super();
         this.sosHibernateSession = sosHibernateSession;
         this.instanceId = instanceId;
@@ -44,27 +47,11 @@ public class CalendarUsedByWriter {
         this.path = path;
         this.command = command;
         if (calendars != null) {
-           for (Calendar calendar : calendars) {
-               if (calendar.getBasedOn() != null) {
-                   this.calendars.put(calendar.getBasedOn(), calendar);
-               }
-           }
-        }
-    }
-    
-    public void deleteUsedBy() throws DBConnectionRefusedException, DBInvalidDataException, SOSHibernateException {
-        CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(this.sosHibernateSession);
-        CalendarUsageFilter calendarUsageFilter = new CalendarUsageFilter();
-        calendarUsageFilter.setInstanceId(instanceId);
-        calendarUsageFilter.setObjectType(objectType);
-        calendarUsageFilter.setPath(path);
-        try {
-            sosHibernateSession.beginTransaction();
-            calendarUsageDBLayer.deleteCalendarUsage(calendarUsageFilter);
-            sosHibernateSession.commit();
-        } catch (Exception e) {
-            sosHibernateSession.rollback();
-            throw e;
+            for (Calendar calendar : calendars) {
+                if (calendar.getBasedOn() != null) {
+                    this.calendars.put(calendar.getBasedOn(), calendar);
+                }
+            }
         }
     }
 
@@ -72,18 +59,19 @@ public class CalendarUsedByWriter {
         SOSXMLXPath sosxml = new SOSXMLXPath(new StringBuffer(command));
         Set<String> calendarPaths = new HashSet<String>();
         NodeList calendarNodes = sosxml.selectNodeList("//date/@calendar|//holiday/@calendar");
-        
+
         try {
             sosHibernateSession.beginTransaction();
             CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(this.sosHibernateSession);
             CalendarsDBLayer calendarsDBLayer = new CalendarsDBLayer(this.sosHibernateSession);
-            List<DBItemInventoryCalendarUsage> dbCalendarUsage = calendarUsageDBLayer.getCalendarUsagesOfAnObject(instanceId, objectType, path);
+            List<DBItemInventoryCalendarUsage> dbCalendarUsage = calendarUsageDBLayer.getCalendarUsagesOfAnObject(instanceId, objectType.name(),
+                    path);
             DBItemInventoryCalendarUsage calendarUsageDbItem = new DBItemInventoryCalendarUsage();
             calendarUsageDbItem.setInstanceId(instanceId);
-            calendarUsageDbItem.setObjectType(objectType);
+            calendarUsageDbItem.setObjectType(objectType.name());
             calendarUsageDbItem.setEdited(false);
             calendarUsageDbItem.setPath(path);
-            
+
             for (int i = 0; i < calendarNodes.getLength(); i++) {
                 String calendarPath = calendarNodes.item(i).getNodeValue();
                 if (calendarPath != null && !calendarPaths.contains(calendarPath)) {
@@ -93,11 +81,11 @@ public class CalendarUsedByWriter {
                         calendarUsageDbItem.setCalendarId(calendarDbItem.getId());
                         Calendar calendar = calendars.get(calendarPath);
                         if (calendar != null) {
-                            calendarUsageDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendars.get(calendarPath))); 
+                            calendarUsageDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendars.get(calendarPath)));
                         }
                         int index = dbCalendarUsage.indexOf(calendarUsageDbItem);
                         if (index == -1) {
-                            calendarUsageDBLayer.saveCalendarUsage(calendarUsageDbItem); 
+                            calendarUsageDBLayer.saveCalendarUsage(calendarUsageDbItem);
                         } else {
                             DBItemInventoryCalendarUsage dbItem = dbCalendarUsage.remove(index);
                             dbItem.setEdited(false);
@@ -115,6 +103,14 @@ public class CalendarUsedByWriter {
             sosHibernateSession.rollback();
             throw e;
         }
+    }
+
+    public void sendEvent() {
+        CalendarEvent calEvt = new CalendarEvent();
+        calEvt.setKey("CalendarUsageUpdated");
+        CalendarVariables calEvtVars = new CalendarVariables();
+        calEvtVars.setPath(path);
+        calEvtVars.setObjectType(objectType);
     }
 
 }
