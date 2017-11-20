@@ -171,7 +171,8 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                         CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), CalendarObjectType.JOB, jobPath,
                                 modifyJob.getRunTime(), modifyJob.getCalendars());
                         calendarUsedByWriter.updateUsedBy();
-                        calendarUsedByWriter.sendEvent();
+                        calendarUsedByWriter.getEvent();
+                        jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
                     } finally {
                         Globals.disconnect(session);
                     }

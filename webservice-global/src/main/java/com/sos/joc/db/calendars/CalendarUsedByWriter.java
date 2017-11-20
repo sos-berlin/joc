@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.w3c.dom.NodeList;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
@@ -105,12 +106,15 @@ public class CalendarUsedByWriter {
         }
     }
 
-    public void sendEvent() {
+    public String getEvent() throws JsonProcessingException {
         CalendarEvent calEvt = new CalendarEvent();
         calEvt.setKey("CalendarUsageUpdated");
         CalendarVariables calEvtVars = new CalendarVariables();
         calEvtVars.setPath(path);
         calEvtVars.setObjectType(objectType);
+        String xmlCommand = new ObjectMapper().writeValueAsString(calEvt);
+        xmlCommand = "<publish_event>" + xmlCommand + "</publish_event>";
+        return xmlCommand;
     }
 
 }

@@ -65,7 +65,7 @@ public class ScheduleResourceSetRunTimeImpl extends JOCResourceImpl implements I
             CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
                     CalendarObjectType.SCHEDULE, schedulePath, modifyRuntime.getRunTime(), modifyRuntime.getCalendars());
             calendarUsedByWriter.updateUsedBy();
-            calendarUsedByWriter.sendEvent();
+            jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
 
             storeAuditLogEntry(scheduleAudit);
 

@@ -243,7 +243,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
                             CalendarObjectType.ORDER, jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
                     calendarUsedByWriter.updateUsedBy();
-                    calendarUsedByWriter.sendEvent();
+                    jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
