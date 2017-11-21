@@ -112,6 +112,7 @@ public class CalendarUsedByWriter {
         CalendarVariables calEvtVars = new CalendarVariables();
         calEvtVars.setPath(path);
         calEvtVars.setObjectType(objectType);
+        calEvt.setVariables(calEvtVars);
         String xmlCommand = new ObjectMapper().writeValueAsString(calEvt);
         xmlCommand = "<publish_event>" + xmlCommand + "</publish_event>";
         return xmlCommand;
