@@ -97,7 +97,7 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public Date saveOrUpdateCalendar(Long instanceId, DBItemCalendar calendarDbItem, Calendar calendar) throws DBConnectionRefusedException,
+    public DBItemCalendar saveOrUpdateCalendar(Long instanceId, DBItemCalendar calendarDbItem, Calendar calendar) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             Date now = Date.from(Instant.now());
@@ -131,7 +131,7 @@ public class CalendarsDBLayer extends DBLayer {
                 calendar.setId(calendarDbItem.getId());
                 getSession().update(calendarDbItem);
             }
-            return now;
+            return calendarDbItem;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {

@@ -131,13 +131,18 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             }
 
             calEvt.setVariables(calEvtVars);
-            Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
+            calendarDbItem = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
+            Date surveyDate = calendarDbItem.getModified();
             List<Err419> listOfErrors = new ArrayList<Err419>();
             List<String> eventCommands = new ArrayList<String>();
             
-            Calendar curCalendar = objMapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);;
-            if (newCalendar || !curCalendar.equals(oldCalendar)) {
+            if (newCalendar) {
                 eventCommands.add(addEvent(calEvt)); 
+            } else {
+                Calendar curCalendar = objMapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);
+                if (!curCalendar.equals(oldCalendar)) {
+                    eventCommands.add(addEvent(calEvt));
+                }
             }
             
             if (updateCalendarUsageIsNecessary) {
@@ -227,8 +232,8 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             if (oldCalendarDbItem != null) {
                 throw new JocObjectAlreadyExistException(calendar.getPath());
             }
-
-            Date surveyDate = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), null, calendar);
+            DBItemCalendar dbItemCalendar = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), null, calendar);
+            Date surveyDate = dbItemCalendar.getModified();
             storeAuditLogEntry(calendarAudit);
             
             CalendarEvent calEvt = new CalendarEvent();
