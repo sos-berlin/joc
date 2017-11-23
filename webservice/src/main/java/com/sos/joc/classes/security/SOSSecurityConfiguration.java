@@ -185,13 +185,21 @@ public class SOSSecurityConfiguration {
 
     private void writeMain() {
         SOSSecurityConfigurationMainEntry sosSecurityConfigurationMainEntry = new SOSSecurityConfigurationMainEntry();
-
+        HashMap <String,String>comments = new HashMap<String,String>();
         Section mainSection = ini.getSection(SECTION_MAIN);
-        clearSection(SECTION_MAIN);
-        
         for (Map.Entry<String, String> entry : mainSection.entrySet()) {
+            if (writeIni.get(SECTION_MAIN).getComment(entry.getKey()) != null) {
+                comments.put(entry.getKey(),writeIni.get(SECTION_MAIN).getComment(entry.getKey()));
+            }
+        }
+        clearSection(SECTION_MAIN);
+        for (Map.Entry<String, String> entry : mainSection.entrySet()) {
+            if (comments.get(entry.getKey()) != null) {
+                writeIni.get(SECTION_MAIN).putComment(entry.getKey(),comments.get(entry.getKey()));
+            }
             writeIni.get(SECTION_MAIN).put(entry.getKey(),sosSecurityConfigurationMainEntry.getIniWriteString(entry));
         }
+
     }
 
     public SecurityConfiguration readConfiguration() {

@@ -17,6 +17,9 @@
       "items": {
         "$ref": "agent-schema.json"
       }
+    },
+    "totalNumOfSuccessfulTasks": {
+      "$ref": "../common/nonNegativeLong-schema.json"
     }
   }
 }

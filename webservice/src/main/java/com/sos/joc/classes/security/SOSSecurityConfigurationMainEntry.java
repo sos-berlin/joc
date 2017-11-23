@@ -9,7 +9,7 @@ public class SOSSecurityConfigurationMainEntry {
             String s = "  ";
             String[] map = entry.getValue().split(",");
             if (map.length > 1) {
-                s = "\\" + "\n" + " ";
+                s = "\\" + "\n" + "  ";
             }
 
             for (int i = 0; i < map.length; i++) {

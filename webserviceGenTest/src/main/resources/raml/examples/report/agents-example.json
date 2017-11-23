@@ -65,5 +65,6 @@
 		"jobschedulerId": "scheduler.1.11.oh",
 		"numOfSuccessfulTasks": 4
 	}],
-	"deliveryDate": "2017-11-02T12:17:43.326Z"
+	"deliveryDate": "2017-11-02T12:17:43.326Z",
+	"totalNumOfSuccessfulTasks": 1077
 }

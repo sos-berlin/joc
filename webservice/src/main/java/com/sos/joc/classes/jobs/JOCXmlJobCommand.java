@@ -155,6 +155,8 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
                 break;
             case QUEUED:
             case WAITINGFORRESOURCE: 
+                filterStates.add(JobStateText.ERROR);
+                filterStates.add(JobStateText.NOT_INITIALIZED);
                 filterStates.add(JobStateText.NOT_IN_PERIOD);
                 filterStates.add(JobStateText.WAITING_FOR_AGENT);
                 filterStates.add(JobStateText.WAITING_FOR_LOCK);
