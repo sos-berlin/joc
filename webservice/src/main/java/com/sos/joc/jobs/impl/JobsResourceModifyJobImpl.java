@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import org.dom4j.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -167,9 +168,10 @@ public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsR
                     
                     SOSHibernateSession session = Globals.createSosHibernateStatelessConnection(API_CALL + SET_RUN_TIME);
                     try {
-                        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), "JOB", jobPath,
+                        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), CalendarObjectType.JOB, jobPath,
                                 modifyJob.getRunTime(), modifyJob.getCalendars());
                         calendarUsedByWriter.updateUsedBy();
+                        jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
                     } finally {
                         Globals.disconnect(session);
                     }

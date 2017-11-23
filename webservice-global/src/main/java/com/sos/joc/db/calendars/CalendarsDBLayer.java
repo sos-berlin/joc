@@ -97,7 +97,7 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public Date saveOrUpdateCalendar(Long instanceId, DBItemCalendar calendarDbItem, Calendar calendar) throws DBConnectionRefusedException,
+    public DBItemCalendar saveOrUpdateCalendar(Long instanceId, DBItemCalendar calendarDbItem, Calendar calendar) throws DBConnectionRefusedException,
             DBInvalidDataException {
         try {
             Date now = Date.from(Instant.now());
@@ -123,12 +123,15 @@ public class CalendarsDBLayer extends DBLayer {
             calendar.setName(null);
             calendarDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
             calendarDbItem.setModified(now);
+            calendar.setPath(calendarDbItem.getName());
+            calendar.setName(calendarDbItem.getBaseName());
             if (newCalendar) {
                 getSession().save(calendarDbItem);
             } else {
+                calendar.setId(calendarDbItem.getId());
                 getSession().update(calendarDbItem);
             }
-            return now;
+            return calendarDbItem;
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);
         } catch (Exception ex) {
@@ -217,19 +220,15 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemCalendar> getCalendars(String type, Set<String> categories, Set<String> folders, Set<String> recuriveFolders)
+    public List<DBItemCalendar> getCalendars(Long instanceId, String type, Set<String> categories, Set<String> folders, Set<String> recuriveFolders)
             throws DBConnectionRefusedException, DBInvalidDataException {
         // all recursiveFolders are included in folders too
         try {
-            Set<String> types = new HashSet<String>();
-            types.add("WORKING_DAYS");
-            types.add("NON_WORKING_DAYS");
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_CALENDARS);
+            sql.append(" where instanceId = :instanceId");
             if (type != null && !type.isEmpty()) {
-                sql.append(" where type = :type");
-            } else {
-                sql.append(" where type in (:type)");
+                sql.append(" and type = :type");
             }
             if (categories != null && !categories.isEmpty()) {
                 if (categories.size() == 1) {
@@ -258,10 +257,9 @@ public class CalendarsDBLayer extends DBLayer {
                 }
             }
             Query<DBItemCalendar> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
             if (type != null && !type.isEmpty()) {
                 query.setParameter("type", type.toUpperCase());
-            } else {
-                query.setParameterList("type", types);
             }
             if (categories != null && !categories.isEmpty()) {
                 if (categories.size() == 1) {

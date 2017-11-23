@@ -10,12 +10,12 @@ import org.w3c.dom.Element;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
-import com.sos.joc.db.calendars.CalendarUsagesWithPath;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerNoResponseException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
+import com.sos.joc.model.calendar.Dates;
 
 public class JobSchedulerCalendarCallable implements Callable<CalendarUsagesAndInstance> {
 
@@ -32,11 +32,23 @@ public class JobSchedulerCalendarCallable implements Callable<CalendarUsagesAndI
         JOCXmlCommand jocXmlCommand = new JOCXmlCommand(calendarUsageAndInstance.getInstance());
         String xmlCommand = null;
         List<String> dates = calendarUsageAndInstance.getDates();
-        Set<CalendarUsagesWithPath> schedules = new HashSet<CalendarUsagesWithPath>();
+        Set<DBItemInventoryCalendarUsage> schedules = new HashSet<DBItemInventoryCalendarUsage>();
         try {
-            for (CalendarUsagesWithPath itemWithPath : calendarUsageAndInstance.getCalendarUsages()) {
-                DBItemInventoryCalendarUsage item = itemWithPath.getdBItemInventoryCalendarUsage();
+            for (DBItemInventoryCalendarUsage item : calendarUsageAndInstance.getCalendarUsages()) {
                 try {
+                    if (item.getConfiguration() != null && !item.getConfiguration().isEmpty() && calendarUsageAndInstance.getBaseCalendar() != null) { // has restrictions
+//                        try {
+                            Dates d = new FrequencyResolver().resolveRestrictionsFromToday(calendarUsageAndInstance.getBaseCalendar(), item
+                                    .getConfiguration());
+                            item.setBasedDates(d.getDates());
+//                        } catch (SOSMissingDataException e) {
+//                            throw new JocMissingRequiredParameterException(e);
+//                        } catch (SOSInvalidDataException e) {
+//                            throw new JobSchedulerInvalidResponseDataException(e);
+//                        }
+                    } else {
+                        item.setBasedDates(dates);
+                    }
                     String objectType = item.getObjectType();
                     Element jobSchedulerObjectElement = null;
                     if (objectType == null) {
@@ -47,8 +59,8 @@ public class JobSchedulerCalendarCallable implements Callable<CalendarUsagesAndI
                             String[] orderPath = item.getPath().split(",", 2);
                             xmlCommand = jocXmlCommand.getShowOrderCommand(orderPath[0], orderPath[1], "source");
                             jocXmlCommand.executePost(xmlCommand, accessToken);
-                            jobSchedulerObjectElement = jocXmlCommand.updateCalendarInRuntimes(dates, item.getObjectType(), item.getPath(),
-                                    itemWithPath.getCalendarPath());
+                            jobSchedulerObjectElement = jocXmlCommand.updateCalendarInRuntimes(item.basedDates(), item.getObjectType(), item
+                                    .getPath(), calendarUsageAndInstance.getCalendarPath(), calendarUsageAndInstance.getOldCalendarPath());
                             if (jobSchedulerObjectElement != null) {
                                 xmlCommand = jocXmlCommand.getModifyHotFolderCommand(item.getPath(), jobSchedulerObjectElement);
                                 jocXmlCommand.executePost(xmlCommand, accessToken);
@@ -57,15 +69,15 @@ public class JobSchedulerCalendarCallable implements Callable<CalendarUsagesAndI
                         case "JOB":
                             xmlCommand = jocXmlCommand.getShowJobCommand(item.getPath(), "source");
                             jocXmlCommand.executePost(xmlCommand, accessToken);
-                            jobSchedulerObjectElement = jocXmlCommand.updateCalendarInRuntimes(dates, item.getObjectType(), item.getPath(),
-                                    itemWithPath.getCalendarPath());
+                            jobSchedulerObjectElement = jocXmlCommand.updateCalendarInRuntimes(item.basedDates(), item.getObjectType(), item
+                                    .getPath(), calendarUsageAndInstance.getCalendarPath(), calendarUsageAndInstance.getOldCalendarPath());
                             if (jobSchedulerObjectElement != null) {
                                 xmlCommand = jocXmlCommand.getModifyHotFolderCommand(item.getPath(), jobSchedulerObjectElement);
                                 jocXmlCommand.executePost(xmlCommand, accessToken);
                             }
                             break;
                         case "SCHEDULE":
-                            schedules.add(itemWithPath);
+                            schedules.add(item);
                             break;
                         default:
                             break;
@@ -90,11 +102,10 @@ public class JobSchedulerCalendarCallable implements Callable<CalendarUsagesAndI
                 xmlCommand = jocXmlCommand.getShowStateCommand("folder schedule", "folders source", null);
                 jocXmlCommand.executePost(xmlCommand, accessToken);
 
-                for (CalendarUsagesWithPath itemWithPath : schedules) {
-                    DBItemInventoryCalendarUsage item = itemWithPath.getdBItemInventoryCalendarUsage();
+                for (DBItemInventoryCalendarUsage item : schedules) {
                     try {
-                        Element jobSchedulerObjectElement = jocXmlCommand.updateCalendarInRuntimes(dates, item.getObjectType(), item.getPath(),
-                                itemWithPath.getCalendarPath());
+                        Element jobSchedulerObjectElement = jocXmlCommand.updateCalendarInRuntimes(item.basedDates(), item.getObjectType(), item
+                                .getPath(), calendarUsageAndInstance.getCalendarPath(), calendarUsageAndInstance.getOldCalendarPath());
                         if (jobSchedulerObjectElement != null) {
                             xmlCommand = jocXmlCommand.getModifyHotFolderCommand(item.getPath(), jobSchedulerObjectElement);
                             jocXmlCommand.executePost(xmlCommand, accessToken);

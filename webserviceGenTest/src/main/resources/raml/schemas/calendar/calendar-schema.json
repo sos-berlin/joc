@@ -32,6 +32,9 @@
     "to": {
       "$ref": "../common/date-schema.json"
     },
+    "periods": {
+      "$ref": "periods-schema.json"
+    },
     "includes": {
       "$ref": "frequencies-schema.json"
     },

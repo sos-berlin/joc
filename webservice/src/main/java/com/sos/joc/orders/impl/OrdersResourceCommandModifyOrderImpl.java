@@ -11,6 +11,10 @@ import javax.ws.rs.Path;
 import org.dom4j.Element;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
+import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
+import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -22,7 +26,10 @@ import com.sos.joc.classes.configuration.JSObjectConfiguration;
 import com.sos.joc.classes.jobscheduler.ValidateXML;
 import com.sos.joc.db.calendars.CalendarUsedByWriter;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
+import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.BulkError;
+import com.sos.joc.exceptions.DBConnectionRefusedException;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
@@ -39,6 +46,7 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private SOSHibernateSession session = null;
     private InventoryJobChainsDBLayer dbJobChainLayer = null;
+    private InventoryOrdersDBLayer dbOrderLayer = null;
 
     @Override
     public JOCDefaultResponse postOrdersStart(String xAccessToken, String accessToken, ModifyOrders modifyOrders) {
@@ -227,22 +235,35 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                     JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
                     String configuration = jocConfiguration.modifyOrderRuntime(order.getRunTime(), this, jobChainPath, order.getOrderId());
 
-                    ValidateXML.validateAgainstJobSchedulerSchema(configuration);
-                    XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                    Element orderElement = XMLBuilder.parse(configuration);
-                    orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
-                    orderElement.addAttribute("id", order.getOrderId());
+                    if (configuration == null) { // adhoc order
+                        ValidateXML.validateAgainstJobSchedulerSchema(order.getRunTime());
+                        xml.add(XMLBuilder.parse(order.getRunTime()));
+                        jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+                        
+                        updateRunTimeIsTemporary(jobChainPath, order.getOrderId(), true);
 
-                    xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
-                    jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
+                        DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter = new DailyPlanCalender2DBFilter();
+                        dailyPlanCalender2DBFilter.setForJobChain(order.getJobChain());
+                        dailyPlanCalender2DBFilter.setForOrderId(order.getOrderId());
+                        updateDailyPlan(dailyPlanCalender2DBFilter);
+                    } else {
+                        ValidateXML.validateAgainstJobSchedulerSchema(configuration);
+                        XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+                        Element orderElement = XMLBuilder.parse(configuration);
+                        orderElement.addAttribute("job_chain", Paths.get(jobChainPath).getFileName().toString());
+                        orderElement.addAttribute("id", order.getOrderId());
 
-                    if (session == null) {
-                        session = Globals.createSosHibernateStatelessConnection(API_CALL);
+                        xmlBuilder.addAttribute("folder", getParent(jobChainPath)).add(orderElement);
+                        jocXmlCommand.executePostWithThrowBadRequest(xmlBuilder.asXML(), getAccessToken());
+
+                        if (session == null) {
+                            session = Globals.createSosHibernateStatelessConnection(API_CALL);
+                        }
+                        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(),
+                                CalendarObjectType.ORDER, jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
+                        calendarUsedByWriter.updateUsedBy();
+                        jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
                     }
-                    CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), "ORDER",
-                            jobChainPath + "," + order.getOrderId(), order.getRunTime(), order.getCalendars());
-                    calendarUsedByWriter.updateUsedBy();
-
                 } catch (JocException e) {
                     throw e;
                 } catch (Exception e) {
@@ -308,6 +329,34 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
             return true;
         }
         return false;
+    }
+    
+    private DBItemInventoryOrder getDBItem(String jobChainPath, String orderId) throws JocException {
+        if (session == null) {
+            session = Globals.createSosHibernateStatelessConnection(API_CALL);
+        }
+        if (dbOrderLayer == null) {
+            dbOrderLayer = new InventoryOrdersDBLayer(session);
+        }
+        return dbOrderLayer.getInventoryOrderByOrderId(jobChainPath, orderId, dbItemInventoryInstance.getId());
+    }
+    
+    private void updateRunTimeIsTemporary(String jobChainPath, String orderId, boolean value) throws JocException {
+        DBItemInventoryOrder dbItem = getDBItem(jobChainPath, orderId);
+        if (dbItem != null) {
+            updateRunTimeIsTemporary(dbItem, value);
+        }
+    }
+
+    private void updateRunTimeIsTemporary(DBItemInventoryOrder dbItem, boolean value) throws JocException {
+        dbItem.setRunTimeIsTemporary(value);
+        try {
+            session.update(dbItem);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
     }
 
 }

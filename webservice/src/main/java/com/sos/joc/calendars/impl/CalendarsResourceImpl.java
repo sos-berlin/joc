@@ -76,7 +76,7 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                         }
                     }
                 }
-                dbCalendars = dbLayer.getCalendars(calendarsFilter.getType(), categories, folders, recursiveFolders);
+                dbCalendars = dbLayer.getCalendars(dbItemInventoryInstance.getId(), calendarsFilter.getType(), categories, folders, recursiveFolders);
             }
 
             List<Calendar> calendarList = new ArrayList<Calendar>();

@@ -325,46 +325,47 @@ public class JOCXmlCommand extends SOSXmlCommand {
         return modifyHotFolder.asXML();
     }
     
-    public Element updateCalendarInRuntimes(List<String> dates, String objectType, String path, String calendarPath) throws Exception {
+    public Element updateCalendarInRuntimes(List<String> dates, String objectType, String path, String calendarPath, String calendarOldPath)
+            throws Exception {
         Node curObject = getSosxml().selectSingleNode(String.format("//%1$s[@path='%2$s']/source", objectType.toLowerCase(), path));
         if (curObject == null) {
             throw new JobSchedulerObjectNotExistException(objectType + ": " + path);
         }
-        NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%1$s']/parent::*", calendarPath));
-        NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%1$s']/parent::*", calendarPath));
+        NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%1$s']/parent::*", calendarOldPath));
+        NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%1$s']/parent::*", calendarOldPath));
         boolean runTimeIsChanged = false;
-        
-        for (int i=0; i < dateParentList.getLength(); i++) {
-            NodeList dateList = getSosxml().selectNodeList(dateParentList.item(i), String.format("date[@calendar='%1$s']", calendarPath));
-            if (updateCalendarInRuntime(dateList, dates)) {
+
+        for (int i = 0; i < dateParentList.getLength(); i++) {
+            NodeList dateList = getSosxml().selectNodeList(dateParentList.item(i), String.format("date[@calendar='%1$s']", calendarOldPath));
+            if (updateCalendarInRuntime(dateList, dates, calendarPath)) {
                 runTimeIsChanged = true;
             }
         }
-        for (int i=0; i < holidayParentList.getLength(); i++) {
-            NodeList holidayList = getSosxml().selectNodeList(holidayParentList.item(i), String.format("holiday[@calendar='%1$s']", calendarPath));
-            if (updateCalendarInRuntime(holidayList, dates)) {
+        for (int i = 0; i < holidayParentList.getLength(); i++) {
+            NodeList holidayList = getSosxml().selectNodeList(holidayParentList.item(i), String.format("holiday[@calendar='%1$s']", calendarOldPath));
+            if (updateCalendarInRuntime(holidayList, dates, calendarPath)) {
                 runTimeIsChanged = true;
             }
         }
-        for (int i=0; i < holidayParentList.getLength(); i++) {
+        for (int i = 0; i < holidayParentList.getLength(); i++) {
             NodeList children = holidayParentList.item(i).getChildNodes();
             if (children.getLength() == 1 && children.item(0).getNodeType() == Node.TEXT_NODE) {
                 holidayParentList.item(i).removeChild(children.item(0));
             }
         }
-        for (int i=0; i < dateParentList.getLength(); i++) {
+        for (int i = 0; i < dateParentList.getLength(); i++) {
             NodeList children = dateParentList.item(i).getChildNodes();
             if (children.getLength() == 1 && children.item(0).getNodeType() == Node.TEXT_NODE) {
                 dateParentList.item(i).removeChild(children.item(0));
             }
         }
-        if(runTimeIsChanged) {
-            return (Element) curObject.getFirstChild(); 
+        if (runTimeIsChanged) {
+            return (Element) curObject.getFirstChild();
         }
-        return null; 
+        return null;
     }
     
-    private boolean updateCalendarInRuntime(NodeList nodeList, List<String> dates) {
+    private boolean updateCalendarInRuntime(NodeList nodeList, List<String> dates, String calendarPath) {
         Element firstElem = null;
         Node parentOfFirstElem = null;
         Node textNode = null;
@@ -392,6 +393,7 @@ public class JOCXmlCommand extends SOSXmlCommand {
                 String lastDateOfdates = dates.remove(dates.size()-1);
                 dates.add(0, lastDateOfdates);
                 firstElem.setAttribute("date", dates.get(0));
+                firstElem.setAttribute("calendar", calendarPath);
                 for (int i=1; i < dates.size(); i++) {
                     Element newElem = (Element) firstElem.cloneNode(true);
                     newElem.setAttribute("date", dates.get(i));
