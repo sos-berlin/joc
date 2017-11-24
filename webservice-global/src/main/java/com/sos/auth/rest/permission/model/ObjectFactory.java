@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.08.28 um 03:50:15 PM CEST 
+// Generiert: 2017.11.24 um 10:35:17 AM CET 
 //
 
 
@@ -274,6 +274,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link SOSPermissionJocCockpit.History }
+     * 
+     */
+    public SOSPermissionJocCockpit.History createSOSPermissionJocCockpitHistory() {
+        return new SOSPermissionJocCockpit.History();
+    }
+
+    /**
      * Create an instance of {@link SOSPermissionJocCockpit.DailyPlan }
      * 
      */
@@ -359,14 +367,6 @@ public class ObjectFactory {
      */
     public SOSPermissionShiro createSOSPermissionShiro() {
         return new SOSPermissionShiro();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionJocCockpit.History }
-     * 
-     */
-    public SOSPermissionJocCockpit.History createSOSPermissionJocCockpitHistory() {
-        return new SOSPermissionJocCockpit.History();
     }
 
     /**
@@ -538,6 +538,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Calendar.View }
+     * 
+     */
+    public SOSPermissionJocCockpit.Calendar.View createSOSPermissionJocCockpitCalendarView() {
+        return new SOSPermissionJocCockpit.Calendar.View();
+    }
+
+    /**
      * Create an instance of {@link SOSPermissionJocCockpit.Calendar.Edit.Assign }
      * 
      */
@@ -559,6 +567,14 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit.YADE.Execute createSOSPermissionJocCockpitYADEExecute() {
         return new SOSPermissionJocCockpit.YADE.Execute();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.JOCConfigurations.Share.View }
+     * 
+     */
+    public SOSPermissionJocCockpit.JOCConfigurations.Share.View createSOSPermissionJocCockpitJOCConfigurationsShareView() {
+        return new SOSPermissionJocCockpit.JOCConfigurations.Share.View();
     }
 
     /**
@@ -735,6 +751,14 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit.Order.Execute createSOSPermissionJocCockpitOrderExecute() {
         return new SOSPermissionJocCockpit.Order.Execute();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.History.View }
+     * 
+     */
+    public SOSPermissionJocCockpit.History.View createSOSPermissionJocCockpitHistoryView() {
+        return new SOSPermissionJocCockpit.History.View();
     }
 
     /**

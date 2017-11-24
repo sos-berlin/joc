@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.08.28 um 03:50:15 PM CEST 
+// Generiert: 2017.11.24 um 10:35:17 AM CET 
 //
 
 
@@ -193,7 +193,17 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="view">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -613,7 +623,17 @@ import javax.xml.bind.annotation.XmlType;
  *                                 &lt;/complexContent>
  *                               &lt;/complexType>
  *                             &lt;/element>
- *                             &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="view">
+ *                               &lt;complexType>
+ *                                 &lt;complexContent>
+ *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                                     &lt;sequence>
+ *                                       &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                                     &lt;/sequence>
+ *                                   &lt;/restriction>
+ *                                 &lt;/complexContent>
+ *                               &lt;/complexType>
+ *                             &lt;/element>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -666,7 +686,17 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                   &lt;element name="view">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
  *                   &lt;element name="edit">
  *                     &lt;complexType>
  *                       &lt;complexContent>
@@ -1510,7 +1540,17 @@ public class SOSPermissionJocCockpit {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="view">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
      *         &lt;element name="edit">
      *           &lt;complexType>
      *             &lt;complexContent>
@@ -1552,23 +1592,32 @@ public class SOSPermissionJocCockpit {
     })
     public static class Calendar {
 
-        protected boolean view;
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.Calendar.View view;
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Calendar.Edit edit;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
          * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.Calendar.View }
+         *     
          */
-        public boolean isView() {
+        public SOSPermissionJocCockpit.Calendar.View getView() {
             return view;
         }
 
         /**
          * Legt den Wert der view-Eigenschaft fest.
          * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.Calendar.View }
+         *     
          */
-        public void setView(boolean value) {
+        public void setView(SOSPermissionJocCockpit.Calendar.View value) {
             this.view = value;
         }
 
@@ -1800,6 +1849,52 @@ public class SOSPermissionJocCockpit {
                     this.change = value;
                 }
 
+            }
+
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "status"
+        })
+        public static class View {
+
+            protected boolean status;
+
+            /**
+             * Ruft den Wert der status-Eigenschaft ab.
+             * 
+             */
+            public boolean isStatus() {
+                return status;
+            }
+
+            /**
+             * Legt den Wert der status-Eigenschaft fest.
+             * 
+             */
+            public void setStatus(boolean value) {
+                this.status = value;
             }
 
         }
@@ -2188,7 +2283,17 @@ public class SOSPermissionJocCockpit {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="view">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -2203,22 +2308,77 @@ public class SOSPermissionJocCockpit {
     })
     public static class History {
 
-        protected boolean view;
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.History.View view;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
          * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.History.View }
+         *     
          */
-        public boolean isView() {
+        public SOSPermissionJocCockpit.History.View getView() {
             return view;
         }
 
         /**
          * Legt den Wert der view-Eigenschaft fest.
          * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.History.View }
+         *     
          */
-        public void setView(boolean value) {
+        public void setView(SOSPermissionJocCockpit.History.View value) {
             this.view = value;
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "status"
+        })
+        public static class View {
+
+            protected boolean status;
+
+            /**
+             * Ruft den Wert der status-Eigenschaft ab.
+             * 
+             */
+            public boolean isStatus() {
+                return status;
+            }
+
+            /**
+             * Legt den Wert der status-Eigenschaft fest.
+             * 
+             */
+            public void setStatus(boolean value) {
+                this.status = value;
+            }
+
         }
 
     }
@@ -2374,7 +2534,17 @@ public class SOSPermissionJocCockpit {
      *                       &lt;/complexContent>
      *                     &lt;/complexType>
      *                   &lt;/element>
-     *                   &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="view">
+     *                     &lt;complexType>
+     *                       &lt;complexContent>
+     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                           &lt;sequence>
+     *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *                           &lt;/sequence>
+     *                         &lt;/restriction>
+     *                       &lt;/complexContent>
+     *                     &lt;/complexType>
+     *                   &lt;/element>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -2456,7 +2626,17 @@ public class SOSPermissionJocCockpit {
          *             &lt;/complexContent>
          *           &lt;/complexType>
          *         &lt;/element>
-         *         &lt;element name="view" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="view">
+         *           &lt;complexType>
+         *             &lt;complexContent>
+         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *                 &lt;sequence>
+         *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+         *                 &lt;/sequence>
+         *               &lt;/restriction>
+         *             &lt;/complexContent>
+         *           &lt;/complexType>
+         *         &lt;/element>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -2474,7 +2654,8 @@ public class SOSPermissionJocCockpit {
 
             @XmlElement(required = true)
             protected SOSPermissionJocCockpit.JOCConfigurations.Share.Change change;
-            protected boolean view;
+            @XmlElement(required = true)
+            protected SOSPermissionJocCockpit.JOCConfigurations.Share.View view;
 
             /**
              * Ruft den Wert der change-Eigenschaft ab.
@@ -2503,16 +2684,24 @@ public class SOSPermissionJocCockpit {
             /**
              * Ruft den Wert der view-Eigenschaft ab.
              * 
+             * @return
+             *     possible object is
+             *     {@link SOSPermissionJocCockpit.JOCConfigurations.Share.View }
+             *     
              */
-            public boolean isView() {
+            public SOSPermissionJocCockpit.JOCConfigurations.Share.View getView() {
                 return view;
             }
 
             /**
              * Legt den Wert der view-Eigenschaft fest.
              * 
+             * @param value
+             *     allowed object is
+             *     {@link SOSPermissionJocCockpit.JOCConfigurations.Share.View }
+             *     
              */
-            public void setView(boolean value) {
+            public void setView(SOSPermissionJocCockpit.JOCConfigurations.Share.View value) {
                 this.view = value;
             }
 
@@ -2681,6 +2870,61 @@ public class SOSPermissionJocCockpit {
                         this.makeShared = value;
                     }
 
+                }
+
+            }
+
+
+            /**
+             * <p>Java-Klasse für anonymous complex type.
+             * 
+             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * 
+             * <pre>
+             * &lt;complexType>
+             *   &lt;complexContent>
+             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+             *       &lt;sequence>
+             *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+             *       &lt;/sequence>
+             *     &lt;/restriction>
+             *   &lt;/complexContent>
+             * &lt;/complexType>
+             * </pre>
+             * 
+             * 
+             */
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "", propOrder = {
+                "status"
+            })
+            public static class View {
+
+                @XmlElement(required = true)
+                protected Object status;
+
+                /**
+                 * Ruft den Wert der status-Eigenschaft ab.
+                 * 
+                 * @return
+                 *     possible object is
+                 *     {@link Object }
+                 *     
+                 */
+                public Object getStatus() {
+                    return status;
+                }
+
+                /**
+                 * Legt den Wert der status-Eigenschaft fest.
+                 * 
+                 * @param value
+                 *     allowed object is
+                 *     {@link Object }
+                 *     
+                 */
+                public void setStatus(Object value) {
+                    this.status = value;
                 }
 
             }
