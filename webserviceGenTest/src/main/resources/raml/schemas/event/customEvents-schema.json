@@ -1,0 +1,22 @@
+{
+  "title": "jobs (permant part)",
+  "id": "schemas/event/customEvents",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.Events",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "events"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "customEvent-schema.json"
+      }
+    }
+  }
+}

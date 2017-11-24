@@ -113,6 +113,25 @@ traits:
       schema200: !include schemas/event/events-schema.json
       example: TODO
       example200: TODO
+  /custom:
+    type:
+      postJSON:
+        description: Custom events
+        description1: !include documentation/common/dateFrom.md
+        description2: !include documentation/common/dateTo.md
+        description3: !include documentation/common/timeZone.md
+        description4: !include documentation/common/regex.md
+        description5: !include documentation/common/folders.md
+        description6: !include documentation/job/filteredByJobs.md
+        description7: !include documentation/order/filteredByOrders.md
+        description8: !include documentation/event/filteredByIdClassExit.md
+        description9: " "
+        description10: !include documentation/common/limit.md
+        description200: " "
+        schema: !include schemas/event/customEventsFilter-schema.json
+        schema200: !include schemas/event/customEvents-schema.json
+        example: " "
+        example200: " "
 /touch:
   type: error
   post:
@@ -1215,26 +1234,6 @@ traits:
         schema200: !include schemas/common/configuration-schema.json
         example: TODO
         example200: !include examples/jobChain/configuration-example.json
-  /graph:
-    type:
-      postJSON:
-        description: |
-           <span style="color:red">IN PROGRESS!</span> Returns the location of the job chain graph. Access to <a href="http://www.graphviz.org/">graphiz</a> is required.
-        description1: !include documentation/jobChain/filteredByJobChain.md
-        description2: !include documentation/jobChain/graphMimeParam.md
-        description3: " "
-        description4: " "
-        description5: " "
-        description6: " "
-        description7: " "
-        description8: " "
-        description9: " "
-        description10: " "
-        description200: Returns the location of the job chain graph.
-        schema: !include schemas/jobChain/graphFilter-schema.json
-        schema200: !include schemas/jobChain/graph-schema.json
-        example: TODO
-        example200: TODO
 
 /job_chain_nodes:
   description: This resource doesn't have a response. Use ./skip, ./stop, ./activate
