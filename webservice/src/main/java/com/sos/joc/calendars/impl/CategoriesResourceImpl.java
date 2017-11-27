@@ -25,7 +25,7 @@ public class CategoriesResourceImpl extends JOCResourceImpl implements ICategori
         SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, jobschedulerId.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getCalendar().isView());
+                    accessToken).getCalendar().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

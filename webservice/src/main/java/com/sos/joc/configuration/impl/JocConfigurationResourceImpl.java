@@ -162,7 +162,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             /** check permissions */
             Boolean owner = this.getJobschedulerUser().getSosShiroCurrentUser().getUsername().equals(dbItem.getAccount());
             Boolean permission = owner
-                    || (dbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView());
+                    || (dbItem.getShared() && getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getView().isStatus());
             if (!permission) {
                 return this.accessDeniedResponse();
             }

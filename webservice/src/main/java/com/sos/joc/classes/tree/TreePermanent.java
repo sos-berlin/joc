@@ -68,12 +68,12 @@ public class TreePermanent {
 				}
 				break;
 			case WORKINGDAYSCALENDAR:
-                if (sosPermission.getCalendar().isView()) {
+                if (sosPermission.getCalendar().getView().isStatus()) {
                     types.add(type);
                 }
                 break;
 			case NONWORKINGDAYSCALENDAR:
-                if (sosPermission.getCalendar().isView()) {
+                if (sosPermission.getCalendar().getView().isStatus()) {
                     types.add(type);
                 }
                 break;

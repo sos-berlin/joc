@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.11.24 um 10:35:17 AM CET 
+// Generiert: 2017.11.27 um 10:46:38 AM CET 
 //
 
 
@@ -628,7 +628,7 @@ import javax.xml.bind.annotation.XmlType;
  *                                 &lt;complexContent>
  *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                                     &lt;sequence>
- *                                       &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+ *                                       &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                                     &lt;/sequence>
  *                                   &lt;/restriction>
  *                                 &lt;/complexContent>
@@ -2539,7 +2539,7 @@ public class SOSPermissionJocCockpit {
      *                       &lt;complexContent>
      *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                           &lt;sequence>
-     *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+     *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                           &lt;/sequence>
      *                         &lt;/restriction>
      *                       &lt;/complexContent>
@@ -2631,7 +2631,7 @@ public class SOSPermissionJocCockpit {
          *             &lt;complexContent>
          *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *                 &lt;sequence>
-         *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+         *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *                 &lt;/sequence>
          *               &lt;/restriction>
          *             &lt;/complexContent>
@@ -2885,7 +2885,7 @@ public class SOSPermissionJocCockpit {
              *   &lt;complexContent>
              *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
              *       &lt;sequence>
-             *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
+             *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
              *       &lt;/sequence>
              *     &lt;/restriction>
              *   &lt;/complexContent>
@@ -2900,30 +2900,21 @@ public class SOSPermissionJocCockpit {
             })
             public static class View {
 
-                @XmlElement(required = true)
-                protected Object status;
+                protected boolean status;
 
                 /**
                  * Ruft den Wert der status-Eigenschaft ab.
                  * 
-                 * @return
-                 *     possible object is
-                 *     {@link Object }
-                 *     
                  */
-                public Object getStatus() {
+                public boolean isStatus() {
                     return status;
                 }
 
                 /**
                  * Legt den Wert der status-Eigenschaft fest.
                  * 
-                 * @param value
-                 *     allowed object is
-                 *     {@link Object }
-                 *     
                  */
-                public void setStatus(Object value) {
+                public void setStatus(boolean value) {
                     this.status = value;
                 }
 

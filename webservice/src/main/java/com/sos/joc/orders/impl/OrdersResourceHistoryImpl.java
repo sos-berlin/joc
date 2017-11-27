@@ -47,7 +47,7 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
                 ordersFilter.setJobschedulerId("");
             }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken, ordersFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getHistory().isView());
+                    getPermissonsJocCockpit(accessToken).getHistory().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

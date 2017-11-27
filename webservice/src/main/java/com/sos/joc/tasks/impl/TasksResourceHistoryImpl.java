@@ -46,7 +46,7 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
                 jobsFilter.setJobschedulerId("");
             }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getHistory().isView());
+                    accessToken).getHistory().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }

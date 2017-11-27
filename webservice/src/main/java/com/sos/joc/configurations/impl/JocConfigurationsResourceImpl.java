@@ -91,7 +91,7 @@ public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJ
                 if(jocConfigurationDbItem.getConfigurationItem() != null && !jocConfigurationDbItem.getConfigurationItem().isEmpty()) {
                     configuration.setConfigurationItem(jocConfigurationDbItem.getConfigurationItem());
                 }
-                if (!jocConfigurationDbItem.getShared() || getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().isView()) {
+                if (!jocConfigurationDbItem.getShared() || getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getView().isStatus()) {
                     listOfConfigurations.add(configuration);
                 }
             }
