@@ -47,9 +47,13 @@ public class PlanFromRunTimeResourceImpl extends JOCResourceImpl implements IPla
                 jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
                 String xPath = String.format("/spooler/answer//schedules/schedule[@path='%1$s']", schedulePath);
+                String timeZone = xml.getRoot().getAttribute("time_zone");
+                if (timeZone == null || timeZone.isEmpty()) {
+                    timeZone = dbItemInventoryInstance.getTimeZone();
+                }
 
                 entity = new RuntimeResolver().resolve(jocXmlCommand.getSosxml(), (Element) jocXmlCommand.getSosxml().selectSingleNode(xPath),
-                        planFilter.getDateFrom(), planFilter.getDateTo(), dbItemInventoryInstance.getTimeZone());
+                        planFilter.getDateFrom(), planFilter.getDateTo(), timeZone);
 
             } else {
                 entity = new RuntimeResolver().resolve(xml, planFilter.getDateFrom(), planFilter.getDateTo(), dbItemInventoryInstance.getTimeZone());
