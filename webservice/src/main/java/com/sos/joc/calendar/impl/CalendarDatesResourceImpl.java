@@ -30,9 +30,8 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
     public JOCDefaultResponse postCalendarDates(String accessToken, CalendarDatesFilter calendarFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            // TODO permissions for runtime and calendar
-            // getPermissonsJocCockpit(accessToken).getCalendar().isView()
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, calendarFilter.getJobschedulerId(), true);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, calendarFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
+                    .getCalendar().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -43,7 +42,7 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
             }
             Dates dates = null;
             FrequencyResolver fr = new FrequencyResolver();
-            
+
             if (calendarPathIsDefined || calendarIdIsDefined) {
                 connection = Globals.createSosHibernateStatelessConnection(API_CALL);
                 CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
@@ -61,9 +60,9 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
                     }
                 }
                 calendarFilter.setCalendar(new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class));
-                
-            } 
-            
+
+            }
+
             try {
                 if (calendarFilter.getCalendar().getBasedOn() != null && !calendarFilter.getCalendar().getBasedOn().isEmpty()) {
                     connection = Globals.createSosHibernateStatelessConnection(API_CALL);
@@ -75,7 +74,7 @@ public class CalendarDatesResourceImpl extends JOCResourceImpl implements ICalen
                     }
                     Calendar basedCalendar = new ObjectMapper().readValue(calendarItem.getConfiguration(), Calendar.class);
                     if (calendarFilter.getDateFrom() == null || calendarFilter.getDateFrom().isEmpty()) {
-                        calendarFilter.setDateFrom(fr.getToday()); 
+                        calendarFilter.setDateFrom(fr.getToday());
                     }
                     dates = fr.resolveRestrictions(basedCalendar, calendarFilter.getCalendar(), calendarFilter.getDateFrom(), calendarFilter.getDateTo());
                 } else {

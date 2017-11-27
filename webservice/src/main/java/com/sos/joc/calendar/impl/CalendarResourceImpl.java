@@ -30,7 +30,7 @@ public class CalendarResourceImpl extends JOCResourceImpl implements ICalendarRe
         SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, calendarFilter, accessToken, calendarFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getCalendar().isView());
+                    accessToken).getCalendar().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
