@@ -1,0 +1,27 @@
+{
+  "title": "run time",
+  "id": "schemas/plan/runtime",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.plan.RunTime",
+  "type": "object",
+  "required": [
+    "deliveryDate",
+    "timeZone",
+    "periods"
+  ],
+  "properties": {
+    "deliveryDate": {
+      "$ref": "../common/deliveryDate-schema.json"
+    },
+    "timeZone": {
+      "type": "string",
+      "default": "UTC"
+    },
+    "periods": {
+      "type": "array",
+      "items": {
+        "$ref": "../calendar/period-schema.json"
+      }
+    }
+  }
+}

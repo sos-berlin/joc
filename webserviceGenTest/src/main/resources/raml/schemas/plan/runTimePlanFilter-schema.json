@@ -1,0 +1,28 @@
+{
+  "title": "order plan filter",
+  "id": "schemas/plan/runTimePlanFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.plan.RunTimePlanFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId",
+    "runTime",
+    "dateTo"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "runTime": {
+      "type": "string"
+    },
+    "dateFrom": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "dateTo": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    }
+  }
+}

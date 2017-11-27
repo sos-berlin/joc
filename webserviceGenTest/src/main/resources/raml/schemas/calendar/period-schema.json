@@ -1,0 +1,27 @@
+{
+  "title": "periods",
+  "id": "schemas/calendar/periods",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.calendar.Period",
+  "type": "object",
+  "properties": {
+    "singleStart": {
+      "type": "string"
+    },
+    "begin": {
+      "type": "string"
+    },
+    "end": {
+      "type": "string"
+    },
+    "repeat": {
+      "type": "string"
+    },
+    "absoluteRepeat": {
+      "type": "string"
+    },
+    "whenHoliday": {
+      "type": "string"
+    }
+  }
+}

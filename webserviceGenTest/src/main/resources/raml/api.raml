@@ -1569,6 +1569,25 @@ traits:
       schema200: !include schemas/plan/plan-schema.json
       example: TODO
       example200: !include examples/plan/plan-example.json
+  /from_run_time:
+    type:
+      postJSON:
+        description: planned starts from runtime
+        description1: " "
+        description2: " "
+        description3: !include documentation/plan/runTime.md
+        description4: !include documentation/calendar/dateFrom.md
+        description5: !include documentation/calendar/dateTo.md
+        description6: " "
+        description7: " "
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: " "
+        schema: !include schemas/plan/runTimePlanFilter-schema.json
+        schema200: !include schemas/plan/runtime-schema.json
+        example: " "
+        example200: " "
 
 /tree:
   type:
