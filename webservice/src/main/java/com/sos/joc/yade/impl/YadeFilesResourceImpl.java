@@ -23,7 +23,7 @@ import com.sos.joc.model.yade.TransferFiles;
 import com.sos.joc.yade.resource.IYadeFilesResource;
 
 
-@Path("/yade/files")
+@Path("yade")
 public class YadeFilesResourceImpl extends JOCResourceImpl implements IYadeFilesResource {
 
     private static final String API_CALL = "./yade/files";
@@ -34,7 +34,7 @@ public class YadeFilesResourceImpl extends JOCResourceImpl implements IYadeFiles
         try {
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
             // TODO new init method for Yade without JobSchedulerId and new permissions
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, "",  
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(),  
                     sosPermission.getYADE().getView().isFiles());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -44,8 +44,8 @@ public class YadeFilesResourceImpl extends JOCResourceImpl implements IYadeFiles
             Boolean compact = filterBody.getCompact();
             List<Long> transferIds = filterBody.getTransferIds();
             List<FileTransferStateText> states = filterBody.getStates(); 
-            List<String> sources = filterBody.getSources();
-            List<String> targets = filterBody.getTargets();
+            List<String> sources = filterBody.getSourceFiles();
+            List<String> targets = filterBody.getTargetFiles();
             List<Long> interventionTransferIds = filterBody.getInterventionTransferIds();
 //            Integer limit = filterBody.getLimit();
             Integer limit = null;

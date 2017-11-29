@@ -14,20 +14,20 @@ import com.sos.joc.db.yade.JocDBLayerYade;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.yade.TransferFilesSummary;
 import com.sos.joc.model.yade.TransferFilter;
-import com.sos.joc.yade.resource.IYadeSummaryResource;
+import com.sos.joc.yade.resource.IYadeOverviewSummaryResource;
 
-@Path("/yade/summary")
-public class YadeSummaryResourceImpl extends JOCResourceImpl implements IYadeSummaryResource {
+@Path("yade")
+public class YadeOverviewSummaryResourceImpl extends JOCResourceImpl implements IYadeOverviewSummaryResource {
 
-    private static final String API_CALL = "./yade/summary";
+    private static final String API_CALL = "./yade/overview/summary";
 
     @Override
-    public JOCDefaultResponse postYadeSummary(String accessToken, TransferFilter filterBody) throws Exception {
+    public JOCDefaultResponse postYadeOverviewSummary(String accessToken, TransferFilter filterBody) throws Exception {
         SOSHibernateSession connection = null;
         try {
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
             // JobSchedulerId has to be "" to prevent exception to be thrown
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, "", 
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), 
                     sosPermission.getYADE().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

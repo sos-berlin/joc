@@ -22,17 +22,17 @@ import com.sos.joc.model.yade.ModifyTransfers;
 import com.sos.joc.yade.resource.IYadeTransfersRestartResource;
 
 
-@Path("/yade/transfers/restart")
+@Path("yade")
 public class YadeTransfersRestartResourceImpl extends JOCResourceImpl implements IYadeTransfersRestartResource {
 
     private static final String API_CALL = "./yade/transfers/restart";
 
     @Override
-    public JOCDefaultResponse postYadeTransfersRestart(String accessToken, ModifyTransfers modifyTransfersFilterBody) throws Exception {
+    public JOCDefaultResponse postYadeTransfersRestart(String accessToken, ModifyTransfers filterBody) throws Exception {
         SOSHibernateSession connection = null;
         try {
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, modifyTransfersFilterBody, accessToken, "",  
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(),  
                     sosPermission.getYADE().getExecute().isTransferStart());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -40,8 +40,8 @@ public class YadeTransfersRestartResourceImpl extends JOCResourceImpl implements
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             JocDBLayerYade yadeDbLayer = new JocDBLayerYade(connection);
             // TODO put Implementation of the Yade Transfer WebService here!
-            List<ModifyTransfer> transfers = modifyTransfersFilterBody.getTransfers();
-            AuditParams auditParams = modifyTransfersFilterBody.getAuditLog();
+            List<ModifyTransfer> transfers = filterBody.getTransfers();
+            AuditParams auditParams = filterBody.getAuditLog();
             String comment = auditParams.getComment();
             Integer timeSpent = auditParams.getTimeSpent();
             String ticketLink = auditParams.getTicketLink();

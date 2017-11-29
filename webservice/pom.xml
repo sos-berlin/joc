@@ -54,6 +54,18 @@
 			</exclusions>
 		</dependency>
 
+        <dependency>
+            <groupId>com.sos-berlin.commons</groupId>
+            <artifactId>sos-json</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
 		<dependency>
 			<groupId>com.sos-berlin.joc</groupId>
 			<artifactId>webservice-global</artifactId>

@@ -14,7 +14,7 @@ import com.sos.joc.model.yade.FileFilter;
 import com.sos.joc.yade.resource.IYadeLogResource;
 
 
-@Path("/yade/log")
+@Path("yade")
 public class YadeLogResourceImpl extends JOCResourceImpl implements IYadeLogResource {
 
     private static final String API_CALL = "./yade/log";

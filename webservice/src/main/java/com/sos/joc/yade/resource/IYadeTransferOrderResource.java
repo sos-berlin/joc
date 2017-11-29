@@ -7,14 +7,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
-import com.sos.joc.model.yade.FileFilter;
+import com.sos.joc.model.yade.ModifyTransfer;
 
 
-public interface IYadeFileResource {
+public interface IYadeTransferOrderResource {
 
     @POST
-    @Path("file")
+    @Path("transfer/order")
     @Produces({ MediaType.APPLICATION_JSON })
-    public JOCDefaultResponse postYadeFile(@HeaderParam("X-Access-Token") String accessToken, FileFilter filterBody)
+    public JOCDefaultResponse postYadeTransferOrder(@HeaderParam("X-Access-Token") String accessToken, ModifyTransfer filterBody)
             throws Exception;
 }

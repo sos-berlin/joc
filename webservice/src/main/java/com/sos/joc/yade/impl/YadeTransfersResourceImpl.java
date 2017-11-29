@@ -27,7 +27,7 @@ import com.sos.joc.model.yade.TransferStateText;
 import com.sos.joc.model.yade.Transfers;
 import com.sos.joc.yade.resource.IYadeTransfersResource;
 
-@Path("/yade/transfers")
+@Path("yade")
 public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeTransfersResource {
 
     private static final String API_CALL = "./yade/transfers";
@@ -37,7 +37,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
         SOSHibernateSession connection = null;
         try {
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, "", 
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), 
                     sosPermission.getYADE().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

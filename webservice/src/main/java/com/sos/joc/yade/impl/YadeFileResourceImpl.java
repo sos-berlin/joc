@@ -15,16 +15,13 @@ import com.sos.joc.classes.yade.TransferFileUtils;
 import com.sos.joc.db.yade.JocDBLayerYade;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.common.Err;
 import com.sos.joc.model.yade.FileFilter;
-import com.sos.joc.model.yade.FileTransferState;
-import com.sos.joc.model.yade.FileTransferStateText;
 import com.sos.joc.model.yade.TransferFile;
 import com.sos.joc.model.yade.TransferFile200;
 import com.sos.joc.yade.resource.IYadeFileResource;
 
 
-@Path("/yade/file")
+@Path("yade")
 public class YadeFileResourceImpl extends JOCResourceImpl implements IYadeFileResource {
 
     private static final String API_CALL = "./yade/file";
@@ -35,7 +32,7 @@ public class YadeFileResourceImpl extends JOCResourceImpl implements IYadeFileRe
         try {
             SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
             // TODO new init method for Yade without JobSchedulerId and new permissions
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, "", 
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), 
                     sosPermission.getYADE().getView().isFiles());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
