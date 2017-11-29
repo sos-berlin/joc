@@ -5,6 +5,9 @@
   "javaType": "com.sos.joc.model.yade.TransferFilter",
   "type": "object",
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "transferIds": {
       "type": "array",
       "items": {
@@ -71,6 +74,18 @@
       "type": "array",
       "items": {
         "$ref": "protocolFragment-schema.json"
+      }
+    },
+    "sourceFiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "targetFiles": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     }
   }

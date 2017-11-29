@@ -16,23 +16,21 @@ post:
     <tr><th>Name</th><th>Type</th><th>Description</th><th>Example</th><th>Default</th>
     </thead><tbody>
     <tr><td>``jobschedulerId``</td><td>required, string</td><td>JobScheduler Master ID</td><td>scheduler</td><td></td></tr>
-    <tr><td>``transfers``</td><td>required; array</td><td>Collection of YADE transfers which contains ``transferId`` and ``fileIds``<br/>
-      If ``fileIds`` undefined or empty then all files of the transfer are considered</td>
-    <td> [{
-      <div style="padding-left:10px;">"transferId": 42,</div>
-      <div style="padding-left:10px;">"fileIds": [3,5,81]</div>
-      }]</td>
-    <td></td></tr>
-    <!--tr><td>``transferId``</td><td>required; integer</td><td>The id of a YADE transfer </td><td>42</td><td></td></tr
-    <tr><td>``fileIds``</td><td>optional; array</td>
-    <td>The ids of files. If this parameter undefined or empty then all files of the transfer are considered</td>
-    <td>[3,5,81]</td><td></td></tr-->
-    <<audit>>
+    <!--tr><td>``host``</td><td>optional, string</td><td>host of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>localhost</td><td></td></tr>
+    <tr><td>``port``</td><td>optional, string</td><td>port of the JobScheduler Master<br/><b>This parameter is required to <i><<resourcePathName>></i> a specific JobScheduler in a cluster</b></td><td>4444</td><td></td></tr-->
     </tbody></table>
   body:
-    application/json:
-      schema: <<schema>>
-      example: <<example>>
+    multipart/form-data:
+      formParameters:
+        file:
+          description: The file to be uploaded
+          required: true
+          type: file
+        jobschedulerId:
+          required: true
+          type: string
+          description: JobScheduler Master ID
+          example: scheduler  
   responses:
     200:
       description: |
@@ -45,6 +43,3 @@ post:
               "ok":true
             }
           schema: ok
-    419:
-      body:
-        application/json:

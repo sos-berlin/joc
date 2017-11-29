@@ -5,6 +5,9 @@
   "javaType": "com.sos.joc.model.yade.FileFilter",
   "type": "object",
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "fileId": {
       "$ref": "../common/nonNegativeLong-schema.json"
     },

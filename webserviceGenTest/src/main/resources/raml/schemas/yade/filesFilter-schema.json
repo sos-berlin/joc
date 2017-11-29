@@ -5,6 +5,9 @@
   "javaType": "com.sos.joc.model.yade.FilesFilter",
   "type": "object",
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "fileIds": {
       "type": "array",
       "items": {
@@ -35,13 +38,13 @@
         "$ref": "fileTransferStateText-schema.json"
       }
     },
-    "sources": {
+    "sourceFiles": {
       "type": "array",
       "items": {
         "type": "string"
       }
     },
-    "targets": {
+    "targetFiles": {
       "type": "array",
       "items": {
         "type": "string"

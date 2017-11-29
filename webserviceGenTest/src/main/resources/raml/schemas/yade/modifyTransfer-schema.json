@@ -5,9 +5,13 @@
   "javaType": "com.sos.joc.model.yade.ModifyTransfer",
   "type": "object",
   "required": [
-    "jobChain"
+    "jobschedulerId",
+    "transferId"
   ],
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "transferId": {
       "$ref": "../common/nonNegativeLong-schema.json"
     },

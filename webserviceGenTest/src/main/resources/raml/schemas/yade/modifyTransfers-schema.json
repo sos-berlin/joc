@@ -5,9 +5,13 @@
   "javaType": "com.sos.joc.model.yade.ModifyTransfers",
   "type": "object",
   "required": [
+    "jobschedulerId",
     "transfers"
   ],
   "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
     "transfers": {
       "type": "array",
       "items": {

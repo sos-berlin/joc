@@ -66,8 +66,14 @@
     "jobChain": {
       "$ref": "../common/path-schema.json"
     },
+    "jobChainNode": {
+      "type": "string"
+    },
     "job": {
       "$ref": "../common/path-schema.json"
+    },
+    "taskId": {
+      "$ref": "../common/nonNegativeLong-schema.json"
     }
   }
 }

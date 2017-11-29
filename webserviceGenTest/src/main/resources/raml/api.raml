@@ -52,14 +52,14 @@ resourceTypes:
   - postJSON: !include resourceTypes/common/postJSON.raml
   - postJSONWithOptionalJSId: !include resourceTypes/common/postJSONWithOptionalJSId.raml
   - postJSONWithoutJSId: !include resourceTypes/common/postJSONWithoutJSId.raml
-  - postYADEJSON15: !include resourceTypes/yade/postJSON15.raml
+  - postJSON15: !include resourceTypes/common/postJSON15.raml
   - postYADEJSONWithOkResponse: !include resourceTypes/yade/postJSONWithOkResponse.raml
-  - postYADEOnlyAccessToken: !include resourceTypes/yade/postOnlyAccessToken.raml
-  - postYADEOnlyAccessTokenWithOkResponse: !include resourceTypes/yade/postOnlyAccessTokenWithOkResponse.raml
   - postOnlyAccessToken: !include resourceTypes/common/postOnlyAccessToken.raml
   - postOnlyId: !include resourceTypes/common/postOnlyId.raml
   - postJSONWithOkResponse: !include resourceTypes/common/postJSONWithOkResponse.raml
   - postJSONWithoutExample: !include resourceTypes/common/postJSONWithoutExample.raml
+  - postForDownload: !include resourceTypes/common/postForDownload.raml
+  - postForUpload: !include resourceTypes/common/postForUpload.raml
   - login: !include resourceTypes/user/login.raml
   - logout: !include resourceTypes/user/logout.raml
   - postEvent: !include resourceTypes/common/postEvent.raml
@@ -1576,8 +1576,8 @@ traits:
         description1: " "
         description2: " "
         description3: !include documentation/plan/runTime.md
-        description4: !include documentation/calendar/dateFrom.md
-        description5: !include documentation/calendar/dateTo.md
+        description4: !include documentation/plan/dateFrom.md
+        description5: !include documentation/plan/dateTo.md
         description6: " "
         description7: " "
         description8: " "
@@ -1586,8 +1586,8 @@ traits:
         description200: " "
         schema: !include schemas/plan/runTimePlanFilter-schema.json
         schema200: !include schemas/plan/runtime-schema.json
-        example: " "
-        example200: " "
+        example: !include examples/plan/runTime-example.json
+        example200: !include examples/plan/runTime200-example.json
 
 /tree:
   type:
@@ -1817,9 +1817,9 @@ traits:
   description: |
     This is not an API call. Use its children!!
     
-  /summary:
+  /overview/summary:
     type:
-      postYADEJSON15:
+      postJSON:
         description: |
             Summary with number of<h5>
             * successful transferred files
@@ -1837,11 +1837,6 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description11: " "
-        description12: " "
-        description13: " "
-        description14: " "
-        description15: " "
         description200: " "
         schema200: !include schemas/yade/summary-schema.json
         schema: !include schemas/yade/transferFilter-schema.json
@@ -1850,10 +1845,24 @@ traits:
               "dateFrom": "1d"
             }
         example200: !include examples/yade/summary-example.json
-  
+  /overview/snapshot:
+      type:
+        postOnlyId:
+          description: |
+            Summary with number of<h5>
+            * running YADE transfers
+            * suspended YADE transfers
+            * YADE transfers with setback
+            * waiting for resource YADE transfers
+            </h5>
+          description200: " "
+          example: " "
+          schema200: !include schemas/yade/snapshot-schema.json
+          example200: " "
+
   /transfers:
     type:
-      postYADEJSON15:
+      postJSON15:
         description: Responds YADE transfers
         description1: !include documentation/common/compact.md
         description2: !include documentation/common/dateFrom.md
@@ -1867,8 +1876,8 @@ traits:
         description10: !include documentation/yade/hasIntervention.md
         description11: !include documentation/yade/isIntervention.md
         description12: !include documentation/yade/profile.md
-        description13: " "
-        description14: " "
+        description13: !include documentation/yade/sourcePath.md
+        description14: !include documentation/yade/targetPath.md
         description15: !include documentation/common/limit.md
         description200: " "
         schema: !include schemas/yade/transferFilter-schema.json
@@ -1884,32 +1893,9 @@ traits:
           schema: !include schemas/yade/modifyTransfers-schema.json
           example: " "
   
-  /transfer:
-    description: |
-      This is not an API call. Use its children!!   
-    /start:
-      type:
-        postYADEOnlyAccessToken:
-          description: YADE Client sends transfer information when starting
-          schema: !include schemas/yadeClient/transferStart-schema.json
-          description200: |
-            responses TransferID for later call of <a href="./resource/yade/transfer/finish.html">./yade/transfer/finish</a>
-          example200:  |
-            {
-              "deliveryDate":"2017-10-05T21:13:35Z",
-              "transferId":123456789
-            }
-          schema200: !include schemas/yade/transferId-schema.json
-    /finish:
-      type:
-        postYADEOnlyAccessTokenWithOkResponse:
-          description: YADE Client sends transfer information when finished
-          schema: !include schemas/yadeClient/transferFinish-schema.json
-      
-        
   /files:
     type:
-      postYADEJSON15:
+      postJSON:
         description: Responds transferred files
         description1: !include documentation/common/compact.md
         description2: " "
@@ -1921,26 +1907,15 @@ traits:
         description8: !include documentation/yade/sourcePath.md
         description9: !include documentation/yade/targetPath.md
         description10: " "
-        description11: " "
-        description12: " "
-        description13: " "
-        description14: " "
-        description15: " "
         description200: " "
         schema: !include schemas/yade/filesFilter-schema.json
         schema200: !include schemas/yade/files-schema.json
         example: " "
         example200: " "
-    
-    /store:
-      type:
-        postYADEOnlyAccessTokenWithOkResponse:
-          description: YADE Client updates files information
-          schema: !include schemas/yadeClient/files-schema.json
 
   /file:
     type:
-      postYADEJSON15:
+      postJSON:
         description: Responds transferred file
         description1: !include documentation/common/compact.md
         description2: !include documentation/yade/fileId.md
@@ -1952,23 +1927,18 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description11: " "
-        description12: " "
-        description13: " "
-        description14: " "
-        description15: " "
         description200: " "
         schema: !include schemas/yade/fileFilter-schema.json
         schema200: !include schemas/yade/file200-schema.json
         example: " "
         example200: " "
 
-  /log:
+  /transfer/order:
     type:
-      postYADEJSON15:
-        description: Log (plain text or html)
-        description1: !include documentation/yade/fileId.md
-        description2: !include documentation/common/logMimeParam.md
+      postJSON:
+        description: sends parametrisized order information for "resume order" dialog
+        description1: !include documentation/yade/transferId.md
+        description2: " "
         description3: " "
         description4: " "
         description5: " "
@@ -1977,27 +1947,12 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description11: " "
-        description12: " "
-        description13: " "
-        description14: " "
-        description15: " "
         description200: " "
-        schema: !include schemas/yade/fileFilter-schema.json
-        schema200: logContent
-        example: TODO
+        schema: !include schemas/yade/modifyTransfer-schema.json
+        schema200: !include schemas/order/order200_v-schema.json  
+        example: " "
         example200: " "
-    /html:
-      is: [accessToken, filteredByTransferFileId]
-      type: error
-      get:
-        description: |
-          <h2>sends log as a complete HTML incl. header to open in a new window</h2>
-        responses:
-          200:
-            body:
-              text/html:
- 
+
 /calendars:
   type:
     postJSON:
@@ -2035,6 +1990,15 @@ traits:
       modifyCalendar:
         description: Deletes calendars
         audit: !include documentation/audit/auditLog.md
+  
+  /export:
+    type:
+      postForDownload:
+        description: Provides Calendars export file as download  (see <a href="../calendars/import">./calendars/import</a>)
+  /import:
+    type:
+      postForUpload:
+        description: Imports Calendar export file (see <a href="../calendars/export">./calendars/export</a>)
 
 /calendar:
   type:
