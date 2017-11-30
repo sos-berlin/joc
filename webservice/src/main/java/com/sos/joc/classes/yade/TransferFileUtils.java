@@ -1,9 +1,24 @@
 package com.sos.joc.classes.yade;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.common.base.Joiner;
 import com.sos.jade.db.DBItemYadeFiles;
+import com.sos.jade.db.DBItemYadeTransfers;
+import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.orders.OrderVolatile;
+import com.sos.joc.db.yade.JocDBLayerYade;
+import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.YADERequestException;
 import com.sos.joc.model.common.Err;
+import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.order.OrderStateText;
+import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.yade.FileTransferState;
 import com.sos.joc.model.yade.FileTransferStateText;
+import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.model.yade.TransferFile;
 
 
@@ -133,5 +148,48 @@ public class TransferFileUtils {
             return 15;
         }
         return null;
+    }
+    
+    
+    public static OrderV getOrderForResume(JocDBLayerYade yadeDbLayer, ModifyTransfer transfer, JOCResourceImpl jocResourceImpl) throws JocException {
+        if (transfer.getTransferId() == null) {
+            throw new JocMissingRequiredParameterException("undefined 'transferId'");
+        }
+        DBItemYadeTransfers dbTransferItem = yadeDbLayer.getTransfer(transfer.getTransferId());
+        List<String> files = yadeDbLayer.getSourceFilesByIdsAndTransferId(transfer.getTransferId(), transfer.getFileIds());
+        return getOrderForResume(dbTransferItem, files, jocResourceImpl);
+    }
+        
+        
+    
+    public static OrderV getOrderForResume(DBItemYadeTransfers dbTransferItem, List<String> sourceFiles, JOCResourceImpl jocResourceImpl) throws JocException {
+        if (dbTransferItem.getState() == 0) {
+            throw new YADERequestException("The original transfer was successful.");
+        }
+        if (dbTransferItem.getJobChain() == null || dbTransferItem.getOrderId() == null || dbTransferItem.getJobChainNode() == null) {
+            throw new YADERequestException("The original transfer order cannot be determined.");
+        }
+        OrderV order = OrderVolatile.getOrder(dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), false, jocResourceImpl);
+        if (!order.getState().equals(dbTransferItem.getJobChainNode())) {
+            throw new YADERequestException(String.format("The original transfer order %1$s,%2$s is on the job chain node %3$s but the node %4$s is expected.",
+                    dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), order.getState(), dbTransferItem.getJobChainNode()));
+        }
+        if (order.getProcessingState().get_text() != OrderStateText.SUSPENDED) {
+            throw new YADERequestException(String.format("The original transfer order %1$s,%2$s has to be suspended", dbTransferItem.getJobChain(),
+                    dbTransferItem.getOrderId()));
+        }
+        NameValuePair param = new NameValuePair();
+        param.setName("file_path_restriction");
+        if (sourceFiles != null && !sourceFiles.isEmpty()) {
+            param.setValue(Joiner.on(";").join(sourceFiles));
+        } else {
+            param.setValue(""); 
+        }
+        if (order.getParams() == null) {
+            order.setParams(new ArrayList<NameValuePair>());
+        }
+        order.getParams().add(param);
+        
+        return order;
     }
 }

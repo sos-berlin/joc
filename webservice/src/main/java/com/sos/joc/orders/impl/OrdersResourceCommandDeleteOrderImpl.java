@@ -38,7 +38,7 @@ public class OrdersResourceCommandDeleteOrderImpl extends JOCResourceImpl implem
                 return jocDefaultResponse;
             }
             checkRequiredComment(modifyOrders.getAuditLog());
-            if (modifyOrders.getOrders().size() == 0) {
+            if (modifyOrders.getOrders() == null || modifyOrders.getOrders().size() == 0) {
                 throw new JocMissingRequiredParameterException("undefined 'orders'");
             }
             Date surveyDate = new Date();

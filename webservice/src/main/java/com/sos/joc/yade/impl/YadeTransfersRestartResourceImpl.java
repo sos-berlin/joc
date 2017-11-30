@@ -1,103 +1,113 @@
 package com.sos.joc.yade.impl;
 
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import org.dom4j.Element;
+
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jade.db.DBItemYadeFiles;
-import com.sos.jade.db.DBItemYadeTransfers;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.JOCXmlCommand;
+import com.sos.joc.classes.XMLBuilder;
+import com.sos.joc.classes.audit.ModifyOrderAudit;
+import com.sos.joc.classes.yade.TransferFileUtils;
 import com.sos.joc.db.yade.JocDBLayerYade;
+import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.model.audit.AuditParams;
-import com.sos.joc.model.common.Ok;
+import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.model.common.Err419;
+import com.sos.joc.model.common.NameValuePair;
+import com.sos.joc.model.order.ModifyOrder;
+import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.model.yade.ModifyTransfers;
 import com.sos.joc.yade.resource.IYadeTransfersRestartResource;
-
 
 @Path("yade")
 public class YadeTransfersRestartResourceImpl extends JOCResourceImpl implements IYadeTransfersRestartResource {
 
     private static final String API_CALL = "./yade/transfers/restart";
+    private List<Err419> listOfErrors = new ArrayList<Err419>();
 
     @Override
     public JOCDefaultResponse postYadeTransfersRestart(String accessToken, ModifyTransfers filterBody) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(),  
-                    sosPermission.getYADE().getExecute().isTransferStart());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getYADE().getExecute().isTransferStart());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            checkRequiredComment(filterBody.getAuditLog());
+            if (filterBody.getTransfers() == null || filterBody.getTransfers().size() == 0) {
+                throw new JocMissingRequiredParameterException("undefined 'transferIds'");
+            }
+
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             JocDBLayerYade yadeDbLayer = new JocDBLayerYade(connection);
-            // TODO put Implementation of the Yade Transfer WebService here!
-            List<ModifyTransfer> transfers = filterBody.getTransfers();
-            AuditParams auditParams = filterBody.getAuditLog();
-            String comment = auditParams.getComment();
-            Integer timeSpent = auditParams.getTimeSpent();
-            String ticketLink = auditParams.getTicketLink();
-            // TODO: for each transfer create the order with the adjusted configuration
-            for (ModifyTransfer modifyTransfer : transfers) {
-                Long transferId = modifyTransfer.getTransferId();
-                DBItemYadeTransfers transferDbItem = yadeDbLayer.getTransfer(transferId);
-                List<Long> fileIds = modifyTransfer.getFileIds();
-                String jobName = transferDbItem.getJob();
-                String jobChainName = transferDbItem.getJobChain();
-                String jobChainNodeName = transferDbItem.getJobChainNode();
-                String orderId = transferDbItem.getOrderId();
-                Long taskId = transferDbItem.getTaskId();
-                String state = null;
-                List<DBItemYadeFiles> filesFromDb = yadeDbLayer.getFilesById(fileIds);
-                StringBuilder newFilePathsSB = new StringBuilder();
-                boolean first = true;
-                for (DBItemYadeFiles file : filesFromDb) {
-                    if (first) {
-                        newFilePathsSB.append(file.getSourcePath());
-                        first = false;
-                    } else {
-                        newFilePathsSB.append(";").append(file.getSourcePath());
-                    }
-                }
-                String newFilePaths = newFilePathsSB.toString();
-                // WS
-                // get History Entry for the specific order or state of the order
-                // determine if the order is finished OR suspended
-                // determine the node the order has to be resumed on (transferDbItem.getJobChainNode())
-                // resume the order with the adjusted parameters
-                //                   OR
-                // start a new order with the calculated node as start AND end node
-                // set parameters for the new order to restart the YADEJob
-                // set newFilePaths
-                // set set transferId as new parentTransferId
-                // update transfer with properties hasIntevention=true and 
-                // set the new TransferId as InterventionTransferId in YADEJob
-                 // JOB
-                // remove or clear the fileSpec and FileList parameter from the order parameters
-                // add the filePath parameter with the adjusted list of file paths
 
-                
+            Date surveyDate = new Date();
+            for (ModifyTransfer transfer : filterBody.getTransfers()) {
+                surveyDate = executeResumeOrderCommand(transfer, filterBody, yadeDbLayer);
             }
-            
-            
-            Ok ok = new Ok();
-            // fill the entity
-            ok.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(ok);
+            if (listOfErrors.size() > 0) {
+                return JOCDefaultResponse.responseStatus419(listOfErrors);
+            }
+            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
+    }
+
+    private Date executeResumeOrderCommand(ModifyTransfer transfer, ModifyTransfers filterBody, JocDBLayerYade yadeDbLayer) {
+        ModifyOrder modifyOrder = new ModifyOrder();
+        modifyOrder.setJobChain("");
+        modifyOrder.setOrderId(null);
+        try {
+            OrderV order = TransferFileUtils.getOrderForResume(yadeDbLayer, transfer, this);
+
+            modifyOrder.setJobChain(order.getJobChain());
+            modifyOrder.setOrderId(order.getOrderId());
+            modifyOrder.setParams(order.getParams());
+            modifyOrder.setResume(true);
+
+            ModifyOrderAudit orderAudit = new ModifyOrderAudit(modifyOrder, filterBody);
+            logAuditMessage(orderAudit);
+
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+            XMLBuilder xml = new XMLBuilder("modify_order");
+            xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", order.getJobChain()).addAttribute("suspended", "no");
+            if (order.getParams() != null && !order.getParams().isEmpty()) {
+                xml.add(getParams(order.getParams()));
+            }
+            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+            storeAuditLogEntry(orderAudit);
+
+            return jocXmlCommand.getSurveyDate();
+        } catch (JocException e) {
+            listOfErrors.add(new BulkError().get(e, getJocError(), modifyOrder));
+        } catch (Exception e) {
+            listOfErrors.add(new BulkError().get(e, getJocError(), modifyOrder));
+        }
+        return null;
+    }
+
+    private Element getParams(List<NameValuePair> params) {
+        Element paramsElem = XMLBuilder.create("params");
+        for (NameValuePair param : params) {
+            paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
+        }
+        return paramsElem;
     }
 
 }

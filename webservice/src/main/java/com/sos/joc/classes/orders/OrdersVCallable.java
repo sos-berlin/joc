@@ -23,6 +23,7 @@ import com.sos.joc.classes.filters.FilterAfterResponse;
 import com.sos.joc.classes.jobchains.JobChainVolatile;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
+import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.order.OrderFilter;
@@ -123,7 +124,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
     }
 
     @Override
-    public Map<String, OrderVolatile> call() throws Exception {
+    public Map<String, OrderVolatile> call() throws JocException {
         try {
             if (orders != null && ordersBody == null) {
                 return getOrders(orders, compact, jocJsonCommand);
@@ -142,7 +143,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         }
     }
 
-    public OrderV getOrder() throws Exception {
+    public OrderV getOrder() throws JocException {
         Map<String, OrderVolatile> orderMap;
         OrderV o = new OrderV();
         o.setParams(null);
@@ -160,7 +161,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         }
     }
 
-    public List<OrderV> getOrdersOfJob() throws Exception {
+    public List<OrderV> getOrdersOfJob() throws JocException {
         Map<String, OrderVolatile> orderMap = getOrders(job, compact, jocJsonCommand);
         if (orderMap == null || orderMap.isEmpty()) {
             return null;
@@ -168,7 +169,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         return new ArrayList<OrderV>(orderMap.values());
     }
 
-    private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, boolean compact, JOCJsonCommand jocJsonCommand) throws Exception {
+    private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, boolean compact, JOCJsonCommand jocJsonCommand) throws JocException {
         JsonObject json = null;
         Boolean chckOrderPathIsInFolder = false;
         try {
@@ -190,7 +191,7 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         return getOrders(json, compact, null, null, null, chckOrderPathIsInFolder);
     }
 
-    private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand) throws Exception {
+    private Map<String, OrderVolatile> getOrders(OrdersPerJobChain orders, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand) throws JocException {
         if (orders.getOrders().size() > 0) {
             ordersBody.setRegex(null);
             ordersBody.setProcessingStates(null);
@@ -217,12 +218,12 @@ public class OrdersVCallable implements Callable<Map<String, OrderVolatile>> {
         return getOrders(json, ordersBody.getCompact(), ordersBody.getRegex(), ordersBody.getProcessingStates(), ordersBody.getRunTimeIsTemporary(), chckOrderPathIsInFolder);
     }
 
-    private Map<String, OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand) throws Exception {
+    private Map<String, OrderVolatile> getOrders(String job, boolean compact, JOCJsonCommand jocJsonCommand) throws JocException {
         return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(job), accessToken), compact, null, null, null,
                 checkOrderPathIsInFolder);
     }
 
-    private Map<String, OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand) throws Exception {
+    private Map<String, OrderVolatile> getOrders(Folder folder, OrdersFilter ordersBody, JOCJsonCommand jocJsonCommand) throws JocException {
         return getOrders(jocJsonCommand.getJsonObjectFromPostWithRetry(getServiceBody(folder, ordersBody), accessToken), ordersBody.getCompact(),
                 ordersBody.getRegex(), ordersBody.getProcessingStates(), ordersBody.getRunTimeIsTemporary(), checkOrderPathIsInFolder);
     }

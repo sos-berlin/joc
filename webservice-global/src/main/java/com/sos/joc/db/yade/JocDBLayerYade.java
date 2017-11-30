@@ -124,23 +124,57 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
     
-    public List<DBItemYadeFiles> getFilesById (List<Long> fileIds) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemYadeFiles> getFilesById(List<Long> fileIds) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
             sql.append(DBItemYadeFiles.class.getSimpleName());
-            sql.append(" where id in (");
-            boolean first = true;
-            for (Long id : fileIds) {
-              if (first) {
-                sql.append(id);
-                first = false;
-              } else {
-                sql.append(", ").append(id);
-              }
+            
+            if (fileIds != null && !fileIds.isEmpty()) {
+                if (fileIds.size() == 1) {
+                    sql.append(" where id = :id");
+                } else {
+                    sql.append(" where id in (:id)");
+                }
             }
-            sql.append(")");
             Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
+            if (fileIds != null && !fileIds.isEmpty()) {
+                if (fileIds.size() == 1) {
+                    query.setParameter("id", fileIds.get(0));
+                } else {
+                    query.setParameterList("id", fileIds);
+                }
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    public List<String> getSourceFilesByIdsAndTransferId(Long transferId, List<Long> fileIds) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select sourcePath from ");
+            sql.append(DBItemYadeFiles.class.getSimpleName());
+            sql.append(" where transferId = :transferId");
+            if (fileIds != null && !fileIds.isEmpty()) {
+                if (fileIds.size() == 1) {
+                    sql.append(" and id = :id");
+                } else {
+                    sql.append(" and id in (:id)");
+                }
+            }
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setParameter("transferId", transferId);
+            if (fileIds != null && !fileIds.isEmpty()) {
+                if (fileIds.size() == 1) {
+                    query.setParameter("id", fileIds.get(0));
+                } else {
+                    query.setParameterList("id", fileIds);
+                }
+            }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

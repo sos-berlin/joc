@@ -1,6 +1,7 @@
 package com.sos.joc.classes.orders;
 
 import java.time.Instant;
+import java.util.ArrayList;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -10,13 +11,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sos.joc.classes.JOCJsonCommand;
+import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.classes.orders.UsedJobs.Job;
 import com.sos.joc.classes.orders.UsedTasks.Task;
 import com.sos.joc.classes.parameters.Parameters;
 import com.sos.joc.classes.orders.UsedJobChains.JobChain;
+import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
+import com.sos.joc.exceptions.JocException;
+import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderState;
 import com.sos.joc.model.order.OrderStateFilter;
 import com.sos.joc.model.order.OrderStateText;
@@ -320,6 +326,25 @@ public class OrderVolatile extends OrderV {
     @JsonIgnore
     public OrderStateFilter getProcessingFilterState() {
         return processingFilterState;
+    }
+    
+    @JsonIgnore
+    public static OrderV getOrder(String jobChain, String orderId, Boolean compact, JOCResourceImpl jocResourceImpl) throws JocException {
+        OrderFilter orderBody = new OrderFilter();
+        orderBody.setCompact(compact);
+        orderBody.setJobChain(jobChain);
+        orderBody.setOrderId(orderId);
+        orderBody.setSuppressNotExistException(false);
+        return getOrder(orderBody, jocResourceImpl);
+    }
+    
+    @JsonIgnore
+    public static OrderV getOrder(OrderFilter orderBody, JOCResourceImpl jocResourceImpl) throws JocException {
+        JOCJsonCommand command = new JOCJsonCommand(jocResourceImpl);
+        command.setUriBuilderForOrders();
+        command.addOrderCompactQuery(orderBody.getCompact());
+        OrdersVCallable o = new OrdersVCallable(orderBody, command, jocResourceImpl.getAccessToken(), new ArrayList<String>());
+        return o.getOrder();
     }
 
 }

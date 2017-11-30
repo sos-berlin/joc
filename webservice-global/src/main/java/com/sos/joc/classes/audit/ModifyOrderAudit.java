@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
+import com.sos.joc.model.order.OrderV;
+import com.sos.joc.model.yade.ModifyTransfer;
+import com.sos.joc.model.yade.ModifyTransfers;
 
 public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
 
@@ -41,6 +44,41 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
         if (modifyOrders != null) {
             setAuditParams(modifyOrders.getAuditLog());
             setJobschedulerId(modifyOrders.getJobschedulerId());
+        }
+    }
+    
+    public ModifyOrderAudit(ModifyOrder modifyOrder, ModifyTransfers modifyTransfers) {
+        if (modifyOrder != null) {
+            getOrders().add(modifyOrder);
+            if (modifyOrder.getJobChain() != null) {
+                Path p = Paths.get(modifyOrder.getJobChain());
+                this.folder = p.getParent().toString().replace('\\', '/');
+                this.jobChain = p.toString().replace('\\', '/');
+                this.orderId = modifyOrder.getOrderId();
+            }
+        }
+        if (modifyTransfers != null) {
+            setAuditParams(modifyTransfers.getAuditLog());
+            setJobschedulerId(modifyTransfers.getJobschedulerId());
+        }
+    }
+    
+    public ModifyOrderAudit(OrderV order, ModifyTransfers modifyTransfers) {
+        if (order != null) {
+            ModifyOrder m = new ModifyOrder();
+            m.setJobChain(order.getJobChain());
+            m.setOrderId(order.getOrderId());
+            m.setParams(order.getParams());
+            m.setResume(true);
+            getOrders().add(m);
+            Path p = Paths.get(order.getJobChain());
+            this.folder = p.getParent().toString().replace('\\', '/');
+            this.jobChain = p.toString().replace('\\', '/');
+            this.orderId = order.getOrderId();
+        }
+        if (modifyTransfers != null) {
+            setAuditParams(modifyTransfers.getAuditLog());
+            setJobschedulerId(modifyTransfers.getJobschedulerId());
         }
     }
     
