@@ -14,6 +14,9 @@
 	<packaging>jar</packaging>
 	<name>webservice</name>
 
+    <properties>
+      <scheduler.xsd.folder>com/sos/scheduler/enginedoc/common</scheduler.xsd.folder>
+    </properties>
 
 	<dependencyManagement>
 		<dependencies>
@@ -214,6 +217,7 @@
 				<directory>src/main/resources</directory>
 				<excludes>
 					<exclude>shiro*</exclude>
+					<!-- exclude>scheduler.xsd</exclude -->
 				</excludes>
 			</resource>
 		</resources>
@@ -223,6 +227,55 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<inherited>true</inherited>
 			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-scheduler-xsd</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.sos-berlin.jobscheduler.enginedoc</groupId>
+                                    <artifactId>enginedoc-common</artifactId>
+                                    <version>${sos.engine.version}</version>
+                                    <includes>${scheduler.xsd.folder}/scheduler.xsd</includes>
+                                    <outputDirectory>${project.build.directory}/tmp</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+             </plugin>
+             <plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-scheduler-xsd</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/tmp/${scheduler.xsd.folder}</directory>
+                                    <includes>
+                                        <include>scheduler.xsd</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+             </plugin>
 		</plugins>
 	</build>
 
