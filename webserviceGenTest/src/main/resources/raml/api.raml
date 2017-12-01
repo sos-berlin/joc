@@ -374,7 +374,7 @@ traits:
       description7: !include documentation/order/state.md
       description8: !include documentation/order/type.md
       description9: !include documentation/common/folders.md
-      description10: !include documentation/order/runTimeIsTemporary.md
+      description10: " "
       description200: !include documentation/order/orders_v.md
       schema: !include schemas/order/ordersFilter-schema.json
       schema200: !include schemas/order/orders_v-schema.json
@@ -717,7 +717,7 @@ traits:
       description7: !include documentation/job/filteredByJobs.md
       description8: !include documentation/job/orderJob.md
       description9: !include documentation/job/state.md
-      description10: !include documentation/job/runTimeIsTemporary.md
+      description10: " "
       description200: !include documentation/job/jobs_v.md
       schema: !include schemas/job/jobsFilter-schema.json
       schema200: jobs
@@ -1953,6 +1953,26 @@ traits:
         example: " "
         example200: " "
 
+  /orders:
+    type:
+      postJSON:
+        description: Returns a collection of orders (volatile part) filtered by a period, job chains or order state
+        description1: !include documentation/common/compact.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        description6: !include documentation/order/filteredByOrders.md
+        description7: !include documentation/yade/orderstate.md
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/order/orders_v.md
+        schema: !include schemas/order/ordersFilter-schema.json
+        schema200: !include schemas/order/orders_v-schema.json
+        example: !include examples/order/filteredOrders-example.json
+        example200: !include examples/order/orders_v-example.json
+
 /calendars:
   type:
     postJSON:
@@ -1963,7 +1983,7 @@ traits:
       description4: !include documentation/calendar/calendarType.md
       description5: !include documentation/calendar/categories.md
       description6: !include documentation/calendar/filteredByCalendars.md
-      description7: " "
+      description7: !include documentation/calendar/filteredByCalendarIds.md
       description8: " "
       description9: " "
       description10: " "
@@ -1995,10 +2015,26 @@ traits:
     type:
       postForDownload:
         description: Provides Calendars export file as download  (see <a href="../calendars/import">./calendars/import</a>)
+        description1: !include documentation/calendar/filteredByCalendars.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description5: " "
+        schema: !include schemas/calendar/calendarsFilter-schema.json
+        example: " "
+
   /import:
     type:
-      postForUpload:
+      postCalendarWithOkResponse:
         description: Imports Calendar export file (see <a href="../calendars/export">./calendars/export</a>)
+        description1: !include documentation/calendar/filteredByCalendars.md
+        description2: " "
+        description3: " "
+        description4: " "
+        description200: " "
+        schema: !include schemas/calendar/calendarImportFilter-schema.json
+        audit: !include documentation/audit/auditLog.md
+        example: " "
 
 /calendar:
   type:
@@ -2037,7 +2073,6 @@ traits:
         description8: " "
         description9: " "
         description10: " "
-        description200: " "
         description200: " "
         schema: !include schemas/calendar/calendarDatesFilter-schema.json
         schema200: !include schemas/calendar/dates-schema.json

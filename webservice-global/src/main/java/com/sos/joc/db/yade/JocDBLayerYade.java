@@ -15,6 +15,7 @@ import com.sos.jade.db.DBItemYadeTransfers;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
+import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.yade.FileTransferStateText;
 import com.sos.joc.model.yade.Operation;
 import com.sos.joc.model.yade.ProtocolFragment;
@@ -22,6 +23,11 @@ import com.sos.joc.model.yade.TransferStateText;
 
 
 public class JocDBLayerYade extends DBLayer {
+    
+    private static final String TRANSFER_ORDER_PATH = TransferOrderPath.class.getName();
+    private static final String DBITEM_YADE_TRANSFERS = DBItemYadeTransfers.class.getSimpleName();
+    private static final String DBITEM_YADE_PROTOCOLS = DBItemYadeProtocols.class.getSimpleName();
+    private static final String DBITEM_YADE_FILES = DBItemYadeFiles.class.getSimpleName();
 
     public JocDBLayerYade(SOSHibernateSession session) {
         super(session);
@@ -30,66 +36,26 @@ public class JocDBLayerYade extends DBLayer {
     // TODO: at the moment only state = 5 (TRANSFERRED) is checked
     public Integer getSuccessfulTransferredFilesCount (Date from, Date to)
             throws DBInvalidDataException, DBConnectionRefusedException {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select count(*) from ");
-            sql.append(DBItemYadeFiles.class.getSimpleName());
-            sql.append(" where state = 5");
-            sql.append(" and transferId in (select id from ");
-            sql.append(DBItemYadeTransfers.class.getSimpleName());
-            if (from != null || to != null) {
-                sql.append(" where");
-            }
-            if (from != null) {
-                sql.append(" end > :from");
-            }
-            if (to != null) {
-                if (from != null) {
-                    sql.append(" and");
-                }
-                sql.append(" end < :to");
-            }
-            sql.append(")");
-            // select count(*) returns Object of type Long, therefore Query has to have type Long also
-            Query<Long> query = getSession().createQuery(sql.toString());
-            if (from != null) {
-                query.setParameter("from", from, TemporalType.TIMESTAMP);
-            }
-            if (to != null) {
-                query.setParameter("to", to, TemporalType.TIMESTAMP);
-            }
-            return getSession().getSingleResult(query).intValue();
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
+        return getTransferredFilesCount(from, to, 5);
     }
     
     // TODO: at the moment only state = 7 (TRANSFER_HAS_ERRORS) is checked
     public Integer getFailedTransferredFilesCount (Date from, Date to)
             throws DBInvalidDataException, DBConnectionRefusedException {
+        return getTransferredFilesCount(from, to, 7);
+    }
+    
+    private Integer getTransferredFilesCount (Date from, Date to, int status)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select count(*) from ");
-            sql.append(DBItemYadeFiles.class.getSimpleName());
-            sql.append(" where state = 7");
-            sql.append(" and transferId in (select id from ");
-            sql.append(DBItemYadeTransfers.class.getSimpleName());
-            if (from != null || to != null) {
-                sql.append(" where");
-            }
-            if (from != null) {
-                sql.append(" end > :from");
-            }
-            if (to != null) {
-                if (from != null) {
-                    sql.append(" and");
-                }
-                sql.append(" end < :to");
-            }
-            sql.append(")");
-            // select count(*) returns Object of type Long, therefore Query hasto have type Long also
+            sql.append(DBITEM_YADE_FILES).append(" yf, ");
+            sql.append(DBITEM_YADE_TRANSFERS).append(" yt");
+            sql.append(" where yf.transferId = yt.id");
+            sql.append(" and yt.end >= :from");
+            sql.append(" and yt.end < :to");
+            sql.append(" and yf.state = ").append(status);
             Query<Long> query = getSession().createQuery(sql.toString());
             if (from != null) {
                 query.setParameter("from", from, TemporalType.TIMESTAMP);
@@ -111,7 +77,7 @@ public class JocDBLayerYade extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
-            sql.append(DBItemYadeFiles.class.getSimpleName());
+            sql.append(DBITEM_YADE_FILES);
             sql.append(" where state = 7");
             sql.append(" and transferId = :transferId ");
             Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
@@ -128,7 +94,7 @@ public class JocDBLayerYade extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
-            sql.append(DBItemYadeFiles.class.getSimpleName());
+            sql.append(DBITEM_YADE_FILES);
             
             if (fileIds != null && !fileIds.isEmpty()) {
                 if (fileIds.size() == 1) {
@@ -157,7 +123,7 @@ public class JocDBLayerYade extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select sourcePath from ");
-            sql.append(DBItemYadeFiles.class.getSimpleName());
+            sql.append(DBITEM_YADE_FILES);
             sql.append(" where transferId = :transferId");
             if (fileIds != null && !fileIds.isEmpty()) {
                 if (fileIds.size() == 1) {
@@ -187,7 +153,7 @@ public class JocDBLayerYade extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
-            sql.append(DBItemYadeTransfers.class.getSimpleName());
+            sql.append(DBITEM_YADE_TRANSFERS);
             Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
@@ -201,7 +167,7 @@ public class JocDBLayerYade extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
-            sql.append(DBItemYadeFiles.class.getSimpleName());
+            sql.append(DBITEM_YADE_FILES);
             sql.append(" where id = :fileId");
             Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
             query.setParameter("fileId", fileId);
@@ -232,8 +198,8 @@ public class JocDBLayerYade extends DBLayer {
                     dateTo != null);
             StringBuilder sql = new StringBuilder();
             sql.append("select yt from ");
-            sql.append(DBItemYadeTransfers.class.getSimpleName()).append(" yt,");
-            sql.append(DBItemYadeProtocols.class.getSimpleName()).append(" yp");
+            sql.append(DBITEM_YADE_TRANSFERS).append(" yt,");
+            sql.append(DBITEM_YADE_PROTOCOLS).append(" yp");
             if (hasFilter) {
                 sql.append(" where");
                 if (operations != null && !operations.isEmpty()) {
@@ -389,7 +355,7 @@ public class JocDBLayerYade extends DBLayer {
     public DBItemYadeProtocols getProtocolById(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
-            sql.append("from ").append(DBItemYadeProtocols.class.getSimpleName());
+            sql.append("from ").append(DBITEM_YADE_PROTOCOLS);
             sql.append(" where id = :id");
             Query<DBItemYadeProtocols> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
@@ -408,7 +374,7 @@ public class JocDBLayerYade extends DBLayer {
             boolean anotherValueAlreadySet = false;
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
-            sql.append(DBItemYadeFiles.class.getSimpleName());
+            sql.append(DBITEM_YADE_FILES);
             if ((transferIds != null && !transferIds.isEmpty()) || (states != null && !states.isEmpty())
                     || (sources != null && !sources.isEmpty()) || (targets != null && !targets.isEmpty())
                     || (interventionTransferIds != null && !interventionTransferIds.isEmpty())) {
@@ -512,7 +478,7 @@ public class JocDBLayerYade extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
-            sql.append(DBItemYadeTransfers.class.getSimpleName());
+            sql.append(DBITEM_YADE_TRANSFERS);
             sql.append(" where id = :id");
             Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
@@ -523,5 +489,27 @@ public class JocDBLayerYade extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public List<TransferOrderPath> getOrders(Long jobschedulerId) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new ").append(TRANSFER_ORDER_PATH).append(" (jobChain, orderId, jobChainNode) from ");
+            sql.append(DBITEM_YADE_TRANSFERS);
+            sql.append(" where jobschedulerId = :jobschedulerId");
+            sql.append(" and state != 1");
+            sql.append(" and orderId is not null");
+            sql.append(" and orderId != ''");
+            sql.append(" group by jobChain, orderId, jobChainNode");
+            Query<TransferOrderPath> query = getSession().createQuery(sql.toString());
+            query.setParameter("jobschedulerId", jobschedulerId);
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    
 
 }
