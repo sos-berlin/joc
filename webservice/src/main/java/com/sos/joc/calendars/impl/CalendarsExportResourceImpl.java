@@ -12,13 +12,16 @@ import javax.ws.rs.Path;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
+import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsExportResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Calendar;
+import com.sos.joc.model.calendar.CalendarType;
 import com.sos.joc.model.calendar.Calendars;
 import com.sos.joc.model.calendar.CalendarsFilter;
 
@@ -39,6 +42,7 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             Long instanceId = dbItemInventoryInstance.getId();
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
+            CalendarUsageDBLayer usageDBLayer = new CalendarUsageDBLayer(connection);
             ObjectMapper objectMapper = new ObjectMapper();
             Set<String> calendarsToExport = new HashSet<String>(calendarsFilter.getCalendars());
             List<DBItemCalendar> calendarsFromDb = new ArrayList<DBItemCalendar>();
@@ -51,8 +55,28 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
                     Calendar calendar = objectMapper.readValue(dbCalendar.getConfiguration(), Calendar.class);
                     calendar.setPath(dbCalendar.getName());
                     calendarList.add(calendar);
+                    List<DBItemInventoryCalendarUsage> dbUsages = usageDBLayer.getCalendarUsages(dbCalendar.getId());
+                    if(dbUsages != null && !dbUsages.isEmpty()) {
+                        for(DBItemInventoryCalendarUsage dbUsage : dbUsages) {
+                            Calendar usage = objectMapper.readValue(dbUsage.getConfiguration(), Calendar.class);
+                            switch(dbUsage.getObjectType()) {
+                            case "JOB":
+                                usage.setType(CalendarType.JOB);
+                                break;
+                            case "ORDER":
+                                usage.setType(CalendarType.ORDER);
+                                break;
+                            case "SCHEDULE":
+                                usage.setType(CalendarType.SCHEDULE);
+                                break;
+                            }
+                            usage.setPath(dbUsage.getPath());
+                            calendarList.add(usage);
+                        }
+                    }
                 }
             }
+            
             Calendars entity = new Calendars();
             entity.setCalendars(calendarList);
             entity.setDeliveryDate(Date.from(Instant.now()));

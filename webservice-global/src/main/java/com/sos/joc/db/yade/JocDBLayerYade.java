@@ -513,4 +513,58 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
 
+    public Integer getSuccessfulTransfersCount(Date from, Date to) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select count(*) from ");
+            sql.append(DBITEM_YADE_TRANSFERS);
+            sql.append(" where state = 1");
+            if (from != null) {
+                sql.append(" and end >= :from");
+            }
+            if (to != null) {
+                sql.append(" and end < :to");
+            }
+            Query<Long> query = getSession().createQuery(sql.toString());
+            if (from != null) {
+                query.setParameter("from", from, TemporalType.TIMESTAMP);
+            }
+            if (to != null) {
+                query.setParameter("to", to, TemporalType.TIMESTAMP);
+            }
+            return getSession().getSingleResult(query).intValue();
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
+    public Integer getFailedTransfersCount(Date from, Date to) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select count(*) from ");
+            sql.append(DBITEM_YADE_TRANSFERS);
+            sql.append(" where state = 3");
+            if (from != null) {
+                sql.append(" and end >= :from");
+            }
+            if (to != null) {
+                sql.append(" and end < :to");
+            }
+            Query<Long> query = getSession().createQuery(sql.toString());
+            if (from != null) {
+                query.setParameter("from", from, TemporalType.TIMESTAMP);
+            }
+            if (to != null) {
+                query.setParameter("to", to, TemporalType.TIMESTAMP);
+            }
+            return getSession().getSingleResult(query).intValue();
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
 }
