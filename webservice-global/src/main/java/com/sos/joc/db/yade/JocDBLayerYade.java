@@ -15,7 +15,6 @@ import com.sos.jade.db.DBItemYadeTransfers;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
-import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.yade.FileTransferStateText;
 import com.sos.joc.model.yade.Operation;
 import com.sos.joc.model.yade.ProtocolFragment;
@@ -490,7 +489,7 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
     
-    public List<TransferOrderPath> getOrders(Long jobschedulerId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<TransferOrderPath> getOrders(String jobschedulerId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select new ").append(TRANSFER_ORDER_PATH).append(" (jobChain, orderId, jobChainNode) from ");

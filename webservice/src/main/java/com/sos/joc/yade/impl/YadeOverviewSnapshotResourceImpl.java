@@ -49,7 +49,7 @@ public class YadeOverviewSnapshotResourceImpl extends JOCResourceImpl implements
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
-            List<TransferOrderPath> orders = dbLayer.getOrders(dbItemInventoryInstance.getId());
+            List<TransferOrderPath> orders = dbLayer.getOrders(jobschedulerId.getJobschedulerId());
             OrdersFilter ordersBody = new OrdersFilter();
             ordersBody.setOrders(new ArrayList<OrderPath>());
             ordersBody.setCompact(true);
