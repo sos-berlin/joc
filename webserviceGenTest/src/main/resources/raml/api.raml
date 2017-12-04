@@ -2014,7 +2014,7 @@ traits:
   /export:
     type:
       postForDownload:
-        description: Provides Calendars export file as download  (see <a href="../calendars/import">./calendars/import</a>)
+        description: Provides Calendars export file as download  (see <a href="../calendars/import.html">./calendars/import</a>)
         description1: !include documentation/calendar/filteredByCalendars.md
         description2: " "
         description3: " "
@@ -2025,16 +2025,17 @@ traits:
 
   /import:
     type:
-      postCalendarWithOkResponse:
-        description: Imports Calendar export file (see <a href="../calendars/export">./calendars/export</a>)
-        description1: !include documentation/calendar/filteredByCalendars.md
-        description2: " "
-        description3: " "
-        description4: " "
-        description200: " "
-        schema: !include schemas/calendar/calendarImportFilter-schema.json
-        audit: !include documentation/audit/auditLog.md
-        example: " "
+#      postCalendarWithOkResponse:
+      postForUpload:
+        description: Imports Calendar export file (see <a href="../calendars/export.html">./calendars/export</a>)
+#        description1: !include documentation/calendar/filteredByCalendars.md
+#        description2: " "
+#        description3: " "
+#        description4: " "
+#        description200: " "
+#        schema: !include schemas/calendar/calendarImportFilter-schema.json
+#        audit: !include documentation/audit/auditLog.md
+#        example: " "
 
 /calendar:
   type:
