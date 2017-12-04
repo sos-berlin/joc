@@ -44,7 +44,6 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             //Filters
-            Boolean compact = filterBody.getCompact();
             Date dateFrom = null;
             Date dateTo = null;
             String from = filterBody.getDateFrom();
