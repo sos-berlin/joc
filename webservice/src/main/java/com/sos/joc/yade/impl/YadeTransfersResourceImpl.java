@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jade.db.DBItemYadeProtocols;
 import com.sos.jade.db.DBItemYadeTransfers;
@@ -23,7 +22,6 @@ import com.sos.joc.model.yade.Protocol;
 import com.sos.joc.model.yade.ProtocolFragment;
 import com.sos.joc.model.yade.Transfer;
 import com.sos.joc.model.yade.TransferFilter;
-import com.sos.joc.model.yade.TransferStateText;
 import com.sos.joc.model.yade.Transfers;
 import com.sos.joc.yade.resource.IYadeTransfersResource;
 
@@ -36,15 +34,14 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
     public JOCDefaultResponse postYadeTransfers(String accessToken, TransferFilter filterBody) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            SOSPermissionJocCockpit sosPermission = getPermissonsJocCockpit(accessToken);
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), 
-                    sosPermission.getYADE().getView().isStatus());
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), getPermissonsJocCockpit(
+                    accessToken).getYADE().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
+            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            //Filters
-            Boolean compact = filterBody.getCompact();
+            
             Date dateFrom = null;
             Date dateTo = null;
             String from = filterBody.getDateFrom();
@@ -56,14 +53,6 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             if (to != null && !to.isEmpty()) {
                 dateTo = JobSchedulerDate.getDateTo(to, timezone);
             }
-            List<Operation> operations = filterBody.getOperations();
-            List<TransferStateText> states = filterBody.getStates();
-            String mandator = filterBody.getMandator();
-            List<ProtocolFragment> sources = filterBody.getSources();
-            List<ProtocolFragment> targets = filterBody.getTargets();
-            Boolean isIntervention = filterBody.getIsIntervention();
-            Boolean hasInterventions = filterBody.getHasIntervention();
-            List<String> profiles = filterBody.getProfiles();
             Integer limit = filterBody.getLimit();
             if (limit == null) {
                 limit = 10000;  // default
@@ -71,8 +60,9 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 limit = null;   // unlimited
             }
             JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
-            List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(operations, states, mandator,
-                    sources, targets, isIntervention, hasInterventions, profiles, limit, dateFrom, dateTo);
+            List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(filterBody.getOperations(), filterBody.getStates(), filterBody
+                    .getMandator(), filterBody.getSources(), filterBody.getTargets(), filterBody.getIsIntervention(), filterBody.getHasIntervention(),
+                    filterBody.getProfiles(), limit, dateFrom, dateTo);
             Transfers entity = new Transfers();
             List<Transfer> transfers = new ArrayList<Transfer>();
             for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
@@ -88,7 +78,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 transfer.setJob(transferFromDb.getJob());
                 transfer.setJobChain(transferFromDb.getJobChain());
                 transfer.setJobschedulerId(transferFromDb.getJobschedulerId());
-                if(transferFromDb.getJumpProtocolId() != null) {
+                if (transferFromDb.getJumpProtocolId() != null) {
                     DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getJumpProtocolId());
                     if (protocol != null) {
                         ProtocolFragment jumpFragment = new ProtocolFragment();
@@ -104,7 +94,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 transfer.setOrderId(transferFromDb.getOrderId());
                 transfer.setParent_id(transferFromDb.getParentTransferId());
                 transfer.setProfile(transferFromDb.getProfileName());
-                if(transferFromDb.getSourceProtocolId() != null) {
+                if (transferFromDb.getSourceProtocolId() != null) {
                     DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getSourceProtocolId());
                     if (protocol != null) {
                         ProtocolFragment sourceFragment = new ProtocolFragment();
@@ -117,7 +107,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 }
                 transfer.setStart(transferFromDb.getStart());
                 transfer.setSurveyDate(transferFromDb.getModified());
-                if(transferFromDb.getTargetProtocolId() != null) {
+                if (transferFromDb.getTargetProtocolId() != null) {
                     DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getTargetProtocolId());
                     if (protocol != null) {
                         ProtocolFragment targetFragment = new ProtocolFragment();
@@ -138,11 +128,13 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+            Globals.disconnect(connection);
         }
     }
 
     private Operation getOperationFromValue(Integer value) {
-        switch(value) {
+        switch (value) {
         case 1:
             return Operation.COPY;
         case 2:
@@ -155,9 +147,9 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             return null;
         }
     }
-    
+
     private Protocol getProtocolFromValue(Integer value) {
-        switch(value) {
+        switch (value) {
         case 1:
             return Protocol.LOCAL;
         case 2:
@@ -178,7 +170,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             return Protocol.SMB;
         default:
             return null;
-        
+
         }
     }
 }

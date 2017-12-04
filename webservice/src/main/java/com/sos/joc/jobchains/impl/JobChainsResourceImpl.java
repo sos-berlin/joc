@@ -31,7 +31,6 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
     }
 
     public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getJobChain().getView().isStatus());
@@ -40,11 +39,8 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
             }
 
             JobChainsV entity = new JobChainsV();
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
-            List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId());
 
-            JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken, ordersWithTempRunTime);
+            JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
             List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
             List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
                        
@@ -64,8 +60,6 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
         }
     }
 

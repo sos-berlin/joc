@@ -150,7 +150,6 @@ public class TransferFileUtils {
         return null;
     }
     
-    
     public static OrderV getOrderForResume(JocDBLayerYade yadeDbLayer, ModifyTransfer transfer, JOCResourceImpl jocResourceImpl) throws JocException {
         if (transfer.getTransferId() == null) {
             throw new JocMissingRequiredParameterException("undefined 'transferId'");
@@ -160,8 +159,6 @@ public class TransferFileUtils {
         return getOrderForResume(dbTransferItem, files, jocResourceImpl);
     }
         
-        
-    
     public static OrderV getOrderForResume(DBItemYadeTransfers dbTransferItem, List<String> sourceFiles, JOCResourceImpl jocResourceImpl) throws JocException {
         if (dbTransferItem.getState() == 0) {
             throw new YADERequestException("The original transfer was successful.");

@@ -29,7 +29,6 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
     }
 
     public JOCDefaultResponse postJobChain(String accessToken, JobChainFilter jobChainFilter) throws Exception {
-        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainFilter, accessToken, jobChainFilter.getJobschedulerId(),
                     getPermissonsJocCockpit(accessToken).getJobChain().getView().isStatus());
@@ -38,12 +37,9 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
             }
             JobChainV200 entity = new JobChainV200();
             if (checkRequiredParameter("jobChain", jobChainFilter.getJobChain())) {
-                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-                InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
                 String jobChainPath = normalizePath(jobChainFilter.getJobChain());
-                List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId(), jobChainPath, null);
 
-                JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken, ordersWithTempRunTime);
+                JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
                 entity.setDeliveryDate(Date.from(Instant.now()));
                 entity.setJobChain(jocXmlCommand.getJobChain(jobChainPath, jobChainFilter.getCompact(), jobChainFilter.getMaxOrders()));
                 entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
@@ -56,8 +52,6 @@ public class JobChainResourceImpl extends JOCResourceImpl implements IJobChainRe
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
         }
     }
 

@@ -36,14 +36,12 @@ public class JobVolatile extends JobV {
     private final Boolean withOrderQueue;
     private final JOCXmlCommand jocXmlCommand;
     private String accessToken = null;
-    private List<String> ordersWithTempRunTime;
     
-    public JobVolatile(Element job, JOCXmlCommand jocXmlCommand, Boolean withOrderQueue, List<String> ordersWithTempRunTime) {
+    public JobVolatile(Element job, JOCXmlCommand jocXmlCommand, Boolean withOrderQueue) {
         this.job = job;
         this.jocXmlCommand = jocXmlCommand;
         this.orderJob = "yes".equals(getAttributeValue("order", "no"));
         this.withOrderQueue = withOrderQueue;
-        this.ordersWithTempRunTime = ordersWithTempRunTime;
     }
     
     public JobVolatile(Element job, JOCXmlCommand jocXmlCommand) {
@@ -178,7 +176,7 @@ public class JobVolatile extends JobV {
             JOCJsonCommand jocJsonCommand = new JOCJsonCommand(jocXmlCommand.getJOCResourceImpl());
             jocJsonCommand.setUriBuilderForOrders();
             jocJsonCommand.addOrderCompactQuery(false);
-            setOrderQueue(new OrdersVCallable(getPath(), false, jocJsonCommand, accessToken, ordersWithTempRunTime).getOrdersOfJob());
+            setOrderQueue(new OrdersVCallable(getPath(), false, jocJsonCommand, accessToken).getOrdersOfJob());
         } else {
             setOrderQueue(null);
         }

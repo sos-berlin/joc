@@ -343,7 +343,7 @@ public class OrderVolatile extends OrderV {
         JOCJsonCommand command = new JOCJsonCommand(jocResourceImpl);
         command.setUriBuilderForOrders();
         command.addOrderCompactQuery(orderBody.getCompact());
-        OrdersVCallable o = new OrdersVCallable(orderBody, command, jocResourceImpl.getAccessToken(), new ArrayList<String>());
+        OrdersVCallable o = new OrdersVCallable(orderBody, command, jocResourceImpl.getAccessToken());
         return o.getOrder();
     }
 

@@ -23,7 +23,7 @@ import com.sos.joc.classes.orders.OrderVolatile;
 import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
-import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
@@ -48,7 +48,6 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
                 return jocDefaultResponse;
             }
 
-            // TODO date post body parameters are not yet considered
             JOCJsonCommand command = new JOCJsonCommand(this);
             command.setUriBuilderForOrders();
             command.addOrderCompactQuery(ordersBody.getCompact());
@@ -70,8 +69,8 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
             }
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
-            List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId());
+            InventoryJobsDBLayer jobDbLayer = new InventoryJobsDBLayer(connection);
+            List<String> yadeJobs = jobDbLayer.getYadeJobs(dbItemInventoryInstance.getId());
 
             Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
             if (orders != null && !orders.isEmpty()) {
@@ -103,18 +102,18 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
 
             if (!ordersLists.isEmpty()) {
                 for (OrdersPerJobChain opj : ordersLists.values()) {
-                    tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken, ordersWithTempRunTime));
+                    tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken, yadeJobs));
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
-                    tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken, ordersWithTempRunTime));
+                    tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken, yadeJobs));
                 }
             } else {
                 Folder rootFolder = new Folder();
                 rootFolder.setFolder("/");
                 rootFolder.setRecursive(true);
-                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken, ordersWithTempRunTime);
+                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken, yadeJobs);
                 listOrders.putAll(callable.call());
             }
 
@@ -136,7 +135,7 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
                     executorService.shutdown();
                 }
             }
-
+            
             OrdersV entity = new OrdersV();
             entity.setOrders(new ArrayList<OrderV>(listOrders.values()));
             entity.setDeliveryDate(Date.from(Instant.now()));

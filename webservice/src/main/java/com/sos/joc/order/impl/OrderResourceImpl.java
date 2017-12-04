@@ -29,7 +29,6 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
     }
 
     public JOCDefaultResponse postOrder(String accessToken, OrderFilter orderBody) throws Exception {
-        SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderBody, accessToken, orderBody.getJobschedulerId(), getPermissonsJocCockpit(
                     accessToken).getOrder().getView().isStatus());
@@ -43,13 +42,9 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             OrderV200 entity = new OrderV200();
 
             if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
-                connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-                InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
                 String jobChainPath = normalizePath(orderBody.getJobChain());
-                List<String> ordersWithTempRunTime = dbLayer.getOrdersWithTemporaryRuntime(dbItemInventoryInstance.getId(), jobChainPath, orderBody
-                        .getOrderId());
                 orderBody.setJobChain(jobChainPath);
-                OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken, ordersWithTempRunTime);
+                OrdersVCallable o = new OrdersVCallable(orderBody, command, accessToken);
                 entity.setOrder(o.getOrder());
                 entity.setDeliveryDate(Date.from(Instant.now()));
             }
@@ -60,8 +55,6 @@ public class OrderResourceImpl extends JOCResourceImpl implements IOrderResource
             return JOCDefaultResponse.responseStatusJSError(e);
         } catch (Exception e) {
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
         }
 
     }

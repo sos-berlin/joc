@@ -64,16 +64,16 @@ public class JOCXmlJobCommand extends JOCXmlCommand {
         this.jobsWithTempRunTime = jobsWithTempRunTime;
     }
     
-    public JobV getJobWithOrderQueue(String job, Boolean compact, List<String> ordersWithTempRunTime) throws Exception {
-        return getJob(job, compact, true, ordersWithTempRunTime);
+    public JobV getJobWithOrderQueue(String job, Boolean compact) throws Exception {
+        return getJob(job, compact, true);
     }
     
-    public JobV getJob(String job, Boolean compact, Boolean withOrderQueue, List<String> ordersWithTempRunTime) throws Exception {
+    public JobV getJob(String job, Boolean compact, Boolean withOrderQueue) throws Exception {
         executePostWithThrowBadRequestAfterRetry(createShowJobPostCommand(job, compact), accessToken);
         Element jobElem = (Element) getSosxml().selectSingleNode("/spooler/answer/job");
-        JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue, ordersWithTempRunTime);
+        JobVolatile jobV = new JobVolatile(jobElem, this, withOrderQueue);
         jobV.setFields(compact, accessToken);
-        jobV.setRunTimeIsTemporary(jobsWithTempRunTime.contains(jobV.getPath()));
+        jobV.setRunTimeIsTemporary(false);
         return jobV;
     }
     

@@ -273,4 +273,24 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
     
+    public List<String> getYadeJobs(Long instanceId) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select name from ").append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where instanceId = :instanceId"); //isYadeJob
+            sql.append(" and isYadeJob = true");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<String> result = getSession().getResultList(query);
+            if (result != null) {
+                return result;
+            }
+            return new ArrayList<String>();
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
 }
