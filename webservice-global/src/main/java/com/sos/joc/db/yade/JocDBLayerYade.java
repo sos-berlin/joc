@@ -52,8 +52,12 @@ public class JocDBLayerYade extends DBLayer {
             sql.append(DBITEM_YADE_FILES).append(" yf, ");
             sql.append(DBITEM_YADE_TRANSFERS).append(" yt");
             sql.append(" where yf.transferId = yt.id");
-            sql.append(" and yt.end >= :from");
-            sql.append(" and yt.end < :to");
+            if (from != null) {
+                sql.append(" and yt.end >= :from");
+            }
+            if (to != null) {
+                sql.append(" and yt.end < :to");
+            }
             sql.append(" and yf.state = ").append(status);
             Query<Long> query = getSession().createQuery(sql.toString());
             if (from != null) {
@@ -508,7 +512,5 @@ public class JocDBLayerYade extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
-    
 
 }
