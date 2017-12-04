@@ -3,31 +3,20 @@ package com.sos.joc.yade.impl;
 import java.sql.Date;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrderVolatile;
-import com.sos.joc.classes.orders.OrdersPerJobChain;
 import com.sos.joc.classes.orders.OrdersVCallable;
-import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
-import com.sos.joc.db.yade.JocDBLayerYade;
-import com.sos.joc.db.yade.TransferOrderPath;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.JocMissingRequiredParameterException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.order.OrderPath;
@@ -59,8 +48,6 @@ public class YadeOverviewSnapshotResourceImpl extends JOCResourceImpl implements
             command.setUriBuilderForOrders();
             command.addOrderCompactQuery(ordersBody.getCompact());
 
-            List<OrderPath> orders = ordersBody.getOrders();
-            
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryJobsDBLayer jobDbLayer = new InventoryJobsDBLayer(connection);
             List<String> yadeJobs = jobDbLayer.getYadeJobs(dbItemInventoryInstance.getId());

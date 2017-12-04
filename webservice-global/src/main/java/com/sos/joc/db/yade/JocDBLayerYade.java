@@ -23,7 +23,6 @@ import com.sos.joc.model.yade.TransferStateText;
 
 public class JocDBLayerYade extends DBLayer {
     
-    private static final String TRANSFER_ORDER_PATH = TransferOrderPath.class.getName();
     private static final String DBITEM_YADE_TRANSFERS = DBItemYadeTransfers.class.getSimpleName();
     private static final String DBITEM_YADE_PROTOCOLS = DBItemYadeProtocols.class.getSimpleName();
     private static final String DBITEM_YADE_FILES = DBItemYadeFiles.class.getSimpleName();
@@ -493,26 +492,6 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
     
-    public List<TransferOrderPath> getOrders(String jobschedulerId) throws DBInvalidDataException, DBConnectionRefusedException {
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("select new ").append(TRANSFER_ORDER_PATH).append(" (jobChain, orderId, jobChainNode) from ");
-            sql.append(DBITEM_YADE_TRANSFERS);
-            sql.append(" where jobschedulerId = :jobschedulerId");
-            sql.append(" and state != 1");
-            sql.append(" and orderId is not null");
-            sql.append(" and orderId != ''");
-            sql.append(" group by jobChain, orderId, jobChainNode");
-            Query<TransferOrderPath> query = getSession().createQuery(sql.toString());
-            query.setParameter("jobschedulerId", jobschedulerId);
-            return getSession().getResultList(query);
-        } catch (SOSHibernateInvalidSessionException ex) {
-            throw new DBConnectionRefusedException(ex);
-        } catch (Exception ex) {
-            throw new DBInvalidDataException(ex);
-        }
-    }
-
     public Integer getSuccessfulTransfersCount(Date from, Date to) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
