@@ -15,6 +15,6 @@ public interface ICalendarsExportResource {
 
     @POST
     @Path("export")
-    @Produces({ MediaType.APPLICATION_JSON })
+    @Produces({ MediaType.APPLICATION_OCTET_STREAM })
     public JOCDefaultResponse exportCalendars(@HeaderParam("X-Access-Token") String xAccessToken, CalendarsFilter calendarsFilter) throws Exception;
 }
