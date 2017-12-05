@@ -496,13 +496,13 @@ public class JocDBLayerYade extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select count(*) from ");
-            sql.append(DBITEM_YADE_TRANSFERS);
+            sql.append(DBITEM_YADE_TRANSFERS).append(" transfer");
             sql.append(" where state = 1");
             if (from != null) {
-                sql.append(" and end >= :from");
+                sql.append(" and transfer.end >= :from");
             }
             if (to != null) {
-                sql.append(" and end < :to");
+                sql.append(" and transfer.end < :to");
             }
             Query<Long> query = getSession().createQuery(sql.toString());
             if (from != null) {
@@ -523,13 +523,13 @@ public class JocDBLayerYade extends DBLayer {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select count(*) from ");
-            sql.append(DBITEM_YADE_TRANSFERS);
+            sql.append(DBITEM_YADE_TRANSFERS).append(" transfer");
             sql.append(" where state = 3");
             if (from != null) {
-                sql.append(" and end >= :from");
+                sql.append(" and transfer.end >= :from");
             }
             if (to != null) {
-                sql.append(" and end < :to");
+                sql.append(" and transfer.end < :to");
             }
             Query<Long> query = getSession().createQuery(sql.toString());
             if (from != null) {
