@@ -176,7 +176,7 @@ public class TransferFileUtils {
                     dbTransferItem.getOrderId()));
         }
         NameValuePair param = new NameValuePair();
-        param.setName("file_path_restriction");
+        param.setName("yade_file_path_restriction");
         if (sourceFiles != null && !sourceFiles.isEmpty()) {
             param.setValue(Joiner.on(";").join(sourceFiles));
         } else {
