@@ -11,6 +11,9 @@
     "jobschedulerId": {
       "type": "string"
     },
+    "id": {
+      "$ref": "../common/nonNegativeLong-schema.json"
+    },
     "eventId": {
       "type": "string"
     },

@@ -1,0 +1,21 @@
+{
+  "title": "customDeleteEventsFilter",
+  "id": "schemas/event/customDeleteEventsFilter",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "javaType": "com.sos.joc.model.event.custom.EventIdsFilter",
+  "type": "object",
+  "required": [
+    "jobschedulerId"
+  ],
+  "properties": {
+    "jobschedulerId": {
+      "type": "string"
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/nonNegativeLong-schema.json" 
+      }
+    }
+  }
+}

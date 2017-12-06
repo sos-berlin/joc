@@ -120,8 +120,8 @@ traits:
         description1: !include documentation/common/dateFrom.md
         description2: !include documentation/common/dateTo.md
         description3: !include documentation/common/timeZone.md
-        description4: !include documentation/common/regex.md
-        description5: !include documentation/common/folders.md
+        description4: " "
+        description5: " "
         description6: !include documentation/job/filteredByJobs.md
         description7: !include documentation/order/filteredByOrders.md
         description8: !include documentation/event/filteredByIdClassExit.md
@@ -132,6 +132,25 @@ traits:
         schema200: !include schemas/event/customEvents-schema.json
         example: " "
         example200: " "
+    /delete:
+      type:
+        postJSON:
+          description: delete custom events
+          description1: !include documentation/event/filteredByIds.md
+          description2: " "
+          description3: !include documentation/audit/auditLog.md
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: " "
+          schema: !include schemas/event/customDeleteEventsFilter-schema.json
+          schema200: ok
+          example: " "
+          example200: " "
 /touch:
   type: error
   post:
