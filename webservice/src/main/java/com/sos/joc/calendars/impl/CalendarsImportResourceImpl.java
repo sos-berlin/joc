@@ -78,6 +78,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                         calendarPaths.put(dbItemCalendar.getName(), dbItemCalendar.getId());
                     }
                 }
+                // then save or update calendar usages (restrictions)
                 InventoryOrdersDBLayer ordersDBLayer = new InventoryOrdersDBLayer(connection);
                 InventoryJobsDBLayer jobsDBLayer = new InventoryJobsDBLayer(connection);
                 InventorySchedulesDBLayer schedulesDBLayer = new InventorySchedulesDBLayer(connection);
@@ -85,27 +86,26 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 for (Calendar calendarUsage : calendars) {
                     if (calendarUsage.getBasedOn() != null && !calendarUsage.getBasedOn().isEmpty()
                             && calendarPaths.containsKey(calendarUsage.getBasedOn())) { // CalendarUsage
-                        // TODO
-                        DBItemInventoryOrder dbOrder = null;
-                        DBItemInventoryJob dbJob = null;
-                        DBItemInventorySchedule dbSchedule = null;
+                        DbItem dbItem = null;
+                        // check first if corresponding order, job or schedule exists
                         switch(calendarUsage.getType()) {
                             case ORDER:
-                                dbOrder = ordersDBLayer.getInventoryOrderByName(dbItemInventoryInstance.getId(), calendarUsage.getPath());
-                                inventoryDBItemsToUpdate.add(dbOrder);
+                                dbItem = ordersDBLayer.getInventoryOrderByName(dbItemInventoryInstance.getId(), calendarUsage.getPath());
+                                inventoryDBItemsToUpdate.add(dbItem);
                                 break;
                             case JOB:
-                                dbJob = jobsDBLayer.getInventoryJobByName(calendarUsage.getPath(), dbItemInventoryInstance.getId());
-                                inventoryDBItemsToUpdate.add(dbJob);
+                                dbItem = jobsDBLayer.getInventoryJobByName(calendarUsage.getPath(), dbItemInventoryInstance.getId());
+                                inventoryDBItemsToUpdate.add(dbItem);
                                 break;
                             case SCHEDULE:
-                                dbSchedule = schedulesDBLayer.getSchedule(calendarUsage.getPath(), dbItemInventoryInstance.getId());
-                                inventoryDBItemsToUpdate.add(dbSchedule);
+                                dbItem = schedulesDBLayer.getSchedule(calendarUsage.getPath(), dbItemInventoryInstance.getId());
+                                inventoryDBItemsToUpdate.add(dbItem);
                                 break;
                             default:
                                 break;
                         }
-                        if (dbOrder != null || dbJob != null || dbSchedule != null) {
+                        // save or update calendar usage (restrition) only if corresponding order, job or schedule exists
+                        if (dbItem != null) {
                             DBItemInventoryCalendarUsage dbUsage = dbUsageLayer.getCalendarUsageByConstraint(
                                     dbItemInventoryInstance.getId(), calendarPaths.get(calendarUsage.getBasedOn()),
                                     calendarUsage.getType().toString(), calendarUsage.getPath());
@@ -139,7 +139,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                         }
                     }
                 }
-                // TODO call ModifyHotFolder for the target objects of the calendar usage
+                // TODO call ModifyHotFolder for the corresponding orders, jobs and schedules of the calendar usage (restriction)
                 for(DbItem item : inventoryDBItemsToUpdate) {
                     if (item instanceof DBItemInventoryOrder) {
                         // TODO implementation for ModifyHotFolder for orders
