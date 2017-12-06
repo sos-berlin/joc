@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
@@ -44,6 +45,7 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
             CalendarUsageDBLayer usageDBLayer = new CalendarUsageDBLayer(connection);
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             Set<String> calendarsToExport = new HashSet<String>(calendarsFilter.getCalendars());
             List<DBItemCalendar> calendarsFromDb = new ArrayList<DBItemCalendar>();
             if (calendarsToExport != null) {
