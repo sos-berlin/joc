@@ -165,4 +165,23 @@ public class InventoryOrdersDBLayer extends DBLayer {
         }
     }
     
+    public DBItemInventoryOrder getInventoryOrderByName(Long instanceId, String path)
+            throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ");
+            sql.append(DBITEM_INVENTORY_ORDERS);
+            sql.append(" and instanceId = :instanceId");
+            sql.append(" and name = :path");
+            Query<DBItemInventoryOrder> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            query.setParameter("path", path);
+            return getSession().getSingleResult(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
 }

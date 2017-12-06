@@ -11,15 +11,22 @@ import java.util.Set;
 import javax.ws.rs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sos.hibernate.classes.DbItem;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
+import com.sos.jitl.reporting.db.DBItemInventoryJob;
+import com.sos.jitl.reporting.db.DBItemInventoryOrder;
+import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsImportResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
+import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
+import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.calendar.Calendar;
 import com.sos.joc.model.calendar.CalendarImportFilter;
@@ -71,40 +78,75 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                         calendarPaths.put(dbItemCalendar.getName(), dbItemCalendar.getId());
                     }
                 }
+                InventoryOrdersDBLayer ordersDBLayer = new InventoryOrdersDBLayer(connection);
+                InventoryJobsDBLayer jobsDBLayer = new InventoryJobsDBLayer(connection);
+                InventorySchedulesDBLayer schedulesDBLayer = new InventorySchedulesDBLayer(connection);
+                Set<DbItem> inventoryDBItemsToUpdate = new HashSet<DbItem>();
                 for (Calendar calendarUsage : calendars) {
                     if (calendarUsage.getBasedOn() != null && !calendarUsage.getBasedOn().isEmpty()
                             && calendarPaths.containsKey(calendarUsage.getBasedOn())) { // CalendarUsage
                         // TODO
-                        DBItemInventoryCalendarUsage dbUsage = dbUsageLayer.getCalendarUsageByConstraint(
-                                dbItemInventoryInstance.getId(), calendarPaths.get(calendarUsage.getBasedOn()), 
-                                calendarUsage.getType().toString(), calendarUsage.getPath());
-                        if (dbUsage != null) {
-                            // update
-                            dbUsage.setObjectType(calendarUsage.getType().toString());
-                            calendarUsage.setType(null);
-                            dbUsage.setPath(calendarUsage.getPath());
-                            calendarUsage.setPath(null);
-                            dbUsage.setEdited(false);
-                            ObjectMapper mapper = new ObjectMapper();
-                            dbUsage.setConfiguration(mapper.writeValueAsString(calendarUsage));
-                            dbUsage.setModified(Date.from(Instant.now()));
-                            dbUsageLayer.updateCalendarUsage(dbUsage);
-                        } else {
-                            // save
-                            dbUsage = new DBItemInventoryCalendarUsage();
-                            dbUsage.setInstanceId(dbItemInventoryInstance.getId());
-                            dbUsage.setCalendarId(calendarPaths.get(calendarUsage.getBasedOn()));
-                            dbUsage.setObjectType(calendarUsage.getType().toString());
-                            calendarUsage.setType(null);
-                            dbUsage.setPath(calendarUsage.getPath());
-                            calendarUsage.setPath(null);
-                            dbUsage.setEdited(false);
-                            dbUsage.setModified(Date.from(Instant.now()));
-                            dbUsage.setCreated(Date.from(Instant.now()));
-                            ObjectMapper mapper = new ObjectMapper();
-                            dbUsage.setConfiguration(mapper.writeValueAsString(calendarUsage));
-                            dbUsageLayer.saveCalendarUsage(dbUsage);
+                        DBItemInventoryOrder dbOrder = null;
+                        DBItemInventoryJob dbJob = null;
+                        DBItemInventorySchedule dbSchedule = null;
+                        switch(calendarUsage.getType()) {
+                            case ORDER:
+                                dbOrder = ordersDBLayer.getInventoryOrderByName(dbItemInventoryInstance.getId(), calendarUsage.getPath());
+                                inventoryDBItemsToUpdate.add(dbOrder);
+                                break;
+                            case JOB:
+                                dbJob = jobsDBLayer.getInventoryJobByName(calendarUsage.getPath(), dbItemInventoryInstance.getId());
+                                inventoryDBItemsToUpdate.add(dbJob);
+                                break;
+                            case SCHEDULE:
+                                dbSchedule = schedulesDBLayer.getSchedule(calendarUsage.getPath(), dbItemInventoryInstance.getId());
+                                inventoryDBItemsToUpdate.add(dbSchedule);
+                                break;
+                            default:
+                                break;
                         }
+                        if (dbOrder != null || dbJob != null || dbSchedule != null) {
+                            DBItemInventoryCalendarUsage dbUsage = dbUsageLayer.getCalendarUsageByConstraint(
+                                    dbItemInventoryInstance.getId(), calendarPaths.get(calendarUsage.getBasedOn()),
+                                    calendarUsage.getType().toString(), calendarUsage.getPath());
+                            if (dbUsage != null) {
+                                // update
+                                dbUsage.setObjectType(calendarUsage.getType().toString());
+                                calendarUsage.setType(null);
+                                dbUsage.setPath(calendarUsage.getPath());
+                                calendarUsage.setPath(null);
+                                dbUsage.setEdited(false);
+                                ObjectMapper mapper = new ObjectMapper();
+                                dbUsage.setConfiguration(mapper.writeValueAsString(calendarUsage));
+                                dbUsage.setModified(Date.from(Instant.now()));
+                                dbUsageLayer.updateCalendarUsage(dbUsage);
+                            } else {
+                                // save
+                                dbUsage = new DBItemInventoryCalendarUsage();
+                                dbUsage.setInstanceId(dbItemInventoryInstance.getId());
+                                dbUsage.setCalendarId(calendarPaths.get(calendarUsage.getBasedOn()));
+                                dbUsage.setObjectType(calendarUsage.getType().toString());
+                                calendarUsage.setType(null);
+                                dbUsage.setPath(calendarUsage.getPath());
+                                calendarUsage.setPath(null);
+                                dbUsage.setEdited(false);
+                                dbUsage.setModified(Date.from(Instant.now()));
+                                dbUsage.setCreated(Date.from(Instant.now()));
+                                ObjectMapper mapper = new ObjectMapper();
+                                dbUsage.setConfiguration(mapper.writeValueAsString(calendarUsage));
+                                dbUsageLayer.saveCalendarUsage(dbUsage);
+                            }
+                        }
+                    }
+                }
+                // TODO call ModifyHotFolder for the target objects of the calendar usage
+                for(DbItem item : inventoryDBItemsToUpdate) {
+                    if (item instanceof DBItemInventoryOrder) {
+                        // TODO implementation for ModifyHotFolder for orders
+                    } else if (item instanceof DBItemInventoryJob) {
+                        // TODO implementation for ModifyHotFolder for jobs
+                    } else if (item instanceof DBItemInventorySchedule) {
+                        // TODO implementation for ModifyHotFolder for schedules
                     }
                 }
             }
