@@ -20,7 +20,6 @@ import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
 import com.sos.jobscheduler.model.event.CalendarEvent;
-import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsImportResource;
@@ -82,10 +81,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 for (Calendar calendar : calendars) {
                     if (calendar.getBasedOn() == null || calendar.getBasedOn().isEmpty()) { // Calendar
                         DBItemCalendar dbItemCalendar = dbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath());
-                        boolean update = false;
-                        if (dbItemCalendar != null) {
-                            update = true;
-                        }
+                        boolean update = (dbItemCalendar != null);
                         dbItemCalendar = dbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), dbItemCalendar, calendar);
                         ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, dbItemCalendar.getName(), 
                                 calendarImportFilter.getAuditLog(), calendarImportFilter.getJobschedulerId());
@@ -146,7 +142,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                                 dbUsage.setModified(Date.from(Instant.now()));
                                 dbUsageLayer.updateCalendarUsage(dbUsage);
                                 ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, dbUsage.getPath(), 
-                                        calendarImportFilter.getAuditLog());
+                                        calendarImportFilter.getAuditLog(), calendarImportFilter.getJobschedulerId());
                                 logAuditMessage(calendarAudit);
                                 eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(dbUsage.getPath(), dbUsage.getObjectType(),
                                         "CalendarUsageUpdated"));
@@ -166,7 +162,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                                 dbUsage.setConfiguration(mapper.writeValueAsString(calendarUsage));
                                 dbUsageLayer.saveCalendarUsage(dbUsage);
                                 ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, dbUsage.getPath(), 
-                                        calendarImportFilter.getAuditLog());
+                                        calendarImportFilter.getAuditLog(), calendarImportFilter.getJobschedulerId());
                                 logAuditMessage(calendarAudit);
                                 eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(dbUsage.getPath(), dbUsage.getObjectType(),
                                         "CalendarUsageCreated"));
