@@ -1,6 +1,7 @@
 package com.sos.joc.calendars.impl;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,10 +19,15 @@ import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
+import com.sos.jobscheduler.model.event.CalendarEvent;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
+import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsImportResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
+import com.sos.joc.classes.audit.ModifyCalendarAudit;
+import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
@@ -43,7 +49,8 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
     public JOCDefaultResponse importCalendars(String accessToken, CalendarImportFilter calendarImportFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, calendarImportFilter.getJobschedulerId(), getPermissonsJocCockpit(accessToken)
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, calendarImportFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(accessToken)
                     .getCalendar().getEdit().isCreate());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -63,6 +70,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
 //            } catch (Exception e) {
 //                throw new JobSchedulerInvalidResponseDataException("calendar import file is invalid", e);
 //            }
+            List<String> eventCommands = new ArrayList<String>();
             List<Calendar> calendars = calendarImportFilter.getCalendars();
 //            if (calendars != null && calendars.getCalendars() != null && !calendars.getCalendars().isEmpty()) {
             if (calendars != null && !calendars.isEmpty()) {
@@ -74,7 +82,24 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 for (Calendar calendar : calendars) {
                     if (calendar.getBasedOn() == null || calendar.getBasedOn().isEmpty()) { // Calendar
                         DBItemCalendar dbItemCalendar = dbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath());
+                        boolean update = false;
+                        if (dbItemCalendar != null) {
+                            update = true;
+                        }
                         dbItemCalendar = dbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), dbItemCalendar, calendar);
+                        ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, dbItemCalendar.getName(), 
+                                calendarImportFilter.getAuditLog());
+                        logAuditMessage(calendarAudit);
+                        CalendarEvent calEvt = new CalendarEvent();
+                        if (update) {
+                            calEvt.setKey("CalendarUpdated");
+                        } else {
+                            calEvt.setKey("CalendarCreated");
+                        }
+                        CalendarVariables calEvtVars = new CalendarVariables();
+                        calEvtVars.setPath(dbItemCalendar.getName());
+                        calEvt.setVariables(calEvtVars);
+                        eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
                         calendarPaths.put(dbItemCalendar.getName(), dbItemCalendar.getId());
                     }
                 }
@@ -120,6 +145,11 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                                 dbUsage.setConfiguration(mapper.writeValueAsString(calendarUsage));
                                 dbUsage.setModified(Date.from(Instant.now()));
                                 dbUsageLayer.updateCalendarUsage(dbUsage);
+                                ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, dbUsage.getPath(), 
+                                        calendarImportFilter.getAuditLog());
+                                logAuditMessage(calendarAudit);
+                                eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(dbUsage.getPath(), dbUsage.getObjectType(),
+                                        "CalendarUsageUpdated"));
                             } else {
                                 // save
                                 dbUsage = new DBItemInventoryCalendarUsage();
@@ -135,10 +165,16 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                                 ObjectMapper mapper = new ObjectMapper();
                                 dbUsage.setConfiguration(mapper.writeValueAsString(calendarUsage));
                                 dbUsageLayer.saveCalendarUsage(dbUsage);
+                                ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, dbUsage.getPath(), 
+                                        calendarImportFilter.getAuditLog());
+                                logAuditMessage(calendarAudit);
+                                eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(dbUsage.getPath(), dbUsage.getObjectType(),
+                                        "CalendarUsageCreated"));
                             }
                         }
                     }
                 }
+                SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, getAccessToken());
                 // TODO call ModifyHotFolder for the corresponding orders, jobs and schedules of the calendar usage (restriction)
                 for(DbItem item : inventoryDBItemsToUpdate) {
                     if (item instanceof DBItemInventoryOrder) {

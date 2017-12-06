@@ -28,6 +28,7 @@ import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
 import com.sos.joc.classes.calendar.FrequencyResolver;
 import com.sos.joc.classes.calendar.JobSchedulerCalendarCallable;
+import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
@@ -137,11 +138,11 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             List<String> eventCommands = new ArrayList<String>();
             
             if (newCalendar) {
-                eventCommands.add(addEvent(calEvt)); 
+                eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt)); 
             } else {
                 Calendar curCalendar = objMapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);
                 if (!curCalendar.equals(oldCalendar)) {
-                    eventCommands.add(addEvent(calEvt));
+                    eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
                 }
             }
             
@@ -157,7 +158,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                             c.setBasedOn(calendar.getPath());
                             item.setConfiguration(objMapper.writeValueAsString(c));
                             calendarUsageDbLayer.updateCalendarUsage(item);
-                            eventCommands.add(addCalUsageEvent(item.getPath(), item.getObjectType()));
+                            eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(item.getPath(), item.getObjectType(), "CalendarUsageUpdated"));
                         }
                         connection.commit();
                     } catch (JocException e) {
@@ -169,7 +170,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                     } 
                 }
             }
-            sendEvent(eventCommands);
+            SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, getAccessToken());
             
             if (updateJobOrderScheduleIsNecessary) {
                 //update calendar in jobs, orders and schedules
@@ -241,7 +242,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             CalendarVariables calEvtVars = new CalendarVariables();
             calEvtVars.setPath(calendar.getPath());
             calEvt.setVariables(calEvtVars);
-            sendEvent(calEvt);
+            SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
 
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
@@ -289,7 +290,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             calEvtVars.setPath(calendarNewPath);
             calEvtVars.setOldPath(calendarPath);
             calEvt.setVariables(calEvtVars);
-            sendEvent(calEvt);
+            SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
 
             return JOCDefaultResponse.responseStatusJSOk(surveyDate);
         } catch (JocException e) {
@@ -332,49 +333,49 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
         return calendar;
     }
     
-    private String addEvent(CalendarEvent calEvt) throws JocException, JsonProcessingException {
-        String xmlCommand = objMapper.writeValueAsString(calEvt);
-        return "<publish_event>" + xmlCommand + "</publish_event>";
-    }
+//    private String addEvent(CalendarEvent calEvt) throws JocException, JsonProcessingException {
+//        String xmlCommand = objMapper.writeValueAsString(calEvt);
+//        return "<publish_event>" + xmlCommand + "</publish_event>";
+//    }
+//    
+//    private void sendEvent(CalendarEvent calEvt) throws JocException, JsonProcessingException {
+//        try {
+//            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+//            jocXmlCommand.executePostWithRetry(addEvent(calEvt), getAccessToken());
+//        } catch (JobSchedulerConnectionRefusedException e) {
+//        } catch (JobSchedulerConnectionResetException e) {
+//        }
+//    }
     
-    private void sendEvent(CalendarEvent calEvt) throws JocException, JsonProcessingException {
-        try {
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            jocXmlCommand.executePostWithRetry(addEvent(calEvt), getAccessToken());
-        } catch (JobSchedulerConnectionRefusedException e) {
-        } catch (JobSchedulerConnectionResetException e) {
-        }
-    }
+//    private void sendEvent(List<String> xmlCommands) throws JocException, JsonProcessingException {
+//        try {
+//            if (!xmlCommands.isEmpty()) {
+//                String xmlCommand = "";
+//                if (xmlCommands.size() > 1) {
+//                    xmlCommand += "<commands>";
+//                }
+//                for (String command : xmlCommands) {
+//                    xmlCommand += command;
+//                }
+//                if (xmlCommands.size() > 1) {
+//                    xmlCommand += "</commands>";
+//                }
+//                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+//                jocXmlCommand.executePostWithRetry(xmlCommand, getAccessToken());
+//            }
+//        } catch (JobSchedulerConnectionRefusedException e) {
+//        } catch (JobSchedulerConnectionResetException e) {
+//        }
+//    }
     
-    private void sendEvent(List<String> xmlCommands) throws JocException, JsonProcessingException {
-        try {
-            if (!xmlCommands.isEmpty()) {
-                String xmlCommand = "";
-                if (xmlCommands.size() > 1) {
-                    xmlCommand += "<commands>";
-                }
-                for (String command : xmlCommands) {
-                    xmlCommand += command;
-                }
-                if (xmlCommands.size() > 1) {
-                    xmlCommand += "</commands>";
-                }
-                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-                jocXmlCommand.executePostWithRetry(xmlCommand, getAccessToken());
-            }
-        } catch (JobSchedulerConnectionRefusedException e) {
-        } catch (JobSchedulerConnectionResetException e) {
-        }
-    }
-    
-    private String addCalUsageEvent(String path, String objectType) throws JsonProcessingException, JocException {
-        CalendarEvent calEvt = new CalendarEvent();
-        calEvt.setKey("CalendarUsageUpdated");
-        CalendarVariables calEvtVars = new CalendarVariables();
-        calEvtVars.setPath(path);
-        calEvtVars.setObjectType(CalendarObjectType.fromValue(objectType));
-        calEvt.setVariables(calEvtVars);
-        return addEvent(calEvt);
-    }
+//    private String addCalUsageEvent(String path, String objectType) throws JsonProcessingException, JocException {
+//        CalendarEvent calEvt = new CalendarEvent();
+//        calEvt.setKey("CalendarUsageUpdated");
+//        CalendarVariables calEvtVars = new CalendarVariables();
+//        calEvtVars.setPath(path);
+//        calEvtVars.setObjectType(CalendarObjectType.fromValue(objectType));
+//        calEvt.setVariables(calEvtVars);
+//        return SendCalendarEventsUtil.addEvent(calEvt);
+//    }
 
 }
