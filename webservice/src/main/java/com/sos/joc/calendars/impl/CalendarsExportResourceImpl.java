@@ -54,26 +54,30 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             List<Calendar> calendarList = new ArrayList<Calendar>();
             if (calendarsFromDb != null && !calendarsFromDb.isEmpty()) {
                 for (DBItemCalendar dbCalendar : calendarsFromDb) {
-                    Calendar calendar = objectMapper.readValue(dbCalendar.getConfiguration(), Calendar.class);
-                    calendar.setPath(dbCalendar.getName());
-                    calendarList.add(calendar);
-                    List<DBItemInventoryCalendarUsage> dbUsages = usageDBLayer.getCalendarUsages(dbCalendar.getId());
-                    if(dbUsages != null && !dbUsages.isEmpty()) {
-                        for(DBItemInventoryCalendarUsage dbUsage : dbUsages) {
-                            Calendar usage = objectMapper.readValue(dbUsage.getConfiguration(), Calendar.class);
-                            switch(dbUsage.getObjectType()) {
-                            case "JOB":
-                                usage.setType(CalendarType.JOB);
-                                break;
-                            case "ORDER":
-                                usage.setType(CalendarType.ORDER);
-                                break;
-                            case "SCHEDULE":
-                                usage.setType(CalendarType.SCHEDULE);
-                                break;
+                    if (dbCalendar.getConfiguration() != null) {
+                        Calendar calendar = objectMapper.readValue(dbCalendar.getConfiguration(), Calendar.class);
+                        calendar.setPath(dbCalendar.getName());
+                        calendarList.add(calendar);
+                        List<DBItemInventoryCalendarUsage> dbUsages = usageDBLayer.getCalendarUsages(dbCalendar.getId());
+                        if (dbUsages != null && !dbUsages.isEmpty()) {
+                            for (DBItemInventoryCalendarUsage dbUsage : dbUsages) {
+                                if (dbUsage.getConfiguration() != null) {
+                                    Calendar usage = objectMapper.readValue(dbUsage.getConfiguration(), Calendar.class);
+                                    switch (dbUsage.getObjectType()) {
+                                    case "JOB":
+                                        usage.setType(CalendarType.JOB);
+                                        break;
+                                    case "ORDER":
+                                        usage.setType(CalendarType.ORDER);
+                                        break;
+                                    case "SCHEDULE":
+                                        usage.setType(CalendarType.SCHEDULE);
+                                        break;
+                                    }
+                                    usage.setPath(dbUsage.getPath());
+                                    calendarList.add(usage);
+                                }
                             }
-                            usage.setPath(dbUsage.getPath());
-                            calendarList.add(usage);
                         }
                     }
                 }
