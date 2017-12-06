@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.Path;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.exception.SOSInvalidDataException;
 import com.sos.exception.SOSMissingDataException;
@@ -18,13 +17,11 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jobscheduler.model.event.CalendarEvent;
-import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarEditResource;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
-import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.audit.ModifyCalendarAudit;
 import com.sos.joc.classes.calendar.FrequencyResolver;
 import com.sos.joc.classes.calendar.JobSchedulerCalendarCallable;
@@ -34,8 +31,6 @@ import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
-import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
-import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingCommentException;
@@ -54,7 +49,6 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
     private static final String API_CALL_STORE = "./calendar/store";
     private static final String API_CALL_SAVE_AS = "./calendar/save_as";
     private static final String API_CALL_MOVE = "./calendar/rename";
-    private ObjectMapper objMapper = new ObjectMapper();
 
     @Override
     public JOCDefaultResponse postStoreCalendar(String accessToken, CalendarObjectFilter calendarFilter) throws Exception {
@@ -79,7 +73,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                 return accessDeniedResponse();
             }
             
-            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog());
+            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog(), calendarFilter.getJobschedulerId());
             logAuditMessage(calendarAudit);
             
             CalendarEvent calEvt = new CalendarEvent();
@@ -97,6 +91,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(connection);
             CalendarUsagesAndInstance calendarUsageInstance = new CalendarUsagesAndInstance(dbItemInventoryInstance, false);
             List<DBItemInventoryCalendarUsage> calendarUsages = null;
+            ObjectMapper objMapper = new ObjectMapper();
             
             if (!newCalendar) {
                 calEvt.setKey("CalendarUpdated");
@@ -226,7 +221,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_SAVE_AS);
             CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
 
-            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog());
+            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarFilter.getAuditLog(), calendarFilter.getJobschedulerId());
             logAuditMessage(calendarAudit);
 
             DBItemCalendar oldCalendarDbItem = calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath());
@@ -272,7 +267,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             String calendarPath = normalizePath(calendarFilter.getPath());
             String calendarNewPath = normalizePath(calendarFilter.getNewPath());
 
-            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, calendarPath, calendarFilter.getAuditLog());
+            ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, calendarPath, calendarFilter.getAuditLog(), calendarFilter.getJobschedulerId());
             logAuditMessage(calendarAudit);
             
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);

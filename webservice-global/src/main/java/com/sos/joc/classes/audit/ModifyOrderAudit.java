@@ -8,7 +8,6 @@ import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.order.ModifyOrder;
 import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.model.order.OrderV;
-import com.sos.joc.model.yade.ModifyTransfer;
 import com.sos.joc.model.yade.ModifyTransfers;
 
 public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {

@@ -88,7 +88,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                         }
                         dbItemCalendar = dbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), dbItemCalendar, calendar);
                         ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(null, dbItemCalendar.getName(), 
-                                calendarImportFilter.getAuditLog());
+                                calendarImportFilter.getAuditLog(), calendarImportFilter.getJobschedulerId());
                         logAuditMessage(calendarAudit);
                         CalendarEvent calEvt = new CalendarEvent();
                         if (update) {

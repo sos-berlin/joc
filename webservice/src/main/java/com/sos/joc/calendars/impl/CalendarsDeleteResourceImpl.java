@@ -58,16 +58,15 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
-            AuditParams auditParams = calendarsFilter.getAuditLog();
 
             if (calendarsFilter.getCalendars() == null || calendarsFilter.getCalendars().size() == 0) {
                 for (Long calendarId : new HashSet<Long>(calendarsFilter.getCalendarIds())) {
-                    executeDeleteCalendar(calendarDbLayer.getCalendar(calendarId), auditParams, calendarDbLayer, accessToken);
+                    executeDeleteCalendar(calendarDbLayer.getCalendar(calendarId), calendarsFilter, calendarDbLayer, accessToken);
                 }
             } else {
                 for (String calendarPath : new HashSet<String>(calendarsFilter.getCalendars())) {
-                    executeDeleteCalendar(calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendarPath), auditParams, calendarDbLayer,
-                            accessToken);
+                    executeDeleteCalendar(calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendarPath), calendarsFilter,
+                            calendarDbLayer, accessToken);
                 }
             }
             if (listOfErrors.size() > 0) {
@@ -84,13 +83,15 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
         }
     }
 
-    private void executeDeleteCalendar(DBItemCalendar calendarDbItem, AuditParams auditParams, CalendarsDBLayer calendarDbLayer, String accessToken) {
+    private void executeDeleteCalendar(DBItemCalendar calendarDbItem, CalendarsFilter calendarsFilter, CalendarsDBLayer calendarDbLayer,
+            String accessToken) {
         if (calendarDbItem != null) {
             try {
-                ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarDbItem.getId(), calendarDbItem.getName(), auditParams);
+                ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendarDbItem.getId(), calendarDbItem.getName(), calendarsFilter
+                        .getAuditLog(), calendarsFilter.getJobschedulerId());
                 logAuditMessage(calendarAudit);
                 calendarDbLayer.deleteCalendar(calendarDbItem);
-                
+
                 CalendarEvent calEvt = new CalendarEvent();
                 calEvt.setKey("CalendarDeleted");
                 CalendarVariables calEvtVars = new CalendarVariables();
@@ -104,7 +105,7 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
                 calendarUsageInstance.setCalendarUsages(calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId()));
                 calendarUsageInstance.setCalendarPath(calendarDbItem.getName());
                 calendarUsageInstance.setOldCalendarPath(calendarDbItem.getName());
-                
+
                 JobSchedulerCalendarCallable callable = new JobSchedulerCalendarCallable(calendarUsageInstance, accessToken);
                 CalendarUsagesAndInstance c = callable.call();
                 calendarUsageDbLayer.updateEditFlag(c.getCalendarUsages(), false);
@@ -125,7 +126,7 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
             }
         }
     }
-    
+
     private void sendEvent(CalendarEvent calEvt, String accessToken) throws JocException, JsonProcessingException {
         try {
             String xmlCommand = new ObjectMapper().writeValueAsString(calEvt);
