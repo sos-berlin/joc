@@ -102,12 +102,12 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                     if (!calendar.getPath().equals(oldCalendarPath)) {
                         calEvtVars.setOldPath(calendarDbItem.getName());
                         updateJobOrderScheduleIsNecessary = true;
-                        updateCalendarUsageIsNecessary = calendar.getType() == CalendarType.WORKING_DAYS;
+                        updateCalendarUsageIsNecessary = true; //calendar.getType() == CalendarType.WORKING_DAYS;
                     } else {
                         oldDates = new FrequencyResolver().resolveFromToday(oldCalendar);
                         updateJobOrderScheduleIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
                     }
-                    if ((calendar.getType() != null && !calendar.getType().name().equals(calendarDbItem.getType())) || (calendar.getType() == null && calendarDbItem.getType() != null)) {
+                    if ((calendar.getType() != null && !calendar.getType().name().equals(calendarDbItem.getType()))) {
                         calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
                         if (!calendarUsages.isEmpty()) {
                             throw new JobSchedulerBadRequestException(String.format("It is not allowed to change the calendar type (%1$s -> %2$s) when it is already assigned to a job, order or schedule.", calendarDbItem.getType(), calendar.getType().name()));

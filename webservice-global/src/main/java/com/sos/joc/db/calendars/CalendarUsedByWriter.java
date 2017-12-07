@@ -82,7 +82,7 @@ public class CalendarUsedByWriter {
                         calendarUsageDbItem.setCalendarId(calendarDbItem.getId());
                         Calendar calendar = calendars.get(calendarPath);
                         if (calendar != null) {
-                            calendarUsageDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendars.get(calendarPath)));
+                            calendarUsageDbItem.setConfiguration(new ObjectMapper().writeValueAsString(calendar));
                         }
                         int index = dbCalendarUsage.indexOf(calendarUsageDbItem);
                         if (index == -1) {
