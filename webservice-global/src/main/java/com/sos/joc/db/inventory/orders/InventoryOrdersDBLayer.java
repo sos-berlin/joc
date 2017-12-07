@@ -171,7 +171,7 @@ public class InventoryOrdersDBLayer extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
             sql.append(DBITEM_INVENTORY_ORDERS);
-            sql.append(" and instanceId = :instanceId");
+            sql.append(" where instanceId = :instanceId");
             sql.append(" and name = :path");
             Query<DBItemInventoryOrder> query = getSession().createQuery(sql.toString());
             query.setParameter("instanceId", instanceId);
