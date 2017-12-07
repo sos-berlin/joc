@@ -22,6 +22,8 @@ import com.sos.joc.model.yade.Protocol;
 import com.sos.joc.model.yade.ProtocolFragment;
 import com.sos.joc.model.yade.Transfer;
 import com.sos.joc.model.yade.TransferFilter;
+import com.sos.joc.model.yade.TransferState;
+import com.sos.joc.model.yade.TransferStateText;
 import com.sos.joc.model.yade.Transfers;
 import com.sos.joc.yade.resource.IYadeTransfersResource;
 
@@ -94,6 +96,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 transfer.setOrderId(transferFromDb.getOrderId());
                 transfer.setParent_id(transferFromDb.getParentTransferId());
                 transfer.setProfile(transferFromDb.getProfileName());
+                transfer.setState(getTransferStateFromValue(transferFromDb.getState()));
                 if (transferFromDb.getSourceProtocolId() != null) {
                     DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getSourceProtocolId());
                     if (protocol != null) {
@@ -171,6 +174,26 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
         default:
             return null;
 
+        }
+    }
+    
+    private TransferState getTransferStateFromValue(Integer value) {
+        TransferState state = new TransferState();
+        switch(value) {
+        case 1:
+            state.setSeverity(0);
+            state.set_text(TransferStateText.SUCCESSFUL);
+            return state;
+        case 2:
+            state.setSeverity(1);
+            state.set_text(TransferStateText.INCOMPLETE);
+            return state;
+        case 3:
+            state.setSeverity(2);
+            state.set_text(TransferStateText.FAILED);
+            return state;
+        default:
+            return null;
         }
     }
 }

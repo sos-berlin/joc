@@ -225,11 +225,23 @@ public class JocDBLayerYade extends DBLayer {
                     sql.append(" yt.state in (");
                     boolean first = true;
                     for (TransferStateText state : states) {
+                        Integer stateDbValue = null;
+                        switch (state) {
+                        case SUCCESSFUL:
+                            stateDbValue = 1;
+                            break;
+                        case INCOMPLETE:
+                            stateDbValue = 2;
+                            break;
+                        case FAILED:
+                            stateDbValue = 3;
+                            break;
+                        }
                         if (first) {
-                            sql.append(state.toString());
+                            sql.append(stateDbValue);
                             first = false;
                         } else {
-                            sql.append(",").append(state.toString());
+                            sql.append(",").append(stateDbValue);
                         }
                     }
                     sql.append(")");
