@@ -9,7 +9,7 @@ import com.sos.joc.model.job.StartJob;
 import com.sos.joc.model.job.StartJobs;
 
 
-public class StartJobAudit extends StartJobs implements IAuditLog {
+public class StartJobAudit extends StartJob implements IAuditLog {
     
     @JsonIgnore
     private String folder;
@@ -26,9 +26,16 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
     @JsonIgnore
     private String ticketLink;
     
+    @JsonIgnore
+    private String jobschedulerId;
+    
     public StartJobAudit(StartJob startJob, StartJobs startJobs) {
         if (startJob != null) {
-            getJobs().add(startJob);
+            setAt(startJob.getAt());
+            setEnvironment(startJob.getEnvironment());
+            setJob(startJob.getJob());
+            setParams(startJob.getParams());
+            setTimeZone(startJob.getTimeZone());
             if (startJob.getJob() != null) {
                 Path p = Paths.get(startJob.getJob());
                 this.folder = p.getParent().toString().replace('\\', '/');
@@ -36,7 +43,7 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
             }
         }
         setAuditParams(startJobs.getAuditLog());
-        setJobschedulerId(startJobs.getJobschedulerId());
+        this.jobschedulerId = startJobs.getJobschedulerId();
     }
 
     private void setAuditParams(AuditParams auditParams) {
@@ -93,5 +100,11 @@ public class StartJobAudit extends StartJobs implements IAuditLog {
     @JsonIgnore
     public String getCalendar() {
         return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getJobschedulerId() {
+        return jobschedulerId;
     }
 }

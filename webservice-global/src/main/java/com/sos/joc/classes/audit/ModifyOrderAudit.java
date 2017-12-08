@@ -10,7 +10,7 @@ import com.sos.joc.model.order.ModifyOrders;
 import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.yade.ModifyTransfers;
 
-public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
+public class ModifyOrderAudit extends ModifyOrder implements IAuditLog {
 
     @JsonIgnore
     private String folder;
@@ -29,10 +29,25 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
 
     @JsonIgnore
     private String ticketLink;
+    
+    @JsonIgnore
+    private String jobschedulerId;
 
     public ModifyOrderAudit(ModifyOrder modifyOrder, ModifyOrders modifyOrders) {
         if (modifyOrder != null) {
-            getOrders().add(modifyOrder);
+            setAt(modifyOrder.getAt());
+            setCalendars(modifyOrder.getCalendars());
+            setEndState(modifyOrder.getEndState());
+            setJobChain(modifyOrder.getJobChain());
+            setOrderId(modifyOrder.getOrderId());
+            setParams(modifyOrder.getParams());
+            setPriority(modifyOrder.getPriority());
+            setRemoveSetback(modifyOrder.getRemoveSetback());
+            setResume(modifyOrder.getResume());
+            setRunTime(null);
+            setState(modifyOrder.getState());
+            setTimeZone(modifyOrder.getTimeZone());
+            setTitle(modifyOrder.getTitle());
             if (modifyOrder.getJobChain() != null) {
                 Path p = Paths.get(modifyOrder.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
@@ -42,13 +57,25 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
         }
         if (modifyOrders != null) {
             setAuditParams(modifyOrders.getAuditLog());
-            setJobschedulerId(modifyOrders.getJobschedulerId());
+            this.jobschedulerId = modifyOrders.getJobschedulerId();
         }
     }
     
     public ModifyOrderAudit(ModifyOrder modifyOrder, ModifyTransfers modifyTransfers) {
         if (modifyOrder != null) {
-            getOrders().add(modifyOrder);
+            setAt(modifyOrder.getAt());
+            setCalendars(modifyOrder.getCalendars());
+            setEndState(modifyOrder.getEndState());
+            setJobChain(modifyOrder.getJobChain());
+            setOrderId(modifyOrder.getOrderId());
+            setParams(modifyOrder.getParams());
+            setPriority(modifyOrder.getPriority());
+            setRemoveSetback(modifyOrder.getRemoveSetback());
+            setResume(modifyOrder.getResume());
+            setRunTime(null);
+            setState(modifyOrder.getState());
+            setTimeZone(modifyOrder.getTimeZone());
+            setTitle(modifyOrder.getTitle());
             if (modifyOrder.getJobChain() != null) {
                 Path p = Paths.get(modifyOrder.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
@@ -58,18 +85,20 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
         }
         if (modifyTransfers != null) {
             setAuditParams(modifyTransfers.getAuditLog());
-            setJobschedulerId(modifyTransfers.getJobschedulerId());
+            this.jobschedulerId = modifyTransfers.getJobschedulerId();
         }
     }
     
     public ModifyOrderAudit(OrderV order, ModifyTransfers modifyTransfers) {
         if (order != null) {
-            ModifyOrder m = new ModifyOrder();
-            m.setJobChain(order.getJobChain());
-            m.setOrderId(order.getOrderId());
-            m.setParams(order.getParams());
-            m.setResume(true);
-            getOrders().add(m);
+            setEndState(order.getEndState());
+            setJobChain(order.getJobChain());
+            setOrderId(order.getOrderId());
+            setParams(order.getParams());
+            setPriority(order.getPriority());
+            setRunTime(null);
+            setState(order.getState());
+            setTitle(order.getTitle());
             Path p = Paths.get(order.getJobChain());
             this.folder = p.getParent().toString().replace('\\', '/');
             this.jobChain = p.toString().replace('\\', '/');
@@ -77,7 +106,7 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
         }
         if (modifyTransfers != null) {
             setAuditParams(modifyTransfers.getAuditLog());
-            setJobschedulerId(modifyTransfers.getJobschedulerId());
+            this.jobschedulerId = modifyTransfers.getJobschedulerId();
         }
     }
     
@@ -140,5 +169,11 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
     @JsonIgnore
     public String getCalendar() {
         return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getJobschedulerId() {
+        return jobschedulerId;
     }
 }

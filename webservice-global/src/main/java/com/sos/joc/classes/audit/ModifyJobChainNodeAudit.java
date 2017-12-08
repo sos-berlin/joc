@@ -9,7 +9,7 @@ import com.sos.joc.model.jobChain.ModifyJobChainNode;
 import com.sos.joc.model.jobChain.ModifyJobChainNodes;
 
 
-public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAuditLog {
+public class ModifyJobChainNodeAudit extends ModifyJobChainNode implements IAuditLog {
     
     @JsonIgnore
     private String folder;
@@ -26,9 +26,13 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
     @JsonIgnore
     private String ticketLink;
     
+    @JsonIgnore
+    private String jobschedulerId;
+    
     public ModifyJobChainNodeAudit(ModifyJobChainNode modifyJobChainNode, ModifyJobChainNodes jobChainNodes) {
         if (modifyJobChainNode != null) {
-            getNodes().add(modifyJobChainNode);
+            setJobChain(modifyJobChainNode.getJobChain());
+            setNode(modifyJobChainNode.getNode());
             if (modifyJobChainNode.getJobChain() != null) {
                 Path p = Paths.get(modifyJobChainNode.getJobChain());
                 this.folder = p.getParent().toString().replace('\\', '/');
@@ -36,8 +40,8 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
             }
         }
         if (jobChainNodes != null) {
-            setAuditParams(jobChainNodes.getAuditLog()); 
-            setJobschedulerId(jobChainNodes.getJobschedulerId());            
+            setAuditParams(jobChainNodes.getAuditLog());
+            this.jobschedulerId = jobChainNodes.getJobschedulerId();
         }
     }
 
@@ -95,5 +99,11 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
     @JsonIgnore
     public String getCalendar() {
         return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getJobschedulerId() {
+        return jobschedulerId;
     }
 }

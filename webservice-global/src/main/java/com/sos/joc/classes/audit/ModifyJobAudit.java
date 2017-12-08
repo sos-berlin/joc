@@ -9,7 +9,7 @@ import com.sos.joc.model.job.ModifyJob;
 import com.sos.joc.model.job.ModifyJobs;
 
 
-public class ModifyJobAudit extends ModifyJobs implements IAuditLog {
+public class ModifyJobAudit extends ModifyJob implements IAuditLog {
     
     @JsonIgnore
     private String folder;
@@ -26,9 +26,14 @@ public class ModifyJobAudit extends ModifyJobs implements IAuditLog {
     @JsonIgnore
     private String ticketLink;
     
+    @JsonIgnore
+    private String jobschedulerId;
+    
     public ModifyJobAudit(ModifyJob modifyJob, ModifyJobs modifyJobs) {
         if (modifyJob != null) {
-            getJobs().add(modifyJob);
+            setCalendars(modifyJob.getCalendars());
+            setJob(modifyJob.getJob());
+            setRunTime(null);
             if (modifyJob.getJob() != null) {
                 Path p = Paths.get(modifyJob.getJob());
                 this.folder = p.getParent().toString().replace('\\', '/');
@@ -37,7 +42,7 @@ public class ModifyJobAudit extends ModifyJobs implements IAuditLog {
         }
         if (modifyJobs != null) {
             setAuditParams(modifyJobs.getAuditLog());
-            setJobschedulerId(modifyJobs.getJobschedulerId());
+            this.jobschedulerId = modifyJobs.getJobschedulerId();
         }
     }
     
@@ -95,5 +100,11 @@ public class ModifyJobAudit extends ModifyJobs implements IAuditLog {
     @JsonIgnore
     public String getCalendar() {
         return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getJobschedulerId() {
+        return jobschedulerId;
     }
 }

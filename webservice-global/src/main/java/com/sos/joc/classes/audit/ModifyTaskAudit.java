@@ -2,6 +2,8 @@ package com.sos.joc.classes.audit;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sos.joc.model.audit.AuditParams;
@@ -34,9 +36,12 @@ public class ModifyTaskAudit extends ModifyTasks implements IAuditLog {
             setJobschedulerId(modifyTasks.getJobschedulerId()); 
         }
         if (job != null) {
-            job.getTaskIds().clear();
-            job.getTaskIds().add(taskId);
-            getJobs().add(job);
+            List<TaskId> taskIds = new ArrayList<TaskId>();
+            taskIds.add(taskId);
+            TasksFilter jobClone = new TasksFilter();
+            jobClone.setJob(job.getJob());
+            jobClone.setTaskIds(taskIds);
+            getJobs().add(jobClone);
             if (job.getJob() != null) {
                 Path p = Paths.get(job.getJob()); 
                 this.folder = p.getParent().toString().replace('\\', '/');
