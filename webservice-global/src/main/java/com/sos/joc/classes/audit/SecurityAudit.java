@@ -63,4 +63,10 @@ public class SecurityAudit implements IAuditLog {
     public String toString() {
         return "{}";
     }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return null;
+    }
 }

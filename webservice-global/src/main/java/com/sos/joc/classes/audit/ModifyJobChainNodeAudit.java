@@ -90,4 +90,10 @@ public class ModifyJobChainNodeAudit extends ModifyJobChainNodes implements IAud
     public String getOrderId() {
         return null;
     }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return null;
+    }
 }

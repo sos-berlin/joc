@@ -29,6 +29,9 @@ public class YadeFilesResourceImpl extends JOCResourceImpl implements IYadeFiles
     public JOCDefaultResponse postYadeFiles(String accessToken, FilesFilter filterBody) throws Exception {
         SOSHibernateSession connection = null;
         try {
+            if (filterBody.getJobschedulerId() == null) {
+                filterBody.setJobschedulerId("");
+            }
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), getPermissonsJocCockpit(
                     accessToken).getYADE().getView().isFiles());
             if (jocDefaultResponse != null) {

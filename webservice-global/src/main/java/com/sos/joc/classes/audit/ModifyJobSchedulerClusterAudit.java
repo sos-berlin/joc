@@ -73,4 +73,10 @@ public class ModifyJobSchedulerClusterAudit extends TimeoutParameter implements 
     public String getOrderId() {
         return null;
     }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return null;
+    }
 }

@@ -83,4 +83,10 @@ public class JobSchedulerCommandAudit extends JobschedulerCommands implements IA
     public String getTicketLink() {
         return ticketLink;
     }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return null;
+    }
 }

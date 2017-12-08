@@ -90,4 +90,10 @@ public class ModifyJobChainAudit extends ModifyJobChains implements IAuditLog {
     public String getOrderId() {
         return null;
     }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return null;
+    }
 }

@@ -52,6 +52,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             List<OrderPath> filterOrders = auditLogFilter.getOrders();
             String filterTicketLink = auditLogFilter.getTicketLink();
             String filterAccount = auditLogFilter.getAccount();
+            List<String> filterCalendars = auditLogFilter.getCalendars();
             if(filterOrders != null && !filterOrders.isEmpty()) {
                 for(OrderPath order : filterOrders) {
                     checkRequiredParameter("jobChain", order.getJobChain());
@@ -67,6 +68,8 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
                 auditLogs = dbLayer.getAuditLogByOrders(schedulerId, filterOrders, filterLimit, filterFrom, filterTo, filterTicketLink, filterAccount);
             } else if (filterJobs != null && !filterJobs.isEmpty()) {
                 auditLogs = dbLayer.getAuditLogByJobs(schedulerId, filterJobs, filterLimit, filterFrom, filterTo, filterTicketLink, filterAccount);
+            } else if (filterCalendars != null && !filterCalendars.isEmpty()) {
+                auditLogs = dbLayer.getAuditLogByCalendars(schedulerId, filterCalendars, filterLimit, filterFrom, filterTo, filterTicketLink, filterAccount);
             } else if (filterFolders != null && !filterFolders.isEmpty()) {
                 Set<String> folders = new HashSet<String>();
                 for (Folder folder : filterFolders) {
@@ -125,6 +128,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
             auditLogItem.setCreated(auditLogFromDb.getCreated());
             auditLogItem.setTicketLink(auditLogFromDb.getTicketLink());
             auditLogItem.setTimeSpent(auditLogFromDb.getTimeSpent());
+            auditLogItem.setCalendar(auditLogFromDb.getCalendar());
             audits.add(auditLogItem);
         }
         return audits;

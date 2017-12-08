@@ -85,4 +85,10 @@ public class ModifyJobSchedulerAudit extends HostPortTimeOutParameter implements
     public String getOrderId() {
         return null;
     }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return null;
+    }
 }

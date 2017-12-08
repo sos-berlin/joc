@@ -123,17 +123,10 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and account = :account");
             }
             if (jobs != null && !jobs.isEmpty()) {
-                sql.append(" and");
-                for (int i = 0; i < jobs.size(); i++) {
-                    if (i == 0) {
-                        sql.append(" (");
-                    } else if (i != 0 && i != jobs.size()) {
-                        sql.append(" or");
-                    }
-                    sql.append(" (job = :job").append(i).append(")");
-                    if (i == jobs.size() - 1) {
-                        sql.append(")");
-                    }
+                if (jobs.size() == 1) {
+                    sql.append(" and job = :jobs");
+                } else {
+                    sql.append(" and job in ( :jobs )");
                 }
             }
             sql.append(" order by created desc");
@@ -154,9 +147,10 @@ public class AuditLogDBLayer extends DBLayer {
                 query.setParameter("account", account);
             }
             if (jobs != null && !jobs.isEmpty()) {
-                for (int i = 0; i < jobs.size(); i++) {
-                    String job = jobs.get(i).getJob();
-                    query.setParameter("job" + i, job);
+                if (jobs.size() == 1) {
+                    query.setParameter("jobs", jobs.iterator().next());
+                } else {
+                    query.setParameterList("jobs", jobs);
                 }
             }
             if (limit != null) {
@@ -284,4 +278,67 @@ public class AuditLogDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+
+    public List<DBItemAuditLog> getAuditLogByCalendars(String schedulerId, List<String> calendars, Integer limit, Date from, Date to, String ticketLink,
+            String account) throws DBConnectionRefusedException, DBInvalidDataException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_AUDIT_LOG);
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                sql.append(" where schedulerId = :schedulerId");
+            } else {
+                sql.append(" where schedulerId != '-'"); 
+            }
+            if (from != null) {
+                sql.append(" and created >= :from");
+            }
+            if (to != null) {
+                sql.append(" and created < :to");
+            }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                sql.append(" and ticketLink = :ticketLink");
+            }
+            if (account != null && !account.isEmpty()) {
+                sql.append(" and account = :account");
+            }
+            if (calendars != null && !calendars.isEmpty()) {
+                if (calendars.size() == 1) {
+                    sql.append(" and calendar = :calendars");
+                } else {
+                    sql.append(" and calendar in (:calendars)");
+                }
+            }
+            sql.append(" order by created desc");
+            Query<DBItemAuditLog> query = getSession().createQuery(sql.toString());
+            if (schedulerId != null && !schedulerId.isEmpty()) {
+                query.setParameter("schedulerId", schedulerId);
+            }
+            if (from != null) {
+                query.setParameter("from", from, TemporalType.TIMESTAMP);
+            }
+            if (to != null) {
+                query.setParameter("to", to, TemporalType.TIMESTAMP);
+            }
+            if (ticketLink != null && !ticketLink.isEmpty()) {
+                query.setParameter("ticketLink", ticketLink);
+            }
+            if (account != null && !account.isEmpty()) {
+                query.setParameter("account", account);
+            }
+            if (calendars.size() == 1) {
+                query.setParameter("calendars", calendars.iterator().next());
+            } else {
+                query.setParameterList("calendars", calendars);
+            }
+            if (limit != null) {
+                query.setMaxResults(limit);
+            }
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
 }

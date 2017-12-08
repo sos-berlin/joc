@@ -90,4 +90,10 @@ public class ModifyJobAudit extends ModifyJobs implements IAuditLog {
     public String getTicketLink() {
         return ticketLink;
     }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return null;
+    }
 }

@@ -135,4 +135,10 @@ public class ModifyOrderAudit extends ModifyOrders implements IAuditLog {
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return null;
+    }
 }

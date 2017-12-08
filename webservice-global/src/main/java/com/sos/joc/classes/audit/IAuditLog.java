@@ -17,4 +17,6 @@ public interface IAuditLog {
     public Integer getTimeSpent();
     
     public String getTicketLink();
+    
+    public String getCalendar();
 }

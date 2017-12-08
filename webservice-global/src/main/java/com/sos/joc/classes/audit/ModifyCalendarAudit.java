@@ -21,6 +21,9 @@ public class ModifyCalendarAudit extends CalendarId implements IAuditLog {
     @JsonIgnore
     private String ticketLink;
     
+    @JsonIgnore
+    private String calendar;
+    
     
     public ModifyCalendarAudit(Long calendarId, String calendarPath, AuditParams auditParams, String jobschedulerId) {
         setId(calendarId);
@@ -29,6 +32,7 @@ public class ModifyCalendarAudit extends CalendarId implements IAuditLog {
         setJobschedulerId(jobschedulerId);
         if (calendarPath != null) {
             this.folder = Paths.get(calendarPath).getParent().toString().replace('\\', '/');
+            this.calendar = calendarPath;
         }
     }
 
@@ -80,5 +84,11 @@ public class ModifyCalendarAudit extends CalendarId implements IAuditLog {
     @JsonIgnore
     public String getOrderId() {
         return null;
+    }
+
+    @Override
+    @JsonIgnore
+    public String getCalendar() {
+        return calendar;
     }
 }

@@ -82,6 +82,7 @@ public class JocAuditLog {
         auditLogToDb.setComment(body.getComment());
         auditLogToDb.setTicketLink(body.getTicketLink());
         auditLogToDb.setTimeSpent(body.getTimeSpent());
+        auditLogToDb.setCalendar(body.getCalendar());
         auditLogToDb.setCreated(Date.from(Instant.now()));
         SOSHibernateSession connection = null;
         try {
