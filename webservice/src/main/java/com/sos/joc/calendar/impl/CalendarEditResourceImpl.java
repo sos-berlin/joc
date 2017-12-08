@@ -58,7 +58,10 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            Calendar calendar = checkRequirements(calendarFilter);
+            
+            checkRequiredComment(calendarFilter.getAuditLog());
+            
+            Calendar calendar = checkRequirements(calendarFilter.getCalendar());
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_STORE);
             CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
@@ -216,7 +219,10 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            Calendar calendar = checkRequirements(calendarFilter);
+            
+            checkRequiredComment(calendarFilter.getAuditLog());
+            
+            Calendar calendar = checkRequirements(calendarFilter.getCalendar());
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL_SAVE_AS);
             CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
@@ -298,9 +304,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
         }
     }
     
-    private Calendar checkRequirements(CalendarObjectFilter calendarFilter) throws JocMissingCommentException, JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
-        checkRequiredComment(calendarFilter.getAuditLog());
-        Calendar calendar = calendarFilter.getCalendar();
+    private Calendar checkRequirements(Calendar calendar) throws JocMissingCommentException, JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
         if (calendar == null) {
             throw new JocMissingRequiredParameterException("undefined 'calendar'");
         }
@@ -327,50 +331,5 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
         calendar.setPath(normalizePath(calendar.getPath()));
         return calendar;
     }
-    
-//    private String addEvent(CalendarEvent calEvt) throws JocException, JsonProcessingException {
-//        String xmlCommand = objMapper.writeValueAsString(calEvt);
-//        return "<publish_event>" + xmlCommand + "</publish_event>";
-//    }
-//    
-//    private void sendEvent(CalendarEvent calEvt) throws JocException, JsonProcessingException {
-//        try {
-//            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-//            jocXmlCommand.executePostWithRetry(addEvent(calEvt), getAccessToken());
-//        } catch (JobSchedulerConnectionRefusedException e) {
-//        } catch (JobSchedulerConnectionResetException e) {
-//        }
-//    }
-    
-//    private void sendEvent(List<String> xmlCommands) throws JocException, JsonProcessingException {
-//        try {
-//            if (!xmlCommands.isEmpty()) {
-//                String xmlCommand = "";
-//                if (xmlCommands.size() > 1) {
-//                    xmlCommand += "<commands>";
-//                }
-//                for (String command : xmlCommands) {
-//                    xmlCommand += command;
-//                }
-//                if (xmlCommands.size() > 1) {
-//                    xmlCommand += "</commands>";
-//                }
-//                JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-//                jocXmlCommand.executePostWithRetry(xmlCommand, getAccessToken());
-//            }
-//        } catch (JobSchedulerConnectionRefusedException e) {
-//        } catch (JobSchedulerConnectionResetException e) {
-//        }
-//    }
-    
-//    private String addCalUsageEvent(String path, String objectType) throws JsonProcessingException, JocException {
-//        CalendarEvent calEvt = new CalendarEvent();
-//        calEvt.setKey("CalendarUsageUpdated");
-//        CalendarVariables calEvtVars = new CalendarVariables();
-//        calEvtVars.setPath(path);
-//        calEvtVars.setObjectType(CalendarObjectType.fromValue(objectType));
-//        calEvt.setVariables(calEvtVars);
-//        return SendCalendarEventsUtil.addEvent(calEvt);
-//    }
 
 }

@@ -22,7 +22,6 @@ public class CalendarUsagesAndInstance {
     private Map<String, Exception> exceptions = new HashMap<String, Exception>();
     private String calendarPath = null;
     private String oldCalendarPath = null;
-    private List<Period> periods = null;
 
     public CalendarUsagesAndInstance(DBItemInventoryInstance instance) {
         this.instance = setMappedUrl(instance);
@@ -115,14 +114,6 @@ public class CalendarUsagesAndInstance {
     public void putException(DBItemInventoryCalendarUsage item, Exception exception) {
         String key = String.format("%1$s: %2$s on %3$s:%4$d", item.getObjectType(), item.getPath(), instance.getHostname(), instance.getPort());
         this.exceptions.put(key, exception);
-    }
-
-    public List<Period> getPeriods() {
-        return periods;
-    }
-
-    public void setPeriods(List<Period> periods) {
-        this.periods = periods;
     }
 
 }
