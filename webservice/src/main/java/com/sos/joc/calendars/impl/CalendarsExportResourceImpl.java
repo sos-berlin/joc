@@ -1,6 +1,8 @@
 package com.sos.joc.calendars.impl;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -45,6 +47,8 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'"));
 
             List<Calendar> calendarList = new ArrayList<Calendar>();
             List<DBItemCalendar> calendarsFromDb = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getId(), new HashSet<String>(calendarsFilter
