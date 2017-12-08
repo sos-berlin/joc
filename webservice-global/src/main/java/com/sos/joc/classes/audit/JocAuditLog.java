@@ -94,7 +94,7 @@ public class JocAuditLog {
             Globals.disconnect(connection); 
         }
     }
-
+    
     public String getJsonString(Object body) {
         if (body != null) {
             try {

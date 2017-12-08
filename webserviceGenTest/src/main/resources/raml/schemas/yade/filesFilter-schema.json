@@ -49,6 +49,11 @@
       "items": {
         "type": "string"
       }
+    },
+    "limit": {
+      "description": "only for db history urls to restrict the number of responsed records; -1=unlimited",
+      "type": "integer",
+      "default": 10000
     }
   }
 }

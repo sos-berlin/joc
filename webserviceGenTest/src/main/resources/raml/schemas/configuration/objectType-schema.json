@@ -16,6 +16,9 @@
     "JOBSCHEDULER",
     "DAILYPLAN",
     "TASK_HISTORY",
-    "ORDER_HISTORY"
+    "ORDER_HISTORY",
+    "YADE", 
+    "YADE_HISTORY",
+    "EVENT"
   ]
 }

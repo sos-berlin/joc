@@ -26,7 +26,7 @@ public class ModifyScheduleAudit extends ModifyRunTime implements IAuditLog {
         if (modifyRunTime != null) {
             setAuditParams(modifyRunTime.getAuditLog());
             setSchedule(modifyRunTime.getSchedule());
-            setRunTime(modifyRunTime.getRunTime());
+            //setRunTime(modifyRunTime.getRunTime());
             setJobschedulerId(modifyRunTime.getJobschedulerId());
             if (modifyRunTime.getSchedule() != null) {
                 Path p = Paths.get(modifyRunTime.getSchedule());

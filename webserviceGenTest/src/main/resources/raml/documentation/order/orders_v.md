@@ -9,7 +9,6 @@ It depends on the parameter ``compact``.
     * job
     * processingState (e.g. suspended, waiting_for_agent, ...)
     * _type (permanent, ad_hoc, file_order)
-    * runTimeIsTemporary (default:false)
 * Additional variable required fields depends on the orders' processingState<br/>
   (*pending*, *running*, *waitingForResource*, *setback*, *suspended*, *blacklist*) where<br/>
   *waitingForResource* means orders which have the processingState (*job_not_in_period*, *node_delay*, *waiting_for_lock*,

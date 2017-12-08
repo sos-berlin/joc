@@ -38,6 +38,9 @@
     "orderId": {
       "type": "string"
     },
+    "calendar": {
+      "type": "string"
+    },
     "timeSpent": {
       "description": "in minutes",
       "$ref": "../common/nonNegativeInteger-schema.json"

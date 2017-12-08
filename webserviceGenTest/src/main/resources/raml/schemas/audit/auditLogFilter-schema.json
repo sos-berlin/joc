@@ -45,6 +45,12 @@
         }
       }
     },
+    "calendars": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/path-schema.json"
+      }
+    },
     "folders": {
       "$ref": "../common/folders-schema.json"
     },

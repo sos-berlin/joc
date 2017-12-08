@@ -132,6 +132,25 @@ traits:
         schema200: !include schemas/event/customEvents-schema.json
         example: " "
         example200: " "
+ #   /add:
+ #     type:
+ #       postJSON:
+ #         description: add custom events
+ #         description1: !include documentation/order/filteredByOrders.md
+ #         description2: " "
+ #         description3: !include documentation/audit/auditLog.md
+ #         description4: " "
+ #         description5: " "
+ #         description6: " "
+ #         description7: " "
+ #         description8: " "
+ #         description9: " "
+ #         description10: " "
+ #         description200: " "
+ #         schema: modifyOrders
+ #         schema200: ok
+ #         example: " "
+ #         example200: " "
     /delete:
       type:
         postJSON:
@@ -518,6 +537,8 @@ traits:
         description8: !include documentation/common/limit.md
         description9: !include documentation/common/historyStates.md
         description10: " "
+        description11: " "
+        description12: " "
         description200: TODO
         schema: !include schemas/order/ordersFilter-schema.json
         schema200: !include schemas/order/history-schema.json
@@ -1006,6 +1027,8 @@ traits:
         description8: !include documentation/common/limit.md
         description9: !include documentation/common/historyStates.md
         description10: " "
+        description11: " "
+        description12: " "
         description200: TODO
         schema: !include schemas/job/jobsFilter-schema.json
         schema200: !include schemas/job/history-schema.json
@@ -1796,9 +1819,11 @@ traits:
       description5: !include documentation/common/folders.md
       description6: !include documentation/job/filteredByJobs.md
       description7: !include documentation/order/filteredByOrders.md
-      description8: !include documentation/audit/ticketLink.md
-      description9: !include documentation/configuration/userParam.md
-      description10: !include documentation/common/limit.md
+      description8: !include documentation/calendar/filteredByCalendars.md
+      description9: !include documentation/audit/ticketLink.md
+      description10: !include documentation/configuration/userParam.md
+      description11: !include documentation/common/limit.md
+      description12: " "
       description200: !include documentation/audit/audit.md
       schema: !include schemas/audit/auditLogFilter-schema.json
       schema200: !include schemas/audit/auditLog-schema.json
@@ -1826,6 +1851,8 @@ traits:
       description8: " "
       description9: " "
       description10: " "
+      description11: " "
+      description12: " "
       description200: !include documentation/report/agents.md
       schema: !include schemas/report/agentsFilter-schema.json
       schema200: !include schemas/report/agents-schema.json
@@ -1898,7 +1925,7 @@ traits:
         description13: !include documentation/yade/sourcePath.md
         description14: !include documentation/yade/targetPath.md
         description15: !include documentation/common/limit.md
-        description200: " "
+        description200: !include documentation/yade/transfers.md
         schema: !include schemas/yade/transferFilter-schema.json
         schema200: !include schemas/yade/transfers-schema.json
         example: " "
@@ -1925,7 +1952,7 @@ traits:
         description7: " "
         description8: !include documentation/yade/sourcePath.md
         description9: !include documentation/yade/targetPath.md
-        description10: " "
+        description10: !include documentation/common/limit.md
         description200: " "
         schema: !include schemas/yade/filesFilter-schema.json
         schema200: !include schemas/yade/files-schema.json
