@@ -49,6 +49,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             String from = filterBody.getDateFrom();
             String to = filterBody.getDateTo();
             String timezone = filterBody.getTimeZone();
+            Boolean compact = filterBody.getCompact();
             if (from != null && !from.isEmpty()) {
                 dateFrom = JobSchedulerDate.getDateFrom(from, timezone);
             }
@@ -77,10 +78,8 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 transfer.setError(err);
                 transfer.setHasIntervention(transferFromDb.getHasIntervention());
                 transfer.setId(transferFromDb.getId());
-                transfer.setJob(transferFromDb.getJob());
-                transfer.setJobChain(transferFromDb.getJobChain());
                 transfer.setJobschedulerId(transferFromDb.getJobschedulerId());
-                if (transferFromDb.getJumpProtocolId() != null) {
+                if (!compact && transferFromDb.getJumpProtocolId() != null) {
                     DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getJumpProtocolId());
                     if (protocol != null) {
                         ProtocolFragment jumpFragment = new ProtocolFragment();
@@ -93,7 +92,6 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 }
                 transfer.setMandator(transferFromDb.getMandator());
                 transfer.setNumOfFiles(transferFromDb.getNumOfFiles().intValue());
-                transfer.setOrderId(transferFromDb.getOrderId());
                 transfer.setParent_id(transferFromDb.getParentTransferId());
                 transfer.setProfile(transferFromDb.getProfileName());
                 transfer.setState(getTransferStateFromValue(transferFromDb.getState()));
@@ -101,10 +99,12 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                     DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getSourceProtocolId());
                     if (protocol != null) {
                         ProtocolFragment sourceFragment = new ProtocolFragment();
-                        sourceFragment.setAccount(protocol.getAccount());
                         sourceFragment.setHost(protocol.getHostname());
-                        sourceFragment.setPort(protocol.getPort());
-                        sourceFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
+                        if (!compact) {
+                            sourceFragment.setAccount(protocol.getAccount());
+                            sourceFragment.setPort(protocol.getPort());
+                            sourceFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
+                        }
                         transfer.setSource(sourceFragment);
                     }
                 }
@@ -114,12 +114,19 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                     DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getTargetProtocolId());
                     if (protocol != null) {
                         ProtocolFragment targetFragment = new ProtocolFragment();
-                        targetFragment.setAccount(protocol.getAccount());
                         targetFragment.setHost(protocol.getHostname());
-                        targetFragment.setPort(protocol.getPort());
                         targetFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
+                        if (!compact) {
+                            targetFragment.setAccount(protocol.getAccount());
+                            targetFragment.setPort(protocol.getPort());
+                        }
                         transfer.setTarget(targetFragment);
                     }
+                }
+                if (!compact) {
+                    transfer.setJob(transferFromDb.getJob());
+                    transfer.setJobChain(transferFromDb.getJobChain());
+                    transfer.setOrderId(transferFromDb.getOrderId());
                 }
                 transfers.add(transfer);
             }
