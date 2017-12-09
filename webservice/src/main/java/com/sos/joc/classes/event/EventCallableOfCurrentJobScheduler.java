@@ -251,6 +251,16 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             break;
                         }
                         eventSnapshot.setPath(eventSnapshot.getEventType());
+                    } else if ("CalendarUsageUpdated".equals(eventKey)) {
+                        continue;
+                    } else if (eventKey.startsWith("Calendar")) {
+                        eventSnapshot.setEventType(eventKey); //CalendarUpdated, CalendarCreated, CalendarDeleted
+                        if (JobSchedulerObjectType.NONWORKINGDAYSCALENDAR.name().equals(variables.getString("objectType", JobSchedulerObjectType.WORKINGDAYSCALENDAR.name()))) {
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.NONWORKINGDAYSCALENDAR);
+                        } else {
+                            eventSnapshot.setObjectType(JobSchedulerObjectType.WORKINGDAYSCALENDAR);
+                        }
+                        eventSnapshot.setPath(variables.getString("path", null));
                     } else {
                         continue;
                     }

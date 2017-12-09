@@ -30,6 +30,8 @@
           "javaType": "com.sos.jobscheduler.model.event.CalendarObjectType",
           "type": "string",
           "enum": [
+             "WORKINGDAYSCALENDAR",
+             "NONWORKINGDAYSCALENDAR",
              "JOB",
              "ORDER",
              "SCHEDULE"

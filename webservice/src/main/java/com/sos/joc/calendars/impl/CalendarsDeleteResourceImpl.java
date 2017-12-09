@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jobscheduler.model.event.CalendarEvent;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsDeleteResource;
@@ -96,6 +97,11 @@ public class CalendarsDeleteResourceImpl extends JOCResourceImpl implements ICal
                 calEvt.setKey("CalendarDeleted");
                 CalendarVariables calEvtVars = new CalendarVariables();
                 calEvtVars.setPath(calendarDbItem.getName());
+                if (CalendarObjectType.NONWORKINGDAYSCALENDAR.name().equals(calendarDbItem.getType())) {
+                    calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
+                } else {
+                    calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
+                }
                 calEvt.setVariables(calEvtVars);
                 sendEvent(calEvt, accessToken);
 

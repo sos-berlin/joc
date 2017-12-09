@@ -17,6 +17,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jobscheduler.model.event.CalendarEvent;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.calendar.resource.ICalendarEditResource;
@@ -129,8 +130,13 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                 }
             }
 
-            calEvt.setVariables(calEvtVars);
             calendarDbItem = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
+            if (CalendarObjectType.NONWORKINGDAYSCALENDAR.name().equals(calendarDbItem.getType())) {
+                calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
+            } else {
+                calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
+            }
+            calEvt.setVariables(calEvtVars);
             Date surveyDate = calendarDbItem.getModified();
             List<Err419> listOfErrors = new ArrayList<Err419>();
             List<String> eventCommands = new ArrayList<String>();
@@ -242,6 +248,11 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             calEvt.setKey("CalendarCreated");
             CalendarVariables calEvtVars = new CalendarVariables();
             calEvtVars.setPath(calendar.getPath());
+            if (CalendarObjectType.NONWORKINGDAYSCALENDAR.name().equals(dbItemCalendar.getType())) {
+                calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
+            } else {
+                calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
+            }
             calEvt.setVariables(calEvtVars);
             SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
 
@@ -282,7 +293,7 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             if (calendarNewDbItem != null) {
                 throw new JocObjectAlreadyExistException(calendarNewPath);
             }
-            Date surveyDate = new CalendarsDBLayer(connection).renameCalendar(dbItemInventoryInstance.getId(), calendarPath, calendarNewPath);
+            DBItemCalendar calendarDbItem = new CalendarsDBLayer(connection).renameCalendar(dbItemInventoryInstance.getId(), calendarPath, calendarNewPath);
             storeAuditLogEntry(calendarAudit);
             
             CalendarEvent calEvt = new CalendarEvent();
@@ -290,10 +301,15 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
             CalendarVariables calEvtVars = new CalendarVariables();
             calEvtVars.setPath(calendarNewPath);
             calEvtVars.setOldPath(calendarPath);
+            if (CalendarObjectType.NONWORKINGDAYSCALENDAR.name().equals(calendarDbItem.getType())) {
+                calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
+            } else {
+                calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
+            }
             calEvt.setVariables(calEvtVars);
             SendCalendarEventsUtil.sendEvent(calEvt, dbItemInventoryInstance, getAccessToken());
 
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+            return JOCDefaultResponse.responseStatusJSOk(Date.from(Instant.now()));
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

@@ -59,20 +59,19 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public Date renameCalendar(Long instanceId, String path, String newPath) throws JocException {
+    public DBItemCalendar renameCalendar(Long instanceId, String path, String newPath) throws JocException {
         try {
             DBItemCalendar calendarDbItem = getCalendar(instanceId, path);
             if (calendarDbItem == null) {
                 throw new DBMissingDataException(String.format("calendar '%1$s' not found", path));
             }
-            Date now = Date.from(Instant.now());
             calendarDbItem.setName(newPath);
             Path p = Paths.get(newPath);
             calendarDbItem.setBaseName(p.getFileName().toString());
             calendarDbItem.setDirectory(p.getParent().toString().replace('\\', '/'));
-            calendarDbItem.setModified(now);
+            calendarDbItem.setModified(Date.from(Instant.now()));
             getSession().update(calendarDbItem);
-            return now;
+            return calendarDbItem;
         } catch (JocException ex) {
             throw ex;
         } catch (SOSHibernateInvalidSessionException ex) {

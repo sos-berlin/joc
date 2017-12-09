@@ -17,6 +17,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemCalendar;
 import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jobscheduler.model.event.CalendarEvent;
+import com.sos.jobscheduler.model.event.CalendarObjectType;
 import com.sos.jobscheduler.model.event.CalendarVariables;
 import com.sos.joc.Globals;
 import com.sos.joc.calendars.resource.ICalendarsImportResource;
@@ -175,9 +176,14 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 }
             }
 
-            calEvt.setVariables(calEvtVars);
             calendarDbItem = calendarDbLayer.saveOrUpdateCalendar(dbItemInventoryInstance.getId(), calendarDbItem, calendar);
-
+            if (CalendarObjectType.NONWORKINGDAYSCALENDAR.name().equals(calendarDbItem.getType())) {
+                calEvtVars.setObjectType(CalendarObjectType.NONWORKINGDAYSCALENDAR);
+            } else {
+                calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
+            }
+            calEvt.setVariables(calEvtVars);
+            
             if (newCalendar) {
                 eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
             } else {
