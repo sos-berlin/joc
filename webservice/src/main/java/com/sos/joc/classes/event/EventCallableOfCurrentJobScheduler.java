@@ -299,7 +299,11 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             continue; 
                         }
                     } else if (eventType.startsWith("Order")) {
-                        eventSnapshot.setEventType("OrderStateChanged");
+                        if ("OrderAdded".equals(eventType)) {
+                            eventSnapshot.setEventType(eventType);
+                        } else {
+                            eventSnapshot.setEventType("OrderStateChanged");
+                        }
                         eventSnapshot.setObjectType(JobSchedulerObjectType.ORDER);
                         eventSnapshots.put(createJobChainEventOfOrder(eventSnapshot));
                         //add event for outerJobChain if exist
