@@ -18,6 +18,7 @@
         "path",
         "name",
         "isOrderJob",
+        "isShellJob",
         "usedInJobChains",
         "estimatedDuration",
         "maxTasks",
@@ -33,6 +34,10 @@
       "$ref": "../common/path-schema.json"
     },
     "isOrderJob": {
+      "type": "boolean"
+    }
+    ,
+    "isShellJob": {
       "type": "boolean"
     },
     "name": {
