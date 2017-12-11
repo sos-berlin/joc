@@ -151,7 +151,26 @@ traits:
  #         schema200: ok
  #         example: " "
  #         example200: " "
-    /delete:
+    /add_event:
+      type:
+        postJSON:
+          description: add custom event
+          description1: !include documentation/event/modifyCustomEvent.md
+          description2: " "
+          description3: !include documentation/audit/auditLog.md
+          description4: " "
+          description5: " "
+          description6: " "
+          description7: " "
+          description8: " "
+          description9: " "
+          description10: " "
+          description200: " "
+          schema: !include schemas/event/modifyCustomEvent-schema.json
+          schema200: ok
+          example: " "
+          example200: " "
+    /delete_events:
       type:
         postJSON:
           description: delete custom events
@@ -2039,10 +2058,10 @@ traits:
       example: " "
       example200: " "
       
-  /usedBy:
+  /used:
     type:
       postJSON:
-        description: Sends collection of calendar items
+        description: Sends compact collection of calendar items with objects which use it
         description1: " "
         description2: !include documentation/common/regex.md
         description3: !include documentation/common/folders.md

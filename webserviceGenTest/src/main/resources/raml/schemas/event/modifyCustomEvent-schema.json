@@ -41,6 +41,9 @@
     },
     "params": {
       "$ref": "../common/nameValuePairs-schema.json"
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
     }
   }
 }

@@ -16,6 +16,9 @@
       "items": {
         "$ref": "../common/nonNegativeLong-schema.json" 
       }
+    },
+    "auditLog": {
+      "$ref": "../audit/auditParams-schema.json"
     }
   }
 }
