@@ -2039,6 +2039,26 @@ traits:
       example: " "
       example200: " "
       
+  /usedBy:
+    type:
+      postJSON:
+        description: Sends collection of calendar items
+        description1: " "
+        description2: !include documentation/common/regex.md
+        description3: !include documentation/common/folders.md
+        description4: !include documentation/calendar/calendarType.md
+        description5: !include documentation/calendar/categories.md
+        description6: !include documentation/calendar/filteredByCalendars.md
+        description7: !include documentation/calendar/filteredByCalendarIds.md
+        description8: " "
+        description9: " "
+        description10: " "
+        description200: !include documentation/calendar/calendar.md
+        schema: !include schemas/calendar/calendarsFilter-schema.json
+        schema200: !include schemas/calendar/calendars-schema.json
+        example: " "
+        example200: " "
+          
   /categories:
     type:
       postOnlyId:

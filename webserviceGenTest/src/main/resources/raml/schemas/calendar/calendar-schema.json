@@ -43,6 +43,9 @@
     },
     "excludes": {
       "$ref": "frequencies-schema.json"
+    },
+    "usedBy": {
+      "$ref": "usedBy-schema.json"
     }
   }
 }
