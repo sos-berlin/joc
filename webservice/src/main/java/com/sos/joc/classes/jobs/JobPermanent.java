@@ -80,6 +80,11 @@ public class JobPermanent {
             job.setSurveyDate(inventoryJob.getModified());
             job.setTitle(inventoryJob.getTitle());
             job.setUsedInJobChains(inventoryJob.getUsedInJobChains());
+            if (inventoryJob.getScriptLanguage() != null && "shell".equalsIgnoreCase(inventoryJob.getScriptLanguage())) {
+                job.setIsShellJob(true);
+            } else {
+                job.setIsShellJob(false);
+            }
             Integer estimatedDuration = JobPermanent.getEstimatedDurationInSeconds(inventoryJob);
             if (estimatedDuration != null) {
                 job.setEstimatedDuration(estimatedDuration);
