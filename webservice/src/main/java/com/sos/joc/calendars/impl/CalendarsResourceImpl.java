@@ -136,11 +136,13 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
         SortedSet<String> orders = new TreeSet<String>();
         SortedSet<String> jobs = new TreeSet<String>();
         SortedSet<String> schedules = new TreeSet<String>();
+        boolean usedByExist = false;
         if (calendarUsages != null) {
             for (DBItemInventoryCalendarUsage item : calendarUsages) {
                 if (item.getObjectType() == null) {
                     continue;
                 }
+                usedByExist = true;
                 switch (item.getObjectType().toUpperCase()) {
                 case "ORDER":
                     orders.add(item.getPath());
@@ -154,7 +156,9 @@ public class CalendarsResourceImpl extends JOCResourceImpl implements ICalendars
                 }
             }
         }
-
+        if (!usedByExist) {
+            return null;
+        }
         UsedBy entity = new UsedBy();
         if (!orders.isEmpty()) {
             entity.setOrders(new ArrayList<String>(orders));

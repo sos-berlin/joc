@@ -5,8 +5,12 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -30,6 +34,9 @@ import com.sos.joc.classes.calendar.SendCalendarEventsUtil;
 import com.sos.joc.db.calendars.CalendarUsageDBLayer;
 import com.sos.joc.db.calendars.CalendarUsagesAndInstance;
 import com.sos.joc.db.calendars.CalendarsDBLayer;
+import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
+import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
+import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.BulkError;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
@@ -57,30 +64,71 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            checkRequiredComment(calendarImportFilter.getAuditLog());
-            
+
             List<String> eventCommands = new ArrayList<String>();
             List<Calendar> calendars = calendarImportFilter.getCalendars();
             List<Err419> listOfErrors = new ArrayList<Err419>();
             ObjectMapper mapper = new ObjectMapper();
-            
+
             if (calendars != null && !calendars.isEmpty()) {
+
+                checkRequiredComment(calendarImportFilter.getAuditLog());
+
                 connection = Globals.createSosHibernateStatelessConnection(API_CALL);
                 CalendarsDBLayer calendarDbLayer = new CalendarsDBLayer(connection);
                 CalendarUsageDBLayer calendarUsageDbLayer = new CalendarUsageDBLayer(connection);
-                
+                InventoryOrdersDBLayer ordersDBLayer = new InventoryOrdersDBLayer(connection);
+                InventoryJobsDBLayer jobsDBLayer = new InventoryJobsDBLayer(connection);
+                InventorySchedulesDBLayer schedulesDBLayer = new InventorySchedulesDBLayer(connection);
+                Map<String, Set<Calendar>> calendarUsages = new HashMap<String, Set<Calendar>>();
+
                 for (Calendar calendar : calendars) {
                     checkRequirements(calendar);
+                    if (calendar.getBasedOn() != null && !calendar.getBasedOn().isEmpty()) {
+                        // check first if corresponding order, job or schedule exists
+                        boolean objectExists = false;
+                        switch (calendar.getType()) {
+                        case ORDER:
+                            objectExists = (ordersDBLayer.getInventoryOrderByName(dbItemInventoryInstance.getId(), calendar.getPath()) != null);
+                            break;
+                        case JOB:
+                            objectExists = (jobsDBLayer.getInventoryJobByName(calendar.getPath(), dbItemInventoryInstance.getId()) != null);
+                            break;
+                        case SCHEDULE:
+                            objectExists = (schedulesDBLayer.getSchedule(calendar.getPath(), dbItemInventoryInstance.getId()) != null);
+                            break;
+                        default:
+                            break;
+                        }
+                        if (!objectExists) {
+                            continue;
+                        }
+                        // check if usage already exists
+                        if (calendarUsageDbLayer.getCalendarUsagesOfAnObject(dbItemInventoryInstance.getId(), calendar.getBasedOn(), calendar
+                                .getType().name(), calendar.getPath()) != null) {
+                            continue;
+                        }
+
+                        calendarUsages.putIfAbsent(calendar.getBasedOn(), new HashSet<Calendar>());
+                        calendarUsages.get(calendar.getBasedOn()).add(calendar);
+                    }
+
+                }
+
+                for (Calendar calendar : calendars) {
                     DBItemCalendar calendarDbItem = calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath());
-                    
-                    ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarImportFilter.getAuditLog(), calendarImportFilter.getJobschedulerId());
+
+                    ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarImportFilter
+                            .getAuditLog(), calendarImportFilter.getJobschedulerId());
                     logAuditMessage(calendarAudit);
-                    importCalendar(calendar, calendarDbItem, mapper, calendarDbLayer, calendarUsageDbLayer, eventCommands, listOfErrors);
+                    importCalendar(calendar, calendarUsages.get(calendar.getPath()), calendarDbItem, mapper, calendarDbLayer, calendarUsageDbLayer,
+                            eventCommands, listOfErrors);
                     storeAuditLogEntry(calendarAudit);
                 }
+
+                SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, accessToken);
             }
-            
-            SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, accessToken);
+
             if (listOfErrors.size() > 0) {
                 return JOCDefaultResponse.responseStatus419(listOfErrors);
             }
@@ -94,70 +142,67 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
             Globals.disconnect(connection);
         }
     }
-    
-    
-    private void checkRequirements(Calendar calendar) throws JocMissingCommentException, JocMissingRequiredParameterException, JobSchedulerInvalidResponseDataException {
+
+    private void checkRequirements(Calendar calendar) throws JocMissingCommentException, JocMissingRequiredParameterException,
+            JobSchedulerInvalidResponseDataException {
         if (calendar == null) {
             throw new JocMissingRequiredParameterException("undefined 'calendar'");
         }
-        
+
         checkRequiredParameter("calendar path", calendar.getPath());
-        
-        if (calendar.getTo() == null || calendar.getTo().isEmpty()) {
-            throw new JobSchedulerInvalidResponseDataException("calendar field 'to' is undefined");
-        } else if (!calendar.getTo().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
-            throw new JobSchedulerInvalidResponseDataException("calendar field 'to' must have the format YYYY-MM-DD.");
-        }
-        
-        if (calendar.getFrom() == null || calendar.getFrom().isEmpty()) {
-            //throw new JobSchedulerInvalidResponseDataException("calendar field 'from' is undefined");
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            calendar.setFrom(df.format(Date.from(Instant.now())));
-        } else if (!calendar.getFrom().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
-            throw new JobSchedulerInvalidResponseDataException("calendar field 'from' must have the format YYYY-MM-DD.");
-        }
-        
-        if (calendar.getType() == null || calendar.getType().name().isEmpty()) {
-            calendar.setType(CalendarType.WORKING_DAYS);
-        }
         calendar.setPath(normalizePath(calendar.getPath()));
+
+        if (calendar.getBasedOn() == null || calendar.getBasedOn().isEmpty()) {
+            if (calendar.getTo() == null || calendar.getTo().isEmpty()) {
+                throw new JobSchedulerInvalidResponseDataException("calendar field 'to' is undefined");
+            } else if (!calendar.getTo().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+                throw new JobSchedulerInvalidResponseDataException("calendar field 'to' must have the format YYYY-MM-DD.");
+            }
+
+            if (calendar.getFrom() == null || calendar.getFrom().isEmpty()) {
+                // throw new JobSchedulerInvalidResponseDataException("calendar field 'from' is undefined");
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                calendar.setFrom(df.format(Date.from(Instant.now())));
+            } else if (!calendar.getFrom().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+                throw new JobSchedulerInvalidResponseDataException("calendar field 'from' must have the format YYYY-MM-DD.");
+            }
+
+            if (calendar.getType() == null || calendar.getType().name().isEmpty()) {
+                calendar.setType(CalendarType.WORKING_DAYS);
+            }
+        } else {
+            calendar.setBasedOn(normalizePath(calendar.getBasedOn()));
+        }
     }
-    
-    private void importCalendar(Calendar calendar, DBItemCalendar calendarDbItem, ObjectMapper mapper, CalendarsDBLayer calendarDbLayer,
-            CalendarUsageDBLayer calendarUsageDbLayer, List<String> eventCommands, List<Err419> listOfErrors) {
+
+    private void importCalendar(Calendar calendar, Set<Calendar> calendarUsagesFromImportFile, DBItemCalendar calendarDbItem, ObjectMapper mapper,
+            CalendarsDBLayer calendarDbLayer, CalendarUsageDBLayer calendarUsageDbLayer, List<String> eventCommands, List<Err419> listOfErrors) {
         try {
             CalendarEvent calEvt = new CalendarEvent();
             CalendarVariables calEvtVars = new CalendarVariables();
             calEvtVars.setPath(calendar.getPath());
 
-            boolean updateJobOrderScheduleIsNecessary = false;
-            boolean updateCalendarUsageIsNecessary = false;
             boolean newCalendar = (calendarDbItem == null);
             Dates newDates = null;
             Dates oldDates = null;
-            String oldCalendarPath = calendar.getPath();
             Calendar oldCalendar = null;
 
             CalendarUsagesAndInstance calendarUsageInstance = new CalendarUsagesAndInstance(dbItemInventoryInstance, false);
-            List<DBItemInventoryCalendarUsage> calendarUsages = null;
+            List<DBItemInventoryCalendarUsage> dbCalendarUsages = null;
+            List<DBItemInventoryCalendarUsage> dbCalendarUsagesFromFile = new ArrayList<DBItemInventoryCalendarUsage>();
 
             if (!newCalendar) {
                 calEvt.setKey("CalendarUpdated");
                 try {
                     oldCalendar = mapper.readValue(calendarDbItem.getConfiguration(), Calendar.class);
-                    oldCalendarPath = calendarDbItem.getName();
                     newDates = new FrequencyResolver().resolveFromToday(calendar);
-                    if (!calendar.getPath().equals(oldCalendarPath)) {
-                        calEvtVars.setOldPath(calendarDbItem.getName());
-                        updateJobOrderScheduleIsNecessary = true;
-                        updateCalendarUsageIsNecessary = true; // calendar.getType() == CalendarType.WORKING_DAYS;
-                    } else {
-                        oldDates = new FrequencyResolver().resolveFromToday(oldCalendar);
-                        updateJobOrderScheduleIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
+                    oldDates = new FrequencyResolver().resolveFromToday(oldCalendar);
+                    if (!newDates.getDates().equals(oldDates.getDates()) && dbCalendarUsages == null) {
+                        dbCalendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
                     }
                     if ((calendar.getType() != null && !calendar.getType().name().equals(calendarDbItem.getType()))) {
-                        calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
-                        if (!calendarUsages.isEmpty()) {
+                        dbCalendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
+                        if (dbCalendarUsages != null && !dbCalendarUsages.isEmpty()) {
                             throw new JobSchedulerBadRequestException(String.format(
                                     "It is not allowed to change the calendar type (%1$s -> %2$s) when it is already assigned to a job, order or schedule.",
                                     calendarDbItem.getType(), calendar.getType().name()));
@@ -183,7 +228,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 calEvtVars.setObjectType(CalendarObjectType.WORKINGDAYSCALENDAR);
             }
             calEvt.setVariables(calEvtVars);
-            
+
             if (newCalendar) {
                 eventCommands.add(SendCalendarEventsUtil.addEvent(calEvt));
             } else {
@@ -193,40 +238,50 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 }
             }
 
-            if (updateCalendarUsageIsNecessary) {
-                if (calendarUsages == null) {
-                    calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
-                }
-                if (!calendarUsages.isEmpty()) {
-                    try {
-                        calendarDbLayer.getSession().beginTransaction();
-                        for (DBItemInventoryCalendarUsage item : calendarUsages) {
-                            Calendar c = mapper.readValue(item.getConfiguration(), Calendar.class);
-                            c.setBasedOn(calendar.getPath());
-                            item.setConfiguration(mapper.writeValueAsString(c));
-                            calendarUsageDbLayer.updateCalendarUsage(item);
-                            eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(item.getPath(), item.getObjectType(), "CalendarUsageUpdated"));
-                        }
-                        calendarDbLayer.getSession().commit();
-                    } catch (JocException e) {
-                        calendarDbLayer.getSession().rollback();
-                        throw e;
-                    } catch (Exception e) {
-                        calendarDbLayer.getSession().rollback();
-                        throw e;
+            if (calendarUsagesFromImportFile != null) {
+                try {
+                    calendarUsageDbLayer.getSession().beginTransaction();
+                    for (Calendar calendarUsageFromFile : calendarUsagesFromImportFile) {
+                        DBItemInventoryCalendarUsage dbItemCalendarUsage = new DBItemInventoryCalendarUsage();
+                        dbItemCalendarUsage.setCalendarId(calendarDbItem.getId());
+                        dbItemCalendarUsage.setInstanceId(dbItemInventoryInstance.getId());
+                        dbItemCalendarUsage.setEdited(false);
+                        dbItemCalendarUsage.setObjectType(calendarUsageFromFile.getType().name());
+                        dbItemCalendarUsage.setPath(calendarUsageFromFile.getPath());
+                        calendarUsageFromFile.setPath(null);
+                        calendarUsageFromFile.setType(null);
+                        calendarUsageFromFile.setName(null);
+                        calendarUsageFromFile.setUsedBy(null);
+                        dbItemCalendarUsage.setConfiguration(mapper.writeValueAsString(calendarUsageFromFile));
+                        calendarUsageDbLayer.saveCalendarUsage(dbItemCalendarUsage);
+                        dbCalendarUsagesFromFile.add(dbItemCalendarUsage);
+                        eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(dbItemCalendarUsage.getPath(), dbItemCalendarUsage.getObjectType(),
+                                "CalendarUsageUpdated"));
                     }
+                } catch (JocException e) {
+                    calendarUsageDbLayer.getSession().rollback();
+                    dbCalendarUsagesFromFile = null;
+                    throw e;
+                } catch (Exception e) {
+                    calendarUsageDbLayer.getSession().rollback();
+                    dbCalendarUsagesFromFile = null;
+                    throw e;
                 }
             }
 
-            if (updateJobOrderScheduleIsNecessary) {
-                // update calendar in jobs, orders and schedules
-                if (calendarUsages == null) {
-                    calendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
+            if (dbCalendarUsagesFromFile != null && !dbCalendarUsagesFromFile.isEmpty()) {
+                if (dbCalendarUsages == null) {
+                    dbCalendarUsages = new ArrayList<DBItemInventoryCalendarUsage>();
                 }
-                if (!calendarUsages.isEmpty()) {
-                    calendarUsageInstance.setCalendarUsages(calendarUsages);
+                dbCalendarUsages.addAll(dbCalendarUsagesFromFile);
+            }
+
+            if (dbCalendarUsages != null && !dbCalendarUsages.isEmpty()) {
+                // update calendar in jobs, orders and schedules
+                if (!dbCalendarUsages.isEmpty()) {
+                    calendarUsageInstance.setCalendarUsages(dbCalendarUsages);
                     calendarUsageInstance.setCalendarPath(calendar.getPath());
-                    calendarUsageInstance.setOldCalendarPath(oldCalendarPath);
+                    calendarUsageInstance.setOldCalendarPath(calendar.getPath());
                     calendarUsageInstance.setBaseCalendar(calendar);
                     calendarUsageInstance.setDates(newDates.getDates());
                     JobSchedulerCalendarCallable callable = new JobSchedulerCalendarCallable(calendarUsageInstance, getAccessToken());
