@@ -53,7 +53,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             Set<String> jobSchedulerIds = new HashSet<String>();
             DBItemInventoryInstance first = null;
             DBItemInventoryInstance selected = null;
-            if (listOfInstance != null) {
+            if (listOfInstance != null && !listOfInstance.isEmpty()) {
                 for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
                     jobSchedulerIds.add(inventoryInstance.getSchedulerId());
                     if (first == null) {
