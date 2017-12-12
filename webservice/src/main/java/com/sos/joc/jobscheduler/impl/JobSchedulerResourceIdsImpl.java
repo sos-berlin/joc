@@ -17,6 +17,7 @@ import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.db.inventory.instances.InventoryInstancesDBLayer;
+import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceIds;
 import com.sos.joc.model.jobscheduler.JobSchedulerIds;
@@ -52,7 +53,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
             Set<String> jobSchedulerIds = new HashSet<String>();
             DBItemInventoryInstance first = null;
             DBItemInventoryInstance selected = null;
-            if (listOfInstance != null) {
+            if (listOfInstance != null && !listOfInstance.isEmpty()) {
                 for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
                     jobSchedulerIds.add(inventoryInstance.getSchedulerId());
                     if (first == null) {
@@ -62,6 +63,8 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                         selected = inventoryInstance;
                     }
                 }
+            } else {
+                throw new DBMissingDataException("No JobSchedulers found in DB!");
             }
             String selectedInstanceSchedulerId = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
             
