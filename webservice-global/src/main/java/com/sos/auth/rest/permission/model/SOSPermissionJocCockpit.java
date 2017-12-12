@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.11.27 um 10:46:38 AM CET 
+// Generiert: 2017.12.12 um 03:35:37 PM CET 
 //
 
 
@@ -497,29 +497,18 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
- *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                 &lt;/sequence>
- *               &lt;/restriction>
- *             &lt;/complexContent>
- *           &lt;/complexType>
- *         &lt;/element>
- *         &lt;element name="EventAction">
- *           &lt;complexType>
- *             &lt;complexContent>
- *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;sequence>
- *                   &lt;element name="view">
+ *                   &lt;element name="execute">
  *                     &lt;complexType>
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
- *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
- *                   &lt;element name="createEventsManually" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -755,7 +744,6 @@ import javax.xml.bind.annotation.XmlType;
     "schedule",
     "lock",
     "event",
-    "eventAction",
     "holidayCalendar",
     "maintenanceWindow",
     "auditLog",
@@ -791,8 +779,6 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionJocCockpit.Lock lock;
     @XmlElement(name = "Event", required = true)
     protected SOSPermissionJocCockpit.Event event;
-    @XmlElement(name = "EventAction", required = true)
-    protected SOSPermissionJocCockpit.EventAction eventAction;
     @XmlElement(name = "HolidayCalendar", required = true)
     protected SOSPermissionJocCockpit.HolidayCalendar holidayCalendar;
     @XmlElement(name = "MaintenanceWindow", required = true)
@@ -1104,30 +1090,6 @@ public class SOSPermissionJocCockpit {
      */
     public void setEvent(SOSPermissionJocCockpit.Event value) {
         this.event = value;
-    }
-
-    /**
-     * Ruft den Wert der eventAction-Eigenschaft ab.
-     * 
-     * @return
-     *     possible object is
-     *     {@link SOSPermissionJocCockpit.EventAction }
-     *     
-     */
-    public SOSPermissionJocCockpit.EventAction getEventAction() {
-        return eventAction;
-    }
-
-    /**
-     * Legt den Wert der eventAction-Eigenschaft fest.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link SOSPermissionJocCockpit.EventAction }
-     *     
-     */
-    public void setEventAction(SOSPermissionJocCockpit.EventAction value) {
-        this.eventAction = value;
     }
 
     /**
@@ -2034,7 +1996,18 @@ public class SOSPermissionJocCockpit {
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
-     *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *         &lt;element name="execute">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -2046,13 +2019,14 @@ public class SOSPermissionJocCockpit {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
         "view",
-        "delete"
+        "execute"
     })
     public static class Event {
 
         @XmlElement(required = true)
         protected SOSPermissionJocCockpit.Event.View view;
-        protected boolean delete;
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.Event.Execute execute;
 
         /**
          * Ruft den Wert der view-Eigenschaft ab.
@@ -2079,19 +2053,27 @@ public class SOSPermissionJocCockpit {
         }
 
         /**
-         * Ruft den Wert der delete-Eigenschaft ab.
+         * Ruft den Wert der execute-Eigenschaft ab.
          * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.Event.Execute }
+         *     
          */
-        public boolean isDelete() {
-            return delete;
+        public SOSPermissionJocCockpit.Event.Execute getExecute() {
+            return execute;
         }
 
         /**
-         * Legt den Wert der delete-Eigenschaft fest.
+         * Legt den Wert der execute-Eigenschaft fest.
          * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.Event.Execute }
+         *     
          */
-        public void setDelete(boolean value) {
-            this.delete = value;
+        public void setExecute(SOSPermissionJocCockpit.Event.Execute value) {
+            this.execute = value;
         }
 
 
@@ -2105,7 +2087,8 @@ public class SOSPermissionJocCockpit {
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
-         *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="add" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="delete" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -2116,112 +2099,46 @@ public class SOSPermissionJocCockpit {
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
-            "status"
+            "add",
+            "delete"
         })
-        public static class View {
+        public static class Execute {
 
-            protected boolean status;
+            protected boolean add;
+            protected boolean delete;
 
             /**
-             * Ruft den Wert der status-Eigenschaft ab.
+             * Ruft den Wert der add-Eigenschaft ab.
              * 
              */
-            public boolean isStatus() {
-                return status;
+            public boolean isAdd() {
+                return add;
             }
 
             /**
-             * Legt den Wert der status-Eigenschaft fest.
+             * Legt den Wert der add-Eigenschaft fest.
              * 
              */
-            public void setStatus(boolean value) {
-                this.status = value;
+            public void setAdd(boolean value) {
+                this.add = value;
             }
 
-        }
+            /**
+             * Ruft den Wert der delete-Eigenschaft ab.
+             * 
+             */
+            public boolean isDelete() {
+                return delete;
+            }
 
-    }
+            /**
+             * Legt den Wert der delete-Eigenschaft fest.
+             * 
+             */
+            public void setDelete(boolean value) {
+                this.delete = value;
+            }
 
-
-    /**
-     * <p>Java-Klasse für anonymous complex type.
-     * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="view">
-     *           &lt;complexType>
-     *             &lt;complexContent>
-     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;sequence>
-     *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                 &lt;/sequence>
-     *               &lt;/restriction>
-     *             &lt;/complexContent>
-     *           &lt;/complexType>
-     *         &lt;/element>
-     *         &lt;element name="createEventsManually" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *       &lt;/sequence>
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "view",
-        "createEventsManually"
-    })
-    public static class EventAction {
-
-        @XmlElement(required = true)
-        protected SOSPermissionJocCockpit.EventAction.View view;
-        protected boolean createEventsManually;
-
-        /**
-         * Ruft den Wert der view-Eigenschaft ab.
-         * 
-         * @return
-         *     possible object is
-         *     {@link SOSPermissionJocCockpit.EventAction.View }
-         *     
-         */
-        public SOSPermissionJocCockpit.EventAction.View getView() {
-            return view;
-        }
-
-        /**
-         * Legt den Wert der view-Eigenschaft fest.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link SOSPermissionJocCockpit.EventAction.View }
-         *     
-         */
-        public void setView(SOSPermissionJocCockpit.EventAction.View value) {
-            this.view = value;
-        }
-
-        /**
-         * Ruft den Wert der createEventsManually-Eigenschaft ab.
-         * 
-         */
-        public boolean isCreateEventsManually() {
-            return createEventsManually;
-        }
-
-        /**
-         * Legt den Wert der createEventsManually-Eigenschaft fest.
-         * 
-         */
-        public void setCreateEventsManually(boolean value) {
-            this.createEventsManually = value;
         }
 
 

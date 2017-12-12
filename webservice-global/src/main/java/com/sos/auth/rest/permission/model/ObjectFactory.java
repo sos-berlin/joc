@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.11.27 um 10:46:38 AM CET 
+// Generiert: 2017.12.12 um 03:35:37 PM CET 
 //
 
 
@@ -207,14 +207,6 @@ public class ObjectFactory {
      */
     public SOSPermissionJocCockpit.HolidayCalendar createSOSPermissionJocCockpitHolidayCalendar() {
         return new SOSPermissionJocCockpit.HolidayCalendar();
-    }
-
-    /**
-     * Create an instance of {@link SOSPermissionJocCockpit.EventAction }
-     * 
-     */
-    public SOSPermissionJocCockpit.EventAction createSOSPermissionJocCockpitEventAction() {
-        return new SOSPermissionJocCockpit.EventAction();
     }
 
     /**
@@ -610,19 +602,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link SOSPermissionJocCockpit.EventAction.View }
-     * 
-     */
-    public SOSPermissionJocCockpit.EventAction.View createSOSPermissionJocCockpitEventActionView() {
-        return new SOSPermissionJocCockpit.EventAction.View();
-    }
-
-    /**
      * Create an instance of {@link SOSPermissionJocCockpit.Event.View }
      * 
      */
     public SOSPermissionJocCockpit.Event.View createSOSPermissionJocCockpitEventView() {
         return new SOSPermissionJocCockpit.Event.View();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Event.Execute }
+     * 
+     */
+    public SOSPermissionJocCockpit.Event.Execute createSOSPermissionJocCockpitEventExecute() {
+        return new SOSPermissionJocCockpit.Event.Execute();
     }
 
     /**

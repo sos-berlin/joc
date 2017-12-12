@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.model.event.custom.EventIdsFilter;
+import com.sos.joc.model.event.custom.ModifyEvent;
 import com.sos.joc.model.order.ModifyOrders;
 
  
@@ -30,9 +31,17 @@ public interface IModifyCustomEventResource {
             @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyEvent) throws Exception;
     
     @POST
-    @Path("custom/delete")
+    @Path("custom/delete_event")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse deleteEvent(            
             @HeaderParam("X-Access-Token") String accessToken, EventIdsFilter eventIdsFilter) throws Exception;
+
+    @POST
+    @Path("custom/add_event")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
+    public JOCDefaultResponse addEvent(            
+            @HeaderParam("X-Access-Token") String accessToken, ModifyEvent modifyEvent) throws Exception;
+
 }
