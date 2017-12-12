@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 
 import com.sos.exception.SOSNoResponseException;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.jobscheduler.RuntimeResolver;
 import com.sos.joc.Globals;
 import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
@@ -331,82 +332,11 @@ public class JOCXmlCommand extends SOSXmlCommand {
         if (curObject == null) {
             throw new JobSchedulerObjectNotExistException(objectType + ": " + path);
         }
-        NodeList dateParentList = getSosxml().selectNodeList(curObject, String.format(".//date[@calendar='%1$s']/parent::*", calendarOldPath));
-        NodeList holidayParentList = getSosxml().selectNodeList(curObject, String.format(".//holiday[@calendar='%1$s']/parent::*", calendarOldPath));
-        boolean runTimeIsChanged = false;
-
-        for (int i = 0; i < dateParentList.getLength(); i++) {
-            NodeList dateList = getSosxml().selectNodeList(dateParentList.item(i), String.format("date[@calendar='%1$s']", calendarOldPath));
-            if (updateCalendarInRuntime(dateList, dates, calendarPath)) {
-                runTimeIsChanged = true;
-            }
+        Node node = RuntimeResolver.updateCalendarInRuntimes(getSosxml(), curObject, dates, objectType, path, calendarPath, calendarOldPath);
+        if (node != null) {
+            return (Element) node.getFirstChild();
         }
-        for (int i = 0; i < holidayParentList.getLength(); i++) {
-            NodeList holidayList = getSosxml().selectNodeList(holidayParentList.item(i), String.format("holiday[@calendar='%1$s']", calendarOldPath));
-            if (updateCalendarInRuntime(holidayList, dates, calendarPath)) {
-                runTimeIsChanged = true;
-            }
-        }
-        for (int i = 0; i < holidayParentList.getLength(); i++) {
-            NodeList children = holidayParentList.item(i).getChildNodes();
-            if (children.getLength() == 1 && children.item(0).getNodeType() == Node.TEXT_NODE) {
-                holidayParentList.item(i).removeChild(children.item(0));
-            }
-        }
-        for (int i = 0; i < dateParentList.getLength(); i++) {
-            NodeList children = dateParentList.item(i).getChildNodes();
-            if (children.getLength() == 1 && children.item(0).getNodeType() == Node.TEXT_NODE) {
-                dateParentList.item(i).removeChild(children.item(0));
-            }
-        }
-        if (runTimeIsChanged) {
-            return (Element) curObject.getFirstChild();
-        }
-        return null;
-    }
-    
-    private boolean updateCalendarInRuntime(NodeList nodeList, List<String> dates, String calendarPath) {
-        Element firstElem = null;
-        Node parentOfFirstElem = null;
-        Node textNode = null;
-        
-        if (nodeList.getLength() > 0) {
-            firstElem = (Element) nodeList.item(0);
-            parentOfFirstElem = firstElem.getParentNode();
-            if (firstElem.getPreviousSibling().getNodeType() == Node.TEXT_NODE) {
-                textNode = firstElem.getPreviousSibling(); 
-            }
-        }
-        if (firstElem != null) {
-            for (int i=1; i < nodeList.getLength(); i++) {
-                if (nodeList.item(i).getPreviousSibling().getNodeType() == Node.TEXT_NODE) {
-                    parentOfFirstElem.removeChild(nodeList.item(i).getPreviousSibling()); 
-                }
-                parentOfFirstElem.removeChild(nodeList.item(i));
-            }
-            if (dates.isEmpty()) {
-                if (textNode != null) {
-                    parentOfFirstElem.removeChild(textNode); 
-                }
-                parentOfFirstElem.removeChild(firstElem);
-            } else {
-                String lastDateOfdates = dates.remove(dates.size()-1);
-                dates.add(0, lastDateOfdates);
-                firstElem.setAttribute("date", dates.get(0));
-                firstElem.setAttribute("calendar", calendarPath);
-                for (int i=1; i < dates.size(); i++) {
-                    Element newElem = (Element) firstElem.cloneNode(true);
-                    newElem.setAttribute("date", dates.get(i));
-                    if (textNode != null) {
-                        parentOfFirstElem.insertBefore(textNode.cloneNode(false), textNode);
-                        parentOfFirstElem.insertBefore(newElem, textNode);
-                    } else {
-                        parentOfFirstElem.insertBefore(newElem, firstElem);
-                    }
-                }
-            }
-        }
-        return firstElem != null;
+        return null; 
     }
     
     public String getXmlString(Node node) throws Exception {

@@ -11,7 +11,6 @@ import com.sos.jitl.reporting.db.DBItemInventoryCalendarUsage;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.model.calendar.Calendar;
-import com.sos.joc.model.calendar.Period;
 
 public class CalendarUsagesAndInstance {
 

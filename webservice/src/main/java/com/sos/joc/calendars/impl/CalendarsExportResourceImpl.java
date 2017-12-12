@@ -46,8 +46,8 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
-            if (calendarsFilter.getCalendars() == null || calendarsFilter.getCalendars().isEmpty()) {
-                throw new JocMissingRequiredParameterException("calendars undefined or empty");
+            if (calendarsFilter.getCalendars() == null) {
+                calendarsFilter.setCalendars(new ArrayList<String>());
             }
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             CalendarsDBLayer dbLayer = new CalendarsDBLayer(connection);
@@ -55,7 +55,7 @@ public class CalendarsExportResourceImpl extends JOCResourceImpl implements ICal
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            //objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'"));
+            objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'"));
 
             List<Calendar> calendarList = new ArrayList<Calendar>();
             List<DBItemCalendar> calendarsFromDb = dbLayer.getCalendarsFromPaths(dbItemInventoryInstance.getId(), new HashSet<String>(calendarsFilter

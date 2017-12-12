@@ -482,7 +482,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             auditLogEvent.setObjectType(JobSchedulerObjectType.ORDER);
                         }
                         auditLogEvent.setPath(path);
-                    } else {
+                    } else if (auditLogItem.getCalendar() != null && !auditLogItem.getCalendar().isEmpty() ) {
+                        auditLogEvent.setObjectType(JobSchedulerObjectType.WORKINGDAYSCALENDAR);
+                        auditLogEvent.setPath(auditLogItem.getCalendar());
+                    }else {
                         auditLogEvent.setObjectType(JobSchedulerObjectType.OTHER);
                         auditLogEvent.setPath("AuditLogChanged");
                     }
