@@ -173,14 +173,14 @@ public class CalendarUsageDBLayer extends DBLayer {
         }
     }
     
-    public List<DBItemInventoryCalendarUsage> getCalendarUsagesOfAnObject(Long instanceId, String calendarPath, String objectType, String objectPath)
+    public DBItemInventoryCalendarUsage getCalendarUsageOfAnObject(Long instanceId, String calendarPath, String objectType, String objectPath)
             throws DBConnectionRefusedException, DBInvalidDataException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select icu from ").append(DBITEM_INVENTORY_CALENDAR_USAGE).append(" icu, ");
             sql.append(DBITEM_CALENDARS).append(" ic ");
             sql.append(" where ic.id = icu.calendarId");
-            sql.append(" and ic.name := calendarPath");
+            sql.append(" and ic.name = :calendarPath");
             sql.append(" and icu.instanceId = :instanceId");
             sql.append(" and icu.objectType = :objectType");
             sql.append(" and icu.path = :path");
@@ -189,7 +189,7 @@ public class CalendarUsageDBLayer extends DBLayer {
             query.setParameter("objectType", objectType);
             query.setParameter("path", objectPath);
             query.setParameter("calendarPath", calendarPath);
-            return getSession().getResultList(query);
+            return getSession().getSingleResult(query);
 
         } catch (SOSHibernateInvalidSessionException ex) {
             throw new DBConnectionRefusedException(ex);

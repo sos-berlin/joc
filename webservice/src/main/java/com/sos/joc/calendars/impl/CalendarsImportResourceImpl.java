@@ -80,12 +80,19 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 InventoryOrdersDBLayer ordersDBLayer = new InventoryOrdersDBLayer(connection);
                 InventoryJobsDBLayer jobsDBLayer = new InventoryJobsDBLayer(connection);
                 InventorySchedulesDBLayer schedulesDBLayer = new InventorySchedulesDBLayer(connection);
-                Map<String, Set<Calendar>> calendarUsages = new HashMap<String, Set<Calendar>>();
+                Map<String, Set<DBItemInventoryCalendarUsage>> calendarUsagesMap = new HashMap<String, Set<DBItemInventoryCalendarUsage>>();
+                Map<String, DBItemCalendar> calendarsMap = new HashMap<String, DBItemCalendar>();
 
                 for (Calendar calendar : calendars) {
                     checkRequirements(calendar);
-                    if (calendar.getBasedOn() != null && !calendar.getBasedOn().isEmpty()) {
-                        // check first if corresponding order, job or schedule exists
+                    if (calendar.getBasedOn() == null || calendar.getBasedOn().isEmpty()) {
+                        calendarsMap.put(calendar.getPath(), calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath()));
+                    }
+                }
+
+                for (Calendar calendar : calendars) {
+                    if (calendar.getBasedOn() != null && !calendar.getBasedOn().isEmpty() && calendarsMap.containsKey(calendar.getBasedOn())) {
+                        // check if corresponding order, job or schedule exists
                         boolean objectExists = false;
                         switch (calendar.getType()) {
                         case ORDER:
@@ -104,26 +111,45 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                             continue;
                         }
                         // check if usage already exists
-                        if (calendarUsageDbLayer.getCalendarUsagesOfAnObject(dbItemInventoryInstance.getId(), calendar.getBasedOn(), calendar
-                                .getType().name(), calendar.getPath()) != null) {
+                        DBItemInventoryCalendarUsage dbItemInventoryCalendarUsage = calendarUsageDbLayer.getCalendarUsageOfAnObject(
+                                dbItemInventoryInstance.getId(), calendar.getBasedOn(), calendar.getType().name(), calendar.getPath());
+                        if (dbItemInventoryCalendarUsage != null && dbItemInventoryCalendarUsage.getConfiguration() != null) {
                             continue;
-                        }
+                        } else {
+                            if (dbItemInventoryCalendarUsage == null) {
+                                dbItemInventoryCalendarUsage = new DBItemInventoryCalendarUsage();
+                            }
+                            dbItemInventoryCalendarUsage.setInstanceId(dbItemInventoryInstance.getId());
+                            dbItemInventoryCalendarUsage.setEdited(false);
+                            dbItemInventoryCalendarUsage.setObjectType(calendar.getType().name());
+                            dbItemInventoryCalendarUsage.setPath(calendar.getPath());
+                            dbItemInventoryCalendarUsage.setCalendarId(calendarsMap.get(calendar.getBasedOn()).getId());
+                            if (CalendarType.NON_WORKING_DAYS.name().equals(calendarsMap.get(calendar.getBasedOn()).getType())) {
+                                calendar.setType(CalendarType.NON_WORKING_DAYS);
+                            } else {
+                                calendar.setType(CalendarType.WORKING_DAYS);
+                            }
+                            calendar.setPath(null);
+                            calendar.setName(null);
+                            calendar.setUsedBy(null);
+                            dbItemInventoryCalendarUsage.setConfiguration(mapper.writeValueAsString(calendar));
 
-                        calendarUsages.putIfAbsent(calendar.getBasedOn(), new HashSet<Calendar>());
-                        calendarUsages.get(calendar.getBasedOn()).add(calendar);
+                            calendarUsagesMap.putIfAbsent(calendar.getBasedOn(), new HashSet<DBItemInventoryCalendarUsage>());
+                            calendarUsagesMap.get(calendar.getBasedOn()).add(dbItemInventoryCalendarUsage);
+                        }
                     }
 
                 }
 
                 for (Calendar calendar : calendars) {
-                    DBItemCalendar calendarDbItem = calendarDbLayer.getCalendar(dbItemInventoryInstance.getId(), calendar.getPath());
-
-                    ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarImportFilter
-                            .getAuditLog(), calendarImportFilter.getJobschedulerId());
-                    logAuditMessage(calendarAudit);
-                    importCalendar(calendar, calendarUsages.get(calendar.getPath()), calendarDbItem, mapper, calendarDbLayer, calendarUsageDbLayer,
-                            eventCommands, listOfErrors);
-                    storeAuditLogEntry(calendarAudit);
+                    if (calendar.getBasedOn() == null || calendar.getBasedOn().isEmpty()) {
+                        ModifyCalendarAudit calendarAudit = new ModifyCalendarAudit(calendar.getId(), calendar.getPath(), calendarImportFilter
+                                .getAuditLog(), calendarImportFilter.getJobschedulerId());
+                        logAuditMessage(calendarAudit);
+                        importCalendar(calendar, calendarUsagesMap.get(calendar.getPath()), calendarsMap.get(calendar.getPath()), mapper,
+                                calendarDbLayer, calendarUsageDbLayer, eventCommands, listOfErrors);
+                        storeAuditLogEntry(calendarAudit);
+                    }
                 }
 
                 SendCalendarEventsUtil.sendEvent(eventCommands, dbItemInventoryInstance, accessToken);
@@ -175,8 +201,9 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
         }
     }
 
-    private void importCalendar(Calendar calendar, Set<Calendar> calendarUsagesFromImportFile, DBItemCalendar calendarDbItem, ObjectMapper mapper,
-            CalendarsDBLayer calendarDbLayer, CalendarUsageDBLayer calendarUsageDbLayer, List<String> eventCommands, List<Err419> listOfErrors) {
+    private void importCalendar(Calendar calendar, Set<DBItemInventoryCalendarUsage> calendarUsagesFromImportFile, DBItemCalendar calendarDbItem,
+            ObjectMapper mapper, CalendarsDBLayer calendarDbLayer, CalendarUsageDBLayer calendarUsageDbLayer, List<String> eventCommands,
+            List<Err419> listOfErrors) {
         try {
             CalendarEvent calEvt = new CalendarEvent();
             CalendarVariables calEvtVars = new CalendarVariables();
@@ -189,7 +216,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
 
             CalendarUsagesAndInstance calendarUsageInstance = new CalendarUsagesAndInstance(dbItemInventoryInstance, false);
             List<DBItemInventoryCalendarUsage> dbCalendarUsages = null;
-            List<DBItemInventoryCalendarUsage> dbCalendarUsagesFromFile = new ArrayList<DBItemInventoryCalendarUsage>();
+//            List<DBItemInventoryCalendarUsage> dbCalendarUsagesFromFile = new ArrayList<DBItemInventoryCalendarUsage>();
 
             if (!newCalendar) {
                 calEvt.setKey("CalendarUpdated");
@@ -238,46 +265,42 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 }
             }
 
+            // insert new CalendarUsages from import file
             if (calendarUsagesFromImportFile != null) {
                 try {
                     calendarUsageDbLayer.getSession().beginTransaction();
-                    for (Calendar calendarUsageFromFile : calendarUsagesFromImportFile) {
-                        DBItemInventoryCalendarUsage dbItemCalendarUsage = new DBItemInventoryCalendarUsage();
-                        dbItemCalendarUsage.setCalendarId(calendarDbItem.getId());
-                        dbItemCalendarUsage.setInstanceId(dbItemInventoryInstance.getId());
-                        dbItemCalendarUsage.setEdited(false);
-                        dbItemCalendarUsage.setObjectType(calendarUsageFromFile.getType().name());
-                        dbItemCalendarUsage.setPath(calendarUsageFromFile.getPath());
-                        calendarUsageFromFile.setPath(null);
-                        calendarUsageFromFile.setType(null);
-                        calendarUsageFromFile.setName(null);
-                        calendarUsageFromFile.setUsedBy(null);
-                        dbItemCalendarUsage.setConfiguration(mapper.writeValueAsString(calendarUsageFromFile));
-                        calendarUsageDbLayer.saveCalendarUsage(dbItemCalendarUsage);
-                        dbCalendarUsagesFromFile.add(dbItemCalendarUsage);
+                    for (DBItemInventoryCalendarUsage dbItemCalendarUsage : calendarUsagesFromImportFile) {
+                        if (dbItemCalendarUsage.getId() == null) {
+                            calendarUsageDbLayer.saveCalendarUsage(dbItemCalendarUsage);
+                        } else {
+                            calendarUsageDbLayer.updateCalendarUsage(dbItemCalendarUsage);
+                        }
+//                        dbCalendarUsagesFromFile.add(dbItemCalendarUsage);
                         eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(dbItemCalendarUsage.getPath(), dbItemCalendarUsage.getObjectType(),
                                 "CalendarUsageUpdated"));
                     }
                 } catch (JocException e) {
                     calendarUsageDbLayer.getSession().rollback();
-                    dbCalendarUsagesFromFile = null;
+//                    dbCalendarUsagesFromFile = null;
                     throw e;
                 } catch (Exception e) {
                     calendarUsageDbLayer.getSession().rollback();
-                    dbCalendarUsagesFromFile = null;
+//                    dbCalendarUsagesFromFile = null;
                     throw e;
                 }
             }
 
-            if (dbCalendarUsagesFromFile != null && !dbCalendarUsagesFromFile.isEmpty()) {
-                if (dbCalendarUsages == null) {
-                    dbCalendarUsages = new ArrayList<DBItemInventoryCalendarUsage>();
-                }
-                dbCalendarUsages.addAll(dbCalendarUsagesFromFile);
-            }
+            // add new CalendarUsages to list of objects where recalculation is necessary
+//            if (dbCalendarUsagesFromFile != null && !dbCalendarUsagesFromFile.isEmpty()) {
+//                if (dbCalendarUsages == null) {
+//                    dbCalendarUsages = new ArrayList<DBItemInventoryCalendarUsage>();
+//                }
+//                dbCalendarUsages.addAll(dbCalendarUsagesFromFile);
+//            }
 
             if (dbCalendarUsages != null && !dbCalendarUsages.isEmpty()) {
                 // update calendar in jobs, orders and schedules
+                // TODO improve performance -> update object for each Calendar in one <modify_hot_folder/>
                 if (!dbCalendarUsages.isEmpty()) {
                     calendarUsageInstance.setCalendarUsages(dbCalendarUsages);
                     calendarUsageInstance.setCalendarPath(calendar.getPath());
