@@ -152,7 +152,9 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                     }
                 }
                 transfer.setMandator(transferFromDb.getMandator());
-                transfer.setNumOfFiles(transferFromDb.getNumOfFiles().intValue());
+                if (transferFromDb.getNumOfFiles() != null) {
+                    transfer.setNumOfFiles(transferFromDb.getNumOfFiles().intValue());
+                }
                 transfer.setParent_id(transferFromDb.getParentTransferId());
                 transfer.setProfile(transferFromDb.getProfileName());
                 transfer.setState(getTransferStateFromValue(transferFromDb.getState()));
