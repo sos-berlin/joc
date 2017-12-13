@@ -3,7 +3,9 @@ package com.sos.joc.yade.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -63,8 +65,67 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 limit = null;   // unlimited
             }
             JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
-            List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(filterBody.getOperations(), filterBody.getStates(), filterBody
-                    .getMandator(), filterBody.getSources(), filterBody.getTargets(), filterBody.getIsIntervention(), filterBody.getHasIntervention(),
+            List<TransferStateText> states = filterBody.getStates();
+            Set<Integer> stateValues = new HashSet<Integer>();
+            for (TransferStateText state : states) {
+                switch (state) {
+                case SUCCESSFUL:
+                    stateValues.add(1);
+                    break;
+                case INCOMPLETE:
+                    stateValues.add(2);
+                    break;
+                case FAILED:
+                    stateValues.add(3);
+                    break;
+                }
+            }
+            Set<String> sourceHosts = null;
+            if (filterBody.getSources() != null && !filterBody.getSources().isEmpty()) {
+                sourceHosts = new HashSet<String>();
+                for (ProtocolFragment source : filterBody.getSources()) {
+                    sourceHosts.add(source.getHost());
+                }
+            }
+            Set<String> targetHosts = null;
+            if (filterBody.getTargets() != null && !filterBody.getTargets().isEmpty()) {
+                targetHosts = new HashSet<String>();
+                for (ProtocolFragment target : filterBody.getTargets()) {
+                    targetHosts.add(target.getHost());
+                }
+            }
+            List<Operation> operations = filterBody.getOperations();
+            Set<Integer> operationValues = null;
+            if (filterBody.getOperations() != null && !filterBody.getOperations().isEmpty()) {
+                operationValues = new HashSet<Integer>();
+                for (Operation operation : filterBody.getOperations()) {
+                    switch(operation) {
+                    case COPY:
+                        operationValues.add(1);
+                        break;
+                    case MOVE:
+                        operationValues.add(2);
+                        break;
+                    case GETLIST:
+                        operationValues.add(3);
+                        break;
+                    case RENAME:
+                        operationValues.add(4);
+                        break;
+                    case COPYTOINTERNET:
+                        operationValues.add(5);
+                        break;
+                    case COPYFROMINTERNET:
+                        operationValues.add(6);
+                        break;
+                    default:
+                        operationValues.add(0);
+                        break;
+                    }
+                }
+            }
+            List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(operationValues, stateValues, filterBody
+                    .getMandator(), sourceHosts, targetHosts, filterBody.getIsIntervention(), filterBody.getHasIntervention(),
                     filterBody.getProfiles(), limit, dateFrom, dateTo);
             Transfers entity = new Transfers();
             List<Transfer> transfers = new ArrayList<Transfer>();

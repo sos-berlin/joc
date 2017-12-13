@@ -2,6 +2,7 @@ package com.sos.joc.db.yade;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.TemporalType;
 
@@ -181,8 +182,8 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
     
-    public List<DBItemYadeTransfers> getFilteredTransfers(List<Operation> operations, List<TransferStateText> states,
-            String mandator, List<ProtocolFragment> sources, List<ProtocolFragment> targets, Boolean isIntervention, 
+    public List<DBItemYadeTransfers> getFilteredTransfers(Set<Integer> operations, Set<Integer> states,
+            String mandator, Set<String> sourceHosts, Set<String> targetHosts, Boolean isIntervention, 
             Boolean hasInterventions, List<String> profiles, Integer limit, Date dateFrom, Date dateTo)
                     throws DBInvalidDataException, DBConnectionRefusedException {
         try {
@@ -191,8 +192,8 @@ public class JocDBLayerYade extends DBLayer {
                     (operations != null && !operations.isEmpty()) || 
                     (states != null && !states.isEmpty()) || 
                     mandator != null || 
-                    (sources != null && !sources.isEmpty()) || 
-                    (targets != null && !targets.isEmpty()) ||
+                    (sourceHosts != null && !sourceHosts.isEmpty()) || 
+                    (targetHosts != null && !targetHosts.isEmpty()) ||
                     isIntervention != null || 
                     hasInterventions != null || 
                     (profiles != null && !profiles.isEmpty()) || 
@@ -201,153 +202,79 @@ public class JocDBLayerYade extends DBLayer {
             StringBuilder sql = new StringBuilder();
             sql.append("select yt from ");
             sql.append(DBITEM_YADE_TRANSFERS).append(" yt,");
-            sql.append(DBITEM_YADE_PROTOCOLS).append(" yp");
+            sql.append(DBITEM_YADE_PROTOCOLS).append(" yps,");
+            sql.append(DBITEM_YADE_PROTOCOLS).append(" ypt");
+            sql.append(" where");
+            sql.append(" yt.sourceProtocolId = yps.id");
+            sql.append(" and");
+            sql.append(" yt.targetProtocolId = ypt.id");
             if (hasFilter) {
-                sql.append(" where");
                 if (operations != null && !operations.isEmpty()) {
-                    sql.append(" yt.operation in (");
-                    boolean first = true;
-                    for (Operation operation : operations) {
-                        if (first) {
-                            sql.append(operation.toString());
-                            first = false;
-                        } else {
-                            sql.append(",").append(operation.toString());
-                        }
-                    }
-                    sql.append(")");
-                    anotherValueAlreadySet = true;
+                    sql.append(" and");
+                    sql.append(" yt.operation in ( :operations)");
                 }
                 if (states != null && !states.isEmpty()) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
-                    sql.append(" yt.state in (");
-                    boolean first = true;
-                    for (TransferStateText state : states) {
-                        Integer stateDbValue = null;
-                        switch (state) {
-                        case SUCCESSFUL:
-                            stateDbValue = 1;
-                            break;
-                        case INCOMPLETE:
-                            stateDbValue = 2;
-                            break;
-                        case FAILED:
-                            stateDbValue = 3;
-                            break;
-                        }
-                        if (first) {
-                            sql.append(stateDbValue);
-                            first = false;
-                        } else {
-                            sql.append(",").append(stateDbValue);
-                        }
-                    }
-                    sql.append(")");
-                    anotherValueAlreadySet = true;
+                    sql.append(" and");
+                    sql.append(" yt.state in ( :states)");
                 }
                 if (mandator != null && !mandator.isEmpty()) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
+                    sql.append(" and");
                     sql.append(" yt.mandator = :mandator");
-                    anotherValueAlreadySet = true;
                 }
-                if (sources != null && !sources.isEmpty()) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
-                    boolean first = true;
-                    sql.append(" yt.sourceProtocolId in (");
-                    sql.append("select yp.id from yp");
-                    sql.append(" where yp.hostname in (");
-                    for (ProtocolFragment source : sources) {
-                        if (first) {
-                            sql.append(source.getHost());
-                            first = false;
-                        } else {
-                            sql.append(",").append(source.getHost());
-                        }
-                    }
-                    sql.append("))");
-                    anotherValueAlreadySet = true;
+                if (sourceHosts != null && !sourceHosts.isEmpty()) {
+                    sql.append(" and");
+                    sql.append(" yps.hostname in ( :sources)");
                 }
-                if (targets != null && !targets.isEmpty()) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
-                    boolean first = true;
-                    sql.append(" yt.targetProtocolId in (");
-                    sql.append("select yp.id from yp");
-                    sql.append(" where yp.hostname in (");
-                    for (ProtocolFragment source : sources) {
-                        if (first) {
-                            sql.append(source.getHost());
-                            first = false;
-                        } else {
-                            sql.append(",").append(source.getHost());
-                        }
-                    }
-                    sql.append("))");
-                    anotherValueAlreadySet = true;
+                if (targetHosts != null && !targetHosts.isEmpty()) {
+                    sql.append(" and");
+                    sql.append(" ypt.hostname in ( :targets)");
                 }
                 if (isIntervention != null) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
+                    sql.append(" and");
                     if (isIntervention) {
                         sql.append(" yt.parentTransferId != null");
                     } else {
                         sql.append(" yt.parentTransferId == null");
                     }
-                    anotherValueAlreadySet = true;
                 }
                 if (hasInterventions != null) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
+                    sql.append(" and");
                     sql.append(" yt.hasIntervention = :hasInterventions");
-                    anotherValueAlreadySet = true;
                 }
                 if (profiles != null && !profiles.isEmpty()) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
-                    sql.append(" yt.profileName in (");
-                    boolean first = true;
-                    for (String profile : profiles) {
-                        if (first) {
-                            sql.append(profile);
-                            first = false;
-                        } else {
-                            sql.append(",").append(profile);
-                        }
-                    }
-                    sql.append(")");
-                    anotherValueAlreadySet = true;
+                    sql.append(" and");
+                    sql.append(" yt.profileName in ( :profiles)");
                 }
                 if (dateFrom != null) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
+                    sql.append(" and");
                     sql.append(" yt.start >= :dateFrom");
-                    anotherValueAlreadySet = true;
                 }
                 if (dateTo != null) {
-                    if (anotherValueAlreadySet) {
-                        sql.append(" and");
-                    }
+                    sql.append(" and");
                     sql.append(" yt.end <= :dateTo");
-                    anotherValueAlreadySet = true;
                 }
             }
             Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
-            if(mandator != null && !mandator.isEmpty()) {
+            if (operations != null && !operations.isEmpty()) {
+                query.setParameterList("operations", operations);
+            }
+            if (states != null && !states.isEmpty()) {
+                query.setParameterList("states", states);
+            }
+            if (mandator != null && !mandator.isEmpty()) {
                 query.setParameter("mandator", mandator);
             }
-            if(hasInterventions != null) {
+            if (sourceHosts != null && !sourceHosts.isEmpty()) {
+                query.setParameter("sources", sourceHosts);
+            }
+            if (targetHosts != null && !targetHosts.isEmpty()) {
+                query.setParameter("targets", targetHosts);
+            }
+            if (hasInterventions != null) {
                 query.setParameter("hasInterventions", hasInterventions);
+            }
+            if (profiles != null && !profiles.isEmpty()) {
+                query.setParameterList("profiles", profiles);
             }
             if(dateFrom != null) {
                 query.setParameter("dateFrom", dateFrom, TemporalType.TIMESTAMP);
