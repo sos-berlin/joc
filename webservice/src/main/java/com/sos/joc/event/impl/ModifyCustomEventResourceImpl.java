@@ -161,9 +161,9 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             }
             String orderId = request + ":";
             if (modifyEvent.getExitCode() != null) {
-                orderId = modifyEvent.getEventClass() + ":" + modifyEvent.getEventId() + ":" + modifyEvent.getExitCode();
+                orderId = orderId + modifyEvent.getEventClass() + ":" + modifyEvent.getEventId() + ":" + modifyEvent.getExitCode();
             } else {
-                orderId = modifyEvent.getEventClass() + ":" + modifyEvent.getEventId();
+                orderId = orderId + modifyEvent.getEventClass() + ":" + modifyEvent.getEventId();
             }
             modifyOrder.setOrderId(orderId);
             modifyOrder.setTitle("Add event: " + modifyEvent.getEventClass() + ":" + modifyEvent.getEventId());
@@ -229,9 +229,9 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
                 ModifyOrder modifyOrder = new ModifyOrder();
                 String orderId = request + ":";
                 if (item.getExitCode() != null) {
-                    orderId = item.getEventClass() + ":" + item.getEventId() + ":" + item.getExitCode() + ":" + item.getId();
+                    orderId = orderId + item.getEventClass() + ":" + item.getEventId() + ":" + item.getExitCode() + ":" + item.getId();
                 } else {
-                    orderId = item.getEventClass() + ":" + item.getEventId() + "::" + item.getId();
+                    orderId = orderId + item.getEventClass() + ":" + item.getEventId() + "::" + item.getId();
                 }
                 modifyOrder.setJobChain(SOS_EVENTS_SCHEDULER_EVENT_SERVICE);
                 modifyOrder.setOrderId(orderId);
