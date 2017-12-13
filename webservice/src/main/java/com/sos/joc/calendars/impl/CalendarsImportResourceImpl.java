@@ -6,9 +6,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -54,7 +56,7 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
     private static final String API_CALL = "./calendars/import";
     private List<Err419> listOfErrors = new ArrayList<Err419>();
     private List<String> eventCommands = new ArrayList<String>();
-    private Map<String, Boolean> updateJobOrderScheduleIsNecessary = new HashMap<String, Boolean>();
+    private Set<Calendar> updateJobOrderScheduleIsNecessary = new HashSet<Calendar>();
     private Map<String, List<String>> newDatesMap = new HashMap<String, List<String>>();
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -135,9 +137,9 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                     }
                 }
 
-                for (Calendar calendar : calendars) {
-                    if (calendar.getBasedOn() == null || calendar.getBasedOn().isEmpty()) {
-                        if (updateJobOrderScheduleIsNecessary.get(calendar.getPath()) && calendarsMap.containsKey(calendar.getPath())) {
+                if (updateJobOrderScheduleIsNecessary != null) {
+                    for (Calendar calendar : updateJobOrderScheduleIsNecessary) {
+                        if (calendarsMap.containsKey(calendar.getPath())) {
                             CalendarUsagesAndInstance calendarUsageInstance = new CalendarUsagesAndInstance(dbItemInventoryInstance, false);
                             List<DBItemInventoryCalendarUsage> dbCalendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarsMap.get(calendar
                                     .getPath()).getId());
@@ -285,8 +287,8 @@ public class CalendarsImportResourceImpl extends JOCResourceImpl implements ICal
                 boolean updateIsNecessary = (!newDates.getDates().equals(oldDates.getDates()));
                 if (updateIsNecessary) {
                     newDatesMap.put(calendar.getPath(), newDates.getDates());
+                    updateJobOrderScheduleIsNecessary.add(calendar);
                 }
-                updateJobOrderScheduleIsNecessary.put(calendar.getPath(), updateIsNecessary);
                 if ((calendar.getType() != null && !calendar.getType().name().equals(calendarDbItem.getType()))) {
                     List<DBItemInventoryCalendarUsage> dbCalendarUsages = calendarUsageDbLayer.getCalendarUsages(calendarDbItem.getId());
                     if (dbCalendarUsages != null && !dbCalendarUsages.isEmpty()) {
