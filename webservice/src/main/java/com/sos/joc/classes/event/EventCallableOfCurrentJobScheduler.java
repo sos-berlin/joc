@@ -183,7 +183,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
             Globals.disconnect(connection);
             connection = null;
         }
-        return null;
+        return events;
     }
 
     @Override
