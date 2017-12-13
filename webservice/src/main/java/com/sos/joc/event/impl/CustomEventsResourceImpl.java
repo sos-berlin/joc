@@ -59,7 +59,7 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
                 schedulerEventFilter.setIntervalFrom(JobSchedulerDate.getDateFrom(eventFilter.getDateFrom(), eventFilter.getTimeZone()));
             }
             if (eventFilter.getDateTo() != null) {
-                schedulerEventFilter.setIntervalTo(JobSchedulerDate.getDateFrom(eventFilter.getDateFrom(), eventFilter.getTimeZone()));
+                schedulerEventFilter.setIntervalTo(JobSchedulerDate.getDateTo(eventFilter.getDateTo(), eventFilter.getTimeZone()));
             }
 
             Integer limit = 0;
