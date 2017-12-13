@@ -146,10 +146,32 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
         return events;
     }
     
-//    private Events createEventsOfJobsAndOrdersWhichUseSchedule(String schedule) {
-//        //
-//        return null;
-//    }
+    private Events createEventforJobAndOrderWhichUseSchedule(String path) {
+//        Events events = new Events();
+//        try {
+//            if (connection == null) {
+//                connection = Globals.createSosHibernateStatelessConnection("eventCallable-" + jobSchedulerEvent.getJobschedulerId());
+//            }
+//            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+//            Globals.beginTransaction(connection);
+//            DBItemInventoryInstance inst = dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerEvent.getJobschedulerId(), accessToken);
+//            shiroUser.addSchedulerInstanceDBItem(jobSchedulerEvent.getJobschedulerId(), inst);
+//            Globals.rollback(connection);
+//            Globals.urlFromJobSchedulerId.put(jobSchedulerEvent.getJobschedulerId(), inst);
+//            if (!instance.equals(inst)) {
+//                EventSnapshot masterChangedEventSnapshot = new EventSnapshot();
+//                masterChangedEventSnapshot.setEventType("CurrentJobSchedulerChanged");
+//                masterChangedEventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+//                masterChangedEventSnapshot.setPath(inst.getUrl());
+//                events.put(masterChangedEventSnapshot);
+//            }
+//        } catch (Exception e) {
+//        } finally {
+//            Globals.disconnect(connection);
+//            connection = null;
+//        }
+        return null;
+    }
 
     @Override
     protected List<EventSnapshot> getEventSnapshots(String eventId) throws JocException {
@@ -221,9 +243,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             removedObjects.add(eventSnapshot.getPath() + "." + eventSnapshot.getObjectType().name());
                             break;
                         }
-//                        if (JobSchedulerObjectType.SCHEDULE == eventSnapshot.getObjectType()) {
-//                            //JOC-242
-//                        }
+                        if (JobSchedulerObjectType.SCHEDULE == eventSnapshot.getObjectType()) {
+                            //JOC-242
+                            createEventforJobAndOrderWhichUseSchedule(eventSnapshot.getPath());
+                        }
                         
                     } else if (variables.containsKey(CustomEventType.DailyPlanChanged.name())) {
                         eventSnapshot.setEventType(CustomEventType.DailyPlanChanged.name());
@@ -261,6 +284,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setObjectType(JobSchedulerObjectType.WORKINGDAYSCALENDAR);
                         }
                         eventSnapshot.setPath(variables.getString("path", null));
+                    } else if (eventKey.startsWith("CustomEvent")) {
+                        eventSnapshot.setEventType(eventKey); //CustomEventAdded, CustomEventDeleted
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
+                        eventSnapshot.setPath(eventSnapshot.getEventType());
                     } else {
                         continue;
                     }
