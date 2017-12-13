@@ -3,6 +3,7 @@ package com.sos.joc.db.inventory.schedules;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.TemporalType;
 
@@ -158,6 +159,31 @@ public class InventorySchedulesDBLayer extends DBLayer {
             sql.append(" and instanceId = :instanceId");
             Query<T> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
+            query.setParameter("instanceId", instanceId);
+            return getSession().getResultList(query);
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+    
+    
+    public <T> List<String> getUsedIn(Set<String> schedulePaths, Long instanceId, Class<T> clazz)
+            throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            if (schedulePaths == null || schedulePaths.isEmpty()) {
+                return null;
+            }
+            StringBuilder sql = new StringBuilder();
+            sql.append("select jo.name from ").append(clazz.getSimpleName()).append(" jo, ");
+            sql.append(DBITEM_INVENTORY_SCHEDULES).append(" s ");
+            sql.append(" where jo.scheduleId != 0");
+            sql.append(" and jo.instanceId = :instanceId");
+            sql.append(" and (s.id = jo.scheduleId or s.substituteId = jo.scheduleId)");
+            sql.append(" and s.name in (:schedulePaths)");
+            Query<String> query = getSession().createQuery(sql.toString());
+            query.setParameter("schedulePaths", schedulePaths);
             query.setParameter("instanceId", instanceId);
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {
