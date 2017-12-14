@@ -31,7 +31,7 @@ public interface IModifyCustomEventResource {
             @HeaderParam("X-Access-Token") String accessToken, ModifyOrders modifyEvent) throws Exception;
     
     @POST
-    @Path("custom/delete_event")
+    @Path("custom/delete_events")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
     public JOCDefaultResponse deleteEvent(            
