@@ -182,13 +182,14 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
     
-    public List<DBItemYadeTransfers> getFilteredTransfers(Set<Integer> operations, Set<Integer> states,
+    public List<DBItemYadeTransfers> getFilteredTransfers(List<Long> transferIds, Set<Integer> operations, Set<Integer> states,
             String mandator, Set<String> sourceHosts, Set<String> targetHosts, Boolean isIntervention, 
             Boolean hasInterventions, List<String> profiles, Integer limit, Date dateFrom, Date dateTo)
                     throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             boolean anotherValueAlreadySet = false;
             boolean hasFilter = (
+                    (transferIds != null && !transferIds.isEmpty()) ||
                     (operations != null && !operations.isEmpty()) || 
                     (states != null && !states.isEmpty()) || 
                     mandator != null || 
@@ -209,6 +210,10 @@ public class JocDBLayerYade extends DBLayer {
             sql.append(" and");
             sql.append(" yt.targetProtocolId = ypt.id");
             if (hasFilter) {
+                if (transferIds != null && !transferIds.isEmpty()) {
+                    sql.append(" and");
+                    sql.append(" yt.id in ( :transferIds)");
+                }
                 if (operations != null && !operations.isEmpty()) {
                     sql.append(" and");
                     sql.append(" yt.operation in ( :operations)");
@@ -255,6 +260,9 @@ public class JocDBLayerYade extends DBLayer {
                 }
             }
             Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
+            if (transferIds != null && !transferIds.isEmpty()) {
+                query.setParameter("transferIds", transferIds);
+            }
             if (operations != null && !operations.isEmpty()) {
                 query.setParameterList("operations", operations);
             }

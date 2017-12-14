@@ -1,5 +1,6 @@
 package com.sos.joc.classes.yade;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +37,12 @@ public class TransferFileUtils {
         transferFile.setInterventionTransferId(file.getInterventionTransferId());
         transferFile.setModificationDate(file.getModificationDate());
         transferFile.setSize(file.getSize());
+        transferFile.setSourceName(Paths.get(file.getSourcePath()).getFileName().toString());
         transferFile.setSourcePath(file.getSourcePath());
-        transferFile.setTargetPath(file.getTargetPath());
+        if (file.getTargetPath() != null && !file.getTargetPath().isEmpty()) {
+            transferFile.setTargetName(Paths.get(file.getTargetPath()).getFileName().toString());
+            transferFile.setTargetPath(file.getTargetPath());
+        }
         transferFile.setTransferId(file.getTransferId());
         // determine state value and severity
         transferFile.setState(initFileTransferStateFromDBItemState(file.getState()));
@@ -102,7 +107,7 @@ public class TransferFileUtils {
             state.setSeverity(1);
             break;
         case 14:
-            state.set_text(FileTransferStateText.SETBACK);
+            state.set_text(FileTransferStateText.ROLLED_BACK);
             state.setSeverity(5);
             break;
         case 15:
@@ -142,7 +147,7 @@ public class TransferFileUtils {
             return 12;
         case IGNORED_DUE_TO_ZEROBYTE_CONSTRAINT:
             return 13;
-        case SETBACK:
+        case ROLLED_BACK:
             return 14;
         case POLLING:
             return 15;

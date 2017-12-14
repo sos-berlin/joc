@@ -94,7 +94,6 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                     targetHosts.add(target.getHost());
                 }
             }
-            List<Operation> operations = filterBody.getOperations();
             Set<Integer> operationValues = null;
             if (filterBody.getOperations() != null && !filterBody.getOperations().isEmpty()) {
                 operationValues = new HashSet<Integer>();
@@ -124,7 +123,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                     }
                 }
             }
-            List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(operationValues, stateValues, filterBody
+            List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(filterBody.getTransferIds(), operationValues, stateValues, filterBody
                     .getMandator(), sourceHosts, targetHosts, filterBody.getIsIntervention(), filterBody.getHasIntervention(),
                     filterBody.getProfiles(), limit, dateFrom, dateTo);
             Transfers entity = new Transfers();
