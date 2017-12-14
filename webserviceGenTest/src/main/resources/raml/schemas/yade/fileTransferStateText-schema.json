@@ -19,7 +19,7 @@
     "DELETED",
     "RENAMED",
     "IGNORED_DUE_TO_ZEROBYTE_CONSTRAINT",
-    "SETBACK",
+    "ROLLED_BACK",
     "POLLING"
   ]
 }

@@ -52,7 +52,7 @@ resourceTypes:
   - postJSON: !include resourceTypes/common/postJSON.raml
   - postJSONWithOptionalJSId: !include resourceTypes/common/postJSONWithOptionalJSId.raml
   - postJSONWithoutJSId: !include resourceTypes/common/postJSONWithoutJSId.raml
-  - postJSON15: !include resourceTypes/common/postJSON15.raml
+  - postJSON16: !include resourceTypes/common/postJSON16.raml
   - postYADEJSONWithOkResponse: !include resourceTypes/yade/postJSONWithOkResponse.raml
   - postOnlyAccessToken: !include resourceTypes/common/postOnlyAccessToken.raml
   - postOnlyId: !include resourceTypes/common/postOnlyId.raml
@@ -1927,23 +1927,24 @@ traits:
 
   /transfers:
     type:
-      postJSON15:
+      postJSON16:
         description: Responds YADE transfers
-        description1: !include documentation/common/compact.md
-        description2: !include documentation/common/dateFrom.md
-        description3: !include documentation/common/dateTo.md
-        description4: !include documentation/common/timeZone.md
-        description5: !include documentation/yade/operations.md
-        description6: !include documentation/yade/states.md
-        description7: !include documentation/yade/mandator.md
-        description8: !include documentation/yade/source.md
-        description9: !include documentation/yade/target.md
-        description10: !include documentation/yade/hasIntervention.md
-        description11: !include documentation/yade/isIntervention.md
-        description12: !include documentation/yade/profile.md
-        description13: !include documentation/yade/sourcePath.md
-        description14: !include documentation/yade/targetPath.md
-        description15: !include documentation/common/limit.md
+        description1: !include documentation/yade/transferIds.md
+        description2: !include documentation/common/compact.md
+        description3: !include documentation/common/dateFrom.md
+        description4: !include documentation/common/dateTo.md
+        description5: !include documentation/common/timeZone.md
+        description6: !include documentation/yade/operations.md
+        description7: !include documentation/yade/states.md
+        description8: !include documentation/yade/mandator.md
+        description9: !include documentation/yade/source.md
+        description10: !include documentation/yade/target.md
+        description11: !include documentation/yade/hasIntervention.md
+        description12: !include documentation/yade/isIntervention.md
+        description13: !include documentation/yade/profile.md
+        description14: !include documentation/yade/sourcePath.md
+        description15: !include documentation/yade/targetPath.md
+        description16: !include documentation/common/limit.md
         description200: !include documentation/yade/transfers.md
         schema: !include schemas/yade/transferFilter-schema.json
         schema200: !include schemas/yade/transfers-schema.json

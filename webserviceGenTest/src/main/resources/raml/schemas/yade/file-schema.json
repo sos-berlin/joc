@@ -40,7 +40,13 @@
     "sourcePath": {
       "type": "string"
     },
+    "sourceName": {
+      "type": "string"
+    },
     "targetPath": {
+      "type": "string"
+    },
+    "targetName": {
       "type": "string"
     }
   }
