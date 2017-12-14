@@ -215,6 +215,10 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             return Operation.GETLIST;
         case 4:
             return Operation.RENAME;
+        case 5:
+            return Operation.COPYTOINTERNET;
+        case 6:
+            return Operation.COPYFROMINTERNET;
         default:
             return null;
         }
