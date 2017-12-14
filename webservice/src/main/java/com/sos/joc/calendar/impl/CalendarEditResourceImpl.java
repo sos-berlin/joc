@@ -158,11 +158,13 @@ public class CalendarEditResourceImpl extends JOCResourceImpl implements ICalend
                     try {
                         connection.beginTransaction();
                         for (DBItemInventoryCalendarUsage item : calendarUsages) {
-                            Calendar c = objMapper.readValue(item.getConfiguration(), Calendar.class);
-                            c.setBasedOn(calendar.getPath());
-                            item.setConfiguration(objMapper.writeValueAsString(c));
-                            calendarUsageDbLayer.updateCalendarUsage(item);
-                            eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(item.getPath(), item.getObjectType(), "CalendarUsageUpdated"));
+                            if (item.getConfiguration() != null) {
+                                Calendar c = objMapper.readValue(item.getConfiguration(), Calendar.class);
+                                c.setBasedOn(calendar.getPath());
+                                item.setConfiguration(objMapper.writeValueAsString(c));
+                                calendarUsageDbLayer.updateCalendarUsage(item);
+                                eventCommands.add(SendCalendarEventsUtil.addCalUsageEvent(item.getPath(), item.getObjectType(), "CalendarUsageUpdated"));
+                            }
                         }
                         connection.commit();
                     } catch (JocException e) {
