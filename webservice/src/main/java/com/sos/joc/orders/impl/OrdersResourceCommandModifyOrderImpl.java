@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 
 import org.dom4j.Element;
 
+import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateInvalidSessionException;
 import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
@@ -87,7 +88,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
 
     public JOCDefaultResponse postOrdersResume(String accessToken, ModifyOrders modifyOrders) {
         try {
-            return postOrdersCommand(accessToken, "resume", getPermissonsJocCockpit(accessToken).getOrder().getExecute().isResume(), modifyOrders);
+            SOSPermissionJocCockpit perm = getPermissonsJocCockpit(accessToken);
+            boolean hasResumeOrderPerm = perm.getOrder().getExecute().isResume() || perm.getYADE().getExecute().isTransferStart();
+            return postOrdersCommand(accessToken, "resume", hasResumeOrderPerm, modifyOrders);
         } catch (JocException e) {
             e.addErrorMetaInfo(getJocError());
             return JOCDefaultResponse.responseStatusJSError(e);

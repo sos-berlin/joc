@@ -17,9 +17,6 @@ import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
 import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.model.yade.FileTransferStateText;
-import com.sos.joc.model.yade.Operation;
-import com.sos.joc.model.yade.ProtocolFragment;
-import com.sos.joc.model.yade.TransferStateText;
 
 
 public class JocDBLayerYade extends DBLayer {
@@ -187,7 +184,6 @@ public class JocDBLayerYade extends DBLayer {
             Boolean hasInterventions, List<String> profiles, Integer limit, Date dateFrom, Date dateTo)
                     throws DBInvalidDataException, DBConnectionRefusedException {
         try {
-            boolean anotherValueAlreadySet = false;
             boolean hasFilter = (
                     (transferIds != null && !transferIds.isEmpty()) ||
                     (operations != null && !operations.isEmpty()) || 
