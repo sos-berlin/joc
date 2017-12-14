@@ -6,13 +6,13 @@
   "type": "object",
   "oneOf": [
     {
-      "description": "as child of nodes only path is required and nothing optional",
+      "description": "as child of nodes only path is required and processClass is optional",
       "required": [
         "path"
       ]
     },
     {
-      "description": "compact=true then ONLY required fields are responded and title is optional",
+      "description": "compact=true then ONLY required fields are responded and title, processClass are optional",
       "required": [
         "surveyDate",
         "path",

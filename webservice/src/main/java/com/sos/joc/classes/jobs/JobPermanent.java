@@ -26,8 +26,8 @@ public class JobPermanent {
             connection = Globals.createSosHibernateStatelessConnection("getEstimatedDurationInSeconds");
 
             DBLayerReporting dbLayer = new DBLayerReporting(connection);
-            Long estimatedDurationInMillis = dbLayer.getTaskEstimatedDuration(job.getName(), Globals.sosShiroProperties.getProperty("limit_for_average_calculation",
-                    WebserviceConstants.DEFAULT_LIMIT));
+            Long estimatedDurationInMillis = dbLayer.getTaskEstimatedDuration(job.getName(), Globals.sosShiroProperties.getProperty(
+                    "limit_for_average_calculation", WebserviceConstants.DEFAULT_LIMIT));
             if (estimatedDurationInMillis != null) {
                 return estimatedDurationInMillis.intValue() / 1000;
             }
@@ -86,19 +86,19 @@ public class JobPermanent {
             } else {
                 job.setEstimatedDuration(0);
             }
-        }
-        
-        if (compact == null || !compact) {
-            if (inventoryJob.getProcessClassName() != null && !inventoryJob.getProcessClassName().isEmpty() && !inventoryJob.getProcessClassName().equalsIgnoreCase(
-                    DBLayer.DEFAULT_NAME)) {
+            if (inventoryJob.getProcessClassName() != null && !inventoryJob.getProcessClassName().isEmpty() && !inventoryJob.getProcessClassName()
+                    .equalsIgnoreCase(DBLayer.DEFAULT_NAME)) {
                 job.setProcessClass(inventoryJob.getProcessClassName());
             } else if (inventoryJob.getProcessClass() != null) {
                 job.setProcessClass(inventoryJob.getProcessClass());
             }
+        }
+
+        if (compact == null || !compact) {
             List<LockUseP> locks = JobPermanent.getLocks(inventoryJob, dbLayer, instanceId);
-            //if (locks != null && !locks.isEmpty()) {
-                job.setLocks(locks);
-            //}
+            // if (locks != null && !locks.isEmpty()) {
+            job.setLocks(locks);
+            // }
             if (job.getIsOrderJob()) {
                 List<DBItemInventoryJobChain> jobChainsFromDb = JobPermanent.getJobChains(inventoryJob, dbLayer, instanceId);
                 if (jobChainsFromDb != null && !jobChainsFromDb.isEmpty()) {

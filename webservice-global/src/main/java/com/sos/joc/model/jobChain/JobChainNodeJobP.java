@@ -12,7 +12,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
-    "path"
+    "path",
+    "processClass"
 })
 public class JobChainNodeJobP {
 
@@ -25,6 +26,14 @@ public class JobChainNodeJobP {
      */
     @JsonProperty("path")
     private String path;
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     */
+    @JsonProperty("processClass")
+    private String processClass;
 
     /**
      * path
@@ -54,6 +63,32 @@ public class JobChainNodeJobP {
         this.path = path;
     }
 
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     * @return
+     *     The processClass
+     */
+    @JsonProperty("processClass")
+    public String getProcessClass() {
+        return processClass;
+    }
+
+    /**
+     * path
+     * <p>
+     * absolute path based on live folder of a JobScheduler object.
+     * 
+     * @param processClass
+     *     The processClass
+     */
+    @JsonProperty("processClass")
+    public void setProcessClass(String processClass) {
+        this.processClass = processClass;
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
@@ -61,7 +96,7 @@ public class JobChainNodeJobP {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).toHashCode();
+        return new HashCodeBuilder().append(path).append(processClass).toHashCode();
     }
 
     @Override
@@ -73,7 +108,7 @@ public class JobChainNodeJobP {
             return false;
         }
         JobChainNodeJobP rhs = ((JobChainNodeJobP) other);
-        return new EqualsBuilder().append(path, rhs.path).isEquals();
+        return new EqualsBuilder().append(path, rhs.path).append(processClass, rhs.processClass).isEquals();
     }
 
 }
