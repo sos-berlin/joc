@@ -44,6 +44,9 @@
       "properties": {
         "path": {
           "$ref": "../common/path-schema.json"
+        },
+        "processClass": {
+          "$ref": "../common/path-schema.json"
         }
       }
     },

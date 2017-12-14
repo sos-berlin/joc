@@ -10,14 +10,15 @@ It depends on the parameter ``compact``.<br/>
     * maxTasks (default:1)
     * hasDescription (default:false)
 * The compact view has the following optional fields
+    * processClass
     * title
 * The detailed view has the following required fields in addition to the compact view
     * configurationDate
 * The detailed view has the following optional fields in addition to the compact view
-    * processClass
     * params
     * locks
     * jobChains (only for order jobs)
 * A job object as child of a job chain node in the response have only the following required fields
     * path
+    * processClass
 * and doesn't have any optional fields
