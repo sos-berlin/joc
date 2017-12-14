@@ -72,6 +72,7 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
 
             for (SchedulerEventDBItem item : listOfEvents) {
                 Event event = new Event();
+                event.setId(item.getId());
                 event.setCreated(item.getCreated());
                 event.setEventClass(item.getEventClass());
                 event.setEventId(item.getEventId());

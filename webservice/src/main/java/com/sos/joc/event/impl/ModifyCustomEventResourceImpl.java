@@ -1,6 +1,7 @@
 package com.sos.joc.event.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,8 +186,9 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 
             modifyOrders.setOrders(listOfOrders);
             addEvent(accessToken, modifyOrders);
-
-            return JOCDefaultResponse.responseStatus200("JobScheduler response: OK");
+ 
+            
+            return JOCDefaultResponse.responseStatusJSOk(new Date());
         } catch (JobSchedulerBadRequestException e) {
             String errorOutput = "JobScheduler reports error: " + e.getError().getMessage();
             return JOCDefaultResponse.responsePlainStatus420(errorOutput);
@@ -255,8 +257,9 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 
             modifyOrders.setOrders(listOfOrders);
             removeEvent(accessToken, modifyOrders);
-
-            return JOCDefaultResponse.responseStatus200("JobScheduler response: OK");
+            
+            
+            return JOCDefaultResponse.responseStatus200(new Date());
         } catch (JobSchedulerBadRequestException e) {
             String errorOutput = "JobScheduler reports error: " + e.getError().getMessage();
             return JOCDefaultResponse.responsePlainStatus420(errorOutput);
