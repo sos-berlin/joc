@@ -185,6 +185,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                         transfer.setTarget(targetFragment);
                     }
                 }
+                transfer.setTaskId(transferFromDb.getTaskId());
                 if (!compact) {
                     transfer.setJob(transferFromDb.getJob());
                     transfer.setJobChain(transferFromDb.getJobChain());
