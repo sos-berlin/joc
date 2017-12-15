@@ -199,6 +199,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 if (order.getParams() != null && !order.getParams().isEmpty()) {
                     xml.add(getParams(order.getParams()));
                 }
+                if (order.getEndState() != null && !"".equals(order.getEndState())) {
+                    xml.addAttribute("end_state", order.getEndState());
+                }
+                if (order.getState() != null && !"".equals(order.getState())) {
+                    xml.addAttribute("state", order.getState());
+                }
                 break;
             case "set_state":
                 if (order.getEndState() != null && !"".equals(order.getEndState())) {
@@ -217,6 +223,9 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                         xml.addAttribute("suspended", "no");
                     }
                 }
+                if (order.getParams() != null && !order.getParams().isEmpty()) {
+                    xml.add(getParams(order.getParams()));
+                }
                 break;
             case "suspend":
                 xml.addAttribute("suspended", "yes");
@@ -225,6 +234,12 @@ public class OrdersResourceCommandModifyOrderImpl extends JOCResourceImpl implem
                 xml.addAttribute("suspended", "no");
                 if (order.getParams() != null && !order.getParams().isEmpty()) {
                     xml.add(getParams(order.getParams()));
+                }
+                if (order.getEndState() != null && !"".equals(order.getEndState())) {
+                    xml.addAttribute("end_state", order.getEndState());
+                }
+                if (order.getState() != null && !"".equals(order.getState())) {
+                    xml.addAttribute("state", order.getState());
                 }
                 break;
             case "reset":

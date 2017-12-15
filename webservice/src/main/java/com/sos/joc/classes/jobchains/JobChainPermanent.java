@@ -10,7 +10,6 @@ import java.util.Set;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChain;
 import com.sos.jitl.reporting.db.DBItemInventoryJobChainNode;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.joc.db.inventory.jobchains.InventoryJobChainNodeWithProcessClass;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.model.jobChain.EndNode;
 import com.sos.joc.model.jobChain.FileWatchingNodeP;
@@ -23,13 +22,13 @@ public class JobChainPermanent {
 
     public static final Set<String> NESTED_JOB_CHAIN_NAMES = new HashSet<String>();
 
-    public static JobChainP initJobChainP(InventoryJobChainsDBLayer dbLayer, DBItemInventoryJobChain inventoryJobChain, Boolean compact,
+    public static JobChainP initJobChainP(InventoryJobChainsDBLayer dbLayer, DBItemInventoryJobChain inventoryJobChain, Map<Long,String> processClassJobs, Boolean compact,
             Long instanceId) throws Exception {
         JobChainP jobChain = new JobChainP();
         jobChain.setSurveyDate(inventoryJobChain.getModified());
         jobChain.setPath(inventoryJobChain.getName());
         jobChain.setName(inventoryJobChain.getBaseName());
-        List<InventoryJobChainNodeWithProcessClass> jobChainNodesFromDb = dbLayer.getJobChainNodesByJobChainId(inventoryJobChain.getId(), instanceId);
+        List<DBItemInventoryJobChainNode> jobChainNodesFromDb = dbLayer.getJobChainNodesByJobChainId(inventoryJobChain.getId(), instanceId);
         jobChain.setTitle(inventoryJobChain.getTitle());
         jobChain.setMaxOrders(inventoryJobChain.getMaxOrders());
         jobChain.setDistributed(inventoryJobChain.getDistributed());
@@ -52,8 +51,7 @@ public class JobChainPermanent {
             Map<String,Integer> levels = new HashMap<String,Integer>();
             if (jobChainNodesFromDb != null) {
                 int numOfNodes = 0;
-                for (InventoryJobChainNodeWithProcessClass nodeWithProcessClass : jobChainNodesFromDb) {
-                    DBItemInventoryJobChainNode node = nodeWithProcessClass.getdBItemInventoryJobChainNode();
+                for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
                     switch (node.getNodeType()) {
                     case 1:
                         // JobNode -> Nodes
@@ -66,7 +64,7 @@ public class JobChainPermanent {
                         JobChainNodeJobP job = new JobChainNodeJobP();
                         if (node.getJob() != null && !"".equalsIgnoreCase(node.getJob())) {
                             job.setPath(node.getJobName());
-                            job.setProcessClass(nodeWithProcessClass.getProcessClass());
+                            job.setProcessClass(processClassJobs.get(node.getJobId()));
                             jobChainNode.setJob(job);
                         } else {
                             jobChainNode.setJob(null);
@@ -162,8 +160,8 @@ public class JobChainPermanent {
         } else {
             if (jobChainNodesFromDb != null) {
                 int numOfNodes = 0;
-                for (InventoryJobChainNodeWithProcessClass node : jobChainNodesFromDb) {
-                    if (node.getdBItemInventoryJobChainNode().getNodeType() < 3) { //JobNode and JobChainNode
+                for (DBItemInventoryJobChainNode node : jobChainNodesFromDb) {
+                    if (node.getNodeType() < 3) { //JobNode and JobChainNode
                         numOfNodes += 1;  
                     }
                 }
