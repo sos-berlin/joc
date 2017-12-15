@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.12.12 um 03:35:37 PM CET 
+// Generiert: 2017.12.15 um 04:07:54 PM CET 
 //
 
 
@@ -717,6 +717,27 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
+ *         &lt;element name="Runtime">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="execute">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;sequence>
+ *                             &lt;element name="editXml" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                           &lt;/sequence>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="isAuthenticated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="user" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -750,7 +771,8 @@ import javax.xml.bind.annotation.XmlType;
     "jocConfigurations",
     "sosPermissionRoles",
     "yade",
-    "calendar"
+    "calendar",
+    "runtime"
 })
 @XmlRootElement(name = "SOSPermissionJocCockpit")
 public class SOSPermissionJocCockpit {
@@ -793,6 +815,8 @@ public class SOSPermissionJocCockpit {
     protected SOSPermissionJocCockpit.YADE yade;
     @XmlElement(name = "Calendar", required = true)
     protected SOSPermissionJocCockpit.Calendar calendar;
+    @XmlElement(name = "Runtime", required = true)
+    protected SOSPermissionJocCockpit.Runtime runtime;
     @XmlAttribute(name = "isAuthenticated")
     protected Boolean isAuthenticated;
     @XmlAttribute(name = "user")
@@ -1258,6 +1282,30 @@ public class SOSPermissionJocCockpit {
      */
     public void setCalendar(SOSPermissionJocCockpit.Calendar value) {
         this.calendar = value;
+    }
+
+    /**
+     * Ruft den Wert der runtime-Eigenschaft ab.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SOSPermissionJocCockpit.Runtime }
+     *     
+     */
+    public SOSPermissionJocCockpit.Runtime getRuntime() {
+        return runtime;
+    }
+
+    /**
+     * Legt den Wert der runtime-Eigenschaft fest.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SOSPermissionJocCockpit.Runtime }
+     *     
+     */
+    public void setRuntime(SOSPermissionJocCockpit.Runtime value) {
+        this.runtime = value;
     }
 
     /**
@@ -6038,6 +6086,117 @@ public class SOSPermissionJocCockpit {
              */
             public void setConfiguration(boolean value) {
                 this.configuration = value;
+            }
+
+        }
+
+    }
+
+
+    /**
+     * <p>Java-Klasse für anonymous complex type.
+     * 
+     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="execute">
+     *           &lt;complexType>
+     *             &lt;complexContent>
+     *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *                 &lt;sequence>
+     *                   &lt;element name="editXml" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                 &lt;/sequence>
+     *               &lt;/restriction>
+     *             &lt;/complexContent>
+     *           &lt;/complexType>
+     *         &lt;/element>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "execute"
+    })
+    public static class Runtime {
+
+        @XmlElement(required = true)
+        protected SOSPermissionJocCockpit.Runtime.Execute execute;
+
+        /**
+         * Ruft den Wert der execute-Eigenschaft ab.
+         * 
+         * @return
+         *     possible object is
+         *     {@link SOSPermissionJocCockpit.Runtime.Execute }
+         *     
+         */
+        public SOSPermissionJocCockpit.Runtime.Execute getExecute() {
+            return execute;
+        }
+
+        /**
+         * Legt den Wert der execute-Eigenschaft fest.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link SOSPermissionJocCockpit.Runtime.Execute }
+         *     
+         */
+        public void setExecute(SOSPermissionJocCockpit.Runtime.Execute value) {
+            this.execute = value;
+        }
+
+
+        /**
+         * <p>Java-Klasse für anonymous complex type.
+         * 
+         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * 
+         * <pre>
+         * &lt;complexType>
+         *   &lt;complexContent>
+         *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+         *       &lt;sequence>
+         *         &lt;element name="editXml" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *       &lt;/sequence>
+         *     &lt;/restriction>
+         *   &lt;/complexContent>
+         * &lt;/complexType>
+         * </pre>
+         * 
+         * 
+         */
+        @XmlAccessorType(XmlAccessType.FIELD)
+        @XmlType(name = "", propOrder = {
+            "editXml"
+        })
+        public static class Execute {
+
+            protected boolean editXml;
+
+            /**
+             * Ruft den Wert der editXml-Eigenschaft ab.
+             * 
+             */
+            public boolean isEditXml() {
+                return editXml;
+            }
+
+            /**
+             * Legt den Wert der editXml-Eigenschaft fest.
+             * 
+             */
+            public void setEditXml(boolean value) {
+                this.editXml = value;
             }
 
         }

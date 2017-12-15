@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.12.12 um 03:35:37 PM CET 
+// Generiert: 2017.12.15 um 04:07:54 PM CET 
 //
 
 
@@ -135,6 +135,14 @@ public class ObjectFactory {
      */
     public SOSPermissionCommands.JobschedulerMaster.Execute createSOSPermissionCommandsJobschedulerMasterExecute() {
         return new SOSPermissionCommands.JobschedulerMaster.Execute();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Runtime }
+     * 
+     */
+    public SOSPermissionJocCockpit.Runtime createSOSPermissionJocCockpitRuntime() {
+        return new SOSPermissionJocCockpit.Runtime();
     }
 
     /**
@@ -527,6 +535,14 @@ public class ObjectFactory {
      */
     public SOSPermissionCommands.JobschedulerMaster.Execute.Restart createSOSPermissionCommandsJobschedulerMasterExecuteRestart() {
         return new SOSPermissionCommands.JobschedulerMaster.Execute.Restart();
+    }
+
+    /**
+     * Create an instance of {@link SOSPermissionJocCockpit.Runtime.Execute }
+     * 
+     */
+    public SOSPermissionJocCockpit.Runtime.Execute createSOSPermissionJocCockpitRuntimeExecute() {
+        return new SOSPermissionJocCockpit.Runtime.Execute();
     }
 
     /**
