@@ -39,7 +39,13 @@ public class Events {
     
     public void put(EventSnapshot event) {
         if ("AuditLogChanged".equals(event.getEventType())) {
-            this.events.putIfAbsent("AuditLogChanged." + event.getPath() + "." + event.getObjectType().name(), event); 
+            this.events.putIfAbsent(event.getEventType() + "." + event.getPath() + "." + event.getObjectType().name(), event); 
+        } else if (event.getEventType().startsWith("YADE")) {
+            this.events.putIfAbsent(event.getEventType() + "." + event.getPath() + "." + event.getObjectType().name(), event); 
+        } else if (event.getEventType().startsWith("CustomEvent")) {
+            this.events.putIfAbsent(event.getEventType() + "." + event.getPath() + "." + event.getObjectType().name(), event); 
+        } else if (event.getEventType().startsWith("Calendar")) {
+            this.events.putIfAbsent(event.getEventType() + "." + event.getPath() + "." + event.getObjectType().name(), event); 
         } else {
             this.events.putIfAbsent(event.getPath() + "." + event.getObjectType().name(), event);
         }
