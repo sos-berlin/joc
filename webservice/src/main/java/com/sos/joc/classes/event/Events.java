@@ -39,9 +39,9 @@ public class Events {
     
     public void put(EventSnapshot event) {
         if ("AuditLogChanged".equals(event.getEventType())) {
-            this.events.put("AuditLogChanged." + event.getPath() + "." + event.getObjectType().name(), event); 
+            this.events.putIfAbsent("AuditLogChanged." + event.getPath() + "." + event.getObjectType().name(), event); 
         } else {
-            this.events.put(event.getPath() + "." + event.getObjectType().name(), event);
+            this.events.putIfAbsent(event.getPath() + "." + event.getObjectType().name(), event);
         }
     }
     
