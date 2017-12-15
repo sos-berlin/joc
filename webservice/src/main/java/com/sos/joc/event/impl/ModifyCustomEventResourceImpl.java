@@ -9,8 +9,11 @@ import java.util.Map;
 import javax.ws.rs.Path;
 
 import org.dom4j.Element;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.classes.UtcTimeHelper;
 import com.sos.jitl.eventing.db.SchedulerEventDBItem;
 import com.sos.jitl.eventing.db.SchedulerEventDBLayer;
 import com.sos.jitl.eventing.db.SchedulerEventFilter;
@@ -35,6 +38,7 @@ import com.sos.joc.model.order.ModifyOrders;
 @Path("events")
 public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IModifyCustomEventResource {
 
+    private static final String EXPIRES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final String SOS_EVENTS_SCHEDULER_EVENT_SERVICE = "/sos/events/scheduler_event_service";
     private static final String API_CALL = "./events/custom/";
 
@@ -138,6 +142,15 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
         return param;
     }
 
+    private String getLocalTimeAsString(String fromTimeZoneString, String dateIso) {
+        String toTimeZoneString = DateTimeZone.getDefault().getID();
+
+        Date expiresUtc = JobSchedulerDate.getDateFromISO8601String(dateIso);
+        DateTimeZone fromZone = DateTimeZone.forID(fromTimeZoneString);
+        String expiresLocal = UtcTimeHelper.convertTimeZonesToString(EXPIRES_DATE_FORMAT, fromTimeZoneString, toTimeZoneString, new DateTime(expiresUtc).withZone(fromZone));
+        return expiresLocal;
+    }
+
     @Override
     public JOCDefaultResponse addEvent(String accessToken, ModifyEvent modifyEvent) throws Exception {
         SOSHibernateSession session = null;
@@ -173,7 +186,10 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             params.add(newParam("event_id", modifyEvent.getEventId()));
             params.add(newParam("event_class", modifyEvent.getEventClass()));
             params.add(newParam("exit_code", String.valueOf(modifyEvent.getExitCode())));
-            params.add(newParam("expires", modifyEvent.getExpires()));
+
+            String expiresLocal = getLocalTimeAsString("UTC",modifyEvent.getExpires());
+
+            params.add(newParam("expires", expiresLocal));
             params.add(newParam("job_chain", modifyEvent.getJobChain()));
             params.add(newParam("job_name", modifyEvent.getJob()));
             params.add(newParam("order_id", modifyEvent.getOrderId()));
@@ -186,8 +202,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 
             modifyOrders.setOrders(listOfOrders);
             addEvent(accessToken, modifyOrders);
- 
-            
+
             return JOCDefaultResponse.responseStatusJSOk(new Date());
         } catch (JobSchedulerBadRequestException e) {
             String errorOutput = "JobScheduler reports error: " + e.getError().getMessage();
@@ -219,7 +234,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
                 schedulerEventFilter.setIds(eventIdsFilter.getIds());
             }
             Integer limit = 0;
- 
+
             schedulerEventDBLayer.setFilter(schedulerEventFilter);
             List<SchedulerEventDBItem> listOfEvents = schedulerEventDBLayer.getSchedulerEventList(limit);
             List<ModifyOrder> listOfOrders = new ArrayList<ModifyOrder>();
@@ -257,8 +272,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
 
             modifyOrders.setOrders(listOfOrders);
             removeEvent(accessToken, modifyOrders);
-            
-            
+
             return JOCDefaultResponse.responseStatus200(new Date());
         } catch (JobSchedulerBadRequestException e) {
             String errorOutput = "JobScheduler reports error: " + e.getError().getMessage();
