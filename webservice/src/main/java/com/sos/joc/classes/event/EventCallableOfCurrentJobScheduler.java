@@ -303,6 +303,7 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot2.setEventType(eventKey);
                             eventSnapshot2.setObjectType(eventSnapshot.getObjectType());
                             eventSnapshot2.setPath(variables.getString("oldPath", null));
+                            eventSnapshots.put(eventSnapshot2);
                         }
                     } else if (eventKey.startsWith("CustomEvent")) {
                         eventSnapshot.setEventType(eventKey); // CustomEventAdded, CustomEventDeleted
