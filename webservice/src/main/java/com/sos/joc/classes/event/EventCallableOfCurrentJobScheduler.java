@@ -303,9 +303,10 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
                         eventSnapshot.setPath(eventSnapshot.getEventType());
                     } else if (eventKey.startsWith("YADE")) {
-                        eventSnapshot.setEventType(eventKey); // YADETransferStarted, YADETransferEnded
-                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
-                        eventSnapshot.setPath(eventSnapshot.getEventType());
+                        eventSnapshot.setEventType(eventKey); // YADETransferStarted, YADETransferFinished, YADEFileStateChanged
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
+                        //eventSnapshot.setPath(variables.getString("fileId", null));
+                        eventSnapshot.setPath(variables.getString("transferId", null));
                     } else {
                         continue;
                     }
