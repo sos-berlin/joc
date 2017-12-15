@@ -298,6 +298,12 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                             eventSnapshot.setObjectType(JobSchedulerObjectType.WORKINGDAYSCALENDAR);
                         }
                         eventSnapshot.setPath(variables.getString("path", null));
+                        if (variables.getString("oldPath", null) != null) {
+                            EventSnapshot eventSnapshot2 = new EventSnapshot();
+                            eventSnapshot2.setEventType(eventKey);
+                            eventSnapshot2.setObjectType(eventSnapshot.getObjectType());
+                            eventSnapshot2.setPath(variables.getString("oldPath", null));
+                        }
                     } else if (eventKey.startsWith("CustomEvent")) {
                         eventSnapshot.setEventType(eventKey); // CustomEventAdded, CustomEventDeleted
                         eventSnapshot.setObjectType(JobSchedulerObjectType.OTHER);
