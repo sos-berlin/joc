@@ -187,9 +187,19 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             params.add(newParam("event_class", modifyEvent.getEventClass()));
             params.add(newParam("exit_code", String.valueOf(modifyEvent.getExitCode())));
 
-            String expiresLocal = getLocalTimeAsString("UTC",modifyEvent.getExpires());
+            if (modifyEvent.getExpires() != null) {
+                String expiresLocal = getLocalTimeAsString("UTC", modifyEvent.getExpires());
+                params.add(newParam("expires", expiresLocal));
+            }
 
-            params.add(newParam("expires", expiresLocal));
+            if (modifyEvent.getExpirationCycle() != null && !modifyEvent.getExpirationCycle().isEmpty()) {
+                params.add(newParam("expiration_cycle", modifyEvent.getExpirationCycle()));
+            }
+            if (modifyEvent.getExpirationPeriod() != null && !modifyEvent.getExpirationPeriod().isEmpty()) {
+                params.add(newParam("expiration_period", modifyEvent.getExpirationPeriod()));
+            } else {
+                params.add(newParam("expiration_period", "24:00:00"));
+            }
             params.add(newParam("job_chain", modifyEvent.getJobChain()));
             params.add(newParam("job_name", modifyEvent.getJob()));
             params.add(newParam("order_id", modifyEvent.getOrderId()));
@@ -201,15 +211,17 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             listOfOrders.add(modifyOrder);
 
             modifyOrders.setOrders(listOfOrders);
-            addEvent(accessToken, modifyOrders);
+            
+            JOCDefaultResponse response = addEvent(accessToken, modifyOrders);
+            if (response.getStatus() == 200) {
+                return JOCDefaultResponse.responseStatusJSOk(new Date());
+            }else {
+                return JOCDefaultResponse.responseStatusJSError((String)response.getEntity());
+            }
 
-            return JOCDefaultResponse.responseStatusJSOk(new Date());
-        } catch (JobSchedulerBadRequestException e) {
-            String errorOutput = "JobScheduler reports error: " + e.getError().getMessage();
-            return JOCDefaultResponse.responsePlainStatus420(errorOutput);
         } catch (Exception e) {
             String errorOutput = e.getClass().getSimpleName() + ": " + ((e.getCause() != null) ? e.getCause().getMessage() : e.getMessage());
-            return JOCDefaultResponse.responsePlainStatus420(errorOutput);
+            return JOCDefaultResponse.responseStatusJSError(errorOutput);
         } finally {
             Globals.disconnect(session);
         }
@@ -271,15 +283,17 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
             }
 
             modifyOrders.setOrders(listOfOrders);
-            removeEvent(accessToken, modifyOrders);
+            JOCDefaultResponse response = removeEvent(accessToken, modifyOrders);
+            if (response.getStatus() == 200) {
+                return JOCDefaultResponse.responseStatusJSOk(new Date());
+            }else {
+                return JOCDefaultResponse.responseStatusJSError((String)response.getEntity());
+            }
+            
 
-            return JOCDefaultResponse.responseStatus200(new Date());
-        } catch (JobSchedulerBadRequestException e) {
-            String errorOutput = "JobScheduler reports error: " + e.getError().getMessage();
-            return JOCDefaultResponse.responsePlainStatus420(errorOutput);
         } catch (Exception e) {
             String errorOutput = e.getClass().getSimpleName() + ": " + ((e.getCause() != null) ? e.getCause().getMessage() : e.getMessage());
-            return JOCDefaultResponse.responsePlainStatus420(errorOutput);
+            return JOCDefaultResponse.responseStatusJSError(errorOutput);
         } finally {
             Globals.disconnect(session);
         }
