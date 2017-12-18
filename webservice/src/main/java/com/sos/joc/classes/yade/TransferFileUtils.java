@@ -172,13 +172,18 @@ public class TransferFileUtils {
             throw new YADERequestException("The original transfer order cannot be determined.");
         }
         OrderV order = OrderVolatile.getOrder(dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), false, jocResourceImpl);
-        if (!order.getState().equals(dbTransferItem.getJobChainNode())) {
-            throw new YADERequestException(String.format("The original transfer order %1$s,%2$s is on the job chain node %3$s but the node %4$s is expected.",
-                    dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), order.getState(), dbTransferItem.getJobChainNode()));
-        }
-        if (order.getProcessingState().get_text() != OrderStateText.SUSPENDED) {
-            throw new YADERequestException(String.format("The original transfer order %1$s,%2$s has to be suspended", dbTransferItem.getJobChain(),
-                    dbTransferItem.getOrderId()));
+        if (order == null) {
+            throw new YADERequestException(String.format("The original transfer order %1$s,%2$s was not found on node %3$s!",
+                    dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), dbTransferItem.getJobChainNode()));
+        } else {
+            if (!order.getState().equals(dbTransferItem.getJobChainNode())) {
+                throw new YADERequestException(String.format("The original transfer order %1$s,%2$s is on the job chain node %3$s but the node %4$s is expected.",
+                        dbTransferItem.getJobChain(), dbTransferItem.getOrderId(), order.getState(), dbTransferItem.getJobChainNode()));
+            }
+            if (order.getProcessingState().get_text() != OrderStateText.SUSPENDED) {
+                throw new YADERequestException(String.format("The original transfer order %1$s,%2$s has to be suspended", dbTransferItem.getJobChain(),
+                        dbTransferItem.getOrderId()));
+            }
         }
         NameValuePair param = new NameValuePair();
         param.setName("yade_file_path_restriction");
