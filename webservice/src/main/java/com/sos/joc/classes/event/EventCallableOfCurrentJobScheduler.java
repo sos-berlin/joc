@@ -299,8 +299,9 @@ public class EventCallableOfCurrentJobScheduler extends EventCallable implements
                         }
                         eventSnapshot.setPath(variables.getString("path", null));
                         if (variables.getString("oldPath", null) != null) {
+                            eventSnapshot.setEventType("CalendarCreated");
                             EventSnapshot eventSnapshot2 = new EventSnapshot();
-                            eventSnapshot2.setEventType(eventKey);
+                            eventSnapshot2.setEventType("CalendarDeleted");
                             eventSnapshot2.setObjectType(eventSnapshot.getObjectType());
                             eventSnapshot2.setPath(variables.getString("oldPath", null));
                             eventSnapshots.put(eventSnapshot2);
