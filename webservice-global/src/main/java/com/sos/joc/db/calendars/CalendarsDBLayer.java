@@ -220,7 +220,7 @@ public class CalendarsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemCalendar> getCalendars(Long instanceId, String type, Set<String> categories, Set<String> folders, Set<String> recuriveFolders)
+    public List<DBItemCalendar> getCalendars(Long instanceId, String type, Set<String> categories, Set<String> folders, Set<String> recursiveFolders)
             throws DBConnectionRefusedException, DBInvalidDataException {
         // all recursiveFolders are included in folders too
         try {
@@ -237,17 +237,18 @@ public class CalendarsDBLayer extends DBLayer {
                     sql.append(" and category in (:category)");
                 }
             }
+            String folder = folders.iterator().next();
             if (folders != null && !folders.isEmpty()) {
                 if (folders.size() == 1) {
-                    if (recuriveFolders != null && recuriveFolders.contains(folders.iterator().next())) {
+                    if (recursiveFolders != null && recursiveFolders.contains(folder)) {
                         sql.append(" and (directory = :directory or directory like :likeDirectory)");
                     } else {
                         sql.append(" and directory = :directory");
                     }
                 } else {
-                    if (recuriveFolders != null && !recuriveFolders.isEmpty()) {
+                    if (recursiveFolders != null && !recursiveFolders.isEmpty()) {
                         sql.append(" and (directory in (:directory)");
-                        for (int i = 0; i < recuriveFolders.size(); i++) {
+                        for (int i = 0; i < recursiveFolders.size(); i++) {
                             sql.append(" or directory like :likeDirectory" + i);
                         }
                         sql.append(")");
@@ -270,15 +271,15 @@ public class CalendarsDBLayer extends DBLayer {
             }
             if (folders != null && !folders.isEmpty()) {
                 if (folders.size() == 1) {
-                    query.setParameter("directory", folders.iterator().next());
-                    if (recuriveFolders != null && recuriveFolders.contains(folders.iterator().next())) {
-                        query.setParameter("likeDirectory", recuriveFolders.iterator().next() + "/%");
+                    query.setParameter("directory", folder);
+                    if (recursiveFolders != null && recursiveFolders.contains(folder)) {
+                        query.setParameter("likeDirectory", recursiveFolders.iterator().next() + "%");
                     }
                 } else {
                     query.setParameterList("directory", folders);
-                    if (recuriveFolders != null && !recuriveFolders.isEmpty()) {
+                    if (recursiveFolders != null && !recursiveFolders.isEmpty()) {
                         int index = 0;
-                        for (String recuriveFolder : recuriveFolders) {
+                        for (String recuriveFolder : recursiveFolders) {
                             query.setParameter("likeDirectory" + index, recuriveFolder + "/%");
                             index++;
                         }
