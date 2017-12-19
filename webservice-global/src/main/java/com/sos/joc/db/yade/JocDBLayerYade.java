@@ -179,9 +179,10 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
     
-    public List<DBItemYadeTransfers> getFilteredTransfers(List<Long> transferIds, Set<Integer> operations, Set<Integer> states,
-            String mandator, Set<String> sourceHosts, Set<String> targetHosts, Boolean isIntervention, 
-            Boolean hasInterventions, List<String> profiles, Integer limit, Date dateFrom, Date dateTo)
+    public List<DBItemYadeTransfers> getFilteredTransfers(List<Long> transferIds, Set<Integer> operations,
+            Set<Integer> states, String mandator, Set<String> sourceHosts, Set<Integer> sourceProtocols, 
+            Set<String> targetHosts, Set<Integer> targetProtocols, Boolean isIntervention, Boolean hasInterventions,
+            List<String> profiles, Integer limit, Date dateFrom, Date dateTo)
                     throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             boolean hasFilter = (
@@ -190,7 +191,9 @@ public class JocDBLayerYade extends DBLayer {
                     (states != null && !states.isEmpty()) || 
                     mandator != null || 
                     (sourceHosts != null && !sourceHosts.isEmpty()) || 
+                    (sourceProtocols != null && !sourceProtocols.isEmpty()) || 
                     (targetHosts != null && !targetHosts.isEmpty()) ||
+                    (targetProtocols != null && !targetProtocols.isEmpty()) ||
                     isIntervention != null || 
                     hasInterventions != null || 
                     (profiles != null && !profiles.isEmpty()) || 
@@ -224,11 +227,19 @@ public class JocDBLayerYade extends DBLayer {
                 }
                 if (sourceHosts != null && !sourceHosts.isEmpty()) {
                     sql.append(" and");
-                    sql.append(" yps.hostname in ( :sources)");
+                    sql.append(" yps.hostname in ( :sourceHosts)");
+                }
+                if (sourceProtocols != null && !sourceProtocols.isEmpty()) {
+                    sql.append(" and");
+                    sql.append(" yps.protocol in ( :sourceProtocols)");
                 }
                 if (targetHosts != null && !targetHosts.isEmpty()) {
                     sql.append(" and");
-                    sql.append(" ypt.hostname in ( :targets)");
+                    sql.append(" ypt.hostname in ( :targetHosts)");
+                }
+                if (targetProtocols != null && !targetProtocols.isEmpty()) {
+                    sql.append(" and");
+                    sql.append(" ypt.protocol in ( :targetProtocols)");
                 }
                 if (isIntervention != null) {
                     sql.append(" and");
@@ -269,10 +280,16 @@ public class JocDBLayerYade extends DBLayer {
                 query.setParameter("mandator", mandator);
             }
             if (sourceHosts != null && !sourceHosts.isEmpty()) {
-                query.setParameter("sources", sourceHosts);
+                query.setParameter("sourceHosts", sourceHosts);
+            }
+            if (sourceProtocols != null && !sourceProtocols.isEmpty()) {
+                query.setParameter("sourceProtocols", sourceProtocols);
             }
             if (targetHosts != null && !targetHosts.isEmpty()) {
-                query.setParameter("targets", targetHosts);
+                query.setParameter("targetHosts", targetHosts);
+            }
+            if (targetProtocols != null && !targetProtocols.isEmpty()) {
+                query.setParameter("targetProtocols", targetProtocols);
             }
             if (hasInterventions != null) {
                 query.setParameter("hasInterventions", hasInterventions);
@@ -360,7 +377,7 @@ public class JocDBLayerYade extends DBLayer {
                         sql.append(" and");
                     }
                     boolean first = true;
-                    sql.append("state in (");
+                    sql.append("sourcePath in (");
                     for(String source : sources) {
                         if (first) {
                             first = false;
@@ -377,7 +394,7 @@ public class JocDBLayerYade extends DBLayer {
                         sql.append(" and");
                     }
                     boolean first = true;
-                    sql.append("state in (");
+                    sql.append("targetPath in (");
                     for(String target : targets) {
                         if (first) {
                             first = false;
@@ -394,7 +411,7 @@ public class JocDBLayerYade extends DBLayer {
                         sql.append(" and");
                     }
                     boolean first = true;
-                    sql.append("state in (");
+                    sql.append("interventionTransferId in (");
                     for(Long interventionTransferId : interventionTransferIds) {
                         if (first) {
                             first = false;
@@ -489,4 +506,38 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
 
+    public boolean transferHasFiles (Long transferId, List<String> sourceFiles, List<String> targetFiles) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ");
+            sql.append(DBITEM_YADE_FILES);
+            sql.append(" where transferId = :transferId");
+            if (sourceFiles != null && !sourceFiles.isEmpty() && (targetFiles == null || targetFiles.isEmpty())) {
+                sql.append(" and");
+                sql.append(" sourcePath in (:sourceFiles)");
+            } else if (targetFiles != null && !targetFiles.isEmpty() && (sourceFiles == null || sourceFiles.isEmpty())) {
+                sql.append(" and");
+                sql.append(" targetPath in (:targetFiles)");
+            } else if (sourceFiles != null && !sourceFiles.isEmpty() && targetFiles != null && !targetFiles.isEmpty()) {
+                sql.append(" and");
+                sql.append(" (sourcePath in (:sourceFiles)");
+                sql.append(" or");
+                sql.append(" targetPath in (:targetFiles))");
+            }
+            Query<DBItemYadeFiles> query = getSession().createQuery(sql.toString());
+            query.setParameter("transferId", transferId);
+            if (sourceFiles != null && !sourceFiles.isEmpty()) {
+                query.setParameterList("sourceFiles", sourceFiles);
+            }
+            if (targetFiles != null && !targetFiles.isEmpty()) {
+                query.setParameter("targetFiles", targetFiles);
+            }
+            List<DBItemYadeFiles> foundFiles = getSession().getResultList(query);
+            return (foundFiles != null && !foundFiles.isEmpty());
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
 }

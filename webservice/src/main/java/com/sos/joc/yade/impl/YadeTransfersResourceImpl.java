@@ -9,6 +9,8 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
+import org.eclipse.swt.dnd.TransferData;
+
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jade.db.DBItemYadeProtocols;
 import com.sos.jade.db.DBItemYadeTransfers;
@@ -81,17 +83,31 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                 }
             }
             Set<String> sourceHosts = null;
+            Set<Integer> sourceProtocols = null;
             if (filterBody.getSources() != null && !filterBody.getSources().isEmpty()) {
                 sourceHosts = new HashSet<String>();
+                sourceProtocols = new HashSet<Integer>();
                 for (ProtocolFragment source : filterBody.getSources()) {
-                    sourceHosts.add(source.getHost());
+                    if (source.getHost() != null && !source.getHost().isEmpty()) {
+                        sourceHosts.add(source.getHost());
+                    }
+                    if (source.getProtocol() != null) {
+                        sourceProtocols.add(getValueFromProtocol(source.getProtocol()));
+                    }
                 }
             }
             Set<String> targetHosts = null;
+            Set<Integer> targetProtocols = null;
             if (filterBody.getTargets() != null && !filterBody.getTargets().isEmpty()) {
                 targetHosts = new HashSet<String>();
+                targetProtocols = new HashSet<Integer>();
                 for (ProtocolFragment target : filterBody.getTargets()) {
-                    targetHosts.add(target.getHost());
+                    if (target.getHost() != null && !target.getHost().isEmpty()) {
+                        targetHosts.add(target.getHost());
+                    }
+                    if (target.getProtocol() != null) {
+                        targetProtocols.add(getValueFromProtocol(target.getProtocol()));
+                    }
                 }
             }
             Set<Integer> operationValues = null;
@@ -123,12 +139,20 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
                     }
                 }
             }
+            List<String> sourceFiles = filterBody.getSourceFiles();
+            List<String> targetFiles = filterBody.getTargetFiles();
             List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(filterBody.getTransferIds(), operationValues, stateValues, filterBody
-                    .getMandator(), sourceHosts, targetHosts, filterBody.getIsIntervention(), filterBody.getHasIntervention(),
+                    .getMandator(), sourceHosts, sourceProtocols, targetHosts, targetProtocols, filterBody.getIsIntervention(), filterBody.getHasIntervention(),
                     filterBody.getProfiles(), limit, dateFrom, dateTo);
             Transfers entity = new Transfers();
+            List<DBItemYadeTransfers> filteredTransfersByFiles = new ArrayList<DBItemYadeTransfers>();
             List<Transfer> transfers = new ArrayList<Transfer>();
             for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
+                if (dbLayer.transferHasFiles(transferFromDb.getId(), sourceFiles, targetFiles)) {
+                    filteredTransfersByFiles.add(transferFromDb);
+                }
+            }
+            for (DBItemYadeTransfers transferFromDb : filteredTransfersByFiles) {
                 Transfer transfer = new Transfer();
                 transfer.set_operation(getOperationFromValue(transferFromDb.getOperation()));
                 transfer.setEnd(transferFromDb.getEnd());
@@ -247,7 +271,31 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             return Protocol.SMB;
         default:
             return null;
-
+        }
+    }
+    
+    private Integer getValueFromProtocol(Protocol protocol) {
+        switch (protocol) {
+        case LOCAL:
+            return 1;
+        case FTP:
+            return 2;
+        case FTPS:
+            return 3;
+        case SFTP:
+            return 4;
+        case HTTP:
+            return 5;
+        case HTTPS:
+            return 6;
+        case WEBDAV:
+            return 7;
+        case WEBDAVS:
+            return 8;
+        case SMB:
+            return 9;
+        default:
+            return null;
         }
     }
     
