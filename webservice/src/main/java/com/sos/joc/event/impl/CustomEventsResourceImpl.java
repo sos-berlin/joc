@@ -34,7 +34,7 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
 
     private static final String API_CALL = "./events/custom/";
     private static final String EXPIRES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
- 
+
     private Date utc2LocalTime(Date expiresUtc) {
         String toTimeZoneString = DateTimeZone.getDefault().getID();
         String fromTimeZoneString = "UTC";
@@ -42,7 +42,7 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
         Date expiresLocal = UtcTimeHelper.convertTimeZonesToDate(fromTimeZoneString, toTimeZoneString, new DateTime(expiresUtc).withZone(fromZone));
         return expiresLocal;
     }
-    
+
     private Date getUtcExpiredTime(Date dateFrom) throws ParseException {
         SimpleDateFormat isoFormat = new SimpleDateFormat(EXPIRES_DATE_FORMAT);
         isoFormat.setTimeZone(TimeZone.getTimeZone(DateTimeZone.getDefault().getID()));
@@ -75,11 +75,6 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
                 schedulerEventFilter.setEventClasses(eventFilter.getEventClasses());
             }
             if (eventFilter.getExitCodes().size() > 0) {
-//                List<String> l = new ArrayList<String>();
-//                for (Integer i: eventFilter.getExitCodes()) {
-//                    l.add(String.valueOf(i));
-//                }
-//                schedulerEventFilter.setExitCodes(l);
                 schedulerEventFilter.setExitCodes(eventFilter.getExitCodes());
             }
             if (eventFilter.getEventIds().size() > 0) {
