@@ -75,11 +75,12 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
                 schedulerEventFilter.setEventClasses(eventFilter.getEventClasses());
             }
             if (eventFilter.getExitCodes().size() > 0) {
-                List<String> l = new ArrayList<String>();
-                for (Integer i: eventFilter.getExitCodes()) {
-                    l.add(String.valueOf(i));
-                }
-                schedulerEventFilter.setExitCodes(l);
+//                List<String> l = new ArrayList<String>();
+//                for (Integer i: eventFilter.getExitCodes()) {
+//                    l.add(String.valueOf(i));
+//                }
+//                schedulerEventFilter.setExitCodes(l);
+                schedulerEventFilter.setExitCodes(eventFilter.getExitCodes());
             }
             if (eventFilter.getEventIds().size() > 0) {
                 schedulerEventFilter.setEventIds(eventFilter.getEventIds());
