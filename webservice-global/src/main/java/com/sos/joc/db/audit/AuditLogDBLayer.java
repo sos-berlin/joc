@@ -123,10 +123,17 @@ public class AuditLogDBLayer extends DBLayer {
                 sql.append(" and account = :account");
             }
             if (jobs != null && !jobs.isEmpty()) {
-                if (jobs.size() == 1) {
-                    sql.append(" and job = :jobs");
-                } else {
-                    sql.append(" and job in ( :jobs )");
+                sql.append(" and");
+                for (int i = 0; i < jobs.size(); i++) {
+                    if (i == 0) {
+                        sql.append(" (");
+                    } else if (i != 0 && i != jobs.size()) {
+                        sql.append(" or");
+                    }
+                    sql.append(" (job = :job").append(i).append(")");
+                    if (i == jobs.size() - 1) {
+                        sql.append(")");
+                    }
                 }
             }
             sql.append(" order by created desc");
@@ -147,10 +154,9 @@ public class AuditLogDBLayer extends DBLayer {
                 query.setParameter("account", account);
             }
             if (jobs != null && !jobs.isEmpty()) {
-                if (jobs.size() == 1) {
-                    query.setParameter("jobs", jobs.iterator().next());
-                } else {
-                    query.setParameterList("jobs", jobs);
+                for (int i = 0; i < jobs.size(); i++) {
+                    String job = jobs.get(i).getJob();
+                    query.setParameter("job" + i, job);
                 }
             }
             if (limit != null) {
