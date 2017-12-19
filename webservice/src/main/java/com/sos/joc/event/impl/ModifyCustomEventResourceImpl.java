@@ -269,7 +269,7 @@ public class ModifyCustomEventResourceImpl extends JOCResourceImpl implements IM
                 List<NameValuePair> params = new ArrayList<NameValuePair>();
                 params.add(newParam("event_id", item.getEventId()));
                 params.add(newParam("event_class", item.getEventClass()));
-                params.add(newParam("exit_code", item.getExitCode()));
+                params.add(newParam("exit_code", item.getExitCodeAsString()));
                 params.add(newParam("expires", item.getExpiresAsString()));
                 params.add(newParam("job_chain", item.getJobChain()));
                 params.add(newParam("job_name", item.getJobName()));

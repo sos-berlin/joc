@@ -107,7 +107,7 @@ public class CustomEventsResourceImpl extends JOCResourceImpl implements ICustom
                 event.setCreated(item.getCreated());
                 event.setEventClass(item.getEventClass());
                 event.setEventId(item.getEventId());
-                event.setExitCode(item.getExitCodeAsInteger());
+                event.setExitCode(item.getExitCode());
                 event.setExpires(getUtcExpiredTime(item.getExpires()));
                 event.setJob(item.getJobName());
                 event.setJobChain(item.getJobChain());
