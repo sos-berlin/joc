@@ -147,75 +147,19 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
             Transfers entity = new Transfers();
             List<DBItemYadeTransfers> filteredTransfersByFiles = new ArrayList<DBItemYadeTransfers>();
             List<Transfer> transfers = new ArrayList<Transfer>();
-            for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
-                if (dbLayer.transferHasFiles(transferFromDb.getId(), sourceFiles, targetFiles)) {
-                    filteredTransfersByFiles.add(transferFromDb);
-                }
-            }
-            for (DBItemYadeTransfers transferFromDb : filteredTransfersByFiles) {
-                Transfer transfer = new Transfer();
-                transfer.set_operation(getOperationFromValue(transferFromDb.getOperation()));
-                transfer.setEnd(transferFromDb.getEnd());
-                Err err = new Err();
-                err.setCode(transferFromDb.getErrorCode());
-                err.setMessage(transferFromDb.getErrorMessage());
-                transfer.setError(err);
-                transfer.setHasIntervention(transferFromDb.getHasIntervention());
-                transfer.setId(transferFromDb.getId());
-                transfer.setJobschedulerId(transferFromDb.getJobschedulerId());
-                if (!compact && transferFromDb.getJumpProtocolId() != null) {
-                    DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getJumpProtocolId());
-                    if (protocol != null) {
-                        ProtocolFragment jumpFragment = new ProtocolFragment();
-                        jumpFragment.setAccount(protocol.getAccount());
-                        jumpFragment.setHost(protocol.getHostname());
-                        jumpFragment.setPort(protocol.getPort());
-                        jumpFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
-                        transfer.setJump(jumpFragment);
+            if ((sourceFiles != null && !sourceFiles.isEmpty()) || (targetFiles != null && !targetFiles.isEmpty())) {
+                for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
+                    if (dbLayer.transferHasFiles(transferFromDb.getId(), sourceFiles, targetFiles)) {
+                        filteredTransfersByFiles.add(transferFromDb);
                     }
                 }
-                transfer.setMandator(transferFromDb.getMandator());
-                if (transferFromDb.getNumOfFiles() != null) {
-                    transfer.setNumOfFiles(transferFromDb.getNumOfFiles().intValue());
+                for (DBItemYadeTransfers transferFromDb : filteredTransfersByFiles) {
+                    transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
                 }
-                transfer.setParent_id(transferFromDb.getParentTransferId());
-                transfer.setProfile(transferFromDb.getProfileName());
-                transfer.setState(getTransferStateFromValue(transferFromDb.getState()));
-                if (transferFromDb.getSourceProtocolId() != null) {
-                    DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getSourceProtocolId());
-                    if (protocol != null) {
-                        ProtocolFragment sourceFragment = new ProtocolFragment();
-                        sourceFragment.setHost(protocol.getHostname());
-                        if (!compact) {
-                            sourceFragment.setAccount(protocol.getAccount());
-                            sourceFragment.setPort(protocol.getPort());
-                            sourceFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
-                        }
-                        transfer.setSource(sourceFragment);
-                    }
+            } else {
+                for (DBItemYadeTransfers transferFromDb : transfersFromDb) {
+                    transfers.add(fillTransfer(transferFromDb, compact, dbLayer));
                 }
-                transfer.setStart(transferFromDb.getStart());
-                transfer.setSurveyDate(transferFromDb.getModified());
-                if (transferFromDb.getTargetProtocolId() != null) {
-                    DBItemYadeProtocols protocol = dbLayer.getProtocolById(transferFromDb.getTargetProtocolId());
-                    if (protocol != null) {
-                        ProtocolFragment targetFragment = new ProtocolFragment();
-                        targetFragment.setHost(protocol.getHostname());
-                        targetFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
-                        if (!compact) {
-                            targetFragment.setAccount(protocol.getAccount());
-                            targetFragment.setPort(protocol.getPort());
-                        }
-                        transfer.setTarget(targetFragment);
-                    }
-                }
-                transfer.setTaskId(transferFromDb.getTaskId());
-                if (!compact) {
-                    transfer.setJob(transferFromDb.getJob());
-                    transfer.setJobChain(transferFromDb.getJobChain());
-                    transfer.setOrderId(transferFromDb.getOrderId());
-                }
-                transfers.add(transfer);
             }
             entity.setTransfers(transfers);
             entity.setDeliveryDate(Date.from(Instant.now()));
@@ -317,5 +261,71 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
         default:
             return null;
         }
+    }
+
+    private Transfer fillTransfer(DBItemYadeTransfers dbTransfer, Boolean compact, JocDBLayerYade dbLayer) throws Exception {
+        Transfer transfer = new Transfer();
+        transfer.set_operation(getOperationFromValue(dbTransfer.getOperation()));
+        transfer.setEnd(dbTransfer.getEnd());
+        Err err = new Err();
+        err.setCode(dbTransfer.getErrorCode());
+        err.setMessage(dbTransfer.getErrorMessage());
+        transfer.setError(err);
+        transfer.setHasIntervention(dbTransfer.getHasIntervention());
+        transfer.setId(dbTransfer.getId());
+        transfer.setJobschedulerId(dbTransfer.getJobschedulerId());
+        if (!compact && dbTransfer.getJumpProtocolId() != null) {
+            DBItemYadeProtocols protocol = dbLayer.getProtocolById(dbTransfer.getJumpProtocolId());
+            if (protocol != null) {
+                ProtocolFragment jumpFragment = new ProtocolFragment();
+                jumpFragment.setAccount(protocol.getAccount());
+                jumpFragment.setHost(protocol.getHostname());
+                jumpFragment.setPort(protocol.getPort());
+                jumpFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
+                transfer.setJump(jumpFragment);
+            }
+        }
+        transfer.setMandator(dbTransfer.getMandator());
+        if (dbTransfer.getNumOfFiles() != null) {
+            transfer.setNumOfFiles(dbTransfer.getNumOfFiles().intValue());
+        }
+        transfer.setParent_id(dbTransfer.getParentTransferId());
+        transfer.setProfile(dbTransfer.getProfileName());
+        transfer.setState(getTransferStateFromValue(dbTransfer.getState()));
+        if (dbTransfer.getSourceProtocolId() != null) {
+            DBItemYadeProtocols protocol = dbLayer.getProtocolById(dbTransfer.getSourceProtocolId());
+            if (protocol != null) {
+                ProtocolFragment sourceFragment = new ProtocolFragment();
+                sourceFragment.setHost(protocol.getHostname());
+                if (!compact) {
+                    sourceFragment.setAccount(protocol.getAccount());
+                    sourceFragment.setPort(protocol.getPort());
+                    sourceFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
+                }
+                transfer.setSource(sourceFragment);
+            }
+        }
+        transfer.setStart(dbTransfer.getStart());
+        transfer.setSurveyDate(dbTransfer.getModified());
+        if (dbTransfer.getTargetProtocolId() != null) {
+            DBItemYadeProtocols protocol = dbLayer.getProtocolById(dbTransfer.getTargetProtocolId());
+            if (protocol != null) {
+                ProtocolFragment targetFragment = new ProtocolFragment();
+                targetFragment.setHost(protocol.getHostname());
+                targetFragment.setProtocol(getProtocolFromValue(protocol.getProtocol()));
+                if (!compact) {
+                    targetFragment.setAccount(protocol.getAccount());
+                    targetFragment.setPort(protocol.getPort());
+                }
+                transfer.setTarget(targetFragment);
+            }
+        }
+        transfer.setTaskId(dbTransfer.getTaskId());
+        if (!compact) {
+            transfer.setJob(dbTransfer.getJob());
+            transfer.setJobChain(dbTransfer.getJobChain());
+            transfer.setOrderId(dbTransfer.getOrderId());
+        }
+        return transfer;
     }
 }
