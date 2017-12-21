@@ -145,7 +145,7 @@ public class JobSchedulerDate {
                 return instant.plusMillis(-1*offset);
                 
             } else {
-                Calendar calendar = Calendar.getInstance();
+                Calendar calendar = Calendar.getInstance(timeZ);
                 calendar.setTime(Date.from(Instant.now()));
                 calendar.setTimeZone(timeZ);
                 if (Pattern.compile("[dwMy]").matcher(dateStr).find()) {
