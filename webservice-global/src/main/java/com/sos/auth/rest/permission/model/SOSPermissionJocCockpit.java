@@ -2,7 +2,7 @@
 // Diese Datei wurde mit der JavaTM Architecture for XML Binding(JAXB) Reference Implementation, v2.2.8-b130911.1802 generiert 
 // Siehe <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Änderungen an dieser Datei gehen bei einer Neukompilierung des Quellschemas verloren. 
-// Generiert: 2017.12.15 um 04:07:54 PM CET 
+// Generiert: 2018.01.11 um 05:18:07 PM CET 
 //
 
 
@@ -78,6 +78,7 @@ import javax.xml.bind.annotation.XmlType;
  *                             &lt;element name="removeOldInstances" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+ *                             &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -645,7 +646,6 @@ import javax.xml.bind.annotation.XmlType;
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
  *                             &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
- *                             &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                           &lt;/sequence>
@@ -658,7 +658,6 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
- *                             &lt;element name="transferStore" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                             &lt;element name="transferStart" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                           &lt;/sequence>
  *                         &lt;/restriction>
@@ -3865,6 +3864,7 @@ public class SOSPermissionJocCockpit {
      *                   &lt;element name="removeOldInstances" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+     *                   &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -3979,6 +3979,7 @@ public class SOSPermissionJocCockpit {
          *         &lt;element name="removeOldInstances" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="manageCategories" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="editPermissions" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
+         *         &lt;element name="editMainSection" type="{http://www.w3.org/2001/XMLSchema}anyType"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
          *   &lt;/complexContent>
@@ -3991,13 +3992,16 @@ public class SOSPermissionJocCockpit {
         @XmlType(name = "", propOrder = {
             "removeOldInstances",
             "manageCategories",
-            "editPermissions"
+            "editPermissions",
+            "editMainSection"
         })
         public static class Administration {
 
             protected boolean removeOldInstances;
             protected boolean manageCategories;
             protected boolean editPermissions;
+            @XmlElement(required = true)
+            protected Object editMainSection;
 
             /**
              * Ruft den Wert der removeOldInstances-Eigenschaft ab.
@@ -4045,6 +4049,30 @@ public class SOSPermissionJocCockpit {
              */
             public void setEditPermissions(boolean value) {
                 this.editPermissions = value;
+            }
+
+            /**
+             * Ruft den Wert der editMainSection-Eigenschaft ab.
+             * 
+             * @return
+             *     possible object is
+             *     {@link Object }
+             *     
+             */
+            public Object getEditMainSection() {
+                return editMainSection;
+            }
+
+            /**
+             * Legt den Wert der editMainSection-Eigenschaft fest.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link Object }
+             *     
+             */
+            public void setEditMainSection(Object value) {
+                this.editMainSection = value;
             }
 
         }
@@ -6475,7 +6503,6 @@ public class SOSPermissionJocCockpit {
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
      *                   &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-     *                   &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                 &lt;/sequence>
@@ -6488,7 +6515,6 @@ public class SOSPermissionJocCockpit {
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
-     *                   &lt;element name="transferStore" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                   &lt;element name="transferStart" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *                 &lt;/sequence>
      *               &lt;/restriction>
@@ -6574,7 +6600,6 @@ public class SOSPermissionJocCockpit {
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
-         *         &lt;element name="transferStore" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="transferStart" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *       &lt;/sequence>
          *     &lt;/restriction>
@@ -6586,29 +6611,11 @@ public class SOSPermissionJocCockpit {
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
-            "transferStore",
             "transferStart"
         })
         public static class Execute {
 
-            protected boolean transferStore;
             protected boolean transferStart;
-
-            /**
-             * Ruft den Wert der transferStore-Eigenschaft ab.
-             * 
-             */
-            public boolean isTransferStore() {
-                return transferStore;
-            }
-
-            /**
-             * Legt den Wert der transferStore-Eigenschaft fest.
-             * 
-             */
-            public void setTransferStore(boolean value) {
-                this.transferStore = value;
-            }
 
             /**
              * Ruft den Wert der transferStart-Eigenschaft ab.
@@ -6640,7 +6647,6 @@ public class SOSPermissionJocCockpit {
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
          *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
-         *         &lt;element name="log" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="transfers" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *         &lt;element name="files" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
          *       &lt;/sequence>
@@ -6654,14 +6660,12 @@ public class SOSPermissionJocCockpit {
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
             "status",
-            "log",
             "transfers",
             "files"
         })
         public static class View {
 
             protected boolean status;
-            protected boolean log;
             protected boolean transfers;
             protected boolean files;
 
@@ -6679,22 +6683,6 @@ public class SOSPermissionJocCockpit {
              */
             public void setStatus(boolean value) {
                 this.status = value;
-            }
-
-            /**
-             * Ruft den Wert der log-Eigenschaft ab.
-             * 
-             */
-            public boolean isLog() {
-                return log;
-            }
-
-            /**
-             * Legt den Wert der log-Eigenschaft fest.
-             * 
-             */
-            public void setLog(boolean value) {
-                this.log = value;
             }
 
             /**
