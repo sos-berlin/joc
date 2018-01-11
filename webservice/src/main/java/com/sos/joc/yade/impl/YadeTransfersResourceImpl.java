@@ -9,8 +9,6 @@ import java.util.Set;
 
 import javax.ws.rs.Path;
 
-import org.eclipse.swt.dnd.TransferData;
-
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jade.db.DBItemYadeProtocols;
 import com.sos.jade.db.DBItemYadeTransfers;
@@ -41,7 +39,7 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
         SOSHibernateSession connection = null;
         try {
             JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getYADE().getView().isStatus());
+                    accessToken).getYADE().getView().isTransfers());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
