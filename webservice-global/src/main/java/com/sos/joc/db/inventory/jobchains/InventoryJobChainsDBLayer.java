@@ -87,9 +87,7 @@ public class InventoryJobChainsDBLayer extends DBLayer {
     public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id, Long instanceId)
             throws DBInvalidDataException, DBConnectionRefusedException {
         try {
-            
-            StringBuilder sql = new StringBuilder(); //JOC-349 with j.processClassName
-            
+            StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES);
             sql.append(" where jobChainId = :id");
             sql.append(" and instanceId = :instanceId");
