@@ -2,7 +2,9 @@ package com.sos.joc.db.inventory.jobs;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.query.Query;
 
@@ -22,8 +24,7 @@ public class InventoryJobsDBLayer extends DBLayer {
         super(conn);
     }
 
-    public DBItemInventoryJob getInventoryJobByName(String name, Long instanceId)
-            throws DBInvalidDataException, DBConnectionRefusedException {
+    public DBItemInventoryJob getInventoryJobByName(String name, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ");
@@ -41,8 +42,7 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemInventoryJob> getInventoryJobs(Long instanceId)
-            throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryJob> getInventoryJobs(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("from ").append(DBITEM_INVENTORY_JOBS);
@@ -80,6 +80,31 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
 
+    public Map<Long, String> getInventoryJobIdsWithProcessClasses(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+        try {
+            StringBuilder sql = new StringBuilder();
+            sql.append("select new ").append(ProcessClassJob.class.getName()).append(" (id, processClassName) from ");
+            sql.append(DBITEM_INVENTORY_JOBS);
+            sql.append(" where instanceId = :instanceId");
+            sql.append(" and processClassId != 0");
+            sql.append(" and isOrderJob = 1");
+            Query<ProcessClassJob> query = getSession().createQuery(sql.toString());
+            query.setParameter("instanceId", instanceId);
+            List<ProcessClassJob> result = getSession().getResultList(query);
+            Map<Long, String> processClassJobs = new HashMap<Long, String>();
+            if (result != null) {
+                for (ProcessClassJob processClassJob : result) {
+                    processClassJobs.put(processClassJob.getId(), processClassJob.getProcessClassName());
+                }
+            }
+            return processClassJobs;
+        } catch (SOSHibernateInvalidSessionException ex) {
+            throw new DBConnectionRefusedException(ex);
+        } catch (Exception ex) {
+            throw new DBInvalidDataException(ex);
+        }
+    }
+
     public Date getJobConfigurationDate(Long id) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
@@ -98,8 +123,7 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemInventoryLock> getLocksIfExists(Long id, Long instanceId)
-            throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryLock> getLocksIfExists(Long id, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select il from ").append(DBITEM_INVENTORY_LOCKS).append(" il, ");
@@ -122,8 +146,7 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemInventoryJobChain> getJobChainsByJobId(Long id, Long instanceId)
-            throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryJobChain> getJobChainsByJobId(Long id, Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ijc from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
@@ -145,9 +168,8 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
-    public List<DBItemInventoryJobChain> getJobChainsWithFileSink(Long instanceId)
-            throws DBInvalidDataException, DBConnectionRefusedException {
+
+    public List<DBItemInventoryJobChain> getJobChainsWithFileSink(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select ijc from ").append(DBITEM_INVENTORY_JOB_CHAINS).append(" ijc, ");
@@ -197,8 +219,8 @@ public class InventoryJobsDBLayer extends DBLayer {
         }
     }
 
-    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, boolean recursive,
-            Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemInventoryJob> getInventoryJobsFilteredByFolder(String folderName, Boolean isOrderJob, boolean recursive, Long instanceId)
+            throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             if (recursive) {
@@ -221,7 +243,7 @@ public class InventoryJobsDBLayer extends DBLayer {
             }
             Query<DBItemInventoryJob> query = getSession().createQuery(sql.toString());
             if (recursive) {
-                query.setParameter("folderName", (folderName + "/%").replaceAll("//+","/"));
+                query.setParameter("folderName", (folderName + "/%").replaceAll("//+", "/"));
             } else {
                 query.setParameter("folderName", folderName);
             }
@@ -240,13 +262,12 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
     public List<String> getJobsWithTemporaryRuntime(Long instanceId) throws DBInvalidDataException, DBConnectionRefusedException {
         return getJobsWithTemporaryRuntime(instanceId, null);
     }
-    
-    public List<String> getJobsWithTemporaryRuntime(Long instanceId, String jobPath)
-            throws DBInvalidDataException, DBConnectionRefusedException {
+
+    public List<String> getJobsWithTemporaryRuntime(Long instanceId, String jobPath) throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("select name from ").append(DBITEM_INVENTORY_JOBS);
@@ -272,5 +293,5 @@ public class InventoryJobsDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
-    
+
 }

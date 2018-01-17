@@ -22,7 +22,6 @@ import com.sos.joc.exceptions.DBInvalidDataException;
 public class InventoryJobChainsDBLayer extends DBLayer {
 
     private static final String NESTED_JOB_CHAIN = NestedJobChain.class.getName();
-    private static final String NODE_WITH_PROCESS_CLASS = InventoryJobChainNodeWithProcessClass.class.getName();
 
     public InventoryJobChainsDBLayer(SOSHibernateSession connection) {
         super(connection);
@@ -85,22 +84,18 @@ public class InventoryJobChainsDBLayer extends DBLayer {
         }
     }
     
-    public List<InventoryJobChainNodeWithProcessClass> getJobChainNodesByJobChainId(Long id, Long instanceId)
+    public List<DBItemInventoryJobChainNode> getJobChainNodesByJobChainId(Long id, Long instanceId)
             throws DBInvalidDataException, DBConnectionRefusedException {
         try {
-            StringBuilder sql = new StringBuilder(); //JOC-349 with j.processClassName
-            sql.append("select new ").append(NODE_WITH_PROCESS_CLASS).append(" ( jcn, j.processClassName ) from ");
-            sql.append(DBITEM_INVENTORY_JOB_CHAIN_NODES).append(" jcn, ");
-            sql.append(DBITEM_INVENTORY_JOBS).append(" j ");
-            sql.append(" where jcn.jobChainId = :id");
-            sql.append(" and jcn.instanceId = :instanceId");
-            sql.append(" and (jcn.jobId = 0 or jcn.jobId = j.id)");
-            sql.append(" group by jcn.id");
-            sql.append(" order by jcn.ordering");
-            Query<InventoryJobChainNodeWithProcessClass> query = getSession().createQuery(sql.toString());
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_JOB_CHAIN_NODES);
+            sql.append(" where jobChainId = :id");
+            sql.append(" and instanceId = :instanceId");
+            sql.append(" order by ordering");
+            Query<DBItemInventoryJobChainNode> query = getSession().createQuery(sql.toString());
             query.setParameter("id", id);
             query.setParameter("instanceId", instanceId);
-            List<InventoryJobChainNodeWithProcessClass> result = getSession().getResultList(query);
+            List<DBItemInventoryJobChainNode> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
             }

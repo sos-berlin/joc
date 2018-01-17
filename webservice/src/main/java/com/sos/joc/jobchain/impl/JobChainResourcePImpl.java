@@ -3,7 +3,9 @@ package com.sos.joc.jobchain.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Path;
 
@@ -15,6 +17,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JobChainPermanent;
 import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
+import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.DBMissingDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchain.resource.IJobChainResourceP;
@@ -48,12 +51,17 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
             Long instanceId = dbItemInventoryInstance.getId();
             InventoryJobChainsDBLayer dbLayer = new InventoryJobChainsDBLayer(connection);
             DBItemInventoryJobChain inventoryJobChain = dbLayer.getJobChainByPath(normalizePath(jobChainFilter.getJobChain()), instanceId);
+            Map<Long,String> processClassJobs = new HashMap<Long,String>();
+            if (!jobChainFilter.getCompact()) {
+                InventoryJobsDBLayer dbJobsLayer = new InventoryJobsDBLayer(connection);
+                processClassJobs = dbJobsLayer.getInventoryJobIdsWithProcessClasses(instanceId);
+            }
             if (inventoryJobChain == null) {
                 String errMessage = String.format("job chain %s for instance %s with internal id %s not found in table %s", jobChainFilter
                         .getJobChain(), jobChainFilter.getJobschedulerId(), instanceId, DBLayer.TABLE_INVENTORY_JOB_CHAINS);
                 throw new DBMissingDataException(errMessage);
             }
-            JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, inventoryJobChain, jobChainFilter.getCompact(), instanceId);
+            JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, inventoryJobChain, processClassJobs, jobChainFilter.getCompact(), instanceId);
             if (jobChain != null) {
                 entity.setJobChain(jobChain);
                 if (!JobChainPermanent.NESTED_JOB_CHAIN_NAMES.isEmpty()) {
@@ -64,7 +72,7 @@ public class JobChainResourcePImpl extends JOCResourceImpl implements IJobChainR
 //                        nestedJobChainName = path.toString().replace("\\", "/");
                         nestedJobChain = dbLayer.getJobChainByPath(normalizePath(nestedJobChainName), instanceId);
                         if (nestedJobChain != null) {
-                            JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, jobChainFilter.getCompact(),
+                            JobChainP nestedJobChainP = JobChainPermanent.initJobChainP(dbLayer, nestedJobChain, processClassJobs, jobChainFilter.getCompact(),
                                     instanceId);
                             if (nestedJobChainP != null) {
                                 nestedJobChains.add(nestedJobChainP);
