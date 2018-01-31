@@ -153,6 +153,19 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<dependency>
+    		<groupId>com.fasterxml.jackson.dataformat</groupId>
+    		<artifactId>jackson-dataformat-xml</artifactId>
+    		<exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+					<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+			<version>${jackson.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
