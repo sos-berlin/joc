@@ -10,6 +10,31 @@
 		"deliveryDate": {
 			"$ref": "../common/deliveryDate-schema.json"
 		},
+		
+		"main":{
+		"type": "array",
+			"items": {
+				"type": "object",
+				"javaType": "com.sos.joc.model.security.SecurityConfigurationMainEntry",
+				"properties": {			
+					"entryName": {
+						"type": "string"
+					},
+					"entryValue": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					},
+					"entryComment": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		},
 
 		"users": {
 			"type": "array",
