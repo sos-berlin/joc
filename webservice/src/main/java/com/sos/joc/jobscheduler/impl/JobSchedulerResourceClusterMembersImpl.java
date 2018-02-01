@@ -39,8 +39,10 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         SOSHibernateSession connection = null;
 
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerId, getPermissonsJocCockpit(
-                    accessToken).getJobschedulerMasterCluster().getView().isStatus());
+            boolean permitted = getPermissonsJocCockpit(
+                    accessToken).getJobschedulerMasterCluster().getView().isStatus() || getPermissonsJocCockpit(
+                            accessToken).getJobschedulerMaster().getView().isStatus();
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerId,permitted);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
