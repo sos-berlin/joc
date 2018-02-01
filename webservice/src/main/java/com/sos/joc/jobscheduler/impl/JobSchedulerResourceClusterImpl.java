@@ -30,8 +30,10 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
 
     public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilter) {
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getView().isStatus());
+            boolean permitted = getPermissonsJocCockpit(
+                    accessToken).getJobschedulerMasterCluster().getView().isStatus() || getPermissonsJocCockpit(
+                            accessToken).getJobschedulerMaster().getView().isStatus();
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),permitted);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -47,6 +49,9 @@ public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements 
             if (clusterElem == null) {
                 cluster.set_type(ClusterType.STANDALONE);
             } else {
+                if (! getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getView().isStatus() ){
+                    return accessDeniedResponse();
+                }
                 NodeList clusterMembers = jocXmlCommand.getSosxml().selectNodeList(clusterElem, "cluster_member[@distributed_orders='yes']");
                 if (clusterMembers != null && clusterMembers.getLength() > 0) {
                     cluster.set_type(ClusterType.ACTIVE);
