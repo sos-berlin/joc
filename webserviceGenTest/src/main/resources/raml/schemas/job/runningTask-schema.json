@@ -3,6 +3,7 @@
   "id": "schemas/job/runningTask",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
+  "javaType": "com.sos.joc.model.job.RunningTask",
   "description": "task object of an order job which is running",
   "required": [
     "taskId",

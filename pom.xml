@@ -26,6 +26,7 @@
     	<!--module>webserviceGenTest</module-->
         <!--module>sos-character-encoding-filter</module-->
         <module>patch-executor</module>
+        <!--module>sos-annotator</module-->
 	</modules>
 
 </project>
