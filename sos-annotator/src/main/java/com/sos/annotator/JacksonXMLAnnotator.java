@@ -35,7 +35,7 @@ public class JacksonXMLAnnotator extends AbstractAnnotator implements Annotator 
 
     @Override
     public void propertySetter(JMethod setter, String propertyName) {
-        if (setter.listParamTypes()[0].erasure().equals(setter.type().owner().ref(List.class))) {
+        if (setter.listParamTypes()[0].erasure().equals(setter.listParamTypes()[0].owner().ref(List.class))) {
             setter.annotate(JacksonXmlProperty.class).param("localName", getSingularPropertyName(propertyName));
         } else {
             setter.annotate(JacksonXmlProperty.class).param("localName", propertyName);

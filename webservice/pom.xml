@@ -163,8 +163,6 @@
 					<artifactId>servlet-api</artifactId>
 				</exclusion>
 			</exclusions>
-			<version>${jackson.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>

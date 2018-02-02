@@ -85,7 +85,7 @@
           "$ref": "../common/timestamp-schema.json"
         },
         "repeat": {
-          "$ref": "../common/nonNegativeInteger-schema.json"
+          "$ref": "../common/nonNegativeLong-schema.json"
         }
       }
 
