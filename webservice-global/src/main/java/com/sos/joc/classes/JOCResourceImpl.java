@@ -1,16 +1,25 @@
 package com.sos.joc.classes;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import org.apache.shiro.config.Ini.Section;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.auth.rest.SOSPermissionsCreator;
+import com.sos.auth.rest.SOSShiroCurrentUser;
+import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
+import com.sos.auth.rest.SOSShiroCurrentUsersList;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -38,339 +47,350 @@ import com.sos.joc.model.common.Folder;
 
 public class JOCResourceImpl {
 
-    protected DBItemInventoryInstance dbItemInventoryInstance;
-    protected JobSchedulerUser jobschedulerUser;
-    private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
-    private String accessToken;
-    private String jobschedulerId;
-    private JocAuditLog jocAuditLog;
+	protected DBItemInventoryInstance dbItemInventoryInstance;
+	protected JobSchedulerUser jobschedulerUser;
+	private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
+	private String accessToken;
+	private String jobschedulerId;
+	private JocAuditLog jocAuditLog;
 
-    private JocError jocError = new JocError();
+	private JocError jocError = new JocError();
 
-    protected void initGetPermissions(String accessToken) {
-        if (jobschedulerUser == null) {
-            this.accessToken = accessToken;
-            jobschedulerUser = new JobSchedulerUser(accessToken);
-        }
+	protected void initGetPermissions(String accessToken) {
+		if (jobschedulerUser == null) {
+			this.accessToken = accessToken;
+			jobschedulerUser = new JobSchedulerUser(accessToken);
+		}
 
-        updateUserInMetaInfo();
-    }
+		updateUserInMetaInfo();
+	}
 
-    protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws SessionNotExistException {
-        initGetPermissions(accessToken);
-        return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
-    }
+	protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws SessionNotExistException {
+		initGetPermissions(accessToken);
+		return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
+	}
 
-    protected SOSPermissionCommands getPermissonsCommands(String accessToken) throws SessionNotExistException {
-        initGetPermissions(accessToken);
-        return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands();
-    }
+	protected SOSPermissionCommands getPermissonsCommands(String accessToken) throws SessionNotExistException {
+		initGetPermissions(accessToken);
+		return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands();
+	}
 
-    public String getAccessToken() {
-        return accessToken;
-    }
+	public String getAccessToken() {
+		return accessToken;
+	}
 
-    public String getAccessToken(String xAccessToken, String oldAccessToken) {
-        if (xAccessToken != null && !xAccessToken.isEmpty()) {
-            return xAccessToken;
-        }
-        return oldAccessToken;
-    }
+	public String getAccessToken(String xAccessToken, String oldAccessToken) {
+		if (xAccessToken != null && !xAccessToken.isEmpty()) {
+			return xAccessToken;
+		}
+		return oldAccessToken;
+	}
 
-    public JobSchedulerUser getJobschedulerUser() {
-        return jobschedulerUser;
-    }
+	public JobSchedulerUser getJobschedulerUser() {
+		return jobschedulerUser;
+	}
 
-    public JocError getJocError() {
-        return jocError;
-    }
+	public JocError getJocError() {
+		return jocError;
+	}
 
-    public Date getDateFromString(String dateString) {
-        Date date = null;
-        try {
-            dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
-            date = Date.from(Instant.parse(dateString));
-        } catch (Exception e) {
-            // TODO what should we do with this exception?
-            // jocError = new JocError("JOC-420","Could not parse date: " +
-            // dateString);
-            LOGGER.warn("Could not parse date: " + dateString, e);
-        }
-        return date;
-    }
+	public Date getDateFromString(String dateString) {
+		Date date = null;
+		try {
+			dateString = dateString.trim().replaceFirst("^(\\d{4}-\\d{2}-\\d{2}) ", "$1T");
+			date = Date.from(Instant.parse(dateString));
+		} catch (Exception e) {
+			// TODO what should we do with this exception?
+			// jocError = new JocError("JOC-420","Could not parse date: " +
+			// dateString);
+			LOGGER.warn("Could not parse date: " + dateString, e);
+		}
+		return date;
+	}
 
-    public Date getDateFromTimestamp(Long timeStamp) {
-        Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp / 1000);
-        return Date.from(fromEpochMilli);
-    }
+	public Date getDateFromTimestamp(Long timeStamp) {
+		Instant fromEpochMilli = Instant.ofEpochMilli(timeStamp / 1000);
+		return Date.from(fromEpochMilli);
+	}
 
-    public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId, boolean permission) throws JocException {
-        this.accessToken = accessToken;
-        if (jobschedulerUser == null) {
-            jobschedulerUser = new JobSchedulerUser(accessToken);
-        }
-        initLogging(request, body);
-        return init(schedulerId, permission);
-    }
+	public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId,
+			boolean permission) throws JocException, SOSHibernateException {
+		this.accessToken = accessToken;
+		if (jobschedulerUser == null) {
+			jobschedulerUser = new JobSchedulerUser(accessToken);
+		}
+		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
 
-    public JOCDefaultResponse init(String request, String accessToken) throws Exception {
-        this.accessToken = accessToken;
-        if (jobschedulerUser == null) {
-            jobschedulerUser = new JobSchedulerUser(accessToken);
-        }
-        initLogging(request, null);
-        return init401And440();
-    }
+		sosPermissionsCreator.loginFromAccessToken(accessToken);
 
-    public String normalizePath(String path) {
-        return Globals.normalizePath(path);
-    }
+		initLogging(request, body);
+		return init(schedulerId, permission);
+	}
 
-    public String normalizeFolder(String path) {
-        if (path == null) {
-            return null;
-        }
-        return ("/" + path.trim()).replaceAll("//+", "/");
-    }
+	public JOCDefaultResponse init(String request, String accessToken) throws Exception {
+		this.accessToken = accessToken;
+		if (jobschedulerUser == null) {
+			jobschedulerUser = new JobSchedulerUser(accessToken);
+		}
+		initLogging(request, null);
+		return init401And440();
+	}
 
-    public boolean checkRequiredComment(AuditParams auditParams) throws JocMissingCommentException {
-        if (Globals.auditLogCommentsAreRequired) {
-            String comment = null;
-            if (auditParams != null) {
-                comment = auditParams.getComment();
-            }
-            if (comment == null || comment.isEmpty()) {
-                throw new JocMissingCommentException();
-            }
-        }
-        return true;
-    }
+	public String normalizePath(String path) {
+		return Globals.normalizePath(path);
+	}
 
-    public boolean checkRequiredComment(String comment) throws JocMissingCommentException {
-        if (Globals.auditLogCommentsAreRequired) {
-            if (comment == null || comment.isEmpty()) {
-                throw new JocMissingCommentException();
-            }
-        }
-        return true;
-    }
+	public String normalizeFolder(String path) {
+		if (path == null) {
+			return null;
+		}
+		return ("/" + path.trim()).replaceAll("//+", "/");
+	}
 
-    public boolean checkRequiredParameter(String paramKey, String paramVal) throws JocMissingRequiredParameterException {
-        if (paramVal == null || paramVal.isEmpty()) {
-            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
-        }
-        return true;
-    }
-    
-    public boolean checkRequiredParameter(String paramKey, Long paramVal) throws JocMissingRequiredParameterException {
-        if (paramVal == null) {
-            throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
-        }
-        return true;
-    }
+	public boolean checkRequiredComment(AuditParams auditParams) throws JocMissingCommentException {
+		if (Globals.auditLogCommentsAreRequired) {
+			String comment = null;
+			if (auditParams != null) {
+				comment = auditParams.getComment();
+			}
+			if (comment == null || comment.isEmpty()) {
+				throw new JocMissingCommentException();
+			}
+		}
+		return true;
+	}
 
-    public boolean checkRequiredParameter(String paramKey, Integer paramVal) throws JocMissingRequiredParameterException {
-        return checkRequiredParameter(paramKey, String.valueOf(paramVal));
-    }
+	public boolean checkRequiredComment(String comment) throws JocMissingCommentException {
+		if (Globals.auditLogCommentsAreRequired) {
+			if (comment == null || comment.isEmpty()) {
+				throw new JocMissingCommentException();
+			}
+		}
+		return true;
+	}
 
-    protected String getParent(String path) {
-        Path p = Paths.get(path).getParent();
-        if (p == null) {
-            return null;
-        } else {
-            return p.toString().replace('\\', '/');
-        }
-    }
+	public boolean checkRequiredParameter(String paramKey, String paramVal)
+			throws JocMissingRequiredParameterException {
+		if (paramVal == null || paramVal.isEmpty()) {
+			throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+		}
+		return true;
+	}
 
-    protected boolean matchesRegex(Pattern p, String path) {
-        if (p != null) {
-            return p.matcher(path).find();
-        } else {
-            return true;
-        }
-    }
+	public boolean checkRequiredParameter(String paramKey, Long paramVal) throws JocMissingRequiredParameterException {
+		if (paramVal == null) {
+			throw new JocMissingRequiredParameterException(String.format("undefined '%1$s'", paramKey));
+		}
+		return true;
+	}
 
-    public void logAuditMessage(IAuditLog body) {
-        jocAuditLog.logAuditMessage(body);
-    }
+	public boolean checkRequiredParameter(String paramKey, Integer paramVal)
+			throws JocMissingRequiredParameterException {
+		return checkRequiredParameter(paramKey, String.valueOf(paramVal));
+	}
 
-    public void storeAuditLogEntry(IAuditLog body) {
-        try {
-            jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession().setAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY,
-                    true);
-        } catch (Exception e) {
-        }
-        jocAuditLog.storeAuditLogEntry(body);
-    }
+	protected String getParent(String path) {
+		Path p = Paths.get(path).getParent();
+		if (p == null) {
+			return null;
+		} else {
+			return p.toString().replace('\\', '/');
+		}
+	}
 
-    public String getJsonString(Object body) {
-        return jocAuditLog.getJsonString(body);
-    }
+	protected boolean matchesRegex(Pattern p, String path) {
+		if (p != null) {
+			return p.matcher(path).find();
+		} else {
+			return true;
+		}
+	}
 
-    public String getUrl() {
-        return dbItemInventoryInstance.getUrl();
-    }
+	public void logAuditMessage(IAuditLog body) {
+		jocAuditLog.logAuditMessage(body);
+	}
 
-    public String getBasicAuthorization() {
-        try {
-            return dbItemInventoryInstance.getAuth();
-        } catch (Exception e) {
-            return null;
-        }
-    }
+	public void storeAuditLogEntry(IAuditLog body) {
+		try {
+			jobschedulerUser.getSosShiroCurrentUser().getCurrentSubject().getSession()
+					.setAttribute(Globals.SESSION_KEY_FOR_SEND_EVENTS_IMMEDIATLY, true);
+		} catch (Exception e) {
+		}
+		jocAuditLog.storeAuditLogEntry(body);
+	}
 
-    public String retrySchedulerInstance() throws JocException {
-        return retrySchedulerInstance(null);
-    }
+	public String getJsonString(Object body) {
+		return jocAuditLog.getJsonString(body);
+	}
 
-    public String retrySchedulerInstance(String schedulerId) throws JocException {
-        if (schedulerId == null) {
-            schedulerId = jobschedulerId;
-        }
-        String url = dbItemInventoryInstance.getUrl();
-        if (schedulerId != null) {
-            jobschedulerUser.getSosShiroCurrentUser().getMapOfSchedulerInstances().remove(jobschedulerId);
-            dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(schedulerId);
-        } else {
-            return null;
-        }
-        if (!url.equals(dbItemInventoryInstance.getUrl())) {
-            return dbItemInventoryInstance.getUrl();
-        }
-        return null;
-    }
+	public String getUrl() {
+		return dbItemInventoryInstance.getUrl();
+	}
 
-    public JOCDefaultResponse accessDeniedResponse() {
-        jocError.setMessage("Access denied");
-        return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, jocError));
-    }
+	public String getBasicAuthorization() {
+		try {
+			return dbItemInventoryInstance.getAuth();
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
-    private void initLogging(String request, Object body) {
-        String user;
-        try {
-            user = jobschedulerUser.getSosShiroCurrentUser().getUsername().trim();
-        } catch (Exception e) {
-            user = "-";
-        }
-        if (request == null || request.isEmpty()) {
-            request = "-";
-        } else {
-            LOGGER.debug(request);
-        }
-        jocAuditLog = new JocAuditLog(user, request);
-        jocError.addMetaInfoOnTop("\nREQUEST: " + request, "PARAMS: " + getJsonString(body), "USER: " + user);
-    }
+	public String retrySchedulerInstance() throws JocException {
+		return retrySchedulerInstance(null);
+	}
 
-    private JOCDefaultResponse init(String schedulerId, boolean permission) throws JocException {
-        JOCDefaultResponse jocDefaultResponse = init401And440();
+	public String retrySchedulerInstance(String schedulerId) throws JocException {
+		if (schedulerId == null) {
+			schedulerId = jobschedulerId;
+		}
+		String url = dbItemInventoryInstance.getUrl();
+		if (schedulerId != null) {
+			jobschedulerUser.getSosShiroCurrentUser().getMapOfSchedulerInstances().remove(jobschedulerId);
+			dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(schedulerId);
+		} else {
+			return null;
+		}
+		if (!url.equals(dbItemInventoryInstance.getUrl())) {
+			return dbItemInventoryInstance.getUrl();
+		}
+		return null;
+	}
 
-        if (!permission) {
-            return accessDeniedResponse();
-        }
-        if (schedulerId == null) {
-            throw new JocMissingRequiredParameterException("undefined 'jobschedulerId'");
-        } else {
-            jobschedulerId = schedulerId;
-            jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().setSchedulerId(schedulerId);
-        }
-        if (!"".equals(schedulerId)) {
-            dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(schedulerId);
-        }
-        return jocDefaultResponse;
-    }
+	public JOCDefaultResponse accessDeniedResponse() {
+		jocError.setMessage("Access denied");
+		return JOCDefaultResponse.responseStatus403(JOCDefaultResponse.getError401Schema(jobschedulerUser, jocError));
+	}
 
-    private JOCDefaultResponse init401And440() {
-        if (!jobschedulerUser.isAuthenticated()) {
-            return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
-        }
-        return null;
-    }
+	private void initLogging(String request, Object body) {
+		String user;
+		try {
+			user = jobschedulerUser.getSosShiroCurrentUser().getUsername().trim();
+		} catch (Exception e) {
+			user = "-";
+		}
+		if (request == null || request.isEmpty()) {
+			request = "-";
+		} else {
+			LOGGER.debug(request);
+		}
+		jocAuditLog = new JocAuditLog(user, request);
+		jocError.addMetaInfoOnTop("\nREQUEST: " + request, "PARAMS: " + getJsonString(body), "USER: " + user);
+	}
 
-    private void updateUserInMetaInfo() {
-        try {
-            if (jocError != null) {
-                String userMetaInfo = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
-                List<String> metaInfo = jocError.getMetaInfo();
-                if (metaInfo.size() > 2) {
-                    metaInfo.remove(2);
-                    metaInfo.add(2, userMetaInfo);
-                }
-            }
-        } catch (Exception e) {
-        }
-    }
+	private JOCDefaultResponse init(String schedulerId, boolean permission) throws JocException {
+		JOCDefaultResponse jocDefaultResponse = init401And440();
 
-    public void getJobSchedulerInstanceByHostPort(String host, Integer port, String schedulerId) throws DBConnectionRefusedException,
-            DBInvalidDataException, UnknownJobSchedulerMasterException {
-        if (host != null && !host.isEmpty() && port != null && port > 0) {
+		if (!permission) {
+			return accessDeniedResponse();
+		}
+		if (schedulerId == null) {
+			throw new JocMissingRequiredParameterException("undefined 'jobschedulerId'");
+		} else {
+			jobschedulerId = schedulerId;
+			jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().setSchedulerId(schedulerId);
+		}
+		if (!"".equals(schedulerId)) {
+			dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(schedulerId);
+		}
+		return jocDefaultResponse;
+	}
 
-            SOSHibernateSession session = null;
+	private JOCDefaultResponse init401And440() {
+		if (!jobschedulerUser.isAuthenticated()) {
+			return JOCDefaultResponse.responseStatus401(JOCDefaultResponse.getError401Schema(jobschedulerUser));
+		}
+		return null;
+	}
 
-            try {
-                try {
-                    session = Globals.createSosHibernateStatelessConnection("getJobSchedulerInstanceByHostPort");
-                } catch (Exception e) {
-                    throw new DBConnectionRefusedException(e);
-                }
+	private void updateUserInMetaInfo() {
+		try {
+			if (jocError != null) {
+				String userMetaInfo = "USER: " + jobschedulerUser.getSosShiroCurrentUser().getUsername();
+				List<String> metaInfo = jocError.getMetaInfo();
+				if (metaInfo.size() > 2) {
+					metaInfo.remove(2);
+					metaInfo.add(2, userMetaInfo);
+				}
+			}
+		} catch (Exception e) {
+		}
+	}
 
-                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
-                dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(host, port, schedulerId);
+	public void getJobSchedulerInstanceByHostPort(String host, Integer port, String schedulerId)
+			throws DBConnectionRefusedException, DBInvalidDataException, UnknownJobSchedulerMasterException {
+		if (host != null && !host.isEmpty() && port != null && port > 0) {
 
-                if (dbItemInventoryInstance == null) {
-                    String errMessage = String.format("JobScheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
-                            schedulerId, host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
-                    throw new UnknownJobSchedulerMasterException(errMessage);
-                }
-            } finally {
-                Globals.disconnect(session);
-            }
-        }
-    }
+			SOSHibernateSession session = null;
 
-    protected void updateDailyPlan(DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter) throws Exception {
-        HashMap<String, String> createDaysScheduleOptionsMap = new HashMap<String, String>();
+			try {
+				try {
+					session = Globals.createSosHibernateStatelessConnection("getJobSchedulerInstanceByHostPort");
+				} catch (Exception e) {
+					throw new DBConnectionRefusedException(e);
+				}
 
-        String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
+				InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
+				dbItemInventoryInstance = dbLayer.getInventoryInstanceByHostPort(host, port, schedulerId);
 
-        createDaysScheduleOptionsMap.put("command_url", commandUrl);
-        String basicAuthorization = dbItemInventoryInstance.getAuth();
-        if (basicAuthorization != null && !basicAuthorization.isEmpty()) {
-            createDaysScheduleOptionsMap.put("basic_authorization", dbItemInventoryInstance.getAuth());
-        }
-        CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
-        createDailyPlanOptions.setAllOptions(createDaysScheduleOptionsMap);
+				if (dbItemInventoryInstance == null) {
+					String errMessage = String.format(
+							"JobScheduler with id:%1$s, host:%2$s and port:%3$s couldn't be found in table %4$s",
+							schedulerId, host, port, DBLayer.TABLE_INVENTORY_INSTANCES);
+					throw new UnknownJobSchedulerMasterException(errMessage);
+				}
+			} finally {
+				Globals.disconnect(session);
+			}
+		}
+	}
 
-        SOSHibernateSession sosHibernateSession = null;
-        try {
-            sosHibernateSession = Globals.createSosHibernateStatelessConnection("dailyplan");
-            sosHibernateSession.setAutoCommit(false);
+	protected void updateDailyPlan(DailyPlanCalender2DBFilter dailyPlanCalender2DBFilter) throws Exception {
+		HashMap<String, String> createDaysScheduleOptionsMap = new HashMap<String, String>();
 
-            Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession, dbItemInventoryInstance.getSchedulerId());
-            calendar2Db.setOptions(createDailyPlanOptions);
-            calendar2Db.addDailyplan2DBFilter(dailyPlanCalender2DBFilter, dbItemInventoryInstance.getId());
-            calendar2Db.processDailyplan2DBFilter();
+		String commandUrl = dbItemInventoryInstance.getUrl() + "/jobscheduler/master/api/command";
 
-        } catch (SOSHibernateException ex) {
-            try {
-                if (sosHibernateSession != null) {
-                    sosHibernateSession.rollback();
-                }
-            } catch (Exception e) {
-            }
-            throw new DBInvalidDataException(ex);
-        }
-    }
+		createDaysScheduleOptionsMap.put("command_url", commandUrl);
+		String basicAuthorization = dbItemInventoryInstance.getAuth();
+		if (basicAuthorization != null && !basicAuthorization.isEmpty()) {
+			createDaysScheduleOptionsMap.put("basic_authorization", dbItemInventoryInstance.getAuth());
+		}
+		CreateDailyPlanOptions createDailyPlanOptions = new CreateDailyPlanOptions();
+		createDailyPlanOptions.setAllOptions(createDaysScheduleOptionsMap);
 
-    protected List<Folder> addPermittedFolder(List<Folder> folders) throws SessionNotExistException {
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                Folder f = new Folder();
-                f.setFolder(folder.getFolder());
-                f.setRecursive(folder.isRecursive());
-                folders.add(f);
-            }
-        }
-        return folders;
-    }
+		SOSHibernateSession sosHibernateSession = null;
+		try {
+			sosHibernateSession = Globals.createSosHibernateStatelessConnection("dailyplan");
+			sosHibernateSession.setAutoCommit(false);
+
+			Calendar2DB calendar2Db = new Calendar2DB(sosHibernateSession, dbItemInventoryInstance.getSchedulerId());
+			calendar2Db.setOptions(createDailyPlanOptions);
+			calendar2Db.addDailyplan2DBFilter(dailyPlanCalender2DBFilter, dbItemInventoryInstance.getId());
+			calendar2Db.processDailyplan2DBFilter();
+
+		} catch (SOSHibernateException ex) {
+			try {
+				if (sosHibernateSession != null) {
+					sosHibernateSession.rollback();
+				}
+			} catch (Exception e) {
+			}
+			throw new DBInvalidDataException(ex);
+		}
+	}
+
+	protected List<Folder> addPermittedFolder(List<Folder> folders) throws SessionNotExistException {
+		if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+			for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+				FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+				Folder f = new Folder();
+				f.setFolder(folder.getFolder());
+				f.setRecursive(folder.isRecursive());
+				folders.add(f);
+			}
+		}
+		return folders;
+	}
+
+
+
 }
