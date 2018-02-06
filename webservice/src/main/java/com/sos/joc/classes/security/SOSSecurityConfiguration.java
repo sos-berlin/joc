@@ -248,10 +248,15 @@ public class SOSSecurityConfiguration {
 			SOSSecurityConfigurationMainEntry sosSecurityConfigurationMainEntry = new SOSSecurityConfigurationMainEntry(
 					securityConfigurationMainEntry);
 
+			String comment = "";
+			String nl = "\r\n";
 			for (int i = 0; i < securityConfigurationMainEntry.getEntryComment().size(); i++) {
-				writeIni.get(SECTION_MAIN).putComment(securityConfigurationMainEntry.getEntryName(),
-						securityConfigurationMainEntry.getEntryComment().get(i));
+				comment = comment + securityConfigurationMainEntry.getEntryComment().get(i) + nl;
+				if (i==securityConfigurationMainEntry.getEntryComment().size()-1) {
+					nl = "";
+				}
 			}
+			writeIni.get(SECTION_MAIN).putComment(securityConfigurationMainEntry.getEntryName(),comment);
 			s.put(securityConfigurationMainEntry.getEntryName(), sosSecurityConfigurationMainEntry.getIniWriteString());
 		}
 	}
