@@ -93,23 +93,25 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
             command.setBasicAuthorization(jocJsonCommand.getBasicAuthorization());
             tasks.add(new AgentVCallable(agent, command, accessToken));
         }
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();
-        try {
-            for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-                try {
-                    AgentOfCluster a = result.get();
-                    mapOfAgents.put(a.getUrl(), a);
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof JocException) {
-                        throw (JocException) e.getCause();
-                    } else {
-                        throw (Exception) e.getCause();
+        Map<String, AgentOfCluster> mapOfAgents = new HashMap<String, AgentOfCluster>();
+        if (!tasks.isEmpty()) {
+            ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size())); // max. 10;
+            try {
+                for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+                    try {
+                        AgentOfCluster a = result.get();
+                        mapOfAgents.put(a.getUrl(), a);
+                    } catch (ExecutionException e) {
+                        if (e.getCause() instanceof JocException) {
+                            throw (JocException) e.getCause();
+                        } else {
+                            throw (Exception) e.getCause();
+                        }
                     }
                 }
+            } finally {
+                executorService.shutdown();
             }
-        } finally {
-            executorService.shutdown();
         }
         List<AgentCluster> listAgentClusterV = new ArrayList<AgentCluster>();
         for (AgentClusterVolatile agentClusterV : listAgentCluster) {
@@ -136,23 +138,25 @@ public class AgentClusterVCallable implements Callable<AgentCluster> {
         for (String agent :  agentClusterV.getAgentSet()) {
             tasks.add(new AgentVCallable(agent, new JOCJsonCommand(jocJsonCommand), accessToken));
         }
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
         Map<String,AgentOfCluster> mapOfAgents = new HashMap<String,AgentOfCluster>();
-        try {
-            for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-                try {
-                    AgentOfCluster a = result.get();
-                    mapOfAgents.put(a.getUrl(), a);
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof JocException) {
-                        throw (JocException) e.getCause();
-                    } else {
-                        throw (Exception) e.getCause();
+        if (!tasks.isEmpty()) {
+            ExecutorService executorService = Executors.newFixedThreadPool(Math.min(5, tasks.size()));
+            try {
+                for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+                    try {
+                        AgentOfCluster a = result.get();
+                        mapOfAgents.put(a.getUrl(), a);
+                    } catch (ExecutionException e) {
+                        if (e.getCause() instanceof JocException) {
+                            throw (JocException) e.getCause();
+                        } else {
+                            throw (Exception) e.getCause();
+                        }
                     }
                 }
+            } finally {
+                executorService.shutdown();
             }
-        } finally {
-            executorService.shutdown();
         }
         agentClusterV.setFields(mapOfAgents, agentClusterBody.getCompact());
         return agentClusterV;
