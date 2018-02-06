@@ -13,12 +13,12 @@ public class SOSSecurityConfigurationMainEntry {
 	public SOSSecurityConfigurationMainEntry(SecurityConfigurationMainEntry securityConfigurationMainEntry) {
 		super();
 		this.securityConfigurationMainEntry = securityConfigurationMainEntry;
-		
+
 	}
 
 	public SOSSecurityConfigurationMainEntry() {
 		super();
- 	}
+	}
 
 	public String getIniWriteString(Map.Entry<String, String> entry) {
 		if (entry.getKey().contains(".groupRolesMap")) {
@@ -67,12 +67,34 @@ public class SOSSecurityConfigurationMainEntry {
 		}
 	}
 
+	private String removeCharInQuotes(String s,String source, String target) {
+		boolean inQuote = false;
+		StringBuffer str = new StringBuffer(s);
+		for (int i = 0; i < s.length(); i++) {
+			String charAt = String.valueOf(s.charAt(i));
+			if ("\"".equals(charAt)) {
+				inQuote = !inQuote;
+			}
+			if (inQuote && ",".equals(charAt)) {
+				str.setCharAt(i, '^');
+			}
+
+		}
+		return str.toString();
+
+	}
+
+	public String removeCharInQuotes(String s) {
+		return removeCharInQuotes(s,",","^");
+	}
+
 	public List<String> getMultiLineValue(String entryKey, String entryMultiLineValue) {
 		List<String> entryValue = new ArrayList<String>();
+		entryMultiLineValue=removeCharInQuotes(entryMultiLineValue,",","°");
 		if (entryKey.contains(".groupRolesMap")) {
 			String s[] = entryMultiLineValue.split(",");
 			for (int i = 0; i < s.length; i++) {
-				entryValue.add(s[i]);
+				entryValue.add(removeCharInQuotes(s[i],"°",","));
 			}
 		} else {
 			entryValue.add(entryMultiLineValue);
