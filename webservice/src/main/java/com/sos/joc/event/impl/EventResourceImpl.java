@@ -169,23 +169,24 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
                 session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
             } catch (Exception e1) {
             }
-
-            ExecutorService executorService = Executors.newFixedThreadPool(tasks.size());
-            try {
-                JobSchedulerEvent evt = executorService.invokeAny(tasks);
-                eventList.put(evt.getJobschedulerId(), evt);
-            } catch (ExecutionException | InterruptedException e) {
-                if (e.getCause() instanceof JocException) {
-                    throw (JocException) e.getCause();
-                } else {
-                    throw (Exception) e.getCause();
+            if (!tasks.isEmpty()) {
+                ExecutorService executorService = Executors.newFixedThreadPool(tasks.size());
+                try {
+                    JobSchedulerEvent evt = executorService.invokeAny(tasks);
+                    eventList.put(evt.getJobschedulerId(), evt);
+                } catch (ExecutionException | InterruptedException e) {
+                    if (e.getCause() instanceof JocException) {
+                        throw (JocException) e.getCause();
+                    } else {
+                        throw (Exception) e.getCause();
+                    }
+                } finally {
+                    // Globals.forceClosingHttpClients(session);
+                    for (JOCJsonCommand command : jocJsonCommands) {
+                        command.forcedClosingHttpClient();
+                    }
+                    executorService.shutdown();
                 }
-            } finally {
-                // Globals.forceClosingHttpClients(session);
-                for (JOCJsonCommand command : jocJsonCommands) {
-                    command.forcedClosingHttpClient();
-                }
-                executorService.shutdown();
             }
 
             entity.setEvents(new ArrayList<JobSchedulerEvent>(eventList.values()));

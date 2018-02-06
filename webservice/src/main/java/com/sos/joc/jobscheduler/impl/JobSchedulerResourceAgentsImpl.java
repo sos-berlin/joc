@@ -62,22 +62,23 @@ public class JobSchedulerResourceAgentsImpl extends JOCResourceImpl implements I
                     tasks.add(new AgentVCallable(agentUri.getString(), new JOCJsonCommand(this), accessToken));
                 }
             }
-
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
-            try {
-                for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-                    try {
-                        listOfAgents.add(result.get());
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof JocException) {
-                            throw (JocException) e.getCause();
-                        } else {
-                            throw (Exception) e.getCause();
+            if (!tasks.isEmpty()) {
+                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                try {
+                    for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+                        try {
+                            listOfAgents.add(result.get());
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
                         }
                     }
+                } finally {
+                    executorService.shutdown();
                 }
-            } finally {
-                executorService.shutdown();
             }
 
             AgentsV entity = new AgentsV();

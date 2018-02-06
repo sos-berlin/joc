@@ -118,7 +118,7 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
             }
 
             if (tasks != null && !tasks.isEmpty()) {
-                ExecutorService executorService = Executors.newFixedThreadPool(10);
+                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
                 try {
                     for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
                         try {

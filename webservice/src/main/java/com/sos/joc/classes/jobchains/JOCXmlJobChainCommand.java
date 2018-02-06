@@ -174,44 +174,49 @@ public class JOCXmlJobChainCommand extends JOCXmlCommand {
            }
         }
         
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        try {
-            for (Future<Map<String, JobChainVolatile>> result : executorService.invokeAll(summaryTasks)) {
-                try {
-                    jobChainMap.putAll(result.get());
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof JocException) {
-                        throw (JocException) e.getCause();
-                    } else {
-                        throw (Exception) e.getCause();
-                    }
-                }
-            }
-            if (!orderTasks.isEmpty()) {
-                for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(orderTasks)) {
-                    try {
-                        Map<String, OrderVolatile> orders = result.get();
-                        if (orders.size() > 0) {
-                            JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
-                            if (j != null) {
-                                if (j.hasJobChainNodes()) {
-                                    j.setOuterOrdersAndSummary(orders, jobChainsFilter.getMaxOrders(), jobChainsFilter.getCompact());
-                                } else {
-                                    j.setOrders(orders, jobChainsFilter.getMaxOrders());
-                                }
+        int threadPoolSize = Math.min(10, Math.max(summaryTasks.size(), orderTasks.size())); //max. 10
+        if (threadPoolSize > 0) {
+            ExecutorService executorService = Executors.newFixedThreadPool(threadPoolSize);
+            try {
+                if (!summaryTasks.isEmpty()) {
+                    for (Future<Map<String, JobChainVolatile>> result : executorService.invokeAll(summaryTasks)) {
+                        try {
+                            jobChainMap.putAll(result.get());
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
                             }
                         }
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof JocException) {
-                            throw (JocException) e.getCause();
-                        } else {
-                            throw (Exception) e.getCause();
+                    }
+                }
+                if (!orderTasks.isEmpty()) {
+                    for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(orderTasks)) {
+                        try {
+                            Map<String, OrderVolatile> orders = result.get();
+                            if (orders.size() > 0) {
+                                JobChainVolatile j = jobChainMap.get(orders.values().iterator().next().origJobChain());
+                                if (j != null) {
+                                    if (j.hasJobChainNodes()) {
+                                        j.setOuterOrdersAndSummary(orders, jobChainsFilter.getMaxOrders(), jobChainsFilter.getCompact());
+                                    } else {
+                                        j.setOrders(orders, jobChainsFilter.getMaxOrders());
+                                    }
+                                }
+                            }
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
                         }
                     }
                 }
+            } finally {
+                executorService.shutdown();
             }
-        } finally {
-            executorService.shutdown();
         }
         //LOGGER.debug("..." + jobChainMap.size() + " jobChains processed");
         return new ArrayList<JobChainV>(jobChainMap.values());

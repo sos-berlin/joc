@@ -6,8 +6,8 @@ import java.util.TimeZone;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.Ini;
-import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.config.Ini.Section;
+import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
 
@@ -19,7 +19,7 @@ import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JocCockpitProperties;
-import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.DBInvalidDataException;
 import com.sos.joc.exceptions.JocException;
 
 public class SOSPermissionsCreator {
@@ -45,15 +45,9 @@ public class SOSPermissionsCreator {
 			try {
 				sosShiroIniShare.provideIniFile();
 			} catch (IOException e) {
-				JocError err = new JocError();
-	            err.setMessage(String.format("IOException: %s", e.getMessage()));
-	            JocException ee = new JocException(err);
-	            throw ee;
+			    throw new JocException(e);
 			} catch (SOSHibernateException e) {
-				JocError err = new JocError();
-	            err.setMessage(String.format("SOSHibernateException: %s", e.getMessage()));
-	            JocException ee = new JocException(err);
-	            throw ee;
+			    throw new DBInvalidDataException(e);
 			}
 			sosHibernateSession.close();
 			

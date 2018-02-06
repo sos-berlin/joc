@@ -1,5 +1,6 @@
 package com.sos.auth.rest;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -106,49 +107,28 @@ public class SOSShiroCurrentUser {
         }
     }
 
-    private String getPermissionSubString(int pos, String permission) {
-        String p = permission.replace(':', '/');
-        Path path = Paths.get(p, "");
-        for (int i = 0; i < pos; i++) {
-            if (path.getParent() != null) {
-                p = path.getParent().toString();
-                path = Paths.get(p, "");
-            }
-        }
-        p = p.replace('/', ':');
-        return p;
-    }
-
-    private boolean getExcluded(String permission, String permissionMaster) {
-        String[] permissionToken = permission.split(":");
+    private boolean getExcluded(String permission, String masterId) {
         boolean excluded = false;
-        for (int i = 0; i < permissionToken.length-1; i++) {
-            String s = getPermissionSubString(i, permission);
-            if (currentSubject != null) {
-                excluded = excluded || currentSubject.isPermitted("-" + s);
-            }
-        }
-
-        if (!excluded) {
-            permissionToken = permissionMaster.split(":");
-            for (int i = 0; i < permissionToken.length-1; i++) {
-                String s = getPermissionSubString(i, permissionMaster);
-                if (currentSubject != null) {
-                    excluded = excluded || currentSubject.isPermitted("-" + s);
+        if (currentSubject != null) {
+            Path path = Paths.get(permission.replace(':', '/'));
+            int nameCount = path.getNameCount();
+            for (int i = 0; i < nameCount - 1; i++) {
+                if (excluded) {
+                    break;
                 }
+                String s = path.subpath(0, nameCount - i).toString().replace(File.separatorChar, ':');
+                excluded = currentSubject.isPermitted("-" + s) || currentSubject.isPermitted("-" + masterId + ":" + s);
             }
         }
         return excluded;
     }
 
-    public boolean testGetExcluded(String permission, String permissionMaster) {
-        return getExcluded(permission, permissionMaster);
+    public boolean testGetExcluded(String permission, String masterId) {
+        return getExcluded(permission, masterId);
     }
 
-    private boolean getPermissionFromSubject(String permission, String permissionMaster) {
-        boolean excluded = currentSubject.isPermitted("-" + permission) || currentSubject.isPermitted("-" + permissionMaster);
-        excluded = getExcluded(permission, permissionMaster);
-        return (currentSubject.isPermitted(permission) || currentSubject.isPermitted(permissionMaster)) && !excluded;
+    private boolean getPermissionFromSubject(String permission, String masterId) {
+        return (currentSubject.isPermitted(permission) || currentSubject.isPermitted(masterId + ":" + permission)) && !getExcluded(permission, masterId);
     }
 
     private boolean getPermissionFromMaster(String permission) {
@@ -159,8 +139,7 @@ public class SOSShiroCurrentUser {
         } else {
             master = selectedInstance.getSchedulerId();
         }
-        String permissionMaster = master + ":" + permission;
-        return getPermissionFromSubject(permission, permissionMaster);
+        return getPermissionFromSubject(permission, master);
     }
 
     public void setSelectedInstance(DBItemInventoryInstance selectedInstance) {
@@ -174,6 +153,14 @@ public class SOSShiroCurrentUser {
     public boolean isPermitted(String permission) {
         if (currentSubject != null) {
             return getPermissionFromMaster(permission);
+        } else {
+            return false;
+        }
+    }
+    
+    public boolean isPermitted(String permission, String masterId) {
+        if (currentSubject != null) {
+            return getPermissionFromSubject(permission, masterId);
         } else {
             return false;
         }

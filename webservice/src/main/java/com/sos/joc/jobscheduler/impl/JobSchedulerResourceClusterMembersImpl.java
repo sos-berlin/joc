@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
+import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
@@ -28,6 +29,8 @@ import com.sos.joc.model.jobscheduler.MastersV;
 public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl implements IJobSchedulerResourceClusterMembers {
 
     private static final String API_CALL = "./jobscheduler/cluster/members";
+    private static final String MASTER_VIEW_PERM = "sos:products:joc_cockpit:jobscheduler_master:view:status";
+    private static final String CLUSTER_VIEW_PERM = "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status";
 
     @Override
     public JOCDefaultResponse postJobschedulerClusterMembers(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerFilter) {
@@ -35,14 +38,23 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
     }
 
     public JOCDefaultResponse postJobschedulerClusterMembers(String accessToken, JobSchedulerId jobSchedulerFilter) {
-        String jobSchedulerId = jobSchedulerFilter.getJobschedulerId();
         SOSHibernateSession connection = null;
 
         try {
-            boolean permitted = getPermissonsJocCockpit(
-                    accessToken).getJobschedulerMasterCluster().getView().isStatus() || getPermissonsJocCockpit(
-                            accessToken).getJobschedulerMaster().getView().isStatus();
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerId,permitted);
+            boolean isPermitted = true;
+            if (jobSchedulerFilter == null) {
+                jobSchedulerFilter = new JobSchedulerId();
+            }
+            if (jobSchedulerFilter.getJobschedulerId() == null) {
+                jobSchedulerFilter.setJobschedulerId("");
+            }
+            if (!jobSchedulerFilter.getJobschedulerId().isEmpty()) {
+                isPermitted = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getView().isStatus() || getPermissonsJocCockpit(
+                        accessToken).getJobschedulerMaster().getView().isStatus();
+            }
+
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),
+                    isPermitted);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
             }
@@ -50,14 +62,29 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             List<JobSchedulerV> masters = new ArrayList<JobSchedulerV>();
 
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
-            List<DBItemInventoryInstance> schedulersFromDb = instanceLayer.getInventoryInstancesBySchedulerId(jobSchedulerId);
+            List<DBItemInventoryInstance> schedulersFromDb = instanceLayer.getInventoryInstancesBySchedulerId(jobSchedulerFilter.getJobschedulerId());
             if (schedulersFromDb != null && !schedulersFromDb.isEmpty()) {
+
+                SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
                 List<JobSchedulerVCallable> tasks = new ArrayList<JobSchedulerVCallable>();
+                String masterId = "";
                 for (DBItemInventoryInstance instance : schedulersFromDb) {
+                    if (jobSchedulerFilter.getJobschedulerId().isEmpty()) {
+                        if (instance.getSchedulerId() == null || instance.getSchedulerId().isEmpty()) {
+                            continue;
+                        }
+                        if (!masterId.equals(instance.getSchedulerId())) {
+                            masterId = instance.getSchedulerId();
+                            isPermitted = shiroUser.isPermitted(CLUSTER_VIEW_PERM, masterId) || shiroUser.isPermitted(MASTER_VIEW_PERM, masterId);
+                        }
+                        if (!isPermitted) {
+                            continue;
+                        }
+                    }
                     tasks.add(new JobSchedulerVCallable(setMappedUrl(instance), accessToken));
                 }
                 if (!tasks.isEmpty()) {
-                    ExecutorService executorService = Executors.newFixedThreadPool(10);
+                    ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
                     try {
                         for (Future<JobSchedulerV> result : executorService.invokeAll(tasks)) {
                             try {
@@ -72,6 +99,10 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                         }
                     } finally {
                         executorService.shutdown();
+                    }
+                } else {
+                    if (jobSchedulerFilter.getJobschedulerId().isEmpty()) {
+                        return accessDeniedResponse();
                     }
                 }
             }
@@ -89,7 +120,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             Globals.rollback(connection);
         }
     }
-    
+
     private DBItemInventoryInstance setMappedUrl(DBItemInventoryInstance instance) {
         if (Globals.jocConfigurationProperties != null) {
             return Globals.jocConfigurationProperties.setUrlMapping(instance);

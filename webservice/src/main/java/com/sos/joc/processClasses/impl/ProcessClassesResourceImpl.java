@@ -82,7 +82,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 entity.setProcessClasses(callable.getProcessClasses());
             }
             if (tasks.size() > 0) {
-                ExecutorService executorService = Executors.newFixedThreadPool(10);
+                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
                 try {
                     for (Future<List<ProcessClassV>> result : executorService.invokeAll(tasks)) {
                         try {
