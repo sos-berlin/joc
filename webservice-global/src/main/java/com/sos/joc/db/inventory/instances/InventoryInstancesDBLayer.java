@@ -91,13 +91,28 @@ public class InventoryInstancesDBLayer extends DBLayer {
             throw new DBInvalidDataException(ex);
         }
     }
+    
+    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws DBInvalidDataException, DBConnectionRefusedException {
+        return getInventoryInstancesBySchedulerId(schedulerId, false);
+    }
 
-    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId) throws DBInvalidDataException,
+    public List<DBItemInventoryInstance> getInventoryInstancesBySchedulerId(String schedulerId, boolean ordered) throws DBInvalidDataException,
             DBConnectionRefusedException {
         try {
-            String sql = String.format("from %s where schedulerId = :schedulerId", DBITEM_INVENTORY_INSTANCES);
+            if (schedulerId == null) {
+                schedulerId = "";  
+            }
+            StringBuilder sql = new StringBuilder();
+            sql.append("from ").append(DBITEM_INVENTORY_INSTANCES);
+            if (!schedulerId.isEmpty()) {
+                sql.append(" where schedulerId = :schedulerId").append(" order by precedence");
+            } else {
+                sql.append(" order by schedulerId, precedence");
+            }
             Query<DBItemInventoryInstance> query = getSession().createQuery(sql.toString());
-            query.setParameter("schedulerId", schedulerId);
+            if (!schedulerId.isEmpty()) {
+                query.setParameter("schedulerId", schedulerId);
+            }
             List<DBItemInventoryInstance> result = getSession().getResultList(query);
             if (result != null && !result.isEmpty()) {
                 return result;
