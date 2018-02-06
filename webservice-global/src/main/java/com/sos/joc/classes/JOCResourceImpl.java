@@ -1,25 +1,17 @@
 package com.sos.joc.classes;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import org.apache.shiro.config.Ini.Section;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSPermissionsCreator;
-import com.sos.auth.rest.SOSShiroCurrentUser;
-import com.sos.auth.rest.SOSShiroCurrentUserAnswer;
-import com.sos.auth.rest.SOSShiroCurrentUsersList;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -114,7 +106,7 @@ public class JOCResourceImpl {
 	}
 
 	public JOCDefaultResponse init(String request, Object body, String accessToken, String schedulerId,
-			boolean permission) throws JocException, SOSHibernateException {
+			boolean permission) throws JocException {
 		this.accessToken = accessToken;
 		if (jobschedulerUser == null) {
 			jobschedulerUser = new JobSchedulerUser(accessToken);

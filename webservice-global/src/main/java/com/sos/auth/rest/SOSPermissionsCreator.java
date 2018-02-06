@@ -1,7 +1,6 @@
 package com.sos.auth.rest;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -34,7 +33,7 @@ public class SOSPermissionsCreator {
 		this.currentUser = currentUser;
 	}
 
-	public void loginFromAccessToken(String accessToken) throws JocException, SOSHibernateException {
+	public void loginFromAccessToken(String accessToken) throws JocException  {
 
 		if (Globals.jocWebserviceDataContainer.getCurrentUsersList() == null
 				|| Globals.jocWebserviceDataContainer.getCurrentUsersList().getUser(accessToken) == null) {
@@ -47,7 +46,12 @@ public class SOSPermissionsCreator {
 				sosShiroIniShare.provideIniFile();
 			} catch (IOException e) {
 				JocError err = new JocError();
-	            err.setMessage(String.format("Error: %s", e.getMessage()));
+	            err.setMessage(String.format("IOException: %s", e.getMessage()));
+	            JocException ee = new JocException(err);
+	            throw ee;
+			} catch (SOSHibernateException e) {
+				JocError err = new JocError();
+	            err.setMessage(String.format("SOSHibernateException: %s", e.getMessage()));
 	            JocException ee = new JocException(err);
 	            throw ee;
 			}
