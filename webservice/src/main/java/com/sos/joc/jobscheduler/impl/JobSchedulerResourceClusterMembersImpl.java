@@ -41,19 +41,25 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
         SOSHibernateSession connection = null;
 
         try {
-            boolean isPermitted = true;
-            if (jobSchedulerFilter == null) {
-                jobSchedulerFilter = new JobSchedulerId();
-            }
             if (jobSchedulerFilter.getJobschedulerId() == null) {
                 jobSchedulerFilter.setJobschedulerId("");
             }
-            if (!jobSchedulerFilter.getJobschedulerId().isEmpty()) {
-                isPermitted = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getView().isStatus() || getPermissonsJocCockpit(
-                        accessToken).getJobschedulerMaster().getView().isStatus();
+            
+            SOSShiroCurrentUser shiroUser = getJobschedulerUser(accessToken).getSosShiroCurrentUser();
+            boolean isPermitted = true;
+            String curJobSchedulerId = jobSchedulerFilter.getJobschedulerId();
+            
+            if (!curJobSchedulerId.isEmpty()) {
+                if (curJobSchedulerId.equals(shiroUser.getSelectedJobSchedulerId())) {
+                    isPermitted = getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getView().isStatus() || getPermissonsJocCockpit(
+                            accessToken).getJobschedulerMaster().getView().isStatus();
+                } else {
+                    isPermitted = shiroUser.isPermitted(CLUSTER_VIEW_PERM, curJobSchedulerId) || shiroUser.isPermitted(MASTER_VIEW_PERM,
+                            curJobSchedulerId);
+                }
             }
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, curJobSchedulerId,
                     isPermitted);
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
@@ -62,14 +68,13 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
             List<JobSchedulerV> masters = new ArrayList<JobSchedulerV>();
 
             InventoryInstancesDBLayer instanceLayer = new InventoryInstancesDBLayer(connection);
-            List<DBItemInventoryInstance> schedulersFromDb = instanceLayer.getInventoryInstancesBySchedulerId(jobSchedulerFilter.getJobschedulerId());
+            List<DBItemInventoryInstance> schedulersFromDb = instanceLayer.getInventoryInstancesBySchedulerId(curJobSchedulerId);
             if (schedulersFromDb != null && !schedulersFromDb.isEmpty()) {
 
-                SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
                 List<JobSchedulerVCallable> tasks = new ArrayList<JobSchedulerVCallable>();
                 String masterId = "";
                 for (DBItemInventoryInstance instance : schedulersFromDb) {
-                    if (jobSchedulerFilter.getJobschedulerId().isEmpty()) {
+                    if (curJobSchedulerId.isEmpty()) {
                         if (instance.getSchedulerId() == null || instance.getSchedulerId().isEmpty()) {
                             continue;
                         }
@@ -101,7 +106,7 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl impl
                         executorService.shutdown();
                     }
                 } else {
-                    if (jobSchedulerFilter.getJobschedulerId().isEmpty()) {
+                    if (curJobSchedulerId.isEmpty()) {
                         return accessDeniedResponse();
                     }
                 }
