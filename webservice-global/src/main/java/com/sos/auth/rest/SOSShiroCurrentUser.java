@@ -132,14 +132,16 @@ public class SOSShiroCurrentUser {
     }
 
     private boolean getPermissionFromMaster(String permission) {
-        String master;
+        return getPermissionFromSubject(permission, getSelectedJobSchedulerId());
+    }
+    
+    public String getSelectedJobSchedulerId() {
         if (selectedInstance == null) {
             JOCPreferences jocPreferences = new JOCPreferences(username);
-            master = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
+            return jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
         } else {
-            master = selectedInstance.getSchedulerId();
+            return selectedInstance.getSchedulerId();
         }
-        return getPermissionFromSubject(permission, master);
     }
 
     public void setSelectedInstance(DBItemInventoryInstance selectedInstance) {

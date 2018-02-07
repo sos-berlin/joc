@@ -81,6 +81,14 @@ public class JOCResourceImpl {
 	public JobSchedulerUser getJobschedulerUser() {
 		return jobschedulerUser;
 	}
+	
+	public JobSchedulerUser getJobschedulerUser(String accessToken) {
+	    if (jobschedulerUser == null) {
+            this.accessToken = accessToken;
+            jobschedulerUser = new JobSchedulerUser(accessToken);
+        }
+	    return jobschedulerUser;
+    }
 
 	public JocError getJocError() {
 		return jocError;
