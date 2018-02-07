@@ -59,15 +59,15 @@ public class SOSSecurityConfigurationMainEntry {
 			}
 			return s;
 		} else {
-			if (securityConfigurationMainEntry.getEntryValue().size() > 0) {
-				return securityConfigurationMainEntry.getEntryValue().get(0);
-			} else {
-				return "";
+			String value = securityConfigurationMainEntry.getEntryValue().get(0).trim();
+			if (value.isEmpty()) {
+				value = ".";
 			}
+			return value;
 		}
 	}
 
-	private String removeCharInQuotes(String s,String source, String target) {
+	private String removeCharInQuotes(String s, String source, String target) {
 		boolean inQuote = false;
 		StringBuffer str = new StringBuffer(s);
 		for (int i = 0; i < s.length(); i++) {
@@ -85,16 +85,16 @@ public class SOSSecurityConfigurationMainEntry {
 	}
 
 	public String removeCharInQuotes(String s) {
-		return removeCharInQuotes(s,",","^");
+		return removeCharInQuotes(s, ",", "^");
 	}
 
 	public List<String> getMultiLineValue(String entryKey, String entryMultiLineValue) {
 		List<String> entryValue = new ArrayList<String>();
-		entryMultiLineValue=removeCharInQuotes(entryMultiLineValue,",","°");
+		entryMultiLineValue = removeCharInQuotes(entryMultiLineValue, ",", "°");
 		if (entryKey.contains(".groupRolesMap")) {
 			String s[] = entryMultiLineValue.split(",");
 			for (int i = 0; i < s.length; i++) {
-				entryValue.add(removeCharInQuotes(s[i],"°",","));
+				entryValue.add(removeCharInQuotes(s[i], "°", ","));
 			}
 		} else {
 			entryValue.add(entryMultiLineValue);

@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.Ini;
+import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.config.Ini.Section;
+import org.apache.shiro.mgt.SecurityManager;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile;
 import org.ini4j.Wini;
@@ -296,8 +299,13 @@ public class SOSSecurityConfiguration {
 			writeUsers();
 			writeMasters();
 			writeIni.store();
-			SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
+
+			IniSecurityManagerFactory factory = Globals.getShiroIniSecurityManagerFactory();
+            SecurityManager securityManager = factory.getInstance();
+
+            SOSShiroIniShare sosShiroIniShare = new SOSShiroIniShare(sosHibernateSession);
 			sosShiroIniShare.copyFileToDb(Globals.getShiroIniFile().toFile());
+
 			return this.securityConfiguration;
 		} finally {
 			sosHibernateSession.close();
