@@ -20,27 +20,6 @@ public class SOSSecurityConfigurationMainEntry {
 		super();
 	}
 
-	public String getIniWriteString(Map.Entry<String, String> entry) {
-		if (entry.getKey().contains(".groupRolesMap")) {
-			String s = "  ";
-			String[] map = entry.getValue().split(",");
-			if (map.length > 1) {
-				s = "\\" + "\n" + "  ";
-			}
-
-			for (int i = 0; i < map.length; i++) {
-				s = s + map[i].trim();
-				if (i < map.length - 1) {
-					s = s + ", \\" + "\n" + "  ";
-				} else {
-					s = s + "\n";
-				}
-			}
-			return s;
-		} else {
-			return entry.getValue();
-		}
-	}
 
 	public String getIniWriteString() {
 		if (securityConfigurationMainEntry.getEntryName().contains(".groupRolesMap")) {
