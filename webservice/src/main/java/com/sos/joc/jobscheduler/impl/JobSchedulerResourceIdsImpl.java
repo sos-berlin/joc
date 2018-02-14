@@ -37,6 +37,11 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
 		SOSHibernateSession connection = null;
 
 		try {
+			   JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "", getPermissonsJocCockpit("",accessToken).getJobschedulerMaster()
+	                    .getView().isStatus());
+	            if (jocDefaultResponse != null) {
+	                return jocDefaultResponse;
+	            }
 
 			SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
 			JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
@@ -67,13 +72,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
 				}
 			}
 
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "",
-					getPermissonsJocCockpit(selectedInstanceSchedulerId, accessToken).getJobschedulerMaster().getView()
-							.isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}			
-			
+						
 			DBItemInventoryInstance inst = jobschedulerUser.getSchedulerInstance(selectedInstanceSchedulerId);
 
 			JobSchedulerIds entity = new JobSchedulerIds();

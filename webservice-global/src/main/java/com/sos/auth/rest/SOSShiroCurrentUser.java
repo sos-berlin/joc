@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMaster;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMasters;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
+import com.sos.joc.classes.JOCJsonCommand;
 
 public class SOSShiroCurrentUser {
 
@@ -37,7 +39,8 @@ public class SOSShiroCurrentUser {
     private Map<String, SOSPermissionJocCockpit> listOfSOSPermissionJocCockpit;
     private Map<String, SOSPermissionCommands> listOfSOSPermissionCommands;
     private SOSShiroFolderPermissions sosShiroFolderPermissions;
-
+    private List<JOCJsonCommand> jocJsonCommands;
+    
     public SOSShiroCurrentUser(String username, String password) {
         super();
         initFolders();
@@ -242,5 +245,13 @@ public class SOSShiroCurrentUser {
     public void setAuthorization(String authorization) {
         this.authorization = authorization;
     }
+
+	public List<JOCJsonCommand> getJocJsonCommands() {
+		return jocJsonCommands;
+	}
+
+	public void setJocJsonCommands(List<JOCJsonCommand> jocJsonCommands) {
+		this.jocJsonCommands = jocJsonCommands;
+	}
 
 }
