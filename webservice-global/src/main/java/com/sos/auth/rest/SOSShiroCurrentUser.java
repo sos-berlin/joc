@@ -10,10 +10,12 @@ import org.apache.log4j.Logger;
 import org.apache.shiro.subject.Subject;
 
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
+import com.sos.auth.rest.permission.model.SOSPermissionCommandsMaster;
+import com.sos.auth.rest.permission.model.SOSPermissionCommandsMasters;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
+import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMaster;
+import com.sos.auth.rest.permission.model.SOSPermissionJocCockpitMasters;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
-import com.sos.joc.classes.JOCPreferences;
-import com.sos.joc.classes.WebserviceConstants;
 
 public class SOSShiroCurrentUser {
 
@@ -28,11 +30,12 @@ public class SOSShiroCurrentUser {
     private String password;
     private String accessToken;
     private String authorization;
-    private DBItemInventoryInstance selectedInstance;
 
-    private SOSPermissionJocCockpit sosPermissionJocCockpit;
-    private SOSPermissionCommands sosPermissionCommands;
+    private SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters;
+    private SOSPermissionCommandsMasters sosPermissionCommandsMasters;
     private Map<String, DBItemInventoryInstance> listOfSchedulerInstances;
+    private Map<String, SOSPermissionJocCockpit> listOfSOSPermissionJocCockpit;
+    private Map<String, SOSPermissionCommands> listOfSOSPermissionCommands;
     private SOSShiroFolderPermissions sosShiroFolderPermissions;
 
     public SOSShiroCurrentUser(String username, String password) {
@@ -51,28 +54,54 @@ public class SOSShiroCurrentUser {
         this.password = password;
     }
 
-    public SOSPermissionJocCockpit getSosPermissionJocCockpit() {
-        if (selectedInstance != null) {
-            sosPermissionJocCockpit.setJobschedulerId(selectedInstance.getSchedulerId());
-            if (selectedInstance.getPrecedence() == null) {
-                sosPermissionJocCockpit.setPrecedence(-1);
-            } else {
-                sosPermissionJocCockpit.setPrecedence(selectedInstance.getPrecedence());
-            }
-        }
-        return sosPermissionJocCockpit;
+    public SOSPermissionJocCockpit getSosPermissionJocCockpit(String masterId) {
+    	if (listOfSOSPermissionJocCockpit == null) {
+    		initListOfSOSPermissionJocCockpit();
+    	}
+        return listOfSOSPermissionJocCockpit.get(masterId);
+    }
+    
+    private void initListOfSOSPermissionJocCockpit() {
+    	listOfSOSPermissionJocCockpit = new HashMap<String,SOSPermissionJocCockpit>();
+    	for (SOSPermissionJocCockpitMaster permission: sosPermissionJocCockpitMasters.getSOSPermissionJocCockpitMaster()) {
+    		listOfSOSPermissionJocCockpit.put(permission.getJobSchedulerMaster(), permission.getSOSPermissionJocCockpit());
+    	}
+		
+	}
+
+    private void initListOfSOSPermissionCommands() {
+    	listOfSOSPermissionCommands = new HashMap<String,SOSPermissionCommands>();
+    	for (SOSPermissionCommandsMaster permission: sosPermissionCommandsMasters.getSOSPermissionCommandsMaster()) {
+    		listOfSOSPermissionCommands.put(permission.getJobSchedulerMaster(), permission.getSOSPermissionCommands());
+    	}
+		
+	}
+
+	public SOSPermissionJocCockpitMasters getSosPermissionJocCockpitMasters() {
+        return sosPermissionJocCockpitMasters;
     }
 
-    public void setSosPermissionJocCockpit(SOSPermissionJocCockpit sosPermissionJocCockpit) {
-        this.sosPermissionJocCockpit = sosPermissionJocCockpit;
+    public void setSosPermissionJocCockpitMasters(SOSPermissionJocCockpitMasters sosPermissionJocCockpitMasters) {
+        this.sosPermissionJocCockpitMasters = sosPermissionJocCockpitMasters;
     }
 
-    public SOSPermissionCommands getSosPermissionCommands() {
-        return sosPermissionCommands;
+	public SOSPermissionCommandsMasters getSosPermissionCommandsMasters() {
+        return sosPermissionCommandsMasters;
     }
 
-    public void setSosPermissionCommands(SOSPermissionCommands sosPermissionCommands) {
-        this.sosPermissionCommands = sosPermissionCommands;
+    public void setSosPermissionCommandsMasters(SOSPermissionCommandsMasters sosPermissionCommandsMasters) {
+        this.sosPermissionCommandsMasters = sosPermissionCommandsMasters;
+    }
+    
+    public SOSPermissionCommands getSosPermissionCommands(String masterId) {
+    	if (listOfSOSPermissionCommands == null) {
+    		initListOfSOSPermissionCommands();
+    	}
+        return listOfSOSPermissionCommands.get(masterId);
+    }
+
+    public void setSosPermissionCommands(SOSPermissionCommandsMasters sosPermissionCommands) {
+        this.sosPermissionCommandsMasters = sosPermissionCommands;
     }
 
     public String getAccessToken() {
@@ -127,47 +156,26 @@ public class SOSShiroCurrentUser {
         return getExcluded(permission, masterId);
     }
 
-    private boolean getPermissionFromSubject(String permission, String masterId) {
+    private boolean getPermissionFromSubject(String masterId, String permission) {
         return (currentSubject.isPermitted(permission) || currentSubject.isPermitted(masterId + ":" + permission)) && !getExcluded(permission, masterId);
     }
-
-    private boolean getPermissionFromMaster(String permission) {
-        return getPermissionFromSubject(permission, getSelectedJobSchedulerId());
-    }
-    
-    public String getSelectedJobSchedulerId() {
-        if (selectedInstance == null) {
-            JOCPreferences jocPreferences = new JOCPreferences(username);
-            return jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
+     
+    public boolean isPermitted(String masterId, String permission) {
+        if (currentSubject != null) {
+            return getPermissionFromSubject(masterId, permission);
         } else {
-            return selectedInstance.getSchedulerId();
+            return false;
         }
-    }
-
-    public void setSelectedInstance(DBItemInventoryInstance selectedInstance) {
-        this.selectedInstance = selectedInstance;
-    }
-
-    public DBItemInventoryInstance getSelectedInstance() {
-        return this.selectedInstance;
     }
 
     public boolean isPermitted(String permission) {
         if (currentSubject != null) {
-            return getPermissionFromMaster(permission);
+            return getPermissionFromSubject("", permission);
         } else {
             return false;
         }
     }
     
-    public boolean isPermitted(String permission, String masterId) {
-        if (currentSubject != null) {
-            return getPermissionFromSubject(permission, masterId);
-        } else {
-            return false;
-        }
-    }
-
     public boolean isAuthenticated() {
         if (currentSubject != null) {
             return currentSubject.isAuthenticated();

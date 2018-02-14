@@ -23,52 +23,54 @@ import com.sos.joc.model.job.JobFilter;
 @Path("job")
 public class JobRunTimeResourceImpl extends JOCResourceImpl implements IJobRunTimeResource {
 
-    private static final String API_CALL = "./job/run_time";
+	private static final String API_CALL = "./job/run_time";
 
-    @Override
-    public JOCDefaultResponse postJobRunTime(String xAccessToken, String accessToken, JobFilter jobFilter) throws Exception {
-        return postJobRunTime(getAccessToken(xAccessToken, accessToken), jobFilter);
-    }
+	@Override
+	public JOCDefaultResponse postJobRunTime(String xAccessToken, String accessToken, JobFilter jobFilter)
+			throws Exception {
+		return postJobRunTime(getAccessToken(xAccessToken, accessToken), jobFilter);
+	}
 
-    public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) throws Exception {
-        SOSHibernateSession connection = null;
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getJob().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            checkRequiredParameter("job", jobFilter.getJob());
-            RunTime200 runTimeAnswer = new RunTime200();
-            String jobPath = normalizePath(jobFilter.getJob());
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
-            runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken);
+	public JOCDefaultResponse postJobRunTime(String accessToken, JobFilter jobFilter) throws Exception {
+		SOSHibernateSession connection = null;
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
+					jobFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			checkRequiredParameter("job", jobFilter.getJob());
+			RunTime200 runTimeAnswer = new RunTime200();
+			String jobPath = normalizePath(jobFilter.getJob());
+			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+			String runTimeCommand = jocXmlCommand.getShowJobCommand(jobPath, "run_time", 0, 0);
+			runTimeAnswer = RunTime.set(jobPath, jocXmlCommand, runTimeCommand, "//job/run_time", accessToken);
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
-            List<DBItemInventoryCalendarUsage> dbCalendars = calendarUsageDBLayer.getCalendarUsagesOfAnObject(dbItemInventoryInstance.getId(), "JOB",
-                    jobPath);
-            if (dbCalendars != null && !dbCalendars.isEmpty()) {
-                List<Calendar> calendars = new ArrayList<Calendar>();
-                ObjectMapper objMapper = new ObjectMapper();
-                for (DBItemInventoryCalendarUsage dbCalendar : dbCalendars) {
-                    if (dbCalendar.getConfiguration() != null && !dbCalendar.getConfiguration().isEmpty()) {
-                        calendars.add(objMapper.readValue(dbCalendar.getConfiguration(), Calendar.class));
-                    }
-                }
-                runTimeAnswer.getRunTime().setCalendars(calendars);
-            }
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			CalendarUsageDBLayer calendarUsageDBLayer = new CalendarUsageDBLayer(connection);
+			List<DBItemInventoryCalendarUsage> dbCalendars = calendarUsageDBLayer
+					.getCalendarUsagesOfAnObject(dbItemInventoryInstance.getId(), "JOB", jobPath);
+			if (dbCalendars != null && !dbCalendars.isEmpty()) {
+				List<Calendar> calendars = new ArrayList<Calendar>();
+				ObjectMapper objMapper = new ObjectMapper();
+				for (DBItemInventoryCalendarUsage dbCalendar : dbCalendars) {
+					if (dbCalendar.getConfiguration() != null && !dbCalendar.getConfiguration().isEmpty()) {
+						calendars.add(objMapper.readValue(dbCalendar.getConfiguration(), Calendar.class));
+					}
+				}
+				runTimeAnswer.getRunTime().setCalendars(calendars);
+			}
 
-            return JOCDefaultResponse.responseStatus200(runTimeAnswer);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
+			return JOCDefaultResponse.responseStatus200(runTimeAnswer);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
 
-    }
+	}
 }

@@ -18,37 +18,41 @@ import com.sos.joc.model.jobChain.JobChainConfigurationFilter;
 @Path("job_chain")
 public class JobChainResourceConfigurationImpl extends JOCResourceImpl implements IJobChainResourceConfiguration {
 
-    private static final String API_CALL = "./job_chain/configuration";
+	private static final String API_CALL = "./job_chain/configuration";
 
-    @Override
-    public JOCDefaultResponse postJobChainConfiguration(String xAccessToken, String accessToken, JobChainConfigurationFilter jobChainBody)
-            throws Exception {
-        return postJobChainConfiguration(getAccessToken(xAccessToken, accessToken), jobChainBody);
-    }
+	@Override
+	public JOCDefaultResponse postJobChainConfiguration(String xAccessToken, String accessToken,
+			JobChainConfigurationFilter jobChainBody) throws Exception {
+		return postJobChainConfiguration(getAccessToken(xAccessToken, accessToken), jobChainBody);
+	}
 
-    public JOCDefaultResponse postJobChainConfiguration(String accessToken, JobChainConfigurationFilter jobChainBody) throws Exception {
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainBody, accessToken, jobChainBody.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getJobChain().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+	public JOCDefaultResponse postJobChainConfiguration(String accessToken, JobChainConfigurationFilter jobChainBody)
+			throws Exception {
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainBody, accessToken,
+					jobChainBody.getJobschedulerId(),
+					getPermissonsJocCockpit(jobChainBody.getJobschedulerId(), accessToken).getJobChain().getView()
+							.isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
-                boolean responseInHtml = jobChainBody.getMime() == ConfigurationMime.HTML;
-                String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainBody.getJobChain()), "source", 0, 0);
-                entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobChainCommand, "/spooler/answer/job_chain",
-                        "job_chain", responseInHtml, accessToken));
-                entity.setDeliveryDate(Date.from(Instant.now()));
-            }
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+			Configuration200 entity = new Configuration200();
+			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+			if (checkRequiredParameter("jobChain", jobChainBody.getJobChain())) {
+				boolean responseInHtml = jobChainBody.getMime() == ConfigurationMime.HTML;
+				String jobChainCommand = jocXmlCommand.getShowJobChainCommand(normalizePath(jobChainBody.getJobChain()),
+						"source", 0, 0);
+				entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, jobChainCommand,
+						"/spooler/answer/job_chain", "job_chain", responseInHtml, accessToken));
+				entity.setDeliveryDate(Date.from(Instant.now()));
+			}
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 }

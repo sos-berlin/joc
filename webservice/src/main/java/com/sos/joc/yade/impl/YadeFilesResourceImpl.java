@@ -23,47 +23,49 @@ import com.sos.joc.yade.resource.IYadeFilesResource;
 @Path("yade")
 public class YadeFilesResourceImpl extends JOCResourceImpl implements IYadeFilesResource {
 
-    private static final String API_CALL = "./yade/files";
+	private static final String API_CALL = "./yade/files";
 
-    @Override
-    public JOCDefaultResponse postYadeFiles(String accessToken, FilesFilter filterBody) throws Exception {
-        SOSHibernateSession connection = null;
-        try {
-            if (filterBody.getJobschedulerId() == null) {
-                filterBody.setJobschedulerId("");
-            }
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getYADE().getView().isFiles());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Integer limit = filterBody.getLimit();
-            if (limit == null) {
-                limit = 10000; // default
-            } else if (limit == -1) {
-                limit = null; // unlimited
-            }
-            JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
-            List<DBItemYadeFiles> dbFiles = dbLayer.getFilteredTransferFiles(filterBody.getTransferIds(), filterBody.getStates(), filterBody
-                    .getSourceFiles(), filterBody.getTargetFiles(), filterBody.getInterventionTransferIds(), limit);
-            TransferFiles entity = new TransferFiles();
-            List<TransferFile> files = new ArrayList<TransferFile>();
-            for (DBItemYadeFiles dbFile : dbFiles) {
-                TransferFile transferFile = TransferFileUtils.initTransferFileFromDbItem(dbFile);
-                files.add(transferFile);
-            }
-            entity.setFiles(files);
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+	@Override
+	public JOCDefaultResponse postYadeFiles(String accessToken, FilesFilter filterBody) throws Exception {
+		SOSHibernateSession connection = null;
+		try {
+			if (filterBody.getJobschedulerId() == null) {
+				filterBody.setJobschedulerId("");
+			}
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
+					filterBody.getJobschedulerId(),
+					getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken).getYADE().getView().isFiles());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			Integer limit = filterBody.getLimit();
+			if (limit == null) {
+				limit = 10000; // default
+			} else if (limit == -1) {
+				limit = null; // unlimited
+			}
+			JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
+			List<DBItemYadeFiles> dbFiles = dbLayer.getFilteredTransferFiles(filterBody.getTransferIds(),
+					filterBody.getStates(), filterBody.getSourceFiles(), filterBody.getTargetFiles(),
+					filterBody.getInterventionTransferIds(), limit);
+			TransferFiles entity = new TransferFiles();
+			List<TransferFile> files = new ArrayList<TransferFile>();
+			for (DBItemYadeFiles dbFile : dbFiles) {
+				TransferFile transferFile = TransferFileUtils.initTransferFileFromDbItem(dbFile);
+				files.add(transferFile);
+			}
+			entity.setFiles(files);
+			entity.setDeliveryDate(Date.from(Instant.now()));
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 
 }

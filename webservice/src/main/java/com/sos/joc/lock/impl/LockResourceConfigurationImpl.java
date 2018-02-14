@@ -18,37 +18,42 @@ import com.sos.joc.model.lock.LockConfigurationFilter;
 @Path("lock")
 public class LockResourceConfigurationImpl extends JOCResourceImpl implements ILockResourceConfiguration {
 
-    private static final String API_CALL = "./lock/configuration";
+	private static final String API_CALL = "./lock/configuration";
 
-    @Override
-    public JOCDefaultResponse postLockConfiguration(String xAccessToken, String accessToken, LockConfigurationFilter lockBody) throws Exception {
-        return postLockConfiguration(getAccessToken(xAccessToken, accessToken), lockBody);
-    }
+	@Override
+	public JOCDefaultResponse postLockConfiguration(String xAccessToken, String accessToken,
+			LockConfigurationFilter lockBody) throws Exception {
+		return postLockConfiguration(getAccessToken(xAccessToken, accessToken), lockBody);
+	}
 
-    public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilter lockBody) throws Exception {
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, lockBody, accessToken, lockBody.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getLock().getView().isConfiguration());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+	public JOCDefaultResponse postLockConfiguration(String accessToken, LockConfigurationFilter lockBody)
+			throws Exception {
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, lockBody, accessToken, lockBody.getJobschedulerId(),
+					getPermissonsJocCockpit(lockBody.getJobschedulerId(), accessToken).getLock().getView()
+							.isConfiguration());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            Configuration200 entity = new Configuration200();
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            if (checkRequiredParameter("lock", lockBody.getLock())) {
-                String lockPath = normalizePath(lockBody.getLock());
-                boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
-                String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", lockPath);
-                String lockCommand = jocXmlCommand.getShowStateCommand("folder lock", "folders no_subfolders source", getParent(lockPath));
-                entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, lockCommand, xPath, "lock", responseInHtml, accessToken));
-                entity.setDeliveryDate(Date.from(Instant.now()));
-            }
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+			Configuration200 entity = new Configuration200();
+			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+			if (checkRequiredParameter("lock", lockBody.getLock())) {
+				String lockPath = normalizePath(lockBody.getLock());
+				boolean responseInHtml = lockBody.getMime() == ConfigurationMime.HTML;
+				String xPath = String.format("/spooler/answer//locks/lock[@path='%s']", lockPath);
+				String lockCommand = jocXmlCommand.getShowStateCommand("folder lock", "folders no_subfolders source",
+						getParent(lockPath));
+				entity.setConfiguration(ConfigurationUtils.getConfigurationSchema(jocXmlCommand, lockCommand, xPath,
+						"lock", responseInHtml, accessToken));
+				entity.setDeliveryDate(Date.from(Instant.now()));
+			}
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 }

@@ -21,55 +21,61 @@ import com.sos.joc.model.jobscheduler.Clusters;
 @Path("jobscheduler")
 public class JobSchedulerResourceClusterImpl extends JOCResourceImpl implements IJobSchedulerResourceCluster {
 
-    private static final String API_CALL = "./jobscheduler/cluster";
+	private static final String API_CALL = "./jobscheduler/cluster";
 
-    @Override
-    public JOCDefaultResponse postJobschedulerCluster(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerFilter) {
-        return postJobschedulerCluster(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
-    }
+	@Override
+	public JOCDefaultResponse postJobschedulerCluster(String xAccessToken, String accessToken,
+			JobSchedulerId jobSchedulerFilter) {
+		return postJobschedulerCluster(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
+	}
 
-    public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilter) {
-        try {
-            boolean permitted = getPermissonsJocCockpit(
-                    accessToken).getJobschedulerMasterCluster().getView().isStatus() || getPermissonsJocCockpit(
-                            accessToken).getJobschedulerMaster().getView().isStatus();
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),permitted);
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+	public JOCDefaultResponse postJobschedulerCluster(String accessToken, JobSchedulerId jobSchedulerFilter) {
+		try {
+			boolean permitted = getPermissonsJocCockpit(jobSchedulerFilter.getJobschedulerId(), accessToken)
+					.getJobschedulerMasterCluster().getView().isStatus()
+					|| getPermissonsJocCockpit(jobSchedulerFilter.getJobschedulerId(), accessToken)
+							.getJobschedulerMaster().getView().isStatus();
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken,
+					jobSchedulerFilter.getJobschedulerId(), permitted);
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-            String command = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders cluster", "/does/not/exist");
-            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
+			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+			String command = jocXmlCommand.getShowStateCommand("folder", "folders no_subfolders cluster",
+					"/does/not/exist");
+			jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
 
-            Cluster cluster = new Cluster();
-            cluster.setJobschedulerId(jobSchedulerFilter.getJobschedulerId());
-            cluster.setSurveyDate(jocXmlCommand.getSurveyDate());
-            Element clusterElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/state/cluster");
-            if (clusterElem == null) {
-                cluster.set_type(ClusterType.STANDALONE);
-            } else {
-                if (! getPermissonsJocCockpit(accessToken).getJobschedulerMasterCluster().getView().isStatus() ){
-                    return accessDeniedResponse();
-                }
-                NodeList clusterMembers = jocXmlCommand.getSosxml().selectNodeList(clusterElem, "cluster_member[@distributed_orders='yes']");
-                if (clusterMembers != null && clusterMembers.getLength() > 0) {
-                    cluster.set_type(ClusterType.ACTIVE);
-                } else {
-                    cluster.set_type(ClusterType.PASSIVE);
-                }
-            }
-            Clusters entity = new Clusters();
-            entity.setCluster(cluster);
-            entity.setDeliveryDate(Date.from(Instant.now()));
+			Cluster cluster = new Cluster();
+			cluster.setJobschedulerId(jobSchedulerFilter.getJobschedulerId());
+			cluster.setSurveyDate(jocXmlCommand.getSurveyDate());
+			Element clusterElem = (Element) jocXmlCommand.getSosxml().selectSingleNode("/spooler/answer/state/cluster");
+			if (clusterElem == null) {
+				cluster.set_type(ClusterType.STANDALONE);
+			} else {
+				if (!getPermissonsJocCockpit(jobSchedulerFilter.getJobschedulerId(), accessToken)
+						.getJobschedulerMasterCluster().getView().isStatus()) {
+					return accessDeniedResponse();
+				}
+				NodeList clusterMembers = jocXmlCommand.getSosxml().selectNodeList(clusterElem,
+						"cluster_member[@distributed_orders='yes']");
+				if (clusterMembers != null && clusterMembers.getLength() > 0) {
+					cluster.set_type(ClusterType.ACTIVE);
+				} else {
+					cluster.set_type(ClusterType.PASSIVE);
+				}
+			}
+			Clusters entity = new Clusters();
+			entity.setCluster(cluster);
+			entity.setDeliveryDate(Date.from(Instant.now()));
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
 
-    }
+	}
 }

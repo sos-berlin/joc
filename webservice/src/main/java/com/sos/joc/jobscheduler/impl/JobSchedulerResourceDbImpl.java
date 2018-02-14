@@ -17,43 +17,46 @@ import com.sos.joc.model.jobscheduler.Database;
 @Path("jobscheduler")
 public class JobSchedulerResourceDbImpl extends JOCResourceImpl implements IJobSchedulerResourceDb {
 
-    private static final String API_CALL = "./jobscheduler/db";
+	private static final String API_CALL = "./jobscheduler/db";
 
-    @Override
-    public JOCDefaultResponse postJobschedulerDb(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerFilter) {
-        return postJobschedulerDb(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
-    }
+	@Override
+	public JOCDefaultResponse postJobschedulerDb(String xAccessToken, String accessToken,
+			JobSchedulerId jobSchedulerFilter) {
+		return postJobschedulerDb(getAccessToken(xAccessToken, accessToken), jobSchedulerFilter);
+	}
 
-    public JOCDefaultResponse postJobschedulerDb(String accessToken, JobSchedulerId jobSchedulerFilter) {
+	public JOCDefaultResponse postJobschedulerDb(String accessToken, JobSchedulerId jobSchedulerFilter) {
 
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, jobSchedulerFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken,
+					jobSchedulerFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(jobSchedulerFilter.getJobschedulerId(), accessToken).getJobschedulerMaster()
+							.getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            DB entity = new DB();
-            Database database = new Database();
-            database.setDbms(dbItemInventoryInstance.getDbmsName());
-            database.setSurveyDate(dbItemInventoryInstance.getModified());
-            database.setVersion(dbItemInventoryInstance.getDbmsVersion());
-            DBState state = new DBState();
-            // TODO DB is not always running
-            state.setSeverity(0);
-            state.set_text(DBStateText.RUNNING);
-            database.setState(state);
-            entity.setDatabase(database);
-            entity.setDeliveryDate(new Date());
+			DB entity = new DB();
+			Database database = new Database();
+			database.setDbms(dbItemInventoryInstance.getDbmsName());
+			database.setSurveyDate(dbItemInventoryInstance.getModified());
+			database.setVersion(dbItemInventoryInstance.getDbmsVersion());
+			DBState state = new DBState();
+			// TODO DB is not always running
+			state.setSeverity(0);
+			state.set_text(DBStateText.RUNNING);
+			database.setState(state);
+			entity.setDatabase(database);
+			entity.setDeliveryDate(new Date());
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
 
-    }
+	}
 
 }

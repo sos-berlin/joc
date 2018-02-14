@@ -31,83 +31,88 @@ import com.sos.joc.yade.resource.IYadeTransfersRestartResource;
 @Path("yade")
 public class YadeTransfersRestartResourceImpl extends JOCResourceImpl implements IYadeTransfersRestartResource {
 
-    private static final String API_CALL = "./yade/transfers/restart";
-    private List<Err419> listOfErrors = new ArrayList<Err419>();
+	private static final String API_CALL = "./yade/transfers/restart";
+	private List<Err419> listOfErrors = new ArrayList<Err419>();
 
-    @Override
-    public JOCDefaultResponse postYadeTransfersRestart(String accessToken, ModifyTransfers filterBody) throws Exception {
-        SOSHibernateSession connection = null;
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getYADE().getExecute().isTransferStart());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            checkRequiredComment(filterBody.getAuditLog());
-            if (filterBody.getTransfers() == null || filterBody.getTransfers().size() == 0) {
-                throw new JocMissingRequiredParameterException("undefined 'transferIds'");
-            }
+	@Override
+	public JOCDefaultResponse postYadeTransfersRestart(String accessToken, ModifyTransfers filterBody)
+			throws Exception {
+		SOSHibernateSession connection = null;
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
+					filterBody.getJobschedulerId(), getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken)
+							.getYADE().getExecute().isTransferStart());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			checkRequiredComment(filterBody.getAuditLog());
+			if (filterBody.getTransfers() == null || filterBody.getTransfers().size() == 0) {
+				throw new JocMissingRequiredParameterException("undefined 'transferIds'");
+			}
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            JocDBLayerYade yadeDbLayer = new JocDBLayerYade(connection);
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			JocDBLayerYade yadeDbLayer = new JocDBLayerYade(connection);
 
-            Date surveyDate = new Date();
-            for (ModifyTransfer transfer : filterBody.getTransfers()) {
-                surveyDate = executeResumeOrderCommand(transfer, filterBody, yadeDbLayer);
-            }
-            if (listOfErrors.size() > 0) {
-                return JOCDefaultResponse.responseStatus419(listOfErrors);
-            }
-            return JOCDefaultResponse.responseStatusJSOk(surveyDate);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+			Date surveyDate = new Date();
+			for (ModifyTransfer transfer : filterBody.getTransfers()) {
+				surveyDate = executeResumeOrderCommand(transfer, filterBody, yadeDbLayer);
+			}
+			if (listOfErrors.size() > 0) {
+				return JOCDefaultResponse.responseStatus419(listOfErrors);
+			}
+			return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 
-    private Date executeResumeOrderCommand(ModifyTransfer transfer, ModifyTransfers filterBody, JocDBLayerYade yadeDbLayer) {
-        ModifyOrder modifyOrder = new ModifyOrder();
-        modifyOrder.setJobChain("");
-        modifyOrder.setOrderId(null);
-        try {
-            OrderV order = TransferFileUtils.getOrderForResume(yadeDbLayer, transfer, this);
+	private Date executeResumeOrderCommand(ModifyTransfer transfer, ModifyTransfers filterBody,
+			JocDBLayerYade yadeDbLayer) {
+		ModifyOrder modifyOrder = new ModifyOrder();
+		modifyOrder.setJobChain("");
+		modifyOrder.setOrderId(null);
+		try {
+			OrderV order = TransferFileUtils.getOrderForResume(yadeDbLayer, transfer, this);
 
-            modifyOrder.setJobChain(order.getJobChain());
-            modifyOrder.setOrderId(order.getOrderId());
-            modifyOrder.setParams(order.getParams());
-            modifyOrder.setResume(true);
+			modifyOrder.setJobChain(order.getJobChain());
+			modifyOrder.setOrderId(order.getOrderId());
+			modifyOrder.setParams(order.getParams());
+			modifyOrder.setResume(true);
 
-            ModifyOrderAudit orderAudit = new ModifyOrderAudit(modifyOrder, filterBody);
-            logAuditMessage(orderAudit);
+			ModifyOrderAudit orderAudit = new ModifyOrderAudit(modifyOrder, filterBody);
+			logAuditMessage(orderAudit);
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            XMLBuilder xml = new XMLBuilder("modify_order");
-            xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", order.getJobChain()).addAttribute("suspended", "no");
-            if (order.getParams() != null && !order.getParams().isEmpty()) {
-                xml.add(getParams(order.getParams()));
-            }
-            jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-            storeAuditLogEntry(orderAudit);
+			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+			XMLBuilder xml = new XMLBuilder("modify_order");
+			xml.addAttribute("order", order.getOrderId()).addAttribute("job_chain", order.getJobChain())
+					.addAttribute("suspended", "no");
+			if (order.getParams() != null && !order.getParams().isEmpty()) {
+				xml.add(getParams(order.getParams()));
+			}
+			jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+			storeAuditLogEntry(orderAudit);
 
-            return jocXmlCommand.getSurveyDate();
-        } catch (JocException e) {
-            listOfErrors.add(new BulkError().get(e, getJocError(), modifyOrder));
-        } catch (Exception e) {
-            listOfErrors.add(new BulkError().get(e, getJocError(), modifyOrder));
-        }
-        return null;
-    }
+			return jocXmlCommand.getSurveyDate();
+		} catch (JocException e) {
+			listOfErrors.add(new BulkError().get(e, getJocError(), modifyOrder));
+		} catch (Exception e) {
+			listOfErrors.add(new BulkError().get(e, getJocError(), modifyOrder));
+		}
+		return null;
+	}
 
-    private Element getParams(List<NameValuePair> params) {
-        Element paramsElem = XMLBuilder.create("params");
-        for (NameValuePair param : params) {
-            paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value", param.getValue());
-        }
-        return paramsElem;
-    }
+	private Element getParams(List<NameValuePair> params) {
+		Element paramsElem = XMLBuilder.create("params");
+		for (NameValuePair param : params) {
+			paramsElem.addElement("param").addAttribute("name", param.getName()).addAttribute("value",
+					param.getValue());
+		}
+		return paramsElem;
+	}
 
 }

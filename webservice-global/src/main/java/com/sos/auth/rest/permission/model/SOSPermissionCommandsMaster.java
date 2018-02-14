@@ -25,8 +25,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}SOSPermissionListCommands"/>
- *         &lt;element ref="{}SOSPermissionListJoc"/>
+ *         &lt;element name="JobSchedulerMaster" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element ref="{}SOSPermissionCommands"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -37,63 +37,63 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "sosPermissionListCommands",
-    "sosPermissionListJoc"
+    "jobSchedulerMaster",
+    "sosPermissionCommands"
 })
-@XmlRootElement(name = "SOSPermissions")
-public class SOSPermissions {
+@XmlRootElement(name = "SOSPermissionCommandsMaster")
+public class SOSPermissionCommandsMaster {
 
-    @XmlElement(name = "SOSPermissionListCommands", required = true)
-    protected SOSPermissionListCommands sosPermissionListCommands;
-    @XmlElement(name = "SOSPermissionListJoc", required = true)
-    protected SOSPermissionListJoc sosPermissionListJoc;
+    @XmlElement(name = "JobSchedulerMaster", required = true)
+    protected String jobSchedulerMaster;
+    @XmlElement(name = "SOSPermissionCommands", required = true)
+    protected SOSPermissionCommands sosPermissionCommands;
 
     /**
-     * Ruft den Wert der sosPermissionListCommands-Eigenschaft ab.
+     * Ruft den Wert der jobSchedulerMaster-Eigenschaft ab.
      * 
      * @return
      *     possible object is
-     *     {@link SOSPermissionListCommands }
+     *     {@link String }
      *     
      */
-    public SOSPermissionListCommands getSOSPermissionListCommands() {
-        return sosPermissionListCommands;
+    public String getJobSchedulerMaster() {
+        return jobSchedulerMaster;
     }
 
     /**
-     * Legt den Wert der sosPermissionListCommands-Eigenschaft fest.
+     * Legt den Wert der jobSchedulerMaster-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
-     *     {@link SOSPermissionListCommands }
+     *     {@link String }
      *     
      */
-    public void setSOSPermissionListCommands(SOSPermissionListCommands value) {
-        this.sosPermissionListCommands = value;
+    public void setJobSchedulerMaster(String value) {
+        this.jobSchedulerMaster = value;
     }
 
     /**
-     * Ruft den Wert der sosPermissionListJoc-Eigenschaft ab.
+     * Ruft den Wert der sosPermissionCommands-Eigenschaft ab.
      * 
      * @return
      *     possible object is
-     *     {@link SOSPermissionListJoc }
+     *     {@link SOSPermissionCommands }
      *     
      */
-    public SOSPermissionListJoc getSOSPermissionListJoc() {
-        return sosPermissionListJoc;
+    public SOSPermissionCommands getSOSPermissionCommands() {
+        return sosPermissionCommands;
     }
 
     /**
-     * Legt den Wert der sosPermissionListJoc-Eigenschaft fest.
+     * Legt den Wert der sosPermissionCommands-Eigenschaft fest.
      * 
      * @param value
      *     allowed object is
-     *     {@link SOSPermissionListJoc }
+     *     {@link SOSPermissionCommands }
      *     
      */
-    public void setSOSPermissionListJoc(SOSPermissionListJoc value) {
-        this.sosPermissionListJoc = value;
+    public void setSOSPermissionCommands(SOSPermissionCommands value) {
+        this.sosPermissionCommands = value;
     }
 
 }

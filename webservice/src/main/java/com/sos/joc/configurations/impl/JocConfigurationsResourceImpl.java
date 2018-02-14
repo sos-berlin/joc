@@ -25,119 +25,128 @@ import com.sos.joc.model.configuration.ConfigurationsFilter;
 @Path("configurations")
 public class JocConfigurationsResourceImpl extends JOCResourceImpl implements IJocConfigurationsResource {
 
-    private static final String API_CALL = "./configurations";
-    private SOSHibernateSession connection = null;
-    
-    @Override
-    public JOCDefaultResponse postConfigurations(String xAccessToken, String accessToken, ConfigurationsFilter configurationsFilter) throws Exception {
-        return postConfigurations(getAccessToken(xAccessToken, accessToken), configurationsFilter);
-    }
+	private static final String API_CALL = "./configurations";
+	private SOSHibernateSession connection = null;
 
-    public JOCDefaultResponse postConfigurations(String accessToken, ConfigurationsFilter configurationsFilter) throws Exception {
+	@Override
+	public JOCDefaultResponse postConfigurations(String xAccessToken, String accessToken,
+			ConfigurationsFilter configurationsFilter) throws Exception {
+		return postConfigurations(getAccessToken(xAccessToken, accessToken), configurationsFilter);
+	}
 
-        try {
+	public JOCDefaultResponse postConfigurations(String accessToken, ConfigurationsFilter configurationsFilter)
+			throws Exception {
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, configurationsFilter, accessToken, configurationsFilter.getJobschedulerId(), true);
+		try {
 
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, configurationsFilter, accessToken,
+					configurationsFilter.getJobschedulerId(), true);
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Globals.beginTransaction(connection);
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            String objectType = "";
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			Globals.beginTransaction(connection);
 
-            if (configurationsFilter.getObjectType() == null) {
-                objectType = null;
-            } else {
-                objectType = configurationsFilter.getObjectType().name();
-            }
+			String objectType = "";
 
-            String configurationType = "";
+			if (configurationsFilter.getObjectType() == null) {
+				objectType = null;
+			} else {
+				objectType = configurationsFilter.getObjectType().name();
+			}
 
-            if (configurationsFilter.getConfigurationType() == null) {
-                configurationType = null;
-            } else {
-                configurationType = configurationsFilter.getConfigurationType().name();
-            }
+			String configurationType = "";
 
-            checkRequiredParameter("jobschedulerId", configurationsFilter.getJobschedulerId());
+			if (configurationsFilter.getConfigurationType() == null) {
+				configurationType = null;
+			} else {
+				configurationType = configurationsFilter.getConfigurationType().name();
+			}
 
-            JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
+			checkRequiredParameter("jobschedulerId", configurationsFilter.getJobschedulerId());
 
-            jocConfigurationDBLayer.getFilter().setObjectType(objectType);
-            jocConfigurationDBLayer.getFilter().setSchedulerId(configurationsFilter.getJobschedulerId());
-            jocConfigurationDBLayer.getFilter().setConfigurationType(configurationType);
-            jocConfigurationDBLayer.getFilter().setAccount(configurationsFilter.getAccount());
-            jocConfigurationDBLayer.getFilter().setShared(configurationsFilter.getShared());
-            
-            List<JocConfigurationDbItem> listOfJocConfigurationDbItem = jocConfigurationDBLayer.getJocConfigurationList(0);
-            Configurations configurations = new Configurations();
-            ArrayList<Configuration> listOfConfigurations = new ArrayList<Configuration>();
-            // cleanup wrongfully duplicated Profile entries
-            listOfJocConfigurationDbItem = cleanupProfileDuplicates(listOfJocConfigurationDbItem);
-            for (JocConfigurationDbItem jocConfigurationDbItem : listOfJocConfigurationDbItem) {
-                Configuration configuration = new Configuration();
-                configuration.setAccount(jocConfigurationDbItem.getAccount());
-                configuration.setConfigurationType(ConfigurationType.fromValue(jocConfigurationDbItem.getConfigurationType()));
-                configuration.setJobschedulerId(configurationsFilter.getJobschedulerId());
-                configuration.setName(jocConfigurationDbItem.getName());
-                if (jocConfigurationDbItem.getObjectType() != null) {
-                    configuration.setObjectType(ConfigurationObjectType.fromValue(jocConfigurationDbItem.getObjectType()));
-                }
-                configuration.setShared(jocConfigurationDbItem.getShared());
-                configuration.setId(jocConfigurationDbItem.getId());
-                if(jocConfigurationDbItem.getConfigurationItem() != null && !jocConfigurationDbItem.getConfigurationItem().isEmpty()) {
-                    configuration.setConfigurationItem(jocConfigurationDbItem.getConfigurationItem());
-                }
-                if (!jocConfigurationDbItem.getShared() || getPermissonsJocCockpit(accessToken).getJOCConfigurations().getShare().getView().isStatus()) {
-                    listOfConfigurations.add(configuration);
-                }
-            }
+			JocConfigurationDbLayer jocConfigurationDBLayer = new JocConfigurationDbLayer(connection);
 
-            configurations.setDeliveryDate(new Date());
-            configurations.setConfigurations(listOfConfigurations);
+			jocConfigurationDBLayer.getFilter().setObjectType(objectType);
+			jocConfigurationDBLayer.getFilter().setSchedulerId(configurationsFilter.getJobschedulerId());
+			jocConfigurationDBLayer.getFilter().setConfigurationType(configurationType);
+			jocConfigurationDBLayer.getFilter().setAccount(configurationsFilter.getAccount());
+			jocConfigurationDBLayer.getFilter().setShared(configurationsFilter.getShared());
 
-            return JOCDefaultResponse.responseStatus200(configurations);
-        } catch (
+			List<JocConfigurationDbItem> listOfJocConfigurationDbItem = jocConfigurationDBLayer
+					.getJocConfigurationList(0);
+			Configurations configurations = new Configurations();
+			ArrayList<Configuration> listOfConfigurations = new ArrayList<Configuration>();
+			// cleanup wrongfully duplicated Profile entries
+			listOfJocConfigurationDbItem = cleanupProfileDuplicates(listOfJocConfigurationDbItem);
+			for (JocConfigurationDbItem jocConfigurationDbItem : listOfJocConfigurationDbItem) {
+				Configuration configuration = new Configuration();
+				configuration.setAccount(jocConfigurationDbItem.getAccount());
+				configuration.setConfigurationType(
+						ConfigurationType.fromValue(jocConfigurationDbItem.getConfigurationType()));
+				configuration.setJobschedulerId(configurationsFilter.getJobschedulerId());
+				configuration.setName(jocConfigurationDbItem.getName());
+				if (jocConfigurationDbItem.getObjectType() != null) {
+					configuration
+							.setObjectType(ConfigurationObjectType.fromValue(jocConfigurationDbItem.getObjectType()));
+				}
+				configuration.setShared(jocConfigurationDbItem.getShared());
+				configuration.setId(jocConfigurationDbItem.getId());
+				if (jocConfigurationDbItem.getConfigurationItem() != null
+						&& !jocConfigurationDbItem.getConfigurationItem().isEmpty()) {
+					configuration.setConfigurationItem(jocConfigurationDbItem.getConfigurationItem());
+				}
+				if (!jocConfigurationDbItem.getShared()
+						|| getPermissonsJocCockpit(configurationsFilter.getJobschedulerId(), accessToken)
+								.getJOCConfigurations().getShare().getView().isStatus()) {
+					listOfConfigurations.add(configuration);
+				}
+			}
 
-        JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
-    
-    private List<JocConfigurationDbItem> cleanupProfileDuplicates(List<JocConfigurationDbItem> configurationDbItems) {
-        Comparator<JocConfigurationDbItem> itemComparator = new Comparator<JocConfigurationDbItem>() {
-            @Override
-            public int compare(JocConfigurationDbItem o1, JocConfigurationDbItem o2) {
-                if (o1.getId() < o2.getId()) {
-                    return -1;
-                } else if (o1.getId() == o2.getId()) {
-                    return 0;
-                } else {
-                    return 1;
-                }
-            }
-        };
-        configurationDbItems.sort(itemComparator);
-        Iterator<JocConfigurationDbItem> iterator = configurationDbItems.iterator();
-        int count = 0;
-        while (iterator.hasNext()) {
-            if(iterator.next().getConfigurationType().equals(ConfigurationType.PROFILE.name())) {
-                if(count == 0) {
-                    count++;
-                } else {
-                    iterator.remove();
-                }
-            }
-        }
-        return configurationDbItems;
-    }
+			configurations.setDeliveryDate(new Date());
+			configurations.setConfigurations(listOfConfigurations);
+
+			return JOCDefaultResponse.responseStatus200(configurations);
+		} catch (
+
+		JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
+
+	private List<JocConfigurationDbItem> cleanupProfileDuplicates(List<JocConfigurationDbItem> configurationDbItems) {
+		Comparator<JocConfigurationDbItem> itemComparator = new Comparator<JocConfigurationDbItem>() {
+			@Override
+			public int compare(JocConfigurationDbItem o1, JocConfigurationDbItem o2) {
+				if (o1.getId() < o2.getId()) {
+					return -1;
+				} else if (o1.getId() == o2.getId()) {
+					return 0;
+				} else {
+					return 1;
+				}
+			}
+		};
+		configurationDbItems.sort(itemComparator);
+		Iterator<JocConfigurationDbItem> iterator = configurationDbItems.iterator();
+		int count = 0;
+		while (iterator.hasNext()) {
+			if (iterator.next().getConfigurationType().equals(ConfigurationType.PROFILE.name())) {
+				if (count == 0) {
+					count++;
+				} else {
+					iterator.remove();
+				}
+			}
+		}
+		return configurationDbItems;
+	}
 
 }

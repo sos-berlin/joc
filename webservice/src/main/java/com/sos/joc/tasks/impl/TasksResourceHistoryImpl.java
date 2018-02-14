@@ -31,148 +31,156 @@ import com.sos.joc.tasks.resource.ITasksResourceHistory;
 @Path("tasks")
 public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksResourceHistory {
 
-    private static final String API_CALL = "./tasks/history";
+	private static final String API_CALL = "./tasks/history";
 
-    @Override
-    public JOCDefaultResponse postTasksHistory(String xAccessToken, String accessToken, JobsFilter jobsFilter) throws Exception {
-        return postTasksHistory(getAccessToken(xAccessToken, accessToken), jobsFilter);
-    }
+	@Override
+	public JOCDefaultResponse postTasksHistory(String xAccessToken, String accessToken, JobsFilter jobsFilter)
+			throws Exception {
+		return postTasksHistory(getAccessToken(xAccessToken, accessToken), jobsFilter);
+	}
 
-    public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
-        SOSHibernateSession connection = null;
+	public JOCDefaultResponse postTasksHistory(String accessToken, JobsFilter jobsFilter) throws Exception {
+		SOSHibernateSession connection = null;
 
-        try {
-            if (jobsFilter.getJobschedulerId() == null) {
-                jobsFilter.setJobschedulerId("");
-            }
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getHistory().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+		try {
+			if (jobsFilter.getJobschedulerId() == null) {
+				jobsFilter.setJobschedulerId("");
+			}
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken,
+					jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(jobsFilter.getJobschedulerId(), accessToken)
+							.getHistory().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Globals.beginTransaction(connection);
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			Globals.beginTransaction(connection);
 
-            List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
+			List<TaskHistoryItem> listOfHistory = new ArrayList<TaskHistoryItem>();
 
-            ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(connection);
-            reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
-            if (jobsFilter.getDateFrom() != null) {
-                reportTaskExecutionsDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter
-                        .getTimeZone()));
-            }
-            if (jobsFilter.getDateTo() != null) {
-                reportTaskExecutionsDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
-            }
+			ReportTaskExecutionsDBLayer reportTaskExecutionsDBLayer = new ReportTaskExecutionsDBLayer(connection);
+			reportTaskExecutionsDBLayer.getFilter().setSchedulerId(jobsFilter.getJobschedulerId());
+			if (jobsFilter.getDateFrom() != null) {
+				reportTaskExecutionsDBLayer.getFilter().setExecutedFrom(
+						JobSchedulerDate.getDateFrom(jobsFilter.getDateFrom(), jobsFilter.getTimeZone()));
+			}
+			if (jobsFilter.getDateTo() != null) {
+				reportTaskExecutionsDBLayer.getFilter()
+						.setExecutedTo(JobSchedulerDate.getDateTo(jobsFilter.getDateTo(), jobsFilter.getTimeZone()));
+			}
 
-            if (jobsFilter.getHistoryStates().size() > 0) {
-                for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
-                    reportTaskExecutionsDBLayer.getFilter().addState(historyStateText.toString());
-                }
-            }
+			if (jobsFilter.getHistoryStates().size() > 0) {
+				for (HistoryStateText historyStateText : jobsFilter.getHistoryStates()) {
+					reportTaskExecutionsDBLayer.getFilter().addState(historyStateText.toString());
+				}
+			}
 
-            if (jobsFilter.getJobs().size() > 0) {
-                for (JobPath jobPath : jobsFilter.getJobs()) {
-                    reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
-                }
-                jobsFilter.setRegex("");
-            } else {
-                if (jobsFilter.getExcludeJobs().size() > 0) {
-                    for (JobPath jobPath : jobsFilter.getExcludeJobs()) {
-                        reportTaskExecutionsDBLayer.getFilter().addExcludedJob(jobPath.getJob());
-                    }
-                }
+			if (jobsFilter.getJobs().size() > 0) {
+				for (JobPath jobPath : jobsFilter.getJobs()) {
+					reportTaskExecutionsDBLayer.getFilter().addJobPath(jobPath.getJob());
+				}
+				jobsFilter.setRegex("");
+			} else {
+				if (jobsFilter.getExcludeJobs().size() > 0) {
+					for (JobPath jobPath : jobsFilter.getExcludeJobs()) {
+						reportTaskExecutionsDBLayer.getFilter().addExcludedJob(jobPath.getJob());
+					}
+				}
 
-                if (jobsFilter.getFolders().size() > 0) {
-                    for (Folder folder : jobsFilter.getFolders()) {
-                        reportTaskExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder(), folder.getRecursive());
-                    }
-                }
-            }
+				if (jobsFilter.getFolders().size() > 0) {
+					for (Folder folder : jobsFilter.getFolders()) {
+						reportTaskExecutionsDBLayer.getFilter().addFolderPath(folder.getFolder(),
+								folder.getRecursive());
+					}
+				}
+			}
 
-            if (jobsFilter.getLimit() == null) {
-                jobsFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
-            }
+			if (jobsFilter.getLimit() == null) {
+				jobsFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);
+			}
 
-            reportTaskExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
+			reportTaskExecutionsDBLayer.getFilter().setLimit(jobsFilter.getLimit());
 
-            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                    reportTaskExecutionsDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.isRecursive());
-                }
-            }
+			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
+						.size(); i++) {
+					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
+							.get(i);
+					reportTaskExecutionsDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),
+							folder.isRecursive());
+				}
+			}
 
-            List<DBItemReportTask> listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer.getSchedulerHistoryListFromTo();
+			List<DBItemReportTask> listOfDBItemReportTaskDBItems = reportTaskExecutionsDBLayer
+					.getSchedulerHistoryListFromTo();
 
-            Matcher regExMatcher = null;
-            if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {
-                regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher("");
-            }
+			Matcher regExMatcher = null;
+			if (jobsFilter.getRegex() != null && !jobsFilter.getRegex().isEmpty()) {
+				regExMatcher = Pattern.compile(jobsFilter.getRegex()).matcher("");
+			}
 
-            for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
-                boolean add = true;
-                TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
-                if (jobsFilter.getJobschedulerId().isEmpty()) {
-                    taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
-                }
-                taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
-                taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
-                taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
-                if (dbItemReportTask.getError()) {
-                    Err error = new Err();
-                    error.setCode(dbItemReportTask.getErrorCode());
-                    error.setMessage(dbItemReportTask.getErrorText());
-                    taskHistoryItem.setError(error);
-                }
+			for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
+				boolean add = true;
+				TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
+				if (jobsFilter.getJobschedulerId().isEmpty()) {
+					taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+				}
+				taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
+				taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
+				taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
+				if (dbItemReportTask.getError()) {
+					Err error = new Err();
+					error.setCode(dbItemReportTask.getErrorCode());
+					error.setMessage(dbItemReportTask.getErrorText());
+					taskHistoryItem.setError(error);
+				}
 
-                taskHistoryItem.setExitCode(dbItemReportTask.getExitCode());
-                taskHistoryItem.setJob(dbItemReportTask.getName());
-                taskHistoryItem.setStartTime(dbItemReportTask.getStartTime());
+				taskHistoryItem.setExitCode(dbItemReportTask.getExitCode());
+				taskHistoryItem.setJob(dbItemReportTask.getName());
+				taskHistoryItem.setStartTime(dbItemReportTask.getStartTime());
 
-                HistoryState state = new HistoryState();
-                if (dbItemReportTask.isSuccessFull()) {
-                    state.setSeverity(0);
-                    state.set_text(HistoryStateText.SUCCESSFUL);
-                }
-                if (dbItemReportTask.isInComplete()) {
-                    state.setSeverity(1);
-                    state.set_text(HistoryStateText.INCOMPLETE);
-                }
-                if (dbItemReportTask.isFailed()) {
-                    state.setSeverity(2);
-                    state.set_text(HistoryStateText.FAILED);
-                }
-                taskHistoryItem.setState(state);
-                taskHistoryItem.setSurveyDate(dbItemReportTask.getCreated());
+				HistoryState state = new HistoryState();
+				if (dbItemReportTask.isSuccessFull()) {
+					state.setSeverity(0);
+					state.set_text(HistoryStateText.SUCCESSFUL);
+				}
+				if (dbItemReportTask.isInComplete()) {
+					state.setSeverity(1);
+					state.set_text(HistoryStateText.INCOMPLETE);
+				}
+				if (dbItemReportTask.isFailed()) {
+					state.setSeverity(2);
+					state.set_text(HistoryStateText.FAILED);
+				}
+				taskHistoryItem.setState(state);
+				taskHistoryItem.setSurveyDate(dbItemReportTask.getCreated());
 
-                // taskHistoryItem.setSteps(dbItemReportExecution.getStep());
-                taskHistoryItem.setTaskId(dbItemReportTask.getHistoryIdAsString());
+				// taskHistoryItem.setSteps(dbItemReportExecution.getStep());
+				taskHistoryItem.setTaskId(dbItemReportTask.getHistoryIdAsString());
 
-                if (regExMatcher != null) {
-                    regExMatcher.reset(dbItemReportTask.getName());
-                    add = regExMatcher.find();
-                }
+				if (regExMatcher != null) {
+					regExMatcher.reset(dbItemReportTask.getName());
+					add = regExMatcher.find();
+				}
 
-                if (add) {
-                    listOfHistory.add(taskHistoryItem);
-                }
+				if (add) {
+					listOfHistory.add(taskHistoryItem);
+				}
 
-            }
+			}
 
-            TaskHistory entity = new TaskHistory();
-            entity.setDeliveryDate(new Date());
-            entity.setHistory(listOfHistory);
+			TaskHistory entity = new TaskHistory();
+			entity.setDeliveryDate(new Date());
+			entity.setHistory(listOfHistory);
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 }

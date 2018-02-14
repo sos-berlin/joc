@@ -18,49 +18,53 @@ import com.sos.joc.order.resource.IOrderLogResource;
 @Path("order")
 public class OrderLogResourceImpl extends JOCResourceImpl implements IOrderLogResource {
 
-    private static final String API_CALL = "./order/log";
+	private static final String API_CALL = "./order/log";
 
-    @Override
-    public JOCDefaultResponse postOrderLog(String xAccessToken, String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        return postOrderLog(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
-    }
+	@Override
+	public JOCDefaultResponse postOrderLog(String xAccessToken, String accessToken,
+			OrderHistoryFilter orderHistoryFilter) throws Exception {
+		return postOrderLog(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
+	}
 
-    public JOCDefaultResponse postOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
+	public JOCDefaultResponse postOrderLog(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
 
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getOrder().getView().isOrderLog());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            checkRequiredParameter("jobschedulerId", orderHistoryFilter.getJobschedulerId());
-            checkRequiredParameter("jobChain", normalizePath(orderHistoryFilter.getJobChain()));
-            checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
-            checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken,
+					orderHistoryFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(orderHistoryFilter.getJobschedulerId(), accessToken).getOrder().getView()
+							.isOrderLog());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			checkRequiredParameter("jobschedulerId", orderHistoryFilter.getJobschedulerId());
+			checkRequiredParameter("jobChain", normalizePath(orderHistoryFilter.getJobChain()));
+			checkRequiredParameter("orderId", orderHistoryFilter.getOrderId());
+			checkRequiredParameter("historyId", orderHistoryFilter.getHistoryId());
 
-            LogContent200 entity = new LogContent200();
-            LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance, accessToken);
-            // TODO surveyDate from database
-            entity.setSurveyDate(Date.from(Instant.now()));
+			LogContent200 entity = new LogContent200();
+			LogOrderContent logOrderContent = new LogOrderContent(orderHistoryFilter, dbItemInventoryInstance,
+					accessToken);
+			// TODO surveyDate from database
+			entity.setSurveyDate(Date.from(Instant.now()));
 
-            LogContent logContentSchema = new LogContent();
-            String log = logOrderContent.getLog();
+			LogContent logContentSchema = new LogContent();
+			String log = logOrderContent.getLog();
 
-            if (orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
-                logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(log));
-            } else {
-                logContentSchema.setPlain(log);
-            }
-            entity.setLog(logContentSchema);
-            entity.setDeliveryDate(Date.from(Instant.now()));
+			if (orderHistoryFilter.getMime() != null && orderHistoryFilter.getMime() == LogMime.HTML) {
+				logContentSchema.setHtml(logOrderContent.htmlWithColouredLogContent(log));
+			} else {
+				logContentSchema.setPlain(log);
+			}
+			entity.setLog(logContentSchema);
+			entity.setDeliveryDate(Date.from(Instant.now()));
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 
 }

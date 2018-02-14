@@ -21,49 +21,52 @@ import com.sos.joc.model.job.JobsV;
 @Path("jobs")
 public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
 
-    private static final String API_CALL = "./jobs";
+	private static final String API_CALL = "./jobs";
 
-    @Override
-    public JOCDefaultResponse postJobs(String xAccessToken, String accessToken, JobsFilter jobsFilter) throws Exception {
-        return postJobs(getAccessToken(xAccessToken, accessToken), jobsFilter);
-    }
+	@Override
+	public JOCDefaultResponse postJobs(String xAccessToken, String accessToken, JobsFilter jobsFilter)
+			throws Exception {
+		return postJobs(getAccessToken(xAccessToken, accessToken), jobsFilter);
+	}
 
-    public JOCDefaultResponse postJobs(String accessToken, JobsFilter jobsFilter) throws Exception {
-        SOSHibernateSession connection = null;
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken, jobsFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getJob().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+	public JOCDefaultResponse postJobs(String accessToken, JobsFilter jobsFilter) throws Exception {
+		SOSHibernateSession connection = null;
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobsFilter, accessToken,
+					jobsFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(jobsFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
-            List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
-            JobsV entity = new JobsV();
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken, jobsWithTempRunTime);
-            List<JobPath> jobs = jobsFilter.getJobs();
-            List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
+			List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
+			JobsV entity = new JobsV();
+			JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken,
+					jobsWithTempRunTime);
+			List<JobPath> jobs = jobsFilter.getJobs();
+			List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
 
-            if (jobs != null && !jobs.isEmpty()) {
-                entity.setJobs(jocXmlCommand.getJobsFromShowJob(jobs, jobsFilter));
-            } else if (folders != null && !folders.isEmpty()) {
-                entity.setJobs(jocXmlCommand.getJobsFromShowState(folders, jobsFilter));
-            } else {
-                entity.setJobs(jocXmlCommand.getJobsFromShowState(jobsFilter));
-            }
-            entity.setDeliveryDate(new Date());
+			if (jobs != null && !jobs.isEmpty()) {
+				entity.setJobs(jocXmlCommand.getJobsFromShowJob(jobs, jobsFilter));
+			} else if (folders != null && !folders.isEmpty()) {
+				entity.setJobs(jocXmlCommand.getJobsFromShowState(folders, jobsFilter));
+			} else {
+				entity.setJobs(jocXmlCommand.getJobsFromShowState(jobsFilter));
+			}
+			entity.setDeliveryDate(new Date());
 
-            return JOCDefaultResponse.responseStatus200(entity);
+			return JOCDefaultResponse.responseStatus200(entity);
 
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 
 }

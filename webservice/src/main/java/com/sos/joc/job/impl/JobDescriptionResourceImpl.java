@@ -41,7 +41,7 @@ public class JobDescriptionResourceImpl extends JOCResourceImpl implements IJobD
                 accessToken = queryAccessToken;
             }
 
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobschedulerId, getPermissonsJocCockpit(accessToken)
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobschedulerId, getPermissonsJocCockpit(jobschedulerId, accessToken)
                     .getJob().getView().isConfiguration());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;
