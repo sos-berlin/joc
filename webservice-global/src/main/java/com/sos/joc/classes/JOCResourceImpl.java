@@ -60,7 +60,7 @@ public class JOCResourceImpl {
 	}
 
 	private String getMasterId(String masterId) throws SessionNotExistException {
-		if (masterId.isEmpty()) {
+		if (masterId == null || masterId.isEmpty()) {
 			SOSShiroSession sosShiroSession = new SOSShiroSession(jobschedulerUser.getSosShiroCurrentUser());
 			masterId = sosShiroSession.getStringAttribute(SESSION_KEY);
 			if (masterId == null) {

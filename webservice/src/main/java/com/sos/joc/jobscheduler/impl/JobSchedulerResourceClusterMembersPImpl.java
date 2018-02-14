@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventoryOperatingSystem;
@@ -49,12 +48,10 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl
 			boolean isPermitted = true;
 			String curJobSchedulerId = jobSchedulerFilter.getJobschedulerId();
 
-			if (!curJobSchedulerId.isEmpty()) {
-				isPermitted = getPermissonsJocCockpit(curJobSchedulerId, accessToken).getJobschedulerMasterCluster()
-						.getView().isStatus()
-						|| getPermissonsJocCockpit(curJobSchedulerId, accessToken).getJobschedulerMaster().getView()
-								.isStatus();
-			}
+            if (!curJobSchedulerId.isEmpty()) {
+                isPermitted = getPermissonsJocCockpit(curJobSchedulerId, accessToken).getJobschedulerMasterCluster().getView().isStatus()
+                        || getPermissonsJocCockpit(curJobSchedulerId, accessToken).getJobschedulerMaster().getView().isStatus();
+            }
 
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, curJobSchedulerId,
 					isPermitted);
@@ -75,13 +72,11 @@ public class JobSchedulerResourceClusterMembersPImpl extends JOCResourceImpl
 						if (instance.getSchedulerId() == null || instance.getSchedulerId().isEmpty()) {
 							continue;
 						}
-						if (!masterId.equals(instance.getSchedulerId())) {
-							masterId = instance.getSchedulerId();
-							isPermitted = getPermissonsJocCockpit(masterId, accessToken).getJobschedulerMasterCluster()
-									.getView().isStatus()
-									|| getPermissonsJocCockpit(masterId, accessToken).getJobschedulerMaster().getView()
-											.isStatus();
-						}
+                        if (!masterId.equals(instance.getSchedulerId())) {
+                            masterId = instance.getSchedulerId();
+                            isPermitted = getPermissonsJocCockpit(masterId, accessToken).getJobschedulerMasterCluster().getView().isStatus()
+                                    || getPermissonsJocCockpit(masterId, accessToken).getJobschedulerMaster().getView().isStatus();
+                        }
 						if (!isPermitted) {
 							continue;
 						}

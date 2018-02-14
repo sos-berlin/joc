@@ -11,7 +11,6 @@ import java.util.concurrent.Future;
 
 import javax.ws.rs.Path;
 
-import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
@@ -31,8 +30,6 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl
 		implements IJobSchedulerResourceClusterMembers {
 
 	private static final String API_CALL = "./jobscheduler/cluster/members";
-	private static final String MASTER_VIEW_PERM = "sos:products:joc_cockpit:jobscheduler_master:view:status";
-	private static final String CLUSTER_VIEW_PERM = "sos:products:joc_cockpit:jobscheduler_master_cluster:view:status";
 
 	@Override
 	public JOCDefaultResponse postJobschedulerClusterMembers(String xAccessToken, String accessToken,
@@ -48,16 +45,14 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl
 				jobSchedulerFilter.setJobschedulerId("");
 			}
 
-			SOSShiroCurrentUser shiroUser = getJobschedulerUser(accessToken).getSosShiroCurrentUser();
 			boolean isPermitted = true;
 			String curJobSchedulerId = jobSchedulerFilter.getJobschedulerId();
 
-			if (!curJobSchedulerId.isEmpty()) {
-				SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(curJobSchedulerId,
-						accessToken);
-				isPermitted = sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().isStatus()
-						|| sosPermissionJocCockpit.getJobschedulerMaster().getView().isStatus();
-			}
+            if (!curJobSchedulerId.isEmpty()) {
+                SOSPermissionJocCockpit sosPermissionJocCockpit = getPermissonsJocCockpit(curJobSchedulerId, accessToken);
+                isPermitted = sosPermissionJocCockpit.getJobschedulerMasterCluster().getView().isStatus() || sosPermissionJocCockpit
+                        .getJobschedulerMaster().getView().isStatus();
+            }
 
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerFilter, accessToken, curJobSchedulerId,
 					isPermitted);
@@ -81,8 +76,8 @@ public class JobSchedulerResourceClusterMembersImpl extends JOCResourceImpl
 						}
 						if (!masterId.equals(instance.getSchedulerId())) {
 							masterId = instance.getSchedulerId();
-							isPermitted = shiroUser.isPermitted(CLUSTER_VIEW_PERM, masterId)
-									|| shiroUser.isPermitted(MASTER_VIEW_PERM, masterId);
+							isPermitted = getPermissonsJocCockpit(masterId, accessToken).getJobschedulerMasterCluster().getView().isStatus()
+                                    || getPermissonsJocCockpit(masterId, accessToken).getJobschedulerMaster().getView().isStatus();
 						}
 						if (!isPermitted) {
 							continue;
