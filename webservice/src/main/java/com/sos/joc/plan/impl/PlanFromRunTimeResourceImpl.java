@@ -4,9 +4,7 @@ import javax.ws.rs.Path;
 
 import org.w3c.dom.Element;
 
-import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jobscheduler.RuntimeResolver;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;

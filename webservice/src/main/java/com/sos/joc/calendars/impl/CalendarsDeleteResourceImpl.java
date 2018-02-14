@@ -31,7 +31,6 @@ import com.sos.joc.exceptions.JobSchedulerConnectionRefusedException;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.model.audit.AuditParams;
 import com.sos.joc.model.calendar.CalendarsFilter;
 import com.sos.joc.model.common.Err419;
 

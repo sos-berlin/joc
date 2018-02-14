@@ -2,9 +2,6 @@ package com.sos.joc.jobscheduler.impl;
 
 import javax.ws.rs.Path;
 
-import org.apache.shiro.session.InvalidSessionException;
-import org.apache.shiro.session.Session;
-
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroSession;
 import com.sos.joc.Globals;
@@ -13,7 +10,6 @@ import com.sos.joc.classes.JOCPreferences;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobscheduler.resource.IJobSchedulerResourceSwitch;
 import com.sos.joc.model.common.JobSchedulerId;
 

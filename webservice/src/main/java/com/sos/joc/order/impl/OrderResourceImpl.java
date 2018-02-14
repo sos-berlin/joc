@@ -2,17 +2,13 @@ package com.sos.joc.order.impl;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 
 import javax.ws.rs.Path;
 
-import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrdersVCallable;
-import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderFilter;
 import com.sos.joc.model.order.OrderV200;
