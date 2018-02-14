@@ -229,6 +229,8 @@ public class CalendarsDBLayer extends DBLayer {
             sql.append(" where instanceId = :instanceId");
             if (type != null && !type.isEmpty()) {
                 sql.append(" and type = :type");
+            } else {
+                sql.append(" and type in (\"WORKING_DAYS\",\"NON_WORKING_DAYS\")"); 
             }
             if (categories != null && !categories.isEmpty()) {
                 if (categories.size() == 1) {
