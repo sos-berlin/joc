@@ -32,8 +32,8 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
     private List<JOCJsonCommand> jocJsonCommands = null;
     private String jobSchedulerId = null;
     private String eventId = null;
-    private Session session = null;
-    private SOSHibernateSession connection = null;
+    private Session shiroSession = null;
+    private SOSHibernateSession session = null;
     private final SOSShiroCurrentUser shiroUser;
     
     public EventCallableOfCurrentCluster(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
@@ -46,7 +46,7 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
         this.jobSchedulerId = jobSchedulerEvent.getJobschedulerId();
         this.shiroUser = shiroUser;
         this.eventId = jobSchedulerEvent.getEventId();
-        this.session = session;
+        this.shiroSession = session;
     }
 
     @Override
@@ -56,14 +56,14 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             JobSchedulerEvent evt = executorService.invokeAny(tasksOfClustermember);
             LOGGER.debug("EventOfCluster: " + evt.getJobschedulerId() + "," + evt.getEventId() );
             if (evt.getJobschedulerId().startsWith("__instance__")) {
-                session.setAttribute("eventIdOfClusterMembers", evt.getEventId());
+                shiroSession.setAttribute("eventIdOfClusterMembers", evt.getEventId());
                 evt.setJobschedulerId(jobSchedulerId);
                 evt.setEventId(eventId);
                 evt.getEventSnapshots().addAll(updateSavedInventoryInstance());
             } else {
-                session.setAttribute("eventIdOfClusterMembers", eventId);
+                shiroSession.setAttribute("eventIdOfClusterMembers", eventId);
             }
-            LOGGER.debug("EventIdOfCluster: "+session.getAttribute("eventIdOfClusterMembers"));
+            LOGGER.debug("EventIdOfCluster: "+shiroSession.getAttribute("eventIdOfClusterMembers"));
             return evt;
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof JocException) {
@@ -86,14 +86,14 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             curInstance = Globals.urlFromJobSchedulerId.get(jobSchedulerId);
         }
         try {
-            if (connection == null) {
-                connection = Globals.createSosHibernateStatelessConnection("eventClusterCallable-" + jobSchedulerId);
+            if (session == null) {
+                session = Globals.createSosHibernateStatelessConnection("eventClusterCallable-" + jobSchedulerId);
             }
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
-            Globals.beginTransaction(connection);
+            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(session);
+            Globals.beginTransaction(session);
             DBItemInventoryInstance inst = dbLayer.getInventoryInstanceBySchedulerId(jobSchedulerId, accessToken, curInstance);
             shiroUser.addSchedulerInstanceDBItem(jobSchedulerId, inst);
-            Globals.rollback(connection);
+            Globals.rollback(session);
             Globals.urlFromJobSchedulerId.put(jobSchedulerId, inst);
             if (inst != null && !inst.equals(curInstance)) {
                 EventSnapshot masterChangedEventSnapshot = new EventSnapshot();
@@ -104,8 +104,8 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             }
         } catch (Exception e) {
         } finally {
-            Globals.disconnect(connection);
-            connection = null;
+            Globals.disconnect(session);
+            session = null;
         }
         return events;
     }

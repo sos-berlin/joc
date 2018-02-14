@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sos.auth.rest.SOSPermissionsCreator;
+import com.sos.auth.rest.SOSShiroSession;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -39,7 +40,8 @@ import com.sos.joc.model.common.Folder;
 
 public class JOCResourceImpl {
 
-	protected DBItemInventoryInstance dbItemInventoryInstance;
+	private static final String SESSION_KEY = "selectedInstance";
+    protected DBItemInventoryInstance dbItemInventoryInstance;
 	protected JobSchedulerUser jobschedulerUser;
 	private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
 	private String accessToken;
@@ -57,14 +59,27 @@ public class JOCResourceImpl {
 		updateUserInMetaInfo();
 	}
 
-	protected SOSPermissionJocCockpit getPermissonsJocCockpit(String accessToken) throws SessionNotExistException {
+	private String getMasterId(String masterId) throws SessionNotExistException {
+		if (masterId == null || masterId.isEmpty()) {
+			SOSShiroSession sosShiroSession = new SOSShiroSession(jobschedulerUser.getSosShiroCurrentUser());
+			masterId = sosShiroSession.getStringAttribute(SESSION_KEY);
+			if (masterId == null) {
+				masterId = "";
+			}
+		}
+       return masterId;
+	}
+	
+	protected SOSPermissionJocCockpit getPermissonsJocCockpit(String masterId, String accessToken) throws SessionNotExistException {
 		initGetPermissions(accessToken);
-		return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit();
+		masterId = getMasterId(masterId);
+		return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit(masterId);
 	}
 
-	protected SOSPermissionCommands getPermissonsCommands(String accessToken) throws SessionNotExistException {
+	protected SOSPermissionCommands getPermissonsCommands(String masterId, String accessToken) throws SessionNotExistException {
 		initGetPermissions(accessToken);
-		return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands();
+		masterId = getMasterId(masterId);
+		return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands(masterId);
 	}
 
 	public String getAccessToken() {

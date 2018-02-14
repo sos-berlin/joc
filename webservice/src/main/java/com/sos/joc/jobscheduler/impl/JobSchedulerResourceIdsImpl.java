@@ -25,78 +25,74 @@ import com.sos.joc.model.jobscheduler.JobSchedulerIds;
 @Path("jobscheduler")
 public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJobSchedulerResourceIds {
 
-    private static final String API_CALL = "./jobscheduler/ids";
+	private static final String API_CALL = "./jobscheduler/ids";
 
-    @Override
-    public JOCDefaultResponse postJobschedulerIds(String xAccessToken, String accessToken) {
-        return postJobschedulerIds(getAccessToken(xAccessToken, accessToken));
-    }
+	@Override
+	public JOCDefaultResponse postJobschedulerIds(String xAccessToken, String accessToken) {
+		return postJobschedulerIds(getAccessToken(xAccessToken, accessToken));
+	}
+	
+ 
+	public JOCDefaultResponse postJobschedulerIds(String accessToken) {
+		SOSHibernateSession connection = null;
 
-    public JOCDefaultResponse postJobschedulerIds(String accessToken) {
-        SOSHibernateSession connection = null;
+		try {
 
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "", getPermissonsJocCockpit(accessToken).getJobschedulerMaster()
-                    .getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+			SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
+			JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
 
-            SOSShiroCurrentUser shiroUser = jobschedulerUser.getSosShiroCurrentUser();
-            JOCPreferences jocPreferences = new JOCPreferences(shiroUser.getUsername());
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+			List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
+			Set<String> jobSchedulerIds = new HashSet<String>();
+			DBItemInventoryInstance first = null;
+			if (listOfInstance != null && !listOfInstance.isEmpty()) {
+				for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
+					jobSchedulerIds.add(inventoryInstance.getSchedulerId());
+					if (first == null) {
+						first = inventoryInstance;
+					}
+				}
+			} else {
+				throw new DBMissingDataException("No JobSchedulers found in DB!");
+			}
+			String selectedInstanceSchedulerId = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE,
+					first.getSchedulerId());
 
-            String idFromPreferences = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, "");
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
-            List<DBItemInventoryInstance> listOfInstance = dbLayer.getJobSchedulerIds();
-            Set<String> jobSchedulerIds = new HashSet<String>();
-            DBItemInventoryInstance first = null;
-            DBItemInventoryInstance selected = null;
-            if (listOfInstance != null && !listOfInstance.isEmpty()) {
-                for (DBItemInventoryInstance inventoryInstance : listOfInstance) {
-                    jobSchedulerIds.add(inventoryInstance.getSchedulerId());
-                    if (first == null) {
-                        first = inventoryInstance;
-                    }
-                    if (idFromPreferences.equals(inventoryInstance.getSchedulerId())) {
-                        selected = inventoryInstance;
-                    }
-                }
-            } else {
-                throw new DBMissingDataException("No JobSchedulers found in DB!");
-            }
-            String selectedInstanceSchedulerId = jocPreferences.get(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
-            
-            if (!jobSchedulerIds.contains(selectedInstanceSchedulerId)) {
-                if (first != null) {
-                    selectedInstanceSchedulerId = first.getSchedulerId();
-                    jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
-                }
-                shiroUser.setSelectedInstance(first);
-            } else {
-                shiroUser.setSelectedInstance(selected);
-            }
-            
-            DBItemInventoryInstance inst = jobschedulerUser.getSchedulerInstance(selectedInstanceSchedulerId);
+			if (!jobSchedulerIds.contains(selectedInstanceSchedulerId)) {
+				if (first != null) {
+					selectedInstanceSchedulerId = first.getSchedulerId();
+					jocPreferences.put(WebserviceConstants.SELECTED_INSTANCE, first.getSchedulerId());
+				}
+			}
 
-            JobSchedulerIds entity = new JobSchedulerIds();
-            entity.getJobschedulerIds().addAll(jobSchedulerIds);
-            entity.setSelected(selectedInstanceSchedulerId);
-            entity.setPrecedence(inst.getPrecedence());
-            entity.setDeliveryDate(Date.from(Instant.now()));
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, null, accessToken, "",
+					getPermissonsJocCockpit(selectedInstanceSchedulerId, accessToken).getJobschedulerMaster().getView()
+							.isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}			
+			
+			DBItemInventoryInstance inst = jobschedulerUser.getSchedulerInstance(selectedInstanceSchedulerId);
 
-            return JOCDefaultResponse.responseStatus200(entity);
+			JobSchedulerIds entity = new JobSchedulerIds();
+			entity.getJobschedulerIds().addAll(jobSchedulerIds);
+			entity.setSelected(selectedInstanceSchedulerId);
+			entity.setPrecedence(inst.getPrecedence());
+			entity.setDeliveryDate(Date.from(Instant.now()));
 
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
+			return JOCDefaultResponse.responseStatus200(entity);
 
-    }
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+
+	}
 
 }

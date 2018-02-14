@@ -29,90 +29,96 @@ import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
 
 @Path("jobscheduler")
-public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClustersP {
+public class JobSchedulerResourceAgentClustersPImpl extends JOCResourceImpl
+		implements IJobSchedulerResourceAgentClustersP {
 
-    private static final String API_CALL = "./jobscheduler/agent_clusters/p";
+	private static final String API_CALL = "./jobscheduler/agent_clusters/p";
 
-    @Override
-    public JOCDefaultResponse postJobschedulerAgentClustersP(String xAccessToken, String accessToken,
-            AgentClusterFilter jobSchedulerAgentClustersBody) {
-        return postJobschedulerAgentClustersP(getAccessToken(xAccessToken, accessToken), jobSchedulerAgentClustersBody);
-    }
+	@Override
+	public JOCDefaultResponse postJobschedulerAgentClustersP(String xAccessToken, String accessToken,
+			AgentClusterFilter jobSchedulerAgentClustersBody) {
+		return postJobschedulerAgentClustersP(getAccessToken(xAccessToken, accessToken), jobSchedulerAgentClustersBody);
+	}
 
-    public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
+	public JOCDefaultResponse postJobschedulerAgentClustersP(String accessToken,
+			AgentClusterFilter jobSchedulerAgentClustersBody) {
 
-        SOSHibernateSession connection = null;
+		SOSHibernateSession connection = null;
 
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerAgentClustersBody, accessToken, jobSchedulerAgentClustersBody
-                    .getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerAgentClustersBody, accessToken,
+					jobSchedulerAgentClustersBody.getJobschedulerId(),
+					getPermissonsJocCockpit(jobSchedulerAgentClustersBody.getJobschedulerId(), accessToken)
+							.getJobschedulerUniversalAgent().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Set<String> agentClusterPaths = new HashSet<String>();
-            if (jobSchedulerAgentClustersBody.getAgentClusters() != null) {
-                for (AgentClusterPath agentCluster : jobSchedulerAgentClustersBody.getAgentClusters()) {
-                    checkRequiredParameter("agentCluster", agentCluster.getAgentCluster());
-                    agentClusterPaths.add(agentCluster.getAgentCluster());
-                }
-            }
-            Globals.beginTransaction(connection);
-            InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
-            // List<AgentClusterMember> agentClusterMembers =
-            // agentLayer.getInventoryAgentClusterMembers(dbItemInventoryInstance.getId(),
-            // null);
-            List<AgentClusterPermanent> agentClusters = agentLayer.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			Set<String> agentClusterPaths = new HashSet<String>();
+			if (jobSchedulerAgentClustersBody.getAgentClusters() != null) {
+				for (AgentClusterPath agentCluster : jobSchedulerAgentClustersBody.getAgentClusters()) {
+					checkRequiredParameter("agentCluster", agentCluster.getAgentCluster());
+					agentClusterPaths.add(agentCluster.getAgentCluster());
+				}
+			}
+			Globals.beginTransaction(connection);
+			InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
+			// List<AgentClusterMember> agentClusterMembers =
+			// agentLayer.getInventoryAgentClusterMembers(dbItemInventoryInstance.getId(),
+			// null);
+			List<AgentClusterPermanent> agentClusters = agentLayer
+					.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
 
-            ArrayList<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
-            for (AgentClusterPermanent agentCluster : agentClusters) {
-                if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentCluster.getPath())) {
-                    continue;
-                }
-                List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(dbItemInventoryInstance.getId(),
-                        agentCluster.getAgentClusterId());
-                int countRunningAgents = 0;
-                for (AgentClusterMember agentClusterMember : agentClusterMembers) {
-                    if (agentClusterMember.getState().getSeverity() == 0) {
-                        countRunningAgents++;
-                    }
-                }
-                NumOfAgentsInCluster numOfAgents = agentCluster.getNumOfAgents();
-                numOfAgents.setRunning(countRunningAgents);
-                AgentClusterState state = new AgentClusterState();
-                if (numOfAgents.getAny() == numOfAgents.getRunning()) {
-                    state.setSeverity(0);
-                    state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_RUNNING);
-                } else if (0 == numOfAgents.getRunning()) {
-                    state.setSeverity(2);
-                    state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_UNREACHABLE);
-                } else {
-                    state.setSeverity(1);
-                    state.set_text(AgentClusterStateText.ONLY_SOME_AGENTS_ARE_RUNNING);
-                }
-                if (jobSchedulerAgentClustersBody.getState() != null && jobSchedulerAgentClustersBody.getState() != state.getSeverity()) {
-                    continue;
-                }
-                agentCluster.setState(state);
-                if (jobSchedulerAgentClustersBody.getCompact() == null || !jobSchedulerAgentClustersBody.getCompact()) {
-                    agentCluster.setAgents(new ArrayList<AgentOfCluster>(agentClusterMembers));
-                }
-                listOfAgentClusters.add(agentCluster);
-            }
+			ArrayList<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
+			for (AgentClusterPermanent agentCluster : agentClusters) {
+				if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentCluster.getPath())) {
+					continue;
+				}
+				List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(
+						dbItemInventoryInstance.getId(), agentCluster.getAgentClusterId());
+				int countRunningAgents = 0;
+				for (AgentClusterMember agentClusterMember : agentClusterMembers) {
+					if (agentClusterMember.getState().getSeverity() == 0) {
+						countRunningAgents++;
+					}
+				}
+				NumOfAgentsInCluster numOfAgents = agentCluster.getNumOfAgents();
+				numOfAgents.setRunning(countRunningAgents);
+				AgentClusterState state = new AgentClusterState();
+				if (numOfAgents.getAny() == numOfAgents.getRunning()) {
+					state.setSeverity(0);
+					state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_RUNNING);
+				} else if (0 == numOfAgents.getRunning()) {
+					state.setSeverity(2);
+					state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_UNREACHABLE);
+				} else {
+					state.setSeverity(1);
+					state.set_text(AgentClusterStateText.ONLY_SOME_AGENTS_ARE_RUNNING);
+				}
+				if (jobSchedulerAgentClustersBody.getState() != null
+						&& jobSchedulerAgentClustersBody.getState() != state.getSeverity()) {
+					continue;
+				}
+				agentCluster.setState(state);
+				if (jobSchedulerAgentClustersBody.getCompact() == null || !jobSchedulerAgentClustersBody.getCompact()) {
+					agentCluster.setAgents(new ArrayList<AgentOfCluster>(agentClusterMembers));
+				}
+				listOfAgentClusters.add(agentCluster);
+			}
 
-            AgentClusters entity = new AgentClusters();
-            entity.setAgentClusters(listOfAgentClusters);
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-            ;
-        }
-    }
+			AgentClusters entity = new AgentClusters();
+			entity.setAgentClusters(listOfAgentClusters);
+			entity.setDeliveryDate(Date.from(Instant.now()));
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+			;
+		}
+	}
 }

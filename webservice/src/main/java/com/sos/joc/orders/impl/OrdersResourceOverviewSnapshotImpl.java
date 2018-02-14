@@ -18,51 +18,59 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSnapshot;
 @Path("orders")
 public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implements IOrdersResourceOverviewSnapshot {
 
-    private static final String API_CALL = "./orders/overview/snapshot";
+	private static final String API_CALL = "./orders/overview/snapshot";
 
-    @Override
-    public JOCDefaultResponse postOrdersOverviewSnapshot(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        return postOrdersOverviewSnapshot(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
-    }
+	@Override
+	public JOCDefaultResponse postOrdersOverviewSnapshot(String xAccessToken, String accessToken,
+			JobChainsFilter jobChainsFilter) throws Exception {
+		return postOrdersOverviewSnapshot(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
+	}
 
-    public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-        String folders = "";
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+	public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter)
+			throws Exception {
+		String folders = "";
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken,
+					jobChainsFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(jobChainsFilter.getJobschedulerId(), accessToken).getOrder().getView()
+							.isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            if (jobChainsFilter.getFolders().size() == 0 && jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                    folders = folders + folder.getFolder() + ",";
-                    com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
-                    f.setFolder(folder.getFolder());
-                    f.setRecursive(folder.isRecursive());
-                    jobChainsFilter.getFolders().add(f);
-                }
-            }
+			if (jobChainsFilter.getFolders().size() == 0
+					&& jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
+						.size(); i++) {
+					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
+							.get(i);
+					folders = folders + folder.getFolder() + ",";
+					com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
+					f.setFolder(folder.getFolder());
+					f.setRecursive(folder.isRecursive());
+					jobChainsFilter.getFolders().add(f);
+				}
+			}
 
-            OrdersSnapshot entity = Orders.getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
+			OrdersSnapshot entity = Orders.getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
 
-            return JOCDefaultResponse.responseStatus200(entity);
+			return JOCDefaultResponse.responseStatus200(entity);
 
-        } catch (JobSchedulerConnectionResetException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatus434JSError(e);
-        } catch (JobSchedulerObjectNotExistException e) {
-            JocError err = new JocError();
-            err.setMessage(String.format("%s: Please check your folders in the Account Management (%s)", e.getMessage(), folders));
-            JocException ee = new JocException(err);
-            return JOCDefaultResponse.responseStatusJSError(ee);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
+		} catch (JobSchedulerConnectionResetException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatus434JSError(e);
+		} catch (JobSchedulerObjectNotExistException e) {
+			JocError err = new JocError();
+			err.setMessage(String.format("%s: Please check your folders in the Account Management (%s)", e.getMessage(),
+					folders));
+			JocException ee = new JocException(err);
+			return JOCDefaultResponse.responseStatusJSError(ee);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
 
-    }
+	}
 }

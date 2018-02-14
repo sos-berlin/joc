@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.Ini;
-import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.config.Ini.Section;
+import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.SecurityManager;
 import org.ini4j.InvalidFileFormatException;
 import org.ini4j.Profile;
@@ -18,6 +17,7 @@ import com.sos.auth.rest.SOSShiroIniShare;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.hibernate.exceptions.SOSHibernateException;
 import com.sos.joc.Globals;
+import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.security.SecurityConfiguration;
 import com.sos.joc.model.security.SecurityConfigurationFolder;
@@ -61,11 +61,17 @@ public class SOSSecurityConfiguration {
 		}
 	}
 
-	private void addMain() {
+	private void addMain() throws JocException {
 
 		SOSSecurityConfigurationMainEntry sosSecurityConfigurationMainEntry = new SOSSecurityConfigurationMainEntry();
 		HashMap<String, String> comments = new HashMap<String, String>();
 		Section mainSection = ini.getSection(SECTION_MAIN);
+		if (mainSection == null) {
+			JocError jocError = new JocError();
+			jocError.setCode("");
+			jocError.setMessage("Missing [main] section");
+			throw new JocException(jocError);
+		}
 		for (Map.Entry<String, String> entry : mainSection.entrySet()) {
 			if (writeIni.get(SECTION_MAIN).getComment(entry.getKey()) != null) {
 				comments.put(entry.getKey(), writeIni.get(SECTION_MAIN).getComment(entry.getKey()));

@@ -22,49 +22,49 @@ import com.sos.joc.model.job.JobP200;
 @Path("job")
 public class JobResourcePImpl extends JOCResourceImpl implements IJobResourceP {
 
-    private static final String API_CALL = "./job/p";
+	private static final String API_CALL = "./job/p";
 
-    @Override
-    public JOCDefaultResponse postJobP(String xAccessToken, String accessToken, JobFilter jobFilter)
-            throws Exception {
-        return postJobP(getAccessToken(xAccessToken, accessToken), jobFilter);
-    }
+	@Override
+	public JOCDefaultResponse postJobP(String xAccessToken, String accessToken, JobFilter jobFilter) throws Exception {
+		return postJobP(getAccessToken(xAccessToken, accessToken), jobFilter);
+	}
 
-    public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) {
+	public JOCDefaultResponse postJobP(String accessToken, JobFilter jobFilter) {
 
-        SOSHibernateSession connection = null;
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getJob().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
-            checkRequiredParameter("job", jobFilter.getJob());
-            Long instanceId = dbItemInventoryInstance.getId();
-            String jobPath = normalizePath(jobFilter.getJob());
-            DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(jobPath, instanceId);
-            if ("/scheduler_file_order_sink".equals(jobPath)) {
-                inventoryJob = new DBItemInventoryJob();
-                inventoryJob.setName("/scheduler_file_order_sink");
-            } else if (inventoryJob == null) {
-                throw new DBMissingDataException("no entry found in DB for job: " + jobFilter.getJob());
-            }
-            JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId);
-            JobP200 entity = new JobP200();
-            entity.setJob(job);
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
+		SOSHibernateSession connection = null;
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
+					jobFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
+			checkRequiredParameter("job", jobFilter.getJob());
+			Long instanceId = dbItemInventoryInstance.getId();
+			String jobPath = normalizePath(jobFilter.getJob());
+			DBItemInventoryJob inventoryJob = dbLayer.getInventoryJobByName(jobPath, instanceId);
+			if ("/scheduler_file_order_sink".equals(jobPath)) {
+				inventoryJob = new DBItemInventoryJob();
+				inventoryJob.setName("/scheduler_file_order_sink");
+			} else if (inventoryJob == null) {
+				throw new DBMissingDataException("no entry found in DB for job: " + jobFilter.getJob());
+			}
+			JobP job = JobPermanent.getJob(inventoryJob, dbLayer, jobFilter.getCompact(), instanceId);
+			JobP200 entity = new JobP200();
+			entity.setJob(job);
+			entity.setDeliveryDate(Date.from(Instant.now()));
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
 
-    }
+	}
 
 }

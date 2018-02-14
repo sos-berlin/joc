@@ -32,192 +32,212 @@ import com.sos.joc.model.job.ModifyJobs;
 @Path("jobs")
 public class JobsResourceModifyJobImpl extends JOCResourceImpl implements IJobsResourceModifyJob {
 
-    private static final String CONTINUE = "continue";
-    private static final String END = "end";
-    private static final String SUSPEND = "suspend";
-    private static final String STOP = "stop";
-    private static final String SET_RUN_TIME = "set_run_time";
-    private static final String UNSTOP = "unstop";
-    private static String API_CALL = "./jobs/";
-    private List<Err419> listOfErrors = new ArrayList<Err419>();
+	private static final String CONTINUE = "continue";
+	private static final String END = "end";
+	private static final String SUSPEND = "suspend";
+	private static final String STOP = "stop";
+	private static final String SET_RUN_TIME = "set_run_time";
+	private static final String UNSTOP = "unstop";
+	private static String API_CALL = "./jobs/";
+	private List<Err419> listOfErrors = new ArrayList<Err419>();
 
-    @Override
-    public JOCDefaultResponse postJobsStop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsStop(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
+	@Override
+	public JOCDefaultResponse postJobsStop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+		return postJobsStop(getAccessToken(xAccessToken, accessToken), modifyJobs);
+	}
 
-    public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
-        try {
-            return postJobsCommand(accessToken, STOP, getPermissonsJocCockpit(accessToken).getJob().getExecute().isStop(), modifyJobs);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+	public JOCDefaultResponse postJobsStop(String accessToken, ModifyJobs modifyJobs) {
+		try {
+			return postJobsCommand(accessToken, STOP,
+					getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute().isStop(),
+					modifyJobs);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 
-    @Override
-    public JOCDefaultResponse postJobsUnstop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsUnstop(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
+	@Override
+	public JOCDefaultResponse postJobsUnstop(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+		return postJobsUnstop(getAccessToken(xAccessToken, accessToken), modifyJobs);
+	}
 
-    public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
-        try {
-            return postJobsCommand(accessToken, UNSTOP, getPermissonsJocCockpit(accessToken).getJob().getExecute().isUnstop(), modifyJobs);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+	public JOCDefaultResponse postJobsUnstop(String accessToken, ModifyJobs modifyJobs) {
+		try {
+			return postJobsCommand(accessToken, UNSTOP,
+					getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
+							.isUnstop(),
+					modifyJobs);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 
-    @Override
-    public JOCDefaultResponse postJobsSetRunTime(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsSetRunTime(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
+	@Override
+	public JOCDefaultResponse postJobsSetRunTime(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+		return postJobsSetRunTime(getAccessToken(xAccessToken, accessToken), modifyJobs);
+	}
 
-    public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
-        try {
-            return postJobsCommand(accessToken, SET_RUN_TIME, getPermissonsJocCockpit(accessToken).getJob().getChange().isRunTime(), modifyJobs);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+	public JOCDefaultResponse postJobsSetRunTime(String accessToken, ModifyJobs modifyJobs) {
+		try {
+			return postJobsCommand(accessToken, SET_RUN_TIME,
+					getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getChange()
+							.isRunTime(),
+					modifyJobs);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 
-    @Override
-    public JOCDefaultResponse postJobsEndAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsEndAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
+	@Override
+	public JOCDefaultResponse postJobsEndAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+		return postJobsEndAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
+	}
 
-    public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        try {
-            return postJobsCommand(accessToken, END, getPermissonsJocCockpit(accessToken).getJob().getExecute().isEndAllTasks(), modifyJobs);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+	public JOCDefaultResponse postJobsEndAllTasks(String accessToken, ModifyJobs modifyJobs) {
+		try {
+			return postJobsCommand(accessToken, END,
+					getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
+							.isEndAllTasks(),
+					modifyJobs);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 
-    @Override
-    public JOCDefaultResponse postJobsSuspendAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsSuspendAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
+	@Override
+	public JOCDefaultResponse postJobsSuspendAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+		return postJobsSuspendAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
+	}
 
-    public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        try {
-            return postJobsCommand(accessToken, SUSPEND, getPermissonsJocCockpit(accessToken).getJob().getExecute().isSuspendAllTasks(), modifyJobs);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+	public JOCDefaultResponse postJobsSuspendAllTasks(String accessToken, ModifyJobs modifyJobs) {
+		try {
+			return postJobsCommand(accessToken, SUSPEND,
+					getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
+							.isSuspendAllTasks(),
+					modifyJobs);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 
-    @Override
-    public JOCDefaultResponse postJobsContinueAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
-        return postJobsContinueAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
-    }
+	@Override
+	public JOCDefaultResponse postJobsContinueAllTasks(String xAccessToken, String accessToken, ModifyJobs modifyJobs) {
+		return postJobsContinueAllTasks(getAccessToken(xAccessToken, accessToken), modifyJobs);
+	}
 
-    public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
-        try {
-            return postJobsCommand(accessToken, CONTINUE, getPermissonsJocCockpit(accessToken).getJob().getExecute().isContinueAllTasks(),
-                    modifyJobs);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+	public JOCDefaultResponse postJobsContinueAllTasks(String accessToken, ModifyJobs modifyJobs) {
+		try {
+			return postJobsCommand(accessToken, CONTINUE,
+					getPermissonsJocCockpit(modifyJobs.getJobschedulerId(), accessToken).getJob().getExecute()
+							.isContinueAllTasks(),
+					modifyJobs);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 
-    private Date executeModifyJobCommand(ModifyJob modifyJob, ModifyJobs modifyJobs, String command) {
+	private Date executeModifyJobCommand(ModifyJob modifyJob, ModifyJobs modifyJobs, String command) {
 
-        try {
-            ModifyJobAudit jobAudit = new ModifyJobAudit(modifyJob, modifyJobs);
-            logAuditMessage(jobAudit);
+		try {
+			ModifyJobAudit jobAudit = new ModifyJobAudit(modifyJob, modifyJobs);
+			logAuditMessage(jobAudit);
 
-            checkRequiredParameter("job", modifyJob.getJob());
-            if (SET_RUN_TIME.equals(command)) {
-                checkRequiredParameter("runTime", modifyJob.getRunTime());
-            }
+			checkRequiredParameter("job", modifyJob.getJob());
+			if (SET_RUN_TIME.equals(command)) {
+				checkRequiredParameter("runTime", modifyJob.getRunTime());
+			}
 
-            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
-            String jobPath = normalizePath(modifyJob.getJob());
-            switch (command) {
-            case SET_RUN_TIME:
-                try {
+			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(dbItemInventoryInstance);
+			String jobPath = normalizePath(modifyJob.getJob());
+			switch (command) {
+			case SET_RUN_TIME:
+				try {
 
-                    JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
-                    String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTime(), this, jobPath);
+					JSObjectConfiguration jocConfiguration = new JSObjectConfiguration();
+					String configuration = jocConfiguration.modifyJobRuntime(modifyJob.getRunTime(), this, jobPath);
 
-                    ValidateXML.validateAgainstJobSchedulerSchema(configuration);
-                    XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
-                    Element jobElement = XMLBuilder.parse(configuration);
-                    jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
-                    xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
-                    String commandAsXml = xmlBuilder.asXML();
-                    jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
-                    
-                    SOSHibernateSession session = Globals.createSosHibernateStatelessConnection(API_CALL + SET_RUN_TIME);
-                    try {
-                        CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session, dbItemInventoryInstance.getId(), CalendarObjectType.JOB, jobPath,
-                                modifyJob.getRunTime(), modifyJob.getCalendars());
-                        calendarUsedByWriter.updateUsedBy();
-                        jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
-                    } finally {
-                        Globals.disconnect(session);
-                    }
+					ValidateXML.validateAgainstJobSchedulerSchema(configuration);
+					XMLBuilder xmlBuilder = new XMLBuilder("modify_hot_folder");
+					Element jobElement = XMLBuilder.parse(configuration);
+					jobElement.addAttribute("name", Paths.get(jobPath).getFileName().toString());
+					xmlBuilder.addAttribute("folder", getParent(jobPath)).add(jobElement);
+					String commandAsXml = xmlBuilder.asXML();
+					jocXmlCommand.executePostWithThrowBadRequest(commandAsXml, getAccessToken());
 
-                    storeAuditLogEntry(jobAudit);
-                } catch (JocException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new JobSchedulerInvalidResponseDataException(e);
-                }
-                break;
-            default:
-                XMLBuilder xml = new XMLBuilder("modify_job");
-                xml.addAttribute("job", jobPath);
-                xml.addAttribute("cmd", command);
-                jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
-                storeAuditLogEntry(jobAudit);
-                break;
-            }
+					SOSHibernateSession session = Globals
+							.createSosHibernateStatelessConnection(API_CALL + SET_RUN_TIME);
+					try {
+						CalendarUsedByWriter calendarUsedByWriter = new CalendarUsedByWriter(session,
+								dbItemInventoryInstance.getId(), CalendarObjectType.JOB, jobPath,
+								modifyJob.getRunTime(), modifyJob.getCalendars());
+						calendarUsedByWriter.updateUsedBy();
+						jocXmlCommand.executePostWithThrowBadRequest(calendarUsedByWriter.getEvent(), getAccessToken());
+					} finally {
+						Globals.disconnect(session);
+					}
 
-            return jocXmlCommand.getSurveyDate();
-        } catch (JocException e) {
-            listOfErrors.add(new BulkError().get(e, getJocError(), modifyJob));
-        } catch (Exception e) {
-            listOfErrors.add(new BulkError().get(e, getJocError(), modifyJob));
-        }
-        return null;
-    }
+					storeAuditLogEntry(jobAudit);
+				} catch (JocException e) {
+					throw e;
+				} catch (Exception e) {
+					throw new JobSchedulerInvalidResponseDataException(e);
+				}
+				break;
+			default:
+				XMLBuilder xml = new XMLBuilder("modify_job");
+				xml.addAttribute("job", jobPath);
+				xml.addAttribute("cmd", command);
+				jocXmlCommand.executePostWithThrowBadRequest(xml.asXML(), getAccessToken());
+				storeAuditLogEntry(jobAudit);
+				break;
+			}
 
-    private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission, ModifyJobs modifyJobs) throws Exception {
-        JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyJobs, accessToken, modifyJobs.getJobschedulerId(), permission);
-        if (jocDefaultResponse != null) {
-            return jocDefaultResponse;
-        }
-        checkRequiredComment(modifyJobs.getAuditLog());
-        if (modifyJobs.getJobs().size() == 0) {
-            throw new JocMissingRequiredParameterException("undefined 'jobs'");
-        }
-        Date surveyDate = new Date();
-        for (ModifyJob job : modifyJobs.getJobs()) {
-            surveyDate = executeModifyJobCommand(job, modifyJobs, command);
-        }
-        if (listOfErrors.size() > 0) {
-            return JOCDefaultResponse.responseStatus419(listOfErrors);
-        }
-        return JOCDefaultResponse.responseStatusJSOk(surveyDate);
-    }
+			return jocXmlCommand.getSurveyDate();
+		} catch (JocException e) {
+			listOfErrors.add(new BulkError().get(e, getJocError(), modifyJob));
+		} catch (Exception e) {
+			listOfErrors.add(new BulkError().get(e, getJocError(), modifyJob));
+		}
+		return null;
+	}
+
+	private JOCDefaultResponse postJobsCommand(String accessToken, String command, boolean permission,
+			ModifyJobs modifyJobs) throws Exception {
+		JOCDefaultResponse jocDefaultResponse = init(API_CALL + command, modifyJobs, accessToken,
+				modifyJobs.getJobschedulerId(), permission);
+		if (jocDefaultResponse != null) {
+			return jocDefaultResponse;
+		}
+		checkRequiredComment(modifyJobs.getAuditLog());
+		if (modifyJobs.getJobs().size() == 0) {
+			throw new JocMissingRequiredParameterException("undefined 'jobs'");
+		}
+		Date surveyDate = new Date();
+		for (ModifyJob job : modifyJobs.getJobs()) {
+			surveyDate = executeModifyJobCommand(job, modifyJobs, command);
+		}
+		if (listOfErrors.size() > 0) {
+			return JOCDefaultResponse.responseStatus419(listOfErrors);
+		}
+		return JOCDefaultResponse.responseStatusJSOk(surveyDate);
+	}
 
 }

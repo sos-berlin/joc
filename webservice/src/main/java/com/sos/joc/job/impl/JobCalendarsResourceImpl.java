@@ -29,7 +29,7 @@ public class JobCalendarsResourceImpl extends JOCResourceImpl implements IJobCal
     public JOCDefaultResponse postJobCalendars(String accessToken, JobFilter jobFilter) throws Exception {
         SOSHibernateSession connection = null;
         try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(jobFilter.getJobschedulerId(),
                     accessToken).getJob().getView().isStatus());
             if (jocDefaultResponse != null) {
                 return jocDefaultResponse;

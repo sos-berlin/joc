@@ -23,67 +23,72 @@ import com.sos.joc.order.resource.IOrderHistoryResource;
 @Path("order")
 public class OrderHistoryResourceImpl extends JOCResourceImpl implements IOrderHistoryResource {
 
-    private static final String API_CALL = "./order/history";
+	private static final String API_CALL = "./order/history";
 
-    @Override
-    public JOCDefaultResponse postOrderHistory(String xAccessToken, String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
-        return postOrderHistory(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
-    }
+	@Override
+	public JOCDefaultResponse postOrderHistory(String xAccessToken, String accessToken,
+			OrderHistoryFilter orderHistoryFilter) throws Exception {
+		return postOrderHistory(getAccessToken(xAccessToken, accessToken), orderHistoryFilter);
+	}
 
-    public JOCDefaultResponse postOrderHistory(String accessToken, OrderHistoryFilter orderHistoryFilter) throws Exception {
+	public JOCDefaultResponse postOrderHistory(String accessToken, OrderHistoryFilter orderHistoryFilter)
+			throws Exception {
 
-        SOSHibernateSession connection = null;
+		SOSHibernateSession connection = null;
 
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken, orderHistoryFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Globals.beginTransaction(connection);
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderHistoryFilter, accessToken,
+					orderHistoryFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(orderHistoryFilter.getJobschedulerId(), accessToken).getOrder().getView()
+							.isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			Globals.beginTransaction(connection);
 
-            List<OrderStepHistoryItem> listOrderStepHistory = new ArrayList<OrderStepHistoryItem>();
+			List<OrderStepHistoryItem> listOrderStepHistory = new ArrayList<OrderStepHistoryItem>();
 
-            ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(connection);
-            reportExecutionsDBLayer.getFilter().setSchedulerId(orderHistoryFilter.getJobschedulerId());
-            reportExecutionsDBLayer.getFilter().setOrderHistoryId(orderHistoryFilter.getHistoryId());
-            List<DBItemReportExecution> listOfOrderStepHistoryItems = reportExecutionsDBLayer.getOrderStepHistoryItems();
+			ReportExecutionsDBLayer reportExecutionsDBLayer = new ReportExecutionsDBLayer(connection);
+			reportExecutionsDBLayer.getFilter().setSchedulerId(orderHistoryFilter.getJobschedulerId());
+			reportExecutionsDBLayer.getFilter().setOrderHistoryId(orderHistoryFilter.getHistoryId());
+			List<DBItemReportExecution> listOfOrderStepHistoryItems = reportExecutionsDBLayer
+					.getOrderStepHistoryItems();
 
-            for (DBItemReportExecution orderStepHistoryItem : listOfOrderStepHistoryItems) {
+			for (DBItemReportExecution orderStepHistoryItem : listOfOrderStepHistoryItems) {
 
-                OrderStepHistoryItem orderStepHistory = new OrderStepHistoryItem();
-                orderStepHistory.setEndTime(orderStepHistoryItem.getEndTime());
-                Err errorSchema = new Err();
-                errorSchema.setCode(orderStepHistoryItem.getErrorCode());
-                errorSchema.setMessage(orderStepHistoryItem.getErrorText());
-                orderStepHistory.setError(errorSchema);
-                orderStepHistory.setJob(orderStepHistoryItem.getName());
-                orderStepHistory.setNode(orderStepHistoryItem.getState());
-                orderStepHistory.setStartTime(orderStepHistoryItem.getStartTime());
-                orderStepHistory.setStep(orderStepHistoryItem.getStep().intValue());
-                orderStepHistory.setAgent(orderStepHistoryItem.getAgentUrl());
-                // orderStepHistory.setClusterMember(dbItemReportExecution.getClusterMemberId());
-                orderStepHistory.setExitCode(orderStepHistoryItem.getExitCode());
-                orderStepHistory.setTaskId(orderStepHistoryItem.getHistoryIdAsString());
-                listOrderStepHistory.add(orderStepHistory);
-            }
+				OrderStepHistoryItem orderStepHistory = new OrderStepHistoryItem();
+				orderStepHistory.setEndTime(orderStepHistoryItem.getEndTime());
+				Err errorSchema = new Err();
+				errorSchema.setCode(orderStepHistoryItem.getErrorCode());
+				errorSchema.setMessage(orderStepHistoryItem.getErrorText());
+				orderStepHistory.setError(errorSchema);
+				orderStepHistory.setJob(orderStepHistoryItem.getName());
+				orderStepHistory.setNode(orderStepHistoryItem.getState());
+				orderStepHistory.setStartTime(orderStepHistoryItem.getStartTime());
+				orderStepHistory.setStep(orderStepHistoryItem.getStep().intValue());
+				orderStepHistory.setAgent(orderStepHistoryItem.getAgentUrl());
+				// orderStepHistory.setClusterMember(dbItemReportExecution.getClusterMemberId());
+				orderStepHistory.setExitCode(orderStepHistoryItem.getExitCode());
+				orderStepHistory.setTaskId(orderStepHistoryItem.getHistoryIdAsString());
+				listOrderStepHistory.add(orderStepHistory);
+			}
 
-            OrderStepHistory entity = new OrderStepHistory();
-            History history = new History();
-            history.setHistoryId(orderHistoryFilter.getHistoryId());
-            history.setSteps(listOrderStepHistory);
-            entity.setDeliveryDate(new Date());
-            entity.setHistory(history);
+			OrderStepHistory entity = new OrderStepHistory();
+			History history = new History();
+			history.setHistoryId(orderHistoryFilter.getHistoryId());
+			history.setSteps(listOrderStepHistory);
+			entity.setDeliveryDate(new Date());
+			entity.setHistory(history);
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 }

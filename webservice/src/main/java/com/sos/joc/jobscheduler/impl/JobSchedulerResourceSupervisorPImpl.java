@@ -23,51 +23,57 @@ import com.sos.joc.model.jobscheduler.JobSchedulerP200;
 @Path("jobscheduler")
 public class JobSchedulerResourceSupervisorPImpl extends JOCResourceImpl implements IJobSchedulerResourcePSupervisor {
 
-    private static final String API_CALL = "./jobscheduler/supervisor/p";
+	private static final String API_CALL = "./jobscheduler/supervisor/p";
 
-    @Override
-    public JOCDefaultResponse postJobschedulerSupervisorP(String xAccessToken, String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
-        return postJobschedulerSupervisorP(getAccessToken(xAccessToken, accessToken), jobSchedulerId);
-    }
+	@Override
+	public JOCDefaultResponse postJobschedulerSupervisorP(String xAccessToken, String accessToken,
+			JobSchedulerId jobSchedulerId) throws Exception {
+		return postJobschedulerSupervisorP(getAccessToken(xAccessToken, accessToken), jobSchedulerId);
+	}
 
-    public JOCDefaultResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerId jobSchedulerId) throws Exception {
-        SOSHibernateSession connection = null;
+	public JOCDefaultResponse postJobschedulerSupervisorP(String accessToken, JobSchedulerId jobSchedulerId)
+			throws Exception {
+		SOSHibernateSession connection = null;
 
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken, jobSchedulerId.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getJobschedulerMaster().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            Globals.beginTransaction(connection);
-            JobSchedulerP200 entity = new JobSchedulerP200();
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerId, accessToken,
+					jobSchedulerId.getJobschedulerId(),
+					getPermissonsJocCockpit(jobSchedulerId.getJobschedulerId(), accessToken).getJobschedulerMaster()
+							.getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			Globals.beginTransaction(connection);
+			JobSchedulerP200 entity = new JobSchedulerP200();
 
-            Long supervisorId = dbItemInventoryInstance.getSupervisorId();
-            if (supervisorId != DBLayer.DEFAULT_ID) {
-                InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
-                DBItemInventoryInstance dbItemInventorySupervisorInstance = dbLayer.getInventoryInstanceByKey(supervisorId);
+			Long supervisorId = dbItemInventoryInstance.getSupervisorId();
+			if (supervisorId != DBLayer.DEFAULT_ID) {
+				InventoryInstancesDBLayer dbLayer = new InventoryInstancesDBLayer(connection);
+				DBItemInventoryInstance dbItemInventorySupervisorInstance = dbLayer
+						.getInventoryInstanceByKey(supervisorId);
 
-                if (dbItemInventorySupervisorInstance == null) {
-                    String errMessage = String.format("jobschedulerId for supervisor of %s with internal id %s not found in table %s", jobSchedulerId
-                            .getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
-                    throw new DBMissingDataException(errMessage);
-                }
-                entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventorySupervisorInstance, true));
-            } else {
-                entity.setJobscheduler(new JobSchedulerP());
-            }
-            entity.setDeliveryDate(Date.from(Instant.now()));
+				if (dbItemInventorySupervisorInstance == null) {
+					String errMessage = String.format(
+							"jobschedulerId for supervisor of %s with internal id %s not found in table %s",
+							jobSchedulerId.getJobschedulerId(), supervisorId, DBLayer.TABLE_INVENTORY_INSTANCES);
+					throw new DBMissingDataException(errMessage);
+				}
+				entity.setJobscheduler(JobSchedulerPermanent.getJobScheduler(dbItemInventorySupervisorInstance, true));
+			} else {
+				entity.setJobscheduler(new JobSchedulerP());
+			}
+			entity.setDeliveryDate(Date.from(Instant.now()));
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 
 }

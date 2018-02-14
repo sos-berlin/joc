@@ -35,121 +35,126 @@ import com.sos.joc.orders.resource.IOrdersResource;
 @Path("orders")
 public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResource {
 
-    private static final String API_CALL = "./orders";
+	private static final String API_CALL = "./orders";
 
-    @Override
-    public JOCDefaultResponse postOrders(String xAccessToken, String accessToken, OrdersFilter ordersBody) throws Exception {
-        return postOrders(getAccessToken(xAccessToken, accessToken), ordersBody);
-    }
+	@Override
+	public JOCDefaultResponse postOrders(String xAccessToken, String accessToken, OrdersFilter ordersBody)
+			throws Exception {
+		return postOrders(getAccessToken(xAccessToken, accessToken), ordersBody);
+	}
 
-    public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
-        SOSHibernateSession connection = null;
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken, ordersBody.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getOrder().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+	public JOCDefaultResponse postOrders(String accessToken, OrdersFilter ordersBody) throws Exception {
+		SOSHibernateSession connection = null;
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersBody, accessToken,
+					ordersBody.getJobschedulerId(), getPermissonsJocCockpit(ordersBody.getJobschedulerId(), accessToken)
+							.getOrder().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            // TODO date post body parameters are not yet considered
-            JOCJsonCommand command = new JOCJsonCommand(this);
-            command.setUriBuilderForOrders();
-            command.addOrderCompactQuery(ordersBody.getCompact());
+			// TODO date post body parameters are not yet considered
+			JOCJsonCommand command = new JOCJsonCommand(this);
+			command.setUriBuilderForOrders();
+			command.addOrderCompactQuery(ordersBody.getCompact());
 
-            Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
-            List<OrderPath> orders = ordersBody.getOrders();
-            List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
-            
-            List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
+			Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
+			List<OrderPath> orders = ordersBody.getOrders();
+			List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
 
-            if (ordersBody.getFolders().size() == 0 && jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                    com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
-                    f.setFolder(folder.getFolder());
-                    f.setRecursive(folder.isRecursive());
-                    folders.add(f);
-                }
-            }
+			List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			if (ordersBody.getFolders().size() == 0
+					&& jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
+						.size(); i++) {
+					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
+							.get(i);
+					com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
+					f.setFolder(folder.getFolder());
+					f.setRecursive(folder.isRecursive());
+					folders.add(f);
+				}
+			}
 
-            Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
-            if (orders != null && !orders.isEmpty()) {
-                InventoryJobChainsDBLayer dbJCLayer = new InventoryJobChainsDBLayer(connection);
-                List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
-                for (OrderPath order : orders) {
-                    if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
-                        throw new JocMissingRequiredParameterException("jobChain");
-                    } else {
-                        order.setJobChain(normalizePath(order.getJobChain()));
-                    }
-                    OrdersPerJobChain opj;
-                    if (ordersLists.containsKey(order.getJobChain())) {
-                        opj = ordersLists.get(order.getJobChain());
-                        if (opj.containsOrder(order.getOrderId())) {
-                            continue;
-                        } else {
-                            opj.addOrder(order.getOrderId());
-                        }
-                    } else {
-                        opj = new OrdersPerJobChain();
-                        opj.setJobChain(order.getJobChain());
-                        opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
-                        opj.addOrder(order.getOrderId());
-                    }
-                    ordersLists.put(order.getJobChain(), opj);
-                }
-            }
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 
-            if (!ordersLists.isEmpty()) {
-                for (OrdersPerJobChain opj : ordersLists.values()) {
-                    tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken));
-                }
-            } else if (folders != null && !folders.isEmpty()) {
-                for (Folder folder : folders) {
-                    folder.setFolder(normalizeFolder(folder.getFolder()));
-                    tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken));
-                }
-            } else {
-                Folder rootFolder = new Folder();
-                rootFolder.setFolder("/");
-                rootFolder.setRecursive(true);
-                OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken);
-                listOrders.putAll(callable.call());
-            }
+			Map<String, OrdersPerJobChain> ordersLists = new HashMap<String, OrdersPerJobChain>();
+			if (orders != null && !orders.isEmpty()) {
+				InventoryJobChainsDBLayer dbJCLayer = new InventoryJobChainsDBLayer(connection);
+				List<String> outerJobChains = dbJCLayer.getOuterJobChains(dbItemInventoryInstance.getId());
+				for (OrderPath order : orders) {
+					if (order.getJobChain() == null || order.getJobChain().isEmpty()) {
+						throw new JocMissingRequiredParameterException("jobChain");
+					} else {
+						order.setJobChain(normalizePath(order.getJobChain()));
+					}
+					OrdersPerJobChain opj;
+					if (ordersLists.containsKey(order.getJobChain())) {
+						opj = ordersLists.get(order.getJobChain());
+						if (opj.containsOrder(order.getOrderId())) {
+							continue;
+						} else {
+							opj.addOrder(order.getOrderId());
+						}
+					} else {
+						opj = new OrdersPerJobChain();
+						opj.setJobChain(order.getJobChain());
+						opj.setIsOuterJobChain(outerJobChains.contains(order.getJobChain()));
+						opj.addOrder(order.getOrderId());
+					}
+					ordersLists.put(order.getJobChain(), opj);
+				}
+			}
 
-            if (tasks != null && !tasks.isEmpty()) {
-                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-                try {
-                    for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
-                        try {
-                            listOrders.putAll(result.get());
-                        } catch (ExecutionException e) {
-                            if (e.getCause() instanceof JocException) {
-                                throw (JocException) e.getCause();
-                            } else {
-                                throw (Exception) e.getCause();
-                            }
-                        }
-                    }
-                } finally {
-                    executorService.shutdown();
-                }
-            }
+			if (!ordersLists.isEmpty()) {
+				for (OrdersPerJobChain opj : ordersLists.values()) {
+					tasks.add(new OrdersVCallable(opj, ordersBody, new JOCJsonCommand(command), accessToken));
+				}
+			} else if (folders != null && !folders.isEmpty()) {
+				for (Folder folder : folders) {
+					folder.setFolder(normalizeFolder(folder.getFolder()));
+					tasks.add(new OrdersVCallable(folder, ordersBody, new JOCJsonCommand(command), accessToken));
+				}
+			} else {
+				Folder rootFolder = new Folder();
+				rootFolder.setFolder("/");
+				rootFolder.setRecursive(true);
+				OrdersVCallable callable = new OrdersVCallable(rootFolder, ordersBody, command, accessToken);
+				listOrders.putAll(callable.call());
+			}
 
-            OrdersV entity = new OrdersV();
-            entity.setOrders(new ArrayList<OrderV>(listOrders.values()));
-            entity.setDeliveryDate(Date.from(Instant.now()));
+			if (tasks != null && !tasks.isEmpty()) {
+				ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+				try {
+					for (Future<Map<String, OrderVolatile>> result : executorService.invokeAll(tasks)) {
+						try {
+							listOrders.putAll(result.get());
+						} catch (ExecutionException e) {
+							if (e.getCause() instanceof JocException) {
+								throw (JocException) e.getCause();
+							} else {
+								throw (Exception) e.getCause();
+							}
+						}
+					}
+				} finally {
+					executorService.shutdown();
+				}
+			}
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+			OrdersV entity = new OrdersV();
+			entity.setOrders(new ArrayList<OrderV>(listOrders.values()));
+			entity.setDeliveryDate(Date.from(Instant.now()));
+
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 }

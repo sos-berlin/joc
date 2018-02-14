@@ -46,204 +46,216 @@ import com.sos.joc.model.jobscheduler.AgentOfCluster;
 import com.sos.joc.model.jobscheduler.NumOfAgentsInCluster;
 
 @Path("jobscheduler")
-public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl implements IJobSchedulerResourceAgentClusters {
+public class JobSchedulerResourceAgentClustersImpl extends JOCResourceImpl
+		implements IJobSchedulerResourceAgentClusters {
 
-    private static final String API_CALL = "./jobscheduler/agent_clusters";
+	private static final String API_CALL = "./jobscheduler/agent_clusters";
 
-    @Override
-    public JOCDefaultResponse postJobschedulerAgentClusters(String xAccessToken, String accessToken,
-            AgentClusterFilter jobSchedulerAgentClustersBody) {
-        return postJobschedulerAgentClusters(getAccessToken(xAccessToken, accessToken), jobSchedulerAgentClustersBody);
-    }
+	@Override
+	public JOCDefaultResponse postJobschedulerAgentClusters(String xAccessToken, String accessToken,
+			AgentClusterFilter jobSchedulerAgentClustersBody) {
+		return postJobschedulerAgentClusters(getAccessToken(xAccessToken, accessToken), jobSchedulerAgentClustersBody);
+	}
 
-    public JOCDefaultResponse postJobschedulerAgentClusters(String accessToken, AgentClusterFilter jobSchedulerAgentClustersBody) {
+	public JOCDefaultResponse postJobschedulerAgentClusters(String accessToken,
+			AgentClusterFilter jobSchedulerAgentClustersBody) {
 
-        SOSHibernateSession connection = null;
+		SOSHibernateSession connection = null;
 
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerAgentClustersBody, accessToken, jobSchedulerAgentClustersBody
-                    .getJobschedulerId(), getPermissonsJocCockpit(accessToken).getJobschedulerUniversalAgent().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobSchedulerAgentClustersBody, accessToken,
+					jobSchedulerAgentClustersBody.getJobschedulerId(),
+					getPermissonsJocCockpit(jobSchedulerAgentClustersBody.getJobschedulerId(), accessToken)
+							.getJobschedulerUniversalAgent().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            JOCJsonCommand command = new JOCJsonCommand(this);
-            command.setUriBuilderForProcessClasses();
-            // always false otherwise no agent info
-            // command.addProcessClassCompactQuery(jobSchedulerAgentClustersBody.getCompact());
-            command.addProcessClassCompactQuery(false);
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			JOCJsonCommand command = new JOCJsonCommand(this);
+			command.setUriBuilderForProcessClasses();
+			// always false otherwise no agent info
+			// command.addProcessClassCompactQuery(jobSchedulerAgentClustersBody.getCompact());
+			command.addProcessClassCompactQuery(false);
 
-            AgentClusters entity = new AgentClusters();
-            boolean volatileResponseIsAvailable = true;
+			AgentClusters entity = new AgentClusters();
+			boolean volatileResponseIsAvailable = true;
 
-            Set<String> agentClusterPaths = new HashSet<String>();
-            if (jobSchedulerAgentClustersBody.getAgentClusters() != null) {
-                for (AgentClusterPath agentClusterPath : jobSchedulerAgentClustersBody.getAgentClusters()) {
-                    checkRequiredParameter("agentCluster", agentClusterPath.getAgentCluster());
-                    agentClusterPaths.add(agentClusterPath.getAgentCluster());
-                }
-            }
-            Set<String> agentSet = new HashSet<String>();
-            Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();
-            connection.beginTransaction();
+			Set<String> agentClusterPaths = new HashSet<String>();
+			if (jobSchedulerAgentClustersBody.getAgentClusters() != null) {
+				for (AgentClusterPath agentClusterPath : jobSchedulerAgentClustersBody.getAgentClusters()) {
+					checkRequiredParameter("agentCluster", agentClusterPath.getAgentCluster());
+					agentClusterPaths.add(agentClusterPath.getAgentCluster());
+				}
+			}
+			Set<String> agentSet = new HashSet<String>();
+			Set<AgentClusterVolatile> listAgentCluster = new HashSet<AgentClusterVolatile>();
+			connection.beginTransaction();
 
-            try {
-                JsonObject jsonObjectFromPost = command.getJsonObjectFromPostWithRetry(getServiceBody(null), accessToken);
-                Date surveyDate = JobSchedulerDate.getDateFromEventId(jsonObjectFromPost.getJsonNumber("eventId").longValue());
-                for (JsonObject processClass : jsonObjectFromPost.getJsonArray("elements").getValuesAs(JsonObject.class)) {
-                    JsonArray agents = processClass.getJsonArray("agents");
-                    if (agents == null || agents.isEmpty()) { // consider only
-                                                              // process classes
-                                                              // with agents
-                        continue;
-                    }
-                    AgentClusterVolatile agentClusterV = new AgentClusterVolatile(processClass, surveyDate);
-                    agentClusterV.setAgentClusterPath();
-                    if (!agentClusterPaths.isEmpty() && !agentClusterPaths.contains(agentClusterV.getPath())) {
-                        continue;
-                    }
-                    if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentClusterV.getPath())) {
-                        continue;
-                    }
-                    if (!isInFolders(agentClusterV.getPath(), jobSchedulerAgentClustersBody.getFolders())) {
-                        continue;
-                    }
-                    agentSet.addAll(agentClusterV.getAgentSet());
-                    listAgentCluster.add(agentClusterV);
-                }
-            } catch (JobSchedulerConnectionRefusedException | JobSchedulerNoResponseException e1) {
-                volatileResponseIsAvailable = false;
-            }
+			try {
+				JsonObject jsonObjectFromPost = command.getJsonObjectFromPostWithRetry(getServiceBody(null),
+						accessToken);
+				Date surveyDate = JobSchedulerDate
+						.getDateFromEventId(jsonObjectFromPost.getJsonNumber("eventId").longValue());
+				for (JsonObject processClass : jsonObjectFromPost.getJsonArray("elements")
+						.getValuesAs(JsonObject.class)) {
+					JsonArray agents = processClass.getJsonArray("agents");
+					if (agents == null || agents.isEmpty()) { // consider only
+																// process classes
+																// with agents
+						continue;
+					}
+					AgentClusterVolatile agentClusterV = new AgentClusterVolatile(processClass, surveyDate);
+					agentClusterV.setAgentClusterPath();
+					if (!agentClusterPaths.isEmpty() && !agentClusterPaths.contains(agentClusterV.getPath())) {
+						continue;
+					}
+					if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(),
+							agentClusterV.getPath())) {
+						continue;
+					}
+					if (!isInFolders(agentClusterV.getPath(), jobSchedulerAgentClustersBody.getFolders())) {
+						continue;
+					}
+					agentSet.addAll(agentClusterV.getAgentSet());
+					listAgentCluster.add(agentClusterV);
+				}
+			} catch (JobSchedulerConnectionRefusedException | JobSchedulerNoResponseException e1) {
+				volatileResponseIsAvailable = false;
+			}
 
-            if (volatileResponseIsAvailable) {
-                List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
-                for (String agent : agentSet) {
-                    tasks.add(new AgentVCallable(agent, new JOCJsonCommand(this), accessToken));
-                }
-                Map<String, AgentOfCluster> mapOfAgents = new HashMap<String, AgentOfCluster>();
-                if (!tasks.isEmpty()) {
-                    ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-                    try {
-                        for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
-                            try {
-                                AgentOfCluster a = result.get();
-                                mapOfAgents.put(a.getUrl(), a);
-                            } catch (ExecutionException e) {
-                                if (e.getCause() instanceof JocException) {
-                                    throw (JocException) e.getCause();
-                                } else {
-                                    throw (Exception) e.getCause();
-                                }
-                            }
-                        }
-                    } finally {
-                        executorService.shutdown();
-                    }
-                }
-                List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
-                for (AgentClusterVolatile agentClusterV : listAgentCluster) {
-                    agentClusterV.setAgentsListAndState(mapOfAgents, jobSchedulerAgentClustersBody.getCompact());
-                    if (jobSchedulerAgentClustersBody.getState() != null && agentClusterV.getState().getSeverity() != jobSchedulerAgentClustersBody
-                            .getState()) {
-                        continue;
-                    }
-                    agentClusterV.setFields(mapOfAgents, jobSchedulerAgentClustersBody.getCompact());
-                    listOfAgentClusters.add(agentClusterV);
-                }
+			if (volatileResponseIsAvailable) {
+				List<AgentVCallable> tasks = new ArrayList<AgentVCallable>();
+				for (String agent : agentSet) {
+					tasks.add(new AgentVCallable(agent, new JOCJsonCommand(this), accessToken));
+				}
+				Map<String, AgentOfCluster> mapOfAgents = new HashMap<String, AgentOfCluster>();
+				if (!tasks.isEmpty()) {
+					ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+					try {
+						for (Future<AgentOfCluster> result : executorService.invokeAll(tasks)) {
+							try {
+								AgentOfCluster a = result.get();
+								mapOfAgents.put(a.getUrl(), a);
+							} catch (ExecutionException e) {
+								if (e.getCause() instanceof JocException) {
+									throw (JocException) e.getCause();
+								} else {
+									throw (Exception) e.getCause();
+								}
+							}
+						}
+					} finally {
+						executorService.shutdown();
+					}
+				}
+				List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
+				for (AgentClusterVolatile agentClusterV : listAgentCluster) {
+					agentClusterV.setAgentsListAndState(mapOfAgents, jobSchedulerAgentClustersBody.getCompact());
+					if (jobSchedulerAgentClustersBody.getState() != null
+							&& agentClusterV.getState().getSeverity() != jobSchedulerAgentClustersBody.getState()) {
+						continue;
+					}
+					agentClusterV.setFields(mapOfAgents, jobSchedulerAgentClustersBody.getCompact());
+					listOfAgentClusters.add(agentClusterV);
+				}
 
-                entity.setAgentClusters(listOfAgentClusters);
+				entity.setAgentClusters(listOfAgentClusters);
 
-            } else {
-                InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
-                List<AgentClusterPermanent> agentClusters = agentLayer.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
+			} else {
+				InventoryAgentsDBLayer agentLayer = new InventoryAgentsDBLayer(connection);
+				List<AgentClusterPermanent> agentClusters = agentLayer
+						.getInventoryAgentClusters(dbItemInventoryInstance.getId(), agentClusterPaths);
 
-                List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
-                for (AgentClusterPermanent agentCluster : agentClusters) {
-                    if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(), agentCluster.getPath())) {
-                        continue;
-                    }
-                    if (!isInFolders(agentCluster.getPath(), jobSchedulerAgentClustersBody.getFolders())) {
-                        continue;
-                    }
-                    List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(dbItemInventoryInstance.getId(),
-                            agentCluster.getAgentClusterId());
-                    int countRunningAgents = 0;
-                    for (AgentClusterMember agentClusterMember : agentClusterMembers) {
-                        if (agentClusterMember.getState().getSeverity() == 0) {
-                            countRunningAgents++;
-                        }
-                    }
-                    NumOfAgentsInCluster numOfAgents = agentCluster.getNumOfAgents();
-                    numOfAgents.setRunning(countRunningAgents);
-                    AgentClusterState state = new AgentClusterState();
-                    if (numOfAgents.getAny() == numOfAgents.getRunning()) {
-                        state.setSeverity(0);
-                        state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_RUNNING);
-                    } else if (0 == numOfAgents.getRunning()) {
-                        state.setSeverity(2);
-                        state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_UNREACHABLE);
-                    } else {
-                        state.setSeverity(1);
-                        state.set_text(AgentClusterStateText.ONLY_SOME_AGENTS_ARE_RUNNING);
-                    }
-                    if (jobSchedulerAgentClustersBody.getState() != null && jobSchedulerAgentClustersBody.getState() != state.getSeverity()) {
-                        continue;
-                    }
-                    agentCluster.setState(state);
-                    if (jobSchedulerAgentClustersBody.getCompact() != null && !jobSchedulerAgentClustersBody.getCompact()) {
-                        agentCluster.setAgents(new ArrayList<AgentOfCluster>(agentClusterMembers));
-                    }
-                    listOfAgentClusters.add(agentCluster);
-                }
-                entity.setAgentClusters(listOfAgentClusters);
-            }
+				List<AgentCluster> listOfAgentClusters = new ArrayList<AgentCluster>();
+				for (AgentClusterPermanent agentCluster : agentClusters) {
+					if (!FilterAfterResponse.matchRegex(jobSchedulerAgentClustersBody.getRegex(),
+							agentCluster.getPath())) {
+						continue;
+					}
+					if (!isInFolders(agentCluster.getPath(), jobSchedulerAgentClustersBody.getFolders())) {
+						continue;
+					}
+					List<AgentClusterMember> agentClusterMembers = agentLayer.getInventoryAgentClusterMembersById(
+							dbItemInventoryInstance.getId(), agentCluster.getAgentClusterId());
+					int countRunningAgents = 0;
+					for (AgentClusterMember agentClusterMember : agentClusterMembers) {
+						if (agentClusterMember.getState().getSeverity() == 0) {
+							countRunningAgents++;
+						}
+					}
+					NumOfAgentsInCluster numOfAgents = agentCluster.getNumOfAgents();
+					numOfAgents.setRunning(countRunningAgents);
+					AgentClusterState state = new AgentClusterState();
+					if (numOfAgents.getAny() == numOfAgents.getRunning()) {
+						state.setSeverity(0);
+						state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_RUNNING);
+					} else if (0 == numOfAgents.getRunning()) {
+						state.setSeverity(2);
+						state.set_text(AgentClusterStateText.ALL_AGENTS_ARE_UNREACHABLE);
+					} else {
+						state.setSeverity(1);
+						state.set_text(AgentClusterStateText.ONLY_SOME_AGENTS_ARE_RUNNING);
+					}
+					if (jobSchedulerAgentClustersBody.getState() != null
+							&& jobSchedulerAgentClustersBody.getState() != state.getSeverity()) {
+						continue;
+					}
+					agentCluster.setState(state);
+					if (jobSchedulerAgentClustersBody.getCompact() != null
+							&& !jobSchedulerAgentClustersBody.getCompact()) {
+						agentCluster.setAgents(new ArrayList<AgentOfCluster>(agentClusterMembers));
+					}
+					listOfAgentClusters.add(agentCluster);
+				}
+				entity.setAgentClusters(listOfAgentClusters);
+			}
 
-            entity.setDeliveryDate(Date.from(Instant.now()));
+			entity.setDeliveryDate(Date.from(Instant.now()));
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 
-    private boolean isInFolders(String objPath, List<Folder> folders) {
-        if (folders == null || folders.isEmpty()) {
-            return true;
-        }
-        String parent = getParent(objPath);
-        if (parent == null) {
-            return false;
-        }
-        for (Folder folder : folders) {
-            String f = normalizeFolder(folder.getFolder());
-            if (folder.getRecursive() == null || folder.getRecursive()) {
-                if (parent.startsWith(f)) {
-                    return true;
-                }
-            } else if (parent.equals(f)) {
-                return true;
-            }
-        }
-        return false;
-    }
+	private boolean isInFolders(String objPath, List<Folder> folders) {
+		if (folders == null || folders.isEmpty()) {
+			return true;
+		}
+		String parent = getParent(objPath);
+		if (parent == null) {
+			return false;
+		}
+		for (Folder folder : folders) {
+			String f = normalizeFolder(folder.getFolder());
+			if (folder.getRecursive() == null || folder.getRecursive()) {
+				if (parent.startsWith(f)) {
+					return true;
+				}
+			} else if (parent.equals(f)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    private String getServiceBody(String agentCluster) {
-        JsonObjectBuilder builder = Json.createObjectBuilder();
-        if (agentCluster == null) {
-            agentCluster = "/";
-        } else {
-            agentCluster = ("/" + agentCluster.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
-            if (agentCluster == "/(default)") {
-                agentCluster = "";
-            }
-        }
-        builder.add("path", agentCluster);
-        return builder.build().toString();
-    }
+	private String getServiceBody(String agentCluster) {
+		JsonObjectBuilder builder = Json.createObjectBuilder();
+		if (agentCluster == null) {
+			agentCluster = "/";
+		} else {
+			agentCluster = ("/" + agentCluster.trim()).replaceAll("//+", "/").replaceFirst("/$", "");
+			if (agentCluster == "/(default)") {
+				agentCluster = "";
+			}
+		}
+		builder.add("path", agentCluster);
+		return builder.build().toString();
+	}
 }

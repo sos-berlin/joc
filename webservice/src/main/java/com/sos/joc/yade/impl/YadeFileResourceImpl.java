@@ -21,38 +21,40 @@ import com.sos.joc.yade.resource.IYadeFileResource;
 @Path("yade")
 public class YadeFileResourceImpl extends JOCResourceImpl implements IYadeFileResource {
 
-    private static final String API_CALL = "./yade/file";
+	private static final String API_CALL = "./yade/file";
 
-    @Override
-    public JOCDefaultResponse postYadeFile(String accessToken, FileFilter filterBody) throws Exception {
-        SOSHibernateSession connection = null;
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken, filterBody.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getYADE().getView().isFiles());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            checkRequiredParameter("fileId", filterBody.getFileId());
+	@Override
+	public JOCDefaultResponse postYadeFile(String accessToken, FileFilter filterBody) throws Exception {
+		SOSHibernateSession connection = null;
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, filterBody, accessToken,
+					filterBody.getJobschedulerId(),
+					getPermissonsJocCockpit(filterBody.getJobschedulerId(), accessToken).getYADE().getView().isFiles());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+			checkRequiredParameter("fileId", filterBody.getFileId());
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			JocDBLayerYade dbLayer = new JocDBLayerYade(connection);
 
-            DBItemYadeFiles file = dbLayer.getTransferFile(filterBody.getFileId());
-            if (file == null) {
-                throw new DBMissingDataException(String.format("File with id = %1$s not found in DB!", filterBody.getFileId()));
-            }
-            TransferFile200 entity = new TransferFile200();
-            entity.setFile(TransferFileUtils.initTransferFileFromDbItem(file));
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+			DBItemYadeFiles file = dbLayer.getTransferFile(filterBody.getFileId());
+			if (file == null) {
+				throw new DBMissingDataException(
+						String.format("File with id = %1$s not found in DB!", filterBody.getFileId()));
+			}
+			TransferFile200 entity = new TransferFile200();
+			entity.setFile(TransferFileUtils.initTransferFileFromDbItem(file));
+			entity.setDeliveryDate(Date.from(Instant.now()));
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 
 }

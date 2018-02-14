@@ -20,71 +20,81 @@ import com.sos.joc.orders.resource.IOrdersResourceOverviewSummary;
 @Path("orders")
 public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implements IOrdersResourceOverviewSummary {
 
-    private static final String API_CALL = "./orders/overview/summary";
+	private static final String API_CALL = "./orders/overview/summary";
 
-    @Override
-    public JOCDefaultResponse postOrdersOverviewSummary(String xAccessToken, String accessToken, OrdersFilter ordersFilter) throws Exception {
-        return postOrdersOverviewSummary(getAccessToken(xAccessToken, accessToken), ordersFilter);
-    }
+	@Override
+	public JOCDefaultResponse postOrdersOverviewSummary(String xAccessToken, String accessToken,
+			OrdersFilter ordersFilter) throws Exception {
+		return postOrdersOverviewSummary(getAccessToken(xAccessToken, accessToken), ordersFilter);
+	}
 
-    public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter) throws Exception {
-        SOSHibernateSession connection = null;
+	public JOCDefaultResponse postOrdersOverviewSummary(String accessToken, OrdersFilter ordersFilter)
+			throws Exception {
+		SOSHibernateSession connection = null;
 
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken, ordersFilter.getJobschedulerId(),
-                    getPermissonsJocCockpit(accessToken).getOrder().getView().isStatus());
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, ordersFilter, accessToken,
+					ordersFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(ordersFilter.getJobschedulerId(), accessToken).getOrder().getView()
+							.isStatus());
 
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            connection = Globals.createSosHibernateStatelessConnection(API_CALL);
-            OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
-            Globals.beginTransaction(connection);
+			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
+			OrdersHistoricSummary ordersHistoricSummary = new OrdersHistoricSummary();
+			Globals.beginTransaction(connection);
 
-            ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
-            reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
+			ReportTriggerDBLayer reportTriggerDBLayer = new ReportTriggerDBLayer(connection);
+			reportTriggerDBLayer.getFilter().setSchedulerId(ordersFilter.getJobschedulerId());
 
-            if (ordersFilter.getDateFrom() != null) {
-                reportTriggerDBLayer.getFilter().setExecutedFrom(JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter
-                        .getTimeZone()));
-            }
-            if (ordersFilter.getDateTo() != null) {
-                reportTriggerDBLayer.getFilter().setExecutedTo(JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
-            }
+			if (ordersFilter.getDateFrom() != null) {
+				reportTriggerDBLayer.getFilter().setExecutedFrom(
+						JobSchedulerDate.getDateFrom(ordersFilter.getDateFrom(), ordersFilter.getTimeZone()));
+			}
+			if (ordersFilter.getDateTo() != null) {
+				reportTriggerDBLayer.getFilter().setExecutedTo(
+						JobSchedulerDate.getDateTo(ordersFilter.getDateTo(), ordersFilter.getTimeZone()));
+			}
 
-            if (ordersFilter.getOrders().size() > 0) {
-                for (OrderPath orderPath : ordersFilter.getOrders()) {
-                    reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()), orderPath.getOrderId());
-                }
-            }
+			if (ordersFilter.getOrders().size() > 0) {
+				for (OrderPath orderPath : ordersFilter.getOrders()) {
+					reportTriggerDBLayer.getFilter().addOrderPath(normalizePath(orderPath.getJobChain()),
+							orderPath.getOrderId());
+				}
+			}
 
-            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                    reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.isRecursive());
-                }
-            }
+			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
+						.size(); i++) {
+					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
+							.get(i);
+					reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),
+							folder.isRecursive());
+				}
+			}
 
-            OrdersOverView entity = new OrdersOverView();
-            entity.setDeliveryDate(new Date());
-            entity.setSurveyDate(new Date());
-            entity.setOrders(ordersHistoricSummary);
-            reportTriggerDBLayer.getFilter().setFailed(true);
-            ordersHistoricSummary.setFailed(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+			OrdersOverView entity = new OrdersOverView();
+			entity.setDeliveryDate(new Date());
+			entity.setSurveyDate(new Date());
+			entity.setOrders(ordersHistoricSummary);
+			reportTriggerDBLayer.getFilter().setFailed(true);
+			ordersHistoricSummary.setFailed(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
 
-            reportTriggerDBLayer.getFilter().setSuccess(true);
-            ordersHistoricSummary.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
+			reportTriggerDBLayer.getFilter().setSuccess(true);
+			ordersHistoricSummary
+					.setSuccessful(reportTriggerDBLayer.getCountSchedulerOrderHistoryListFromTo().intValue());
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        } finally {
-            Globals.disconnect(connection);
-        }
-    }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		} finally {
+			Globals.disconnect(connection);
+		}
+	}
 
 }

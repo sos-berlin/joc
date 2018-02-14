@@ -1,7 +1,6 @@
 package com.sos.joc.classes.orders;
 
 import java.time.Instant;
-import java.util.ArrayList;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -15,11 +14,10 @@ import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
+import com.sos.joc.classes.orders.UsedJobChains.JobChain;
 import com.sos.joc.classes.orders.UsedJobs.Job;
 import com.sos.joc.classes.orders.UsedTasks.Task;
 import com.sos.joc.classes.parameters.Parameters;
-import com.sos.joc.classes.orders.UsedJobChains.JobChain;
-import com.sos.joc.exceptions.JobSchedulerBadRequestException;
 import com.sos.joc.exceptions.JobSchedulerInvalidResponseDataException;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.order.OrderFilter;

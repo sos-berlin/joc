@@ -26,8 +26,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence maxOccurs="unbounded" minOccurs="0">
- *         &lt;element ref="{}SOSPermission"/>
+ *       &lt;sequence maxOccurs="unbounded">
+ *         &lt;element ref="{}SOSPermissionJocCockpitMaster"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "sosPermission"
+    "sosPermissionJocCockpitMaster"
 })
-@XmlRootElement(name = "SOSPermissionListJoc")
-public class SOSPermissionListJoc {
+@XmlRootElement(name = "SOSPermissionJocCockpitMasters")
+public class SOSPermissionJocCockpitMasters {
 
-    @XmlElement(name = "SOSPermission")
-    protected List<String> sosPermission;
+    @XmlElement(name = "SOSPermissionJocCockpitMaster", required = true)
+    protected List<SOSPermissionJocCockpitMaster> sosPermissionJocCockpitMaster;
 
     /**
-     * Gets the value of the sosPermission property.
+     * Gets the value of the sosPermissionJocCockpitMaster property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the sosPermission property.
+     * This is why there is not a <CODE>set</CODE> method for the sosPermissionJocCockpitMaster property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getSOSPermission().add(newItem);
+     *    getSOSPermissionJocCockpitMaster().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link String }
+     * {@link SOSPermissionJocCockpitMaster }
      * 
      * 
      */
-    public List<String> getSOSPermission() {
-        if (sosPermission == null) {
-            sosPermission = new ArrayList<String>();
+    public List<SOSPermissionJocCockpitMaster> getSOSPermissionJocCockpitMaster() {
+        if (sosPermissionJocCockpitMaster == null) {
+            sosPermissionJocCockpitMaster = new ArrayList<SOSPermissionJocCockpitMaster>();
         }
-        return this.sosPermission;
+        return this.sosPermissionJocCockpitMaster;
     }
 
 }

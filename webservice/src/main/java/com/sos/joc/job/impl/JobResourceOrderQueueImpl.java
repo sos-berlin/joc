@@ -15,35 +15,36 @@ import com.sos.joc.model.job.JobV200;
 @Path("job")
 public class JobResourceOrderQueueImpl extends JOCResourceImpl implements IJobResourceOrderQueue {
 
-    private static final String API_CALL = "./job/order_queue";
+	private static final String API_CALL = "./job/order_queue";
 
-    @Override
-    public JOCDefaultResponse postJobOrderQueue(String xAccessToken, String accessToken, JobFilter jobFilter)
-            throws Exception {
-        return postJobOrderQueue(getAccessToken(xAccessToken, accessToken), jobFilter);
-    }
+	@Override
+	public JOCDefaultResponse postJobOrderQueue(String xAccessToken, String accessToken, JobFilter jobFilter)
+			throws Exception {
+		return postJobOrderQueue(getAccessToken(xAccessToken, accessToken), jobFilter);
+	}
 
-    public JOCDefaultResponse postJobOrderQueue(String accessToken, JobFilter jobFilter) throws Exception {
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken, jobFilter.getJobschedulerId(), getPermissonsJocCockpit(
-                    accessToken).getJob().getView().isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
-            
-            checkRequiredParameter("job", jobFilter.getJob());
-            String jobPath = normalizePath(jobFilter.getJob());
-            JobV200 entity = new JobV200();
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
-            entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobPath, jobFilter.getCompact()));
-            entity.setDeliveryDate(new Date());
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+	public JOCDefaultResponse postJobOrderQueue(String accessToken, JobFilter jobFilter) throws Exception {
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobFilter, accessToken,
+					jobFilter.getJobschedulerId(),
+					getPermissonsJocCockpit(jobFilter.getJobschedulerId(), accessToken).getJob().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
+
+			checkRequiredParameter("job", jobFilter.getJob());
+			String jobPath = normalizePath(jobFilter.getJob());
+			JobV200 entity = new JobV200();
+			JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken);
+			entity.setJob(jocXmlCommand.getJobWithOrderQueue(jobPath, jobFilter.getCompact()));
+			entity.setDeliveryDate(new Date());
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 
 }

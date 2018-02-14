@@ -14,34 +14,39 @@ import com.sos.joc.order.resource.IOrderConfigurationResource;
 @Path("order")
 public class OrderConfigurationResourceImpl extends JOCResourceImpl implements IOrderConfigurationResource {
 
-    private static final String API_CALL = "./order/configuration";
+	private static final String API_CALL = "./order/configuration";
 
-    @Override
-    public JOCDefaultResponse postOrderConfiguration(String xAccessToken, String accessToken, OrderConfigurationFilter orderBody) throws Exception {
-        return postOrderConfiguration(getAccessToken(xAccessToken, accessToken), orderBody);
-    }
+	@Override
+	public JOCDefaultResponse postOrderConfiguration(String xAccessToken, String accessToken,
+			OrderConfigurationFilter orderBody) throws Exception {
+		return postOrderConfiguration(getAccessToken(xAccessToken, accessToken), orderBody);
+	}
 
-    public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilter orderBody) throws Exception {
-        try {
-            JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderBody, accessToken, orderBody.getJobschedulerId(), getPermissonsJocCockpit(accessToken).getOrder().getView()
-                    .isStatus());
-            if (jocDefaultResponse != null) {
-                return jocDefaultResponse;
-            }
+	public JOCDefaultResponse postOrderConfiguration(String accessToken, OrderConfigurationFilter orderBody)
+			throws Exception {
+		try {
+			JOCDefaultResponse jocDefaultResponse = init(API_CALL, orderBody, accessToken,
+					orderBody.getJobschedulerId(), getPermissonsJocCockpit(orderBody.getJobschedulerId(), accessToken)
+							.getOrder().getView().isStatus());
+			if (jocDefaultResponse != null) {
+				return jocDefaultResponse;
+			}
 
-            Configuration200 entity = new Configuration200();
-            if (checkRequiredParameter("orderId", orderBody.getOrderId()) && checkRequiredParameter("jobChain", orderBody.getJobChain())) {
-                JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken);
-                boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
-                entity = jocConfiguration.getOrderConfiguration(this, orderBody.getJobChain(), orderBody.getOrderId(), responseInHtml);
-            }
+			Configuration200 entity = new Configuration200();
+			if (checkRequiredParameter("orderId", orderBody.getOrderId())
+					&& checkRequiredParameter("jobChain", orderBody.getJobChain())) {
+				JSObjectConfiguration jocConfiguration = new JSObjectConfiguration(accessToken);
+				boolean responseInHtml = orderBody.getMime() == ConfigurationMime.HTML;
+				entity = jocConfiguration.getOrderConfiguration(this, orderBody.getJobChain(), orderBody.getOrderId(),
+						responseInHtml);
+			}
 
-            return JOCDefaultResponse.responseStatus200(entity);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
+			return JOCDefaultResponse.responseStatus200(entity);
+		} catch (JocException e) {
+			e.addErrorMetaInfo(getJocError());
+			return JOCDefaultResponse.responseStatusJSError(e);
+		} catch (Exception e) {
+			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+		}
+	}
 }
