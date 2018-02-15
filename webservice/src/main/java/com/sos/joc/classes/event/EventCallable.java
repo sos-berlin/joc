@@ -75,7 +75,11 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     public JobSchedulerEvent call() throws Exception {
         try {
             setStartTime();
-            jobSchedulerEvent.getEventSnapshots().addAll(getEventSnapshots(jobSchedulerEvent.getEventId()));
+            List<EventSnapshot> evtSnapshots = getEventSnapshots(jobSchedulerEvent.getEventId());
+            if (evtSnapshots.isEmpty()) {
+                throw new ForcedClosingHttpClientException(command.getSchemeAndAuthority());
+            }
+            jobSchedulerEvent.getEventSnapshots().addAll(evtSnapshots);
             Globals.jobSchedulerIsRunning.put(command.getSchemeAndAuthority(), true);
         } catch (ForcedClosingHttpClientException e) {
             LOGGER.debug("Connection force close: " + command.getSchemeAndAuthority());
@@ -154,31 +158,48 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
     protected List<EventSnapshot> getEventSnapshots(String eventId) throws JocException {
         List<EventSnapshot> eventSnapshots = new ArrayList<EventSnapshot>();
         checkTimeout();
-        JsonObject json = getJsonObject(eventId);
-        Long newEventId = json.getJsonNumber("eventId").longValue();
-        String type = json.getString("TYPE", "Empty");
-        switch (type) {
-        case "Empty":
-            eventSnapshots.addAll(getEventSnapshots(newEventId.toString()));
-            break;
-        case "NonEmpty":
-            eventSnapshots.addAll(nonEmptyEvent(newEventId, json));
-            if (eventSnapshots.isEmpty()) {
-                eventSnapshots.addAll(getEventSnapshots(newEventId.toString())); 
-            } else {
-                try { //collect further events after 2sec to minimize the number of responses 
-                    int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
-                    if (delay > 0) {
-                        Thread.sleep(delay);
+        try {
+            JsonObject json = getJsonObject(eventId);
+            Long newEventId = json.getJsonNumber("eventId").longValue();
+            String type = json.getString("TYPE", "Empty");
+            switch (type) {
+            case "Empty":
+                eventSnapshots.addAll(getEventSnapshots(newEventId.toString()));
+                break;
+            case "NonEmpty":
+                eventSnapshots.addAll(nonEmptyEvent(newEventId, json));
+                if (eventSnapshots.isEmpty()) {
+                    eventSnapshots.addAll(getEventSnapshots(newEventId.toString())); 
+                } else {
+                    try { //collect further events after 2sec to minimize the number of responses 
+                        int delay = Math.min(2000, new Long(getSessionTimeout()).intValue());
+                        if (delay > 0) {
+                            Thread.sleep(delay);
+                        }
+                    } catch (InterruptedException e1) {
                     }
-                } catch (InterruptedException e1) {
+                    eventSnapshots.addAll(getEventSnapshotsFromNextResponse(newEventId.toString()));
                 }
-                eventSnapshots.addAll(getEventSnapshotsFromNextResponse(newEventId.toString()));
+                break;
+            case "Torn":
+                eventSnapshots.addAll(getEventSnapshots(newEventId.toString()));
+                break;
             }
-            break;
-        case "Torn":
-            eventSnapshots.addAll(getEventSnapshots(newEventId.toString()));
-            break;
+        } catch (JobSchedulerNoResponseException | JobSchedulerConnectionRefusedException e) {
+            // if current Jobscheduler down then retry after 15sec
+            try {
+                int delay = Math.min(15000, new Long(getSessionTimeout()).intValue());
+                LOGGER.debug(command.getSchemeAndAuthority() + ": connection refused: retry after " + delay + "ms");
+                Thread.sleep(delay);
+            } catch (InterruptedException e1) {
+            }
+            eventSnapshots.addAll(getEventSnapshots(eventId));
+        } catch (JobSchedulerConnectionResetException e) {
+            EventSnapshot eventSnapshot = new EventSnapshot();
+            eventSnapshot.setEventType("SchedulerStateChanged");
+            eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+            eventSnapshot.setPath(command.getSchemeAndAuthority());
+            eventSnapshots.add(eventSnapshot);
         }
         return eventSnapshots;
     }
@@ -258,9 +279,9 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
             if (eventType.startsWith("Task")) {
                 continue;
             }
-            if (eventType.startsWith("Scheduler")) {
-                continue;
-            }
+//            if (eventType.startsWith("Scheduler")) {
+//                continue;
+//            }
             if (eventType.startsWith("JobChainNode")) {
                 continue;
             }
@@ -287,9 +308,15 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                     if (eventType.startsWith("JobState")) {
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOB);
                         eventSnapshot.setState(event.getString("state", null));
+                        if ("initialized,loaded,closed".contains(eventSnapshot.getState())) {
+                            continue;
+                        }
                     } else if (eventType.startsWith("JobChainState")) {
                         eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
                         eventSnapshot.setState(event.getString("state", null));
+                        if ("initialized,loaded,closed".contains(eventSnapshot.getState())) {
+                            continue;
+                        }
 //                    } else if (eventType.startsWith("JobChainNode")) {
 //                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBCHAIN);
 //                        eventSnapshot.setNodeId(event.getString("nodeId", null));
@@ -343,10 +370,12 @@ public class EventCallable implements Callable<JobSchedulerEvent> {
                             break;
                         }
                         
-//                    } else if (eventType.startsWith("Scheduler")) {
-//                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
-//                        eventSnapshot.setState(event.getString("state", null));
-//                        eventSnapshot.setPath(command.getSchemeAndAuthority());
+                    } else if (eventType.startsWith("Scheduler")) {
+                        eventSnapshot.setEventType("SchedulerStateChanged");
+                        //eventSnapshot.setState(event.getString("state", null));
+                        eventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
+                        eventSnapshot.setPath(command.getSchemeAndAuthority());
+//                        eventSnapshots.put(eventSnapshot);
                     }
 //                }
 //            }

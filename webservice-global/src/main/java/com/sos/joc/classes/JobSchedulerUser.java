@@ -1,8 +1,7 @@
 package com.sos.joc.classes;
 
-import java.util.List;
+import java.util.Set;
 
- 
 import com.sos.auth.rest.SOSShiroCurrentUser;
 import com.sos.auth.rest.SOSShiroSession;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -68,7 +67,7 @@ public class JobSchedulerUser {
 		return (sosShiroCurrentUser != null);
 	}
 
-	public void setJocJsonCommands(List<JOCJsonCommand> jocJsonCommands) {
+	public void setJocJsonCommands(Set<JOCJsonCommand> jocJsonCommands) {
 		sosShiroCurrentUser.setJocJsonCommands(jocJsonCommands);	
 	}
 
