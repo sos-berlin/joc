@@ -124,6 +124,8 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 				TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
 				if (jobsFilter.getJobschedulerId().isEmpty()) {
 					taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+					add = getPermissonsJocCockpit(dbItemReportTask.getSchedulerId(), accessToken).getHistory().getView()
+							.isStatus();
 				}
 				taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
 				taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
