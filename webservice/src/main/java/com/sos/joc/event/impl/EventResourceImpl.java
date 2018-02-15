@@ -93,7 +93,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 			// Globals.forceClosingHttpClients(session);
 
 			if (eventBody.getClose() != null && eventBody.getClose()) {
-				Globals.forceClosingHttpClients(session);
+				Globals.forceClosingHttpClients(accessToken);
 				entity.setEvents(null);
 				entity.setDeliveryDate(Date.from(Instant.now()));
 				return JOCDefaultResponse.responseStatus200(entity);
@@ -175,7 +175,7 @@ public class EventResourceImpl extends JOCResourceImpl implements IEventResource
 			jocJsonCommands.addAll(jocJsonCommandsOfClusterMember);
 			Globals.disconnect(connection);
 			try {
-				session.setAttribute(Globals.SESSION_KEY_FOR_USED_HTTP_CLIENTS_BY_EVENTS, jocJsonCommands);
+				jobschedulerUser.setJocJsonCommands(jocJsonCommands);
 			} catch (Exception e1) {
 			}
 			if (!tasks.isEmpty()) {
