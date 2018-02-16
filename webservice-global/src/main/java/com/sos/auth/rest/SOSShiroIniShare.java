@@ -39,21 +39,18 @@ public class SOSShiroIniShare {
 
 		checkForceFile();
 		String inifileContent = getContentFromDatabase();
-		if (inifileContent.isEmpty()) {
-			copyFileToDb(new File(iniFileName));
-		} else {
-			createShiroIniFileFromDb(inifileContent);
-		}
+		createShiroIniFileFromDb(inifileContent);
+
 	}
 
 	private void checkForceFile()
 			throws SOSHibernateException, JocException, UnsupportedEncodingException, IOException {
-		File forceFile = new File(iniFileName + ".import");
+		File forceFile = new File(iniFileName);
 
 		if (forceFile.exists()) {
 			copyFileToDb(forceFile);
 			forceFile.delete();
-			File iniFile = new File(iniFileName);
+			File iniFile = new File(Globals.getIniFileForShiro(iniFileName));
 			File destinationFile = new File(iniFileName + ".backup");
 			destinationFile.delete();
 			iniFile.renameTo(destinationFile);
@@ -90,15 +87,15 @@ public class SOSShiroIniShare {
 		if (jocConfigurationDbItem.getId() == null) {
 			jocConfigurationDbItem.setId(id);
 		}
-		Globals.commit(sosHibernateSession);;
+		Globals.commit(sosHibernateSession);
+		;
 	}
 
 	private void createShiroIniFileFromDb(String inifileContent) throws IOException {
-	    byte[] bytes = inifileContent.getBytes(StandardCharsets.UTF_8);
-	    Files.write(Paths.get(iniFileName), bytes,java.nio.file.StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+		byte[] bytes = inifileContent.getBytes(StandardCharsets.UTF_8);
+		Files.write(Paths.get(Globals.getIniFileForShiro(iniFileName)), bytes, java.nio.file.StandardOpenOption.WRITE,
+				StandardOpenOption.CREATE);
 	}
-
- 
 
 	private String getContentFromDatabase() throws SOSHibernateException {
 		Globals.beginTransaction(sosHibernateSession);
