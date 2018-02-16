@@ -127,7 +127,7 @@ public class SOSPermissionsCreator {
 			sosPermissionJocCockpit.setPrecedence(instance.getPrecedence());
 			sosPermissionJocCockpitMaster.setSOSPermissionJocCockpit(sosPermissionJocCockpit);
 			sosPermissionJocCockpitMaster.setJobSchedulerMaster(instance.getSchedulerId());
-			if (unique.get(sosPermissionJocCockpitMaster.getJobSchedulerMaster()) != null) {
+			if (unique.get(sosPermissionJocCockpitMaster.getJobSchedulerMaster()) == null) {
 				sosPermissionJocCockpitMasters.getSOSPermissionJocCockpitMaster().add(sosPermissionJocCockpitMaster);
 				unique.put(sosPermissionJocCockpitMaster.getJobSchedulerMaster(), "");
 			}
@@ -161,7 +161,7 @@ public class SOSPermissionsCreator {
 			sosPermissionCommands = sosPermissionsCreator.getSosPermissionCommands(instance.getSchedulerId());
 			sosPermissionCommandsMaster.setSOSPermissionCommands(sosPermissionCommands);
 			sosPermissionCommandsMaster.setJobSchedulerMaster(instance.getSchedulerId());
-			if (unique.get(sosPermissionCommandsMaster.getJobSchedulerMaster()) != null) {
+			if (unique.get(sosPermissionCommandsMaster.getJobSchedulerMaster()) == null) {
 				sosPermissionCommandsMasters.getSOSPermissionCommandsMaster().add(sosPermissionCommandsMaster);
 				unique.put(sosPermissionCommandsMaster.getJobSchedulerMaster(), "");
 			}
