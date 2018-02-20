@@ -93,7 +93,7 @@ public class SOSShiroIniShare {
 
 	private void createShiroIniFileFromDb(String inifileContent) throws IOException {
 		byte[] bytes = inifileContent.getBytes(StandardCharsets.UTF_8);
-		Files.write(Paths.get(Globals.getIniFileForShiro(iniFileName)), bytes, java.nio.file.StandardOpenOption.WRITE,
+		Files.write(Paths.get(Globals.getIniFileForShiro(iniFileName)), bytes, java.nio.file.StandardOpenOption.WRITE,StandardOpenOption.TRUNCATE_EXISTING, 
 				StandardOpenOption.CREATE);
 	}
 
