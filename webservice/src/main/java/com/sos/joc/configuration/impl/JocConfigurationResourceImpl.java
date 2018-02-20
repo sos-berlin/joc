@@ -94,25 +94,29 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
 			/** set DBItem with values from parameters */
 			JocConfigurationDbItem dbItem = new JocConfigurationDbItem();
-            if (configuration.getId() != null) {
-                dbItem = jocConfigurationDBLayer.getJocConfiguration(configuration.getId());
-                if (dbItem == null) {
-                    throw new DBMissingDataException(String.format("no entry found for configuration id: %d", configuration.getId()));
-                }
-            } else {
-			dbItem.setAccount(configuration.getAccount());
-			dbItem.setConfigurationType(configuration.getConfigurationType().name());
-			if (configuration.getObjectType() != null) {
-				dbItem.setObjectType(configuration.getObjectType().name());
+			if (configuration.getId() == 0) {
+				configuration.setId(null);
 			}
-			dbItem.setName(configuration.getName());
-			dbItem.setConfigurationItem(configuration.getConfigurationItem());
-			dbItem.setInstanceId(dbItemInventoryInstance.getId());
-			dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
-            }
+			if (configuration.getId() != null) {
+				dbItem = jocConfigurationDBLayer.getJocConfiguration(configuration.getId());
+				if (dbItem == null) {
+					throw new DBMissingDataException(
+							String.format("no entry found for configuration id: %d", configuration.getId()));
+				}
+			} else {
+				dbItem.setAccount(configuration.getAccount());
+				dbItem.setConfigurationType(configuration.getConfigurationType().name());
+				if (configuration.getObjectType() != null) {
+					dbItem.setObjectType(configuration.getObjectType().name());
+				}
+				dbItem.setName(configuration.getName());
+				dbItem.setConfigurationItem(configuration.getConfigurationItem());
+				dbItem.setInstanceId(dbItemInventoryInstance.getId());
+				dbItem.setSchedulerId(dbItemInventoryInstance.getSchedulerId());
+			}
 
-            dbItem.setShared(configuration.getShared());
-            dbItem.setConfigurationItem(configuration.getConfigurationItem());
+			dbItem.setShared(configuration.getShared());
+			dbItem.setConfigurationItem(configuration.getConfigurationItem());
 
 			/** check permissions */
 			boolean shareStatusMakePrivate = (dbItem != null && dbItem.getShared() && !configuration.getShared());
