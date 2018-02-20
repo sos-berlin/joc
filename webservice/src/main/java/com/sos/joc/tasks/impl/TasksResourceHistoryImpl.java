@@ -120,11 +120,14 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 			}
 
 			for (DBItemReportTask dbItemReportTask : listOfDBItemReportTaskDBItems) {
-				boolean add = true;
 				TaskHistoryItem taskHistoryItem = new TaskHistoryItem();
 				if (jobsFilter.getJobschedulerId().isEmpty()) {
-					taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
+					if (!getPermissonsJocCockpit(dbItemReportTask.getSchedulerId(), accessToken).getHistory().getView()
+							.isStatus()) {
+					    continue;
+					}
 				}
+				taskHistoryItem.setJobschedulerId(dbItemReportTask.getSchedulerId());
 				taskHistoryItem.setAgent(dbItemReportTask.getAgentUrl());
 				taskHistoryItem.setClusterMember(dbItemReportTask.getClusterMemberId());
 				taskHistoryItem.setEndTime(dbItemReportTask.getEndTime());
@@ -160,13 +163,12 @@ public class TasksResourceHistoryImpl extends JOCResourceImpl implements ITasksR
 
 				if (regExMatcher != null) {
 					regExMatcher.reset(dbItemReportTask.getName());
-					add = regExMatcher.find();
+					if (!regExMatcher.find()) {
+					    continue;
+					}
 				}
 
-				if (add) {
-					listOfHistory.add(taskHistoryItem);
-				}
-
+				listOfHistory.add(taskHistoryItem);
 			}
 
 			TaskHistory entity = new TaskHistory();

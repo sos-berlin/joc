@@ -111,12 +111,12 @@ public class Globals {
 	public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
 		String iniFile = getShiroIniInClassPath();
 		if (factory == null) {
-			factory = new IniSecurityManagerFactory(iniFile);
+			factory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
 		} else {
 			Ini oldShiroIni = factory.getIni();
-			Ini currentShiroIni = Ini.fromResourcePath(iniFile);
+			Ini currentShiroIni = Ini.fromResourcePath(getIniFileForShiro(iniFile));
 			if (!oldShiroIni.equals(currentShiroIni)) {
-				LOGGER.debug(iniFile + " is changed");
+				LOGGER.debug(getIniFileForShiro(iniFile) + " is changed");
 				factory = new IniSecurityManagerFactory();
 				factory.setIni(currentShiroIni);
 			}
@@ -127,9 +127,13 @@ public class Globals {
 	public static Ini getIniFromSecurityManagerFactory() {
 		if (factory == null) {
 			String iniFile = getShiroIniInClassPath();
-			factory = new IniSecurityManagerFactory(iniFile);
+			factory = new IniSecurityManagerFactory(getIniFileForShiro(iniFile));
 		}
 		return factory.getIni();
+	}
+
+	public static String getIniFileForShiro(String iniFile) {
+		return iniFile + ".active";
 	}
 
 	public static String getShiroIniInClassPath() {
@@ -142,9 +146,9 @@ public class Globals {
 
 	public static Path getShiroIniFile() {
 		if (sosShiroProperties != null) {
-			return sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
+			return sosShiroProperties.resolvePath(getIniFileForShiro(SHIRO_INI_FILENAME));
 		}
-		return Paths.get(DEFAULT_SHIRO_INI_FILENAME);
+		return Paths.get(getIniFileForShiro(DEFAULT_SHIRO_INI_FILENAME));
 	}
 
 	public static void setProperties() throws JocException {

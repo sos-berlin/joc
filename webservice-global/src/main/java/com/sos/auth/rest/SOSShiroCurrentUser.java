@@ -4,8 +4,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.subject.Subject;
@@ -39,7 +39,7 @@ public class SOSShiroCurrentUser {
     private Map<String, SOSPermissionJocCockpit> listOfSOSPermissionJocCockpit;
     private Map<String, SOSPermissionCommands> listOfSOSPermissionCommands;
     private SOSShiroFolderPermissions sosShiroFolderPermissions;
-    private List<JOCJsonCommand> jocJsonCommands;
+    private Set<JOCJsonCommand> jocJsonCommands;
     
     public SOSShiroCurrentUser(String username, String password) {
         super();
@@ -61,7 +61,11 @@ public class SOSShiroCurrentUser {
     	if (listOfSOSPermissionJocCockpit == null) {
     		initListOfSOSPermissionJocCockpit();
     	}
-        return listOfSOSPermissionJocCockpit.get(masterId);
+    	if(listOfSOSPermissionJocCockpit.containsKey(masterId)) {
+            return listOfSOSPermissionJocCockpit.get(masterId);
+    	} else {
+            return listOfSOSPermissionJocCockpit.get("");
+    	}
     }
     
     private void initListOfSOSPermissionJocCockpit() {
@@ -246,11 +250,11 @@ public class SOSShiroCurrentUser {
         this.authorization = authorization;
     }
 
-	public List<JOCJsonCommand> getJocJsonCommands() {
+	public Set<JOCJsonCommand> getJocJsonCommands() {
 		return jocJsonCommands;
 	}
 
-	public void setJocJsonCommands(List<JOCJsonCommand> jocJsonCommands) {
+	public void setJocJsonCommands(Set<JOCJsonCommand> jocJsonCommands) {
 		this.jocJsonCommands = jocJsonCommands;
 	}
 

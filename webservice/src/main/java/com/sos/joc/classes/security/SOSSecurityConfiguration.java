@@ -42,7 +42,8 @@ public class SOSSecurityConfiguration {
 	public SOSSecurityConfiguration() {
 		super();
 		securityConfiguration = new SecurityConfiguration();
-		ini = Ini.fromResourcePath(Globals.getShiroIniInClassPath());
+		String iniFileName = Globals.getShiroIniInClassPath();
+		ini = Ini.fromResourcePath(Globals.getIniFileForShiro(iniFileName));
 		listOfMasters = SOSSecurityConfigurationMasters.getInstance();
 	}
 

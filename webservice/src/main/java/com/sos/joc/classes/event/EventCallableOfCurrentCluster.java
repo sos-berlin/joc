@@ -2,12 +2,11 @@ package com.sos.joc.classes.event;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventCallableOfCurrentCluster.class);
     private final String accessToken;
+    private final Boolean isCurrent;
     private List<EventCallable> tasksOfClustermember = null;
     private List<JOCJsonCommand> jocJsonCommands = null;
     private String jobSchedulerId = null;
@@ -37,9 +37,8 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
     private final SOSShiroCurrentUser shiroUser;
     
     public EventCallableOfCurrentCluster(JOCJsonCommand command, JobSchedulerEvent jobSchedulerEvent, String accessToken, Session session,
-            Long instanceId, SOSShiroCurrentUser shiroUser, List<EventCallable> tasksOfClustermember, List<JOCJsonCommand> jocJsonCommands, Map<String, Set<String>> nestedJobChains) {
+            Long instanceId, SOSShiroCurrentUser shiroUser, List<EventCallable> tasksOfClustermember, List<JOCJsonCommand> jocJsonCommands, Boolean isCurrentJobScheduler) {
         super();
-        tasksOfClustermember.add(0, new EventCallableOfCurrentJobScheduler(command, jobSchedulerEvent, accessToken, session, instanceId, shiroUser, nestedJobChains));
         this.accessToken = accessToken;
         this.tasksOfClustermember = tasksOfClustermember;
         this.jocJsonCommands = jocJsonCommands;
@@ -47,6 +46,7 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
         this.shiroUser = shiroUser;
         this.eventId = jobSchedulerEvent.getEventId();
         this.shiroSession = session;
+        this.isCurrent = isCurrentJobScheduler;
     }
 
     @Override
@@ -56,14 +56,14 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             JobSchedulerEvent evt = executorService.invokeAny(tasksOfClustermember);
             LOGGER.debug("EventOfCluster: " + evt.getJobschedulerId() + "," + evt.getEventId() );
             if (evt.getJobschedulerId().startsWith("__instance__")) {
-                shiroSession.setAttribute("eventIdOfClusterMembers", evt.getEventId());
+                shiroSession.setAttribute(jobSchedulerId + "#eventIdOfClusterMembers", evt.getEventId());
                 evt.setJobschedulerId(jobSchedulerId);
                 evt.setEventId(eventId);
                 evt.getEventSnapshots().addAll(updateSavedInventoryInstance());
             } else {
-                shiroSession.setAttribute("eventIdOfClusterMembers", eventId);
+                shiroSession.setAttribute(jobSchedulerId + "#eventIdOfClusterMembers", eventId);
             }
-            LOGGER.debug("EventIdOfCluster: "+shiroSession.getAttribute("eventIdOfClusterMembers"));
+            LOGGER.debug("EventIdOfCluster: "+shiroSession.getAttribute(jobSchedulerId + "#eventIdOfClusterMembers"));
             return evt;
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof JocException) {
@@ -76,6 +76,11 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
                 command.forcedClosingHttpClient();
             }
             executorService.shutdown();
+            if (!executorService.awaitTermination(300, TimeUnit.MILLISECONDS)) {
+                for (JOCJsonCommand command : jocJsonCommands) {
+                    command.forcedClosingHttpClient();
+                }
+            }
         }
     }
     
@@ -95,7 +100,7 @@ public class EventCallableOfCurrentCluster extends EventCallable implements Call
             shiroUser.addSchedulerInstanceDBItem(jobSchedulerId, inst);
             Globals.rollback(session);
             Globals.urlFromJobSchedulerId.put(jobSchedulerId, inst);
-            if (inst != null && !inst.equals(curInstance)) {
+            if (isCurrent && inst != null && !inst.equals(curInstance)) {
                 EventSnapshot masterChangedEventSnapshot = new EventSnapshot();
                 masterChangedEventSnapshot.setEventType("CurrentJobSchedulerChanged");
                 masterChangedEventSnapshot.setObjectType(JobSchedulerObjectType.JOBSCHEDULER);
