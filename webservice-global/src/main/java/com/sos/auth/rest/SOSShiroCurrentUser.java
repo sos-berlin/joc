@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,7 +61,11 @@ public class SOSShiroCurrentUser {
     	if (listOfSOSPermissionJocCockpit == null) {
     		initListOfSOSPermissionJocCockpit();
     	}
-        return listOfSOSPermissionJocCockpit.get(masterId);
+    	if(listOfSOSPermissionJocCockpit.containsKey(masterId)) {
+            return listOfSOSPermissionJocCockpit.get(masterId);
+    	} else {
+            return listOfSOSPermissionJocCockpit.get("");
+    	}
     }
     
     private void initListOfSOSPermissionJocCockpit() {
