@@ -179,13 +179,14 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
     
-    public List<DBItemYadeTransfers> getFilteredTransfers(List<Long> transferIds, Set<Integer> operations,
+    public List<DBItemYadeTransfers> getFilteredTransfers(String jobschedulerId, List<Long> transferIds, Set<Integer> operations,
             Set<Integer> states, String mandator, Set<String> sourceHosts, Set<Integer> sourceProtocols, 
             Set<String> targetHosts, Set<Integer> targetProtocols, Boolean isIntervention, Boolean hasInterventions,
             List<String> profiles, Integer limit, Date dateFrom, Date dateTo)
                     throws DBInvalidDataException, DBConnectionRefusedException {
         try {
             boolean hasFilter = (
+                    (jobschedulerId != null && !jobschedulerId.isEmpty()) ||
                     (transferIds != null && !transferIds.isEmpty()) ||
                     (operations != null && !operations.isEmpty()) || 
                     (states != null && !states.isEmpty()) || 
@@ -209,6 +210,10 @@ public class JocDBLayerYade extends DBLayer {
             sql.append(" and");
             sql.append(" yt.targetProtocolId = ypt.id");
             if (hasFilter) {
+                if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
+                    sql.append(" and");
+                    sql.append(" yt.jobschedulerId = :jobschedulerId");
+                }
                 if (transferIds != null && !transferIds.isEmpty()) {
                     sql.append(" and");
                     sql.append(" yt.id in ( :transferIds)");
@@ -267,6 +272,9 @@ public class JocDBLayerYade extends DBLayer {
                 }
             }
             Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
+            if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
+                query.setParameter("jobschedulerId", jobschedulerId);
+            }
             if (transferIds != null && !transferIds.isEmpty()) {
                 query.setParameter("transferIds", transferIds);
             }
