@@ -56,7 +56,7 @@ public class JobSchedulerResourceIdsImpl extends JOCResourceImpl implements IJob
                         continue;
                     }
                     if (!getPermissonsJocCockpit(inventoryInstance.getSchedulerId(), accessToken).getJobschedulerMasterCluster().getView().isStatus()
-                            || getPermissonsJocCockpit(inventoryInstance.getSchedulerId(), accessToken).getJobschedulerMaster().getView().isStatus()) {
+                            && !getPermissonsJocCockpit(inventoryInstance.getSchedulerId(), accessToken).getJobschedulerMaster().getView().isStatus()) {
                         continue;
                     }
                     jobSchedulerIds.add(inventoryInstance.getSchedulerId());
