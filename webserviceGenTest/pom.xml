@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.sos-berlin</groupId>
 		<artifactId>joc</artifactId>
-		<version>1.12.1-SNAPSHOT</version>
+		<version>2.0.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>com.sos-berlin.joc</groupId>
@@ -63,13 +63,21 @@
 					<artifactId>jackson-annotations</artifactId>
 				</dependency>
 				<dependency>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>com.fasterxml.jackson.dataformat</groupId>
+					<artifactId>jackson-dataformat-xml</artifactId>
+				</dependency>
+				<dependency>
 					<groupId>org.glassfish.jersey.media</groupId>
 					<artifactId>jersey-media-moxy</artifactId>
 				</dependency>
 				<dependency>
-    		       <groupId>org.glassfish.jersey.media</groupId>
-    		       <artifactId>jersey-media-multipart</artifactId>
-		        </dependency>
+					<groupId>org.glassfish.jersey.media</groupId>
+					<artifactId>jersey-media-multipart</artifactId>
+				</dependency>
 				<dependency>
 					<groupId>org.glassfish.jersey.containers</groupId>
 					<artifactId>jersey-container-grizzly2-http</artifactId>
@@ -110,11 +118,6 @@
 					<version>2.4</version>
 				</dependency>
 				<dependency>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-databind</artifactId>
-					<!-- version>2.0.0</version -->
-				</dependency>
-				<dependency>
 					<groupId>com.oracle</groupId>
 					<artifactId>ojdbc6</artifactId>
 				</dependency>
@@ -126,10 +129,10 @@
 					<groupId>org.mariadb.jdbc</groupId>
 					<artifactId>mariadb-java-client</artifactId>
 				</dependency>
-	            <dependency>
-	                <groupId>net.sourceforge.jtds</groupId>
-	                <artifactId>jtds</artifactId>
-	            </dependency>
+				<dependency>
+					<groupId>net.sourceforge.jtds</groupId>
+					<artifactId>jtds</artifactId>
+				</dependency>
 				<dependency>
 					<groupId>com.owlike</groupId>
 					<artifactId>genson</artifactId>
@@ -150,22 +153,34 @@
 					<plugin>
 						<groupId>org.jsonschema2pojo</groupId>
 						<artifactId>jsonschema2pojo-maven-plugin</artifactId>
-						<version>0.4.23</version>
-						
+						<dependencies>
+							<dependency>
+								<groupId>com.sos-berlin</groupId>
+								<artifactId>sos-annotator</artifactId>
+								<version>${project.version}</version>
+							</dependency>
+							<dependency>
+								<groupId>com.fasterxml.jackson.dataformat</groupId>
+								<artifactId>jackson-dataformat-xml</artifactId>
+								<version>${jackson.version}</version>
+							</dependency>
+						</dependencies>
 						<executions>
 							<execution>
 								<id>generate-joc-model</id>
+								<phase>process-classes</phase>
 								<configuration>
 									<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
 									<targetPackage>com.sos.joc.model</targetPackage>
 									<removeOldOutput>true</removeOldOutput>
 									<annotationStyle>jackson2</annotationStyle>
+									<customAnnotator>com.sos.annotator.JacksonXMLAnnotator</customAnnotator>
 									<propertyWordDelimiters>- </propertyWordDelimiters>
 									<includeAdditionalProperties>false</includeAdditionalProperties>
 									<includes>
 										<include>**/*.json</include>
 									</includes>
-                            		<excludes>
+									<excludes>
 										<exclude>user/*.json</exclude>
 										<exclude>jobschedulerEvent/*.json</exclude>
 										<exclude>calendar/*.json</exclude>
@@ -177,11 +192,13 @@
 							</execution>
 							<execution>
 								<id>generate-calendar-model</id>
+								<phase>process-classes</phase>
 								<configuration>
 									<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
 									<targetPackage>com.sos.joc.model</targetPackage>
 									<removeOldOutput>false</removeOldOutput>
 									<annotationStyle>jackson2</annotationStyle>
+									<customAnnotator>com.sos.annotator.JacksonXMLAnnotator</customAnnotator>
 									<propertyWordDelimiters>- </propertyWordDelimiters>
 									<includeAdditionalProperties>false</includeAdditionalProperties>
 									<initializeCollections>false</initializeCollections>
@@ -195,11 +212,13 @@
 							</execution>
 							<execution>
 								<id>generate-event-model</id>
+								<phase>process-classes</phase>
 								<configuration>
 									<sourceDirectory>${basedir}/src/main/resources/raml/schemas</sourceDirectory>
 									<targetPackage>com.sos.jobscheduler.model</targetPackage>
 									<removeOldOutput>false</removeOldOutput>
 									<annotationStyle>jackson2</annotationStyle>
+									<customAnnotator>com.sos.annotator.JacksonXMLAnnotator</customAnnotator>
 									<propertyWordDelimiters>- </propertyWordDelimiters>
 									<includeAdditionalProperties>false</includeAdditionalProperties>
 									<includes>
@@ -236,12 +255,15 @@
 				<dependency>
 					<groupId>com.fasterxml.jackson.core</groupId>
 					<artifactId>jackson-databind</artifactId>
-					<!-- version>2.0.0</version -->
 				</dependency>
 				<dependency>
-    		       <groupId>org.glassfish.jersey.media</groupId>
-    		       <artifactId>jersey-media-multipart</artifactId>
-		        </dependency>
+					<groupId>com.fasterxml.jackson.dataformat</groupId>
+					<artifactId>jackson-dataformat-xml</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.glassfish.jersey.media</groupId>
+					<artifactId>jersey-media-multipart</artifactId>
+				</dependency>
 				<dependency>
 					<groupId>commons-lang</groupId>
 					<artifactId>commons-lang</artifactId>

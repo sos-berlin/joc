@@ -3,6 +3,7 @@
   "id": "schemas/plan/planItem",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
+  "javaType": "com.sos.joc.model.plan.PlanItem",
   "oneOf": [
     {
       "required": [
@@ -84,7 +85,7 @@
           "$ref": "../common/timestamp-schema.json"
         },
         "repeat": {
-          "$ref": "../common/nonNegativeInteger-schema.json"
+          "$ref": "../common/nonNegativeLong-schema.json"
         }
       }
 
