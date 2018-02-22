@@ -36,9 +36,17 @@ public class SOSShiroIniShare {
 		} else {
 			iniFileName = iniFileName.replaceFirst("^file:", "");
 		}
-
+		
 		checkForceFile();
 		String inifileContent = getContentFromDatabase();
+		if (inifileContent.isEmpty()) {
+			File iniFile = new File(Globals.getIniFileForShiro(iniFileName));
+			File forceFile = new File(iniFileName);
+			forceFile.delete();
+			iniFile.renameTo(forceFile);
+			checkForceFile();
+		}
+
 		createShiroIniFileFromDb(inifileContent);
 
 	}
@@ -93,8 +101,8 @@ public class SOSShiroIniShare {
 
 	private void createShiroIniFileFromDb(String inifileContent) throws IOException {
 		byte[] bytes = inifileContent.getBytes(StandardCharsets.UTF_8);
-		Files.write(Paths.get(Globals.getIniFileForShiro(iniFileName)), bytes, java.nio.file.StandardOpenOption.WRITE,StandardOpenOption.TRUNCATE_EXISTING, 
-				StandardOpenOption.CREATE);
+		Files.write(Paths.get(Globals.getIniFileForShiro(iniFileName)), bytes, java.nio.file.StandardOpenOption.WRITE,
+				StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 	}
 
 	private String getContentFromDatabase() throws SOSHibernateException {

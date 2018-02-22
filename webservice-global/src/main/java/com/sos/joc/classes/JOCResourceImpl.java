@@ -50,11 +50,13 @@ public class JOCResourceImpl {
 
 	private JocError jocError = new JocError();
 
-	protected void initGetPermissions(String accessToken) {
+	protected void initGetPermissions(String accessToken) throws JocException {
 		if (jobschedulerUser == null) {
 			this.accessToken = accessToken;
 			jobschedulerUser = new JobSchedulerUser(accessToken);
 		}
+		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
+		sosPermissionsCreator.loginFromAccessToken(accessToken);
 
 		updateUserInMetaInfo();
 	}
@@ -70,13 +72,13 @@ public class JOCResourceImpl {
        return masterId;
 	}
 	
-	protected SOSPermissionJocCockpit getPermissonsJocCockpit(String masterId, String accessToken) throws SessionNotExistException {
+	protected SOSPermissionJocCockpit getPermissonsJocCockpit(String masterId, String accessToken) throws JocException {
 		initGetPermissions(accessToken);
 		masterId = getMasterId(masterId);
 		return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionJocCockpit(masterId);
 	}
 
-	protected SOSPermissionCommands getPermissonsCommands(String masterId, String accessToken) throws SessionNotExistException {
+	protected SOSPermissionCommands getPermissonsCommands(String masterId, String accessToken) throws JocException {
 		initGetPermissions(accessToken);
 		masterId = getMasterId(masterId);
 		return jobschedulerUser.getSosShiroCurrentUser().getSosPermissionCommands(masterId);
@@ -135,7 +137,6 @@ public class JOCResourceImpl {
 			jobschedulerUser = new JobSchedulerUser(accessToken);
 		}
 		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
-
 		sosPermissionsCreator.loginFromAccessToken(accessToken);
 
 		initLogging(request, body);
@@ -147,6 +148,10 @@ public class JOCResourceImpl {
 		if (jobschedulerUser == null) {
 			jobschedulerUser = new JobSchedulerUser(accessToken);
 		}
+		
+		SOSPermissionsCreator sosPermissionsCreator = new SOSPermissionsCreator(null);
+		sosPermissionsCreator.loginFromAccessToken(accessToken);
+		
 		initLogging(request, null);
 		return init401And440();
 	}
