@@ -45,6 +45,7 @@ public class SOSShiroIniShare {
 			forceFile.delete();
 			iniFile.renameTo(forceFile);
 			checkForceFile();
+			inifileContent = getContentFromDatabase();
 		}
 
 		createShiroIniFileFromDb(inifileContent);

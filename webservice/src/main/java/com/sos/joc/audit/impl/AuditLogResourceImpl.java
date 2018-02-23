@@ -114,7 +114,7 @@ public class AuditLogResourceImpl extends JOCResourceImpl implements IAuditLogRe
         return filteredAuditLogs;
     }
 
-    private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb, String jobschedulerId) throws SessionNotExistException {
+    private List<AuditLogItem> fillAuditLogItems(List<DBItemAuditLog> auditLogsFromDb, String jobschedulerId) throws JocException {
         List<AuditLogItem> audits = new ArrayList<AuditLogItem>();
         for (DBItemAuditLog auditLogFromDb : auditLogsFromDb) {
             AuditLogItem auditLogItem = new AuditLogItem();
