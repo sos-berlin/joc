@@ -79,8 +79,8 @@ public class AgentClusterVolatile extends AgentCluster {
             if (agents != null) {
                 for (JsonString agent : agents.getValuesAs(JsonString.class)) {
                     AgentOfCluster a = mapOfAgents.get(agent.getString());
-                    if (a != null) {
-                        a.setRunningTasks(null); //only send for Agents call and not for AgentsCluster
+                    if (a != null && !agentList.contains(a)) {
+                        //a.setRunningTasks(null); //only send for Agents call and not for AgentsCluster
                         agentList.add(a);
                         if (a.getState().get_text() == JobSchedulerStateText.RUNNING) {
                             numOfRunning += 1;
@@ -135,7 +135,7 @@ public class AgentClusterVolatile extends AgentCluster {
         setConfigurationStatus(ConfigurationStatus.getConfigurationStatus(obstacles));
         JsonArray agents = agent.getJsonArray("agents");
         if (agents != null) {
-            if (agents.size() == 1) {
+            if (getAgentSet().size() == 1) {
                 set_type(AgentClusterType.SINGLE_AGENT); 
             } else {
                 switch (agent.getString("selectionMethod", "")) {
