@@ -39,7 +39,7 @@ public class JOCDefaultResponse extends com.sos.joc.classes.ResponseWrapper {
             + "      div.innerframe{margin:0 auto;max-width:748px;text-align:center;font-family:\"Open Sans\",\"lucida grande\",\"Segoe UI\",arial,verdana,\"lucida sans unicode\",tahoma,serif;text-rendering:optimizeLegibility;}%n"
             + "      div.code {color:#eb8814;font-size:18pt;font-weight:bold;text-align:center;}%n"
             + "      div.message {color:#666;font-size:12pt;font-weight:normal;text-align:left;margin:4px 10px;}%n"
-            + "  </style>"
+            + "  </style>%n"
             + "</head>%n"
             + "<body>%n"
             + "  <div class=\"frame\">%n"

@@ -19,13 +19,16 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.hibernate.classes.SOSHibernateFactory;
 import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateConfigurationException;
+import com.sos.hibernate.exceptions.SOSHibernateFactoryBuildException;
+import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JocCockpitProperties;
 import com.sos.joc.classes.JocWebserviceDataContainer;
 import com.sos.joc.exceptions.DBConnectionRefusedException;
-import com.sos.joc.exceptions.JocError;
+import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.exceptions.JocException;
 
 public class Globals {
@@ -51,27 +54,24 @@ public class Globals {
     public static JocCockpitProperties jocConfigurationProperties;
     public static IniSecurityManagerFactory factory = null;
 
-    public static SOSHibernateFactory getHibernateFactory() throws JocException {
+    public static SOSHibernateFactory getHibernateFactory() throws JocConfigurationException {
         if (sosHibernateFactory == null) {
             try {
-                String confFile = getConfFile(null);
+                String confFile = getHibernateConfFile(null);
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(DBLayer.getInventoryClassMapping());
                 sosHibernateFactory.addClassMapping(DBLayer.getReportingClassMapping());
                 sosHibernateFactory.setAutoCommit(true);
                 sosHibernateFactory.build();
-            } catch (JocException e) {
+            } catch (SOSHibernateConfigurationException | SOSHibernateFactoryBuildException e) {
                 sosHibernateFactory = null;
-                throw e;
-            } catch (Exception e) {
-                sosHibernateFactory = null;
-                throw new DBConnectionRefusedException(e);
+                throw new JocConfigurationException(e);
             }
         }
         return sosHibernateFactory;
     }
 
-    public static SOSHibernateFactory getHibernateFactory(String schedulerId) throws JocException {
+    public static SOSHibernateFactory getHibernateFactory(String schedulerId) throws JocConfigurationException {
         if (sosSchedulerHibernateFactories == null) {
             sosSchedulerHibernateFactories = new HashMap<String, SOSHibernateFactory>();
         }
@@ -79,34 +79,33 @@ public class Globals {
 
         if (sosHibernateFactory == null) {
             try {
-                String confFile = getConfFile(schedulerId);
+                String confFile = getHibernateConfFile(schedulerId);
                 sosHibernateFactory = new SOSHibernateFactory(confFile);
                 sosHibernateFactory.addClassMapping(DBLayer.getSchedulerClassMapping());
                 sosHibernateFactory.setAutoCommit(true);
                 sosHibernateFactory.build();
                 sosSchedulerHibernateFactories.put(schedulerId, sosHibernateFactory);
-            } catch (JocException e) {
-                throw e;
-            } catch (Exception e) {
-                throw new DBConnectionRefusedException(e);
+            } catch (SOSHibernateConfigurationException | SOSHibernateFactoryBuildException e) {
+                sosHibernateFactory = null;
+                throw new JocConfigurationException(e);
             }
         }
-
         return sosHibernateFactory;
     }
 
-    public static SOSHibernateSession createSosHibernateStatelessConnection(String identifier) throws JocException {
+    public static SOSHibernateSession createSosHibernateStatelessConnection(String identifier) throws JocConfigurationException,
+            DBConnectionRefusedException {
         if (sosHibernateFactory == null) {
             getHibernateFactory();
         }
         try {
             SOSHibernateSession sosHibernateSession = sosHibernateFactory.openStatelessSession(identifier);
             return sosHibernateSession;
-        } catch (Exception e) {
+        } catch (SOSHibernateOpenSessionException e) {
             throw new DBConnectionRefusedException(e);
         }
     }
-    
+
     public static IniSecurityManagerFactory getShiroIniSecurityManagerFactory() {
         String iniFile = getShiroIniInClassPath();
         if (factory == null) {
@@ -122,7 +121,7 @@ public class Globals {
         }
         return factory;
     }
-    
+
     public static Ini getIniFromSecurityManagerFactory() {
         if (factory == null) {
             String iniFile = getShiroIniInClassPath();
@@ -130,7 +129,7 @@ public class Globals {
         }
         return factory.getIni();
     }
-    
+
     public static String getShiroIniInClassPath() {
         if (sosShiroProperties != null) {
             Path p = sosShiroProperties.resolvePath(SHIRO_INI_FILENAME);
@@ -203,41 +202,42 @@ public class Globals {
         }
     }
 
-    private static String getConfFile(String schedulerId) throws JocException {
+    private static String getHibernateConfFile(String schedulerId) throws JocConfigurationException {
         String confFile = null;
-        JocError error = new JocError();
-        error.setCode("JOC-003");
-        String propertyKey = null;
+        String propKey = null;
 
         if (sosShiroProperties == null) {
-            error.setMessage("sosShiroProperties are not initialized");
-            throw new JocException(error);
+            throw new JocConfigurationException("sosShiroProperties are not initialized");
         }
 
-        if (schedulerId != null) {
-            propertyKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
-            confFile = sosShiroProperties.getProperty(propertyKey);
+        if (schedulerId != null && !schedulerId.isEmpty()) {
+            propKey = HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId;
+            confFile = sosShiroProperties.getProperty(propKey);
 
             if (confFile == null) {
-                propertyKey = HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE;
-                confFile = sosShiroProperties.getProperty(propertyKey);
+                propKey = HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE;
+                confFile = sosShiroProperties.getProperty(propKey);
+            }
+
+            if (confFile == null || confFile.trim().isEmpty()) {
+                throw new JocConfigurationException(String.format("Neither property '%1$s' nor '%2$s' found in %3$s",
+                        HIBERNATE_CONFIGURATION_SCHEDULER_DEFAULT_FILE, HIBERNATE_CONFIGURATION_FILE + "_" + schedulerId, sosShiroProperties
+                                .getPropertiesFile()));
+            }
+        } else {
+            confFile = sosShiroProperties.getProperty(HIBERNATE_CONFIGURATION_FILE, "reporting.hibernate.cfg.xml");
+            if (confFile.trim().isEmpty()) {
+                throw new JocConfigurationException(String.format("Property '%1$s' not found in %2$s", HIBERNATE_CONFIGURATION_FILE,
+                        sosShiroProperties.getPropertiesFile()));
             }
         }
 
-        if (confFile == null) {
-            propertyKey = HIBERNATE_CONFIGURATION_FILE;
-            confFile = sosShiroProperties.getProperty(propertyKey, "reporting.hibernate.cfg.xml");
-        }
-
-        if (confFile != null) {
-            confFile = confFile.trim();
-        }
-
+        confFile = confFile.trim();
         Path p = sosShiroProperties.resolvePath(confFile);
         if (p != null) {
-            if (!Files.exists(p)) {
-                error.setMessage(String.format("hibernate configuration (%1$s) is set but file (%2$s) not found.", confFile, p.toString()));
-                throw new JocException(error);
+            if (!Files.exists(p) || Files.isDirectory(p)) {
+                throw new JocConfigurationException(String.format("hibernate configuration (%1$s) is set but file (%2$s) not found.", confFile, p
+                        .toString()));
             } else {
                 confFile = p.toString().replace('\\', '/');
             }
@@ -309,7 +309,7 @@ public class Globals {
             }
         }
     }
-    
+
     private static void setConfigurationProperties() throws JocException {
         if (sosShiroProperties != null) {
             String confFile = sosShiroProperties.getProperty("configuration_file", "");
