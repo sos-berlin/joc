@@ -1,14 +1,20 @@
 package com.sos.joc.classes;
 
-import com.sos.hibernate.classes.SOSHibernateSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sos.hibernate.classes.SOSHibernateFactory;
+import com.sos.hibernate.classes.SOSHibernateSession;
+import com.sos.hibernate.exceptions.SOSHibernateOpenSessionException;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.joc.Globals;
 import com.sos.joc.db.history.order.JobSchedulerOrderHistoryDBLayer;
+import com.sos.joc.exceptions.JocConfigurationException;
 import com.sos.joc.model.order.OrderHistoryFilter;
 
 public class LogOrderContent extends LogContent {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogOrderContent.class);
     private static final String XPATH_ORDER_LOG = "/spooler/answer/order/log";
     private OrderHistoryFilter orderHistoryFilter;
 
@@ -18,21 +24,29 @@ public class LogOrderContent extends LogContent {
     }
 
     public String getLog() throws Exception {
- 
-        SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
-        SOSHibernateSession sosHibernateSession = sosHibernateFactory.openStatelessSession();
 
-        Globals.beginTransaction(sosHibernateSession);
+        String log = getLogFromDB();
+        if (log == null) {
+            log = getOrderLogFromXmlCommand();
+        }
+        return log;
+    }
+
+    private String getLogFromDB() {
+        SOSHibernateSession sosHibernateSession = null;
         try {
-            JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateSession);
-            String log = jobSchedulerOrderHistoryDBLayer.getLogAsString(orderHistoryFilter);
-            if (log == null) {
-                log = getOrderLogFromXmlCommand();
+            SOSHibernateFactory sosHibernateFactory = Globals.getHibernateFactory(orderHistoryFilter.getJobschedulerId());
+            sosHibernateSession = sosHibernateFactory.openStatelessSession("getOrderLog");
+            try {
+                Globals.beginTransaction(sosHibernateSession);
+                JobSchedulerOrderHistoryDBLayer jobSchedulerOrderHistoryDBLayer = new JobSchedulerOrderHistoryDBLayer(sosHibernateSession);
+                return jobSchedulerOrderHistoryDBLayer.getLogAsString(orderHistoryFilter);
+            } finally {
+                Globals.rollback(sosHibernateSession);
             }
-            return log;
-        } catch (Exception e) {
-            sosHibernateSession.rollback();
-            throw e;
+        } catch (JocConfigurationException | SOSHibernateOpenSessionException e) {
+            LOGGER.warn(e.toString());
+            return null;
         } finally {
             Globals.disconnect(sosHibernateSession);
         }
