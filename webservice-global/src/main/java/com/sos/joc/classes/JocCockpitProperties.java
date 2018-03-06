@@ -15,8 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 
-import sos.scheduler.misc.ParameterSubstitutor;
+import sos.util.ParameterSubstitutor;
 
+ 
 public class JocCockpitProperties {
     private static final Logger LOGGER = LoggerFactory.getLogger(JocCockpitProperties.class);
     private Properties properties = new Properties();
