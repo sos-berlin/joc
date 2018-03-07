@@ -2,7 +2,6 @@ package com.sos.joc.db.yade;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.TemporalType;
 
@@ -179,27 +178,24 @@ public class JocDBLayerYade extends DBLayer {
         }
     }
     
-    public List<DBItemYadeTransfers> getFilteredTransfers(String jobschedulerId, List<Long> transferIds, Set<Integer> operations,
-            Set<Integer> states, String mandator, Set<String> sourceHosts, Set<Integer> sourceProtocols, 
-            Set<String> targetHosts, Set<Integer> targetProtocols, Boolean isIntervention, Boolean hasInterventions,
-            List<String> profiles, Integer limit, Date dateFrom, Date dateTo)
-                    throws DBInvalidDataException, DBConnectionRefusedException {
+    public List<DBItemYadeTransfers> getFilteredTransfers(JocYadeFilter filter) throws DBInvalidDataException,
+        DBConnectionRefusedException {
         try {
             boolean hasFilter = (
-                    (jobschedulerId != null && !jobschedulerId.isEmpty()) ||
-                    (transferIds != null && !transferIds.isEmpty()) ||
-                    (operations != null && !operations.isEmpty()) || 
-                    (states != null && !states.isEmpty()) || 
-                    mandator != null || 
-                    (sourceHosts != null && !sourceHosts.isEmpty()) || 
-                    (sourceProtocols != null && !sourceProtocols.isEmpty()) || 
-                    (targetHosts != null && !targetHosts.isEmpty()) ||
-                    (targetProtocols != null && !targetProtocols.isEmpty()) ||
-                    isIntervention != null || 
-                    hasInterventions != null || 
-                    (profiles != null && !profiles.isEmpty()) || 
-                    dateFrom != null || 
-                    dateTo != null);
+                    (filter.getJobschedulerId() != null && !filter.getJobschedulerId().isEmpty()) ||
+                    (filter.getTransferIds() != null && !filter.getTransferIds().isEmpty()) ||
+                    (filter.getOperations() != null && !filter.getOperations().isEmpty()) || 
+                    (filter.getStates() != null && !filter.getStates().isEmpty()) || 
+                    filter.getMandator() != null || 
+                    (filter.getSourceHosts() != null && !filter.getSourceHosts().isEmpty()) || 
+                    (filter.getSourceProtocols() != null && !filter.getSourceProtocols().isEmpty()) || 
+                    (filter.getTargetHosts() != null && !filter.getTargetHosts().isEmpty()) ||
+                    (filter.getTargetProtocols() != null && !filter.getTargetProtocols().isEmpty()) ||
+                    filter.getIsIntervention() != null || 
+                    filter.getHasInterventions() != null || 
+                    (filter.getProfiles() != null && !filter.getProfiles().isEmpty()) || 
+                    filter.getDateFrom() != null || 
+                    filter.getDateTo() != null);
             StringBuilder sql = new StringBuilder();
             sql.append("select yt from ");
             sql.append(DBITEM_YADE_TRANSFERS).append(" yt,");
@@ -210,109 +206,109 @@ public class JocDBLayerYade extends DBLayer {
             sql.append(" and");
             sql.append(" yt.targetProtocolId = ypt.id");
             if (hasFilter) {
-                if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
+                if (filter.getJobschedulerId() != null && !filter.getJobschedulerId().isEmpty()) {
                     sql.append(" and");
                     sql.append(" yt.jobschedulerId = :jobschedulerId");
                 }
-                if (transferIds != null && !transferIds.isEmpty()) {
+                if (filter.getTransferIds() != null && !filter.getTransferIds().isEmpty()) {
                     sql.append(" and");
                     sql.append(" yt.id in ( :transferIds)");
                 }
-                if (operations != null && !operations.isEmpty()) {
+                if (filter.getOperations() != null && !filter.getOperations().isEmpty()) {
                     sql.append(" and");
                     sql.append(" yt.operation in ( :operations)");
                 }
-                if (states != null && !states.isEmpty()) {
+                if (filter.getStates() != null && !filter.getStates().isEmpty()) {
                     sql.append(" and");
                     sql.append(" yt.state in ( :states)");
                 }
-                if (mandator != null && !mandator.isEmpty()) {
+                if (filter.getMandator() != null && !filter.getMandator().isEmpty()) {
                     sql.append(" and");
                     sql.append(" yt.mandator = :mandator");
                 }
-                if (sourceHosts != null && !sourceHosts.isEmpty()) {
+                if (filter.getSourceHosts() != null && !filter.getSourceHosts().isEmpty()) {
                     sql.append(" and");
                     sql.append(" yps.hostname in ( :sourceHosts)");
                 }
-                if (sourceProtocols != null && !sourceProtocols.isEmpty()) {
+                if (filter.getSourceProtocols() != null && !filter.getSourceProtocols().isEmpty()) {
                     sql.append(" and");
                     sql.append(" yps.protocol in ( :sourceProtocols)");
                 }
-                if (targetHosts != null && !targetHosts.isEmpty()) {
+                if (filter.getTargetHosts() != null && !filter.getTargetHosts().isEmpty()) {
                     sql.append(" and");
                     sql.append(" ypt.hostname in ( :targetHosts)");
                 }
-                if (targetProtocols != null && !targetProtocols.isEmpty()) {
+                if (filter.getTargetProtocols() != null && !filter.getTargetProtocols().isEmpty()) {
                     sql.append(" and");
                     sql.append(" ypt.protocol in ( :targetProtocols)");
                 }
-                if (isIntervention != null) {
+                if (filter.getIsIntervention() != null) {
                     sql.append(" and");
-                    if (isIntervention) {
+                    if (filter.getIsIntervention()) {
                         sql.append(" yt.parentTransferId != null");
                     } else {
                         sql.append(" yt.parentTransferId == null");
                     }
                 }
-                if (hasInterventions != null) {
+                if (filter.getHasInterventions() != null) {
                     sql.append(" and");
                     sql.append(" yt.hasIntervention = :hasInterventions");
                 }
-                if (profiles != null && !profiles.isEmpty()) {
+                if (filter.getProfiles() != null && !filter.getProfiles().isEmpty()) {
                     sql.append(" and");
                     sql.append(" yt.profileName in ( :profiles)");
                 }
-                if (dateFrom != null) {
+                if (filter.getDateFrom() != null) {
                     sql.append(" and");
                     sql.append(" yt.start >= :dateFrom");
                 }
-                if (dateTo != null) {
+                if (filter.getDateTo() != null) {
                     sql.append(" and");
-                    sql.append(" yt.end <= :dateTo");
+                    sql.append(" yt.start <= :dateTo");
                 }
             }
             Query<DBItemYadeTransfers> query = getSession().createQuery(sql.toString());
-            if (jobschedulerId != null && !jobschedulerId.isEmpty()) {
-                query.setParameter("jobschedulerId", jobschedulerId);
+            if (filter.getJobschedulerId() != null && !filter.getJobschedulerId().isEmpty()) {
+                query.setParameter("jobschedulerId", filter.getJobschedulerId());
             }
-            if (transferIds != null && !transferIds.isEmpty()) {
-                query.setParameter("transferIds", transferIds);
+            if (filter.getTransferIds() != null && !filter.getTransferIds().isEmpty()) {
+                query.setParameter("transferIds", filter.getTransferIds());
             }
-            if (operations != null && !operations.isEmpty()) {
-                query.setParameterList("operations", operations);
+            if (filter.getOperations() != null && !filter.getOperations().isEmpty()) {
+                query.setParameterList("operations", filter.getOperations());
             }
-            if (states != null && !states.isEmpty()) {
-                query.setParameterList("states", states);
+            if (filter.getStates() != null && !filter.getStates().isEmpty()) {
+                query.setParameterList("states", filter.getStates());
             }
-            if (mandator != null && !mandator.isEmpty()) {
-                query.setParameter("mandator", mandator);
+            if (filter.getMandator() != null && !filter.getMandator().isEmpty()) {
+                query.setParameter("mandator", filter.getMandator());
             }
-            if (sourceHosts != null && !sourceHosts.isEmpty()) {
-                query.setParameter("sourceHosts", sourceHosts);
+            if (filter.getSourceHosts() != null && !filter.getSourceHosts().isEmpty()) {
+                query.setParameter("sourceHosts", filter.getSourceHosts());
             }
-            if (sourceProtocols != null && !sourceProtocols.isEmpty()) {
-                query.setParameter("sourceProtocols", sourceProtocols);
+            if (filter.getSourceProtocols() != null && !filter.getSourceProtocols().isEmpty()) {
+                query.setParameter("sourceProtocols", filter.getSourceProtocols());
             }
-            if (targetHosts != null && !targetHosts.isEmpty()) {
-                query.setParameter("targetHosts", targetHosts);
+            if (filter.getTargetHosts() != null && !filter.getTargetHosts().isEmpty()) {
+                query.setParameter("targetHosts", filter.getTargetHosts());
             }
-            if (targetProtocols != null && !targetProtocols.isEmpty()) {
-                query.setParameter("targetProtocols", targetProtocols);
+            if (filter.getTargetProtocols() != null && !filter.getTargetProtocols().isEmpty()) {
+                query.setParameter("targetProtocols", filter.getTargetProtocols());
             }
-            if (hasInterventions != null) {
-                query.setParameter("hasInterventions", hasInterventions);
+            if (filter.getHasInterventions() != null) {
+                query.setParameter("hasInterventions", filter.getHasInterventions());
             }
-            if (profiles != null && !profiles.isEmpty()) {
-                query.setParameterList("profiles", profiles);
+            if (filter.getProfiles() != null && !filter.getProfiles().isEmpty()) {
+                query.setParameterList("profiles", filter.getProfiles());
             }
-            if(dateFrom != null) {
-                query.setParameter("dateFrom", dateFrom, TemporalType.TIMESTAMP);
+            if(filter.getDateFrom() != null) {
+                query.setParameter("dateFrom", filter.getDateFrom(), TemporalType.TIMESTAMP);
             }
-            if(dateTo != null) {
-                query.setParameter("dateTo", dateTo, TemporalType.TIMESTAMP);
+            if(filter.getDateTo() != null) {
+                query.setParameter("dateTo", filter.getDateTo(), TemporalType.TIMESTAMP);
             }
-            if(limit != null) {
-                query.setMaxResults(limit);
+            if(filter.getLimit() != null) {
+                query.setMaxResults(filter.getLimit());
             }
             return getSession().getResultList(query);
         } catch (SOSHibernateInvalidSessionException ex) {

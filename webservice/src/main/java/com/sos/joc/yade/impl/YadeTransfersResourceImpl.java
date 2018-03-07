@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.db.yade.JocDBLayerYade;
+import com.sos.joc.db.yade.JocYadeFilter;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
 import com.sos.joc.model.yade.Operation;
@@ -147,10 +148,23 @@ public class YadeTransfersResourceImpl extends JOCResourceImpl implements IYadeT
 			}
 			List<String> sourceFiles = filterBody.getSourceFiles();
 			List<String> targetFiles = filterBody.getTargetFiles();
-			List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(filterBody.getJobschedulerId(),
-			        filterBody.getTransferIds(), operationValues, stateValues, filterBody.getMandator(), sourceHosts, 
-			        sourceProtocols, targetHosts, targetProtocols, filterBody.getIsIntervention(), 
-			        filterBody.getHasIntervention(), filterBody.getProfiles(), limit, dateFrom, dateTo);
+			JocYadeFilter filter = new JocYadeFilter();
+			filter.setJobschedulerId(filterBody.getJobschedulerId());
+			filter.setTransferIds(filterBody.getTransferIds());
+			filter.setOperations(operationValues);
+			filter.setStates(stateValues);
+			filter.setMandator(filterBody.getMandator());
+			filter.setSourceHosts(sourceHosts);
+			filter.setSourceProtocols(sourceProtocols);
+			filter.setTargetHosts(targetHosts);
+			filter.setTargetProtocols(targetProtocols);
+			filter.setIsIntervention(filterBody.getIsIntervention());
+			filter.setHasInterventions(filterBody.getHasIntervention());
+			filter.setProfiles(filterBody.getProfiles());
+			filter.setLimit(limit);
+			filter.setDateFrom(dateFrom);
+			filter.setDateTo(dateTo);
+			List<DBItemYadeTransfers> transfersFromDb = dbLayer.getFilteredTransfers(filter);
 			Transfers entity = new Transfers();
 			List<DBItemYadeTransfers> filteredTransfersByFiles = new ArrayList<DBItemYadeTransfers>();
 			List<Transfer> transfers = new ArrayList<Transfer>();
