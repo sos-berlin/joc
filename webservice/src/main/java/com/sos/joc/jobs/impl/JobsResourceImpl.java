@@ -42,7 +42,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
             JobsV entity = new JobsV();
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken, jobsWithTempRunTime);
+            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
             List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
 
