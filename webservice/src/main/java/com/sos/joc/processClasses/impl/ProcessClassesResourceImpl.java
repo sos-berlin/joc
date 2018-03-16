@@ -58,7 +58,6 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 			// command.addProcessClassCompactQuery(jobSchedulerAgentClustersBody.getCompact());
 			command.addProcessClassCompactQuery(false);
 
-<<<<<<< HEAD
 			List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
 			Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(
 					processClassFilter.getProcessClasses());
@@ -72,7 +71,6 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 					tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()),
 							new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
 				}
-				entity.setProcessClasses(listProcessClasses);
 			} else if (folders != null && !folders.isEmpty()) {
 				for (Folder folder : folders) {
 					folder.setFolder(normalizeFolder(folder.getFolder()));
@@ -87,7 +85,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 				ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder,
 						processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(), command, accessToken,
 						jobViewStatusEnabled);
-				entity.setProcessClasses(callable.getProcessClasses());
+				listProcessClasses = callable.getProcessClasses();
 			}
 			if (tasks.size() > 0) {
 				ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
@@ -106,9 +104,11 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 				} finally {
 					executorService.shutdown();
 				}
-				entity.setProcessClasses(listProcessClasses);
+
 			}
 
+			listProcessClasses = addAllPermittedJobs(listProcessClasses);
+			entity.setProcessClasses(listProcessClasses);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);
 
@@ -122,81 +122,19 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
 		}
 	}
-=======
-            List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
-            Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(processClassFilter.getProcessClasses());
-            List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
 
-            List<ProcessClassV> listProcessClasses = new ArrayList<ProcessClassV>();
-            ProcessClassesV entity = new ProcessClassesV();
-            if (processClasses != null && !processClasses.isEmpty()) {
-                for (ProcessClassPath processClass : processClasses) {
-                    checkRequiredParameter("processClass", processClass.getProcessClass());
-                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken,
-                            jobViewStatusEnabled));
-                }
-            } else if (folders != null && !folders.isEmpty()) {
-                for (Folder folder : folders) {
-                    folder.setFolder(normalizeFolder(folder.getFolder()));
-                    tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(),
-                            new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
-                }
-            } else {
-                Folder rootFolder = new Folder();
-                rootFolder.setFolder("/");
-                rootFolder.setRecursive(true);
-                ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder, processClassFilter.getRegex(), processClassFilter
-                        .getIsAgentCluster(), command, accessToken, jobViewStatusEnabled);
-                listProcessClasses = callable.getProcessClasses();
-            }
-            if (tasks.size() > 0) {
-                ExecutorService executorService = Executors.newFixedThreadPool(10);
-                try {
-                    for (Future<List<ProcessClassV>> result : executorService.invokeAll(tasks)) {
-                        try {
-                            listProcessClasses.addAll(result.get());
-                        } catch (ExecutionException e) {
-                            if (e.getCause() instanceof JocException) {
-                                throw (JocException) e.getCause();
-                            } else {
-                                throw (Exception) e.getCause();
-                            }
-                        }
-                    }
-                } finally {
-                    executorService.shutdown();
-                }
-            }
+	private List<ProcessClassV> addAllPermittedJobs(List<ProcessClassV> processClassesToAdd)
+			throws SessionNotExistException {
+		List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
+		if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+			for (ProcessClassV processClass : processClassesToAdd)
+				if (canAdd(processClass, processClass.getPath())) {
+					listOfProcessClasses.add(processClass);
+				}
+		} else {
+			listOfProcessClasses.addAll(processClassesToAdd);
+		}
+		return listOfProcessClasses;
 
-            listProcessClasses = addAllPermittedJobs(listProcessClasses);
-            entity.setProcessClasses(listProcessClasses);
-            entity.setDeliveryDate(Date.from(Instant.now()));
-            return JOCDefaultResponse.responseStatus200(entity);
-
-        } catch (JobSchedulerConnectionResetException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatus434JSError(e);
-        } catch (JocException e) {
-            e.addErrorMetaInfo(getJocError());
-            return JOCDefaultResponse.responseStatusJSError(e);
-        } catch (Exception e) {
-            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-        }
-    }
-
-    private List<ProcessClassV> addAllPermittedJobs(List<ProcessClassV> processClassesToAdd) throws SessionNotExistException {
-        List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (ProcessClassV processClass : processClassesToAdd)
-                if (canAdd(processClass, processClass.getPath())) {
-                    listOfProcessClasses.add(processClass);
-                }
-        } else {
-            listOfProcessClasses.addAll(processClassesToAdd);
-        }
-        return listOfProcessClasses;
-
-    }
-
->>>>>>> origin/release/1.11
+	}
 }

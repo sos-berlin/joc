@@ -112,10 +112,10 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 		}
 	}
 
-<<<<<<< HEAD
 	private List<ScheduleP> getSchedulesToAdd(InventorySchedulesDBLayer dbLayer,
 			List<DBItemInventorySchedule> schedulesFromDb, DBItemInventoryInstance instance) throws Exception {
 		List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
+		schedulesFromDb = addAllPermittedSchedules(schedulesFromDb);
 		if (schedulesFromDb != null) {
 			for (DBItemInventorySchedule scheduleFromDb : schedulesFromDb) {
 				if (regex != null && !regex.isEmpty()) {
@@ -130,38 +130,19 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 		}
 		return schedulesToAdd;
 	}
-=======
-    private List<ScheduleP> getSchedulesToAdd(InventorySchedulesDBLayer dbLayer, List<DBItemInventorySchedule> schedulesFromDb,
-            DBItemInventoryInstance instance) throws Exception {
-        List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
-        schedulesFromDb = addAllPermittedSchedules(schedulesFromDb);
-        if (schedulesFromDb != null) {
-            for (DBItemInventorySchedule scheduleFromDb : schedulesFromDb) {
-                if (regex != null && !regex.isEmpty()) {
-                    Matcher regExMatcher = Pattern.compile(regex).matcher(scheduleFromDb.getName());
-                    if (regExMatcher.find()) {
-                        schedulesToAdd.add(SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, instance));
-                    }
-                } else {
-                    schedulesToAdd.add(SchedulePermanent.initSchedule(dbLayer, scheduleFromDb, instance));
-                }
-            }
-        }
-        return schedulesToAdd;
-    }
->>>>>>> origin/release/1.11
 
-    private List<DBItemInventorySchedule> addAllPermittedSchedules(List<DBItemInventorySchedule> schedulesClassesToAdd) throws SessionNotExistException{
-        List<DBItemInventorySchedule> listOfSchedules = new ArrayList<DBItemInventorySchedule>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (DBItemInventorySchedule schedule : schedulesClassesToAdd)
-                if (canAdd(schedule, schedule.getName())) {
-                    listOfSchedules.add(schedule);
-                }
-        } else {
-            listOfSchedules.addAll(schedulesClassesToAdd);
-        }
-        return listOfSchedules;
+	private List<DBItemInventorySchedule> addAllPermittedSchedules(List<DBItemInventorySchedule> schedulesClassesToAdd)
+			throws SessionNotExistException {
+		List<DBItemInventorySchedule> listOfSchedules = new ArrayList<DBItemInventorySchedule>();
+		if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+			for (DBItemInventorySchedule schedule : schedulesClassesToAdd)
+				if (canAdd(schedule, schedule.getName())) {
+					listOfSchedules.add(schedule);
+				}
+		} else {
+			listOfSchedules.addAll(schedulesClassesToAdd);
+		}
+		return listOfSchedules;
 
-    }
+	}
 }
