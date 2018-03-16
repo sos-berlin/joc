@@ -46,7 +46,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
             JobsV entity = new JobsV();
             List<JobV> listOfJobs=null;
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken, jobsWithTempRunTime);
+            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
             List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
 

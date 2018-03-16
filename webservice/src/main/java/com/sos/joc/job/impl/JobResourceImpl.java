@@ -40,7 +40,7 @@ public class JobResourceImpl extends JOCResourceImpl implements IJobResource {
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             String jobPath = normalizePath(jobFilter.getJob());
             List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId(), jobPath);
-            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken, jobsWithTempRunTime);
+            JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(this, accessToken, jobsWithTempRunTime);
             JobV200 entity = new JobV200();
             entity.setJob(jocXmlCommand.getJob(jobPath, jobFilter.getCompact(), true, null));
             entity.setDeliveryDate(new Date());
