@@ -1,21 +1,24 @@
 package com.sos.joc.jobs.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
+import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
+import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.JobsV;
 
@@ -42,17 +45,20 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(connection);
             List<String> jobsWithTempRunTime = dbLayer.getJobsWithTemporaryRuntime(dbItemInventoryInstance.getId());
             JobsV entity = new JobsV();
+            List<JobV> listOfJobs=null;
             JOCXmlJobCommand jocXmlCommand = new JOCXmlJobCommand(dbItemInventoryInstance, accessToken, jobsWithTempRunTime);
             List<JobPath> jobs = jobsFilter.getJobs();
             List<Folder> folders = addPermittedFolder(jobsFilter.getFolders());
 
             if (jobs != null && !jobs.isEmpty()) {
-                entity.setJobs(jocXmlCommand.getJobsFromShowJob(jobs, jobsFilter));
+                listOfJobs = jocXmlCommand.getJobsFromShowJob(jobs, jobsFilter);
             } else if (folders != null && !folders.isEmpty()) {
-                entity.setJobs(jocXmlCommand.getJobsFromShowState(folders, jobsFilter));
+                listOfJobs = jocXmlCommand.getJobsFromShowState(folders, jobsFilter);
             } else {
-                entity.setJobs(jocXmlCommand.getJobsFromShowState(jobsFilter));
+                listOfJobs = jocXmlCommand.getJobsFromShowState(jobsFilter);
             }
+            listOfJobs = addAllPermittedJobs(listOfJobs);
+            entity.setJobs(listOfJobs);
             entity.setDeliveryDate(new Date());
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -65,6 +71,20 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
         } finally {
             Globals.disconnect(connection);
         }
+    }
+    
+    private List<JobV> addAllPermittedJobs(List<JobV> jobsToAdd) throws SessionNotExistException{
+        List<JobV> listOfJobs = new ArrayList<JobV>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (JobV job : jobsToAdd)
+                if (canAdd(job, job.getPath())) {
+                    listOfJobs.add(job);
+                }
+        } else {
+            listOfJobs.addAll(jobsToAdd);
+        }
+        return listOfJobs;
+
     }
 
 }

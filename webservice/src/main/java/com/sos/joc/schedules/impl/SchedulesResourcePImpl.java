@@ -12,13 +12,13 @@ import javax.ws.rs.Path;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBItemInventorySchedule;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.schedule.SchedulePermanent;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.schedule.ScheduleP;
 import com.sos.joc.model.schedule.SchedulePath;
@@ -108,6 +108,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
     private List<ScheduleP> getSchedulesToAdd(InventorySchedulesDBLayer dbLayer, List<DBItemInventorySchedule> schedulesFromDb,
             DBItemInventoryInstance instance) throws Exception {
         List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
+        schedulesFromDb = addAllPermittedSchedules(schedulesFromDb);
         if (schedulesFromDb != null) {
             for (DBItemInventorySchedule scheduleFromDb : schedulesFromDb) {
                 if (regex != null && !regex.isEmpty()) {
@@ -123,4 +124,17 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
         return schedulesToAdd;
     }
 
+    private List<DBItemInventorySchedule> addAllPermittedSchedules(List<DBItemInventorySchedule> schedulesClassesToAdd) throws SessionNotExistException{
+        List<DBItemInventorySchedule> listOfSchedules = new ArrayList<DBItemInventorySchedule>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (DBItemInventorySchedule schedule : schedulesClassesToAdd)
+                if (canAdd(schedule, schedule.getName())) {
+                    listOfSchedules.add(schedule);
+                }
+        } else {
+            listOfSchedules.addAll(schedulesClassesToAdd);
+        }
+        return listOfSchedules;
+
+    }
 }

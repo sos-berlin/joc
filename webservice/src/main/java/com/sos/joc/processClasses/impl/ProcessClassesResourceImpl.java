@@ -20,6 +20,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.processclasses.ProcessClassesVCallable;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.processClass.ProcessClassPath;
 import com.sos.joc.model.processClass.ProcessClassV;
@@ -57,7 +58,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
             Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(processClassFilter.getProcessClasses());
             List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
-            
+
             List<ProcessClassV> listProcessClasses = new ArrayList<ProcessClassV>();
             ProcessClassesV entity = new ProcessClassesV();
             if (processClasses != null && !processClasses.isEmpty()) {
@@ -66,7 +67,6 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                     tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken,
                             jobViewStatusEnabled));
                 }
-                entity.setProcessClasses(listProcessClasses);
             } else if (folders != null && !folders.isEmpty()) {
                 for (Folder folder : folders) {
                     folder.setFolder(normalizeFolder(folder.getFolder()));
@@ -79,7 +79,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 rootFolder.setRecursive(true);
                 ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder, processClassFilter.getRegex(), processClassFilter
                         .getIsAgentCluster(), command, accessToken, jobViewStatusEnabled);
-                entity.setProcessClasses(callable.getProcessClasses());
+                listProcessClasses = callable.getProcessClasses();
             }
             if (tasks.size() > 0) {
                 ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -98,9 +98,10 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
                 } finally {
                     executorService.shutdown();
                 }
-                entity.setProcessClasses(listProcessClasses);
             }
 
+            listProcessClasses = addAllPermittedJobs(listProcessClasses);
+            entity.setProcessClasses(listProcessClasses);
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
 
@@ -114,4 +115,19 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
             return JOCDefaultResponse.responseStatusJSError(e, getJocError());
         }
     }
+
+    private List<ProcessClassV> addAllPermittedJobs(List<ProcessClassV> processClassesToAdd) throws SessionNotExistException {
+        List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (ProcessClassV processClass : processClassesToAdd)
+                if (canAdd(processClass, processClass.getPath())) {
+                    listOfProcessClasses.add(processClass);
+                }
+        } else {
+            listOfProcessClasses.addAll(processClassesToAdd);
+        }
+        return listOfProcessClasses;
+
+    }
+
 }

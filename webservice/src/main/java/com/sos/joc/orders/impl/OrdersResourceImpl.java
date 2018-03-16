@@ -26,7 +26,9 @@ import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrdersFilter;
@@ -60,18 +62,8 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             Map<String, OrderVolatile> listOrders = new HashMap<String, OrderVolatile>();
             List<OrderPath> orders = ordersBody.getOrders();
             List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
-            
-            List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
-            if (ordersBody.getFolders().size() == 0 && jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                    com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
-                    f.setFolder(folder.getFolder());
-                    f.setRecursive(folder.isRecursive());
-                    folders.add(f);
-                }
-            }
+            List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
 
             connection = Globals.createSosHibernateStatelessConnection(API_CALL);
             InventoryOrdersDBLayer dbLayer = new InventoryOrdersDBLayer(connection);
@@ -142,7 +134,10 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             }
 
             OrdersV entity = new OrdersV();
-            entity.setOrders(new ArrayList<OrderV>(listOrders.values()));
+            List<OrderV> permittedOrders = new ArrayList<OrderV>(listOrders.values());
+            permittedOrders = addAllPermittedOrders(permittedOrders);
+
+            entity.setOrders(permittedOrders);
             entity.setDeliveryDate(Date.from(Instant.now()));
 
             return JOCDefaultResponse.responseStatus200(entity);
@@ -155,4 +150,19 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
             Globals.disconnect(connection);
         }
     }
+
+    private List<OrderV> addAllPermittedOrders(List<OrderV> ordersToAdd) throws SessionNotExistException {
+        List<OrderV> listOfOrders = new ArrayList<OrderV>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (OrderV order : ordersToAdd)
+                if (canAdd(order, order.getPath())) {
+                    listOfOrders.add(order);
+                }
+        } else {
+            listOfOrders.addAll(ordersToAdd);
+        }
+        return listOfOrders;
+
+    }
+
 }

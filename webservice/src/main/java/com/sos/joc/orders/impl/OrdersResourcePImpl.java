@@ -11,14 +11,15 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryOrder;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrderPermanent;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.lock.LockP;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersP;
@@ -78,13 +79,17 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                 List<DBItemInventoryOrder> unfilteredOrders = dbLayer.getInventoryOrders(instanceId);
                 for (DBItemInventoryOrder unfilteredOrder : unfilteredOrders) {
                     Matcher regExMatcher = Pattern.compile(regex).matcher(unfilteredOrder.getName());
-                    if (regExMatcher.find()) {
+                    if (regExMatcher.find() && canAdd(unfilteredOrder,unfilteredOrder.getName())) {
                         ordersFromDB.add(unfilteredOrder);
                     }
                 }
             } else {
-                ordersFromDB = dbLayer.getInventoryOrders(instanceId);
+                List<DBItemInventoryOrder>  filteredOrders = dbLayer.getInventoryOrders(instanceId);
+                if (filteredOrders != null && !filteredOrders.isEmpty()) {
+                    ordersFromDB.addAll(filteredOrders);
+                }
             }
+            ordersFromDB = addAllPermittedOrder(ordersFromDB);
             entity.setOrders(OrderPermanent.fillOutputOrders(ordersFromDB, dbLayer, compact));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
@@ -98,4 +103,17 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
         }
     }
 
+    private List<DBItemInventoryOrder> addAllPermittedOrder(List<DBItemInventoryOrder> ordersToAdd) throws SessionNotExistException{
+        List<DBItemInventoryOrder> listOfOrders = new ArrayList<DBItemInventoryOrder>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (DBItemInventoryOrder order : ordersToAdd)
+                if (canAdd(order, order.getName())) {
+                    listOfOrders.add(order);
+                }
+        } else {
+            listOfOrders.addAll(ordersToAdd);
+        }
+        return listOfOrders;
+
+    }
 }

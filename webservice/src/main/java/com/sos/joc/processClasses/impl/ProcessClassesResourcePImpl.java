@@ -11,13 +11,13 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryProcessClass;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.processclasses.ProcessClassPermanent;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.processClass.ProcessClassP;
 import com.sos.joc.model.processClass.ProcessClassPath;
@@ -60,7 +60,9 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                     if (processClassFromDb == null) {
                         continue;
                     }
-                    listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));
+                    if (canAdd(processClassFromDb,processClassFromDb.getName())) {
+                        listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));
+                    }
                 }
             } else if (folders != null && !folders.isEmpty()) {
                 Map<String, ProcessClassP> mapOfProcessClasses = new HashMap<String, ProcessClassP>();
@@ -68,6 +70,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                     List<DBItemInventoryProcessClass> processClassesFromDb = null;
                     processClassesFromDb = dbLayer.getProcessClassesByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance.getId(),
                             folder.getRecursive().booleanValue());
+                    processClassesFromDb = addAllPermittedProcessClasses(processClassesFromDb);
                     Map<String, ProcessClassP> processClassesToAdd = ProcessClassPermanent.getProcessClassesMap(dbLayer, processClassesFromDb,
                             processClassFilter.getRegex());
                     mapOfProcessClasses.putAll(processClassesToAdd);
@@ -75,6 +78,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                 listOfProcessClasses = new ArrayList<ProcessClassP>(mapOfProcessClasses.values());
             } else {
                 List<DBItemInventoryProcessClass> processClassesFromDb = dbLayer.getProcessClasses(dbItemInventoryInstance.getId());
+                processClassesFromDb = addAllPermittedProcessClasses(processClassesFromDb);
                 listOfProcessClasses = ProcessClassPermanent.getProcessClassesList(dbLayer, processClassesFromDb, processClassFilter.getRegex());
             }
             entity.setProcessClasses(listOfProcessClasses);
@@ -88,6 +92,20 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
         } finally {
             Globals.disconnect(connection);
         }
+    }
+    
+    private List<DBItemInventoryProcessClass> addAllPermittedProcessClasses(List<DBItemInventoryProcessClass> processClassesToAdd) throws SessionNotExistException{
+        List<DBItemInventoryProcessClass> listOfProcessClasses = new ArrayList<DBItemInventoryProcessClass>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (DBItemInventoryProcessClass processClass : processClassesToAdd)
+                if (canAdd(processClass, processClass.getName())) {
+                    listOfProcessClasses.add(processClass);
+                }
+        } else {
+            listOfProcessClasses.addAll(processClassesToAdd);
+        }
+        return listOfProcessClasses;
+
     }
 
 }

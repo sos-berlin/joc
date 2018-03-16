@@ -17,6 +17,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobP;
@@ -56,15 +57,14 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
             
             jobs = jobsFilter.getJobs();
             isOrderJob = jobsFilter.getIsOrderJob();
+
             List<JobP> listJobs = new ArrayList<JobP>();
             InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(session);
             Long instanceId = dbItemInventoryInstance.getId();
             List<DBItemInventoryJob> listOfJobs = processFilters(dbLayer);
             for (DBItemInventoryJob inventoryJob : listOfJobs) {
                 JobP job = JobPermanent.getJob(inventoryJob, dbLayer, compact, instanceId);
-                if (job != null) {
-                    listJobs.add(job);
-                }
+                 listJobs.add(job);
             }
             JobsP entity = new JobsP();
             entity.setJobs(listJobs);
@@ -139,7 +139,22 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                 }
             }
         }
+        listOfJobs = addAllPermittedOrder(listOfJobs);
         return listOfJobs;
+    }
+    
+    private List<DBItemInventoryJob> addAllPermittedOrder(List<DBItemInventoryJob> jobsToAdd) throws SessionNotExistException{
+        List<DBItemInventoryJob> listOfJobs = new ArrayList<DBItemInventoryJob>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (DBItemInventoryJob job : jobsToAdd)
+                if (canAdd(job, job.getName())) {
+                    listOfJobs.add(job);
+                }
+        } else {
+            listOfJobs.addAll(jobsToAdd);
+        }
+        return listOfJobs;
+
     }
 
 }

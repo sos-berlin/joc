@@ -14,7 +14,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -24,7 +23,9 @@ import com.sos.joc.classes.schedule.ScheduleVolatile;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
+import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.schedule.SchedulePath;
 import com.sos.joc.model.schedule.ScheduleV;
 import com.sos.joc.model.schedule.SchedulesFilter;
@@ -95,6 +96,7 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             }
 
             SchedulesV entity = new SchedulesV();
+            listOfSchedules = addAllPermittedJobs(listOfSchedules);
             entity.setSchedules(listOfSchedules);
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
@@ -128,5 +130,19 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
             }
         }
         return false;
+    }
+    
+    private List<ScheduleV> addAllPermittedJobs(List<ScheduleV> schedulesToAdd) throws SessionNotExistException{
+        List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (ScheduleV schedule : schedulesToAdd)
+                if (canAdd(schedule, schedule.getPath())) {
+                    listOfSchedules.add(schedule);
+                }
+        } else {
+            listOfSchedules.addAll(schedulesToAdd);
+        }
+        return listOfSchedules;
+
     }
 }
