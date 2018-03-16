@@ -9,13 +9,13 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.locks.LockPermanent;
 import com.sos.joc.db.inventory.locks.InventoryLocksDBLayer;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.locks.resource.ILocksResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.lock.LockP;
@@ -51,14 +51,15 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			// FILTER
 			locks = locksFilter.getLocks();
+
+            regex = locksFilter.getRegex();
 			folders = addPermittedFolder(locksFilter.getFolders());
 
-			regex = locksFilter.getRegex();
 			InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(connection);
 			LocksP entity = new LocksP();
 			List<LockP> listOfLocks = new ArrayList<LockP>();
+            List<LockP> locksToAdd = new ArrayList<LockP>();
 			if (locks != null && !locks.isEmpty()) {
-				List<LockP> locksToAdd = new ArrayList<LockP>();
 				for (LockPath lockPath : locks) {
 					DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()),
 							dbItemInventoryInstance.getId());
@@ -66,30 +67,20 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 						continue;
 					}
 					LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
-					if (lock != null) {
-						locksToAdd.add(lock);
-					}
-				}
-				if (locksToAdd != null && !locksToAdd.isEmpty()) {
-					listOfLocks.addAll(locksToAdd);
-				}
+                    locksToAdd.add(lock);
+                }
 			} else if (folders != null && !folders.isEmpty()) {
 				for (Folder folder : folders) {
 					List<DBItemInventoryLock> locksFromDb = null;
 					locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()),
 							dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-					List<LockP> locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
-					if (locksToAdd != null && !locksToAdd.isEmpty()) {
-						listOfLocks.addAll(locksToAdd);
-					}
-				}
+                    locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
+                }
 			} else {
 				List<DBItemInventoryLock> locksFromDb = dbLayer.getLocks(dbItemInventoryInstance.getId());
-				List<LockP> locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
-				if (locksToAdd != null && !locksToAdd.isEmpty()) {
-					listOfLocks.addAll(locksToAdd);
-				}
-			}
+                locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
+            }
+            listOfLocks = addAllPermittedLocks(locksToAdd);
 			entity.setLocks(listOfLocks);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);
@@ -103,5 +94,19 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 		}
 
 	}
+
+    private List<LockP> addAllPermittedLocks(List<LockP> locksToAdd) throws SessionNotExistException {
+        List<LockP> listOfLocks = new ArrayList<LockP>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (LockP lock : locksToAdd)
+                if (canAdd(lock, lock.getPath())) {
+                    listOfLocks.add(lock);
+                }
+        } else {
+            listOfLocks.addAll(locksToAdd);
+        }
+        return listOfLocks;
+
+    }
 
 }

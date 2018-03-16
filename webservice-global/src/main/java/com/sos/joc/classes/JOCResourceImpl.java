@@ -3,6 +3,7 @@ package com.sos.joc.classes;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -398,16 +399,22 @@ public class JOCResourceImpl {
 		}
 	}
 
+    protected boolean canAdd(Object o, String path) throws SessionNotExistException {
+        return (o != null && jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().isPermittedForFolder(getParent(path)));
+    }
+
 	protected List<Folder> addPermittedFolder(List<Folder> folders) throws SessionNotExistException {
-		if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-			for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-				FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-				Folder f = new Folder();
-				f.setFolder(folder.getFolder());
-				f.setRecursive(folder.isRecursive());
-				folders.add(f);
-			}
-		}
+        if (folders == null || folders.size() == 0) {
+            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
+                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
+                    Folder f = new Folder();
+                    f.setFolder(folder.getFolder());
+                    f.setRecursive(folder.isRecursive());
+                    folders.add(f);
+                }
+            }
+        }
 		return folders;
 	}
 

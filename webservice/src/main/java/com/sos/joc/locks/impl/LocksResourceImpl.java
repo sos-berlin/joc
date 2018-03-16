@@ -72,8 +72,10 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
 
 				LockVolatile lockV = new LockVolatile(lock, jocXmlCommand);
 				lockV.setFields();
-				locksV.add(lockV);
-			}
+                if (canAdd(lockV, lockV.getPath())) {
+                    locksV.add(lockV);
+                }
+            }
 
 			LocksV entity = new LocksV();
 			entity.setLocks(locksV);

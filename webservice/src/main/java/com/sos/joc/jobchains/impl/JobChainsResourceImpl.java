@@ -1,5 +1,6 @@
 package com.sos.joc.jobchains.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,9 +10,11 @@ import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JOCXmlJobChainCommand;
 import com.sos.joc.exceptions.JocException;
+import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobchains.resource.IJobChainsResource;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainPath;
+import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.jobChain.JobChainsV;
 
@@ -21,8 +24,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
 	private static final String API_CALL = "./job_chains";
 
 	@Override
-	public JOCDefaultResponse postJobChains(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter)
-			throws Exception {
+    public JOCDefaultResponse postJobChains(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
 		return postJobChains(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
 	}
 
@@ -41,14 +43,17 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
 			JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
 			List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
 			List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
+            List<JobChainV> listOfJobChains = null;
 
 			if (jobChains != null && !jobChains.isEmpty()) {
-				entity.setJobChains(jocXmlCommand.getJobChainsFromShowJobChain(jobChains, jobChainsFilter));
+                listOfJobChains = jocXmlCommand.getJobChainsFromShowJobChain(jobChains, jobChainsFilter);
 			} else if (folders != null && !folders.isEmpty()) {
-				entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(folders, jobChainsFilter));
+                listOfJobChains = jocXmlCommand.getJobChainsFromShowState(folders, jobChainsFilter);
 			} else {
-				entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(jobChainsFilter));
+                listOfJobChains = jocXmlCommand.getJobChainsFromShowState(jobChainsFilter);
 			}
+            listOfJobChains = addAllPermittedJobChainss(listOfJobChains);
+            entity.setJobChains(listOfJobChains);
 			entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
 			entity.setDeliveryDate(new Date());
 
@@ -61,4 +66,17 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
 		}
 	}
 
+    private List<JobChainV> addAllPermittedJobChainss(List<JobChainV> jobChainsToAdd) throws SessionNotExistException {
+        List<JobChainV> listOfJobChains = new ArrayList<JobChainV>();
+        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
+            for (JobChainV jobChain : jobChainsToAdd)
+                if (canAdd(jobChain, jobChain.getPath())) {
+                    listOfJobChains.add(jobChain);
+}
+        } else {
+            listOfJobChains.addAll(jobChainsToAdd);
+        }
+        return listOfJobChains;
+
+    }
 }
