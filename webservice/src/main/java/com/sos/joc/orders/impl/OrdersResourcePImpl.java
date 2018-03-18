@@ -89,7 +89,7 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                     ordersFromDB.addAll(filteredOrders);
                 }
             }
-            ordersFromDB = addAllPermittedOrder(ordersFromDB);
+            ordersFromDB = addAllPermittedOrders(ordersFromDB);
             entity.setOrders(OrderPermanent.fillOutputOrders(ordersFromDB, dbLayer, compact));
             entity.setDeliveryDate(Date.from(Instant.now()));
             return JOCDefaultResponse.responseStatus200(entity);
@@ -103,8 +103,8 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
         }
     }
 
-    private List<DBItemInventoryOrder> addAllPermittedOrder(List<DBItemInventoryOrder> ordersToAdd) {
-        if (folderPermissions == null) {
+    private List<DBItemInventoryOrder> addAllPermittedOrders(List<DBItemInventoryOrder> ordersToAdd) {
+        if (folderPermissions == null || ordersToAdd == null) {
             return ordersToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();

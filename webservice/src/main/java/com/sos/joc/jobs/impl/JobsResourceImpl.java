@@ -73,7 +73,7 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
     }
     
     private List<JobV> addAllPermittedJobs(List<JobV> jobsToAdd) {
-        if (folderPermissions == null) {
+        if (folderPermissions == null || jobsToAdd == null) {
             return jobsToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();

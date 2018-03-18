@@ -150,7 +150,7 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
     }
 
     private List<OrderV> addAllPermittedOrders(List<OrderV> ordersToAdd) {
-        if (folderPermissions == null) {
+        if (folderPermissions == null || ordersToAdd == null) {
             return ordersToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();

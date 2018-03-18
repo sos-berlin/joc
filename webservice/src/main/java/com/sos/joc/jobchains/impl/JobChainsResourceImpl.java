@@ -74,7 +74,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
     }
 
     private List<JobChainV> addAllPermittedJobChains(List<JobChainV> jobChainsToAdd) {
-        if (folderPermissions == null) {
+        if (folderPermissions == null || jobChainsToAdd == null) {
             return jobChainsToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();

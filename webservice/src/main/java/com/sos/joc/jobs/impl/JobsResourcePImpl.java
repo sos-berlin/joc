@@ -139,12 +139,12 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
                 }
             }
         }
-        listOfJobs = addAllPermittedOrder(listOfJobs);
+        listOfJobs = addAllPermittedJobs(listOfJobs);
         return listOfJobs;
     }
     
-    private List<DBItemInventoryJob> addAllPermittedOrder(List<DBItemInventoryJob> jobsToAdd) {
-        if (folderPermissions == null) {
+    private List<DBItemInventoryJob> addAllPermittedJobs(List<DBItemInventoryJob> jobsToAdd) {
+        if (folderPermissions == null || jobsToAdd == null) {
             return jobsToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();
