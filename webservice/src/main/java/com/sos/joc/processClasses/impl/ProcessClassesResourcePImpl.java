@@ -62,7 +62,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
 					checkRequiredParameter("processClass", processClassPath.getProcessClass());
 					DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(
 							normalizePath(processClassPath.getProcessClass()), dbItemInventoryInstance.getId());
-					if (processClassFromDb == null) {
+                    if (processClassFromDb == null) {
 						continue;
 					}
                     if (canAdd(processClassFromDb.getName(), foldersSet)) {

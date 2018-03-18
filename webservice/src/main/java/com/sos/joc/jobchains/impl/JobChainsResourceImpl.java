@@ -21,51 +21,48 @@ import com.sos.joc.model.jobChain.JobChainsV;
 @Path("job_chains")
 public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChainsResource {
 
-	private static final String API_CALL = "./job_chains";
+    private static final String API_CALL = "./job_chains";
 
-	@Override
-	public JOCDefaultResponse postJobChains(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter)
-			throws Exception {
-		return postJobChains(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
-	}
+    @Override
+    public JOCDefaultResponse postJobChains(String xAccessToken, String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
+        return postJobChains(getAccessToken(xAccessToken, accessToken), jobChainsFilter);
+    }
 
-	public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
-		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken,
-					jobChainsFilter.getJobschedulerId(),
-					getPermissonsJocCockpit(jobChainsFilter.getJobschedulerId(), accessToken).getJobChain().getView()
-							.isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
+    public JOCDefaultResponse postJobChains(String accessToken, JobChainsFilter jobChainsFilter) throws Exception {
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken, jobChainsFilter.getJobschedulerId(),
+                    getPermissonsJocCockpit(jobChainsFilter.getJobschedulerId(), accessToken).getJobChain().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
-			JobChainsV entity = new JobChainsV();
+            JobChainsV entity = new JobChainsV();
 
-			JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
-			List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
-			List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
+            JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
+            List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
+            List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
             List<JobChainV> listOfJobChains = null;
 
-			if (jobChains != null && !jobChains.isEmpty()) {
+            if (jobChains != null && !jobChains.isEmpty()) {
                 listOfJobChains = jocXmlCommand.getJobChainsFromShowJobChain(jobChains, jobChainsFilter);
-			} else if (folders != null && !folders.isEmpty()) {
+            } else if (folders != null && !folders.isEmpty()) {
                 listOfJobChains = jocXmlCommand.getJobChainsFromShowState(folders, jobChainsFilter);
-			} else {
+            } else {
                 listOfJobChains = jocXmlCommand.getJobChainsFromShowState(jobChainsFilter);
-			}
+            }
             listOfJobChains = addAllPermittedJobChains(listOfJobChains);
             entity.setJobChains(listOfJobChains);
-			entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
-			entity.setDeliveryDate(new Date());
+            entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
+            entity.setDeliveryDate(new Date());
 
-			return JOCDefaultResponse.responseStatus200(entity);
-		} catch (JocException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatusJSError(e);
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		}
-	}
+            return JOCDefaultResponse.responseStatus200(entity);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
 
     private List<JobChainV> addAllPermittedJobChains(List<JobChainV> jobChainsToAdd) {
         if (folderPermissions == null || jobChainsToAdd == null) {
