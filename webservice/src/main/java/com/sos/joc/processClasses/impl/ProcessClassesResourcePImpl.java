@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -17,7 +18,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.processclasses.ProcessClassPermanent;
 import com.sos.joc.db.inventory.processclasses.InventoryProcessClassesDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.processClass.ProcessClassP;
 import com.sos.joc.model.processClass.ProcessClassPath;
@@ -53,6 +53,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
             List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
 
             if (processClassPaths != null && !processClassPaths.isEmpty()) {
+                Set<Folder> foldersSet = folderPermissions.getListOfFolders();
                 for (ProcessClassPath processClassPath : processClassPaths) {
                     checkRequiredParameter("processClass", processClassPath.getProcessClass());
                     DBItemInventoryProcessClass processClassFromDb = dbLayer.getProcessClass(normalizePath(processClassPath.getProcessClass()),
@@ -60,7 +61,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
                     if (processClassFromDb == null) {
                         continue;
                     }
-                    if (canAdd(processClassFromDb,processClassFromDb.getName())) {
+                    if (canAdd(processClassFromDb.getName(), foldersSet)) {
                         listOfProcessClasses.add(ProcessClassPermanent.getProcessClassP(dbLayer, processClassFromDb));
                     }
                 }
@@ -94,18 +95,21 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
         }
     }
     
-    private List<DBItemInventoryProcessClass> addAllPermittedProcessClasses(List<DBItemInventoryProcessClass> processClassesToAdd) throws SessionNotExistException{
+    private List<DBItemInventoryProcessClass> addAllPermittedProcessClasses(List<DBItemInventoryProcessClass> processClassesToAdd) {
+        if (folderPermissions == null) {
+            return processClassesToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return processClassesToAdd;
+        }
         List<DBItemInventoryProcessClass> listOfProcessClasses = new ArrayList<DBItemInventoryProcessClass>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (DBItemInventoryProcessClass processClass : processClassesToAdd)
-                if (canAdd(processClass, processClass.getName())) {
-                    listOfProcessClasses.add(processClass);
-                }
-        } else {
-            listOfProcessClasses.addAll(processClassesToAdd);
+        for (DBItemInventoryProcessClass processClass : processClassesToAdd) {
+            if (processClass != null && canAdd(processClass.getName(), folders)) {
+                listOfProcessClasses.add(processClass);
+            }
         }
         return listOfProcessClasses;
-
     }
 
 }

@@ -5,7 +5,6 @@ import javax.ws.rs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sos.auth.rest.SOSShiroFolderPermissions;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
@@ -48,11 +47,10 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
             JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
 
             String xml = "";
-            SOSShiroFolderPermissions sosShiroFolderPermissions = this.getJobschedulerUser().getSosShiroCurrentUser().getSosShiroFolderPermissions();
             for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
 
                 xml = xml + jobSchedulerCommandFactory.getXml(jobschedulerCommand);
-                if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(accessToken), sosShiroFolderPermissions)) {
+                if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(accessToken), folderPermissions)) {
                     if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
                         return accessDeniedResponse();
                     } else {

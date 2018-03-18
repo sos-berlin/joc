@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -15,7 +16,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.locks.LockPermanent;
 import com.sos.joc.db.inventory.locks.InventoryLocksDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.locks.resource.ILocksResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.lock.LockP;
@@ -91,18 +91,21 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 
     }
 
-    private List<LockP> addAllPermittedLocks(List<LockP> locksToAdd) throws SessionNotExistException {
+    private List<LockP> addAllPermittedLocks(List<LockP> locksToAdd) {
+        if (folderPermissions == null) {
+            return locksToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return locksToAdd;
+        }
         List<LockP> listOfLocks = new ArrayList<LockP>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (LockP lock : locksToAdd)
-                if (canAdd(lock, lock.getPath())) {
-                    listOfLocks.add(lock);
-                }
-        } else {
-            listOfLocks.addAll(locksToAdd);
+        for (LockP lock : locksToAdd) {
+            if (lock != null && canAdd(lock.getPath(), folders)) {
+                listOfLocks.add(lock);
+            }
         }
         return listOfLocks;
-
     }
 
 }

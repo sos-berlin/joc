@@ -6,13 +6,13 @@ import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.ReportTaskExecutionsDBLayer;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceOverviewSummary;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
 import com.sos.joc.model.job.JobsFilter;
 import com.sos.joc.model.job.JobsHistoricSummary;
@@ -56,11 +56,8 @@ public class JobsResourceOverviewSummaryImpl extends JOCResourceImpl implements 
                 }
             }
 
-            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                    reportTaskExecDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.isRecursive());
-                }
+            for (Folder folder : folderPermissions.getListOfFolders()) {
+                reportTaskExecDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
             }
 
             JobsOverView entity = new JobsOverView();

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,6 +73,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
             }
             
             List<JobChainP> jobChains = new ArrayList<JobChainP>();
+            Set<Folder> foldersSet = folderPermissions.getListOfFolders();
             if (jobChainPaths != null && !jobChainPaths.isEmpty()) {
                 for (JobChainPath jobChainPath : jobChainPaths) {
                     DBItemInventoryJobChain jobChainFromDb = dbLayer.getJobChainByPath(normalizePath(jobChainPath.getJobChain()), instanceId);
@@ -79,7 +81,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                         continue;
                     }
                     JobChainP jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
-                    if (canAdd(jobChain,jobChain.getPath())) {
+                    if (jobChain != null && canAdd(jobChain.getPath(), foldersSet)) {
                         jobChains.add(jobChain);
                         initNestedJobChainsIfExists(dbLayer, jobChain, processClassJobs);
                     }
@@ -99,7 +101,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                             } else {
                                 jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
                             }
-                            if (canAdd(jobChain,jobChain.getPath())) {
+                            if (jobChain != null && canAdd(jobChain.getPath(), foldersSet)) {
                                 jobChains.add(jobChain);
                                 initNestedJobChainsIfExists(dbLayer, jobChain, processClassJobs);
                             }
@@ -119,7 +121,7 @@ public class JobChainsResourcePImpl extends JOCResourceImpl implements IJobChain
                         } else {
                             jobChain = JobChainPermanent.initJobChainP(dbLayer, jobChainFromDb, processClassJobs, compact, instanceId);
                         }
-                        if (canAdd(jobChain,jobChain.getPath())) {
+                        if (jobChain != null && canAdd(jobChain.getPath(), foldersSet)) {
                             jobChains.add(jobChain);
                             initNestedJobChainsIfExists(dbLayer, jobChain, processClassJobs);
                         }

@@ -3,6 +3,7 @@ package com.sos.joc.jobchains.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -13,7 +14,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobchains.JOCXmlJobChainCommand;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobchains.resource.IJobChainsResource;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainPath;
@@ -57,7 +57,7 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
             } else {
                 listOfJobChains = jocXmlCommand.getJobChainsFromShowState(jobChainsFilter);
             }
-            listOfJobChains = addAllPermittedJobChainss(listOfJobChains);
+            listOfJobChains = addAllPermittedJobChains(listOfJobChains);
             entity.setJobChains(listOfJobChains);
             entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
             entity.setDeliveryDate(new Date());
@@ -73,15 +73,19 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
         }
     }
 
-    private List<JobChainV> addAllPermittedJobChainss(List<JobChainV> jobChainsToAdd) throws SessionNotExistException {
+    private List<JobChainV> addAllPermittedJobChains(List<JobChainV> jobChainsToAdd) {
+        if (folderPermissions == null) {
+            return jobChainsToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return jobChainsToAdd;
+        }
         List<JobChainV> listOfJobChains = new ArrayList<JobChainV>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (JobChainV jobChain : jobChainsToAdd)
-                if (canAdd(jobChain, jobChain.getPath())) {
-                    listOfJobChains.add(jobChain);
-                }
-        } else {
-            listOfJobChains.addAll(jobChainsToAdd);
+        for (JobChainV jobChain : jobChainsToAdd) {
+            if (jobChain != null && canAdd(jobChain.getPath(), folders)) {
+                listOfJobChains.add(jobChain);
+            }
         }
         return listOfJobChains;
 

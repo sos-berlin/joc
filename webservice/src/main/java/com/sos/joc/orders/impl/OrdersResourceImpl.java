@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,7 +15,6 @@ import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -26,9 +26,7 @@ import com.sos.joc.db.inventory.jobchains.InventoryJobChainsDBLayer;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrderV;
 import com.sos.joc.model.order.OrdersFilter;
@@ -151,18 +149,21 @@ public class OrdersResourceImpl extends JOCResourceImpl implements IOrdersResour
         }
     }
 
-    private List<OrderV> addAllPermittedOrders(List<OrderV> ordersToAdd) throws SessionNotExistException {
+    private List<OrderV> addAllPermittedOrders(List<OrderV> ordersToAdd) {
+        if (folderPermissions == null) {
+            return ordersToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return ordersToAdd;
+        }
         List<OrderV> listOfOrders = new ArrayList<OrderV>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (OrderV order : ordersToAdd)
-                if (canAdd(order, order.getPath())) {
-                    listOfOrders.add(order);
-                }
-        } else {
-            listOfOrders.addAll(ordersToAdd);
+        for (OrderV order : ordersToAdd) {
+            if (order != null && canAdd(order.getPath(), folders)) {
+                listOfOrders.add(order);
+            }
         }
         return listOfOrders;
-
     }
 
 }

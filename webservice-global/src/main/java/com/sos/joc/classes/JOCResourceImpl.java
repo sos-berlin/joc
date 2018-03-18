@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sos.auth.rest.SOSShiroFolderPermissions;
 import com.sos.auth.rest.permission.model.SOSPermissionCommands;
 import com.sos.auth.rest.permission.model.SOSPermissionJocCockpit;
 import com.sos.hibernate.classes.SOSHibernateSession;
@@ -21,7 +23,6 @@ import com.sos.jitl.dailyplan.db.DailyPlanCalender2DBFilter;
 import com.sos.jitl.dailyplan.job.CreateDailyPlanOptions;
 import com.sos.jitl.reporting.db.DBItemInventoryInstance;
 import com.sos.jitl.reporting.db.DBLayer;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.audit.IAuditLog;
 import com.sos.joc.classes.audit.JocAuditLog;
@@ -41,6 +42,7 @@ public class JOCResourceImpl {
 
     protected DBItemInventoryInstance dbItemInventoryInstance;
     protected JobSchedulerUser jobschedulerUser;
+    protected SOSShiroFolderPermissions folderPermissions;
     private static final Logger LOGGER = LoggerFactory.getLogger(JOCResourceImpl.class);
     private String accessToken;
     private String jobschedulerId;
@@ -272,7 +274,8 @@ public class JOCResourceImpl {
             throw new JocMissingRequiredParameterException("undefined 'jobschedulerId'");
         } else {
             jobschedulerId = schedulerId;
-            jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().setSchedulerId(schedulerId);
+            folderPermissions = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions();
+            folderPermissions.setSchedulerId(schedulerId);
         }
         if (!"".equals(schedulerId)) {
             dbItemInventoryInstance = jobschedulerUser.getSchedulerInstance(schedulerId);
@@ -362,21 +365,13 @@ public class JOCResourceImpl {
         }
     }
 
-    protected boolean canAdd(Object o, String path) throws SessionNotExistException {
-        return (o != null && jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().isPermittedForFolder(getParent(path)));
+    protected boolean canAdd(String path, Set<Folder> listOfFolders) {
+        return folderPermissions.isPermittedForFolder(getParent(path), listOfFolders);
     }
 
-    protected List<Folder> addPermittedFolder(List<Folder> folders) throws SessionNotExistException {
-        if (folders == null || folders.size() == 0) {
-            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                    Folder f = new Folder();
-                    f.setFolder(folder.getFolder());
-                    f.setRecursive(folder.isRecursive());
-                    folders.add(f);
-                }
-            }
+    protected List<Folder> addPermittedFolder(List<Folder> folders) {
+        if (folders == null || folders.isEmpty()) {
+            folders = new ArrayList<Folder>(folderPermissions.getListOfFolders());
         }
         return folders;
     }

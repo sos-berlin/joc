@@ -19,13 +19,13 @@ import com.sos.jitl.dailyplan.db.DailyPlanDBLayer;
 import com.sos.jitl.dailyplan.db.DailyPlanWithReportExecutionDBItem;
 import com.sos.jitl.dailyplan.db.DailyPlanWithReportTriggerDBItem;
 import com.sos.jitl.dailyplan.job.CreateDailyPlanOptions;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JobSchedulerDate;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.common.Err;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.plan.Period;
 import com.sos.joc.model.plan.Plan;
 import com.sos.joc.model.plan.PlanCreated;
@@ -154,11 +154,8 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
                 }
             }
 
-            if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-                for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size(); i++) {
-                    FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-                    dailyPlanDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.isRecursive());
-                }
+            for (Folder folder : folderPermissions.getListOfFolders()) {
+                dailyPlanDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
             }
 
             Matcher regExMatcher = null;

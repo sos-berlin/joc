@@ -20,7 +20,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.processclasses.ProcessClassesVCallable;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.processClass.ProcessClassPath;
 import com.sos.joc.model.processClass.ProcessClassV;
@@ -116,18 +115,21 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
         }
     }
 
-    private List<ProcessClassV> addAllPermittedJobs(List<ProcessClassV> processClassesToAdd) throws SessionNotExistException {
+    private List<ProcessClassV> addAllPermittedJobs(List<ProcessClassV> processClassesToAdd) {
+        if (folderPermissions == null) {
+            return processClassesToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return processClassesToAdd;
+        }
         List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (ProcessClassV processClass : processClassesToAdd)
-                if (canAdd(processClass, processClass.getPath())) {
-                    listOfProcessClasses.add(processClass);
-                }
-        } else {
-            listOfProcessClasses.addAll(processClassesToAdd);
+        for (ProcessClassV processClass : processClassesToAdd) {
+            if (processClass != null && canAdd(processClass.getPath(), folders)) {
+                listOfProcessClasses.add(processClass);
+            }
         }
         return listOfProcessClasses;
-
     }
 
 }

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,6 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JobPermanent;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobs.resource.IJobsResourceP;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobP;
@@ -143,18 +143,21 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
         return listOfJobs;
     }
     
-    private List<DBItemInventoryJob> addAllPermittedOrder(List<DBItemInventoryJob> jobsToAdd) throws SessionNotExistException{
+    private List<DBItemInventoryJob> addAllPermittedOrder(List<DBItemInventoryJob> jobsToAdd) {
+        if (folderPermissions == null) {
+            return jobsToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return jobsToAdd;
+        }
         List<DBItemInventoryJob> listOfJobs = new ArrayList<DBItemInventoryJob>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (DBItemInventoryJob job : jobsToAdd)
-                if (canAdd(job, job.getName())) {
-                    listOfJobs.add(job);
-                }
-        } else {
-            listOfJobs.addAll(jobsToAdd);
+        for (DBItemInventoryJob job : jobsToAdd) {
+            if (job != null && canAdd(job.getName(), folders)) {
+                listOfJobs.add(job);
+            }
         }
         return listOfJobs;
-
     }
 
 }

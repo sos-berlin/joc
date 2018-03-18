@@ -3,18 +3,17 @@ package com.sos.joc.jobs.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.DBItemInventoryJob;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.jobs.JOCXmlJobCommand;
 import com.sos.joc.db.inventory.jobs.InventoryJobsDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.jobs.resource.IJobsResource;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.job.JobPath;
@@ -73,18 +72,21 @@ public class JobsResourceImpl extends JOCResourceImpl implements IJobsResource {
         }
     }
     
-    private List<JobV> addAllPermittedJobs(List<JobV> jobsToAdd) throws SessionNotExistException{
+    private List<JobV> addAllPermittedJobs(List<JobV> jobsToAdd) {
+        if (folderPermissions == null) {
+            return jobsToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return jobsToAdd;
+        }
         List<JobV> listOfJobs = new ArrayList<JobV>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (JobV job : jobsToAdd)
-                if (canAdd(job, job.getPath())) {
-                    listOfJobs.add(job);
-                }
-        } else {
-            listOfJobs.addAll(jobsToAdd);
+        for (JobV job : jobsToAdd) {
+            if (job != null && canAdd(job.getPath(), folders)) {
+                listOfJobs.add(job);
+            }
         }
         return listOfJobs;
-
     }
 
 }

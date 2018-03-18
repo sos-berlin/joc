@@ -88,7 +88,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 
             /** set DBItem with values from parameters */
             JocConfigurationDbItem dbItem = new JocConfigurationDbItem();
-            if (configuration.getId() != null) {
+            if (configuration.getId() != null && configuration.getId() != 0L) {
                 dbItem = jocConfigurationDBLayer.getJocConfiguration(configuration.getId());
                 if (dbItem == null) {
                     throw new DBMissingDataException(String.format("no entry found for configuration id: %d", configuration.getId()));
@@ -123,10 +123,10 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
             }
 
             /** check id from parameters if DBItem is new (id==0) or has to be updated (id != 0) */
-            if (configuration.getId() == null || configuration.getId() == 0) {
+            if (configuration.getId() == null || configuration.getId() == 0L) {
                 dbItem.setId(null);
             } else {
-                dbItem.setId(configuration.getId().longValue());
+                dbItem.setId(configuration.getId());
             }
 
             /** save item to DB */

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,9 +18,7 @@ import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.OrderPermanent;
 import com.sos.joc.db.inventory.orders.InventoryOrdersDBLayer;
 import com.sos.joc.exceptions.JocException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.lock.LockP;
 import com.sos.joc.model.order.OrderPath;
 import com.sos.joc.model.order.OrdersFilter;
 import com.sos.joc.model.order.OrdersP;
@@ -77,9 +76,10 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
                 }
             } else if (regex != null && !regex.isEmpty()) {
                 List<DBItemInventoryOrder> unfilteredOrders = dbLayer.getInventoryOrders(instanceId);
+                Set<Folder> foldersSet = folderPermissions.getListOfFolders();
                 for (DBItemInventoryOrder unfilteredOrder : unfilteredOrders) {
                     Matcher regExMatcher = Pattern.compile(regex).matcher(unfilteredOrder.getName());
-                    if (regExMatcher.find() && canAdd(unfilteredOrder,unfilteredOrder.getName())) {
+                    if (regExMatcher.find() && canAdd(unfilteredOrder.getName(), foldersSet)) {
                         ordersFromDB.add(unfilteredOrder);
                     }
                 }
@@ -103,17 +103,20 @@ public class OrdersResourcePImpl extends JOCResourceImpl implements IOrdersResou
         }
     }
 
-    private List<DBItemInventoryOrder> addAllPermittedOrder(List<DBItemInventoryOrder> ordersToAdd) throws SessionNotExistException{
+    private List<DBItemInventoryOrder> addAllPermittedOrder(List<DBItemInventoryOrder> ordersToAdd) {
+        if (folderPermissions == null) {
+            return ordersToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return ordersToAdd;
+        }
         List<DBItemInventoryOrder> listOfOrders = new ArrayList<DBItemInventoryOrder>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (DBItemInventoryOrder order : ordersToAdd)
-                if (canAdd(order, order.getName())) {
-                    listOfOrders.add(order);
-                }
-        } else {
-            listOfOrders.addAll(ordersToAdd);
+        for (DBItemInventoryOrder order : ordersToAdd) {
+            if (order != null && canAdd(order.getName(), folders)) {
+                listOfOrders.add(order);
+            }
         }
         return listOfOrders;
-
     }
 }

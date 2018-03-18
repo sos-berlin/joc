@@ -23,9 +23,7 @@ import com.sos.joc.classes.schedule.ScheduleVolatile;
 import com.sos.joc.db.inventory.schedules.InventorySchedulesDBLayer;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.exceptions.JocMissingRequiredParameterException;
-import com.sos.joc.exceptions.SessionNotExistException;
 import com.sos.joc.model.common.Folder;
-import com.sos.joc.model.job.JobV;
 import com.sos.joc.model.schedule.SchedulePath;
 import com.sos.joc.model.schedule.ScheduleV;
 import com.sos.joc.model.schedule.SchedulesFilter;
@@ -132,17 +130,20 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
         return false;
     }
     
-    private List<ScheduleV> addAllPermittedJobs(List<ScheduleV> schedulesToAdd) throws SessionNotExistException{
+    private List<ScheduleV> addAllPermittedJobs(List<ScheduleV> schedulesToAdd) {
+        if (folderPermissions == null) {
+            return schedulesToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return schedulesToAdd;
+        }
         List<ScheduleV> listOfSchedules = new ArrayList<ScheduleV>();
-        if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-            for (ScheduleV schedule : schedulesToAdd)
-                if (canAdd(schedule, schedule.getPath())) {
-                    listOfSchedules.add(schedule);
-                }
-        } else {
-            listOfSchedules.addAll(schedulesToAdd);
+        for (ScheduleV schedule : schedulesToAdd) {
+            if (schedule != null && canAdd(schedule.getPath(), folders)) {
+                listOfSchedules.add(schedule);
+            }
         }
         return listOfSchedules;
-
     }
 }
