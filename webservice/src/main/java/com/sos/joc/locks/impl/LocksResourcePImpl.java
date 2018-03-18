@@ -94,7 +94,7 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
     }
 
     private List<LockP> addAllPermittedLocks(List<LockP> locksToAdd) {
-        if (folderPermissions == null) {
+        if (folderPermissions == null || locksToAdd == null) {
             return locksToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();

@@ -99,7 +99,7 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
 			}
 
 			SchedulesV entity = new SchedulesV();
-            listOfSchedules = addAllPermittedJobs(listOfSchedules);
+            listOfSchedules = addAllPermittedSchedules(listOfSchedules);
 			entity.setSchedules(listOfSchedules);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);
@@ -135,8 +135,8 @@ public class SchedulesResourceImpl extends JOCResourceImpl implements ISchedules
 		return false;
     }
     
-    private List<ScheduleV> addAllPermittedJobs(List<ScheduleV> schedulesToAdd) {
-        if (folderPermissions == null) {
+    private List<ScheduleV> addAllPermittedSchedules(List<ScheduleV> schedulesToAdd) {
+        if (folderPermissions == null || schedulesToAdd == null) {
             return schedulesToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();

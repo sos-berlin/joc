@@ -101,7 +101,7 @@ public class ProcessClassesResourcePImpl extends JOCResourceImpl implements IPro
     }
     
     private List<DBItemInventoryProcessClass> addAllPermittedProcessClasses(List<DBItemInventoryProcessClass> processClassesToAdd) {
-        if (folderPermissions == null) {
+        if (folderPermissions == null || processClassesToAdd == null) {
             return processClassesToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();

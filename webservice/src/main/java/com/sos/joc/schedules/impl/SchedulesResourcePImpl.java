@@ -132,7 +132,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 	}
 
     private List<DBItemInventorySchedule> addAllPermittedSchedules(List<DBItemInventorySchedule> schedulesClassesToAdd) {
-        if (folderPermissions == null) {
+        if (folderPermissions == null || schedulesClassesToAdd == null) {
             return schedulesClassesToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();

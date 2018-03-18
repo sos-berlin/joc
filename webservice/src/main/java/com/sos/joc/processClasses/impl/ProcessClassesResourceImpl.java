@@ -105,7 +105,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 				}
 			}
 
-            listProcessClasses = addAllPermittedJobs(listProcessClasses);
+            listProcessClasses = addAllPermittedProcessClasses(listProcessClasses);
             entity.setProcessClasses(listProcessClasses);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);
@@ -121,8 +121,8 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 		}
 	}
 
-    private List<ProcessClassV> addAllPermittedJobs(List<ProcessClassV> processClassesToAdd) {
-        if (folderPermissions == null) {
+    private List<ProcessClassV> addAllPermittedProcessClasses(List<ProcessClassV> processClassesToAdd) {
+        if (folderPermissions == null || processClassesToAdd == null) {
             return processClassesToAdd;
         }
         Set<Folder> folders = folderPermissions.getListOfFolders();
