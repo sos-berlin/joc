@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,6 +115,7 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 	private List<ScheduleP> getSchedulesToAdd(InventorySchedulesDBLayer dbLayer,
 			List<DBItemInventorySchedule> schedulesFromDb, DBItemInventoryInstance instance) throws Exception {
 		List<ScheduleP> schedulesToAdd = new ArrayList<ScheduleP>();
+        schedulesFromDb = addAllPermittedSchedules(schedulesFromDb);
 		if (schedulesFromDb != null) {
 			for (DBItemInventorySchedule scheduleFromDb : schedulesFromDb) {
 				if (regex != null && !regex.isEmpty()) {
@@ -129,4 +131,20 @@ public class SchedulesResourcePImpl extends JOCResourceImpl implements ISchedule
 		return schedulesToAdd;
 	}
 
+    private List<DBItemInventorySchedule> addAllPermittedSchedules(List<DBItemInventorySchedule> schedulesClassesToAdd) {
+        if (folderPermissions == null) {
+            return schedulesClassesToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return schedulesClassesToAdd;
+        }
+        List<DBItemInventorySchedule> listOfSchedules = new ArrayList<DBItemInventorySchedule>();
+        for (DBItemInventorySchedule schedule : schedulesClassesToAdd) {
+            if (schedule != null && canAdd(schedule.getName(), folders)) {
+                listOfSchedules.add(schedule);
+            }
+        }
+        return listOfSchedules;
+    }
 }

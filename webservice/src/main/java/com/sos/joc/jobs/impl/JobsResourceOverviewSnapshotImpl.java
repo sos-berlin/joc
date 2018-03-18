@@ -2,7 +2,6 @@ package com.sos.joc.jobs.impl;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.ws.rs.Path;
@@ -10,18 +9,16 @@ import javax.ws.rs.Path;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.JOCXmlCommand;
 import com.sos.joc.classes.WebserviceConstants;
 import com.sos.joc.classes.configuration.ConfigurationStatus;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
-import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobs.resource.IJobsResourceOverviewSnapshot;
 import com.sos.joc.model.common.ConfigurationState;
+import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.common.JobSchedulerId;
 import com.sos.joc.model.job.JobStateText;
 import com.sos.joc.model.job.JobsSnapshot;
@@ -35,7 +32,6 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
 	@Override
 	public JOCDefaultResponse postJobsOverviewSnapshot(String accessToken, JobSchedulerId jobScheduler)
 			throws Exception {
-		String folders = "";
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobScheduler, accessToken,
 					jobScheduler.getJobschedulerId(),
@@ -44,38 +40,23 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
 			if (jocDefaultResponse != null) {
 				return jocDefaultResponse;
 			}
-			Set<String> recursiveFolderSet = new HashSet<String>();
-			Set<String> nonRecursiveFolderSet = new HashSet<String>();
-			FilterFolder folder = new FilterFolder();
-			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
-						.size(); i++) {
-					folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().get(i);
-					if (folder.isRecursive()) {
-						recursiveFolderSet.add(folder.getFolder());
-					} else {
-						nonRecursiveFolderSet.add(folder.getFolder());
-					}
-					folders = folders + folder.getFolder() + ",";
-				}
-			}
 
-			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
-			String command = jocXmlCommand.getShowStateCommand("job", "", "", 0, 0);
-			jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
-			Integer countPending = 0;
-			Integer countRunning = 0;
-			Integer countStopped = 0;
-			Integer countWaitingForResource = 0;
-			Integer countRunningTasks = 0;
-			Integer countQueuedTasks = 0;
-			Integer curRunningTasks = 0;
-			Integer curQueuedTasks = 0;
-			NodeList jobStatistics = jocXmlCommand.getSosxml()
-					.selectNodeList("//job[not(@path='/scheduler_file_order_sink') and @enabled='yes']");
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(this);
+            String command = jocXmlCommand.getShowStateCommand("job", "", "", 0, 0);
+            jocXmlCommand.executePostWithThrowBadRequestAfterRetry(command, accessToken);
+            Integer countPending = 0;
+            Integer countRunning = 0;
+            Integer countStopped = 0;
+            Integer countWaitingForResource = 0;
+            Integer countRunningTasks = 0;
+            Integer countQueuedTasks = 0;
+            Integer curRunningTasks = 0;
+            Integer curQueuedTasks = 0;
+            NodeList jobStatistics = jocXmlCommand.getSosxml().selectNodeList("//job[not(@path='/scheduler_file_order_sink') and @enabled='yes']");
+            Set<Folder> folders = folderPermissions.getListOfFolders();
 			for (int i = 0; i < jobStatistics.getLength(); i++) {
 				Element job = (Element) jobStatistics.item(i);
-				if (!jobIsInFolder(job.getAttribute("path"), recursiveFolderSet, nonRecursiveFolderSet)) {
+                if (!jobIsInFolder(job.getAttribute("path"), folders)) {
 					continue;
 				}
 				curRunningTasks = getNumOfRunningTasks(jocXmlCommand, job);
@@ -126,12 +107,6 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
 		} catch (JobSchedulerConnectionResetException e) {
 			e.addErrorMetaInfo(getJocError());
 			return JOCDefaultResponse.responseStatus434JSError(e);
-		} catch (JobSchedulerObjectNotExistException e) {
-			JocError err = new JocError();
-			err.setMessage(String.format("%s: Please check your folders in the Account Management (%s)", e.getMessage(),
-					folders));
-			JocException ee = new JocException(err);
-			return JOCDefaultResponse.responseStatusJSError(ee);
 		} catch (JocException e) {
 			e.addErrorMetaInfo(getJocError());
 			return JOCDefaultResponse.responseStatusJSError(e);
@@ -208,20 +183,10 @@ public class JobsResourceOverviewSnapshotImpl extends JOCResourceImpl implements
 		return "yes".equals(getAttributeValue(job, "order", "no"));
 	}
 
-	private boolean jobIsInFolder(String path, Set<String> recursiveFolderSet, Set<String> nonRecursiveFolderSet) {
+    private boolean jobIsInFolder(String path, Set<Folder> folders) {
 		if (path == null || path.isEmpty()) {
 			return false;
 		}
-		if (nonRecursiveFolderSet.isEmpty() || nonRecursiveFolderSet.contains(path)) {
-			return true;
-		}
-		if (recursiveFolderSet.isEmpty() || recursiveFolderSet.contains(path)) {
-			return true;
-		}
-		for (String s : recursiveFolderSet) {
-			path.startsWith(s);
-			return true;
-		}
-		return false;
+        return folderPermissions.isPermittedForFolder(getParent(path), folders);
 	}
 }

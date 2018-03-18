@@ -1,117 +1,97 @@
 package com.sos.auth.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import com.sos.jitl.reporting.db.filter.FilterFolder;
-import com.sos.joc.Globals;
+import com.sos.joc.model.common.Folder;
 
 public class SOSShiroFolderPermissions {
 
-	private Map<String, ArrayList<FilterFolder>> listOfFoldersForInstance;
-	private String schedulerId;
-    private boolean force=false;
+    private Map<String, Set<Folder>> listOfFoldersForInstance;
+    private String schedulerId;
+    private boolean force = false;
+
+    public SOSShiroFolderPermissions() {
+        listOfFoldersForInstance = new HashMap<String, Set<Folder>>();
+    }
+
+    private Set<Folder> getListOfFolders(String jobSchedulerId) {
+        Set<Folder> retListOfFolders = new HashSet<Folder>();
+        if (jobSchedulerId != null) {
+            Set<Folder> listOfFolders = listOfFoldersForInstance.get(jobSchedulerId);
+            if (listOfFolders != null) {
+                retListOfFolders.addAll(listOfFolders);
+            }
+        }
+        Set<Folder> listOfFoldersDefault = listOfFoldersForInstance.get("");
+        if (listOfFoldersDefault != null) {
+            retListOfFolders.addAll(listOfFoldersDefault);
+        }
+
+        return retListOfFolders;
+    }
+
+    public void setFolders(String jobSchedulerId, String folders) {
+        String[] stringlistOfFolders = folders.split(",");
+        Set<Folder> listOfFolders = listOfFoldersForInstance.get(jobSchedulerId);
+        if (listOfFolders == null) {
+            listOfFolders = new HashSet<Folder>();
+        }
+
+        for (int i = 0; i < stringlistOfFolders.length; i++) {
+            String f = stringlistOfFolders[i].trim();
+            Folder filterFolder = new Folder();
+            filterFolder.setRecursive(f.endsWith("/*"));
+            filterFolder.setFolder(normalizeFolder(f));
+            listOfFolders.add(filterFolder);
+        }
+        listOfFoldersForInstance.put(jobSchedulerId, listOfFolders);
+    }
+
+    private String normalizeFolder(String folder) {
+        folder = ("/" + folder.trim()).replaceAll("//+", "/").replaceFirst("/\\*?$", "");
+        if (folder.isEmpty()) {
+            folder = "/";
+        }
+        return folder;
+    }
+
+    public boolean isPermittedForFolder(String folder) {
+        return isPermittedForFolder(folder, getListOfFolders());
+    }
     
-	public SOSShiroFolderPermissions() {
-		super();
-		listOfFoldersForInstance = new HashMap<String, ArrayList<FilterFolder>>();
-	}
+    public boolean isPermittedForFolder(String folder, Set<Folder> listOfFolders) {
+        if (this.force) {
+            return true;
+        }
+        if (listOfFolders == null || listOfFolders.isEmpty()) {
+            return true;
+        }
+        folder = normalizeFolder(folder);
 
-	private ArrayList<FilterFolder> getListOfFolders(String jobSchedulerId) {
-        ArrayList<FilterFolder> retListOfFolders = new ArrayList<FilterFolder>();
-		ArrayList<FilterFolder> listOfFolders = listOfFoldersForInstance.get(jobSchedulerId);
-		if (listOfFolders != null) {
-			retListOfFolders.addAll(listOfFolders);
-		}
-		ArrayList<FilterFolder> listOfFoldersDefault = listOfFoldersForInstance.get("");
-		if (listOfFoldersDefault != null) {
-			retListOfFolders.addAll(listOfFoldersDefault);
-		}
+        for (Folder f : listOfFolders) {
+            if (f.getFolder().equals(folder)) {
+                return true;
+            }
+            if (f.getRecursive() && folder.startsWith(f.getFolder() + "/")) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-		return retListOfFolders;
-	}
+    public Set<Folder> getListOfFolders() {
+        return getListOfFolders(schedulerId);
+    }
 
-	public void setFolders(String jobSchedulerId, String folders) {
-		String[] stringlistOfFolders = folders.split(",");
-		ArrayList<FilterFolder> listOfFolders = listOfFoldersForInstance.get(jobSchedulerId);
-		if (listOfFolders == null) {
-			listOfFolders = new ArrayList<FilterFolder>();
-		}
+    public void setSchedulerId(String schedulerId) {
+        this.schedulerId = schedulerId;
+    }
 
-		for (int i = 0; i < stringlistOfFolders.length; i++) {
-			String f = stringlistOfFolders[i].trim();
-			FilterFolder filterFolder = new FilterFolder();
-			if (f.endsWith("/*")) {
-				filterFolder.setRecursive(true);
-				filterFolder.setFolder(("/" + f.trim()).replaceAll("//+", "/").replaceFirst("/\\*$", ""));
-			} else {
-				filterFolder.setRecursive(false);
-				filterFolder.setFolder(f);
-			}
-			listOfFolders.add(filterFolder);
-		}
-		listOfFoldersForInstance.put(jobSchedulerId, listOfFolders);
-	}
-
-	public boolean isPermittedForFolder(String folder) {
-	    if (this.force){
-	        return true;
-	    }
-       folder = Globals.normalizePath(folder);
-
-		ArrayList<FilterFolder> listOfFolders = getListOfFolders(schedulerId);
-
-		if (listOfFolders == null || listOfFolders.size() == 0) {
-			return true;
-		}
-
-		for (int i = 0; i < listOfFolders.size(); i++) {
-			FilterFolder f = listOfFolders.get(i);
-			if (f.isRecursive()) {
-				if (folder.startsWith(f.getFolder())) {
-					return true;
-				}
-			} else {
-				if (f.getFolder().equals(folder)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public int size() {
-		ArrayList<FilterFolder> listOfFolders = getListOfFolders(schedulerId);
-		return listOfFolders.size();
-	}
-
-	public FilterFolder get(int i) {
-		ArrayList<FilterFolder> listOfFolders = getListOfFolders(schedulerId);
-		return listOfFolders.get(i);
-	}
-
-	public String getFolderPermissionsWhere(String field) {
-		ArrayList<FilterFolder> listOfFolders = getListOfFolders(schedulerId);
-		String s = "1=1";
-		for (int i = 0; i < listOfFolders.size(); i++) {
-			FilterFolder f = listOfFolders.get(i);
-			if (f.isRecursive()) {
-				s = s + " and " + field + " like " + f.getFolder();
-			} else {
-				s = s + " and " + field + " = " + f.getFolder();
-			}
-		}
-		return s;
-	}
-
-	public void setSchedulerId(String schedulerId) {
-		this.schedulerId = schedulerId;
-	}
-	
     public void setForce(boolean force) {
         this.force = force;
     }
-
 
 }

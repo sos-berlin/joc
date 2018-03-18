@@ -1,7 +1,9 @@
 package com.sos.joc.jobchains.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
@@ -12,6 +14,7 @@ import com.sos.joc.exceptions.JocException;
 import com.sos.joc.jobchains.resource.IJobChainsResource;
 import com.sos.joc.model.common.Folder;
 import com.sos.joc.model.jobChain.JobChainPath;
+import com.sos.joc.model.jobChain.JobChainV;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.jobChain.JobChainsV;
 
@@ -41,14 +44,17 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
 			JOCXmlJobChainCommand jocXmlCommand = new JOCXmlJobChainCommand(this, accessToken);
 			List<JobChainPath> jobChains = jobChainsFilter.getJobChains();
 			List<Folder> folders = addPermittedFolder(jobChainsFilter.getFolders());
+            List<JobChainV> listOfJobChains = null;
 
 			if (jobChains != null && !jobChains.isEmpty()) {
-				entity.setJobChains(jocXmlCommand.getJobChainsFromShowJobChain(jobChains, jobChainsFilter));
+                listOfJobChains = jocXmlCommand.getJobChainsFromShowJobChain(jobChains, jobChainsFilter);
 			} else if (folders != null && !folders.isEmpty()) {
-				entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(folders, jobChainsFilter));
+                listOfJobChains = jocXmlCommand.getJobChainsFromShowState(folders, jobChainsFilter);
 			} else {
-				entity.setJobChains(jocXmlCommand.getJobChainsFromShowState(jobChainsFilter));
+                listOfJobChains = jocXmlCommand.getJobChainsFromShowState(jobChainsFilter);
 			}
+            listOfJobChains = addAllPermittedJobChains(listOfJobChains);
+            entity.setJobChains(listOfJobChains);
 			entity.setNestedJobChains(jocXmlCommand.getNestedJobChains());
 			entity.setDeliveryDate(new Date());
 
@@ -61,4 +67,21 @@ public class JobChainsResourceImpl extends JOCResourceImpl implements IJobChains
 		}
 	}
 
+    private List<JobChainV> addAllPermittedJobChains(List<JobChainV> jobChainsToAdd) {
+        if (folderPermissions == null) {
+            return jobChainsToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return jobChainsToAdd;
+        }
+        List<JobChainV> listOfJobChains = new ArrayList<JobChainV>();
+        for (JobChainV jobChain : jobChainsToAdd) {
+            if (jobChain != null && canAdd(jobChain.getPath(), folders)) {
+                listOfJobChains.add(jobChain);
+            }
+        }
+        return listOfJobChains;
+
+    }
 }

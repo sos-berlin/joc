@@ -11,7 +11,6 @@ import javax.ws.rs.Path;
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemReportTrigger;
 import com.sos.jitl.reporting.db.ReportTriggerDBLayer;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -112,15 +111,9 @@ public class OrdersResourceHistoryImpl extends JOCResourceImpl implements IOrder
 				}
 			}
 
-			if (jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
-						.size(); i++) {
-					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
-							.get(i);
-					reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()),
-							folder.isRecursive());
-				}
-			}
+            for (Folder folder : folderPermissions.getListOfFolders()) {
+                reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
+            }
 
 			if (ordersFilter.getLimit() == null) {
 				ordersFilter.setLimit(WebserviceConstants.HISTORY_RESULTSET_LIMIT);

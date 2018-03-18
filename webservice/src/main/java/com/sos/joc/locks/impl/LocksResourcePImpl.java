@@ -4,12 +4,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
 import com.sos.jitl.reporting.db.DBItemInventoryLock;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCResourceImpl;
@@ -57,39 +57,28 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 			InventoryLocksDBLayer dbLayer = new InventoryLocksDBLayer(connection);
 			LocksP entity = new LocksP();
 			List<LockP> listOfLocks = new ArrayList<LockP>();
-			if (locks != null && !locks.isEmpty()) {
-				List<LockP> locksToAdd = new ArrayList<LockP>();
-				for (LockPath lockPath : locks) {
-					DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()),
-							dbItemInventoryInstance.getId());
-					if (lockFromDb == null) {
-						continue;
-					}
-					LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
-					if (lock != null) {
-						locksToAdd.add(lock);
-					}
-				}
-				if (locksToAdd != null && !locksToAdd.isEmpty()) {
-					listOfLocks.addAll(locksToAdd);
-				}
-			} else if (folders != null && !folders.isEmpty()) {
-				for (Folder folder : folders) {
-					List<DBItemInventoryLock> locksFromDb = null;
-					locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()),
-							dbItemInventoryInstance.getId(), folder.getRecursive().booleanValue());
-					List<LockP> locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
-					if (locksToAdd != null && !locksToAdd.isEmpty()) {
-						listOfLocks.addAll(locksToAdd);
-					}
-				}
-			} else {
-				List<DBItemInventoryLock> locksFromDb = dbLayer.getLocks(dbItemInventoryInstance.getId());
-				List<LockP> locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
-				if (locksToAdd != null && !locksToAdd.isEmpty()) {
-					listOfLocks.addAll(locksToAdd);
-				}
-			}
+            List<LockP> locksToAdd = new ArrayList<LockP>();
+            if (locks != null && !locks.isEmpty()) {
+                for (LockPath lockPath : locks) {
+                    DBItemInventoryLock lockFromDb = dbLayer.getLock(normalizePath(lockPath.getLock()), dbItemInventoryInstance.getId());
+                    if (lockFromDb == null) {
+                        continue;
+                    }
+                    LockP lock = LockPermanent.getLockP(dbLayer, lockFromDb);
+                    locksToAdd.add(lock);
+                }
+            } else if (folders != null && !folders.isEmpty()) {
+                for (Folder folder : folders) {
+                    List<DBItemInventoryLock> locksFromDb = null;
+                    locksFromDb = dbLayer.getLocksByFolders(normalizeFolder(folder.getFolder()), dbItemInventoryInstance.getId(), folder
+                            .getRecursive().booleanValue());
+                    locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
+                }
+            } else {
+                List<DBItemInventoryLock> locksFromDb = dbLayer.getLocks(dbItemInventoryInstance.getId());
+                locksToAdd = LockPermanent.getListOfLocksToAdd(dbLayer, locksFromDb, regex);
+            }
+            listOfLocks = addAllPermittedLocks(locksToAdd);
 			entity.setLocks(listOfLocks);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);
@@ -102,6 +91,23 @@ public class LocksResourcePImpl extends JOCResourceImpl implements ILocksResourc
 			Globals.disconnect(connection);
 		}
 
+    }
+
+    private List<LockP> addAllPermittedLocks(List<LockP> locksToAdd) {
+        if (folderPermissions == null) {
+            return locksToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return locksToAdd;
+        }
+        List<LockP> listOfLocks = new ArrayList<LockP>();
+        for (LockP lock : locksToAdd) {
+            if (lock != null && canAdd(lock.getPath(), folders)) {
+                listOfLocks.add(lock);
+            }
+        }
+        return listOfLocks;
 	}
 
 }

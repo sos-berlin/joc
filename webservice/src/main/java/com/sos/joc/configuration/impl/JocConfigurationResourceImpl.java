@@ -144,7 +144,7 @@ public class JocConfigurationResourceImpl extends JOCResourceImpl implements IJo
 			if (configuration.getId() == null || configuration.getId() == 0) {
 				dbItem.setId(null);
 			} else {
-				dbItem.setId(configuration.getId().longValue());
+				dbItem.setId(configuration.getId());
 			}
 
 			/** save item to DB */

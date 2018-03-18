@@ -60,6 +60,7 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
 			}
 
 			List<LockV> locksV = new ArrayList<LockV>();
+            Set<Folder> foldersSet = folderPermissions.getListOfFolders();
 			for (int i = 0; i < locks.getLength(); i++) {
 				Element lock = (Element) locks.item(i);
 
@@ -72,7 +73,9 @@ public class LocksResourceImpl extends JOCResourceImpl implements ILocksResource
 
 				LockVolatile lockV = new LockVolatile(lock, jocXmlCommand);
 				lockV.setFields();
-				locksV.add(lockV);
+                if (canAdd(lockV.getPath(), foldersSet)) {
+                    locksV.add(lockV);
+                }
 			}
 
 			LocksV entity = new LocksV();

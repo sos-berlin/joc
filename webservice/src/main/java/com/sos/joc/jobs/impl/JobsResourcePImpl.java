@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +58,7 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
 
 			jobs = jobsFilter.getJobs();
 			isOrderJob = jobsFilter.getIsOrderJob();
+
 			List<JobP> listJobs = new ArrayList<JobP>();
 			InventoryJobsDBLayer dbLayer = new InventoryJobsDBLayer(session);
 			Long instanceId = dbItemInventoryInstance.getId();
@@ -139,9 +141,27 @@ public class JobsResourcePImpl extends JOCResourceImpl implements IJobsResourceP
 				} else {
 					listOfJobs.addAll(unfilteredJobs);
 				}
-			}
-		}
-		return listOfJobs;
-	}
+            }
+        }
+        listOfJobs = addAllPermittedOrder(listOfJobs);
+        return listOfJobs;
+    }
+    
+    private List<DBItemInventoryJob> addAllPermittedOrder(List<DBItemInventoryJob> jobsToAdd) {
+        if (folderPermissions == null) {
+            return jobsToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return jobsToAdd;
+        }
+        List<DBItemInventoryJob> listOfJobs = new ArrayList<DBItemInventoryJob>();
+        for (DBItemInventoryJob job : jobsToAdd) {
+            if (job != null && canAdd(job.getName(), folders)) {
+                listOfJobs.add(job);
+            }
+        }
+        return listOfJobs;
+    }
 
 }

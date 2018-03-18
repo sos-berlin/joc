@@ -2,14 +2,11 @@ package com.sos.joc.orders.impl;
 
 import javax.ws.rs.Path;
 
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
 import com.sos.joc.classes.JOCResourceImpl;
 import com.sos.joc.classes.orders.Orders;
 import com.sos.joc.exceptions.JobSchedulerConnectionResetException;
-import com.sos.joc.exceptions.JobSchedulerObjectNotExistException;
-import com.sos.joc.exceptions.JocError;
 import com.sos.joc.exceptions.JocException;
 import com.sos.joc.model.jobChain.JobChainsFilter;
 import com.sos.joc.model.order.OrdersSnapshot;
@@ -28,7 +25,6 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 
 	public JOCDefaultResponse postOrdersOverviewSnapshot(String accessToken, JobChainsFilter jobChainsFilter)
 			throws Exception {
-		String folders = "";
 		try {
 			JOCDefaultResponse jocDefaultResponse = init(API_CALL, jobChainsFilter, accessToken,
 					jobChainsFilter.getJobschedulerId(),
@@ -38,19 +34,9 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 				return jocDefaultResponse;
 			}
 
-			if (jobChainsFilter.getFolders().size() == 0
-					&& jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
-						.size(); i++) {
-					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
-							.get(i);
-					folders = folders + folder.getFolder() + ",";
-					com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
-					f.setFolder(folder.getFolder());
-					f.setRecursive(folder.isRecursive());
-					jobChainsFilter.getFolders().add(f);
-				}
-			}
+            if (jobChainsFilter.getFolders().isEmpty()) {
+                jobChainsFilter.getFolders().addAll(folderPermissions.getListOfFolders());
+            }
 
 			OrdersSnapshot entity = Orders.getSnapshot(new JOCJsonCommand(this), accessToken, jobChainsFilter);
 
@@ -59,12 +45,6 @@ public class OrdersResourceOverviewSnapshotImpl extends JOCResourceImpl implemen
 		} catch (JobSchedulerConnectionResetException e) {
 			e.addErrorMetaInfo(getJocError());
 			return JOCDefaultResponse.responseStatus434JSError(e);
-		} catch (JobSchedulerObjectNotExistException e) {
-			JocError err = new JocError();
-			err.setMessage(String.format("%s: Please check your folders in the Account Management (%s)", e.getMessage(),
-					folders));
-			JocException ee = new JocException(err);
-			return JOCDefaultResponse.responseStatusJSError(ee);
 		} catch (JocException e) {
 			e.addErrorMetaInfo(getJocError());
 			return JOCDefaultResponse.responseStatusJSError(e);

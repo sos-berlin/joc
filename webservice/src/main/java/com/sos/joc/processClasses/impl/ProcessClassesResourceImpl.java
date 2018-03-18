@@ -70,7 +70,6 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 					tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()),
 							new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
 				}
-				entity.setProcessClasses(listProcessClasses);
 			} else if (folders != null && !folders.isEmpty()) {
 				for (Folder folder : folders) {
 					folder.setFolder(normalizeFolder(folder.getFolder()));
@@ -85,7 +84,7 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 				ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder,
 						processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(), command, accessToken,
 						jobViewStatusEnabled);
-				entity.setProcessClasses(callable.getProcessClasses());
+                listProcessClasses = callable.getProcessClasses();
 			}
 			if (tasks.size() > 0) {
 				ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
@@ -104,9 +103,10 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 				} finally {
 					executorService.shutdown();
 				}
-				entity.setProcessClasses(listProcessClasses);
 			}
 
+            listProcessClasses = addAllPermittedJobs(listProcessClasses);
+            entity.setProcessClasses(listProcessClasses);
 			entity.setDeliveryDate(Date.from(Instant.now()));
 			return JOCDefaultResponse.responseStatus200(entity);
 
@@ -120,4 +120,22 @@ public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProc
 			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
 		}
 	}
+
+    private List<ProcessClassV> addAllPermittedJobs(List<ProcessClassV> processClassesToAdd) {
+        if (folderPermissions == null) {
+            return processClassesToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return processClassesToAdd;
+        }
+        List<ProcessClassV> listOfProcessClasses = new ArrayList<ProcessClassV>();
+        for (ProcessClassV processClass : processClassesToAdd) {
+            if (processClass != null && canAdd(processClass.getPath(), folders)) {
+                listOfProcessClasses.add(processClass);
+            }
+        }
+        return listOfProcessClasses;
+    }
+
 }
