@@ -17,41 +17,41 @@ import com.sos.joc.model.commands.JobschedulerCommands;
 @Path("jobscheduler")
 public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements IJobSchedulerResourceCommand {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceCommandImpl.class);
-	private static final String API_CALL_COMMAND = "./jobscheduler/commands";
+    private static final Logger LOGGER = LoggerFactory.getLogger(JobSchedulerResourceCommandImpl.class);
+    private static final String API_CALL_COMMAND = "./jobscheduler/commands";
 
-	@Override
-	public JOCDefaultResponse postJobschedulerCommands(String xAccessToken, String accessToken,
-			JobschedulerCommands jobSchedulerCommands) throws Exception {
-		return postJobschedulerCommands(getAccessToken(xAccessToken, accessToken), jobSchedulerCommands);
-	}
+    @Override
+    public JOCDefaultResponse postJobschedulerCommands(String xAccessToken, String accessToken, JobschedulerCommands jobSchedulerCommands)
+            throws Exception {
+        return postJobschedulerCommands(getAccessToken(xAccessToken, accessToken), jobSchedulerCommands);
+    }
 
-	public JOCDefaultResponse postJobschedulerCommands(String accessToken, JobschedulerCommands jobSchedulerCommands)
-			throws Exception {
+    public JOCDefaultResponse postJobschedulerCommands(String accessToken, JobschedulerCommands jobSchedulerCommands) throws Exception {
 
-		try {
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL_COMMAND, jobSchedulerCommands, accessToken,
-					jobSchedulerCommands.getJobschedulerId(), true);
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
+        try {
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL_COMMAND, jobSchedulerCommands, accessToken, jobSchedulerCommands
+                    .getJobschedulerId(), true);
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
-			checkRequiredParameter("jobschedulerId", jobSchedulerCommands.getJobschedulerId());
-			checkRequiredComment(jobSchedulerCommands.getComment());
-			if (jobSchedulerCommands.getUrl() == null || jobSchedulerCommands.getUrl().isEmpty()) {
-				jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
-			}
+            checkRequiredParameter("jobschedulerId", jobSchedulerCommands.getJobschedulerId());
+            checkRequiredComment(jobSchedulerCommands.getComment());
+            if (jobSchedulerCommands.getUrl() == null || jobSchedulerCommands.getUrl().isEmpty()) {
+                jobSchedulerCommands.setUrl(dbItemInventoryInstance.getUrl());
+            }
 
-			JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jobSchedulerCommands.getUrl());
-			jocXmlCommand.setBasicAuthorization(getBasicAuthorization());
+            JOCXmlCommand jocXmlCommand = new JOCXmlCommand(jobSchedulerCommands.getUrl());
+            jocXmlCommand.setBasicAuthorization(getBasicAuthorization());
 
-			JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
+            JobSchedulerCommandFactory jobSchedulerCommandFactory = new JobSchedulerCommandFactory();
 
-			String xml = "";
+            String xml = "";
             for (Object jobschedulerCommand : jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask()) {
 
-				xml = xml + jobSchedulerCommandFactory.getXml(jobschedulerCommand);
-                if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(accessToken), folderPermissions)) {
+                xml = xml + jobSchedulerCommandFactory.getXml(jobschedulerCommand);
+                if (!jobSchedulerCommandFactory.isPermitted(getPermissonsCommands(jobSchedulerCommands.getJobschedulerId(), accessToken),
+                        folderPermissions)) {
                     if (jobSchedulerCommands.getAddOrderOrCheckFoldersOrKillTask().size() == 1) {
                         return accessDeniedResponse();
                     } else {
@@ -59,27 +59,27 @@ public class JobSchedulerResourceCommandImpl extends JOCResourceImpl implements 
                     }
                 }
 
-			}
-			if (!xml.startsWith("<params.get") && !xml.contains("param.get")) {
-				xml = "<commands>" + xml + "</commands>";
-			}
+            }
+            if (!xml.startsWith("<params.get") && !xml.contains("param.get")) {
+                xml = "<commands>" + xml + "</commands>";
+            }
 
-			JobSchedulerCommandAudit jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
-			logAuditMessage(jobschedulerAudit);
-			// String answer = jocXmlCommand.executePostWithThrowBadRequest(xml,
-			// getAccessToken());
-			String answer = jocXmlCommand.executePost(xml, getAccessToken());
-			storeAuditLogEntry(jobschedulerAudit);
+            JobSchedulerCommandAudit jobschedulerAudit = new JobSchedulerCommandAudit(xml, jobSchedulerCommands);
+            logAuditMessage(jobschedulerAudit);
+            // String answer = jocXmlCommand.executePostWithThrowBadRequest(xml,
+            // getAccessToken());
+            String answer = jocXmlCommand.executePost(xml, getAccessToken());
+            storeAuditLogEntry(jobschedulerAudit);
 
-			return JOCDefaultResponse.responseStatus200(answer, "application/xml");
-		} catch (JocException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatusJSError(e);
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		} finally {
-		}
+            return JOCDefaultResponse.responseStatus200(answer, "application/xml");
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        } finally {
+        }
 
-	}
+    }
 
 }

@@ -3,7 +3,9 @@ package com.sos.joc.plan.impl;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -149,17 +151,12 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 			for (PlanStateText state : planFilter.getStates()) {
 				dailyPlanDBLayer.getFilter().addState(state.name());
 			}
-
+			
+			dailyPlanDBLayer.getFilter().setListOfFolders(folderPermissions.getListOfFolders());
 			if (planFilter.getFolders().size() > 0) {
-				for (com.sos.joc.model.common.Folder folder : planFilter.getFolders()) {
-					dailyPlanDBLayer.getFilter().addFolderPath(folder.getFolder(), folder.getRecursive());
-				}
-			}
-
-            for (Folder folder : folderPermissions.getListOfFolders()) {
-                dailyPlanDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
+			    dailyPlanDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(planFilter.getFolders()));
             }
-
+            
 			Matcher regExMatcher = null;
 			if (planFilter.getRegex() != null && !planFilter.getRegex().isEmpty()) {
 				regExMatcher = Pattern.compile(planFilter.getRegex()).matcher("");
@@ -179,30 +176,28 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
 			for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfWaitingDailyPlanStandaloneDBItems) {
 
-				boolean add = true;
 				PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
 				p.setStartMode(dailyPlanDBItem.getStartMode());
 
 				if (regExMatcher != null) {
 					regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
-					add = regExMatcher.find();
+					if (!regExMatcher.find()) {
+					   continue; 
+					}
 				}
 				p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
-
 				if (dailyPlanDBItem.getDbItemReportTask() != null) {
 					p.setStartTime(dailyPlanDBItem.getDbItemReportTask().getStartTime());
 					p.setEndTime(dailyPlanDBItem.getDbItemReportTask().getEndTime());
 					p.setHistoryId(dailyPlanDBItem.getDbItemReportTask().getHistoryIdAsString());
 				}
 
-				if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() == null) {
+				if (dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() == null) {
 					result.add(p);
 				}
 			}
 
 			for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfWaitingDailyPlanOrderDBItems) {
-
-				boolean add = true;
 
 				PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
 				p.setStartMode(dailyPlanDBItem.getStartMode());
@@ -210,19 +205,20 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 				if (regExMatcher != null) {
 					regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + ","
 							+ dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
-					add = regExMatcher.find();
+					if (!regExMatcher.find()) {
+	                    continue; 
+	                }
 				}
 				p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
 				p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
 
-				if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() == null) {
+				if (dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() == null) {
 					result.add(p);
 				}
 			}
 
 			for (DailyPlanWithReportExecutionDBItem dailyPlanDBItem : listOfDailyPlanStandaloneDBItems) {
 
-				boolean add = true;
 				PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
 				p.setStartMode(dailyPlanDBItem.getStartMode());
 
@@ -230,7 +226,9 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 
 				if (regExMatcher != null) {
 					regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJob());
-					add = regExMatcher.find();
+					if (!regExMatcher.find()) {
+                        continue; 
+                    }
 				}
 				p.setJob(dailyPlanDBItem.getDailyPlanDbItem().getJobOrNull());
 
@@ -243,14 +241,12 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 					err.setMessage(dailyPlanDBItem.getDbItemReportTask().getErrorText());
 					p.setError(err);
 				}
-				if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() != null) {
+				if (dailyPlanDBItem.getDailyPlanDbItem().getReportExecutionId() != null) {
 					result.add(p);
 				}
 			}
 
 			for (DailyPlanWithReportTriggerDBItem dailyPlanDBItem : listOfDailyPlanOrderDBItems) {
-
-				boolean add = true;
 
 				PlanItem p = createPlanItem(dailyPlanDBItem.getDailyPlanDbItem());
 
@@ -259,7 +255,9 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 				if (regExMatcher != null) {
 					regExMatcher.reset(dailyPlanDBItem.getDailyPlanDbItem().getJobChain() + ","
 							+ dailyPlanDBItem.getDailyPlanDbItem().getOrderId());
-					add = regExMatcher.find();
+					if (!regExMatcher.find()) {
+                        continue; 
+                    }
 				}
 				p.setJobChain(dailyPlanDBItem.getDailyPlanDbItem().getJobChainOrNull());
 				p.setOrderId(dailyPlanDBItem.getDailyPlanDbItem().getOrderIdOrNull());
@@ -272,7 +270,7 @@ public class PlanImpl extends JOCResourceImpl implements IPlanResource {
 					p.setOrderId(dailyPlanDBItem.getDbItemReportTrigger().getName());
 				}
 
-				if (add && dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() != null) {
+				if (dailyPlanDBItem.getDailyPlanDbItem().getReportTriggerId() != null) {
 					result.add(p);
 				}
 			}

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,7 +15,6 @@ import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 
 import com.sos.hibernate.classes.SOSHibernateSession;
-import com.sos.jitl.reporting.db.filter.FilterFolder;
 import com.sos.joc.Globals;
 import com.sos.joc.classes.JOCDefaultResponse;
 import com.sos.joc.classes.JOCJsonCommand;
@@ -58,19 +58,6 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
 			List<Folder> folders = addPermittedFolder(ordersBody.getFolders());
 
 			List<OrdersVCallable> tasks = new ArrayList<OrdersVCallable>();
-
-			if (ordersBody.getFolders().size() == 0
-					&& jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions().size() > 0) {
-				for (int i = 0; i < jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
-						.size(); i++) {
-					FilterFolder folder = jobschedulerUser.getSosShiroCurrentUser().getSosShiroFolderPermissions()
-							.get(i);
-					com.sos.joc.model.common.Folder f = new com.sos.joc.model.common.Folder();
-					f.setFolder(folder.getFolder());
-					f.setRecursive(folder.isRecursive());
-					folders.add(f);
-				}
-			}
 
 			connection = Globals.createSosHibernateStatelessConnection(API_CALL);
 			InventoryJobsDBLayer jobDbLayer = new InventoryJobsDBLayer(connection);
@@ -142,7 +129,7 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
 			}
 
 			OrdersV entity = new OrdersV();
-			entity.setOrders(new ArrayList<OrderV>(listOrders.values()));
+			entity.setOrders(addAllPermittedOrders(new ArrayList<OrderV>(listOrders.values())));
 			entity.setDeliveryDate(Date.from(Instant.now()));
 
 			return JOCDefaultResponse.responseStatus200(entity);
@@ -155,4 +142,21 @@ public class YadeOrdersResourceImpl extends JOCResourceImpl implements IYadeOrde
 			Globals.disconnect(connection);
 		}
 	}
+	
+	private List<OrderV> addAllPermittedOrders(List<OrderV> ordersToAdd) {
+        if (folderPermissions == null || ordersToAdd == null) {
+            return ordersToAdd;
+        }
+        Set<Folder> folders = folderPermissions.getListOfFolders();
+        if (folders.isEmpty()) {
+            return ordersToAdd;
+        }
+        List<OrderV> listOfOrders = new ArrayList<OrderV>();
+        for (OrderV order : ordersToAdd) {
+            if (order != null && canAdd(order.getPath(), folders)) {
+                listOfOrders.add(order);
+            }
+        }
+        return listOfOrders;
+    }
 }

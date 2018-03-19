@@ -1,6 +1,7 @@
 package com.sos.joc.orders.impl;
 
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.ws.rs.Path;
 
@@ -66,10 +67,11 @@ public class OrdersResourceOverviewSummaryImpl extends JOCResourceImpl implement
 				}
 			}
 
-            for (Folder folder : folderPermissions.getListOfFolders()) {
-                reportTriggerDBLayer.getFilter().addFolderPath(normalizeFolder(folder.getFolder()), folder.getRecursive());
+			reportTriggerDBLayer.getFilter().setListOfFolders(folderPermissions.getListOfFolders());
+            if (ordersFilter.getFolders().size() > 0) {
+			    reportTriggerDBLayer.getFilter().addFolderPaths(new HashSet<Folder>(ordersFilter.getFolders()));
             }
-
+			
 			OrdersOverView entity = new OrdersOverView();
 			entity.setDeliveryDate(new Date());
 			entity.setSurveyDate(new Date());

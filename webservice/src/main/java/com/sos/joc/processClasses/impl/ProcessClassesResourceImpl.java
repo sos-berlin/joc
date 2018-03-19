@@ -30,96 +30,90 @@ import com.sos.joc.processClasses.resource.IProcessClassesResource;
 @Path("process_classes")
 public class ProcessClassesResourceImpl extends JOCResourceImpl implements IProcessClassesResource {
 
-	private static final String API_CALL = "./process_classes";
+    private static final String API_CALL = "./process_classes";
 
-	@Override
-	public JOCDefaultResponse postProcessClasses(String xAccessToken, String accessToken,
-			ProcessClassesFilter processClassFilter) throws Exception {
-		return postProcessClasses(getAccessToken(xAccessToken, accessToken), processClassFilter);
-	}
+    @Override
+    public JOCDefaultResponse postProcessClasses(String xAccessToken, String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+        return postProcessClasses(getAccessToken(xAccessToken, accessToken), processClassFilter);
+    }
 
-	public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter)
-			throws Exception {
-		try {
-			SOSPermissionJocCockpit perms = getPermissonsJocCockpit(processClassFilter.getJobschedulerId(),
-					accessToken);
-			JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken,
-					processClassFilter.getJobschedulerId(), perms.getProcessClass().getView().isStatus());
-			if (jocDefaultResponse != null) {
-				return jocDefaultResponse;
-			}
+    public JOCDefaultResponse postProcessClasses(String accessToken, ProcessClassesFilter processClassFilter) throws Exception {
+        try {
+            SOSPermissionJocCockpit perms = getPermissonsJocCockpit(processClassFilter.getJobschedulerId(), accessToken);
+            JOCDefaultResponse jocDefaultResponse = init(API_CALL, processClassFilter, accessToken, processClassFilter.getJobschedulerId(), perms
+                    .getProcessClass().getView().isStatus());
+            if (jocDefaultResponse != null) {
+                return jocDefaultResponse;
+            }
 
-			boolean jobViewStatusEnabled = perms.getJob().getView().isStatus();
+            boolean jobViewStatusEnabled = perms.getJob().getView().isStatus();
 
-			JOCJsonCommand command = new JOCJsonCommand(this);
-			command.setUriBuilderForProcessClasses();
-			// always false otherwise no processes info
-			// command.addProcessClassCompactQuery(jobSchedulerAgentClustersBody.getCompact());
-			command.addProcessClassCompactQuery(false);
+            JOCJsonCommand command = new JOCJsonCommand(this);
+            command.setUriBuilderForProcessClasses();
+            // always false otherwise no processes info
+            // command.addProcessClassCompactQuery(jobSchedulerAgentClustersBody.getCompact());
+            command.addProcessClassCompactQuery(false);
 
-			List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
-			Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(
-					processClassFilter.getProcessClasses());
-			List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
+            List<ProcessClassesVCallable> tasks = new ArrayList<ProcessClassesVCallable>();
+            Set<ProcessClassPath> processClasses = new HashSet<ProcessClassPath>(processClassFilter.getProcessClasses());
+            List<Folder> folders = addPermittedFolder(processClassFilter.getFolders());
 
-			List<ProcessClassV> listProcessClasses = new ArrayList<ProcessClassV>();
-			ProcessClassesV entity = new ProcessClassesV();
-			if (processClasses != null && !processClasses.isEmpty()) {
-				for (ProcessClassPath processClass : processClasses) {
-					checkRequiredParameter("processClass", processClass.getProcessClass());
-					tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()),
-							new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
-				}
-			} else if (folders != null && !folders.isEmpty()) {
-				for (Folder folder : folders) {
-					folder.setFolder(normalizeFolder(folder.getFolder()));
-					tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(),
-							processClassFilter.getIsAgentCluster(), new JOCJsonCommand(command), accessToken,
-							jobViewStatusEnabled));
-				}
-			} else {
-				Folder rootFolder = new Folder();
-				rootFolder.setFolder("/");
-				rootFolder.setRecursive(true);
-				ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder,
-						processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(), command, accessToken,
-						jobViewStatusEnabled);
+            List<ProcessClassV> listProcessClasses = new ArrayList<ProcessClassV>();
+            ProcessClassesV entity = new ProcessClassesV();
+            if (processClasses != null && !processClasses.isEmpty()) {
+                for (ProcessClassPath processClass : processClasses) {
+                    checkRequiredParameter("processClass", processClass.getProcessClass());
+                    tasks.add(new ProcessClassesVCallable(normalizePath(processClass.getProcessClass()), new JOCJsonCommand(command), accessToken,
+                            jobViewStatusEnabled));
+                }
+            } else if (folders != null && !folders.isEmpty()) {
+                for (Folder folder : folders) {
+                    folder.setFolder(normalizeFolder(folder.getFolder()));
+                    tasks.add(new ProcessClassesVCallable(folder, processClassFilter.getRegex(), processClassFilter.getIsAgentCluster(),
+                            new JOCJsonCommand(command), accessToken, jobViewStatusEnabled));
+                }
+            } else {
+                Folder rootFolder = new Folder();
+                rootFolder.setFolder("/");
+                rootFolder.setRecursive(true);
+                ProcessClassesVCallable callable = new ProcessClassesVCallable(rootFolder, processClassFilter.getRegex(), processClassFilter
+                        .getIsAgentCluster(), command, accessToken, jobViewStatusEnabled);
                 listProcessClasses = callable.getProcessClasses();
-			}
-			if (tasks.size() > 0) {
-				ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
-				try {
-					for (Future<List<ProcessClassV>> result : executorService.invokeAll(tasks)) {
-						try {
-							listProcessClasses.addAll(result.get());
-						} catch (ExecutionException e) {
-							if (e.getCause() instanceof JocException) {
-								throw (JocException) e.getCause();
-							} else {
-								throw (Exception) e.getCause();
-							}
-						}
-					}
-				} finally {
-					executorService.shutdown();
-				}
-			}
+            }
+            if (tasks.size() > 0) {
+                ExecutorService executorService = Executors.newFixedThreadPool(Math.min(10, tasks.size()));
+                try {
+                    for (Future<List<ProcessClassV>> result : executorService.invokeAll(tasks)) {
+                        try {
+                            listProcessClasses.addAll(result.get());
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof JocException) {
+                                throw (JocException) e.getCause();
+                            } else {
+                                throw (Exception) e.getCause();
+                            }
+                        }
+                    }
+                } finally {
+                    executorService.shutdown();
+                }
+            }
 
             listProcessClasses = addAllPermittedProcessClasses(listProcessClasses);
             entity.setProcessClasses(listProcessClasses);
-			entity.setDeliveryDate(Date.from(Instant.now()));
-			return JOCDefaultResponse.responseStatus200(entity);
+            entity.setDeliveryDate(Date.from(Instant.now()));
+            return JOCDefaultResponse.responseStatus200(entity);
 
-		} catch (JobSchedulerConnectionResetException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatus434JSError(e);
-		} catch (JocException e) {
-			e.addErrorMetaInfo(getJocError());
-			return JOCDefaultResponse.responseStatusJSError(e);
-		} catch (Exception e) {
-			return JOCDefaultResponse.responseStatusJSError(e, getJocError());
-		}
-	}
+        } catch (JobSchedulerConnectionResetException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatus434JSError(e);
+        } catch (JocException e) {
+            e.addErrorMetaInfo(getJocError());
+            return JOCDefaultResponse.responseStatusJSError(e);
+        } catch (Exception e) {
+            return JOCDefaultResponse.responseStatusJSError(e, getJocError());
+        }
+    }
 
     private List<ProcessClassV> addAllPermittedProcessClasses(List<ProcessClassV> processClassesToAdd) {
         if (folderPermissions == null || processClassesToAdd == null) {
